@@ -1,0 +1,1044 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// NextAuth.js Models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// Application User Model
+model User {
+  id                 String            @id @default(cuid())
+  name               String?
+  email              String            @unique
+  emailVerified      DateTime?
+  password           String?
+  image              String?
+  username           String?           @unique
+  firstName          String?
+  lastName           String?
+  bio                String?
+  tagline            String?           // Short one-liner
+  skills             String[]          @default([])
+  interests          String[]          @default([])
+  website            String?
+  location           String?
+  timezone           String?           @default("UTC")
+  availabilityStatus String?           @default("AVAILABLE") // AVAILABLE, BUSY, DO_NOT_DISTURB, MENTORING
+  isOnboarded        Boolean           @default(false)
+  points             Int               @default(0)
+  level              Int               @default(1)
+  appRole            AppRole           @default(USER)
+  subscriptionPlan   String?           @default("FREE") // FREE, PROFESSIONAL, PREMIUM
+  subscriptionStatus String?           @default("ACTIVE") // ACTIVE, PAST_DUE, CANCELED, etc.
+  stripeCustomerId   String?           @unique // Stripe customer ID
+  stripeSubscriptionId String?         @unique // Current Stripe subscription ID
+  subscriptionEndsAt DateTime?         // When subscription ends (for canceled subscriptions)
+  resetToken         String?           // Password reset token
+  resetTokenExpiry   DateTime?         // Token expiration time
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  lastActiveAt       DateTime?
+  
+  // NextAuth Relations
+  accounts           Account[]
+  sessions           Session[]
+  
+  // Application Relations
+  mentorAvailability Availability[]
+  comments           Comment[]
+  ownedCommunities   Community[]       @relation("CommunityOwner")
+  conversationsAsParticipant1 Conversation[] @relation("ConversationParticipant1")
+  conversationsAsParticipant2 Conversation[] @relation("ConversationParticipant2")
+  receivedMessages   DirectMessage[]   @relation("MessageReceiver")
+  sentMessages       DirectMessage[]   @relation("MessageSender")
+  memberships        Member[]
+  notifications      Notification[]
+  posts              Post[]
+  reactions          Reaction[]
+  menteeSessions     MentorSession[]   @relation("MenteeSessions")
+  mentorSessions     MentorSession[]   @relation("MentorSessions")
+  achievements       UserAchievement[]
+  channelMessages    ChannelMessage[]
+  channelMembers     ChannelMember[]
+  buddyPartnerships1 BuddyPartnership[] @relation("BuddyUser1")
+  buddyPartnerships2 BuddyPartnership[] @relation("BuddyUser2")
+  buddyCheckIns      BuddyCheckIn[]
+  sessionParticipations SessionParticipation[]
+  sessionFeedbacks   SessionFeedback[]
+  sessionNotes       SessionNote[]
+  membershipSubscriptions MembershipSubscription[]
+  mentorPairs        BuddyPair[]       @relation("MentorPairs")
+  menteePairs        BuddyPair[]       @relation("MenteePairs")
+  usageRecords       UsageRecord[]
+  
+  // Usage tracking (NEW)
+  currentVideoMinutes Int              @default(0) // Current billing cycle
+  currentMemberCount  Int              @default(0) // Total across all communities
+  billingCycleStart   DateTime?
+  billingCycleEnd     DateTime?
+  usageAlertSent      Boolean          @default(false)
+  
+  @@index([email])
+  @@index([username])
+  @@map("users")
+}
+
+model Community {
+  id                String             @id @default(cuid())
+  name              String
+  slug              String             @unique
+  description       String?
+  imageUrl          String?
+  coverImageUrl     String?
+  theme             Json?
+  customDomain      String?            @unique
+  subdomain         String?            @unique
+  // 💰 PAID MEMBERSHIP FIELDS
+  isPaid            Boolean            @default(false)
+  membershipPrice   Float?             // Price in USD
+  membershipInterval String?           @default("month") // "month" or "year"
+  membershipCurrency String?           @default("USD")
+  stripeAccountId   String?            // Creator's Stripe Connect account ID
+  stripeProductId   String?            // Stripe product ID for this community
+  stripePriceId     String?            // Stripe price ID for recurring billing
+
+  // legacy pricing field retained for backwards compatibility
+  pricing           Json?
+  isPrivate         Boolean            @default(false)
+  requireApproval   Boolean            @default(false)
+  settings          Json?
+  metaTitle         String?
+  metaDescription   String?
+  memberCount       Int                @default(0)
+  postCount         Int                @default(0)
+  subscriptionTier  SubscriptionTier?   @default(FREE)
+  
+  // 🎨 PAGE BUILDER FIELDS (NEW)
+  layoutType        CommunityLayoutType @default(MODERN_GRID)
+  primaryColor      String?            @default("#8B5CF6") // Purple
+  secondaryColor    String?            @default("#EC4899") // Pink
+  accentColor       String?            @default("#F59E0B") // Amber
+  fontFamily        String?            @default("Inter")
+  heroTitle         String?
+  heroSubtitle      String?
+  heroCTA           String?
+  heroCTALink       String?
+  aboutSection      String?            @db.Text
+  showStats         Boolean            @default(true)
+  showMembers       Boolean            @default(true)
+  showCourses       Boolean            @default(true)
+  customCSS         String?            @db.Text
+  sectionOrder      String[]           @default([]) // Array of section IDs
+  
+  // 👤 OWNER BIO & CUSTOM CONTENT
+  ownerBio          String?            @db.Text
+  ownerTitle        String?            // e.g., "Founder", "Lead Instructor"
+  ownerLinks        Json?              // Social links, website, etc.
+  customImages      Json?              // Array of custom image URLs with titles/descriptions
+  welcomeMessage    String?            @db.Text
+  
+  // SECTION BUILDER (NEW - replaces Visual Builder)
+  landingLayout     Json?              // Array of SectionInstance objects from Section Builder
+  
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  ownerId           String
+  channels          Channel[]
+  owner             User               @relation("CommunityOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  courses           Course[]
+  members           Member[]
+  posts             Post[]
+  subscriptionPlans SubscriptionPlan[]
+  buddyPartnerships BuddyPartnership[]
+  sections          CommunitySection[] // Drag & drop sections
+  membershipSubscriptions MembershipSubscription[]
+  buddyPairs        BuddyPair[]
+
+  @@index([slug])
+  @@index([ownerId])
+  @@index([customDomain])
+  @@index([subdomain])
+  @@map("communities")
+}
+
+model Member {
+  id          String       @id @default(cuid())
+  role        MemberRole   @default(MEMBER)
+  
+  // 🔐 ENHANCED PERMISSIONS (NEW)
+  customRole  String?      // Custom role name (e.g., "Content Manager", "Lead Instructor")
+  permissions Json?        // Granular permissions object
+  
+  points      Int          @default(0)
+  level       Int          @default(1)
+  status      MemberStatus @default(ACTIVE)
+  joinedAt    DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  userId      String
+  communityId String
+  community   Community    @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, communityId])
+  @@index([userId])
+  @@index([communityId])
+  @@index([role])
+  @@map("members")
+}
+
+model Channel {
+  id          String          @id @default(cuid())
+  name        String
+  slug        String
+  description String?
+  emoji       String?
+  position    Int             @default(0)
+  isPrivate   Boolean         @default(false)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  communityId String
+  community   Community       @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  posts       Post[]
+  messages    ChannelMessage[]
+  members     ChannelMember[]
+
+  @@unique([communityId, slug])
+  @@index([communityId])
+  @@map("channels")
+}
+
+model Post {
+  id          String          @id @default(cuid())
+  title       String?
+  content     String
+  contentType PostContentType @default(DISCUSSION)
+  attachments Json?
+  viewCount   Int             @default(0)
+  isPinned    Boolean         @default(false)
+  isLocked    Boolean         @default(false)
+  isPublished Boolean         @default(true)
+  publishedAt DateTime?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  authorId    String
+  communityId String
+  channelId   String?
+  comments    Comment[]
+  author      User            @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  channel     Channel?        @relation(fields: [channelId], references: [id])
+  community   Community       @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  reactions   Reaction[]
+
+  @@index([authorId])
+  @@index([communityId])
+  @@index([channelId])
+  @@index([createdAt])
+  @@index([isPinned])
+  @@map("posts")
+}
+
+model Comment {
+  id        String     @id @default(cuid())
+  content   String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  authorId  String
+  postId    String
+  parentId  String?
+  author    User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parent    Comment?   @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[]  @relation("CommentReplies")
+  post      Post       @relation(fields: [postId], references: [id], onDelete: Cascade)
+  reactions Reaction[]
+
+  @@index([authorId])
+  @@index([postId])
+  @@index([parentId])
+  @@index([createdAt])
+  @@map("comments")
+}
+
+model Reaction {
+  id        String       @id @default(cuid())
+  type      ReactionType
+  createdAt DateTime     @default(now())
+  userId    String
+  postId    String?
+  commentId String?
+  comment   Comment?     @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  post      Post?        @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId, type])
+  @@unique([userId, commentId, type])
+  @@index([userId])
+  @@index([postId])
+  @@index([commentId])
+  @@map("reactions")
+}
+
+model DirectMessage {
+  id             String        @id @default(cuid())
+  content        String
+  attachments    Json?
+  isRead         Boolean       @default(false)
+  readAt         DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  senderId       String
+  receiverId     String
+  conversationId String?
+  conversation   Conversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  receiver       User          @relation("MessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  sender         User          @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([conversationId])
+  @@index([createdAt])
+  @@map("direct_messages")
+}
+
+model Conversation {
+  id               String          @id @default(cuid())
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  lastMessageAt    DateTime        @default(now())
+  participant1Id   String
+  participant2Id   String
+  isBlocked        Boolean         @default(false)
+  blockedBy        String?
+  participant1     User            @relation("ConversationParticipant1", fields: [participant1Id], references: [id], onDelete: Cascade)
+  participant2     User            @relation("ConversationParticipant2", fields: [participant2Id], references: [id], onDelete: Cascade)
+  messages         DirectMessage[]
+
+  @@unique([participant1Id, participant2Id])
+  @@index([participant1Id])
+  @@index([participant2Id])
+  @@index([lastMessageAt])
+  @@map("conversations")
+}
+
+model MentorSession {
+  id            String        @id @default(cuid())
+  title         String
+  description   String?
+  scheduledAt   DateTime
+  duration      Int
+  timezone      String
+  meetingUrl    String?
+  roomId        String?
+  recordingUrl  String?
+  videoRoomName String?       // LiveKit room name (e.g., "session-cm123456")
+  whiteboardData String?      @db.Text // Excalidraw whiteboard state (JSON)
+  status        SessionStatus @default(SCHEDULED)
+  mentorNotes   String?
+  menteeNotes   String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  startedAt     DateTime?
+  endedAt       DateTime?
+  mentorId      String
+  menteeId      String
+  mentee        User          @relation("MenteeSessions", fields: [menteeId], references: [id], onDelete: Cascade)
+  mentor        User          @relation("MentorSessions", fields: [mentorId], references: [id], onDelete: Cascade)
+  participations SessionParticipation[]
+  feedbacks     SessionFeedback[]
+  recording     SessionRecording?
+  notes         SessionNote[]
+
+  @@index([mentorId])
+  @@index([menteeId])
+  @@index([scheduledAt])
+  @@index([status])
+  @@map("mentor_sessions")
+}
+
+model Availability {
+  id        String   @id @default(cuid())
+  dayOfWeek Int
+  startTime String
+  endTime   String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("availabilities")
+}
+
+model Course {
+  id              String       @id @default(cuid())
+  title           String
+  slug            String
+  description     String?
+  imageUrl        String?
+  isPaid          Boolean      @default(false)
+  price           Float?
+  currency        String?      @default("USD")
+  isPublished     Boolean      @default(false)
+  publishedAt     DateTime?
+  enrollmentCount Int          @default(0)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  communityId     String
+  community       Community    @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  enrollments     Enrollment[]
+  modules         Module[]
+
+  @@unique([communityId, slug])
+  @@index([communityId])
+  @@map("courses")
+}
+
+model Module {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  position    Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  courseId    String
+  lessons     Lesson[]
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@index([courseId])
+  @@index([position])
+  @@map("modules")
+}
+
+model Lesson {
+  id          String            @id @default(cuid())
+  title       String
+  content     String
+  contentType LessonContentType @default(TEXT)
+  videoUrl    String?
+  duration    Int?
+  position    Int
+  isPublished Boolean           @default(false)
+  isFree      Boolean           @default(false)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  moduleId    String
+  progress    LessonProgress[]
+  module      Module            @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@index([moduleId])
+  @@index([position])
+  @@map("lessons")
+}
+
+model Enrollment {
+  id             String           @id @default(cuid())
+  progress       Float            @default(0)
+  completedAt    DateTime?
+  enrolledAt     DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  userId         String
+  courseId       String
+  course         Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessonProgress LessonProgress[]
+
+  @@unique([userId, courseId])
+  @@index([userId])
+  @@index([courseId])
+  @@map("enrollments")
+}
+
+model LessonProgress {
+  id           String     @id @default(cuid())
+  isCompleted  Boolean    @default(false)
+  completedAt  DateTime?
+  timeSpent    Int        @default(0)
+  startedAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  enrollmentId String
+  lessonId     String
+  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  lesson       Lesson     @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([enrollmentId, lessonId])
+  @@index([enrollmentId])
+  @@index([lessonId])
+  @@map("lesson_progress")
+}
+
+model SubscriptionPlan {
+  id            String          @id @default(cuid())
+  name          String
+  description   String?
+  price         Float
+  currency      String          @default("USD")
+  interval      BillingInterval @default(MONTHLY)
+  stripePriceId String?
+  features      Json?
+  isActive      Boolean         @default(true)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  communityId   String
+  community     Community       @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  subscriptions Subscription[]
+
+  @@index([communityId])
+  @@map("subscription_plans")
+}
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  stripeSubscriptionId String?            @unique
+  stripeCustomerId     String?
+  status               SubscriptionStatus @default(ACTIVE)
+  currentPeriodStart   DateTime
+  currentPeriodEnd     DateTime
+  cancelAtPeriodEnd    Boolean            @default(false)
+  canceledAt           DateTime?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  userId               String
+  planId               String
+  plan                 SubscriptionPlan   @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([planId])
+  @@index([status])
+  @@map("subscriptions")
+}
+
+model MembershipSubscription {
+  id                   String   @id @default(cuid())
+  userId               String
+  communityId          String
+  
+  // Stripe fields
+  stripeSubscriptionId String   @unique
+  stripeCustomerId     String
+  stripePriceId        String
+  
+  // Subscription info
+  status               String   @default("active") // active, canceled, past_due
+  currentPeriodStart   DateTime
+  currentPeriodEnd     DateTime
+  cancelAtPeriodEnd    Boolean  @default(false)
+  canceledAt           DateTime?
+  
+  // Metadata
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  community    Community   @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  @@unique([userId, communityId])
+  @@index([userId])
+  @@index([communityId])
+  @@index([stripeSubscriptionId])
+  @@index([status])
+  @@map("membership_subscriptions")
+}
+
+model Achievement {
+  id               String            @id @default(cuid())
+  name             String
+  description      String?
+  icon             String?
+  points           Int               @default(0)
+  criteria         Json
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  userAchievements UserAchievement[]
+
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id            String      @id @default(cuid())
+  unlockedAt    DateTime    @default(now())
+  userId        String
+  achievementId String
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+  @@index([userId])
+  @@index([achievementId])
+  @@map("user_achievements")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  type      NotificationType
+  title     String
+  message   String
+  data      Json?
+  isRead    Boolean          @default(false)
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+model ChannelMessage {
+  id          String    @id @default(cuid())
+  content     String
+  attachments Json?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  authorId    String
+  channelId   String
+  author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  channel     Channel   @relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+  @@index([authorId])
+  @@index([channelId])
+  @@index([createdAt])
+  @@map("channel_messages")
+}
+
+model ChannelMember {
+  id            String    @id @default(cuid())
+  isOnline      Boolean   @default(false)
+  isTyping      Boolean   @default(false)
+  lastSeenAt    DateTime  @default(now())
+  lastTypingAt  DateTime?
+  joinedAt      DateTime  @default(now())
+  userId        String
+  channelId     String
+  channel       Channel   @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, channelId])
+  @@index([userId])
+  @@index([channelId])
+  @@index([isOnline])
+  @@map("channel_members")
+}
+
+model BuddyPartnership {
+  id          String   @id @default(cuid())
+  user1Id     String
+  user2Id     String
+  communityId String
+  status      BuddyStatus @default(ACTIVE)
+  matchedAt   DateTime @default(now())
+  endedAt     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user1     User      @relation("BuddyUser1", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2     User      @relation("BuddyUser2", fields: [user2Id], references: [id], onDelete: Cascade)
+  community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  checkIns  BuddyCheckIn[]
+  goals     BuddyGoal[]
+
+  @@unique([user1Id, user2Id, communityId])
+  @@index([user1Id])
+  @@index([user2Id])
+  @@index([communityId])
+  @@map("buddy_partnerships")
+}
+
+model BuddyCheckIn {
+  id            String   @id @default(cuid())
+  partnershipId String
+  userId        String
+  mood          Int      @default(5) // 1-10 scale
+  notes         String?
+  completedGoals String[] // Array of goal IDs
+  createdAt     DateTime @default(now())
+
+  partnership BuddyPartnership @relation(fields: [partnershipId], references: [id], onDelete: Cascade)
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([partnershipId])
+  @@index([userId])
+  @@map("buddy_check_ins")
+}
+
+model BuddyGoal {
+  id            String   @id @default(cuid())
+  partnershipId String
+  title         String
+  description   String?
+  targetDate    DateTime?
+  completed     Boolean  @default(false)
+  completedAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  partnership BuddyPartnership @relation(fields: [partnershipId], references: [id], onDelete: Cascade)
+
+  @@index([partnershipId])
+  @@map("buddy_goals")
+}
+
+model CommunitySection {
+  id          String               @id @default(cuid())
+  type        CommunitySectionType
+  title       String?
+  content     Json?                // Flexible content storage
+  position    Int                  @default(0)
+  isVisible   Boolean              @default(true)
+  settings    Json?                // Section-specific settings
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  communityId String
+  community   Community            @relation(fields: [communityId], references: [id], onDelete: Cascade)
+
+  @@index([communityId])
+  @@index([position])
+  @@map("community_sections")
+}
+
+model SessionParticipation {
+  id            String   @id @default(cuid())
+  sessionId     String
+  userId        String
+  joinedAt      DateTime @default(now())
+  leftAt        DateTime?
+  pointsEarned  Int      @default(0)
+  eventsData    Json?    // Track specific events: questions_asked, answers_given, etc.
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  session MentorSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user    User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, userId])
+  @@index([sessionId])
+  @@index([userId])
+  @@index([joinedAt])
+  @@map("session_participations")
+}
+
+model SessionFeedback {
+  id          String   @id @default(cuid())
+  sessionId   String
+  userId      String
+  rating      Int      // 1-5 stars
+  comment     String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  session MentorSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user    User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, userId])
+  @@index([sessionId])
+  @@index([userId])
+  @@index([rating])
+  @@map("session_feedback")
+}
+
+model SessionRecording {
+  id              String   @id @default(cuid())
+  sessionId       String   @unique
+  recordingUrl    String   // S3/R2 URL of the video file
+  thumbnailUrl    String?  // Video thumbnail
+  duration        Int?     // Duration in seconds
+  fileSize        Int?     // File size in bytes
+  status          RecordingStatus @default(PROCESSING)
+  startedAt       DateTime?
+  completedAt     DateTime?
+  
+  // LiveKit Egress info
+  egressId        String?  // LiveKit egress ID
+  roomId          String?  // LiveKit room ID
+  
+  // Processing metadata
+  processingError String?  @db.Text
+  retryCount      Int      @default(0)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  session       MentorSession        @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  transcription SessionTranscription?
+
+  @@index([sessionId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("session_recordings")
+}
+
+model SessionTranscription {
+  id            String   @id @default(cuid())
+  recordingId   String   @unique
+  fullText      String   @db.Text // Full transcription text
+  segments      Json     // Array of timestamped segments with speaker info
+  
+  // AI Processing
+  summary       String?  @db.Text // GPT-4 generated summary
+  keyPoints     String[] @default([]) // Main takeaways
+  actionItems   String[] @default([]) // Action items extracted
+  topics        String[] @default([]) // Topics discussed
+  
+  // Metadata
+  language      String   @default("en")
+  confidence    Float?   // Average confidence score
+  wordCount     Int?
+  
+  // Processing status
+  status        TranscriptionStatus @default(PROCESSING)
+  processingError String? @db.Text
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  recording SessionRecording @relation(fields: [recordingId], references: [id], onDelete: Cascade)
+
+  @@index([recordingId])
+  @@index([status])
+  @@map("session_transcriptions")
+}
+
+model SessionNote {
+  id          String   @id @default(cuid())
+  sessionId   String
+  userId      String
+  content     String   @db.Text // Markdown content
+  timestamp   Int?     // Timestamp in video (seconds) if linked
+  isShared    Boolean  @default(false) // Shared with all participants
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  session MentorSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user    User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@index([userId])
+  @@index([timestamp])
+  @@map("session_notes")
+}
+
+enum MemberRole {
+  OWNER
+  ADMIN
+  MODERATOR
+  MENTOR
+  MEMBER
+}
+
+enum MemberStatus {
+  ACTIVE
+  PENDING
+  SUSPENDED
+  BANNED
+}
+
+enum PostContentType {
+  DISCUSSION
+  QUESTION
+  ANNOUNCEMENT
+  RESOURCE
+}
+
+enum SessionStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum LessonContentType {
+  TEXT
+  VIDEO
+  AUDIO
+  QUIZ
+  ASSIGNMENT
+}
+
+enum BillingInterval {
+  MONTHLY
+  YEARLY
+  LIFETIME
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  UNPAID
+  TRIALING
+}
+
+enum ReactionType {
+  LIKE
+  LOVE
+  CELEBRATE
+  FIRE
+  IDEA
+  CLAP
+}
+
+enum NotificationType {
+  COMMENT
+  REACTION
+  MENTION
+  NEW_POST
+  NEW_MEMBER
+  SESSION_REMINDER
+  SESSION_CANCELLED
+  MESSAGE
+  ACHIEVEMENT
+  SYSTEM
+}
+
+enum BuddyStatus {
+  PENDING
+  ACTIVE
+  PAUSED
+  ENDED
+}
+
+enum CommunityLayoutType {
+  MODERN_GRID       // Pinterest-style, visual-first
+  CLASSIC_FORUM     // Traditional forum layout
+  ACADEMY           // Course-focused educational
+  DASHBOARD         // Analytics and data-visible
+  MINIMALIST        // Clean, Notion-like
+}
+
+enum CommunitySectionType {
+  HERO              // Hero banner with CTA
+  ABOUT             // About section with rich text
+  STATS             // Member/post/course statistics
+  FEATURED_POSTS    // Highlighted content
+  FEATURED_COURSES  // Course showcase
+  MEMBER_GRID       // Active members display
+  TESTIMONIALS      // Member testimonials
+  CTA               // Call to action block
+  CUSTOM_HTML       // Custom content block
+  EVENTS            // Upcoming events
+  LEADERBOARD       // Top contributors
+}
+
+enum RecordingStatus {
+  PROCESSING
+  READY
+  ERROR
+}
+
+enum TranscriptionStatus {
+  PROCESSING
+  READY
+  ERROR
+}
+
+enum SubscriptionTier {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
+enum AppRole {
+  SUPER_ADMIN  // Full access to everything
+  ADMIN        // Can manage users and communities
+  MODERATOR    // Can moderate content across platform
+  USER         // Regular user
+}
+
+model UsageRecord {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Usage metrics
+  videoMinutes     Int      @default(0)
+  memberCount      Int      @default(0)
+  storageGB        Float    @default(0)
+  
+  // Costs
+  baseCharge       Float    // Plan base price
+  videoOverage     Float    @default(0)
+  memberOverage    Float    @default(0)
+  storageOverage   Float    @default(0)
+  totalCharge      Float
+  
+  // Period
+  billingPeriodStart DateTime
+  billingPeriodEnd   DateTime
+  
+  // Status
+  status       String   @default("pending") // pending, paid, failed
+  paidAt       DateTime?
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([billingPeriodStart])
+}
+
+model BuddyPair {
+  id          String   @id @default(cuid())
+  communityId String
+  mentor      String   // userId
+  mentee      String   // userId
+  status      String   @default("active") // active, completed, inactive
+  startedAt   DateTime @default(now())
+  endedAt     DateTime?
+  notes       String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  mentorUser  User      @relation("MentorPairs", fields: [mentor], references: [id], onDelete: Cascade)
+  menteeUser  User      @relation("MenteePairs", fields: [mentee], references: [id], onDelete: Cascade)
+
+  @@unique([communityId, mentor, mentee])
+  @@index([communityId])
+  @@index([mentor])
+  @@index([mentee])
+  @@map("buddy_pairs")
+}
