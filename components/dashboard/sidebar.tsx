@@ -17,7 +17,6 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
@@ -39,8 +38,8 @@ export function DashboardSidebar() {
   const userRole = (session?.user as any)?.appRole;
   const isAdmin = userRole === "SUPER_ADMIN" || userRole === "ADMIN" || userRole === "MODERATOR";
 
-  // Get current locale from pathname
-  const currentLocale = pathname?.startsWith('/es') ? 'es' : 'en';
+  // Get current locale - default to 'en' for now
+  const currentLocale = 'en';
 
   return (
     <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-card/50 backdrop-blur-xl">
@@ -111,12 +110,7 @@ export function DashboardSidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="border-t border-border p-4 space-y-3">
-        {/* Language Switcher */}
-        <div className="flex justify-center">
-          <LanguageSwitcher />
-        </div>
-        
+      <div className="border-t border-border p-4">
         <div className="rounded-lg bg-gradient-to-br from-primary/10 to-purple-600/10 p-4">
           <p className="text-sm font-semibold text-foreground">
             Upgrade to Premium

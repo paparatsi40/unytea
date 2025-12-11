@@ -7,7 +7,6 @@ import Link from "next/link"
 import { Chrome, Github, Mail, Lock, ArrowRight, ArrowLeft } from "lucide-react"
 import { toast } from "react-hot-toast"
 import { LogoWithText } from "@/components/brand/Logo"
-import { LanguageSwitcher } from "@/components/LanguageSwitcher"
 
 export default function SignInPage() {
   const router = useRouter()
@@ -62,11 +61,6 @@ export default function SignInPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 flex items-center justify-center p-4">
-      {/* Language Switcher - Top Right */}
-      <div className="fixed top-4 right-4 z-50">
-        <LanguageSwitcher />
-      </div>
-
       {/* Back to Home - Top Left */}
       <div className="fixed top-4 left-4 z-50">
         <Link
