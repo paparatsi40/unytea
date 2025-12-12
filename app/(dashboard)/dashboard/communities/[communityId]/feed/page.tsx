@@ -15,9 +15,18 @@ export default async function CommunityFeedPage({
   }
 
   // Fetch community
-  const community = await prisma.communities.findFirst({
+  const community = await prisma.community.findFirst({
     where: {
       id: params.communityId,
+    },
+    include: {
+      owner: {
+        select: {
+          id: true,
+          name: true,
+          image: true,
+        },
+      },
     },
   });
 
