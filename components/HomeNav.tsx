@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { LayoutDashboard } from "lucide-react";
+import { LayoutDashboard, LogIn } from "lucide-react";
 import { useSession } from "next-auth/react";
 
 interface HomeNavProps {
@@ -9,10 +9,11 @@ interface HomeNavProps {
 }
 
 export function HomeNav({ locale }: HomeNavProps) {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+  const isLoading = status === "loading";
 
   return (
-    <nav className="fixed top-0 w-full z-50 glass-strong border-b">
+    <nav className="fixed top-0 w-full z-50 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-gradient-to-br from-primary to-purple-600 rounded-lg flex items-center justify-center">
@@ -41,7 +42,9 @@ export function HomeNav({ locale }: HomeNavProps) {
           )}
         </div>
         <div className="flex items-center gap-3">
-          {session?.user ? (
+          {isLoading ? (
+            <div className="h-10 w-32 animate-pulse rounded-lg bg-muted" />
+          ) : session?.user ? (
             <Link
               href="/dashboard"
               className="btn-hover-lift px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium shadow-smooth flex items-center gap-2"
