@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
   Home,
@@ -33,15 +33,14 @@ const navigation = [
 export function DashboardSidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
+  const { locale } = useParams();
 
   // Check if user is admin
   const userRole = (session?.user as any)?.appRole;
   const isAdmin = userRole === "SUPER_ADMIN" || userRole === "ADMIN" || userRole === "MODERATOR";
 
   // Get current locale - default to 'en' for now
- import { useParams } from "next/navigation";
- const { locale } = useParams();
- const currentLocale = locale || 'en';
+  const currentLocale = locale || 'en';
 
   return (
     <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-card/50 backdrop-blur-xl">
