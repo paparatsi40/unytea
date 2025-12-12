@@ -39,7 +39,9 @@ export function DashboardSidebar() {
   const isAdmin = userRole === "SUPER_ADMIN" || userRole === "ADMIN" || userRole === "MODERATOR";
 
   // Get current locale - default to 'en' for now
-  const currentLocale = 'en';
+ import { useParams } from "next/navigation";
+ const { locale } = useParams();
+ const currentLocale = locale || 'en';
 
   return (
     <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-card/50 backdrop-blur-xl">
