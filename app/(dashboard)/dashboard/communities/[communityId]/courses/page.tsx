@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import { BookOpen } from "lucide-react";
+import { BookOpen, GraduationCap } from "lucide-react";
 
 export default async function CommunityCoursesPage({
   params,
@@ -14,12 +14,9 @@ export default async function CommunityCoursesPage({
     redirect("/auth/signin");
   }
 
-  const supabase = createClient();
-  const { data: community } = await supabase
-    .from("communities")
-    .select("*")
-    .eq("id", params.communityId)
-    .single();
+  const community = await prisma.community.findUnique({
+    where: { id: params.communityId },
+  });
 
   if (!community) {
     redirect("/dashboard");
@@ -36,16 +33,41 @@ export default async function CommunityCoursesPage({
         </p>
       </div>
 
-      <div className="flex flex-col items-center justify-center py-20 text-center rounded-xl border-2 border-dashed border-border bg-muted/20">
-        <div className="rounded-full bg-primary/10 p-6 mb-6">
-          <BookOpen className="h-12 w-12 text-primary" />
+      <div className="rounded-xl border border-border bg-gradient-to-br from-purple-500/5 to-blue-500/5 p-12 text-center">
+        <div className="mx-auto max-w-2xl">
+          <div className="mb-6 flex justify-center">
+            <div className="rounded-full bg-purple-500/10 p-4">
+              <GraduationCap className="h-12 w-12 text-purple-500" />
+            </div>
+          </div>
+          
+          <h2 className="text-2xl font-bold text-foreground mb-4">
+            Courses Coming Soon
+          </h2>
+          
+          <p className="text-muted-foreground mb-8 text-lg">
+            Create and sell courses exclusive to your community members.
+          </p>
+
+          <div className="grid gap-3 text-left max-w-sm mx-auto">
+            <div className="flex items-center gap-3 text-sm">
+              <div className="h-2 w-2 rounded-full bg-purple-500"></div>
+              <span className="text-foreground">Video lessons & modules</span>
+            </div>
+            <div className="flex items-center gap-3 text-sm">
+              <div className="h-2 w-2 rounded-full bg-purple-500"></div>
+              <span className="text-foreground">Progress tracking</span>
+            </div>
+            <div className="flex items-center gap-3 text-sm">
+              <div className="h-2 w-2 rounded-full bg-purple-500"></div>
+              <span className="text-foreground">Assignments & quizzes</span>
+            </div>
+            <div className="flex items-center gap-3 text-sm">
+              <div className="h-2 w-2 rounded-full bg-purple-500"></div>
+              <span className="text-foreground">Certificates</span>
+            </div>
+          </div>
         </div>
-        <h3 className="text-2xl font-bold text-foreground mb-2">
-          Courses Coming Soon
-        </h3>
-        <p className="text-muted-foreground max-w-md">
-          Create and sell courses exclusive to this community. Modules, lessons, and progress tracking.
-        </p>
       </div>
     </div>
   );

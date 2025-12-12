@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import { Settings } from "lucide-react";
+import { Settings, Wrench } from "lucide-react";
 
 export default async function CommunitySettingsPage({
   params,
@@ -14,12 +14,9 @@ export default async function CommunitySettingsPage({
     redirect("/auth/signin");
   }
 
-  const supabase = createClient();
-  const { data: community } = await supabase
-    .from("communities")
-    .select("*")
-    .eq("id", params.communityId)
-    .single();
+  const community = await prisma.community.findUnique({
+    where: { id: params.communityId },
+  });
 
   if (!community) {
     redirect("/dashboard");
@@ -41,16 +38,45 @@ export default async function CommunitySettingsPage({
         </p>
       </div>
 
-      <div className="flex flex-col items-center justify-center py-20 text-center rounded-xl border-2 border-dashed border-border bg-muted/20">
-        <div className="rounded-full bg-primary/10 p-6 mb-6">
-          <Settings className="h-12 w-12 text-primary" />
+      <div className="rounded-xl border border-border bg-gradient-to-br from-primary/5 to-blue-500/5 p-12 text-center">
+        <div className="mx-auto max-w-2xl">
+          <div className="mb-6 flex justify-center">
+            <div className="rounded-full bg-primary/10 p-4">
+              <Wrench className="h-12 w-12 text-primary" />
+            </div>
+          </div>
+          
+          <h2 className="text-2xl font-bold text-foreground mb-4">
+            Settings Panel Coming Soon
+          </h2>
+          
+          <p className="text-muted-foreground mb-8 text-lg">
+            Advanced settings and customization options for your community.
+          </p>
+
+          <div className="grid gap-3 text-left max-w-sm mx-auto">
+            <div className="flex items-center gap-3 text-sm">
+              <div className="h-2 w-2 rounded-full bg-primary"></div>
+              <span className="text-foreground">Community details</span>
+            </div>
+            <div className="flex items-center gap-3 text-sm">
+              <div className="h-2 w-2 rounded-full bg-primary"></div>
+              <span className="text-foreground">Privacy settings</span>
+            </div>
+            <div className="flex items-center gap-3 text-sm">
+              <div className="h-2 w-2 rounded-full bg-primary"></div>
+              <span className="text-foreground">Branding & customization</span>
+            </div>
+            <div className="flex items-center gap-3 text-sm">
+              <div className="h-2 w-2 rounded-full bg-primary"></div>
+              <span className="text-foreground">Permissions & roles</span>
+            </div>
+            <div className="flex items-center gap-3 text-sm">
+              <div className="h-2 w-2 rounded-full bg-primary"></div>
+              <span className="text-foreground">Integrations</span>
+            </div>
+          </div>
         </div>
-        <h3 className="text-2xl font-bold text-foreground mb-2">
-          Settings Coming Soon
-        </h3>
-        <p className="text-muted-foreground max-w-md">
-          Configure community name, description, privacy settings, branding, and more.
-        </p>
       </div>
     </div>
   );
