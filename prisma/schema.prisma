@@ -197,6 +197,7 @@ model Community {
   sections          CommunitySection[] // Drag & drop sections
   membershipSubscriptions MembershipSubscription[]
   buddyPairs        BuddyPair[]
+  mentorSessions    MentorSession[]    // Community sessions
 
   @@index([slug])
   @@index([ownerId])
@@ -378,6 +379,7 @@ model MentorSession {
   status        SessionStatus @default(SCHEDULED)
   mentorNotes   String?
   menteeNotes   String?
+  communityId   String?       // Optional: sessions can be personal or community-scoped
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
   startedAt     DateTime?
@@ -386,6 +388,7 @@ model MentorSession {
   menteeId      String
   mentee        User          @relation("MenteeSessions", fields: [menteeId], references: [id], onDelete: Cascade)
   mentor        User          @relation("MentorSessions", fields: [mentorId], references: [id], onDelete: Cascade)
+  community     Community?    @relation(fields: [communityId], references: [id], onDelete: SetNull)
   participations SessionParticipation[]
   feedbacks     SessionFeedback[]
   recording     SessionRecording?
@@ -393,6 +396,7 @@ model MentorSession {
 
   @@index([mentorId])
   @@index([menteeId])
+  @@index([communityId])
   @@index([scheduledAt])
   @@index([status])
   @@map("mentor_sessions")
