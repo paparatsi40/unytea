@@ -38,7 +38,7 @@ export default async function CommunityMembersPage({
   const isOwner = community.ownerId === session.user.id;
 
   // Fetch community members using Prisma
-  const members = await prisma.communityMember.findMany({
+  const members = await prisma.member.findMany({
     where: { communityId: params.communityId },
     include: {
       user: {

@@ -24,7 +24,7 @@ export default async function DashboardPage() {
   });
 
   // Fetch communities where user is member
-  const memberCommunities = await prisma.communityMember.findMany({
+  const memberCommunities = await prisma.member.findMany({
     where: { 
       userId: session.user.id,
       community: {

@@ -30,7 +30,7 @@ export default async function CommunityLayout({
 
   // Check if user is member (if not owner)
   if (!isOwner) {
-    const membership = await prisma.communityMember.findFirst({
+    const membership = await prisma.member.findFirst({
       where: {
         communityId: params.communityId,
         userId: session.user.id,

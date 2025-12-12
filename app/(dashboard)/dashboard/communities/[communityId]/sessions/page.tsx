@@ -30,7 +30,7 @@ export default async function CommunitySessionsPage({
   let isMember = false;
 
   if (!isOwner) {
-    const membership = await prisma.communityMember.findFirst({
+    const membership = await prisma.member.findFirst({
       where: {
         communityId: params.communityId,
         userId: session.user.id,
