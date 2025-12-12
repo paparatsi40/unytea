@@ -51,6 +51,7 @@ export async function createSession(data: {
         status: "SCHEDULED",
         mentorId: userId,
         menteeId: userId, // For now, creator is both mentor and mentee
+        communityId: data.communityId, // Add communityId
       },
       include: {
         mentor: {
@@ -64,7 +65,12 @@ export async function createSession(data: {
       },
     });
 
+    // Revalidate both global and community-specific pages
     revalidatePath("/dashboard/sessions");
+    if (data.communityId) {
+      revalidatePath(`/dashboard/communities/${data.communityId}/sessions`);
+    }
+    
     return { success: true, session };
   } catch (error) {
     console.error("Error creating session:", error);

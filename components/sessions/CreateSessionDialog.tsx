@@ -8,9 +8,10 @@ import { useRouter } from "next/navigation";
 
 interface CreateSessionDialogProps {
   triggerText?: string;
+  communityId?: string;
 }
 
-export function CreateSessionDialog({ triggerText = "Create Session" }: CreateSessionDialogProps) {
+export function CreateSessionDialog({ triggerText = "Create Session", communityId }: CreateSessionDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -30,6 +31,7 @@ export function CreateSessionDialog({ triggerText = "Create Session" }: CreateSe
       description,
       scheduledAt,
       duration,
+      communityId, // Pass communityId if provided
     });
 
     if (result.success) {
