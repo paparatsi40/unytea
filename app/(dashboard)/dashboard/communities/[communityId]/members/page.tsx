@@ -1,5 +1,5 @@
 import { auth } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { Users, Crown, Shield, UserPlus, Search } from "lucide-react";
 import Image from "next/image";
@@ -15,14 +15,20 @@ export default async function CommunityMembersPage({
     redirect("/auth/signin");
   }
 
-  const supabase = createClient();
-
-  // Fetch community
-  const { data: community } = await supabase
-    .from("communities")
-    .select("*, owner:users!ownerId(id, name, email, image)")
-    .eq("id", params.communityId)
-    .single();
+  // Fetch community with owner using Prisma
+  const community = await prisma.community.findUnique({
+    where: { id: params.communityId },
+    include: {
+      owner: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+        },
+      },
+    },
+  });
 
   if (!community) {
     redirect("/dashboard");
@@ -31,14 +37,24 @@ export default async function CommunityMembersPage({
   // Check if user is owner or member
   const isOwner = community.ownerId === session.user.id;
 
-  // Fetch community members
-  const { data: members } = await supabase
-    .from("community_members")
-    .select("*, user:users(id, name, email, image, username)")
-    .eq("communityId", params.communityId)
-    .order("joinedAt", { ascending: false });
+  // Fetch community members using Prisma
+  const members = await prisma.communityMember.findMany({
+    where: { communityId: params.communityId },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+          username: true,
+        },
+      },
+    },
+    orderBy: { joinedAt: "desc" },
+  });
 
-  const membersList = members?.map(m => m.user).filter(Boolean) || [];
+  const membersList = members.map(m => m.user).filter(Boolean);
   const totalMembers = membersList.length + 1; // +1 for owner
 
   return (

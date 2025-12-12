@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/prisma";
 import { CommunitySidebar } from "@/components/community/CommunitySidebar";
 
 export default async function CommunityLayout({
@@ -16,16 +16,12 @@ export default async function CommunityLayout({
     redirect("/auth/signin");
   }
 
-  const supabase = createClient();
-
   // Fetch community data
-  const { data: community, error } = await supabase
-    .from("communities")
-    .select("*")
-    .eq("id", params.communityId)
-    .single();
+  const community = await prisma.community.findUnique({
+    where: { id: params.communityId },
+  });
 
-  if (error || !community) {
+  if (!community) {
     redirect("/dashboard");
   }
 
@@ -34,12 +30,12 @@ export default async function CommunityLayout({
 
   // Check if user is member (if not owner)
   if (!isOwner) {
-    const { data: membership } = await supabase
-      .from("community_members")
-      .select("*")
-      .eq("communityId", params.communityId)
-      .eq("userId", session.user.id)
-      .single();
+    const membership = await prisma.communityMember.findFirst({
+      where: {
+        communityId: params.communityId,
+        userId: session.user.id,
+      },
+    });
 
     if (!membership) {
       // User is not a member, redirect to dashboard

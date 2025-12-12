@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { 
   Users, 
@@ -17,26 +17,26 @@ export default async function DashboardPage() {
     redirect("/auth/signin");
   }
 
-  const supabase = createClient();
-
   // Fetch communities where user is owner
-  const { data: ownedCommunities } = await supabase
-    .from("communities")
-    .select("*")
-    .eq("ownerId", session.user.id)
-    .order("createdAt", { ascending: false });
+  const ownedCommunities = await prisma.community.findMany({
+    where: { ownerId: session.user.id },
+    orderBy: { createdAt: "desc" },
+  });
 
   // Fetch communities where user is member
-  const { data: memberCommunities } = await supabase
-    .from("community_members")
-    .select(`
-      community:communities(*)
-    `)
-    .eq("userId", session.user.id)
-    .neq("communities.ownerId", session.user.id);
+  const memberCommunities = await prisma.communityMember.findMany({
+    where: { 
+      userId: session.user.id,
+      community: {
+        ownerId: { not: session.user.id }
+      }
+    },
+    include: {
+      community: true,
+    },
+  });
 
-  const joinedCommunities = memberCommunities?.map(m => m.community).filter(Boolean) || [];
-
+  const joinedCommunities = memberCommunities.map(m => m.community).filter(Boolean) || [];
   const totalCommunities = (ownedCommunities?.length || 0) + (joinedCommunities?.length || 0);
 
   return (

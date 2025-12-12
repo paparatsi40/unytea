@@ -1,5 +1,5 @@
 import { auth } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { Video, Calendar, Clock, Plus } from "lucide-react";
 import { CreateSessionDialog } from "@/components/sessions/CreateSessionDialog";
@@ -16,14 +16,10 @@ export default async function CommunitySessionsPage({
     redirect("/auth/signin");
   }
 
-  const supabase = createClient();
-
   // Fetch community
-  const { data: community } = await supabase
-    .from("communities")
-    .select("*")
-    .eq("id", params.communityId)
-    .single();
+  const community = await prisma.community.findUnique({
+    where: { id: params.communityId },
+  });
 
   if (!community) {
     redirect("/dashboard");
@@ -34,12 +30,12 @@ export default async function CommunitySessionsPage({
   let isMember = false;
 
   if (!isOwner) {
-    const { data: membership } = await supabase
-      .from("community_members")
-      .select("*")
-      .eq("communityId", params.communityId)
-      .eq("userId", session.user.id)
-      .single();
+    const membership = await prisma.communityMember.findFirst({
+      where: {
+        communityId: params.communityId,
+        userId: session.user.id,
+      },
+    });
 
     isMember = !!membership;
   }
@@ -49,30 +45,60 @@ export default async function CommunitySessionsPage({
   }
 
   // Fetch sessions for this community
-  const now = new Date().toISOString();
+  const now = new Date();
   
-  const { data: upcomingSessions } = await supabase
-    .from("mentor_sessions")
-    .select(`
-      *,
-      mentor:users!mentor_sessions_mentorId_fkey(id, name, email, image),
-      mentee:users!mentor_sessions_menteeId_fkey(id, name, email, image)
-    `)
-    .eq("communityId", params.communityId)
-    .gte("scheduledFor", now)
-    .order("scheduledFor", { ascending: true });
+  const upcomingSessions = await prisma.mentorSession.findMany({
+    where: {
+      communityId: params.communityId,
+      scheduledAt: { gte: now },
+    },
+    include: {
+      mentor: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+        },
+      },
+      mentee: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+        },
+      },
+    },
+    orderBy: { scheduledAt: "asc" },
+  });
 
-  const { data: pastSessions } = await supabase
-    .from("mentor_sessions")
-    .select(`
-      *,
-      mentor:users!mentor_sessions_mentorId_fkey(id, name, email, image),
-      mentee:users!mentor_sessions_menteeId_fkey(id, name, email, image)
-    `)
-    .eq("communityId", params.communityId)
-    .lt("scheduledFor", now)
-    .order("scheduledFor", { ascending: false })
-    .limit(10);
+  const pastSessions = await prisma.mentorSession.findMany({
+    where: {
+      communityId: params.communityId,
+      scheduledAt: { lt: now },
+    },
+    include: {
+      mentor: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+        },
+      },
+      mentee: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+        },
+      },
+    },
+    orderBy: { scheduledAt: "desc" },
+    take: 10,
+  });
 
   const upcoming = upcomingSessions || [];
   const past = pastSessions || [];
