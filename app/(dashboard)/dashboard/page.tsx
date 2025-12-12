@@ -1,210 +1,242 @@
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
+import Link from "next/link";
 import { 
   Users, 
-  TrendingUp, 
-  Video, 
-  MessageSquare,
-  ArrowUpRight,
-  Calendar,
+  Plus,
+  Crown,
+  ArrowRight,
+  TrendingUp,
 } from "lucide-react";
 
-export default function DashboardPage() {
-  // TODO: Fetch real data from database
-  const stats = [
-    {
-      name: "Total Members",
-      value: "2,543",
-      change: "+12.5%",
-      icon: Users,
-      color: "text-blue-500",
-      bgColor: "bg-blue-500/10",
-    },
-    {
-      name: "Active Communities",
-      value: "8",
-      change: "+2",
-      icon: MessageSquare,
-      color: "text-purple-500",
-      bgColor: "bg-purple-500/10",
-    },
-    {
-      name: "Video Sessions",
-      value: "47",
-      change: "+8.2%",
-      icon: Video,
-      color: "text-green-500",
-      bgColor: "bg-green-500/10",
-    },
-    {
-      name: "Growth Rate",
-      value: "23.8%",
-      change: "+4.3%",
-      icon: TrendingUp,
-      color: "text-orange-500",
-      bgColor: "bg-orange-500/10",
-    },
-  ];
+export default async function DashboardPage() {
+  const session = await auth();
+  
+  if (!session?.user?.id) {
+    redirect("/auth/signin");
+  }
 
-  const upcomingSessions = [
-    {
-      id: 1,
-      title: "1-on-1 Mentoring Session",
-      mentee: "John Doe",
-      time: "Today, 2:00 PM",
-      avatar: "https://avatar.vercel.sh/john",
-    },
-    {
-      id: 2,
-      title: "Group Coaching Call",
-      mentee: "Sarah Smith",
-      time: "Tomorrow, 10:00 AM",
-      avatar: "https://avatar.vercel.sh/sarah",
-    },
-    {
-      id: 3,
-      title: "Strategy Session",
-      mentee: "Mike Johnson",
-      time: "Dec 15, 3:30 PM",
-      avatar: "https://avatar.vercel.sh/mike",
-    },
-  ];
+  const supabase = createClient();
+
+  // Fetch communities where user is owner
+  const { data: ownedCommunities } = await supabase
+    .from("communities")
+    .select("*")
+    .eq("ownerId", session.user.id)
+    .order("createdAt", { ascending: false });
+
+  // Fetch communities where user is member
+  const { data: memberCommunities } = await supabase
+    .from("community_members")
+    .select(`
+      community:communities(*)
+    `)
+    .eq("userId", session.user.id)
+    .neq("communities.ownerId", session.user.id);
+
+  const joinedCommunities = memberCommunities?.map(m => m.community).filter(Boolean) || [];
+
+  const totalCommunities = (ownedCommunities?.length || 0) + (joinedCommunities?.length || 0);
 
   return (
     <div className="space-y-8">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-foreground">
-          Welcome back! 👋
+          Welcome back, {session.user.name}! 👋
         </h1>
         <p className="mt-2 text-muted-foreground">
-          Here's what's happening with your communities today.
+          Select a community to get started, or create a new one.
         </p>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => {
-          const Icon = stat.icon;
-          return (
-            <div
-              key={stat.name}
-              className="group relative overflow-hidden rounded-xl border border-border bg-card p-6 transition-all hover:border-primary/50 hover:shadow-lg"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">
-                    {stat.name}
-                  </p>
-                  <p className="mt-2 text-3xl font-bold text-foreground">
-                    {stat.value}
-                  </p>
-                  <div className="mt-2 flex items-center text-sm">
-                    <ArrowUpRight className="h-4 w-4 text-green-500" />
-                    <span className="ml-1 font-medium text-green-500">
-                      {stat.change}
-                    </span>
-                    <span className="ml-2 text-muted-foreground">
-                      vs last month
-                    </span>
+      {/* Quick Stats */}
+      <div className="grid gap-6 sm:grid-cols-3">
+        <div className="group relative overflow-hidden rounded-xl border border-border bg-card p-6 transition-all hover:border-primary/50 hover:shadow-lg">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">
+                Total Communities
+              </p>
+              <p className="mt-2 text-3xl font-bold text-foreground">
+                {totalCommunities}
+              </p>
+            </div>
+            <div className="rounded-full p-3 bg-blue-500/10">
+              <Users className="h-6 w-6 text-blue-500" />
+            </div>
+          </div>
+        </div>
+
+        <div className="group relative overflow-hidden rounded-xl border border-border bg-card p-6 transition-all hover:border-primary/50 hover:shadow-lg">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">
+                You Own
+              </p>
+              <p className="mt-2 text-3xl font-bold text-foreground">
+                {ownedCommunities?.length || 0}
+              </p>
+            </div>
+            <div className="rounded-full p-3 bg-yellow-500/10">
+              <Crown className="h-6 w-6 text-yellow-500" />
+            </div>
+          </div>
+        </div>
+
+        <div className="group relative overflow-hidden rounded-xl border border-border bg-card p-6 transition-all hover:border-primary/50 hover:shadow-lg">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">
+                You Joined
+              </p>
+              <p className="mt-2 text-3xl font-bold text-foreground">
+                {joinedCommunities?.length || 0}
+              </p>
+            </div>
+            <div className="rounded-full p-3 bg-purple-500/10">
+              <TrendingUp className="h-6 w-6 text-purple-500" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Your Communities (Owned) */}
+      {ownedCommunities && ownedCommunities.length > 0 && (
+        <div>
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-bold text-foreground">
+                Your Communities
+              </h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                Communities you own and manage
+              </p>
+            </div>
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {ownedCommunities.map((community) => (
+              <Link
+                key={community.id}
+                href={`/dashboard/communities/${community.id}`}
+                className="group relative overflow-hidden rounded-xl border border-border bg-card p-6 transition-all hover:border-primary hover:shadow-xl"
+              >
+                <div className="absolute top-4 right-4">
+                  <div className="rounded-full bg-yellow-500/10 p-2">
+                    <Crown className="h-4 w-4 text-yellow-500" />
                   </div>
                 </div>
-                <div className={`rounded-full p-3 ${stat.bgColor}`}>
-                  <Icon className={`h-6 w-6 ${stat.color}`} />
+                
+                <div className="mb-4">
+                  <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
+                    {community.name}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
+                    {community.description || "No description"}
+                  </p>
                 </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
 
-      {/* Grid Layout */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Upcoming Sessions */}
-        <div className="rounded-xl border border-border bg-card p-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-foreground">
-              Upcoming Sessions
-            </h2>
-            <Calendar className="h-5 w-5 text-muted-foreground" />
-          </div>
-          <div className="mt-6 space-y-4">
-            {upcomingSessions.map((session) => (
-              <div
-                key={session.id}
-                className="flex items-center space-x-4 rounded-lg border border-border p-4 transition-colors hover:bg-accent"
-              >
-                <img
-                  src={session.avatar}
-                  alt={session.mentee}
-                  className="h-12 w-12 rounded-full"
-                />
-                <div className="flex-1">
-                  <p className="font-semibold text-foreground">
-                    {session.title}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    with {session.mentee}
-                  </p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                    <span className="flex items-center">
+                      <Users className="h-4 w-4 mr-1" />
+                      {community.memberCount || 0}
+                    </span>
+                  </div>
+                  <ArrowRight className="h-5 w-5 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
-                <div className="text-right">
-                  <p className="text-sm font-medium text-primary">
-                    {session.time}
+              </Link>
+            ))}
+
+            {/* Create New Community Card */}
+            <Link
+              href="/dashboard/communities/new"
+              className="group relative overflow-hidden rounded-xl border-2 border-dashed border-border bg-card/50 p-6 transition-all hover:border-primary hover:bg-card"
+            >
+              <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
+                <div className="rounded-full bg-primary/10 p-4 group-hover:bg-primary/20 transition-colors">
+                  <Plus className="h-8 w-8 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-foreground">
+                    Create New Community
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Start building your community
                   </p>
                 </div>
               </div>
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* Joined Communities */}
+      {joinedCommunities && joinedCommunities.length > 0 && (
+        <div>
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-foreground">
+              Joined Communities
+            </h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              Communities you're a member of
+            </p>
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {joinedCommunities.map((community: any) => (
+              <Link
+                key={community.id}
+                href={`/dashboard/communities/${community.id}`}
+                className="group relative overflow-hidden rounded-xl border border-border bg-card p-6 transition-all hover:border-primary hover:shadow-xl"
+              >
+                <div className="mb-4">
+                  <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
+                    {community.name}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
+                    {community.description || "No description"}
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                    <span className="flex items-center">
+                      <Users className="h-4 w-4 mr-1" />
+                      {community.memberCount || 0}
+                    </span>
+                  </div>
+                  <ArrowRight className="h-5 w-5 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
+              </Link>
             ))}
           </div>
-          <button className="mt-4 w-full rounded-lg bg-primary/10 px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/20">
-            View All Sessions
-          </button>
         </div>
+      )}
 
-        {/* Recent Activity */}
-        <div className="rounded-xl border border-border bg-card p-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-foreground">
-              Recent Activity
-            </h2>
-            <TrendingUp className="h-5 w-5 text-muted-foreground" />
+      {/* Empty State */}
+      {totalCommunities === 0 && (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div className="rounded-full bg-primary/10 p-6 mb-6">
+            <Users className="h-12 w-12 text-primary" />
           </div>
-          <div className="mt-6 space-y-4">
-            <div className="flex items-start space-x-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500/10">
-                <Users className="h-4 w-4 text-blue-500" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm text-foreground">
-                  <span className="font-semibold">John Doe</span> joined your
-                  community
-                </p>
-                <p className="text-xs text-muted-foreground">2 hours ago</p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-500/10">
-                <MessageSquare className="h-4 w-4 text-purple-500" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm text-foreground">
-                  New post in <span className="font-semibold">General</span>
-                </p>
-                <p className="text-xs text-muted-foreground">5 hours ago</p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-500/10">
-                <Video className="h-4 w-4 text-green-500" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm text-foreground">
-                  Session completed with{" "}
-                  <span className="font-semibold">Sarah Smith</span>
-                </p>
-                <p className="text-xs text-muted-foreground">Yesterday</p>
-              </div>
-            </div>
-          </div>
+          <h3 className="text-2xl font-bold text-foreground mb-2">
+            No communities yet
+          </h3>
+          <p className="text-muted-foreground mb-8 max-w-md">
+            Create your first community to start building your audience and connecting with members.
+          </p>
+          <Link
+            href="/dashboard/communities/new"
+            className="inline-flex items-center px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+          >
+            <Plus className="h-5 w-5 mr-2" />
+            Create Your First Community
+          </Link>
         </div>
-      </div>
+      )}
     </div>
   );
 }
