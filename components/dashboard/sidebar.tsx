@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
   Home,
@@ -33,14 +33,10 @@ const navigation = [
 export function DashboardSidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
-  const { locale } = useParams();
 
   // Check if user is admin
   const userRole = (session?.user as any)?.appRole;
   const isAdmin = userRole === "SUPER_ADMIN" || userRole === "ADMIN" || userRole === "MODERATOR";
-
-  // Get current locale - default to 'en' for now
-  const currentLocale = locale || 'en';
 
   return (
     <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-card/50 backdrop-blur-xl">
@@ -59,8 +55,8 @@ export function DashboardSidebar() {
       {/* Back to Home Button */}
       <div className="px-3 pt-4 pb-2">
         <Link
-          href={`/${currentLocale}`}
-          className="flex items-center space-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-muted-foreground hover:bg-accent hover:text-foreground border border-border/50"
+          href="/en"
+          className="flex items-center space-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-muted-foreground hover:bg-accent hover:text-foreground border border-border/50 hover:border-primary/50"
         >
           <ArrowLeft className="h-5 w-5" />
           <span>Back to Home</span>
