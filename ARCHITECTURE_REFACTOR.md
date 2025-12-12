@@ -118,7 +118,41 @@
 
 ---
 
-### **4. SUBSCRIPTION & LIMITS** 💳
+### **4. FILE UPLOADS - UploadThing Integration** 📁
+
+**Location:**
+
+- `app/api/uploadthing/core.ts` - **FILE ROUTER CONFIG**
+- `app/api/uploadthing/route.ts` - Route handler
+- `lib/uploadthing.ts` - React helpers
+
+**Uploaders Configured:**
+
+- ✅ `avatarUploader` - Profile pictures (2MB, 1 file)
+- ✅ `imageUploader` - Posts/comments (4MB, 5 files)
+- ✅ `communityBranding` - Logos/covers (10MB, 1 file)
+- ✅ `documentUploader` - PDFs/docs (8MB, 3 PDFs, 5 text)
+- ✅ `mediaUploader` - Videos/audio (32MB video, 8MB audio)
+
+**Used In:**
+
+- `components/sessions/FileViewer.tsx` (162 lines) - Display uploaded files
+- `app/(dashboard)/dashboard/communities/new/page.tsx` - Community creation
+- `app/(dashboard)/dashboard/c/[slug]/settings/appearance/page.tsx` - Branding
+
+**Features:**
+
+- ✅ Drag & drop upload
+- ✅ File type validation
+- ✅ Size limits
+- ✅ Progress tracking
+- ✅ Secure middleware (auth required)
+
+**Status:** ✅ FULLY FUNCTIONAL - Ready to use in sessions
+
+---
+
+### **5. SUBSCRIPTION & LIMITS** 💳
 
 **Location:**
 
