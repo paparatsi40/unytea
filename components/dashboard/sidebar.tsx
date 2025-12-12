@@ -6,13 +6,8 @@ import { cn } from "@/lib/utils";
 import {
   Home,
   Users,
-  MessageSquare,
-  Video,
-  BookOpen,
-  Settings,
-  TrendingUp,
-  Award,
   Bell,
+  Settings,
   Crown,
   ArrowLeft,
 } from "lucide-react";
@@ -21,11 +16,6 @@ import { useSession } from "next-auth/react";
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
   { name: "Communities", href: "/dashboard/communities", icon: Users },
-  { name: "Messages", href: "/dashboard/messages", icon: MessageSquare },
-  { name: "Sessions", href: "/dashboard/sessions", icon: Video },
-  { name: "Courses", href: "/dashboard/courses", icon: BookOpen },
-  { name: "Analytics", href: "/dashboard/analytics", icon: TrendingUp },
-  { name: "Achievements", href: "/dashboard/achievements", icon: Award },
   { name: "Notifications", href: "/dashboard/notifications", icon: Bell },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
