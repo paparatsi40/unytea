@@ -6,7 +6,6 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 import { Button } from "@/components/ui/button";
 import { createCommunity } from "@/app/actions/communities";
 import { UpgradeModal } from "@/components/subscription/UpgradeModal";
-import { SubscriptionPlan } from "@/lib/subscription-plans";
 import {
   ArrowLeft,
   ArrowRight,
