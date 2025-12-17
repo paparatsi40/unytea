@@ -38,10 +38,6 @@ interface Community {
   layoutType: string | null;
 }
 
-interface PageProps {
-  params: Promise<{ slug: string; locale: string }>;
-}
-
 export default function CommunitySettingsPage({
   params,
 }: {
