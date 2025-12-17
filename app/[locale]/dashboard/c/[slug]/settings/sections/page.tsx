@@ -175,7 +175,7 @@ type Section = {
 
 export default function SectionsManagerPage() {
   const params = useParams();
-  const slug = params.slug as string;
+  const slug = params?.slug as string;
 
   const [sections, setSections] = useState<Section[]>([]);
   const [showLibrary, setShowLibrary] = useState(false);
