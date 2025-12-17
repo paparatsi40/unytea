@@ -178,7 +178,7 @@ export function UpgradeModal({
                 </div>
                 <div className="flex items-center gap-2 text-sm text-white/80">
                   <Check className="w-4 h-4 text-primary flex-shrink-0" />
-                  <span>Dedicated support (<4hr response)</span>
+                  <span>Dedicated support (&lt;4hr response)</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-white/80">
                   <Check className="w-4 h-4 text-primary flex-shrink-0" />
