@@ -15,7 +15,6 @@ interface Message {
 }
 
 export default function CommunityChatClient({ slug, communityName }: { slug: string; communityName: string }) {
-  const params = useParams();
   const { data: session } = useSession();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
