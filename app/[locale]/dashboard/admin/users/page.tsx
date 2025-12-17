@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { currentUserIsAdmin } from "@/lib/admin-utils";
 import { prisma } from "@/lib/prisma";
-import { Users, Crown, User as UserIcon } from "lucide-react";
+import { Users, Crown } from "lucide-react";
 import Link from "next/link";
 import { UserRoleManager } from "@/components/admin/UserRoleManager";
 import { UserFilters } from "@/components/admin/UserFilters";
