@@ -2,7 +2,6 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { Users, Crown, UserPlus, Search } from "lucide-react";
-import Image from "next/image";
 
 export default async function CommunityMembersPage({
   params,
