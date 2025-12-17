@@ -108,7 +108,7 @@ export default async function CommunityMembersPage({
               {community.owner.image ? (
                 <img
                   src={community.owner.image}
-                  alt={community.owner.name}
+                  alt={community.owner.name ?? undefined}
                   className="h-12 w-12 rounded-full"
                 />
               ) : (
@@ -155,7 +155,7 @@ export default async function CommunityMembersPage({
                     {member.image ? (
                       <img
                         src={member.image}
-                        alt={member.name}
+                        alt={member.name ?? undefined}
                         className="h-10 w-10 rounded-full flex-shrink-0"
                       />
                     ) : (
