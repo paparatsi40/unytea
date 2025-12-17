@@ -50,7 +50,7 @@ export default function CommunitySettingsPage({
   const [community, setCommunity] = useState<Community | null>(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState<'logo' | 'cover' | null>(null);
-  const [saving, setSaving] = useState(false);
+  const [, setSaving] = useState(false);
 
   // Form states
   const [name, setName] = useState("");
