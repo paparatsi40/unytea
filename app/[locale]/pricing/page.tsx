@@ -56,7 +56,7 @@ const plans = [
     slug: "PROFESSIONAL",
     icon: Zap,
     price: { monthly: 99, yearly: 990 },
-    priceId: "price_1ScwoGIHad7GoCUdJfnOKXGz", // Stripe Price ID
+    priceId: "price_1SfOmfIHad7GoCUdd1H11znb", // Stripe Price ID (monthly)
     description: "For growing communities",
     badge: "🔥 MOST POPULAR",
     features: [
@@ -82,7 +82,7 @@ const plans = [
     slug: "SCALE",
     icon: TrendingUp,
     price: { monthly: 249, yearly: 2490 },
-    priceId: "price_1ScwqIIHad7GoCUdObtvl8DN", // Stripe Price ID
+    priceId: "price_1SfOntIHad7GoCUd5Ec95w81", // Stripe Price ID (monthly)
     description: "For established communities",
     features: [
       { name: "6 communities", included: true },

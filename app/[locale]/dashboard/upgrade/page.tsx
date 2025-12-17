@@ -96,7 +96,7 @@ export default function UpgradePage() {
       price: 99,
       icon: Zap,
       color: "from-blue-500 to-cyan-500",
-      priceId: "price_1ScwoGIHad7GoCUdJfnOKXGz", // Stripe price ID
+      priceId: "price_1SfOmfIHad7GoCUdd1H11znb", // Stripe price ID
       features: [
         "3 communities",
         "500 members each",
@@ -113,7 +113,7 @@ export default function UpgradePage() {
       icon: Sparkles,
       color: "from-purple-500 to-pink-500",
       popular: true,
-      priceId: "price_1ScwqIIHad7GoCUdObtvl8DN",
+      priceId: "price_1SfOntIHad7GoCUd5Ec95w81",
       features: [
         "6 communities",
         "2,000 members each",
