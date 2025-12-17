@@ -12,7 +12,6 @@ import {
   Check,
   Settings as SettingsIcon,
   Sparkles,
-  X,
   Image as ImageIcon,
 } from "lucide-react";
 import { useUploadThing } from "@/lib/uploadthing";
