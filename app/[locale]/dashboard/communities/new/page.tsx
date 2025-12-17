@@ -12,7 +12,6 @@ import {
   Check,
   Settings as SettingsIcon,
   Sparkles,
-  Link as LinkIcon,
   X,
   Image as ImageIcon,
 } from "lucide-react";
