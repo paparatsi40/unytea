@@ -198,7 +198,7 @@ export async function updateUserProfile(data: {
     });
 
     revalidatePath("/dashboard/settings/profile");
-    revalidatePath("/c/[slug]/members");
+    revalidatePath("/communities/[slug]/members");
 
     return { success: true, user };
   } catch (error) {

@@ -71,9 +71,10 @@ function renderSection(section: SectionInstance, index: number) {
 export default async function PublicCommunityPage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
-  const community = await getCommunity(params.slug);
+  const { slug } = await params;
+  const community = await getCommunity(slug);
 
   if (!community) {
     notFound();
@@ -93,7 +94,7 @@ export default async function PublicCommunityPage({
       <div className="sticky top-0 z-50 border-b border-border bg-white/80 backdrop-blur-sm">
         <div className="container mx-auto flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-4">
-            <Link href={isOwner ? `/dashboard/c/${params.slug}` : "/dashboard"}>
+            <Link href={isOwner ? `/dashboard/c/${slug}` : "/dashboard"}>
               <Button variant="ghost" size="sm">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Back to Dashboard
@@ -106,7 +107,7 @@ export default async function PublicCommunityPage({
           </div>
           
           {isOwner && (
-            <Link href={`/dashboard/c/${params.slug}/settings/landing`}>
+            <Link href={`/dashboard/c/${slug}/settings/landing`}>
               <Button variant="outline" size="sm">
                 Edit Landing Page
               </Button>
@@ -144,7 +145,7 @@ export default async function PublicCommunityPage({
                 : "This community hasn't set up their landing page yet"}
             </p>
             {isOwner && (
-              <Link href={`/dashboard/c/${params.slug}/settings/landing`}>
+              <Link href={`/dashboard/c/${slug}/settings/landing`}>
                 <Button>Build Landing Page</Button>
               </Link>
             )}
@@ -160,7 +161,7 @@ export default async function PublicCommunityPage({
                 <p className="mb-3 text-sm text-blue-900">
                   👋 You're viewing your public landing page
                 </p>
-                <Link href={`/dashboard/c/${params.slug}/settings/landing`}>
+                <Link href={`/dashboard/c/${slug}/settings/landing`}>
                   <Button variant="outline" size="sm">
                     Edit Landing Page
                   </Button>

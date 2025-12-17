@@ -198,11 +198,12 @@ export async function getPointsToNextLevel(userId: string) {
  */
 export async function getAchievements() {
   try {
-    const achievements = await prisma.achievement.findMany({
-      orderBy: { points: "asc" },
-    });
-
-    return { success: true, achievements };
+    return {
+      success: true,
+      achievements: await prisma.achievement.findMany({
+        orderBy: { points: "asc" },
+      }),
+    };
   } catch (error) {
     console.error("Error getting achievements:", error);
     return { success: false, error: "Failed to get achievements", achievements: [] };

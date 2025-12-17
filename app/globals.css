@@ -2,78 +2,80 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Force larger base font size for better readability */
+html {
+  font-size: 18px !important;
+}
+
+body {
+  font-size: 18px !important;
+  line-height: 1.6 !important;
+}
+
+/* Override all text sizes to be more readable */
+* {
+  font-size: inherit;
+}
+
 @layer base {
   :root {
-    /* Design Tokens - Light Mode */
+    /* Unytea Brand Colors */
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 240 10% 3.9%;
     
-    /* Primary - Vibrant & Modern */
-    --primary: 262 83% 58%;
-    --primary-foreground: 210 40% 98%;
-    --primary-50: 270 100% 98%;
-    --primary-100: 269 100% 95%;
-    --primary-200: 269 100% 92%;
-    --primary-300: 269 97% 85%;
-    --primary-400: 270 95% 75%;
-    --primary-500: 262 83% 58%;
-    --primary-600: 262 80% 50%;
-    --primary-700: 262 72% 42%;
-    --primary-800: 263 69% 34%;
-    --primary-900: 263 67% 28%;
+    /* Primary - Purple from logo */
+    --primary: 280 54% 37%;           /* #6B2D8F */
+    --primary-foreground: 0 0% 98%;
     
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Secondary - Orange from logo */
+    --secondary: 14 100% 60%;         /* #FF6B35 */
+    --secondary-foreground: 0 0% 98%;
+    
+    /* Accent - Complementary Cyan */
+    --accent: 189 94% 43%;            /* #06B6D4 */
+    --accent-foreground: 0 0% 98%;
+    
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 262 83% 58%;
-    --radius: 0.5rem;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 280 54% 37%;              /* Match primary */
+    --radius: 0.75rem;
   }
 
   .dark {
-    /* Design Tokens - Dark Mode */
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
     
-    /* Primary - Adjusted for dark mode */
-    --primary: 263 70% 60%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --primary-50: 263 67% 28%;
-    --primary-100: 263 69% 34%;
-    --primary-200: 262 72% 42%;
-    --primary-300: 262 80% 50%;
-    --primary-400: 262 83% 58%;
-    --primary-500: 270 95% 75%;
-    --primary-600: 269 97% 85%;
-    --primary-700: 269 100% 92%;
-    --primary-800: 269 100% 95%;
-    --primary-900: 270 100% 98%;
+    /* Primary - Lighter purple for dark mode */
+    --primary: 280 54% 65%;           /* Lighter #9B59B6 */
+    --primary-foreground: 240 10% 3.9%;
     
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    /* Secondary - Slightly lighter orange for dark mode */
+    --secondary: 14 100% 65%;
+    --secondary-foreground: 240 10% 3.9%;
+    
+    /* Accent - Cyan remains similar */
+    --accent: 189 94% 50%;
+    --accent-foreground: 240 10% 3.9%;
+    
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 263 70% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 280 54% 65%;
   }
 }
 
@@ -82,11 +84,17 @@
     @apply border-border;
   }
   
+  html {
+    /* font-size: 16px; */ /* Base font size - increased from default 14px */
+  }
+  
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* font-size: 1rem; */ /* 16px base */
+    line-height: 1.6; /* Better readability */
   }
   
   /* Custom Scrollbar */

@@ -64,13 +64,34 @@ export function PostFeed({
     setIsSubmitting(true);
 
     try {
-      const result = await createPost(user.id, communityId, {
-        content: content.trim(),
-      });
+      // Create FormData object
+      const formData = new FormData();
+      formData.append("communityId", communityId);
+      formData.append("content", content.trim());
+
+      const result = await createPost(formData);
 
       if (result.success) {
+        // Transform the post to match the expected format
+        const transformedPost = {
+          id: result.post.id,
+          title: result.post.title,
+          content: result.post.content,
+          createdAt: result.post.createdAt,
+          author: {
+            id: result.post.author.id,
+            firstName: result.post.author.firstName,
+            lastName: result.post.author.lastName,
+            imageUrl: result.post.author.image, // Map 'image' to 'imageUrl'
+          },
+          _count: {
+            comments: result.post._count?.comments || 0,
+            reactions: result.post._count?.reactions || 0,
+          },
+        };
+
         // Add new post to the top of the list with animation
-        setPosts([result.post as any, ...posts]);
+        setPosts([transformedPost as any, ...posts]);
         setContent("");
         setIsFocused(false);
         

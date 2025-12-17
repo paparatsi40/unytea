@@ -23,12 +23,8 @@ const nextConfig = {
   },
   // Optimize for production
   reactStrictMode: true,
-  // Enable SWC minification
-  swcMinify: true,
   // Compression
   compress: true,
-  // Optimize font loading
-  optimizeFonts: true,
   // Production source maps (disable for smaller builds)
   productionBrowserSourceMaps: false,
   // Power by header

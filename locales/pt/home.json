@@ -1,19 +1,231 @@
 {
-  "headline": "Onde as comunidades",
-  "unite": "Se unem",
-  "subtitle": "A",
-  "advanced": "plataforma de comunidades mais avançada",
-  "subtitle2": "do planeta. Não a mais barata.",
-  "thebest": "A melhor",
-  "signin": "Entrar",
-  "startfree": "Começar Grátis",
-  "dashboard": "Painel",
-  "features": "Recursos",
-  "pricing": "Preços",
-  "cta": "Começar Grátis",
-  "beta": "Beta",
-  "video": {
-    "title": "Veja Unytea em Ação",
-    "subtitle": "Veja como as comunidades prosperam em nossa plataforma"
+  "nav": {
+    "features": "Recursos",
+    "pricing": "Preços",
+    "community": "Comunidade",
+    "signin": "Entrar",
+    "startfree": "Começar Grátis",
+    "dashboard": "Painel",
+    "gotodashboard": "Ir ao Painel"
+  },
+  "hero": {
+    "badge": "🔥 3.000+ Comunidades Já Mudaram",
+    "headline1": "Onde as Comunidades",
+    "headline2": "Prosperam",
+    "subtitle1": "A plataforma completa:",
+    "subtitle2": "tudo o que sua comunidade precisa, mais recursos inteligentes que vão adorar.",
+    "description": "Chamadas de vídeo integradas. Emparelhamento de colegas. Compartilhamento de conteúdo. Personalização real. Preços justos.",
+    "descriptionBold": "Chega de pagar $99-$399/mês por fóruns básicos.",
+    "ctaPrimary": "Começar Grátis - Sem Cartão",
+    "ctaSecondary": "Ver Comparação Completa",
+    "trustBadges": "✓ Teste grátis de 14 dias ✓ Cancele quando quiser ✓ Migração do Circle/Skool grátis"
+  },
+  "priceComparison": {
+    "circle": {
+      "name": "Circle",
+      "price": "$399",
+      "period": "/mês",
+      "description": "Sem vídeo. Sem personalização. Fórum básico."
+    },
+    "skool": {
+      "name": "Skool",
+      "price": "$99",
+      "period": "/mês",
+      "description": "Design genérico. Sem chamadas. Igual a todos."
+    },
+    "unytea": {
+      "name": "Unytea",
+      "price": "$129",
+      "period": "/mês",
+      "description": "Tudo + Vídeo + IA + Personalização"
+    }
+  },
+  "failingSection": {
+    "title": "Por Que Estão",
+    "titleHighlight": "Roubando Você",
+    "subtitle": "Vamos ser honestos sobre o que você NÃO está recebendo com Circle, Skool e Teachable",
+    "points": {
+      "noVideo": {
+        "title": "Sem Chamadas de Vídeo Integradas",
+        "problem": "Circle e Skool forçam você a usar Zoom/Google Meet. Mais ferramentas = mais atrito = menor engajamento.",
+        "solution": "Unytea: Chamadas de vídeo de 1 clique com gravação, transcrição e compartilhamento de tela integrados."
+      },
+      "noCustomization": {
+        "title": "Zero Personalização",
+        "problem": "Todas as comunidades Skool parecem idênticas. A 'personalização' do Circle é apenas mudar a cor do logo.",
+        "solution": "Unytea: Controle total da marca. Domínios personalizados. Suas cores. Suas fontes. Seu CSS."
+      },
+      "noEngagement": {
+        "title": "Sem Ferramentas de Engajamento Reais",
+        "problem": "Fóruns e cursos básicos. Sem responsabilidade. Sem emparelhamento de membros. Apenas outra comunidade morta.",
+        "solution": "Unytea: Sistema de Colegas emparelha membros para responsabilidade. Insights de engajamento com IA."
+      },
+      "overpriced": {
+        "title": "Preço Excessivo pelo Que Você Recebe",
+        "problem": "Circle: $399/mês por um fórum. Skool: $99/mês mas todas as comunidades parecem iguais. Teachable: Ótimo para cursos, terrível para comunidade.",
+        "solution": "Unytea: $129/mês por tudo. Chamadas de vídeo, IA, personalização e inovação real."
+      },
+      "ancientTech": {
+        "title": "Tecnologia Antiga",
+        "problem": "Construídos há 5-10 anos. Páginas lentas. UX desajeitada. Sem recursos em tempo real. WebRTC de 2015.",
+        "solution": "Unytea: Tecnologia de 2024. WebSockets. Latência de 0ms. React moderno. Construído para comunidades de hoje."
+      },
+      "vendorLock": {
+        "title": "Bloqueio de Fornecedor",
+        "problem": "Tente exportar seus dados do Circle. Boa sorte. Eles tornam quase impossível sair.",
+        "solution": "Unytea: Exportação de 1 clique. Acesso à API. Seus dados são seus. Saia quando quiser. Até ajudamos você a migrar."
+      }
+    }
+  },
+  "featuresSection": {
+    "title": "Recursos Que Nunca",
+    "titleHighlight": "Construirão",
+    "subtitle": "Porque o modelo de negócios deles não permite. O nosso permite.",
+    "features": {
+      "video": {
+        "title": "Sessões ao Vivo Integradas",
+        "description": "Chamadas de vídeo de 1 clique com gravação, transcrição IA e compartilhamento de tela. Sem Zoom, sem Calendly, sem bobagem.",
+        "badge": "ELES NÃO TÊM ISSO"
+      },
+      "buddy": {
+        "title": "Sistema de Colegas™",
+        "description": "IA emparelha membros para parcerias de responsabilidade. Algoritmo pendente de patente que realmente aumenta a retenção.",
+        "badge": "APENAS NO UNYTEA"
+      },
+      "content": {
+        "title": "Painel de Compartilhamento de Conteúdo",
+        "description": "Compartilhe quadros brancos, PDFs, vídeos e mais em tempo real durante as sessões. Colaboração revolucionária.",
+        "badge": "APENAS NO UNYTEA"
+      },
+      "customization": {
+        "title": "Personalização Verdadeira",
+        "description": "Sua marca. Seu domínio. Suas cores. Suas fontes. Até CSS personalizado. Não apenas trocar um logo.",
+        "badge": "MELHOR QUE CIRCLE"
+      },
+      "aiInsights": {
+        "title": "Insights de Engajamento com IA",
+        "description": "Saiba quem está engajado, quem está em risco e qual conteúdo funciona. Análises impulsionadas por OpenAI.",
+        "badge": "EXCLUSIVO"
+      },
+      "realtime": {
+        "title": "Tudo em Tempo Real",
+        "description": "WebSockets. Latência de 0ms. Desempenho nível Discord. 90% menos carga de servidor que Circle.",
+        "badge": "O MAIS RÁPIDO"
+      },
+      "pricing": {
+        "title": "Preços Transparentes",
+        "description": "Veja seu uso em tempo real. Sem contas surpresa. Pague apenas pelo que usar.",
+        "badge": "HONESTO"
+      },
+      "security": {
+        "title": "Segurança Empresarial",
+        "description": "Compatível com SOC 2. Pronto para GDPR. 2FA. Permissões baseadas em função. Criptografia de nível bancário.",
+        "badge": "SEGURO"
+      },
+      "matching": {
+        "title": "Emparelhamento de Membros",
+        "description": "Algoritmos inteligentes de introdução conectam os membros certos. Melhor que o emparelhamento do LinkedIn.",
+        "badge": "PATENTE PENDENTE"
+      }
+    }
+  },
+  "comparisonSection": {
+    "title": "A Verdade Brutal",
+    "subtitle": "Recurso por recurso. Sem bobagem. Apenas fatos.",
+    "ctaButton": "Mudar para Unytea Grátis",
+    "features": {
+      "videoCalls": "Chamadas de Vídeo Integradas",
+      "recording": "Gravação e Transcrição de Sessões",
+      "buddySystem": "Sistema de Colegas / Emparelhamento",
+      "contentSharing": "Painel de Compartilhamento de Conteúdo",
+      "realtime": "Chat em Tempo Real (latência 0ms)",
+      "aiInsights": "Insights de Engajamento com IA",
+      "customDomain": "Domínio Personalizado",
+      "branding": "Personalização Completa da Marca",
+      "whiteLabel": "Opção Marca Branca",
+      "courses": "Cursos e Conteúdo",
+      "forums": "Fóruns de Discussão",
+      "profiles": "Perfis de Membros",
+      "mobileApp": "Aplicativo Móvel",
+      "api": "Acesso à API",
+      "usagePricing": "Preços por Uso",
+      "migration": "Serviço de Migração Grátis"
+    }
+  },
+  "pricingSection": {
+    "title": "Pague Menos. Receba",
+    "titleHighlight": "10x Mais",
+    "subtitle": "Sem taxas ocultas. Sem cobranças surpresa. Apenas preços honestos.",
+    "plans": {
+      "professional": {
+        "name": "Profissional",
+        "price": "129",
+        "period": "/mês",
+        "badge": "🔥 MELHOR VALOR",
+        "comparison": "vs Circle $399/mês - Economize $270/mês",
+        "features": [
+          "1 comunidade, 500 membros",
+          "20 horas de vídeo/mês",
+          "✅ Chamadas de vídeo integradas (Circle: ❌)",
+          "✅ Transcrição IA (Circle: ❌)",
+          "✅ Sistema de Colegas (Ninguém tem isso)",
+          "✅ Personalização completa",
+          "✅ Análises avançadas",
+          "✅ Gravação e hospedagem de arquivos",
+          "Excesso: $0.15/membro, $0.30/hora"
+        ],
+        "cta": "Iniciar Teste Grátis"
+      },
+      "scale": {
+        "name": "Escala",
+        "price": "249",
+        "period": "/mês",
+        "comparison": "vs Circle $799/mês - Economize $550/mês",
+        "features": [
+          "3 comunidades, 2K membros cada",
+          "60 horas de vídeo/mês",
+          "Tudo no Profissional",
+          "✅ Marca branca",
+          "✅ Suporte prioritário",
+          "✅ Integrações personalizadas",
+          "✅ Permissões avançadas",
+          "Excesso: $0.10/membro, $0.20/hora"
+        ],
+        "cta": "Iniciar Teste Grátis"
+      },
+      "enterprise": {
+        "name": "Empresarial",
+        "price": "499",
+        "period": "/mês",
+        "comparison": "vs Circle $1,499/mês - Economize $1,000/mês",
+        "features": [
+          "10 comunidades, 5K membros cada",
+          "150 horas de vídeo/mês",
+          "Tudo na Escala",
+          "✅ Gerente de conta dedicado",
+          "✅ Garantia SLA (99.9%)",
+          "✅ Acesso completo à API",
+          "✅ Recursos personalizados",
+          "Excesso: $0.08/membro, $0.15/hora"
+        ],
+        "cta": "Iniciar Teste Grátis"
+      }
+    }
+  },
+  "migrationSection": {
+    "title": "Mude do Circle ou Skool em",
+    "titleHighlight": "24 Horas",
+    "description": "Migraremos toda a sua comunidade gratuitamente. Membros, postagens, tudo.",
+    "descriptionBold": "Zero tempo de inatividade. Zero complicação.",
+    "ctaPrimary": "Iniciar Migração Grátis",
+    "ctaSecondary": "Falar com Especialista em Migração"
+  },
+  "footer": {
+    "tagline": "2024 Unytea. A Plataforma de Comunidade Que Não É Ruim.",
+    "links": {
+      "privacy": "Privacidade",
+      "terms": "Termos",
+      "contact": "Contato"
+    }
   }
 }

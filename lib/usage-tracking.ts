@@ -5,7 +5,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
-import { SubscriptionPlan, getPlanLimits, calculateMonthlyCost } from "@/lib/subscription-limits";
+import { SubscriptionPlan, getPlanLimits, calculateMonthlyCost } from "@/lib/subscription-plans";
 
 /**
  * Initialize billing cycle for a user

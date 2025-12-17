@@ -16,6 +16,21 @@ const config: Config = {
       },
     },
     extend: {
+      fontSize: {
+        xs: ['0.875rem', { lineHeight: '1.5' }],    // 14px (antes 13px)
+        sm: ['0.9375rem', { lineHeight: '1.5' }],   // 15px (antes 14px)
+        base: ['1.125rem', { lineHeight: '1.6' }],  // 18px (default más grande)
+        lg: ['1.25rem', { lineHeight: '1.6' }],     // 20px
+        xl: ['1.375rem', { lineHeight: '1.5' }],    // 22px (antes 20px)
+        '2xl': ['1.5rem', { lineHeight: '2rem' }],
+        '3xl': ['1.875rem', { lineHeight: '2.25rem' }],
+        '4xl': ['2.25rem', { lineHeight: '2.5rem' }],
+        '5xl': ['3rem', { lineHeight: '1' }],
+        '6xl': ['3.75rem', { lineHeight: '1' }],
+        '7xl': ['4.5rem', { lineHeight: '1' }],
+        '8xl': ['6rem', { lineHeight: '1' }],
+        '9xl': ['8rem', { lineHeight: '1' }],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -103,6 +118,10 @@ const config: Config = {
           "0%": { transform: "translateX(-100%)" },
           "100%": { transform: "translateX(100%)" },
         },
+        confetti: {
+          "0%": { transform: "translateY(0) rotate(0deg)", opacity: "1" },
+          "100%": { transform: "translateY(100vh) rotate(360deg)", opacity: "0" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -114,6 +133,7 @@ const config: Config = {
         "slide-out-to-top": "slide-out-to-top 0.3s ease-out",
         "slide-out-to-bottom": "slide-out-to-bottom 0.3s ease-out",
         shimmer: "shimmer 2s infinite",
+        confetti: "confetti linear forwards",
       },
       fontFamily: {
         sans: ["var(--font-geist-sans)", "system-ui", "sans-serif"],

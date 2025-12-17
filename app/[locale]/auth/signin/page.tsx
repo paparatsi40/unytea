@@ -40,19 +40,27 @@ export default function SignInPage() {
 
     try {
       setIsLoading(true)
+      
+      console.log("🔐 Attempting sign in with:", { email, passwordLength: password.length })
+      
       const result = await signIn("credentials", {
         email,
         password,
         redirect: false,
       })
 
+      console.log("📝 Sign in result:", result)
+
       if (result?.error) {
+        console.error("❌ Sign in error:", result.error)
         toast.error("Invalid email or password")
       } else {
+        console.log("✅ Sign in successful!")
         toast.success("Welcome back!")
         router.push(callbackUrl)
       }
     } catch (error) {
+      console.error("❌ Exception during sign in:", error)
       toast.error("Something went wrong. Please try again.")
     } finally {
       setIsLoading(false)
@@ -75,7 +83,7 @@ export default function SignInPage() {
       <div className="w-full max-w-md">
         {/* Logo/Brand */}
         <div className="text-center mb-8">
-          <div className="mb-4 flex justify-center">
+          <div className="mb-6 flex justify-center">
             <LogoWithText />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">

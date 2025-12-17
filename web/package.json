@@ -3,6 +3,7 @@
     "@livekit/components-react": "^2.9.17",
     "@radix-ui/react-label": "^2.1.8",
     "@uploadthing/react": "^7.3.3",
+    "cloudinary": "^2.8.0",
     "express-rate-limit": "^8.2.1",
     "helmet": "^8.1.0",
     "joi": "^18.0.2",

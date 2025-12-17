@@ -104,7 +104,7 @@ export default function SignUpPage() {
       <div className="w-full max-w-md">
         {/* Logo/Brand */}
         <div className="text-center mb-8">
-          <div className="mb-4 flex justify-center">
+          <div className="mb-6 flex justify-center">
             <LogoWithText />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">

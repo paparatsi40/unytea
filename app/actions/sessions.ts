@@ -4,8 +4,9 @@ import { revalidatePath } from "next/cache";
 import { getCurrentUserId } from "@/lib/auth-utils";
 import { prisma } from "@/lib/prisma";
 import { nanoid } from "nanoid";
-import { canStartVideoCall } from "@/lib/subscription-limits";
+import { canStartVideoCall } from "@/lib/subscription-plans";
 import { trackVideoUsage, updateMemberCount } from "@/lib/usage-tracking";
+import { notifySessionStarted } from "@/lib/notifications";
 
 /**
  * Create a new video session
@@ -23,6 +24,45 @@ export async function createSession(data: {
 
     if (!userId) {
       return { success: false, error: "Not authenticated" };
+    }
+
+    // 🔐 CHECK IF USER IS COMMUNITY OWNER OR HAS PERMISSION (if communityId provided)
+    if (data.communityId) {
+      const community = await prisma.community.findUnique({
+        where: { id: data.communityId },
+        select: { 
+          ownerId: true,
+          members: {
+            where: { userId },
+            select: { 
+              role: true,
+              permissions: true,
+            },
+          },
+        },
+      });
+
+      if (!community) {
+        return { success: false, error: "Community not found" };
+      }
+
+      const isOwner = community.ownerId === userId;
+      const member = community.members[0];
+      
+      // Check if user has permission to create sessions
+      const canCreateSessions = 
+        isOwner || 
+        member?.role === "ADMIN" || 
+        member?.role === "MODERATOR" || 
+        member?.role === "MENTOR" ||
+        (member?.permissions as any)?.canCreateSessions === true;
+
+      if (!canCreateSessions) {
+        return { 
+          success: false, 
+          error: "You don't have permission to create sessions in this community" 
+        };
+      }
     }
 
     // 🔐 CHECK VIDEO CALL LIMIT
@@ -211,6 +251,8 @@ export async function startSession(sessionId: string) {
         startedAt: new Date(),
       },
     });
+
+    await notifySessionStarted(sessionId);
 
     revalidatePath("/dashboard/sessions");
     return { success: true, session: updatedSession };

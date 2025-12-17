@@ -1,70 +1,88 @@
 import { NextRequest, NextResponse } from "next/server";
-import createIntlMiddleware from 'next-intl/middleware';
-import { locales, defaultLocale } from './i18n';
-import { auth } from "@/lib/auth"
+import createIntlMiddleware from "next-intl/middleware";
+import { locales, defaultLocale } from "./i18n";
+import { auth } from "@/lib/auth";
 
 // Create the intl middleware
 const intlMiddleware = createIntlMiddleware({
   locales,
   defaultLocale,
-  localePrefix: 'always',
+  localePrefix: "always",
   localeDetection: true
 });
 
 export default auth((req) => {
-  const isLoggedIn = !!req.auth
-  const pathname = req.nextUrl.pathname
+  const isLoggedIn = !!req.auth;
+  const pathname = req.nextUrl.pathname;
 
-  // Skip intl middleware for API routes, dashboard, and static files
+  // Skip API routes and static files
   if (
-    pathname.startsWith('/api/') ||
-    pathname.startsWith('/_next/') ||
-    pathname.startsWith('/socket.io/') ||
-    pathname.startsWith('/dashboard') ||
-    pathname.includes('/api/socket')
+    pathname.startsWith("/api/") ||
+    pathname.startsWith("/_next/") ||
+    pathname.startsWith("/socket.io/") ||
+    pathname.includes("/api/socket")
   ) {
     return NextResponse.next();
   }
 
-  // Apply intl routing for non-API/non-dashboard routes
-  const response = intlMiddleware(req);
+  // Extract locale from pathname
+  const localeRegex = new RegExp(`^/(${locales.join('|')})(/|$)`);
+  const localeMatch = pathname.match(localeRegex);
+  const locale = localeMatch ? localeMatch[1] : defaultLocale;
 
-  // Remove locale prefix to check routes
-  // e.g., /en/auth/signup -> /auth/signup
-  const pathnameWithoutLocale = pathname.replace(/^\/(en|es|fr|pt)/, '') || '/';
+  // Remove locale prefix for route checks
+  // e.g. /en/auth/signup → /auth/signup
+  const pathnameWithoutLocale = localeMatch
+    ? pathname.slice(locale.length + 1) || "/"
+    : pathname;
 
-  // Public routes (accessible without auth)
+  // Redirect old /dashboard/c/ routes to new /dashboard/communities/ routes
+  if (pathnameWithoutLocale.startsWith("/dashboard/c/")) {
+    const slug = pathnameWithoutLocale.replace("/dashboard/c/", "").split("/")[0];
+    const rest = pathnameWithoutLocale.replace(`/dashboard/c/${slug}`, "");
+    const newPath = rest && rest !== "/" 
+      ? `/${locale}/dashboard/communities/${slug}${rest}`
+      : `/${locale}/dashboard/communities/${slug}/feed`;
+    return NextResponse.redirect(new URL(newPath, req.url));
+  }
+
+  // Redirect /dashboard/c (without slug) to /dashboard/communities
+  if (pathnameWithoutLocale === "/dashboard/c" || pathnameWithoutLocale === "/dashboard/c/") {
+    return NextResponse.redirect(new URL(`/${locale}/dashboard/communities`, req.url));
+  }
+
+  // Public routes
   const isPublicRoute =
     pathnameWithoutLocale === "/" ||
     pathnameWithoutLocale.startsWith("/auth/") ||
     pathnameWithoutLocale.startsWith("/contact") ||
     pathnameWithoutLocale.startsWith("/privacy") ||
     pathnameWithoutLocale.startsWith("/terms") ||
-    pathnameWithoutLocale.startsWith("/c/")
+    pathnameWithoutLocale.startsWith("/c/");
 
-  // Protected routes (require auth)
+  // Protected routes
   const isProtectedRoute =
-    pathname.startsWith("/dashboard") ||
-    pathnameWithoutLocale.startsWith("/onboarding")
+    pathnameWithoutLocale.startsWith("/dashboard") ||
+    pathnameWithoutLocale.startsWith("/onboarding");
 
-  // Redirect logic
+  // Redirect unauthenticated users
   if (isProtectedRoute && !isLoggedIn) {
-    return NextResponse.redirect(new URL(`/en/auth/signin`, req.url))
+    const response = intlMiddleware(req);
+    const redirectUrl = new URL(`/${locale}/auth/signin`, req.url);
+    return NextResponse.redirect(redirectUrl);
   }
 
+  // Redirect logged-in users away from auth pages
   if (pathnameWithoutLocale.startsWith("/auth/") && isLoggedIn) {
-    return NextResponse.redirect(new URL(`/dashboard`, req.url))
+    const response = intlMiddleware(req);
+    const redirectUrl = new URL(`/${locale}/dashboard`, req.url);
+    return NextResponse.redirect(redirectUrl);
   }
 
-  return response;
-})
+  // Apply next-intl middleware for all other cases
+  return intlMiddleware(req);
+});
 
 export const config = {
-  // Match all routes except:
-  // - API routes (/api/*)
-  // - Next.js internals (_next/*)
-  // - Static files (with file extensions)
-  matcher: [
-    '/((?!api/|_next/|_vercel/|.*\\..*).*)',
-  ],
-}
+  matcher: ["/((?!api|_next|_vercel|.*\\..*).*)"]
+};

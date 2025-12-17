@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronDown, Crown, Users, Home } from "lucide-react";
+import { ChevronDown, Crown, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Logo } from "@/components/brand/Logo";
 
 interface Community {
   id: string;
   name: string;
+  slug: string;
   description?: string;
   memberCount?: number;
   ownerId: string;
@@ -16,9 +18,10 @@ interface Community {
 interface CommunitySwitcherProps {
   currentCommunityId: string;
   userId: string;
+  locale: string;
 }
 
-export function CommunitySwitcher({ currentCommunityId, userId }: CommunitySwitcherProps) {
+export function CommunitySwitcher({ currentCommunityId, userId, locale }: CommunitySwitcherProps) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [communities, setCommunities] = useState<Community[]>([]);
@@ -52,14 +55,14 @@ export function CommunitySwitcher({ currentCommunityId, userId }: CommunitySwitc
     }
   };
 
-  const handleSwitch = (communityId: string) => {
+  const handleSwitch = (slug: string) => {
     setIsOpen(false);
-    router.push(`/dashboard/communities/${communityId}`);
+    router.push(`/${locale}/dashboard/communities/${slug}`);
   };
 
   const handleBackToDashboard = () => {
     setIsOpen(false);
-    router.push("/dashboard");
+    router.push(`/${locale}/dashboard`);
   };
 
   const isOwner = currentCommunity?.ownerId === userId;
@@ -123,8 +126,8 @@ export function CommunitySwitcher({ currentCommunityId, userId }: CommunitySwitc
               onClick={handleBackToDashboard}
               className="w-full flex items-center space-x-3 px-4 py-3 text-sm font-medium transition-colors hover:bg-accent border-b border-border"
             >
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-                <Home className="h-4 w-4 text-primary" />
+              <div className="flex h-8 w-8 items-center justify-center flex-shrink-0">
+                <Logo iconSize={32} showText={false} />
               </div>
               <div className="flex-1 text-left">
                 <span className="text-foreground">All Communities</span>
@@ -141,7 +144,7 @@ export function CommunitySwitcher({ currentCommunityId, userId }: CommunitySwitc
                 return (
                   <button
                     key={community.id}
-                    onClick={() => !isCurrent && handleSwitch(community.id)}
+                    onClick={() => !isCurrent && handleSwitch(community.slug)}
                     className={cn(
                       "w-full flex items-center space-x-3 px-4 py-3 text-sm font-medium transition-colors",
                       isCurrent

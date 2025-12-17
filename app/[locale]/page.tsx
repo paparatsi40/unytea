@@ -1,231 +1,356 @@
 import Link from "next/link";
-import { ArrowRight, Video, Sparkles, Palette, Zap, Shield, Globe } from "lucide-react";
+import { ArrowRight, Video, Sparkles, Palette, Zap, Shield, Globe, Check, X, DollarSign, Users, Clock, Brain, Megaphone, TrendingUp } from "lucide-react";
 import { HomeNav } from "@/components/HomeNav";
+import { getTranslations } from 'next-intl/server';
+import { Logo } from "@/components/brand/Logo";
 
-export default async function Home({ params }: { params: { locale: string } }) {
-  const locale = params.locale || 'en';
+export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const t = await getTranslations(); // Sin namespace, porque i18n.ts ya carga home.json como root
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-primary/5">
       {/* Navigation */}
-      <HomeNav />
+      <HomeNav locale={locale} />
 
-      {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4">
-        <div className="container mx-auto max-w-6xl text-center">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-8 slide-up-fade">
+      {/* Hero Section - KILLER */}
+      <section className="pt-32 pb-20 px-4 relative overflow-hidden">
+        <div className="absolute inset-0 grid-pattern-animated opacity-20" />
+        <div className="container mx-auto max-w-6xl text-center relative z-10">
+          {/* Aggressive Badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-vibrant mb-8 slide-up-fade glow-pulse">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
             </span>
-            <span className="text-sm font-medium"> Now in Beta</span>
+            <span className="text-sm font-bold">{t('hero.badge')}</span>
           </div>
 
-          {/* Main Headline */}
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 slide-up-fade" style={{ animationDelay: "0.1s" }}>
-            Where Communities
+          {/* KILLER Headline */}
+          <h1 className="text-6xl md:text-8xl font-black mb-6 slide-up-fade leading-tight" style={{ animationDelay: "0.1s" }}>
+            {t('hero.headline1')}
             <br />
-            <span className="text-foreground font-bold">Unite</span>
+            <span className="gradient-text text-shimmer">{t('hero.headline2')}</span>
           </h1>
 
-          <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto slide-up-fade" style={{ animationDelay: "0.2s" }}>
-            Like sharing tea with friends, Unytea makes community building warm, human, and genuine.
-            <strong className="text-foreground"> Everything Skool has, plus the soul it's missing.</strong>
+          <p className="text-2xl md:text-3xl text-muted-foreground mb-6 max-w-3xl mx-auto slide-up-fade font-bold" style={{ animationDelay: "0.2s" }}>
+            {t('hero.subtitle1')}
+            <span className="text-primary"> {t('hero.subtitle2')}</span>
           </p>
 
-          {/* Community with Soul Section */}
-          <div className="text-center mb-12 slide-up-fade" style={{ animationDelay: "0.25s" }}>
-            <h2 className="text-3xl md:text-4xl font-bold mb-3">
-              Community with Soul.
-              <br />
-              <span className="text-primary">Not Just Another Platform.</span>
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              We took what works and added the warmth that's missing.
-            </p>
-          </div>
+          <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto slide-up-fade" style={{ animationDelay: "0.25s" }}>
+            {t('hero.description')}
+            <strong className="text-foreground"> {t('hero.descriptionBold')}</strong>
+          </p>
 
-          {/* Communities Showcase Grid */}
-          <div className="relative slide-up-fade mb-12" style={{ animationDelay: "0.3s" }}>
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-purple-500/20 blur-3xl -z-10" />
-            <div className="glass-strong rounded-2xl p-6 shadow-smooth-xl">
-              <h3 className="text-center text-lg font-semibold mb-6 text-muted-foreground">
-                Join Thriving Communities
-              </h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {mockCommunities.map((community, index) => (
-                  <div
-                    key={index}
-                    className="glass rounded-xl p-4 hover:scale-105 transition-transform cursor-pointer group"
-                  >
-                    <div className="w-full aspect-square rounded-lg mb-3 overflow-hidden shadow-lg group-hover:shadow-xl transition-shadow relative">
-                      <img 
-                        src={community.image}
-                        alt={community.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                    </div>
-                    <h4 className="font-semibold text-sm mb-1 truncate">{community.name}</h4>
-                    <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{community.description}</p>
-                    <p className="text-xs text-muted-foreground flex items-center gap-1">
-                      <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                      {community.members} members
-                    </p>
+          {/* Price Comparison Shock */}
+          <div className="glass-strong rounded-2xl p-8 mb-12 max-w-3xl mx-auto slide-up-fade" style={{ animationDelay: "0.3s" }}>
+            <div className="grid md:grid-cols-3 gap-6 text-left">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <X className="w-5 h-5 text-red-500" />
+                  <span className="font-bold text-red-500">{t('priceComparison.circle.name')}</span>
+                </div>
+                <p className="text-3xl font-bold text-red-500 mb-1">{t('priceComparison.circle.price')}<span className="text-sm">{t('priceComparison.circle.period')}</span></p>
+                <p className="text-sm text-muted-foreground">{t('priceComparison.circle.description')}</p>
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <X className="w-5 h-5 text-red-500" />
+                  <span className="font-bold text-red-500">{t('priceComparison.skool.name')}</span>
+                </div>
+                <p className="text-3xl font-bold text-red-500 mb-1">{t('priceComparison.skool.price')}<span className="text-sm">{t('priceComparison.skool.period')}</span></p>
+                <p className="text-sm text-muted-foreground">{t('priceComparison.skool.description')}</p>
+              </div>
+              <div className="relative">
+                <div className="absolute -inset-2 bg-gradient-vibrant rounded-xl blur-lg opacity-30"></div>
+                <div className="relative bg-background rounded-xl p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Check className="w-5 h-5 text-green-500" />
+                    <span className="font-bold text-primary">{t('priceComparison.unytea.name')}</span>
                   </div>
-                ))}
+                  <p className="text-3xl font-bold text-primary mb-1">{t('priceComparison.unytea.price')}<span className="text-sm">{t('priceComparison.unytea.period')}</span></p>
+                  <p className="text-sm text-foreground font-semibold">{t('priceComparison.unytea.description')}</p>
+                </div>
               </div>
             </div>
           </div>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center slide-up-fade" style={{ animationDelay: "0.4s" }}>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center slide-up-fade mb-8" style={{ animationDelay: "0.4s" }}>
             <Link
               href={`/${locale}/auth/signup`}
-              className="btn-hover-lift px-8 py-4 bg-primary text-primary-foreground rounded-xl text-lg font-semibold shadow-smooth-lg inline-flex items-center gap-2 group"
+              className="btn-hover-lift px-10 py-5 bg-gradient-vibrant text-white rounded-2xl text-xl font-bold shadow-smooth-lg inline-flex items-center gap-2 group hover-glow"
             >
-              Start Building Free
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              {t('hero.ctaPrimary')}
+              <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <Link
+              href="#comparison"
+              className="px-10 py-5 glass-strong rounded-2xl text-xl font-semibold hover:shadow-smooth-lg transition-all"
+            >
+              {t('hero.ctaSecondary')}
+            </Link>
+          </div>
+
+          <p className="text-sm text-muted-foreground slide-up-fade" style={{ animationDelay: "0.5s" }}>
+            {t('hero.trustBadges')}
+          </p>
+        </div>
+      </section>
+
+      {/* Why They're Failing You Section */}
+      <section className="py-20 px-4 bg-gradient-to-r from-red-500/5 via-orange-500/5 to-red-500/5">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl font-black mb-4">
+              {t('failingSection.title')} <span className="text-red-500">{t('failingSection.titleHighlight')}</span>
+            </h2>
+            <p className="text-xl text-muted-foreground">
+              {t('failingSection.subtitle')}
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {['noVideo', 'noCustomization', 'noEngagement', 'overpriced', 'ancientTech', 'vendorLock'].map((key, index) => (
+              <div
+                key={key}
+                className="glass-strong rounded-2xl p-8 hover:scale-105 transition-transform"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-red-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <X className="w-6 h-6 text-red-500" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold mb-2">{t(`failingSection.points.${key}.title`)}</h3>
+                    <p className="text-muted-foreground mb-3">{t(`failingSection.points.${key}.problem`)}</p>
+                    <div className="flex items-start gap-2 text-primary">
+                      <Check className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                      <p className="font-semibold">{t(`failingSection.points.${key}.solution`)}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* KILLER Features Section */}
+      <section className="py-20 px-4">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl font-black mb-4">
+              {t('featuresSection.title')} <span className="gradient-text">{t('featuresSection.titleHighlight')}</span>
+            </h2>
+            <p className="text-xl text-muted-foreground">
+              {t('featuresSection.subtitle')}
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { key: 'video', icon: Video },
+              { key: 'buddy', icon: Sparkles },
+              { key: 'content', icon: Brain },
+              { key: 'customization', icon: Palette },
+              { key: 'aiInsights', icon: TrendingUp },
+              { key: 'realtime', icon: Zap },
+              { key: 'pricing', icon: DollarSign },
+              { key: 'security', icon: Shield },
+              { key: 'matching', icon: Users },
+            ].map((feature, index) => (
+              <div
+                key={feature.key}
+                className="card-hover glass-strong rounded-2xl p-8 relative overflow-hidden"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-vibrant blur-3xl opacity-20"></div>
+                <div className="relative">
+                  <div className="w-14 h-14 bg-gradient-vibrant rounded-2xl flex items-center justify-center mb-4">
+                    <feature.icon className="w-7 h-7 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-3">{t(`featuresSection.features.${feature.key}.title`)}</h3>
+                  <p className="text-muted-foreground mb-4">{t(`featuresSection.features.${feature.key}.description`)}</p>
+                  <span className="inline-block px-4 py-2 bg-gradient-vibrant text-white text-xs font-bold rounded-full">
+                    {t(`featuresSection.features.${feature.key}.badge`)}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Brutal Comparison Table */}
+      <section id="comparison" className="py-20 px-4 bg-muted/30">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl font-black mb-4">{t('comparisonSection.title')}</h2>
+            <p className="text-xl text-muted-foreground">
+              {t('comparisonSection.subtitle')}
+            </p>
+          </div>
+
+          <div className="glass-strong rounded-2xl overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gradient-vibrant text-white">
+                  <tr>
+                    <th className="text-left p-6 font-bold text-lg">{t('comparisonSection.title')}</th>
+                    <th className="text-center p-6 font-bold text-lg">Circle</th>
+                    <th className="text-center p-6 font-bold text-lg">Skool</th>
+                    <th className="text-center p-6 font-bold text-lg">Teachable</th>
+                    <th className="text-center p-6 font-bold text-lg bg-primary">Unytea</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    { key: 'videoCalls', circle: false, skool: false, teachable: false },
+                    { key: 'recording', circle: false, skool: false, teachable: false },
+                    { key: 'buddySystem', circle: false, skool: false, teachable: false },
+                    { key: 'contentSharing', circle: false, skool: false, teachable: false },
+                    { key: 'realtime', circle: false, skool: false, teachable: false },
+                    { key: 'aiInsights', circle: false, skool: false, teachable: false },
+                    { key: 'customDomain', circle: true, skool: true, teachable: true },
+                    { key: 'branding', circle: false, skool: false, teachable: false },
+                    { key: 'whiteLabel', circle: true, skool: false, teachable: true },
+                    { key: 'courses', circle: true, skool: true, teachable: true },
+                    { key: 'forums', circle: true, skool: true, teachable: false },
+                    { key: 'profiles', circle: true, skool: true, teachable: true },
+                    { key: 'mobileApp', circle: true, skool: true, teachable: true },
+                    { key: 'api', circle: true, skool: false, teachable: true },
+                    { key: 'usagePricing', circle: false, skool: false, teachable: false },
+                    { key: 'migration', circle: false, skool: false, teachable: false },
+                  ].map((feature, index) => (
+                    <tr key={feature.key} className="border-b border-border/50 last:border-0">
+                      <td className="p-6 font-semibold">{t(`comparisonSection.features.${feature.key}`)}</td>
+                      <td className="p-6 text-center">
+                        {feature.circle ? <Check className="w-6 h-6 text-green-500 mx-auto" /> : <X className="w-6 h-6 text-red-500 mx-auto" />}
+                      </td>
+                      <td className="p-6 text-center">
+                        {feature.skool ? <Check className="w-6 h-6 text-green-500 mx-auto" /> : <X className="w-6 h-6 text-red-500 mx-auto" />}
+                      </td>
+                      <td className="p-6 text-center">
+                        {feature.teachable ? <Check className="w-6 h-6 text-green-500 mx-auto" /> : <X className="w-6 h-6 text-red-500 mx-auto" />}
+                      </td>
+                      <td className="p-6 text-center bg-primary/5">
+                        <Check className="w-6 h-6 text-primary mx-auto font-bold" />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="text-center mt-8">
+            <Link
+              href={`/${locale}/auth/signup`}
+              className="btn-hover-lift inline-flex items-center gap-2 px-8 py-4 bg-gradient-vibrant text-white rounded-xl text-lg font-bold shadow-smooth-lg hover-glow"
+            >
+              {t('comparisonSection.ctaButton')}
+              <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Features Grid */}
-      <section id="features" className="py-20 px-4">
-        <div className="container mx-auto max-w-6xl">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature, index) => (
-              <div
-                key={feature.title}
-                className="card-hover glass-strong rounded-2xl p-6"
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
-                  <feature.icon className="w-6 h-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                <p className="text-muted-foreground mb-3">{feature.description}</p>
-                {feature.badge && (
-                  <span className="inline-block px-3 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full">
-                    {feature.badge}
-                  </span>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Comparison Section */}
-      <section className="py-20 px-4 bg-muted/30">
-        <div className="container mx-auto max-w-4xl">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">Why Choose Unytea Over Skool?</h2>
-            <p className="text-xl text-muted-foreground">
-              Same core features. Better soul. Fair pricing.
-            </p>
-          </div>
-
-          <div className="glass-strong rounded-2xl p-8 space-y-4">
-            {comparisons.map((item, index) => (
-              <div
-                key={index}
-                className="flex items-start gap-4 pb-4 border-b border-border/50 last:border-0 last:pb-0"
-              >
-                <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Zap className="w-4 h-4 text-primary" />
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-semibold mb-1">{item.title}</h4>
-                  <p className="text-sm text-muted-foreground">{item.description}</p>
-                </div>
-                <span className="text-xs font-medium px-3 py-1 bg-primary/10 text-primary rounded-full flex-shrink-0">
-                  NEW
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing Section */}
+      {/* Pricing - More Aggressive */}
       <section id="pricing" className="py-20 px-4">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Simple, Honest Pricing
+            <h2 className="text-5xl font-black mb-4">
+              {t('pricingSection.title')} <span className="gradient-text">{t('pricingSection.titleHighlight')}</span>
             </h2>
             <p className="text-xl text-muted-foreground">
-              Start free. Scale as you grow. Cancel anytime.
+              {t('pricingSection.subtitle')}
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {pricingPlans.map((plan) => (
-              <div
-                key={plan.name}
-                className={`glass-strong rounded-2xl p-8 ${
-                  plan.featured
-                    ? "ring-2 ring-primary shadow-smooth-xl scale-105"
-                    : ""
-                }`}
-              >
-                {plan.featured && (
-                  <div className="text-center mb-4">
-                    <span className="inline-block px-4 py-1 bg-primary text-primary-foreground text-sm font-medium rounded-full">
-                      Most Popular
-                    </span>
-                  </div>
-                )}
-                <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
-                <div className="mb-6">
-                  <span className="text-4xl font-bold">${plan.price}</span>
-                  <span className="text-muted-foreground">/month</span>
-                </div>
-                <ul className="space-y-3 mb-8">
-                  {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-2">
-                      <Zap className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                      <span className="text-sm">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href={`/${locale}/auth/signup`}
-                  className={`btn-hover-lift block text-center py-3 rounded-xl font-semibold ${
-                    plan.featured
-                      ? "bg-primary text-primary-foreground shadow-smooth"
-                      : "glass border border-border"
+            {['professional', 'scale', 'enterprise'].map((plan, idx) => {
+              const isFeatured = plan === 'professional';
+              return (
+                <div
+                  key={plan}
+                  className={`glass-strong rounded-2xl p-8 relative overflow-hidden ${
+                    isFeatured
+                      ? "ring-4 ring-primary shadow-smooth-xl scale-105"
+                      : ""
                   }`}
                 >
-                  Get Started
-                </Link>
-              </div>
-            ))}
+                  {isFeatured && (
+                    <>
+                      <div className="absolute inset-0 bg-gradient-vibrant opacity-5"></div>
+                      <div className="text-center mb-4 relative">
+                        <span className="inline-block px-4 py-2 bg-gradient-vibrant text-white text-sm font-bold rounded-full">
+                          {t(`pricingSection.plans.${plan}.badge`)}
+                        </span>
+                      </div>
+                    </>
+                  )}
+                  <h3 className="text-3xl font-black mb-2 relative">{t(`pricingSection.plans.${plan}.name`)}</h3>
+                  <div className="mb-6 relative">
+                    <span className="text-5xl font-black">${t(`pricingSection.plans.${plan}.price`)}</span>
+                    <span className="text-muted-foreground text-xl">{t(`pricingSection.plans.${plan}.period`)}</span>
+                  </div>
+                  <div className="mb-6 text-sm text-muted-foreground relative">
+                    {t(`pricingSection.plans.${plan}.comparison`)}
+                  </div>
+                  <ul className="space-y-4 mb-8 relative">
+                    {(t.raw(`pricingSection.plans.${plan}.features`) as string[]).map((feature: string) => (
+                      <li key={feature} className="flex items-start gap-3">
+                        <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                        <span className="text-sm font-medium">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    href={`/${locale}/auth/signup`}
+                    className={`btn-hover-lift block text-center py-4 rounded-xl font-bold relative ${
+                      isFeatured
+                        ? "bg-gradient-vibrant text-white shadow-smooth hover-glow"
+                        : "glass-strong border-2 border-border"
+                    }`}
+                  >
+                    {t(`pricingSection.plans.${plan}.cta`)}
+                  </Link>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 px-4">
-        <div className="container mx-auto max-w-4xl">
-          <div className="glass-strong rounded-3xl p-12 text-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-purple-500/10 -z-10" />
-            <h2 className="text-4xl font-bold mb-4">
-              Ready to Unite Your Community?
+      {/* Migration Made Easy */}
+      <section className="py-20 px-4 bg-gradient-to-r from-primary/5 via-purple-500/5 to-primary/5">
+        <div className="container mx-auto max-w-4xl text-center">
+          <div className="glass-strong rounded-3xl p-12 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-vibrant opacity-5"></div>
+            <h2 className="text-5xl font-black mb-4 relative">
+              {t('migrationSection.title')} <span className="gradient-text">{t('migrationSection.titleHighlight')}</span>
             </h2>
-            <p className="text-xl text-muted-foreground mb-8">
-              Join us and experience community building that feels like home. 
+            <p className="text-xl text-muted-foreground mb-8 relative">
+              {t('migrationSection.description')}
+              <br />
+              <strong className="text-foreground">{t('migrationSection.descriptionBold')}</strong>
             </p>
-            <Link
-              href={`/${locale}/auth/signup`}
-              className="btn-hover-lift inline-flex items-center gap-2 px-8 py-4 bg-primary text-primary-foreground rounded-xl text-lg font-semibold shadow-smooth-lg"
-            >
-              Start Building Free
-              <ArrowRight className="w-5 h-5" />
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center relative">
+              <Link
+                href={`/${locale}/auth/signup`}
+                className="btn-hover-lift inline-flex items-center gap-2 px-8 py-4 bg-gradient-vibrant text-white rounded-xl text-lg font-bold shadow-smooth-lg hover-glow"
+              >
+                {t('migrationSection.ctaPrimary')}
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+              <Link
+                href={`/${locale}/contact`}
+                className="px-8 py-4 glass-strong rounded-xl text-lg font-semibold hover:shadow-smooth-lg transition-all"
+              >
+                {t('migrationSection.ctaSecondary')}
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -235,23 +360,20 @@ export default async function Home({ params }: { params: { locale: string } }) {
         <div className="container mx-auto max-w-6xl">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-primary to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-xl font-bold text-white">U</span>
-              </div>
-              <span className="font-bold">Unytea</span>
+              <Logo iconSize={32} showText={true} />
             </div>
             <p className="text-sm text-muted-foreground">
-              2024 Unytea. Where Communities Unite. 
+              {t('footer.tagline')}
             </p>
             <div className="flex gap-6">
               <Link href={`/${locale}/privacy`} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                Privacy
+                {t('footer.links.privacy')}
               </Link>
               <Link href={`/${locale}/terms`} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                Terms
+                {t('footer.links.terms')}
               </Link>
               <Link href={`/${locale}/contact`} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                Contact
+                {t('footer.links.contact')}
               </Link>
             </div>
           </div>
@@ -260,172 +382,3 @@ export default async function Home({ params }: { params: { locale: string } }) {
     </div>
   );
 }
-
-// Features data
-const features = [
-  {
-    icon: Video,
-    title: "Built-in Video Calls",
-    description: "1-on-1 and group sessions with recording, transcription, and screen sharing.",
-    badge: "Skool doesn't have this",
-  },
-  {
-    icon: Palette,
-    title: "Complete Customization",
-    description: "Your brand, your colors, your domain. Make it truly yours.",
-    badge: "Skool doesn't have this",
-  },
-  {
-    icon: Sparkles,
-    title: "Buddy System",
-    description: "Smart member matching and accountability partnerships that drive real connections.",
-    badge: "Nobody else has this",
-  },
-  {
-    icon: Zap,
-    title: "Content Sharing Panel",
-    description: "Share screens, whiteboards, PDFs, and videos in real-time during sessions.",
-    badge: "Nobody else has this",
-  },
-  {
-    icon: Shield,
-    title: "Real-time Everything",
-    description: "0ms latency with WebSockets. Discord-level performance for your community.",
-    badge: null,
-  },
-  {
-    icon: Globe,
-    title: "Modern & Beautiful",
-    description: "2024 design, not 2015. Glassmorphism, smooth animations, delightful UX.",
-    badge: null,
-  },
-];
-
-// Comparison data
-const comparisons = [
-  {
-    title: "Buddy System",
-    description: "Smart member matching for accountability partnerships. Skool doesn't have this at all.",
-  },
-  {
-    title: "Content Sharing Panel",
-    description: "Share whiteboards, files, and videos during live sessions. Nobody else has this.",
-  },
-  {
-    title: "Videocalls Integrated",
-    description: "Schedule, host, and record sessions without leaving the platform. No more Zoom links.",
-  },
-  {
-    title: "Your Brand, Your Way",
-    description: "Custom domains, colors, fonts, and CSS. Skool communities all look the same.",
-  },
-  {
-    title: "Usage-Based Pricing",
-    description: "Only pay for what you use. Transparent dashboard shows real-time usage.",
-  },
-  {
-    title: "Real-time WebSockets",
-    description: "Discord-level performance. 0ms latency. 90% less server load.",
-  },
-];
-
-// Pricing data - Updated to match Stripe configuration
-const pricingPlans = [
-  {
-    name: "Professional",
-    price: 129,
-    featured: true,
-    features: [
-      "1 community",
-      "500 members included",
-      "20 video hours/month",
-      "AI transcription & summaries",
-      "Recording & file hosting",
-      "Buddy System",
-      "Advanced analytics",
-      "Overage: $0.15/member, $0.30/hour",
-    ],
-  },
-  {
-    name: "Scale",
-    price: 249,
-    featured: false,
-    features: [
-      "3 communities",
-      "2,000 members each",
-      "60 video hours/month",
-      "Everything in Professional",
-      "White-label branding",
-      "Priority support",
-      "Custom integrations",
-      "Overage: $0.10/member, $0.20/hour",
-    ],
-  },
-  {
-    name: "Enterprise",
-    price: 499,
-    featured: false,
-    features: [
-      "10 communities",
-      "5,000 members each",
-      "150 video hours/month",
-      "Everything in Scale",
-      "Dedicated account manager",
-      "SLA guarantee (99.9%)",
-      "API access",
-      "Overage: $0.08/member, $0.15/hour",
-    ],
-  },
-];
-
-// Mock communities data with real images
-const mockCommunities = [
-  {
-    name: "Fitness Tribe",
-    members: "2.3k",
-    description: "Transform your body and mind with supportive fitness enthusiasts",
-    image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&h=400&fit=crop&q=80",
-  },
-  {
-    name: "Tech Founders",
-    members: "1.8k",
-    description: "Build the next unicorn with fellow startup founders and CTOs",
-    image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400&h=400&fit=crop&q=80",
-  },
-  {
-    name: "Design Masters",
-    members: "3.1k",
-    description: "Elevate your craft with world-class designers and creative minds",
-    image: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=400&h=400&fit=crop&q=80",
-  },
-  {
-    name: "Content Creators",
-    members: "4.2k",
-    description: "Grow your audience and master the art of digital storytelling",
-    image: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=400&h=400&fit=crop&q=80",
-  },
-  {
-    name: "Mindful Living",
-    members: "1.5k",
-    description: "Find inner peace through meditation, yoga, and mindfulness",
-    image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=400&fit=crop&q=80",
-  },
-  {
-    name: "Book Club",
-    members: "890",
-    description: "Discuss great books and expand your knowledge with fellow readers",
-    image: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=400&h=400&fit=crop&q=80",
-  },
-  {
-    name: "Music Lovers",
-    members: "2.7k",
-    description: "Share your passion for music and discover new sounds together",
-    image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=400&fit=crop&q=80",
-  },
-  {
-    name: "Entrepreneurs",
-    members: "5.1k",
-    description: "Scale your business with proven strategies from successful founders",
-    image: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=400&h=400&fit=crop&q=80",
-  },
-];

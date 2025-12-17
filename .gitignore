@@ -75,3 +75,5 @@ lerna-debug.log*
 .cache
 .parcel-cache
 .turbo
+
+.vercel

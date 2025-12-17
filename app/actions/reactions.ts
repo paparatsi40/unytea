@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-export type ReactionType = "LIKE" | "LOVE" | "CELEBRATE" | "FIRE" | "IDEA" | "CLAP";
+export type ReactionType = "LIKE" | "LOVE" | "CELEBRATE" | "FIRE" | "IDEA" | "CLAP" | "THINKING" | "SUPPORT" | "ROCKET" | "STAR" | "EYES" | "CHECK";
 
 /**
  * Toggle reaction on a post
@@ -29,7 +29,7 @@ export async function toggleReaction(
         where: { id: existingReaction.id },
       });
 
-      revalidatePath("/c/[slug]");
+      revalidatePath("/communities/[slug]");
       return { success: true, action: "removed" };
     } else {
       // Add reaction
@@ -41,7 +41,7 @@ export async function toggleReaction(
         },
       });
 
-      revalidatePath("/c/[slug]");
+      revalidatePath("/communities/[slug]");
       return { success: true, action: "added" };
     }
   } catch (error) {

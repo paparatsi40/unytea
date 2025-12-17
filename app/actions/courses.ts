@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getCurrentUserId } from "@/lib/auth-utils";
 import { prisma } from "@/lib/prisma";
+import { stripe } from "@/lib/stripe";
 
 /**
  * Create a new course
@@ -15,6 +16,15 @@ export async function createCourse(data: {
   communityId: string;
   isPaid?: boolean;
   price?: number;
+  tier?: string;
+  isLeadMagnet?: boolean;
+  upgradeCourseId?: string;
+  certificateEnabled?: boolean;
+  liveSupportEnabled?: boolean;
+  whatYouWillLearn?: string[];
+  previewVideoUrl?: string;
+  salesPageContent?: string;
+  testimonials?: any;
 }) {
   try {
     const userId = await getCurrentUserId();
@@ -47,6 +57,43 @@ export async function createCourse(data: {
       return { success: false, error: "Course slug already exists" };
     }
 
+    // Create Stripe Product if paid course
+    let stripeProductId: string | null = null;
+    let stripePriceId: string | null = null;
+
+    if (data.isPaid && data.price > 0) {
+      try {
+        // Create Stripe Product
+        const product = await stripe.products.create({
+          name: data.title,
+          description: data.description || undefined,
+          metadata: {
+            courseSlug: data.slug,
+            communityId: data.communityId,
+            type: "course",
+          },
+        });
+        stripeProductId = product.id;
+
+        // Create Stripe Price
+        const price = await stripe.prices.create({
+          product: stripeProductId,
+          unit_amount: Math.round(data.price * 100), // Convert to cents
+          currency: "usd",
+          metadata: {
+            courseSlug: data.slug,
+          },
+        });
+        stripePriceId = price.id;
+      } catch (stripeError) {
+        console.error("Error creating Stripe product:", stripeError);
+        return { 
+          success: false, 
+          error: "Failed to create payment product. Please check your Stripe configuration." 
+        };
+      }
+    }
+
     const course = await prisma.course.create({
       data: {
         title: data.title,
@@ -56,6 +103,18 @@ export async function createCourse(data: {
         communityId: data.communityId,
         isPaid: data.isPaid || false,
         price: data.price || 0,
+        isPublished: false,
+        tier: data.tier || "standard",
+        isLeadMagnet: data.isLeadMagnet || false,
+        upgradeCourseId: data.upgradeCourseId,
+        certificateEnabled: data.certificateEnabled || false,
+        liveSupportEnabled: data.liveSupportEnabled || false,
+        whatYouWillLearn: data.whatYouWillLearn || [],
+        previewVideoUrl: data.previewVideoUrl,
+        salesPageContent: data.salesPageContent,
+        testimonials: data.testimonials,
+        stripeProductId: stripeProductId,
+        stripePriceId: stripePriceId,
         isPublished: false,
       },
     });
@@ -165,6 +224,15 @@ export async function updateCourse(
     isPaid?: boolean;
     price?: number;
     isPublished?: boolean;
+    tier?: string;
+    isLeadMagnet?: boolean;
+    upgradeCourseId?: string;
+    certificateEnabled?: boolean;
+    liveSupportEnabled?: boolean;
+    whatYouWillLearn?: string[];
+    previewVideoUrl?: string;
+    salesPageContent?: string;
+    testimonials?: any;
   }
 ) {
   try {

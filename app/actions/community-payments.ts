@@ -30,10 +30,10 @@ export async function enablePaidCommunity(communityId: string, priceInCents: num
     // Verify user owns the community
     const community = await prisma.community.findUnique({
       where: { id: communityId },
-      select: { creatorId: true },
+      select: { ownerId: true },
     });
 
-    if (!community || community.creatorId !== session.user.id) {
+    if (!community || community.ownerId !== session.user.id) {
       return { success: false, error: "Unauthorized" };
     }
 
@@ -81,10 +81,10 @@ export async function disablePaidCommunity(communityId: string) {
     // Verify ownership
     const community = await prisma.community.findUnique({
       where: { id: communityId },
-      select: { creatorId: true },
+      select: { ownerId: true },
     });
 
-    if (!community || community.creatorId !== session.user.id) {
+    if (!community || community.ownerId !== session.user.id) {
       return { success: false, error: "Unauthorized" };
     }
 
@@ -291,7 +291,7 @@ export async function joinPaidCommunity(communityId: string) {
     const community = await prisma.community.findUnique({
       where: { id: communityId },
       include: {
-        creator: {
+        owner: {
           select: {
             stripeConnectAccountId: true,
           },
@@ -307,17 +307,15 @@ export async function joinPaidCommunity(communityId: string) {
       return { success: false, error: "Community is not paid" };
     }
 
-    if (!community.creator.stripeConnectAccountId) {
+    if (!community.owner.stripeConnectAccountId) {
       return { success: false, error: "Creator hasn't set up payments" };
     }
 
     // Check if already member
-    const existingMember = await prisma.communityMember.findUnique({
+    const existingMember = await prisma.member.findFirst({
       where: {
-        communityId_userId: {
-          communityId,
-          userId: session.user.id,
-        },
+        communityId: communityId,
+        userId: session.user.id,
       },
     });
 
@@ -333,7 +331,7 @@ export async function joinPaidCommunity(communityId: string) {
     const checkoutResult = await createMembershipCheckout({
       communityId,
       communityName: community.name,
-      creatorAccountId: community.creator.stripeConnectAccountId,
+      creatorAccountId: community.owner.stripeConnectAccountId,
       memberEmail: session.user.email,
       priceInCents: community.membershipPrice,
       successUrl,
@@ -362,17 +360,15 @@ export async function cancelMembership(communityId: string) {
     }
 
     // Get membership subscription
-    const subscription = await prisma.membershipSubscription.findUnique({
+    const subscription = await prisma.membershipSubscription.findFirst({
       where: {
-        communityId_userId: {
-          communityId,
-          userId: session.user.id,
-        },
+        communityId: communityId,
+        userId: session.user.id,
       },
       include: {
         community: {
           include: {
-            creator: {
+            owner: {
               select: {
                 stripeConnectAccountId: true,
               },
@@ -386,14 +382,14 @@ export async function cancelMembership(communityId: string) {
       return { success: false, error: "Subscription not found" };
     }
 
-    if (!subscription.community.creator.stripeConnectAccountId) {
+    if (!subscription.community.owner.stripeConnectAccountId) {
       return { success: false, error: "Invalid creator account" };
     }
 
     // Cancel in Stripe
     const cancelResult = await cancelMemberSubscription(
       subscription.stripeSubscriptionId,
-      subscription.community.creator.stripeConnectAccountId
+      subscription.community.owner.stripeConnectAccountId
     );
 
     if (!cancelResult.success) {
@@ -403,10 +399,7 @@ export async function cancelMembership(communityId: string) {
     // Update in database
     await prisma.membershipSubscription.update({
       where: {
-        communityId_userId: {
-          communityId,
-          userId: session.user.id,
-        },
+        id: subscription.id,
       },
       data: {
         status: "canceled",

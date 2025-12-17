@@ -56,27 +56,27 @@ export function SpectacularFeedHeader({ postsCount }: SpectacularFeedHeaderProps
           </div>
 
           {/* Premium Stats Cards */}
-          <div className="grid grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
             {/* Posts Card with pulsing animation */}
-            <div className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-500/10 to-purple-500/10 backdrop-blur-xl border border-violet-500/20 p-8 hover:scale-105 transition-all duration-500 hover:shadow-2xl hover:shadow-violet-500/50">
+            <div className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-500/10 to-purple-500/10 backdrop-blur-xl border border-violet-500/20 p-6 hover:scale-105 transition-all duration-500 hover:shadow-2xl hover:shadow-violet-500/50">
               <div className="absolute inset-0 bg-gradient-to-r from-violet-600/0 via-violet-600/10 to-violet-600/0 translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000" />
               <div className="absolute -top-12 -right-12 w-32 h-32 bg-violet-500/20 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-500" />
               
-              <div className="relative flex items-center gap-5">
-                <div className="bg-gradient-to-br from-violet-500 to-purple-600 p-4 rounded-2xl shadow-lg group-hover:rotate-12 transition-transform duration-300">
-                  <TrendingUp className="w-10 h-10 text-white" />
+              <div className="relative flex items-center gap-4">
+                <div className="bg-gradient-to-br from-violet-500 to-purple-600 p-3 rounded-2xl shadow-lg group-hover:rotate-12 transition-transform duration-300 flex-shrink-0">
+                  <TrendingUp className="w-8 h-8 text-white" />
                 </div>
-                <div>
-                  <div className="text-5xl font-black text-white mb-1 group-hover:scale-110 transition-transform duration-300">
+                <div className="flex-1 min-w-0">
+                  <div className="text-4xl font-black text-white mb-1 group-hover:scale-110 transition-transform duration-300">
                     {postsCount}
                   </div>
-                  <div className="text-lg font-bold text-violet-300">Posts</div>
+                  <div className="text-base font-bold text-violet-300">Posts</div>
                 </div>
               </div>
             </div>
 
             {/* Active Community Card */}
-            <div className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-500/10 to-green-500/10 backdrop-blur-xl border border-emerald-500/20 p-8 hover:scale-105 transition-all duration-500 hover:shadow-2xl hover:shadow-emerald-500/50">
+            <div className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-500/10 to-green-500/10 backdrop-blur-xl border border-emerald-500/20 p-6 hover:scale-105 transition-all duration-500 hover:shadow-2xl hover:shadow-emerald-500/50">
               <div className="absolute inset-0 bg-gradient-to-r from-emerald-600/0 via-emerald-600/10 to-emerald-600/0 translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000" />
               <div className="absolute -top-12 -right-12 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-500" />
               
@@ -87,21 +87,22 @@ export function SpectacularFeedHeader({ postsCount }: SpectacularFeedHeaderProps
                 <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }} />
               </div>
               
-              <div className="relative flex items-center gap-5">
-                <div className="bg-gradient-to-br from-emerald-500 to-green-600 p-4 rounded-2xl shadow-lg group-hover:rotate-12 transition-transform duration-300">
-                  <Users className="w-10 h-10 text-white" />
+              <div className="relative flex items-center gap-4">
+                <div className="bg-gradient-to-br from-emerald-500 to-green-600 p-3 rounded-2xl shadow-lg group-hover:rotate-12 transition-transform duration-300 flex-shrink-0">
+                  <Users className="w-8 h-8 text-white" />
                 </div>
-                <div>
-                  <div className="text-5xl font-black text-white mb-1 group-hover:scale-110 transition-transform duration-300">
+                <div className="flex-1 min-w-0">
+                  <div className="text-2xl lg:text-3xl font-black text-white group-hover:scale-105 transition-transform duration-300 leading-tight">
                     Active
                   </div>
-                  <div className="text-lg font-bold text-emerald-300">Community</div>
+                  <div className="text-base lg:text-lg font-bold text-white leading-tight">Community</div>
+                  <div className="text-xs font-semibold text-white/70 mt-1">Growing strong</div>
                 </div>
               </div>
             </div>
 
             {/* Live Engagement Card */}
-            <div className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-amber-500/10 to-orange-500/10 backdrop-blur-xl border border-amber-500/20 p-8 hover:scale-105 transition-all duration-500 hover:shadow-2xl hover:shadow-amber-500/50">
+            <div className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-amber-500/10 to-orange-500/10 backdrop-blur-xl border border-amber-500/20 p-6 hover:scale-105 transition-all duration-500 hover:shadow-2xl hover:shadow-amber-500/50">
               <div className="absolute inset-0 bg-gradient-to-r from-amber-600/0 via-amber-600/10 to-amber-600/0 translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000" />
               <div className="absolute -top-12 -right-12 w-32 h-32 bg-amber-500/20 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-500" />
               
@@ -110,15 +111,16 @@ export function SpectacularFeedHeader({ postsCount }: SpectacularFeedHeaderProps
                 <Zap className="w-6 h-6 text-amber-400 fill-amber-400 animate-pulse" />
               </div>
               
-              <div className="relative flex items-center gap-5">
-                <div className="bg-gradient-to-br from-amber-500 to-orange-600 p-4 rounded-2xl shadow-lg group-hover:rotate-12 transition-transform duration-300 animate-pulse">
-                  <Zap className="w-10 h-10 text-white" />
+              <div className="relative flex items-center gap-4">
+                <div className="bg-gradient-to-br from-amber-500 to-orange-600 p-3 rounded-2xl shadow-lg group-hover:rotate-12 transition-transform duration-300 animate-pulse flex-shrink-0">
+                  <Zap className="w-8 h-8 text-white" />
                 </div>
-                <div>
-                  <div className="text-5xl font-black text-white mb-1 group-hover:scale-110 transition-transform duration-300">
+                <div className="flex-1 min-w-0">
+                  <div className="text-2xl lg:text-3xl font-black text-white group-hover:scale-105 transition-transform duration-300 leading-tight">
                     Live
                   </div>
-                  <div className="text-lg font-bold text-amber-300">Engagement</div>
+                  <div className="text-base lg:text-lg font-bold text-white leading-tight">Engagement</div>
+                  <div className="text-xs font-semibold text-white/70 mt-1">Real-time activity</div>
                 </div>
               </div>
             </div>

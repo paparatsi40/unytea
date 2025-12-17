@@ -8,11 +8,15 @@ export async function POST(request: NextRequest) {
     const session = await auth();
     
     if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
     }
 
     const { currentPassword, newPassword } = await request.json();
 
+    // Validate input
     if (!currentPassword || !newPassword) {
       return NextResponse.json(
         { error: "Current password and new password are required" },
@@ -27,16 +31,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get user with password
+    // Get user from database
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { id: true, password: true },
+      select: { id: true, password: true, email: true },
     });
 
-    if (!user || !user.password) {
+    if (!user) {
       return NextResponse.json(
-        { error: "User not found or password not set" },
+        { error: "User not found" },
         { status: 404 }
+      );
+    }
+
+    // Check if user has a password (might be OAuth only)
+    if (!user.password) {
+      return NextResponse.json(
+        { error: "Cannot change password for OAuth accounts. Please use your OAuth provider." },
+        { status: 400 }
       );
     }
 
@@ -53,15 +65,20 @@ export async function POST(request: NextRequest) {
     // Hash new password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    // Update password
+    // Update password in database
     await prisma.user.update({
-      where: { id: session.user.id },
+      where: { id: user.id },
       data: { password: hashedPassword },
     });
 
-    return NextResponse.json({ success: true, message: "Password changed successfully" });
+    console.log(`✅ Password changed successfully for user: ${user.email}`);
+
+    return NextResponse.json({
+      success: true,
+      message: "Password changed successfully",
+    });
   } catch (error) {
-    console.error("Error changing password:", error);
+    console.error("❌ Error changing password:", error);
     return NextResponse.json(
       { error: "Failed to change password" },
       { status: 500 }

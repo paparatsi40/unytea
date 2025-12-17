@@ -101,9 +101,9 @@ export function UsageDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Usage Dashboard</h2>
-          <p className="text-sm text-muted-foreground">
+          <span className="text-sm text-muted-foreground">
             Current Plan: <Badge variant="default">{usage.plan}</Badge>
-          </p>
+          </span>
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Clock className="h-4 w-4" />

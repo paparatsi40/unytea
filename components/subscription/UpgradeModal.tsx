@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { X, Zap, Check, ArrowRight, TrendingUp } from "lucide-react";
 import Link from "next/link";
-import { SubscriptionPlan } from "@/lib/subscription-limits";
+import { SubscriptionPlan } from "@/lib/subscription-plans";
 
 interface UpgradeModalProps {
   isOpen: boolean;
@@ -32,14 +32,14 @@ export function UpgradeModal({
   if (!isOpen) return null;
 
   const suggestedPlan =
-    currentPlan === SubscriptionPlan.FREE
+    currentPlan === "FREE"
       ? "Professional"
-      : currentPlan === SubscriptionPlan.PROFESSIONAL
-      ? "Premium"
-      : null;
+      : currentPlan === "PROFESSIONAL"
+      ? "Scale"
+      : "Enterprise";
 
   const suggestedPrice =
-    currentPlan === SubscriptionPlan.FREE ? 49 : currentPlan === SubscriptionPlan.PROFESSIONAL ? 149 : null;
+    currentPlan === "FREE" ? 99 : currentPlan === "PROFESSIONAL" ? 249 : "Custom";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -88,57 +88,33 @@ export function UpgradeModal({
         )}
 
         {/* Comparison */}
-        {suggestedPlan && (
-          <div className="space-y-3 mb-6">
-            <div className="flex items-center gap-3 text-sm">
-              <div className="flex-1 glass rounded-lg p-3 border border-white/10">
-                <div className="text-white/60 text-xs mb-1">Current Plan</div>
-                <div className="font-semibold text-white">{currentPlan}</div>
-                <div className="text-primary text-xs mt-1">
-                  {currentPlan === SubscriptionPlan.FREE ? "$0/month" : "$49/month"}
-                </div>
+        <div className="space-y-3 mb-6">
+          <div className="flex items-center gap-3 text-sm">
+            <div className="flex-1 glass rounded-lg p-3 border border-white/10">
+              <div className="text-white/60 text-xs mb-1">Current Plan</div>
+              <div className="font-semibold text-white capitalize">{currentPlan.toLowerCase()}</div>
+              <div className="text-primary text-xs mt-1">
+                {currentPlan === "FREE" ? "$0/month" : currentPlan === "PROFESSIONAL" ? "$99/month" : "$249/month"}
               </div>
-              <ArrowRight className="w-5 h-5 text-white/40 flex-shrink-0" />
-              <div className="flex-1 glass rounded-lg p-3 border-2 border-primary/50 bg-primary/5">
-                <div className="text-white/60 text-xs mb-1">Upgrade to</div>
-                <div className="font-semibold text-white">{suggestedPlan}</div>
-                <div className="text-primary text-xs mt-1 font-semibold">${suggestedPrice}/month</div>
+            </div>
+            <ArrowRight className="w-5 h-5 text-white/40 flex-shrink-0" />
+            <div className="flex-1 glass rounded-lg p-3 border-2 border-primary/50 bg-primary/5">
+              <div className="text-white/60 text-xs mb-1">Upgrade to</div>
+              <div className="font-semibold text-white">{suggestedPlan}</div>
+              <div className="text-primary text-xs mt-1 font-semibold">
+                {typeof suggestedPrice === 'number' ? `$${suggestedPrice}/month` : suggestedPrice}
               </div>
             </div>
           </div>
-        )}
+        </div>
 
         {/* Benefits */}
         <div className="glass rounded-xl p-4 mb-6 border border-white/10">
           <div className="text-sm font-semibold text-white mb-3">
-            {suggestedPlan && `What you get with ${suggestedPlan}:`}
+            What you get with {suggestedPlan}:
           </div>
           <div className="space-y-2">
-            {currentPlan === SubscriptionPlan.FREE && (
-              <>
-                <div className="flex items-center gap-2 text-sm text-white/80">
-                  <Check className="w-4 h-4 text-primary flex-shrink-0" />
-                  <span>Unlimited members</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-white/80">
-                  <Check className="w-4 h-4 text-primary flex-shrink-0" />
-                  <span>Unlimited video calls</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-white/80">
-                  <Check className="w-4 h-4 text-primary flex-shrink-0" />
-                  <span>Recording + AI Transcription</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-white/80">
-                  <Check className="w-4 h-4 text-primary flex-shrink-0" />
-                  <span>Full customization</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-white/80">
-                  <Check className="w-4 h-4 text-primary flex-shrink-0" />
-                  <span>Priority support</span>
-                </div>
-              </>
-            )}
-            {currentPlan === SubscriptionPlan.PROFESSIONAL && (
+            {currentPlan === "FREE" && (
               <>
                 <div className="flex items-center gap-2 text-sm text-white/80">
                   <Check className="w-4 h-4 text-primary flex-shrink-0" />
@@ -146,15 +122,67 @@ export function UpgradeModal({
                 </div>
                 <div className="flex items-center gap-2 text-sm text-white/80">
                   <Check className="w-4 h-4 text-primary flex-shrink-0" />
+                  <span>500 members per community (vs 50)</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-white/80">
+                  <Check className="w-4 h-4 text-primary flex-shrink-0" />
+                  <span>20 video hours/month (vs 2)</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-white/80">
+                  <Check className="w-4 h-4 text-primary flex-shrink-0" />
+                  <span>Advanced analytics</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-white/80">
+                  <Check className="w-4 h-4 text-primary flex-shrink-0" />
+                  <span>50GB storage (vs 1GB)</span>
+                </div>
+              </>
+            )}
+            {currentPlan === "PROFESSIONAL" && (
+              <>
+                <div className="flex items-center gap-2 text-sm text-white/80">
+                  <Check className="w-4 h-4 text-primary flex-shrink-0" />
+                  <span>6 communities (vs 3)</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-white/80">
+                  <Check className="w-4 h-4 text-primary flex-shrink-0" />
+                  <span>2,000 members per community (vs 500)</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-white/80">
+                  <Check className="w-4 h-4 text-primary flex-shrink-0" />
                   <span>White-label branding</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-white/80">
                   <Check className="w-4 h-4 text-primary flex-shrink-0" />
-                  <span>API access</span>
+                  <span>Priority support</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-white/80">
                   <Check className="w-4 h-4 text-primary flex-shrink-0" />
-                  <span>Dedicated support</span>
+                  <span>Dedicated onboarding</span>
+                </div>
+              </>
+            )}
+            {currentPlan === "SCALE" && (
+              <>
+                <div className="flex items-center gap-2 text-sm text-white/80">
+                  <Check className="w-4 h-4 text-primary flex-shrink-0" />
+                  <span>Unlimited communities & members</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-white/80">
+                  <Check className="w-4 h-4 text-primary flex-shrink-0" />
+                  <span>API access (beta)</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-white/80">
+                  <Check className="w-4 h-4 text-primary flex-shrink-0" />
+                  <span>Custom integrations</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-white/80">
+                  <Check className="w-4 h-4 text-primary flex-shrink-0" />
+                  <span>Dedicated support (<4hr response)</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-white/80">
+                  <Check className="w-4 h-4 text-primary flex-shrink-0" />
+                  <span>SLA available on request</span>
                 </div>
               </>
             )}

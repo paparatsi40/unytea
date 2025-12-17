@@ -1,0 +1,170 @@
+{
+  "sidebar": {
+    "dashboard": "Panel",
+    "communities": "Comunidades",
+    "courses": "Cursos",
+    "sessions": "Sesiones",
+    "messages": "Mensajes",
+    "analytics": "Analíticas",
+    "settings": "Configuración",
+    "help": "Ayuda",
+    "admin": "Administración",
+    "achievements": "Logros",
+    "recordings": "Grabaciones",
+    "notifications": "Notificaciones",
+    "upgrade": "Actualizar Plan"
+  },
+  "header": {
+    "search": "Buscar comunidades, cursos, miembros...",
+    "quickActions": "Acciones Rápidas",
+    "createCommunity": "Crear Comunidad",
+    "scheduleSession": "Programar Sesión",
+    "messages": "Mensajes",
+    "notifications": "Notificaciones",
+    "myProfile": "Mi Perfil",
+    "myCommunities": "Mis Comunidades",
+    "analytics": "Analíticas",
+    "paymentsEarnings": "Pagos y Ganancias",
+    "subscriptionBilling": "Suscripción y Facturación",
+    "settings": "Configuración",
+    "helpSupport": "Ayuda y Soporte",
+    "documentation": "Documentación",
+    "signOut": "Cerrar Sesión"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "update": "Actualizar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "sort": "Ordenar",
+    "close": "Cerrar",
+    "back": "Volver",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "submit": "Enviar",
+    "confirm": "Confirmar",
+    "success": "Éxito",
+    "error": "Error",
+    "warning": "Advertencia",
+    "info": "Información"
+  },
+  "communities": {
+    "title": "Comunidades",
+    "description": "Administra y explora tus comunidades",
+    "create": "Crear Comunidad",
+    "explore": "Explorar",
+    "manage": "Administrar",
+    "myComm": "Mis Comunidades",
+    "members": "Miembros",
+    "posts": "Publicaciones",
+    "settings": "Configuración"
+  },
+  "courses": {
+    "title": "Cursos",
+    "description": "Aprende y crece con cursos estructurados",
+    "create": "Crear Curso",
+    "browse": "Explorar Cursos",
+    "myCourses": "Mis Cursos",
+    "inProgress": "En Progreso",
+    "completed": "Completados",
+    "notStarted": "No Iniciados",
+    "totalEnrolled": "Total Inscritos",
+    "lessons": "Lecciones",
+    "modules": "Módulos",
+    "students": "Estudiantes"
+  },
+  "sessions": {
+    "title": "Sesiones",
+    "description": "Sesiones de mentoría en vivo",
+    "schedule": "Programar Sesión",
+    "upcoming": "Próximas",
+    "past": "Pasadas",
+    "live": "En Vivo",
+    "recordings": "Grabaciones"
+  },
+  "settings": {
+    "title": "Configuración",
+    "profile": "Perfil",
+    "account": "Cuenta",
+    "security": "Seguridad",
+    "privacy": "Privacidad",
+    "notifications": "Notificaciones",
+    "appearance": "Apariencia",
+    "billing": "Facturación",
+    "payments": "Pagos",
+    "integrations": "Integraciones"
+  },
+  "welcome": {
+    "title": "¡Bienvenido de nuevo!",
+    "titleWithName": "¡Bienvenido de nuevo, {name}!",
+    "subtitle": "Selecciona una comunidad para comenzar"
+  },
+  "stats": {
+    "totalCommunities": "Total de Comunidades",
+    "youOwn": "Tú Posees",
+    "totalMembers": "Total de Miembros",
+    "quickAccess": "Acceso Rápido",
+    "active": "Activas",
+    "owner": "Propietario",
+    "across": "En todas",
+    "learn": "Aprender"
+  },
+  "actions": {
+    "newCommunity": "Nueva Comunidad",
+    "createFirstCommunity": "Crear Primera Comunidad",
+    "learnMore": "Aprender Más"
+  },
+  "discover": {
+    "title": "Descubre Comunidades",
+    "description": "Explora miles de comunidades llenas de conocimiento, conexiones y oportunidades de crecimiento. ¡Tu próxima aventura de aprendizaje te espera!",
+    "button": "Explorar Comunidades",
+    "sidebarTitle": "Descubrir",
+    "sidebarBadge": "NUEVO",
+    "sidebarDesc": "Explora comunidades",
+    "stats": {
+      "communities": "Comunidades",
+      "members": "Miembros",
+      "possibilities": "Posibilidades"
+    }
+  },
+  "quickAccess": {
+    "myCommunities": "Mis Comunidades",
+    "myCommunitiesDesc": "Gestiona y participa en tus comunidades",
+    "explore": "Explorar Nuevas",
+    "exploreDesc": "Descubre comunidades interesantes para unirte",
+    "browseNow": "Explorar ahora",
+    "owned": "propias",
+    "joined": "unidas"
+  },
+  "sections": {
+    "recentActivity": "Actividad Reciente",
+    "quickLinks": "Enlaces Rápidos"
+  },
+  "activity": {
+    "allSet": "¡Todo listo!",
+    "communitiesActive": "{count, plural, =0 {ninguna comunidad activa} =1 {# comunidad activa} other {# comunidades activas}}",
+    "membersCount": "{count, plural, =0 {0 miembros} =1 {# miembro} other {# miembros}}",
+    "noActivity": "No hay actividad reciente"
+  },
+  "emptyState": {
+    "title": "Aún no tienes comunidades",
+    "description": "Explora las comunidades disponibles y comienza a aprender hoy"
+  },
+  "quickLinks": {
+    "myCourses": "Mis Cursos",
+    "myCoursesDesc": "Continúa aprendiendo",
+    "sessions": "Sesiones",
+    "sessionsDesc": "Ver calendario",
+    "messages": "Mensajes",
+    "messagesDesc": "Ver bandeja de entrada"
+  },
+  "upgrade": {
+    "title": "Actualiza tu Plan",
+    "description": "Desbloquea todas las funciones"
+  }
+}

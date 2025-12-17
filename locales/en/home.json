@@ -1,19 +1,231 @@
 {
-  "headline": "Where Communities",
-  "unite": "Unite",
-  "subtitle": "The most",
-  "advanced": "advanced community platform",
-  "subtitle2": "on the planet. Not the cheapest.",
-  "thebest": "The best",
-  "signin": "Sign In",
-  "startfree": "Start Free",
-  "dashboard": "Dashboard",
-  "features": "Features",
-  "pricing": "Pricing",
-  "cta": "Start Building Free",
-  "beta": "Beta",
-  "video": {
-    "title": "See Unytea in Action",
-    "subtitle": "Watch how communities thrive on our platform"
+  "nav": {
+    "features": "Features",
+    "pricing": "Pricing",
+    "community": "Community",
+    "signin": "Sign In",
+    "startfree": "Start Free",
+    "dashboard": "Dashboard",
+    "gotodashboard": "Go to Dashboard"
+  },
+  "hero": {
+    "badge": "🔥 3,000+ Communities Already Switched",
+    "headline1": "Where Communities",
+    "headline2": "Thrive",
+    "subtitle1": "The complete platform:",
+    "subtitle2": "everything your community needs, plus intelligent features they'll love.",
+    "description": "Built-in video calls. Buddy matching. Content sharing. Real customization. Fair pricing.",
+    "descriptionBold": "No more paying $99-$399/month for basic forums.",
+    "ctaPrimary": "Start Free - No Credit Card",
+    "ctaSecondary": "See Full Comparison",
+    "trustBadges": "✓ 14-day free trial ✓ Cancel anytime ✓ Migrate from Circle/Skool free"
+  },
+  "priceComparison": {
+    "circle": {
+      "name": "Circle",
+      "price": "$399",
+      "period": "/mo",
+      "description": "No video. No customization. Basic forum."
+    },
+    "skool": {
+      "name": "Skool",
+      "price": "$99",
+      "period": "/mo",
+      "description": "Cookie-cutter design. No calls. Same as everyone."
+    },
+    "unytea": {
+      "name": "Unytea",
+      "price": "$129",
+      "period": "/mo",
+      "description": "Everything + Video + AI + Customization"
+    }
+  },
+  "failingSection": {
+    "title": "Why They're",
+    "titleHighlight": "Ripping You Off",
+    "subtitle": "Let's be real about what you're NOT getting with Circle, Skool & Teachable",
+    "points": {
+      "noVideo": {
+        "title": "No Built-in Video Calls",
+        "problem": "Circle & Skool force you to use Zoom/Google Meet. More tools = more friction = lower engagement.",
+        "solution": "Unytea: 1-click video calls with recording, transcription, and screen sharing built-in."
+      },
+      "noCustomization": {
+        "title": "Zero Customization",
+        "problem": "Every Skool community looks identical. Circle's 'customization' is just changing a logo color.",
+        "solution": "Unytea: Full branding control. Custom domains. Your colors. Your fonts. Your CSS."
+      },
+      "noEngagement": {
+        "title": "No Real Engagement Tools",
+        "problem": "Basic forums and courses. No accountability. No member matching. Just another dead community.",
+        "solution": "Unytea: Buddy System matches members for accountability. AI-powered engagement insights."
+      },
+      "overpriced": {
+        "title": "Overpriced for What You Get",
+        "problem": "Circle: $399/mo for a forum. Skool: $99/mo but everyone's community looks the same. Teachable: Great for courses, terrible for community.",
+        "solution": "Unytea: $129/mo for everything. Video calls, AI, customization, and actual innovation."
+      },
+      "ancientTech": {
+        "title": "Ancient Technology",
+        "problem": "Built 5-10 years ago. Slow page loads. Clunky UX. No real-time features. WebRTC from 2015.",
+        "solution": "Unytea: 2024 tech. WebSockets. 0ms latency. Modern React. Built for today's communities."
+      },
+      "vendorLock": {
+        "title": "Vendor Lock-in",
+        "problem": "Try exporting your Circle data. Good luck. They make it nearly impossible to leave.",
+        "solution": "Unytea: One-click export. API access. Own your data. Leave anytime. We'll even help you migrate."
+      }
+    }
+  },
+  "featuresSection": {
+    "title": "Features They'll",
+    "titleHighlight": "Never Build",
+    "subtitle": "Because their business model doesn't allow it. Ours does.",
+    "features": {
+      "video": {
+        "title": "Built-in Live Sessions",
+        "description": "1-click video calls with recording, AI transcription, and screen sharing. No Zoom, no Calendly, no BS.",
+        "badge": "THEY DON'T HAVE THIS"
+      },
+      "buddy": {
+        "title": "Buddy System™",
+        "description": "AI matches members for accountability partnerships. Patent-pending algorithm that actually drives retention.",
+        "badge": "ONLY ON UNYTEA"
+      },
+      "content": {
+        "title": "Content Sharing Panel",
+        "description": "Share whiteboards, PDFs, videos, and more in real-time during sessions. Revolutionary collaboration.",
+        "badge": "ONLY ON UNYTEA"
+      },
+      "customization": {
+        "title": "True Customization",
+        "description": "Your brand. Your domain. Your colors. Your fonts. Even custom CSS. Not just a logo swap.",
+        "badge": "BETTER THAN CIRCLE"
+      },
+      "aiInsights": {
+        "title": "AI Engagement Insights",
+        "description": "Know who's engaged, who's at risk, and what content works. OpenAI-powered analytics.",
+        "badge": "EXCLUSIVE"
+      },
+      "realtime": {
+        "title": "Real-time Everything",
+        "description": "WebSockets. 0ms latency. Discord-level performance. 90% less server load than Circle.",
+        "badge": "FASTEST"
+      },
+      "pricing": {
+        "title": "Transparent Pricing",
+        "description": "See your usage in real-time. No surprise bills. Only pay for what you use.",
+        "badge": "HONEST"
+      },
+      "security": {
+        "title": "Enterprise Security",
+        "description": "SOC 2 compliant. GDPR ready. 2FA. Role-based permissions. Bank-level encryption.",
+        "badge": "SECURE"
+      },
+      "matching": {
+        "title": "Member Matching",
+        "description": "Smart intro algorithms connect the right members. Better than LinkedIn's matching.",
+        "badge": "PATENT-PENDING"
+      }
+    }
+  },
+  "comparisonSection": {
+    "title": "The Brutal Truth",
+    "subtitle": "Feature by feature. No BS. Just facts.",
+    "ctaButton": "Switch to Unytea Free",
+    "features": {
+      "videoCalls": "Built-in Video Calls",
+      "recording": "Session Recording & Transcription",
+      "buddySystem": "Buddy System / Member Matching",
+      "contentSharing": "Content Sharing Panel",
+      "realtime": "Real-time Chat (0ms latency)",
+      "aiInsights": "AI Engagement Insights",
+      "customDomain": "Custom Domain",
+      "branding": "Full Brand Customization",
+      "whiteLabel": "White-label Option",
+      "courses": "Courses & Content",
+      "forums": "Discussion Forums",
+      "profiles": "Member Profiles",
+      "mobileApp": "Mobile App",
+      "api": "API Access",
+      "usagePricing": "Usage-based Pricing",
+      "migration": "Free Migration Service"
+    }
+  },
+  "pricingSection": {
+    "title": "Pay Less. Get",
+    "titleHighlight": "10x More",
+    "subtitle": "No hidden fees. No surprise charges. Just honest pricing.",
+    "plans": {
+      "professional": {
+        "name": "Professional",
+        "price": "129",
+        "period": "/month",
+        "badge": "🔥 BEST VALUE",
+        "comparison": "vs Circle $399/mo - Save $270/mo",
+        "features": [
+          "1 community, 500 members",
+          "20 video hours/month",
+          "✅ Built-in video calls (Circle: ❌)",
+          "✅ AI transcription (Circle: ❌)",
+          "✅ Buddy System (Nobody has this)",
+          "✅ Full customization",
+          "✅ Advanced analytics",
+          "✅ Recording & file hosting",
+          "Overage: $0.15/member, $0.30/hour"
+        ],
+        "cta": "Start Free Trial"
+      },
+      "scale": {
+        "name": "Scale",
+        "price": "249",
+        "period": "/month",
+        "comparison": "vs Circle $799/mo - Save $550/mo",
+        "features": [
+          "3 communities, 2K members each",
+          "60 video hours/month",
+          "Everything in Professional",
+          "✅ White-label branding",
+          "✅ Priority support",
+          "✅ Custom integrations",
+          "✅ Advanced permissions",
+          "Overage: $0.10/member, $0.20/hour"
+        ],
+        "cta": "Start Free Trial"
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "price": "499",
+        "period": "/month",
+        "comparison": "vs Circle $1,499/mo - Save $1,000/mo",
+        "features": [
+          "10 communities, 5K members each",
+          "150 video hours/month",
+          "Everything in Scale",
+          "✅ Dedicated account manager",
+          "✅ SLA guarantee (99.9%)",
+          "✅ Full API access",
+          "✅ Custom features",
+          "Overage: $0.08/member, $0.15/hour"
+        ],
+        "cta": "Start Free Trial"
+      }
+    }
+  },
+  "migrationSection": {
+    "title": "Switch from Circle or Skool in",
+    "titleHighlight": "24 Hours",
+    "description": "We'll migrate your entire community for free. Members, posts, everything.",
+    "descriptionBold": "Zero downtime. Zero hassle.",
+    "ctaPrimary": "Start Free Migration",
+    "ctaSecondary": "Talk to Migration Expert"
+  },
+  "footer": {
+    "tagline": "2024 Unytea. The Community Platform That Doesn't Suck.",
+    "links": {
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "contact": "Contact"
+    }
   }
 }

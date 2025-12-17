@@ -62,6 +62,10 @@ export async function POST(req: NextRequest) {
         await handlePaymentFailed(event.data.object);
         break;
 
+      case "payment_intent.succeeded":
+        await handlePaymentIntentSucceeded(event.data.object);
+        break;
+
       default:
         console.log(`Unhandled event type: ${event.type}`);
     }
@@ -84,10 +88,20 @@ async function handleCheckoutCompleted(session: any) {
   console.log("💳 Checkout completed:", session.id);
 
   try {
-    // Check if this is a community membership or platform subscription
-    const communityId = session.metadata?.communityId;
-    const userId = session.metadata?.userId;
-    const planName = session.metadata?.planName;
+    // Check metadata to determine checkout type
+    const metadata = session.metadata || {};
+    const type = metadata.type;
+    const communityId = metadata.communityId;
+    const userId = metadata.userId;
+    const planName = metadata.planName;
+    const courseId = metadata.courseId;
+
+    // COURSE PURCHASE (NEW)
+    if (type === "course_purchase" && courseId && userId) {
+      console.log("📚 Course purchase checkout:", courseId);
+      await handleCoursePurchase(session, courseId, userId);
+      return;
+    }
 
     // PLATFORM SUBSCRIPTION (Professional, Scale, Enterprise)
     if (userId && planName && !communityId) {
@@ -103,7 +117,7 @@ async function handleCheckoutCompleted(session: any) {
       return;
     }
 
-    console.error("Unknown checkout type - no communityId or planName in metadata");
+    console.error("Unknown checkout type - missing metadata");
   } catch (error) {
     console.error("Error handling checkout completed:", error);
   }
@@ -152,26 +166,108 @@ async function handlePlatformSubscriptionCreated(
   }
 }
 
+// =====================================================
+// HANDLE COURSE PURCHASE
+// =====================================================
+
+async function handleCoursePurchase(
+  session: any,
+  courseId: string,
+  userId: string
+) {
+  try {
+    console.log("📚 Processing course purchase:", { courseId, userId });
+
+    // 1. Check if already enrolled
+    const existingEnrollment = await prisma.courseEnrollment.findFirst({
+      where: {
+        courseId,
+        userId,
+      },
+    });
+
+    if (existingEnrollment) {
+      console.log("ℹ️ User already enrolled, skipping");
+      return;
+    }
+
+    // 2. Get course details
+    const course = await prisma.course.findUnique({
+      where: { id: courseId },
+      select: {
+        id: true,
+        title: true,
+        price: true,
+      },
+    });
+
+    if (!course) {
+      console.error("Course not found:", courseId);
+      return;
+    }
+
+    // 3. Create enrollment
+    await prisma.courseEnrollment.create({
+      data: {
+        userId,
+        courseId,
+        enrolledAt: new Date(),
+      },
+    });
+
+    // 4. Increment enrollment count
+    await prisma.course.update({
+      where: { id: courseId },
+      data: {
+        enrollmentCount: {
+          increment: 1,
+        },
+      },
+    });
+
+    console.log("✅ User enrolled in paid course successfully:", {
+      userId,
+      courseId,
+      courseTitle: course.title,
+      price: course.price,
+    });
+
+    // TODO: Send confirmation email
+    // TODO: Award points for purchase (gamification)
+  } catch (error) {
+    console.error("❌ Error handling course purchase:", error);
+  }
+}
+
 async function handleCommunityMembershipCreated(
   session: any,
   communityId: string
 ) {
   try {
-    const customerEmail = session.customer_details?.email;
+    // First try to get userId from metadata (more reliable)
+    const metadata = session.metadata || {};
+    let userId = metadata.userId;
 
-    if (!customerEmail) {
-      console.error("Missing email in session");
-      return;
-    }
+    // Fallback to customer email lookup if userId not in metadata
+    if (!userId) {
+      const customerEmail = session.customer_details?.email;
 
-    // Find user by email
-    const user = await prisma.user.findUnique({
-      where: { email: customerEmail },
-    });
+      if (!customerEmail) {
+        console.error("Missing email in session");
+        return;
+      }
 
-    if (!user) {
-      console.error("User not found:", customerEmail);
-      return;
+      // Find user by email
+      const user = await prisma.user.findUnique({
+        where: { email: customerEmail },
+      });
+
+      if (!user) {
+        console.error("User not found:", customerEmail);
+        return;
+      }
+
+      userId = user.id;
     }
 
     // Check if already member
@@ -179,32 +275,44 @@ async function handleCommunityMembershipCreated(
       where: {
         userId_communityId: {
           communityId,
-          userId: user.id,
+          userId: userId,
         },
       },
     });
 
     if (existingMember) {
       console.log("User already a member, updating subscription status");
-      await handleCommunitySubscriptionUpdated(session, user.id, communityId);
+      await handleCommunitySubscriptionUpdated(session, userId, communityId);
       return;
     }
 
-    // Add user as member
+    // Add user as member with ACTIVE status (paid member)
     await prisma.member.create({
       data: {
         communityId,
-        userId: user.id,
+        userId: userId,
         role: "MEMBER",
+        status: "ACTIVE", // Paid members are automatically active
+      },
+    });
+
+    // Increment member count
+    await prisma.community.update({
+      where: { id: communityId },
+      data: {
+        memberCount: {
+          increment: 1,
+        },
       },
     });
 
     // Create subscription record
-    await handleCommunitySubscriptionUpdated(session, user.id, communityId);
+    await handleCommunitySubscriptionUpdated(session, userId, communityId);
 
     console.log("✅ User added to community:", {
-      userId: user.id,
+      userId: userId,
       communityId,
+      status: "ACTIVE (paid)",
     });
   } catch (error) {
     console.error("Error handling community membership:", error);
@@ -350,6 +458,66 @@ async function handleSubscriptionDeleted(subscription: any) {
     console.log("✅ Community subscription marked as canceled");
   } catch (error) {
     console.error("Error handling subscription deletion:", error);
+  }
+}
+
+// =====================================================
+// HANDLE INDIVIDUAL COURSE PAYMENT
+// =====================================================
+
+async function handlePaymentIntentSucceeded(paymentIntent: any) {
+  console.log("💳 PaymentIntent succeeded:", paymentIntent.id);
+  
+  const metadata = paymentIntent.metadata || {};
+  const courseId = metadata.courseId;
+  const userId = metadata.userId;
+
+  // Check if it's a course purchase
+  if (courseId && userId) {
+    try {
+      console.log("📚 Processing course purchase:", { courseId, userId });
+      
+      // 1. Mark payment as succeeded
+      await prisma.coursePayment.updateMany({
+        where: {
+          courseId,
+          userId,
+          stripePaymentIntentId: paymentIntent.id,
+        },
+        data: {
+          status: "succeeded",
+          paidAt: new Date(),
+        },
+      });
+
+      console.log("✅ Payment marked as succeeded");
+
+      // 2. Create enrollment if not exists
+      const existing = await prisma.enrollment.findFirst({
+        where: {
+          userId,
+          courseId,
+        },
+      });
+
+      if (!existing) {
+        await prisma.enrollment.create({
+          data: { userId, courseId },
+        });
+
+        // 3. Increment enrollment count
+        await prisma.course.update({
+          where: { id: courseId },
+          data: { enrollmentCount: { increment: 1 } },
+        });
+
+        console.log("✅ User enrolled in paid course successfully");
+      } else {
+        console.log("ℹ️ User already enrolled, payment recorded");
+      }
+    } catch (err) {
+      console.error("❌ Error handling course payment:", err);
+    }
   }
 }
 

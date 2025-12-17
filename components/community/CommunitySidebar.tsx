@@ -14,6 +14,15 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { CommunitySwitcher } from "./CommunitySwitcher";
+import { Logo } from "@/components/brand/Logo";
+
+interface CommunitySidebarProps {
+  communityId: string;
+  slug: string;
+  userId: string;
+  isOwner: boolean;
+  locale: string;
+}
 
 const navigation = [
   { name: "Feed", href: "/feed", icon: Home },
@@ -24,43 +33,64 @@ const navigation = [
   { name: "Members", href: "/members", icon: Users },
 ];
 
-interface CommunitySidebarProps {
-  communityId: string;
-  userId: string;
-  isOwner: boolean;
-}
-
-export function CommunitySidebar({ communityId, userId, isOwner }: CommunitySidebarProps) {
+export function CommunitySidebar({ communityId, slug, userId, isOwner, locale }: CommunitySidebarProps) {
   const pathname = usePathname();
+
+  const links = [
+    {
+      href: `/${locale}/dashboard/communities/${slug}/feed`,
+      label: "Feed",
+      icon: Home,
+    },
+    {
+      href: `/${locale}/dashboard/communities/${slug}/chat`,
+      label: "Chat",
+      icon: MessageSquare,
+    },
+    {
+      href: `/${locale}/dashboard/communities/${slug}/sessions`,
+      label: "Sessions",
+      icon: Video,
+    },
+    {
+      href: `/${locale}/dashboard/communities/${slug}/courses`,
+      label: "Courses",
+      icon: BookOpen,
+    },
+    {
+      href: `/${locale}/dashboard/communities/${slug}/leaderboard`,
+      label: "Leaderboard",
+      icon: Trophy,
+    },
+    {
+      href: `/${locale}/dashboard/communities/${slug}/members`,
+      label: "Members",
+      icon: Users,
+    },
+  ];
 
   return (
     <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-card/50 backdrop-blur-xl">
       {/* Logo */}
       <div className="flex h-16 items-center border-b border-border px-6">
-        <Link href="/dashboard" className="flex items-center space-x-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-purple-600">
-            <span className="text-lg font-bold text-white">U</span>
-          </div>
-          <span className="text-xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-            Unytea
-          </span>
+        <Link href={`/${locale}/dashboard`} className="flex items-center space-x-2">
+          <Logo width={120} height={45} />
         </Link>
       </div>
 
       {/* Community Switcher */}
-      <CommunitySwitcher currentCommunityId={communityId} userId={userId} />
+      <CommunitySwitcher currentCommunityId={communityId} userId={userId} locale={locale} />
 
       {/* Navigation */}
       <nav className="flex-1 space-y-1 px-3 py-4">
-        {navigation.map((item) => {
-          const fullHref = `/dashboard/communities/${communityId}${item.href}`;
-          const isActive = pathname === fullHref || pathname?.startsWith(fullHref + "/");
-          const Icon = item.icon;
+        {links.map((link) => {
+          const Icon = link.icon;
+          const isActive = pathname === link.href || pathname?.startsWith(link.href + "/");
 
           return (
             <Link
-              key={item.name}
-              href={fullHref}
+              key={link.label}
+              href={link.href}
               className={cn(
                 "flex items-center space-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
                 isActive
@@ -69,7 +99,7 @@ export function CommunitySidebar({ communityId, userId, isOwner }: CommunitySide
               )}
             >
               <Icon className={cn("h-5 w-5", isActive && "text-primary")} />
-              <span>{item.name}</span>
+              <span>{link.label}</span>
             </Link>
           );
         })}
@@ -79,15 +109,15 @@ export function CommunitySidebar({ communityId, userId, isOwner }: CommunitySide
           <>
             <div className="my-2 border-t border-border" />
             <Link
-              href={`/dashboard/communities/${communityId}/settings`}
+              href={`/${locale}/dashboard/communities/${slug}/settings`}
               className={cn(
                 "flex items-center space-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
-                pathname?.startsWith(`/dashboard/communities/${communityId}/settings`)
+                pathname?.startsWith(`/${locale}/dashboard/communities/${slug}/settings`)
                   ? "bg-primary/10 text-primary shadow-sm"
                   : "text-muted-foreground hover:bg-accent hover:text-foreground"
               )}
             >
-              <Settings className={cn("h-5 w-5", pathname?.startsWith(`/dashboard/communities/${communityId}/settings`) && "text-primary")} />
+              <Settings className={cn("h-5 w-5", pathname?.startsWith(`/${locale}/dashboard/communities/${slug}/settings`) && "text-primary")} />
               <span>Manage</span>
             </Link>
           </>
@@ -97,7 +127,7 @@ export function CommunitySidebar({ communityId, userId, isOwner }: CommunitySide
       {/* Back to Dashboard Button */}
       <div className="border-t border-border px-3 py-4">
         <Link
-          href="/dashboard"
+          href={`/${locale}/dashboard`}
           className="flex items-center space-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-muted-foreground hover:bg-accent hover:text-foreground border border-border/50 hover:border-primary/50"
         >
           <ArrowLeft className="h-5 w-5" />
@@ -115,7 +145,7 @@ export function CommunitySidebar({ communityId, userId, isOwner }: CommunitySide
             Unlock premium features
           </p>
           <Link
-            href={`/dashboard/communities/${communityId}/settings/billing`}
+            href={`/${locale}/dashboard/communities/${slug}/settings/billing`}
             className="mt-3 block w-full rounded-md bg-primary px-3 py-2 text-center text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
           >
             Upgrade Now

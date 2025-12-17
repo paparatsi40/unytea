@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { PostReactions } from "@/components/community/PostReactions";
-import { MessageSquare, Share2, Sparkles } from "lucide-react";
+import { MessageSquare, Share2, Sparkles, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type Post = {
@@ -12,6 +12,8 @@ type Post = {
   createdAt: Date;
   author: {
     id: string;
+    username?: string | null;
+    name?: string | null;
     firstName: string | null;
     lastName: string | null;
     imageUrl: string | null;
@@ -29,12 +31,27 @@ interface PostCardProps {
 
 export function PostCard({ post, index = 0 }: PostCardProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
 
   const getAuthorName = (author: Post["author"]) => {
+    // Priority 1: Username (public display name chosen by user)
+    if (author.username) {
+      return author.username;
+    }
+    // Priority 2: Full name (firstName + lastName)
     if (author.firstName && author.lastName) {
       return `${author.firstName} ${author.lastName}`;
     }
-    return author.firstName || "User";
+    // Priority 3: Just firstName
+    if (author.firstName) {
+      return author.firstName;
+    }
+    // Priority 4: Name field (fallback)
+    if (author.name) {
+      return author.name;
+    }
+    // Last resort
+    return "User";
   };
 
   const formatTime = (date: Date) => {
@@ -49,6 +66,28 @@ export function PostCard({ post, index = 0 }: PostCardProps) {
     if (hours < 24) return `${hours}h ago`;
     if (days < 7) return `${days}d ago`;
     return new Date(date).toLocaleDateString();
+  };
+
+  const handleShare = async () => {
+    try {
+      const postUrl = `${window.location.origin}${window.location.pathname}?post=${post.id}`;
+      
+      // Try to use native share API if available (mobile)
+      if (navigator.share) {
+        await navigator.share({
+          title: post.title || `Post by ${getAuthorName(post.author)}`,
+          text: post.content.slice(0, 100) + (post.content.length > 100 ? "..." : ""),
+          url: postUrl,
+        });
+      } else {
+        // Fallback to clipboard
+        await navigator.clipboard.writeText(postUrl);
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000);
+      }
+    } catch (error) {
+      console.error("Error sharing:", error);
+    }
   };
 
   return (
@@ -123,8 +162,21 @@ export function PostCard({ post, index = 0 }: PostCardProps) {
               </p>
             </div>
           </div>
-          <button className="rounded-xl p-2.5 text-muted-foreground opacity-0 transition-all hover:bg-accent hover:text-foreground active:scale-95 group-hover:opacity-100">
-            <Share2 className="h-4 w-4" />
+          <button 
+            onClick={handleShare}
+            className={cn(
+              "rounded-xl p-2.5 transition-all hover:bg-accent active:scale-95 group-hover:opacity-100",
+              isCopied 
+                ? "opacity-100 bg-green-500/10 text-green-500" 
+                : "text-muted-foreground opacity-0 hover:text-foreground"
+            )}
+            title={isCopied ? "Link copied!" : "Share post"}
+          >
+            {isCopied ? (
+              <Check className="h-4 w-4" />
+            ) : (
+              <Share2 className="h-4 w-4" />
+            )}
           </button>
         </div>
 
@@ -158,11 +210,26 @@ export function PostCard({ post, index = 0 }: PostCardProps) {
 
           {/* Share Button */}
           <button 
-            className="group/btn flex items-center space-x-2 rounded-xl px-4 py-2.5 text-sm font-medium text-muted-foreground transition-all hover:bg-primary/10 hover:text-primary active:scale-95 animate-in fade-in slide-in-from-right-4 duration-300"
+            onClick={handleShare}
+            className={cn(
+              "group/btn flex items-center space-x-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all active:scale-95 animate-in fade-in slide-in-from-right-4 duration-300",
+              isCopied
+                ? "bg-green-500/10 text-green-500"
+                : "text-muted-foreground hover:bg-primary/10 hover:text-primary"
+            )}
             style={{ animationDelay: `${index * 100 + 300}ms` }}
           >
-            <Share2 className="h-4 w-4 transition-transform group-hover/btn:rotate-12 group-hover/btn:scale-110 duration-300" />
-            <span className="font-semibold">Share</span>
+            {isCopied ? (
+              <>
+                <Check className="h-4 w-4" />
+                <span className="font-semibold">Copied!</span>
+              </>
+            ) : (
+              <>
+                <Share2 className="h-4 w-4 transition-transform group-hover/btn:rotate-12 group-hover/btn:scale-110 duration-300" />
+                <span className="font-semibold">Share</span>
+              </>
+            )}
           </button>
         </div>
       </div>

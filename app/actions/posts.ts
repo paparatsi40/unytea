@@ -48,6 +48,22 @@ export async function createPost(formData: FormData) {
         isPublished: true,
         publishedAt: new Date(),
       },
+      include: {
+        author: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            image: true,
+          },
+        },
+        _count: {
+          select: {
+            comments: true,
+            reactions: true,
+          },
+        },
+      },
     });
 
     // Update community post count
@@ -63,7 +79,7 @@ export async function createPost(formData: FormData) {
     // Check for achievements (don't await to not block response)
     checkAndUnlockAchievements(userId).catch(console.error);
 
-    revalidatePath(`/c/[slug]`);
+    revalidatePath(`/communities/[slug]`);
     return { success: true, post };
   } catch (error) {
     console.error("Error creating post:", error);
@@ -125,7 +141,7 @@ export async function deletePost(postId: string) {
       },
     });
 
-    revalidatePath(`/c/[slug]`);
+    revalidatePath(`/communities/[slug]`);
     return { success: true };
   } catch (error) {
     console.error("Error deleting post:", error);
@@ -174,7 +190,7 @@ export async function updatePost(postId: string, formData: FormData) {
       },
     });
 
-    revalidatePath(`/c/[slug]`);
+    revalidatePath(`/communities/[slug]`);
     return { success: true, post: updatedPost };
   } catch (error) {
     console.error("Error updating post:", error);
@@ -223,7 +239,7 @@ export async function togglePostPin(postId: string) {
       },
     });
 
-    revalidatePath(`/c/[slug]`);
+    revalidatePath(`/communities/[slug]`);
     return { success: true, isPinned: updatedPost.isPinned };
   } catch (error) {
     console.error("Error toggling pin:", error);

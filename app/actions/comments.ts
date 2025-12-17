@@ -44,7 +44,7 @@ export async function createComment(postId: string, content: string, parentId?: 
     // Check for achievements (don't await)
     checkAndUnlockAchievements(userId).catch(console.error);
 
-    revalidatePath(`/c/[slug]`);
+    revalidatePath(`/communities/[slug]`);
 
     return { success: true, comment };
   } catch (error) {
@@ -132,7 +132,7 @@ export async function deleteComment(commentId: string) {
       where: { id: commentId },
     });
 
-    revalidatePath(`/c/[slug]`);
+    revalidatePath(`/communities/[slug]`);
 
     return { success: true };
   } catch (error) {

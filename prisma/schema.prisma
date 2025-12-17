@@ -122,6 +122,16 @@ model User {
   billingCycleEnd     DateTime?
   usageAlertSent      Boolean          @default(false)
   
+  // NOTIFICATION PREFERENCES
+  notificationPreferences Json?        @map("notificationpreferences") // Notification settings object
+  emailNotifications      Boolean      @default(true) @map("emailnotifications")
+  pushNotifications       Boolean      @default(true) @map("pushnotifications")
+  sessionReminders        Boolean      @default(true) @map("sessionreminders")
+  sessionStarted          Boolean      @default(true) @map("sessionstarted")
+  newPostNotifications    Boolean      @default(true) @map("newpostnotifications")
+  newMemberNotifications  Boolean      @default(true) @map("newmembernotifications")
+  newMessageNotifications Boolean      @default(true) @map("newmessagenotifications")
+  
   @@index([email])
   @@index([username])
   @@map("users")
@@ -179,7 +189,8 @@ model Community {
   ownerTitle        String?            // e.g., "Founder", "Lead Instructor"
   ownerLinks        Json?              // Social links, website, etc.
   customImages      Json?              // Array of custom image URLs with titles/descriptions
-  welcomeMessage    String?            @db.Text
+  welcomeMessage    String?            @db.Text @map("welcomemessage")
+  showWelcomeMessage Boolean            @default(true) @map("showwelcomemessage")
   
   // SECTION BUILDER (NEW - replaces Visual Builder)
   landingLayout     Json?              // Array of SectionInstance objects from Section Builder
@@ -209,7 +220,7 @@ model Community {
 model Member {
   id          String       @id @default(cuid())
   role        MemberRole   @default(MEMBER)
-  
+  welcomeMessageSeen Boolean @default(false) @map("welcomemessageseen")
   // 🔐 ENHANCED PERMISSIONS (NEW)
   customRole  String?      // Custom role name (e.g., "Content Manager", "Lead Instructor")
   permissions Json?        // Granular permissions object
@@ -421,23 +432,46 @@ model Course {
   id              String       @id @default(cuid())
   title           String
   slug            String
-  description     String?
+  description     String?      @db.Text
   imageUrl        String?
   isPaid          Boolean      @default(false)
-  price           Float?
+  price           Float        @default(0)
   currency        String?      @default("USD")
   isPublished     Boolean      @default(false)
+  isArchived      Boolean      @default(false)
   publishedAt     DateTime?
   enrollmentCount Int          @default(0)
+
+  // Stripe integration
+  stripeProductId String?      @unique
+  stripePriceId   String?
+  
+  // Freemium strategy
+  tier                String?   @default("standard")
+  isLeadMagnet        Boolean   @default(false)
+  upgradeCourseId     String?
+  
+  // Marketing & Sales
+  whatYouWillLearn    String?   @db.Text
+  salesPageContent    String?   @db.Text
+  previewVideoUrl     String?
+  testimonials        Json?
+  
+  // Value propositions
+  certificateEnabled  Boolean   @default(false)
+  liveSupportEnabled  Boolean   @default(false)
+
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
   communityId     String
   community       Community    @relation(fields: [communityId], references: [id], onDelete: Cascade)
   enrollments     Enrollment[]
   modules         Module[]
+  payments        CoursePayment[]
 
   @@unique([communityId, slug])
   @@index([communityId])
+  @@index([isArchived])
   @@map("courses")
 }
 
@@ -923,6 +957,12 @@ enum ReactionType {
   FIRE
   IDEA
   CLAP
+  THINKING
+  SUPPORT
+  ROCKET
+  STAR
+  EYES
+  CHECK
 }
 
 enum NotificationType {
@@ -951,6 +991,7 @@ enum CommunityLayoutType {
   ACADEMY           // Course-focused educational
   DASHBOARD         // Analytics and data-visible
   MINIMALIST        // Clean, Notion-like
+  SOCIAL_HUB        // Instagram/Facebook-style social feed
 }
 
 enum CommunitySectionType {
@@ -1045,4 +1086,33 @@ model BuddyPair {
   @@index([mentor])
   @@index([mentee])
   @@map("buddy_pairs")
+}
+
+model CoursePayment {
+  id                   String   @id @default(cuid())
+  userId               String
+  courseId             String
+  
+  // Stripe info
+  stripePaymentIntentId String  @unique
+  stripeCustomerId     String?
+  amount               Float                          // Amount paid
+  currency             String   @default("USD")
+  
+  // Status
+  status               String   @default("pending")   // pending, succeeded, failed, refunded
+  paidAt               DateTime?
+  refundedAt           DateTime?
+  
+  // Metadata
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  
+  course               Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([courseId])
+  @@index([stripePaymentIntentId])
+  @@index([status])
+  @@map("course_payments")
 }

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { toggleReaction, getPostReactions, type ReactionType } from "@/app/actions/reactions";
-import { Heart, ThumbsUp, PartyPopper, Flame, Lightbulb, Hand } from "lucide-react";
+import { Heart, ThumbsUp, PartyPopper, Flame, Lightbulb, Hand, ThumbsDown, Rocket, Star, Eye, CheckCircle2, Brain } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type ReactionData = {
@@ -19,6 +19,12 @@ const REACTIONS = [
   { type: "FIRE" as ReactionType, emoji: "🔥", icon: Flame, label: "Fire", color: "text-orange-500", bgColor: "bg-orange-500/10", hoverColor: "hover:bg-orange-500/20" },
   { type: "IDEA" as ReactionType, emoji: "💡", icon: Lightbulb, label: "Idea", color: "text-yellow-500", bgColor: "bg-yellow-500/10", hoverColor: "hover:bg-yellow-500/20" },
   { type: "CLAP" as ReactionType, emoji: "👏", icon: Hand, label: "Clap", color: "text-green-500", bgColor: "bg-green-500/10", hoverColor: "hover:bg-green-500/20" },
+  { type: "THINKING" as ReactionType, emoji: "🤔", icon: Brain, label: "Thinking", color: "text-indigo-500", bgColor: "bg-indigo-500/10", hoverColor: "hover:bg-indigo-500/20" },
+  { type: "SUPPORT" as ReactionType, emoji: "🙌", icon: Hand, label: "Support", color: "text-teal-500", bgColor: "bg-teal-500/10", hoverColor: "hover:bg-teal-500/20" },
+  { type: "ROCKET" as ReactionType, emoji: "🚀", icon: Rocket, label: "Rocket", color: "text-cyan-500", bgColor: "bg-cyan-500/10", hoverColor: "hover:bg-cyan-500/20" },
+  { type: "STAR" as ReactionType, emoji: "⭐", icon: Star, label: "Star", color: "text-amber-500", bgColor: "bg-amber-500/10", hoverColor: "hover:bg-amber-500/20" },
+  { type: "EYES" as ReactionType, emoji: "👀", icon: Eye, label: "Eyes", color: "text-gray-500", bgColor: "bg-gray-500/10", hoverColor: "hover:bg-gray-500/20" },
+  { type: "CHECK" as ReactionType, emoji: "✅", icon: CheckCircle2, label: "Check", color: "text-emerald-500", bgColor: "bg-emerald-500/10", hoverColor: "hover:bg-emerald-500/20" },
 ] as const;
 
 export function PostReactions({ postId }: { postId: string }) {

@@ -2,10 +2,10 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { getCurrentUserId } from "@/lib/auth-utils";
 import { redirect } from "next/navigation";
+import { getCurrentUserId } from "@/lib/auth-utils";
 import { checkAndUnlockAchievements } from "./achievements";
-import { canCreateCommunity, canAddMember } from "@/lib/subscription-limits";
+import { canCreateCommunity, canAddMember } from "@/lib/subscription-plans";
 import { updateMemberCount } from "@/lib/usage-tracking";
 
 /**
@@ -121,7 +121,7 @@ export async function createCommunity(data: {
 
     // Revalidate paths BEFORE returning
     revalidatePath("/dashboard/communities");
-    revalidatePath(`/dashboard/c/${result.community.slug}`);
+    revalidatePath(`/dashboard/communities/${result.community.slug}`);
     
     console.log("✅ Paths revalidated, returning success");
     
@@ -181,7 +181,7 @@ export async function updateCommunity(
       data,
     });
 
-    revalidatePath(`/dashboard/c/${community.slug}`);
+    revalidatePath(`/dashboard/communities/${community.slug}`);
     return { success: true, community };
   } catch (error) {
     console.error("Error updating community:", error);
@@ -271,7 +271,7 @@ export async function joinCommunity(communityId: string) {
       }
     }
 
-    revalidatePath(`/dashboard/c/${community.slug}`);
+    revalidatePath(`/dashboard/communities/${community.slug}`);
     revalidatePath("/dashboard/communities");
     return { success: true, member };
   } catch (error) {
@@ -348,7 +348,7 @@ export async function leaveCommunity(communityId: string) {
       }
     }
 
-    revalidatePath(`/dashboard/c/${member.community.slug}`);
+    revalidatePath(`/dashboard/communities/${member.community.slug}`);
     revalidatePath("/dashboard/communities");
     return { success: true };
   } catch (error) {
