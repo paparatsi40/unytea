@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { MessageSquare, Users, Send } from "lucide-react";
-import { useParams } from "next/navigation";
 
 interface Message {
   id: string;
