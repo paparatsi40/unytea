@@ -84,7 +84,7 @@ export default function AppearanceSettingsPage() {
   const [uploadingCover, setUploadingCover] = useState(false);
 
   // Uploadthing hook
-  const { startUpload, isUploading } = useUploadThing("communityBranding");
+  const { startUpload } = useUploadThing("communityBranding");
 
   // Load existing community data
   useEffect(() => {
