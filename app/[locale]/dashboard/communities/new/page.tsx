@@ -13,6 +13,7 @@ import {
   Settings as SettingsIcon,
   Sparkles,
   Users,
+  Palette,
 } from "lucide-react";
 import { useUploadThing } from "@/lib/uploadthing";
 import { toast } from "sonner";
