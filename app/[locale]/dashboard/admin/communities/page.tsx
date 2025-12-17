@@ -53,7 +53,6 @@ export default async function AdminCommunitiesPage({
           id: true,
           name: true,
           email: true,
-          imageUrl: true,
         },
       },
       _count: {
