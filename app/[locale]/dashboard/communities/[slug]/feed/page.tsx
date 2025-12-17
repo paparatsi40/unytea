@@ -3,7 +3,6 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { PostFeed } from "@/components/community/PostFeed";
 import { WelcomeBanner } from "@/components/community/WelcomeBanner";
-import { Home, Sparkles } from "lucide-react";
 
 export default async function CommunityFeedPage({
   params,
