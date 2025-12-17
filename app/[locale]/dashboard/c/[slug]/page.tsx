@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
 import { joinCommunity } from "@/app/actions/communities";
 import Link from "next/link";
-import { Users, Lock, ArrowLeft, BookOpen, MessageSquare, CheckCircle, Star, TrendingUp, Award, Zap, Target } from "lucide-react";
+import { Users, Lock, ArrowLeft, BookOpen, CheckCircle, Star, TrendingUp, Award, Zap, Target } from "lucide-react";
 
 // Import all layout components
 import { ModernGridLayout } from "@/components/community/layouts/ModernGridLayout";
