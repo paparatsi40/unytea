@@ -3,7 +3,7 @@
 import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Settings, Palette, Users, DollarSign, AlertTriangle, Save, Image as ImageIcon, Globe, Lock, Upload, Sparkles } from "lucide-react";
+import { Settings, Palette, Users, AlertTriangle, Save, Image as ImageIcon, Globe, Lock, Upload, Sparkles } from "lucide-react";
 import { CommunityPricingSettings } from "@/components/community/CommunityPricingSettings";
 import { Button } from "@/components/ui/button";
 import { useUploadThing } from "@/lib/uploadthing";
