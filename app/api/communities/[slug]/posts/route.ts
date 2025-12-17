@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
     const searchParams = request.nextUrl.searchParams;
@@ -16,11 +16,13 @@ export async function GET(
       );
     }
 
-    console.log("🔍 API: Fetching posts for community:", params.slug);
+    const { slug } = await params;
+
+    console.log("🔍 API: Fetching posts for community:", slug);
 
     // Get community
     const community = await prisma.community.findUnique({
-      where: { slug: params.slug },
+      where: { slug: slug },
       select: { id: true, isPrivate: true },
     });
 
