@@ -11,7 +11,7 @@ import { Loader2, Eye, ArrowLeft } from "lucide-react";
 export default function LandingPageSettings() {
   const params = useParams();
   const router = useRouter();
-  const slug = params.slug as string;
+  const slug = params?.slug as string;
 
   const [loading, setLoading] = useState(true);
   const [communityName, setCommunityName] = useState("");
