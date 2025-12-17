@@ -473,13 +473,13 @@ export default function AppearanceSettingsPage() {
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {LAYOUTS.map((layout) => (
+              {LAYOUTS.map((layoutOption) => (
                 <button
-                  key={layout.id}
-                  onClick={() => setLayout(layout.id)}
+                  key={layoutOption.id}
+                  onClick={() => setLayout(layoutOption.id)}
                   disabled={isSaving}
                   className={`relative text-left border-2 rounded-lg p-4 transition-all hover:scale-105 ${
-                    layout.id === layout
+                    layoutOption.id === layout
                       ? "border-sky-500 bg-sky-50"
                       : "border-gray-200 hover:border-sky-300"
                   }`}
@@ -491,17 +491,17 @@ export default function AppearanceSettingsPage() {
 
                   {/* Layout Info */}
                   <div className="flex items-start justify-between mb-2">
-                    <h3 className="font-semibold text-gray-900">{layout.name}</h3>
-                    {layout.id === layout && (
+                    <h3 className="font-semibold text-gray-900">{layoutOption.name}</h3>
+                    {layoutOption.id === layout && (
                       <Check className="h-5 w-5 text-sky-500 flex-shrink-0" />
                     )}
                   </div>
 
-                  <p className="text-sm text-gray-600 mb-3">{layout.description}</p>
+                  <p className="text-sm text-gray-600 mb-3">{layoutOption.description}</p>
 
                   {/* Features */}
                   <div className="flex flex-wrap gap-1">
-                    {layout.features.map((feature) => (
+                    {layoutOption.features.map((feature) => (
                       <span
                         key={feature}
                         className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded"
