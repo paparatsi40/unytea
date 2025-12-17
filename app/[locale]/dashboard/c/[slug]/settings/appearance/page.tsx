@@ -191,7 +191,7 @@ export default function AppearanceSettingsPage() {
         throw new Error(error.error || 'Failed to save changes');
       }
 
-      const data = await response.json();
+      await response.json(); // Consume the response
       
       toast.success("Theme saved successfully! Your community has been updated.");
       
