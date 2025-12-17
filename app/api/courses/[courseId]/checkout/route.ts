@@ -9,7 +9,7 @@ import { stripe } from "@/lib/stripe";
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { courseId: string } }
+  { params }: { params: Promise<{ courseId: string }> }
 ) {
   try {
     const session = await auth();
@@ -21,7 +21,7 @@ export async function POST(
       );
     }
 
-    const { courseId } = params;
+    const { courseId } = await params;
 
     // Get course details
     const course = await prisma.course.findUnique({
@@ -183,7 +183,7 @@ export async function POST(
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { courseId: string } }
+  { params }: { params: Promise<{ courseId: string }> }
 ) {
   try {
     const session = await auth();
@@ -195,7 +195,7 @@ export async function GET(
       );
     }
 
-    const { courseId } = params;
+    const { courseId } = await params;
 
     // Check if user has paid for this course
     const payment = await prisma.coursePayment.findFirst({
