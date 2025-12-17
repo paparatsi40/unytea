@@ -228,11 +228,11 @@ export default function CommunitySettingsPage({
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to update');
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to save settings');
       }
 
-      const data = await response.json();
+      await response.json();
       setCommunity(prev => prev ? {
         ...prev,
         name: name.trim(),
