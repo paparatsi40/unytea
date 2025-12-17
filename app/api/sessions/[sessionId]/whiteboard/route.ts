@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 // GET: Load whiteboard state
 export async function GET(
   request: NextRequest,
-  { params }: { params: { sessionId: string } }
+  { params }: { params: Promise<{ sessionId: string }> }
 ) {
   try {
     const session = await auth();
@@ -13,7 +13,7 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { sessionId } = params;
+    const { sessionId } = await params;
 
     // Get whiteboard data from database
     const whiteboardData = await prisma.mentorSession.findUnique({
@@ -43,7 +43,7 @@ export async function GET(
 // POST: Save whiteboard state
 export async function POST(
   request: NextRequest,
-  { params }: { params: { sessionId: string } }
+  { params }: { params: Promise<{ sessionId: string }> }
 ) {
   try {
     const session = await auth();
@@ -51,7 +51,7 @@ export async function POST(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { sessionId } = params;
+    const { sessionId } = await params;
     const data = await request.json();
 
     // Check if user is the mentor (only mentor can save whiteboard)
