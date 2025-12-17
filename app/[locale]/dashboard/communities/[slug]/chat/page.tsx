@@ -19,7 +19,7 @@ export default function CommunityChatClient({ slug, communityName }: { slug: str
   const [newMessage, setNewMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSending, setIsSending] = useState(false);
-  const [community, setCommunity] = useState<any>(null);
+  const [, setCommunity] = useState<any>(null);
 
   useEffect(() => {
     fetchCommunity();
