@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { BookOpen, Clock, Users, Play, Plus, TrendingUp, Award, CheckCircle2 } from "lucide-react";
+import { BookOpen, Users, Play, Plus, TrendingUp, Award, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CoursesPageClient } from "@/components/courses/CoursesPageClient";
 
