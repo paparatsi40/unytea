@@ -46,7 +46,7 @@ export default async function AdminCommunitiesPage({
       description: true,
       imageUrl: true,
       slug: true,
-      visibility: true,
+      isPrivate: true,
       createdAt: true,
       owner: {
         select: {
@@ -153,7 +153,7 @@ export default async function AdminCommunitiesPage({
                 </div>
                 <div className="text-center p-2 bg-muted/50 rounded-lg">
                   <Eye className="w-4 h-4 mx-auto mb-1 text-purple-600" />
-                  <p className="text-xs font-semibold">{community.visibility}</p>
+                  <p className="text-xs font-semibold">{community.isPrivate ? "Private" : "Public"}</p>
                   <p className="text-xs text-muted-foreground">Visibility</p>
                 </div>
               </div>
