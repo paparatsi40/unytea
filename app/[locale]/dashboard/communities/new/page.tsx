@@ -10,7 +10,6 @@ import {
   ArrowLeft,
   ArrowRight,
   Check,
-  Globe,
   Settings as SettingsIcon,
   Sparkles,
   Link as LinkIcon,
