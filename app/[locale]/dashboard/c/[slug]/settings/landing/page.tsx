@@ -14,7 +14,6 @@ export default function LandingPageSettings() {
   const slug = params?.slug as string;
 
   const [loading, setLoading] = useState(true);
-  const [communityName, setCommunityName] = useState("");
   const [initialSections, setInitialSections] = useState<SectionInstance[]>([]);
 
   useEffect(() => {
@@ -27,8 +26,6 @@ export default function LandingPageSettings() {
       if (!response.ok) throw new Error("Failed to fetch community");
       
       const data = await response.json();
-      
-      setCommunityName(data.name || "");
       
       // Load existing landing layout or use empty array
       if (data.landingLayout && Array.isArray(data.landingLayout)) {
