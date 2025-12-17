@@ -12,7 +12,6 @@ import {
   Check,
   Settings as SettingsIcon,
   Sparkles,
-  Image as ImageIcon,
 } from "lucide-react";
 import { useUploadThing } from "@/lib/uploadthing";
 import { toast } from "sonner";
