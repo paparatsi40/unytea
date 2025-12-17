@@ -44,7 +44,7 @@ export default async function AdminCommunitiesPage({
       id: true,
       name: true,
       description: true,
-      image: true,
+      imageUrl: true,
       slug: true,
       visibility: true,
       createdAt: true,
@@ -53,7 +53,7 @@ export default async function AdminCommunitiesPage({
           id: true,
           name: true,
           email: true,
-          image: true,
+          imageUrl: true,
         },
       },
       _count: {
@@ -114,9 +114,9 @@ export default async function AdminCommunitiesPage({
           >
             {/* Community Image */}
             <div className="relative h-40 bg-gradient-to-br from-purple-500 to-pink-500">
-              {community.image && (
+              {community.imageUrl && (
                 <Image
-                  src={community.image}
+                  src={community.imageUrl}
                   alt={community.name}
                   fill
                   className="object-cover"
