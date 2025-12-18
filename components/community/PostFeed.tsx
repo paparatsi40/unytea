@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { createPost } from "@/app/actions/posts";
 import { Button } from "@/components/ui/button";
-import dynamic from "next/dynamic";
 import { 
   MessageSquare, 
   Heart, 
