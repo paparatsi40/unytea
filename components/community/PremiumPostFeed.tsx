@@ -24,7 +24,7 @@ type Post = {
 
 export function PremiumPostFeed({ posts: initialPosts, communityId }: { posts: Post[]; communityId: string }) {
   const { user, isLoading: _isLoading } = useCurrentUser();
-  const [posts, setPosts] = useState<Post[]>(initialPosts);
+  const [posts, _setPosts] = useState<Post[]>(initialPosts);
   const [content, setContent] = useState("");
   const [title, setTitle] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
