@@ -60,7 +60,7 @@ export async function PATCH(
 
 // DELETE - Delete course permanently
 export async function DELETE(
-  req: NextRequest,
+  _req: NextRequest,
   { params }: { params: Promise<{ courseId: string }> }
 ) {
   try {
