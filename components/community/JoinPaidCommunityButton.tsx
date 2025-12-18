@@ -9,7 +9,6 @@ import { joinPaidCommunity } from "@/app/actions/community-payments";
 
 interface JoinPaidCommunityButtonProps {
   communityId: string;
-  _communityName: string;
   isPaid: boolean;
   price: number | null; // in cents
   isMember: boolean;
@@ -18,7 +17,6 @@ interface JoinPaidCommunityButtonProps {
 
 export function JoinPaidCommunityButton({
   communityId,
-  _communityName,
   isPaid,
   price,
   isMember,
