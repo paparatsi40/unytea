@@ -23,6 +23,9 @@ export default async function LessonPage({
 
   const { course, hasAccess, isOwner } = result;
 
+  // Convert hasAccess to boolean if it's an object
+  const hasAccessBoolean = typeof hasAccess === 'boolean' ? hasAccess : !!hasAccess;
+
   // Find the lesson
   let currentLesson: any = null;
   let currentModule: any = null;
@@ -41,7 +44,7 @@ export default async function LessonPage({
   }
 
   // Check access
-  if (!hasAccess && !isOwner && !currentLesson.isFree) {
+  if (!hasAccessBoolean && !isOwner && !currentLesson.isFree) {
     redirect(`/dashboard/courses/${params.courseId}`);
   }
 
@@ -51,7 +54,7 @@ export default async function LessonPage({
       <LessonSidebar
         course={course}
         currentLessonId={params.lessonId}
-        hasAccess={hasAccess}
+        hasAccess={hasAccessBoolean}
         isOwner={isOwner}
       />
 
