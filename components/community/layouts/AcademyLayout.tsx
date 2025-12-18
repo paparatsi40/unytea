@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen, Users, Award, Clock, Star, PlayCircle, CheckCircle2, TrendingUp } from "lucide-react";
+import { BookOpen, Users, Award, Star, PlayCircle, CheckCircle2, TrendingUp } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
