@@ -26,7 +26,9 @@ export default async function CoursePage({
   const hasAccessBoolean = typeof hasAccess === 'boolean' ? hasAccess : !!hasAccess;
 
   // What You'll Learn & Testimonials
-  const whatYouWillLearn = course.whatYouWillLearn || [];
+  const whatYouWillLearn = Array.isArray(course.whatYouWillLearn) 
+    ? course.whatYouWillLearn 
+    : (course.whatYouWillLearn ? [course.whatYouWillLearn] : []);
   const testimonials = Array.isArray(course.testimonials) ? course.testimonials : [];
   const previewVideoUrl = course.previewVideoUrl;
 
