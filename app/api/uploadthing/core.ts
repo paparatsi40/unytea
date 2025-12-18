@@ -38,7 +38,7 @@ export const ourFileRouter = {
   // Community branding uploader (logos & covers)
   communityBranding: f({ 
     image: { 
-      maxFileSize: "10MB", // Larger for high-res covers
+      maxFileSize: "8MB", // Larger for high-res covers
       maxFileCount: 1 
     } 
   })
@@ -71,7 +71,7 @@ export const ourFileRouter = {
 
   // Media uploader for videos, audio (future)
   mediaUploader: f({
-    video: { maxFileSize: "32MB", maxFileCount: 1 },
+    video: { maxFileSize: "16MB", maxFileCount: 1 },
     audio: { maxFileSize: "8MB", maxFileCount: 3 },
   })
     .middleware(async () => {
