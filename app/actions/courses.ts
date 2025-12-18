@@ -115,7 +115,6 @@ export async function createCourse(data: {
         testimonials: data.testimonials,
         stripeProductId: stripeProductId,
         stripePriceId: stripePriceId,
-        isPublished: false,
       },
     });
 
