@@ -34,16 +34,6 @@ export async function POST(
           },
         },
       },
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        price: true,
-        isPaid: true,
-        stripeProductId: true,
-        stripePriceId: true,
-        slug: true,
-      },
     });
 
     if (!course) {
