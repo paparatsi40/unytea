@@ -42,7 +42,7 @@ export function PostFeed({
   communityId: string;
   initialPosts: Post[];
 }) {
-  const { user, isLoading } = useCurrentUser();
+  const { user, isLoading: _isLoading } = useCurrentUser();
   const [posts, setPosts] = useState(initialPosts);
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
