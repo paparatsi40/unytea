@@ -8,7 +8,7 @@ import { stripe } from "@/lib/stripe";
  * POST /api/courses/[courseId]/checkout
  */
 export async function POST(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ courseId: string }> }
 ) {
   try {
