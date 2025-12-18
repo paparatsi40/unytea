@@ -19,7 +19,7 @@ export function LanguageSwitcher() {
   const router = useRouter();
 
   // Normalize the pathname (remove trailing slash)
-  const pathname = rawPathname.replace(/\/+$/, "") || "/";
+  const pathname = (rawPathname?.replace(/\/+$/, "") || "/");
 
   useEffect(() => {
     setMounted(true);
