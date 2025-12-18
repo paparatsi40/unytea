@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 // GET: Load whiteboard state
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ sessionId: string }> }
 ) {
   try {
