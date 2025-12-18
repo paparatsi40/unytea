@@ -35,7 +35,7 @@ export function CommunityLayoutClient({
 }) {
   const { user, isLoading } = useCurrentUser();
   const router = useRouter();
-  const pathname = usePathname();
+  const _pathname = usePathname();
   const [community, setCommunity] = useState<Community | null>(null);
   const [membership, setMembership] = useState<Membership>(null);
   const [loading, setLoading] = useState(true);
