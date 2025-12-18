@@ -444,7 +444,21 @@ export async function deleteCommunity(communityId: string) {
       });
 
       for (const course of courses) {
-        await tx.lesson.deleteMany({
+        // Get modules for this course
+        const modules = await tx.module.findMany({
+          where: { courseId: course.id },
+          select: { id: true },
+        });
+
+        // Delete lessons through modules
+        for (const module of modules) {
+          await tx.lesson.deleteMany({
+            where: { moduleId: module.id },
+          });
+        }
+
+        // Delete modules
+        await tx.module.deleteMany({
           where: { courseId: course.id },
         });
       }
