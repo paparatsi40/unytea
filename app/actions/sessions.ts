@@ -5,7 +5,7 @@ import { getCurrentUserId } from "@/lib/auth-utils";
 import { prisma } from "@/lib/prisma";
 import { nanoid } from "nanoid";
 import { canStartVideoCall } from "@/lib/subscription-plans";
-import { trackVideoUsage, updateMemberCount } from "@/lib/usage-tracking";
+import { trackVideoUsage } from "@/lib/usage-tracking";
 import { notifySessionStarted } from "@/lib/notifications";
 
 /**
