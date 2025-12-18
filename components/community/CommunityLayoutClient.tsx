@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { TrendingUp, Hash, Loader2 } from "lucide-react";
+import { Hash, Loader2 } from "lucide-react";
 import { PremiumCommunityHeader } from "@/components/community/PremiumCommunityHeader";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { AIChatWidget } from "@/components/ai/AIChatWidget";
