@@ -375,7 +375,6 @@ async function handleSubscriptionUpdated(subscription: any) {
   try {
     const stripeSubscriptionId = subscription.id;
     const status = subscription.status;
-    const _customerId = subscription.customer;
 
     // Try to update platform subscription first
     const user = await prisma.user.findFirst({
