@@ -12,8 +12,8 @@ import { CurrentPlanBadge } from "@/components/subscription/CurrentPlanBadge";
 export default function BillingPage() {
   const { user } = useCurrentUser();
   
-  const currentPlan = user?.subscriptionPlan || "FREE";
-  const subscriptionStatus = user?.subscriptionStatus;
+  const currentPlan = (user as any)?.subscriptionPlan || "FREE";
+  const subscriptionStatus = (user as any)?.subscriptionStatus;
 
   return (
     <div className="space-y-8">
