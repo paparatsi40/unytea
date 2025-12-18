@@ -178,7 +178,7 @@ export async function POST(
  * GET /api/courses/[courseId]/checkout
  */
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ courseId: string }> }
 ) {
   try {
