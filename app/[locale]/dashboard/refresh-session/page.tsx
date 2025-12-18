@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Loader2, CheckCircle } from "lucide-react";
 
 export default function RefreshSessionPage() {
-  const { data: session, status, update } = useSession();
+  const { status, update } = useSession();
   const router = useRouter();
   const [isRefreshing, setIsRefreshing] = useState(true);
   const [success, setSuccess] = useState(false);
