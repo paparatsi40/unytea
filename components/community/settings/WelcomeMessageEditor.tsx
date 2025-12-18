@@ -8,7 +8,6 @@ import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 
 interface WelcomeMessageEditorProps {
-  _communityId: string;
   communitySlug: string;
   initialMessage: string;
   initialEnabled: boolean;
@@ -16,7 +15,6 @@ interface WelcomeMessageEditorProps {
 }
 
 export function WelcomeMessageEditor({
-  _communityId,
   communitySlug,
   initialMessage,
   initialEnabled,

@@ -51,7 +51,6 @@ export default async function WelcomeMessageSettingsPage({
 
       {/* Editor */}
       <WelcomeMessageEditor
-        _communityId={community.id}
         communitySlug={community.slug}
         initialMessage={community.welcomeMessage || ""}
         initialEnabled={community.showWelcomeMessage}
