@@ -301,7 +301,7 @@ export function PostFeed({
           </div>
         ) : (
           posts.map((post, index) => (
-            <PostCard key={post.id} post={post} index={index} />
+            <PostCard key={post.id} post={post as any} index={index} />
           ))
         )}
       </div>
