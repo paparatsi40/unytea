@@ -64,7 +64,7 @@ export function PostFeed({
 
       const result = await createPost(formData);
 
-      if (result.success) {
+      if (result.success && result.post) {
         // Transform the post to match the expected format
         const transformedPost = {
           id: result.post.id,
