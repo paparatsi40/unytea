@@ -24,13 +24,14 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (user) {
+      const userAny = user as any;
       setFormData({
         name: user.name || "",
-        bio: user.bio || "",
-        tagline: user.tagline || "",
-        website: user.website || "",
-        location: user.location || "",
-        timezone: user.timezone || "UTC",
+        bio: userAny.bio || "",
+        tagline: userAny.tagline || "",
+        website: userAny.website || "",
+        location: userAny.location || "",
+        timezone: userAny.timezone || "UTC",
       });
     }
   }, [user]);
@@ -256,13 +257,14 @@ export default function ProfilePage() {
             type="button"
             variant="outline"
             onClick={() => {
+              const userAny = user as any;
               setFormData({
                 name: user.name || "",
-                bio: user.bio || "",
-                tagline: user.tagline || "",
-                website: user.website || "",
-                location: user.location || "",
-                timezone: user.timezone || "UTC",
+                bio: userAny.bio || "",
+                tagline: userAny.tagline || "",
+                website: userAny.website || "",
+                location: userAny.location || "",
+                timezone: userAny.timezone || "UTC",
               });
               setMessage(null);
             }}
