@@ -118,7 +118,7 @@ export function CommunityFeedClient({
   return (
     <div className="container mx-auto px-6 py-12">
       {isMember || !isPrivate ? (
-        <PremiumPostFeed posts={posts} communityId={communityId} />
+        <PremiumPostFeed posts={posts as any} communityId={communityId} />
       ) : isPending ? (
         /* Pending Approval State */
         <div className="mx-auto max-w-2xl rounded-2xl border-2 border-dashed border-amber-500/20 bg-gradient-to-br from-amber-500/5 to-amber-500/10 p-12 text-center">
