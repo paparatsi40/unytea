@@ -12,7 +12,6 @@ import {
   Image as ImageIcon, 
   Smile,
   Sparkles,
-  TrendingUp,
   Users,
   Zap,
   CheckCircle2
