@@ -403,7 +403,7 @@ export default function PricingPage() {
                       </span>
                       <span className="text-muted-foreground">{plan.price.monthly === null ? "" : "/month"}</span>
                     </div>
-                    {plan.price.yearly > 0 && (
+                    {(plan.price.yearly ?? 0) > 0 && (
                       <div className="mt-2 text-lg text-muted-foreground">
                         or {plan.price.yearly === null ? "Custom" : `$${plan.price.yearly}`} /year (save 17%)
                       </div>
