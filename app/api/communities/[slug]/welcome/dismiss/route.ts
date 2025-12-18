@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
  * Mark welcome message as seen for the current user
  */
 export async function POST(
-  req: NextRequest,
+  _req: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
