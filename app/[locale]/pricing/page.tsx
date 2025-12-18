@@ -461,7 +461,7 @@ export default function PricingPage() {
                   {'comparison' in plan && plan.comparison && (
                     <div className="pt-3 border-t border-border">
                       <p className="text-lg text-primary font-semibold text-center">
-                        {plan.comparison}
+                        {plan.comparison as React.ReactNode}
                       </p>
                     </div>
                   )}
