@@ -73,7 +73,13 @@ export async function POST(
     }
 
     // Get or create Stripe customer
-    let customerId = session.user.stripeCustomerId;
+    // Fetch user from database to get stripeCustomerId
+    const dbUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { stripeCustomerId: true },
+    });
+    
+    let customerId = dbUser?.stripeCustomerId;
 
     if (!customerId) {
       const customer = await stripe.customers.create({
