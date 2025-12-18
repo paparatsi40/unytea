@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Shield, Key, Smartphone, Monitor, Loader2, Eye, EyeOff, CheckCircle2 } from "lucide-react";
+import { Key, Smartphone, Monitor, Loader2, Eye, EyeOff, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function SecurityPage() {
