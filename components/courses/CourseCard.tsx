@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen, Clock, Users, CheckCircle2, Star, Award, Zap, DollarSign, Sparkles } from "lucide-react";
+import { BookOpen, Users, CheckCircle2, Star, Award, Zap, DollarSign, Sparkles } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
