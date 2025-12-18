@@ -208,7 +208,7 @@ export function PremiumPostFeed({ posts: initialPosts, communityId }: { posts: P
       {posts.length > 0 ? (
         <div className="space-y-4">
           {posts.map((post) => (
-            <PremiumPostCard key={post.id} post={post} />
+            <PremiumPostCard key={post.id} post={post as any} />
           ))}
         </div>
       ) : (
