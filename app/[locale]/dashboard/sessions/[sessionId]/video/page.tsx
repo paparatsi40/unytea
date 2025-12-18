@@ -108,10 +108,10 @@ export default function SessionVideoPage() {
     // Track session leave and award bonus points if stayed full duration
     try {
       const result = await trackSessionLeave(sessionId);
-      if (result.success && result.bonusPoints > 0) {
-        const notification = formatPointsNotification("STAY_FULL_SESSION", result.bonusPoints);
+      if (result.success && (result.bonusPoints ?? 0) > 0) {
+        const notification = formatPointsNotification("STAY_FULL_SESSION", result.bonusPoints ?? 0);
         addNotification(
-          result.bonusPoints,
+          result.bonusPoints ?? 0,
           notification.title,
           notification.message,
           notification.emoji
