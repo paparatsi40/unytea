@@ -100,13 +100,6 @@ export function PostFeed({
     }
   };
 
-  const getAuthorName = (author: Post["author"]) => {
-    if (author.firstName && author.lastName) {
-      return `${author.firstName} ${author.lastName}`;
-    }
-    return author.firstName || "User";
-  };
-
   const formatTime = (date: Date) => {
     const now = new Date();
     const diff = now.getTime() - new Date(date).getTime();
