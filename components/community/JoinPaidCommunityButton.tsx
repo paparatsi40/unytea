@@ -18,7 +18,7 @@ interface JoinPaidCommunityButtonProps {
 
 export function JoinPaidCommunityButton({
   communityId,
-  communityName,
+  _communityName,
   isPaid,
   price,
   isMember,
