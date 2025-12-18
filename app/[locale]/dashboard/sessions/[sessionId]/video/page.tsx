@@ -35,7 +35,7 @@ interface SessionData {
 export default function SessionVideoPage() {
   const params = useParams();
   const router = useRouter();
-  const sessionId = params.sessionId as string;
+  const sessionId = params?.sessionId as string;
 
   const [session, setSession] = useState<SessionData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -49,8 +49,10 @@ export default function SessionVideoPage() {
   const { currentNotification, addNotification, clearCurrent } = usePointsNotifications();
 
   useEffect(() => {
-    fetchSession();
-    checkFeedbackStatus();
+    if (sessionId) {
+      fetchSession();
+      checkFeedbackStatus();
+    }
   }, [sessionId]);
 
   async function checkFeedbackStatus() {
