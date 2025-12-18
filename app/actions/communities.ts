@@ -428,7 +428,7 @@ export async function deleteCommunity(communityId: string) {
       });
 
       for (const channel of channels) {
-        await tx.message.deleteMany({
+        await tx.channelMessage.deleteMany({
           where: { channelId: channel.id },
         });
       }
