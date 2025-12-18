@@ -25,8 +25,7 @@ type Post = {
   createdAt: Date;
   author: {
     id: string;
-    firstName: string | null;
-    lastName: string | null;
+    name: string | null;
     imageUrl: string | null;
   };
   _count: {
@@ -73,8 +72,7 @@ export function PostFeed({
           createdAt: result.post.createdAt,
           author: {
             id: result.post.author.id,
-            firstName: result.post.author.firstName,
-            lastName: result.post.author.lastName,
+            name: result.post.author.name,
             imageUrl: result.post.author.image, // Map 'image' to 'imageUrl'
           },
           _count: {
@@ -138,7 +136,7 @@ export function PostFeed({
                 <div className="relative">
                   <img
                     src={user.image}
-                    alt={`${user.firstName || ''} ${user.lastName || ''}`.trim() || "User"}
+                    alt={user.name || "User"}
                     className="h-14 w-14 rounded-2xl border-2 border-primary/20 object-cover shadow-lg ring-2 ring-primary/10"
                   />
                   <div className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-background bg-green-500 shadow-sm" />
@@ -146,7 +144,7 @@ export function PostFeed({
               ) : (
                 <div className="flex h-14 w-14 items-center justify-center rounded-2xl border-2 border-primary/20 bg-gradient-to-br from-primary/20 to-primary/10 shadow-lg">
                   <span className="text-xl font-bold text-primary">
-                    {user?.firstName?.[0] || "U"}
+                    {user?.name?.[0] || "U"}
                   </span>
                 </div>
               )}
