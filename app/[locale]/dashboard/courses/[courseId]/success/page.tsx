@@ -4,7 +4,6 @@ import { redirect, notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getCourse } from "@/app/actions/courses";
 import { SuccessContent } from "@/components/courses/SuccessContent";
-import { Button } from "@/components/ui/button";
 import { CheckCircle2, Sparkles, BookOpen, ArrowRight, Gift, Award } from "lucide-react";
 
 export default async function CourseSuccessPage({
