@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { toggleReaction, getPostReactions, type ReactionType } from "@/app/actions/reactions";
-import { Heart, ThumbsUp, PartyPopper, Flame, Lightbulb, Hand, ThumbsDown, Rocket, Star, Eye, CheckCircle2, Brain } from "lucide-react";
+import { Heart, ThumbsUp, PartyPopper, Flame, Lightbulb, Hand, Rocket, Star, Eye, CheckCircle2, Brain } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type ReactionData = {
