@@ -23,7 +23,7 @@ export default function PaymentsSettingsPage() {
 
   // Check if returning from onboarding
   useEffect(() => {
-    if (searchParams.get("onboarding") === "success") {
+    if (searchParams?.get("onboarding") === "success") {
       toast.success("Stripe account connected successfully! 🎉");
       // Remove query param
       window.history.replaceState({}, "", "/dashboard/settings/payments");
