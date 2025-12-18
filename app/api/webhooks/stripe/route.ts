@@ -179,7 +179,7 @@ async function handleCoursePurchase(
     console.log("📚 Processing course purchase:", { courseId, userId });
 
     // 1. Check if already enrolled
-    const existingEnrollment = await prisma.courseEnrollment.findFirst({
+    const existingEnrollment = await prisma.enrollment.findFirst({
       where: {
         courseId,
         userId,
@@ -207,7 +207,7 @@ async function handleCoursePurchase(
     }
 
     // 3. Create enrollment
-    await prisma.courseEnrollment.create({
+    await prisma.enrollment.create({
       data: {
         userId,
         courseId,
