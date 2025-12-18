@@ -24,15 +24,6 @@ interface CommunitySidebarProps {
   locale: string;
 }
 
-const navigation = [
-  { name: "Feed", href: "/feed", icon: Home },
-  { name: "Chat", href: "/chat", icon: MessageSquare },
-  { name: "Sessions", href: "/sessions", icon: Video },
-  { name: "Courses", href: "/courses", icon: BookOpen },
-  { name: "Leaderboard", href: "/leaderboard", icon: Trophy },
-  { name: "Members", href: "/members", icon: Users },
-];
-
 export function CommunitySidebar({ communityId, slug, userId, isOwner, locale }: CommunitySidebarProps) {
   const pathname = usePathname();
 
