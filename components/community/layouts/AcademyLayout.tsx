@@ -29,14 +29,12 @@ interface AcademyLayoutProps {
     };
   };
   courses?: any[];
-  _members?: any[];
   instructors?: any[];
 }
 
 export function AcademyLayout({
   community,
   courses = [],
-  _members = [],
   instructors = [],
 }: AcademyLayoutProps) {
   const primaryColor = community.primaryColor || "#8B5CF6";
