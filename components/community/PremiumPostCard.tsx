@@ -60,10 +60,10 @@ export function PremiumPostCard({ post }: { post: Post }) {
     }
 
     setIsSaving(true);
-    const result = await updatePost(post.id, {
-      title: editTitle || undefined,
-      content: editContent,
-    });
+    const formData = new FormData();
+    if (editTitle) formData.append("title", editTitle);
+    formData.append("content", editContent);
+    const result = await updatePost(post.id, formData);
 
     if (result.success) {
       setIsEditing(false);
