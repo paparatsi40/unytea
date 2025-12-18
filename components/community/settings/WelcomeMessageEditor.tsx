@@ -18,7 +18,7 @@ export function WelcomeMessageEditor({
   communitySlug,
   initialMessage,
   initialEnabled,
-  locale,
+  _locale,
 }: WelcomeMessageEditorProps) {
   const router = useRouter();
   const [message, setMessage] = useState(initialMessage);
