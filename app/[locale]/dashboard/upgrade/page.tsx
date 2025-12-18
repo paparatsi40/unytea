@@ -4,11 +4,9 @@ import { Check, Sparkles, Zap, Crown, Building2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function UpgradePage() {
-  const router = useRouter();
   const [loading, setLoading] = useState<string | null>(null);
 
   const plans = [
