@@ -163,7 +163,7 @@ const features = [
 ];
 
 export default function PricingPage() {
-  const { user, isLoading: userLoading } = useCurrentUser();
+  const { user } = useCurrentUser();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const params = useParams();
   const locale = params.locale as string;
