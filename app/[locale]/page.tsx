@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Video, Sparkles, Palette, Zap, Shield, Check, X, DollarSign, Users, Brain, Megaphone, TrendingUp } from "lucide-react";
+import { ArrowRight, Video, Sparkles, Palette, Zap, Shield, Check, X, DollarSign, Users, Brain, TrendingUp } from "lucide-react";
 import { HomeNav } from "@/components/HomeNav";
 import { getTranslations } from 'next-intl/server';
 import { Logo } from "@/components/brand/Logo";
