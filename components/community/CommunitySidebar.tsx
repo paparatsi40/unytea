@@ -65,7 +65,7 @@ export function CommunitySidebar({ communityId, slug, userId, isOwner, locale }:
       {/* Logo */}
       <div className="flex h-16 items-center border-b border-border px-6">
         <Link href={`/${locale}/dashboard`} className="flex items-center space-x-2">
-          <Logo width={120} height={45} />
+          <Logo iconSize={40} />
         </Link>
       </div>
 
