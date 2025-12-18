@@ -37,7 +37,7 @@ export function CommunityActions({
     setIsLoading(true);
 
     try {
-      const result = await joinCommunity(user.id, communityId);
+      const result = await joinCommunity(communityId);
 
       if (result.success) {
         toast.success(result.message || "Successfully joined!");
