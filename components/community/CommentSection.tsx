@@ -40,7 +40,7 @@ export function CommentSection({ postId, initialComments = [] }: CommentSectionP
     const result = await getPostComments(postId);
 
     if (result.success && result.comments) {
-      setComments(result.comments);
+      setComments(result.comments as Comment[]);
     } else {
       setError(result.error || "Failed to load comments");
     }
