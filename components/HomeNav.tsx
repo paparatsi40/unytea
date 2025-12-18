@@ -12,7 +12,7 @@ interface HomeNavProps {
 }
 
 export function HomeNav({ locale }: HomeNavProps) {
-  const { data: session, status } = useSession();
+  const { data: _session, status } = useSession();
   const t = useTranslations("nav");
 
   const isLoading = status === "loading";
