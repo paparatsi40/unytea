@@ -22,6 +22,9 @@ export default async function CoursePage({
 
   const { course, hasAccess, isOwner, enrollment } = result;
 
+  // Convert hasAccess to boolean if it's an object
+  const hasAccessBoolean = typeof hasAccess === 'boolean' ? hasAccess : !!hasAccess;
+
   // What You'll Learn & Testimonials
   const whatYouWillLearn = course.whatYouWillLearn || [];
   const testimonials = Array.isArray(course.testimonials) ? course.testimonials : [];
@@ -40,7 +43,7 @@ export default async function CoursePage({
   return (
     <CoursePageClient
       course={course}
-      hasAccess={hasAccess}
+      hasAccess={hasAccessBoolean}
       isOwner={isOwner}
       enrollment={enrollment}
       whatYouWillLearn={whatYouWillLearn}
