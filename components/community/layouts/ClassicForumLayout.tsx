@@ -36,7 +36,7 @@ export function ClassicForumLayout({
   pinnedPosts = [],
 }: ClassicForumLayoutProps) {
   const primaryColor = community.primaryColor || "#8B5CF6";
-  const accentColor = community.accentColor || "#F59E0B";
+  const _accentColor = community.accentColor || "#F59E0B";
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -121,7 +121,7 @@ export function ClassicForumLayout({
                       post={post}
                       communitySlug={community.slug}
                       primaryColor={primaryColor}
-                      accentColor={accentColor}
+                      accentColor={_accentColor}
                       isPinned
                     />
                   ))}
@@ -137,7 +137,7 @@ export function ClassicForumLayout({
                   post={post}
                   communitySlug={community.slug}
                   primaryColor={primaryColor}
-                  accentColor={accentColor}
+                  accentColor={_accentColor}
                 />
               ))}
             </div>
@@ -196,7 +196,7 @@ export function ClassicForumLayout({
                         <div
                           className="flex h-6 w-6 items-center justify-center rounded text-xs font-bold"
                           style={{
-                            backgroundColor: index < 3 ? accentColor : '#E5E7EB',
+                            backgroundColor: index < 3 ? _accentColor : '#E5E7EB',
                             color: index < 3 ? 'white' : '#6B7280',
                           }}
                         >
@@ -270,7 +270,7 @@ function PostCard({
   post,
   communitySlug,
   primaryColor,
-  accentColor,
+  _accentColor,
   isPinned = false,
 }: {
   post: any;
