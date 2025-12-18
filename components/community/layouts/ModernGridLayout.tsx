@@ -30,7 +30,6 @@ interface ModernGridLayoutProps {
       courses: number;
     };
   };
-  _sections?: any[];
   posts?: any[];
   members?: any[];
   courses?: any[];
@@ -38,7 +37,6 @@ interface ModernGridLayoutProps {
 
 export function ModernGridLayout({
   community,
-  _sections = [],
   posts = [],
   members = [],
   courses = [],
