@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
-import { getChannelMessages, updateChannelPresence, getTypingUsers } from "@/app/actions/channels";
+import { getChannelMessages, updateChannelPresence } from "@/app/actions/channels";
 import { formatDistanceToNow } from "date-fns";
 import { Trash2, Loader2 } from "lucide-react";
 import { deleteChannelMessage } from "@/app/actions/channels";
