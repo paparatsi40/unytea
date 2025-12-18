@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getUserRecordings } from "@/app/actions/recordings";
-import { Play, Clock, Calendar, Search, Filter, Loader2 } from "lucide-react";
+import { Play, Clock, Calendar, Search, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 
