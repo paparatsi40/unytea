@@ -10,7 +10,6 @@ import {
   TrendingUp,
   MessageSquare,
   BookOpen,
-  Calendar,
   Activity,
   Sparkles,
   Compass,
