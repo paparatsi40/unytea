@@ -9,7 +9,7 @@ import { CurrentPlanBadge } from "@/components/subscription/CurrentPlanBadge";
 import Link from "next/link";
 
 export default function ProfilePage() {
-  const { user, mutate } = useCurrentUser();
+  const { user } = useCurrentUser();
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   
@@ -51,7 +51,6 @@ export default function ProfilePage() {
 
       if (response.ok) {
         setMessage({ type: "success", text: "Profile updated successfully" });
-        mutate(); // Refresh user data
       } else {
         setMessage({ type: "error", text: data.error || "Failed to update profile" });
       }
