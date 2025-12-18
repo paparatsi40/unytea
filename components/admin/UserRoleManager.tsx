@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Crown, Shield, Eye, User, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { toast } from "react-hot-toast";
 
 type AppRole = "SUPER_ADMIN" | "ADMIN" | "MODERATOR" | "USER";
@@ -57,19 +57,6 @@ export function UserRoleManager({ userId, currentRole }: UserRoleManagerProps) {
         return "bg-blue-100 text-blue-800 border-blue-300 hover:bg-blue-200";
       default:
         return "bg-gray-100 text-gray-800 border-gray-300 hover:bg-gray-200";
-    }
-  };
-
-  const getRoleIcon = (role: AppRole) => {
-    switch (role) {
-      case "SUPER_ADMIN":
-        return <Crown className="w-3 h-3" />;
-      case "ADMIN":
-        return <Shield className="w-3 h-3" />;
-      case "MODERATOR":
-        return <Eye className="w-3 h-3" />;
-      default:
-        return <User className="w-3 h-3" />;
     }
   };
 
