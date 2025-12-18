@@ -66,11 +66,11 @@ export function CommunityActions({
     setIsLoading(true);
 
     try {
-      const result = await leaveCommunity(user.id, communityId);
+      const result = await leaveCommunity(communityId);
 
       if (result.success) {
-        toast.success(result.message || "Successfully left community");
-        router.push("/dashboard/communities");
+        toast.success("Successfully left community");
+        router.refresh();
       }
     } catch (error) {
       console.error("Error leaving community:", error);
