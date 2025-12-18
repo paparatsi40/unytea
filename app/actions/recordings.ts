@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
-import { startRecording, stopRecording, getRecordingStatus } from "@/lib/livekit/recording";
+import { startRecording, stopRecording } from "@/lib/livekit/recording";
 import { transcribeFromUrl, processTranscription } from "@/lib/ai/transcription";
 import { getPublicRecordingUrl, generateThumbnail } from "@/lib/storage/recordings";
 import { revalidatePath } from "next/cache";
