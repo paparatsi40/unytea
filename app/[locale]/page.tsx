@@ -112,7 +112,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
-            {['noVideo', 'noCustomization', 'noEngagement', 'overpriced', 'ancientTech', 'vendorLock'].map((key, index) => (
+            {['noVideo', 'noCustomization', 'noEngagement', 'overpriced', 'ancientTech', 'vendorLock'].map((key) => (
               <div
                 key={key}
                 className="glass-strong rounded-2xl p-8 hover:scale-105 transition-transform"
@@ -222,7 +222,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
                     { key: 'api', circle: true, skool: false, teachable: true },
                     { key: 'usagePricing', circle: false, skool: false, teachable: false },
                     { key: 'migration', circle: false, skool: false, teachable: false },
-                  ].map((feature, index) => (
+                  ].map((feature) => (
                     <tr key={feature.key} className="border-b border-border/50 last:border-0">
                       <td className="p-6 font-semibold">{t(`comparisonSection.features.${feature.key}`)}</td>
                       <td className="p-6 text-center">
