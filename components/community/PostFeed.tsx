@@ -20,7 +20,7 @@ import { PostCard } from "@/components/community/PostCard";
 import { SpectacularFeedHeader } from "@/components/community/SpectacularFeedHeader";
 
 // Dynamically import Lottie to avoid SSR issues
-const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
+const _Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 
 type Post = {
   id: string;
