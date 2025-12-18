@@ -40,7 +40,7 @@ export function CommunityActions({
       const result = await joinCommunity(communityId);
 
       if (result.success) {
-        toast.success(result.message || "Successfully joined!");
+        toast.success("Successfully joined!");
         router.refresh();
       }
     } catch (error) {
