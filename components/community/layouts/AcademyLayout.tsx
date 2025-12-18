@@ -29,7 +29,7 @@ interface AcademyLayoutProps {
     };
   };
   courses?: any[];
-  members?: any[];
+  _members?: any[];
   instructors?: any[];
 }
 
