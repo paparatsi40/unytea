@@ -121,7 +121,6 @@ export function ClassicForumLayout({
                       post={post}
                       communitySlug={community.slug}
                       primaryColor={primaryColor}
-                      _accentColor={_accentColor}
                       isPinned
                     />
                   ))}
@@ -137,7 +136,6 @@ export function ClassicForumLayout({
                   post={post}
                   communitySlug={community.slug}
                   primaryColor={primaryColor}
-                  _accentColor={_accentColor}
                 />
               ))}
             </div>
@@ -270,13 +268,11 @@ function PostCard({
   post,
   communitySlug,
   primaryColor,
-  _accentColor,
   isPinned = false,
 }: {
   post: any;
   communitySlug: string;
   primaryColor: string;
-  _accentColor: string;
   isPinned?: boolean;
 }) {
   return (
