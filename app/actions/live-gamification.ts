@@ -128,7 +128,7 @@ export async function trackLiveEvent(
       throw new Error("Participation not found. User must join session first.");
     }
 
-    const currentData = (participation.eventsData as SessionParticipationData) ||
+    const currentData = (participation.eventsData as unknown as SessionParticipationData) ||
       DEFAULT_PARTICIPATION_DATA;
 
     // Calculate points for this event
@@ -245,7 +245,7 @@ export async function trackSessionLeave(sessionId: string) {
     const stayedFull = minutesAttended >= requiredMinutes;
 
     let bonusPoints = 0;
-    const currentData = (participation.eventsData as SessionParticipationData) ||
+    const currentData = (participation.eventsData as unknown as SessionParticipationData) ||
       DEFAULT_PARTICIPATION_DATA;
     const updatedData = { ...currentData, stayedFull };
 
@@ -319,7 +319,7 @@ export async function getSessionParticipationStats(sessionId: string) {
 
     return {
       pointsEarned: participation.pointsEarned,
-      eventsData: participation.eventsData as SessionParticipationData,
+      eventsData: participation.eventsData as unknown as SessionParticipationData,
       joinedAt: participation.joinedAt,
     };
   } catch (error) {
