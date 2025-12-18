@@ -75,6 +75,7 @@ model User {
   subscriptionPlan   String?           @default("FREE") // FREE, PROFESSIONAL, PREMIUM
   subscriptionStatus String?           @default("ACTIVE") // ACTIVE, PAST_DUE, CANCELED, etc.
   stripeCustomerId   String?           @unique // Stripe customer ID
+  stripeConnectAccountId String?       @unique // Stripe Connect account ID (for creators)
   stripeSubscriptionId String?         @unique // Current Stripe subscription ID
   subscriptionEndsAt DateTime?         // When subscription ends (for canceled subscriptions)
   resetToken         String?           // Password reset token
