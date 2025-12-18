@@ -8,7 +8,6 @@ import dynamic from "next/dynamic";
 import { 
   MessageSquare, 
   Heart, 
-  Share2, 
   Send, 
   Image as ImageIcon, 
   Smile,
