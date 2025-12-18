@@ -65,10 +65,7 @@ export default function CreateCoursePage() {
       const result = await createCourse({
         ...formData,
         price: formData.isPaid ? formData.price : 0,
-        whatYouWillLearn: formData.whatYouWillLearn
-          .split('\n')
-          .map(line => line.trim())
-          .filter(line => line.length > 0),
+        whatYouWillLearn: formData.whatYouWillLearn,
       });
 
       if (result.success && result.course) {
