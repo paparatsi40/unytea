@@ -168,7 +168,7 @@ export default function PricingPage() {
   const params = useParams();
   const locale = params?.locale as string;
 
-  const currentPlan = user?.subscriptionPlan || "FREE";
+  const currentPlan = (user as any)?.subscriptionPlan || "FREE";
 
   const handleUpgrade = async (plan: typeof plans[0]) => {
     // If no priceId, handle special cases
