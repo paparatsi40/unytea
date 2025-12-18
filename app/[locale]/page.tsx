@@ -269,7 +269,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {['professional', 'scale', 'enterprise'].map((plan, idx) => {
+            {['professional', 'scale', 'enterprise'].map((plan) => {
               const isFeatured = plan === 'professional';
               return (
                 <div
