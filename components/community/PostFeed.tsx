@@ -72,7 +72,7 @@ export function PostFeed({
           createdAt: result.post.createdAt,
           author: {
             id: result.post.author.id,
-            name: result.post.author.name,
+            name: `${result.post.author.firstName || ''} ${result.post.author.lastName || ''}`.trim() || null,
             imageUrl: result.post.author.image, // Map 'image' to 'imageUrl'
           },
           _count: {
