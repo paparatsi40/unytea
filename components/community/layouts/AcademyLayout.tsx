@@ -36,7 +36,7 @@ interface AcademyLayoutProps {
 export function AcademyLayout({
   community,
   courses = [],
-  members = [],
+  _members = [],
   instructors = [],
 }: AcademyLayoutProps) {
   const primaryColor = community.primaryColor || "#8B5CF6";
