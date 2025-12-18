@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Loader2, RefreshCw, CheckCircle } from "lucide-react";
+import { Loader2, CheckCircle } from "lucide-react";
 
 export default function RefreshSessionPage() {
   const { data: session, status, update } = useSession();
