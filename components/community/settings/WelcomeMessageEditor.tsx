@@ -11,7 +11,7 @@ interface WelcomeMessageEditorProps {
   communitySlug: string;
   initialMessage: string;
   initialEnabled: boolean;
-  locale: string;
+  _locale: string;
 }
 
 export function WelcomeMessageEditor({
