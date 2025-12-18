@@ -2,7 +2,6 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { getCurrentUserId } from "@/lib/auth-utils";
 import { checkAndUnlockAchievements } from "./achievements";
 import { canCreateCommunity, canAddMember } from "@/lib/subscription-plans";
