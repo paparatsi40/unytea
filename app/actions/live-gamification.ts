@@ -8,7 +8,6 @@ import {
   SessionParticipationData,
   DEFAULT_PARTICIPATION_DATA,
   calculateEventPoints,
-  checkLiveSessionAchievements,
 } from "@/lib/live-gamification";
 
 /**
