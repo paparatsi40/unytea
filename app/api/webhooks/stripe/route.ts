@@ -171,7 +171,7 @@ async function handlePlatformSubscriptionCreated(
 // =====================================================
 
 async function handleCoursePurchase(
-  session: any,
+  _session: any,
   courseId: string,
   userId: string
 ) {
