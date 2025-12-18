@@ -8,8 +8,8 @@ export function UserFilters() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
-  const search = searchParams.get("search") || "";
-  const roleFilter = searchParams.get("role") || "all";
+  const search = searchParams?.get("search") || "";
+  const roleFilter = searchParams?.get("role") || "all";
 
   const handleSearch = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
