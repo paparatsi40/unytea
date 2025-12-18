@@ -11,14 +11,12 @@ interface WelcomeMessageEditorProps {
   communitySlug: string;
   initialMessage: string;
   initialEnabled: boolean;
-  _locale: string;
 }
 
 export function WelcomeMessageEditor({
   communitySlug,
   initialMessage,
   initialEnabled,
-  _locale,
 }: WelcomeMessageEditorProps) {
   const router = useRouter();
   const [message, setMessage] = useState(initialMessage);
