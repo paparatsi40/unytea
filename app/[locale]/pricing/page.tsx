@@ -166,7 +166,7 @@ export default function PricingPage() {
   const { user } = useCurrentUser();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const params = useParams();
-  const locale = params.locale as string;
+  const locale = params?.locale as string;
 
   const currentPlan = user?.subscriptionPlan || "FREE";
 
