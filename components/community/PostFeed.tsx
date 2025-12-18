@@ -16,7 +16,6 @@ import {
   Zap,
   CheckCircle2
 } from "lucide-react";
-import { PostReactions } from "@/components/community/PostReactions";
 import { PostCard } from "@/components/community/PostCard";
 import { SpectacularFeedHeader } from "@/components/community/SpectacularFeedHeader";
 
