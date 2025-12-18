@@ -82,7 +82,7 @@ export default function ProfilePage() {
         </p>
         <div className="mt-3 flex items-center gap-2">
           <CurrentPlanBadge />
-          {user && user.subscriptionPlan !== "FREE" && (
+          {user && (user as any).subscriptionPlan !== "FREE" && (
             <Link 
               href="/dashboard/settings/billing" 
               className="text-sm text-muted-foreground hover:text-foreground"
