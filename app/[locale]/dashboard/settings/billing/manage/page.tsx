@@ -38,7 +38,6 @@ export default async function ManageSubscriptionPage({
   });
 
   const hasActiveSubscription = user?.subscriptionStatus === "ACTIVE";
-  const isPaidPlan = user?.subscriptionPlan && user.subscriptionPlan !== "FREE";
 
   return (
     <div className="space-y-6">
