@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
-import { Loader2, CheckCircle2, Upload, MapPin, Globe, Clock } from "lucide-react";
+import { Loader2, CheckCircle2, MapPin, Globe, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AvatarUpload } from "@/components/profile/AvatarUpload";
 import { CurrentPlanBadge } from "@/components/subscription/CurrentPlanBadge";
