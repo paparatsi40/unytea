@@ -38,7 +38,6 @@ export function MinimalistLayout({
   courses = [],
   members = [],
 }: MinimalistLayoutProps) {
-  const _primaryColor = community.primaryColor || "#18181B";
   const accentColor = community.accentColor || "#3B82F6";
 
   return (
