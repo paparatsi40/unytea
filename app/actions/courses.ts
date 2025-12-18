@@ -21,7 +21,7 @@ export async function createCourse(data: {
   upgradeCourseId?: string;
   certificateEnabled?: boolean;
   liveSupportEnabled?: boolean;
-  whatYouWillLearn?: string[];
+  whatYouWillLearn?: string;
   previewVideoUrl?: string;
   salesPageContent?: string;
   testimonials?: any;
@@ -109,7 +109,7 @@ export async function createCourse(data: {
         upgradeCourseId: data.upgradeCourseId,
         certificateEnabled: data.certificateEnabled || false,
         liveSupportEnabled: data.liveSupportEnabled || false,
-        whatYouWillLearn: data.whatYouWillLearn || [],
+        whatYouWillLearn: data.whatYouWillLearn || "",
         previewVideoUrl: data.previewVideoUrl,
         salesPageContent: data.salesPageContent,
         testimonials: data.testimonials,
@@ -229,7 +229,7 @@ export async function updateCourse(
     upgradeCourseId?: string;
     certificateEnabled?: boolean;
     liveSupportEnabled?: boolean;
-    whatYouWillLearn?: string[];
+    whatYouWillLearn?: string;
     previewVideoUrl?: string;
     salesPageContent?: string;
     testimonials?: any;
@@ -257,7 +257,23 @@ export async function updateCourse(
 
     const updatedCourse = await prisma.course.update({
       where: { id: courseId },
-      data,
+      data: {
+        title: data.title,
+        description: data.description,
+        imageUrl: data.imageUrl,
+        isPaid: data.isPaid,
+        price: data.price,
+        isPublished: data.isPublished,
+        tier: data.tier,
+        isLeadMagnet: data.isLeadMagnet,
+        upgradeCourseId: data.upgradeCourseId,
+        certificateEnabled: data.certificateEnabled,
+        liveSupportEnabled: data.liveSupportEnabled,
+        whatYouWillLearn: data.whatYouWillLearn,
+        previewVideoUrl: data.previewVideoUrl,
+        salesPageContent: data.salesPageContent,
+        testimonials: data.testimonials,
+      },
     });
 
     revalidatePath("/dashboard/courses");
