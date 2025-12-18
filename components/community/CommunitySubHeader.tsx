@@ -57,7 +57,7 @@ export function CommunitySubHeader({ communitySlug, communityName }: CommunitySu
         {/* Tab Navigation */}
         <nav className="flex space-x-1">
           {navigation.map((item) => {
-            const isActive = item.match(pathname);
+            const isActive = item.match(pathname ?? '');
             const Icon = item.icon;
 
             return (
