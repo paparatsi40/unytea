@@ -59,7 +59,7 @@ export async function getRecommendedPosts(
     const interactedPostIds = [
       ...userReactions.map((r) => r.postId),
       ...userComments.map((c) => c.postId),
-    ];
+    ].filter((id): id is string => id !== null);
 
     // Get trending posts user hasn't interacted with
     const posts = await prisma.post.findMany({
