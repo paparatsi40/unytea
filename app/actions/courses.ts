@@ -61,7 +61,7 @@ export async function createCourse(data: {
     let stripeProductId: string | null = null;
     let stripePriceId: string | null = null;
 
-    if (data.isPaid && data.price > 0) {
+    if (data.isPaid && (data.price ?? 0) > 0) {
       try {
         // Create Stripe Product
         const product = await stripe.products.create({
@@ -78,7 +78,7 @@ export async function createCourse(data: {
         // Create Stripe Price
         const price = await stripe.prices.create({
           product: stripeProductId,
-          unit_amount: Math.round(data.price * 100), // Convert to cents
+          unit_amount: Math.round((data.price ?? 0) * 100), // Convert to cents
           currency: "usd",
           metadata: {
             courseSlug: data.slug,
