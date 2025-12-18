@@ -54,7 +54,7 @@ export default async function WelcomeMessageSettingsPage({
         communitySlug={community.slug}
         initialMessage={community.welcomeMessage || ""}
         initialEnabled={community.showWelcomeMessage}
-        locale={locale}
+        _locale={locale}
       />
     </div>
   );
