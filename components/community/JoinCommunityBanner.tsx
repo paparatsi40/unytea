@@ -28,7 +28,7 @@ export function JoinCommunityBanner({
   const [isLoading, setIsLoading] = useState(false);
 
   // Show success/error toasts based on URL params
-  const paymentStatus = searchParams.get("payment");
+  const paymentStatus = searchParams?.get("payment");
   if (paymentStatus === "success") {
     toast.success("Payment successful!", {
       description: `Welcome to ${communityName}! You now have full access.`,
