@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import { TrendingUp, Users, Zap, Sparkles, Star, Heart, Flame } from "lucide-react";
 
 interface SpectacularFeedHeaderProps {
