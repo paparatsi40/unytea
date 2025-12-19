@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { BookOpen, Users, Play, Plus, TrendingUp, Award, CheckCircle2, Archive } from "lucide-react";
+import { BookOpen, Users, Plus, Archive } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CourseActions } from "./CourseActions";

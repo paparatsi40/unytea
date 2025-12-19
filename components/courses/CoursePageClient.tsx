@@ -12,7 +12,6 @@ import {
   CheckCircle2,
   Star,
   TrendingUp,
-  Clock,
   BarChart,
   Sparkles,
   MessageSquare,
