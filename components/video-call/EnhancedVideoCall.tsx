@@ -6,7 +6,6 @@ import {
   VideoConference,
   RoomAudioRenderer,
   useRoomContext,
-  useDataChannel,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
 import { Loader2, MessageSquare, BarChart3, Smile, X } from "lucide-react";
