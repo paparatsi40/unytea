@@ -151,7 +151,7 @@ function VideoCallInterface({
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [activePoll, setActivePoll] = useState<Poll | null>(null);
   const [pollRevision, setPollRevision] = useState(0); // Force re-render counter
-  const [pinnedMessages, setPinnedMessages] = useState<Set<string>>(new Set());
+  const [, setPinnedMessages] = useState<Set<string>>(new Set());
   const [answeredQuestions, setAnsweredQuestions] = useState<Set<string>>(new Set());
   const [processedVotes, setProcessedVotes] = useState<Set<string>>(new Set()); // Track processed votes
 
