@@ -901,7 +901,6 @@ export default function NewCommunityPage() {
           title="Community Limit Reached"
           message="You've reached the maximum number of communities for your plan."
           currentPlan={upgradeModalData.currentPlan as any}
-          limitType="communities"
           currentUsage={
             upgradeModalData.currentCount && upgradeModalData.limit
               ? {
