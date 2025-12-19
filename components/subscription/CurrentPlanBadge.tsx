@@ -9,8 +9,8 @@ export function CurrentPlanBadge() {
 
   if (!user) return null;
 
-  const plan = user.subscriptionPlan || "FREE";
-  const status = user.subscriptionStatus || "ACTIVE";
+  const plan = (user as any).subscriptionPlan || "FREE";
+  const status = (user as any).subscriptionStatus || "ACTIVE";
 
   const getPlanConfig = (planName: string) => {
     switch (planName) {
