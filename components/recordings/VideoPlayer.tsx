@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Play, Pause, Volume2, VolumeX, Maximize, Download, Settings } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, Maximize, Download } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface TranscriptionSegment {
