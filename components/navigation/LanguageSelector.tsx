@@ -30,6 +30,7 @@ export default function LanguageSelector() {
   }, []);
 
   const handleLanguageChange = (newLocale: string) => {
+    if (!pathname) return;
     const newPathname = pathname.replace(`/${locale}`, `/${newLocale}`);
     router.push(newPathname);
     setIsOpen(false);
