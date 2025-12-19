@@ -8,8 +8,7 @@ import {
   Bookmark, 
   Send, 
   Pin,
-  CheckCircle,
-  X
+  CheckCircle
 } from "lucide-react";
 
 export type ChatMessageType = "general" | "question" | "resource";
