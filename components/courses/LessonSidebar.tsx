@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ChevronDown, ChevronRight, PlayCircle, FileText, Lock, CheckCircle2, X, Menu } from "lucide-react";
+import { ChevronDown, ChevronRight, PlayCircle, FileText, Lock, X, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type LessonSidebarProps = {
