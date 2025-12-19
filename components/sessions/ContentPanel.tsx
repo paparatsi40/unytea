@@ -6,7 +6,6 @@ import {
   FileText, 
   Video, 
   Upload,
-  X,
   Maximize2,
   Minimize2
 } from "lucide-react";
