@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { X, Zap, Check, ArrowRight, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { SubscriptionPlan } from "@/lib/subscription-plans";
