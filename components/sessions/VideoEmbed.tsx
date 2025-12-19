@@ -5,11 +5,10 @@ import { Play, Trash2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type Props = {
-  sessionId: string;
   isModerator: boolean;
 };
 
-export function VideoEmbed({ sessionId, isModerator }: Props) {
+export function VideoEmbed({ isModerator }: Props) {
   const [videoUrl, setVideoUrl] = useState("");
   const [currentVideo, setCurrentVideo] = useState<string | null>(null);
   const [error, setError] = useState("");

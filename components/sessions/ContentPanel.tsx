@@ -139,7 +139,6 @@ export function ContentPanel({
 
           <TabsContent value="video" className="flex-1 m-0 p-0">
             <VideoEmbed 
-              sessionId={sessionId}
               isModerator={isModerator}
             />
           </TabsContent>
