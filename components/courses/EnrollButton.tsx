@@ -17,7 +17,6 @@ type EnrollButtonProps = {
 export function EnrollButton({ courseId, isPaid, price, currency, userOwnsCourse }: EnrollButtonProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
 
   // Free Flow
@@ -62,15 +61,6 @@ export function EnrollButton({ courseId, isPaid, price, currency, userOwnsCourse
       }
     }
   };
-
-  if (success) {
-    return (
-      <div className="space-y-2 text-center">
-        <CheckCircle2 className="mx-auto h-8 w-8 text-green-500" />
-        <p className="font-semibold text-green-700">You are now enrolled!</p>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-3">
