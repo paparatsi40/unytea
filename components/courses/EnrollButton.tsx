@@ -46,7 +46,7 @@ export function EnrollButton({ courseId, isPaid, price, currency, userOwnsCourse
       // Minimal approach: Stripe will handle full card element
       const result = await stripe?.confirmCardPayment(clientSecret, {
         payment_method: {
-          card: { token: undefined }, // Stripe will handle element automatically
+          card: {}, // Stripe will handle element automatically
         },
       });
       if (!result || result.error) {
