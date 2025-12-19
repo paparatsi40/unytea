@@ -10,7 +10,6 @@ interface UpgradeModalProps {
   title: string;
   message: string;
   currentPlan: SubscriptionPlan;
-  feature?: string;
   limitType?: "communities" | "members" | "videoCalls";
   currentUsage?: {
     current: number;
@@ -24,7 +23,6 @@ export function UpgradeModal({
   title,
   message,
   currentPlan,
-  feature,
   limitType,
   currentUsage,
 }: UpgradeModalProps) {
