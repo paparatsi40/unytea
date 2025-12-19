@@ -4,7 +4,6 @@ import { useState } from "react";
 import { 
   PenTool, 
   FileText, 
-  Image as ImageIcon, 
   Video, 
   Upload,
   X,
