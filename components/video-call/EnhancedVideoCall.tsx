@@ -9,7 +9,7 @@ import {
 } from "@livekit/components-react";
 import "@livekit/components-styles";
 import { Loader2, MessageSquare, BarChart3, X } from "lucide-react";
-import { RoomEvent, DataPacket_Kind } from "livekit-client";
+import { RoomEvent } from "livekit-client";
 import { LiveReactions } from "@/components/live-session/LiveReactions";
 import { SegmentedChat, ChatMessage, ChatMessageType } from "@/components/live-session/SegmentedChat";
 import { LivePoll, PollCreator, Poll } from "@/components/live-session/LivePoll";
@@ -387,7 +387,9 @@ function VideoCallInterface({
     const encoder = new TextEncoder();
     const encoded = encoder.encode(message);
 
-    room.localParticipant.publishData(encoded, DataPacket_Kind.RELIABLE);
+    room.localParticipant.publishData(encoded, {
+      reliable: true,
+    });
 
     // Process the message locally since we don't receive our own DataReceived events
     if (processLocally) {
