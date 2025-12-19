@@ -12,11 +12,10 @@ import { useHandRaise } from "@/hooks/use-hand-raise";
 
 type Props = {
   sessionId: string;
-  userId: string;
   isModerator: boolean;
 };
 
-export function VideoRoomContent({ sessionId, userId, isModerator }: Props) {
+export function VideoRoomContent({ sessionId, isModerator }: Props) {
   const room = useRoomContext();
   const { queue, isHandRaised, raiseHand, lowerHand, clearAllHands } = useHandRaise(room);
   const [showContentPanel, setShowContentPanel] = useState(false);
