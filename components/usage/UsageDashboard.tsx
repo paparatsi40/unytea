@@ -9,7 +9,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { 
   Video, 
   Users, 
-  HardDrive, 
   TrendingUp, 
   AlertTriangle, 
   Clock,
