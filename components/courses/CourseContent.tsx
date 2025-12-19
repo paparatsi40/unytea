@@ -24,7 +24,7 @@ export function CourseContent({ course, hasAccess, isOwner, enrollment }: Course
     );
   };
 
-  const isLessonCompleted = (lessonId: string) => {
+  const isLessonCompleted = (_lessonId: string) => {
     if (!enrollment) return false;
     // Would need to check lessonProgress - simplified for now
     return false;
