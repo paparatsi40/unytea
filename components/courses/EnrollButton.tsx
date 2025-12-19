@@ -22,7 +22,6 @@ export function EnrollButton({ courseId, isPaid, price, currency, userOwnsCourse
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
-  const [showPaymentInput, setShowPaymentInput] = useState(false);
 
   // Paid Course Flow
   const handleStripeCheckout = async () => {
