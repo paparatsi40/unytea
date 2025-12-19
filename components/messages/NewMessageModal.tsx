@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { X, Search, Loader2, Users } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
