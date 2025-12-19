@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Plus, Users, TrendingUp, Crown, Lock, Loader2, Search, Grid3x3, List, Filter, Sparkles, Dumbbell, Briefcase, Code, BookOpen, Palette, DollarSign, X, ArrowRight } from "lucide-react";
+import { Plus, Users, TrendingUp, Crown, Lock, Loader2, Search, Grid3x3, List, Filter, Sparkles, Dumbbell, Briefcase, Code, BookOpen, Palette, DollarSign, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FeaturedCommunityCard } from "@/components/dashboard/FeaturedCommunityCard";
 
@@ -67,7 +67,7 @@ export function CommunitiesClient() {
   const searchParams = useSearchParams();
 
   // Tab state - set tab from searchParams in initialState
-  const tabParam = searchParams.get("tab");
+  const tabParam = searchParams?.get("tab");
   const initialTab = tabParam === "discover" ? "discover" : "yours";
   const [activeTab, setActiveTab] = useState<"yours" | "discover">(initialTab);
 
@@ -94,7 +94,7 @@ export function CommunitiesClient() {
 
   // Sync tab with URL - MUST BE BEFORE OTHER useEffects
   useEffect(() => {
-    const tabParam = searchParams.get("tab");
+    const tabParam = searchParams?.get("tab");
     if (tabParam === "discover") {
       setActiveTab("discover");
     } else {

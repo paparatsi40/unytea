@@ -3,7 +3,6 @@
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { signOut } from "next-auth/react";
 import { 
-  Bell, 
   Search, 
   LogOut, 
   User as UserIcon, 
@@ -38,7 +37,7 @@ export function DashboardHeader() {
   const t = useTranslations('dashboard');
   
   // Extract locale from pathname
-  const locale = pathname.split('/')[1] || 'en';
+  const locale = pathname?.split('/')[1] || 'en';
 
   const getInitials = (name?: string | null) => {
     if (!name) return "U";

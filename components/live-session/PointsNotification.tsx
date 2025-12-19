@@ -26,6 +26,7 @@ export function PointsNotification({
       const timer = setTimeout(onComplete, 3000);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [show, onComplete]);
 
   return (

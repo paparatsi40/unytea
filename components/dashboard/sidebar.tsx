@@ -31,7 +31,7 @@ export function DashboardSidebar() {
   const t = useTranslations('dashboard');
   
   // Extract locale from pathname (e.g., /en/dashboard -> en)
-  const locale = pathname.split('/')[1] || 'en';
+  const locale = pathname?.split('/')[1] || 'en';
   
   // Navigation items with translations
   const nav = navigation.map((item) => {

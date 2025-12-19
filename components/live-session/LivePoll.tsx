@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { BarChart3, CheckCircle, X, Clock } from "lucide-react";
 
 export interface PollOption {
@@ -31,7 +31,6 @@ interface LivePollProps {
   currentUserId: string;
   onVote: (pollId: string, optionId: string) => void;
   onClose?: () => void;
-  isModerator?: boolean;
 }
 
 export function LivePoll({
@@ -39,7 +38,6 @@ export function LivePoll({
   currentUserId,
   onVote,
   onClose,
-  isModerator = false,
 }: LivePollProps) {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [hasVoted, setHasVoted] = useState(false);
@@ -83,8 +81,8 @@ export function LivePoll({
     setHasVoted(true);
   };
 
-  const showResults = hasVoted || !poll.isActive || poll.showResults;
-  const isExpired = poll.endsAt && Date.now() > poll.endsAt;
+  const showResults = hasVoted || !poll.isActive || !!poll.showResults;
+  const isExpired = !!(poll.endsAt && Date.now() > poll.endsAt);
 
   // Calculate percentages
   const getPercentage = (votes: number) => {
