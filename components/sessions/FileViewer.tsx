@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { X, FileText, Image as ImageIcon, Download, ZoomIn, ZoomOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
 
 type FileItem = {
   id: string;
