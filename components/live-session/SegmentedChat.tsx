@@ -31,7 +31,6 @@ interface SegmentedChatProps {
   onSendMessage: (content: string, type: ChatMessageType) => void;
   onPinMessage?: (messageId: string) => void;
   onMarkAnswered?: (messageId: string) => void;
-  currentUserId: string;
   isModerator?: boolean;
 }
 
@@ -42,7 +41,6 @@ export function SegmentedChat({
   onSendMessage,
   onPinMessage,
   onMarkAnswered,
-  currentUserId,
   isModerator = false,
 }: SegmentedChatProps) {
   const [activeTab, setActiveTab] = useState<ChatTab>("all");
@@ -108,7 +106,6 @@ export function SegmentedChat({
           <ChatMessageComponent
             key={message.id}
             message={message}
-            currentUserId={currentUserId}
             isModerator={isModerator}
             onPin={onPinMessage}
             onMarkAnswered={onMarkAnswered}
@@ -242,7 +239,6 @@ function TypeButton({ active, onClick, icon, label }: TypeButtonProps) {
  */
 interface ChatMessageComponentProps {
   message: ChatMessage;
-  currentUserId: string;
   isModerator: boolean;
   onPin?: (messageId: string) => void;
   onMarkAnswered?: (messageId: string) => void;
@@ -250,7 +246,6 @@ interface ChatMessageComponentProps {
 
 function ChatMessageComponent({
   message,
-  currentUserId,
   isModerator,
   onPin,
   onMarkAnswered,
