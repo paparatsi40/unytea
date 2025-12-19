@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Plus, Users, TrendingUp, Crown, Lock, Loader2, Search, Grid3x3, List, Filter, Sparkles, Dumbbell, Briefcase, Code, BookOpen, Palette, Flame, Star, Calendar, MessageSquare, Video, GraduationCap, DollarSign, X, ArrowRight } from "lucide-react";
+import { Plus, Users, TrendingUp, Crown, Lock, Loader2, Search, Grid3x3, List, Filter, Sparkles, Dumbbell, Briefcase, Code, BookOpen, Palette, DollarSign, X, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FeaturedCommunityCard } from "@/components/dashboard/FeaturedCommunityCard";
 
