@@ -116,7 +116,7 @@ export function VideoRoom({ roomName, sessionId, userId, mentorId, onLeave }: Vi
         <RoomAudioRenderer />
         
         {/* All interactive controls */}
-        <VideoRoomContent sessionId={sessionId} userId={userId} isModerator={isModerator} />
+        <VideoRoomContent sessionId={sessionId} isModerator={isModerator} />
       </LiveKitRoom>
     </div>
   );
