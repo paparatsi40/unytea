@@ -17,7 +17,6 @@ type EnrollButtonProps = {
 export function EnrollButton({ courseId, isPaid, price, currency, userOwnsCourse }: EnrollButtonProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
 
   // Free Flow
   const handleEnroll = async () => {
@@ -101,9 +100,6 @@ export function EnrollButton({ courseId, isPaid, price, currency, userOwnsCourse
             </>
           )}
         </Button>
-      )}
-      {error && (
-        <p className="text-xs text-center text-red-500 font-semibold">{error}</p>
       )}
       {/* Info below button */}
       {isPaid ? (
