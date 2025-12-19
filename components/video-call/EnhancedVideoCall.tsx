@@ -9,7 +9,7 @@ import {
 } from "@livekit/components-react";
 import "@livekit/components-styles";
 import { Loader2, MessageSquare, BarChart3, X } from "lucide-react";
-import { RoomEvent, DataPacket_Kind } from "livekit-client";
+import { RoomEvent } from "livekit-client";
 import { LiveReactions } from "@/components/live-session/LiveReactions";
 import { SegmentedChat, ChatMessage, ChatMessageType } from "@/components/live-session/SegmentedChat";
 import { LivePoll, PollCreator, Poll } from "@/components/live-session/LivePoll";
@@ -180,8 +180,7 @@ function VideoCallInterface({
 
     const handleDataReceived = (
       payload: Uint8Array,
-      participant: any,
-      kind: DataPacket_Kind
+      participant: any
     ) => {
       try {
         const decoder = new TextDecoder();
