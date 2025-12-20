@@ -4,7 +4,7 @@
  * Handles automatic recording of video sessions using LiveKit Egress API
  */
 
-import { EgressClient, EncodedFileOutput } from 'livekit-server-sdk';
+import { EgressClient, EncodedFileOutput, EgressStatus } from 'livekit-server-sdk';
 
 const egressClient = new EgressClient(
   process.env.LIVEKIT_URL!,
@@ -111,8 +111,8 @@ export async function getRecordingStatus(egressId: string): Promise<RecordingInf
     return {
       egressId: recording.egressId,
       roomName: recording.roomName,
-      status: recording.status === 'EGRESS_COMPLETE' ? 'ended' : 
-              recording.status === 'EGRESS_FAILED' ? 'failed' : 'active',
+      status: recording.status === EgressStatus.EGRESS_COMPLETE ? 'ended' : 
+              recording.status === EgressStatus.EGRESS_FAILED ? 'failed' : 'active',
       startedAt: Number(recording.startedAt),
       endedAt: recording.endedAt ? Number(recording.endedAt) : undefined,
       fileUrl: recording.file?.location,
@@ -134,8 +134,8 @@ export async function listRoomRecordings(roomName: string): Promise<RecordingInf
     return egresses.map(recording => ({
       egressId: recording.egressId,
       roomName: recording.roomName,
-      status: recording.status === 'EGRESS_COMPLETE' ? 'ended' : 
-              recording.status === 'EGRESS_FAILED' ? 'failed' : 'active',
+      status: recording.status === EgressStatus.EGRESS_COMPLETE ? 'ended' : 
+              recording.status === EgressStatus.EGRESS_FAILED ? 'failed' : 'active',
       startedAt: Number(recording.startedAt),
       endedAt: recording.endedAt ? Number(recording.endedAt) : undefined,
       fileUrl: recording.file?.location,
