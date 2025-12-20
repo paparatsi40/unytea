@@ -1,53 +1,81 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
+import { getCurrentUserId } from "@/lib/auth-utils";
+import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
-    const session = await auth();
+    const userId = await getCurrentUserId();
 
-    if (!session?.user?.id) {
+    if (!userId) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
       );
     }
 
-    const supabase = createClient();
+    console.log("📋 Fetching communities for user:", userId);
 
     // Fetch owned communities
-    const { data: ownedCommunities, error: ownedError } = await supabase
-      .from("communities")
-      .select("*")
-      .eq("ownerId", session.user.id)
-      .order("createdAt", { ascending: false });
+    const ownedCommunities = await prisma.community.findMany({
+      where: {
+        ownerId: userId,
+      },
+      include: {
+        _count: {
+          select: {
+            members: true,
+            posts: true,
+            courses: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
 
-    if (ownedError) {
-      console.error("Error fetching owned communities:", ownedError);
-    }
+    console.log("✅ Owned communities:", ownedCommunities.length);
 
-    // Fetch joined communities
-    const { data: memberCommunities, error: memberError } = await supabase
-      .from("community_members")
-      .select(`
-        community:communities(*)
-      `)
-      .eq("userId", session.user.id)
-      .neq("communities.ownerId", session.user.id);
+    // Fetch joined communities (where user is a member but not owner)
+    const membershipRecords = await prisma.member.findMany({
+      where: {
+        userId,
+        status: "ACTIVE",
+        community: {
+          ownerId: {
+            not: userId,
+          },
+        },
+      },
+      include: {
+        community: {
+          include: {
+            _count: {
+              select: {
+                members: true,
+                posts: true,
+                courses: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        joinedAt: "desc",
+      },
+    });
 
-    if (memberError) {
-      console.error("Error fetching joined communities:", memberError);
-    }
+    const joinedCommunities = membershipRecords.map((m) => m.community);
 
-    const joinedCommunities = memberCommunities?.map(m => m.community).filter(Boolean) || [];
+    console.log("✅ Joined communities:", joinedCommunities.length);
 
     return NextResponse.json({
       success: true,
-      ownedCommunities: ownedCommunities || [],
-      joinedCommunities: joinedCommunities,
+      ownedCommunities,
+      joinedCommunities,
     });
   } catch (error) {
-    console.error("Error in user-communities API:", error);
+    console.error("❌ Error in user-communities API:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
