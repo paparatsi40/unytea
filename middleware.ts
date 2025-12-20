@@ -52,13 +52,7 @@ export default auth((req) => {
   }
 
   // Public routes
-  const _isPublicRoute =
-    pathnameWithoutLocale === "/" ||
-    pathnameWithoutLocale.startsWith("/auth/") ||
-    pathnameWithoutLocale.startsWith("/contact") ||
-    pathnameWithoutLocale.startsWith("/privacy") ||
-    pathnameWithoutLocale.startsWith("/terms") ||
-    pathnameWithoutLocale.startsWith("/c/");
+  // Removed unused variable declaration
 
   // Protected routes
   const isProtectedRoute =
