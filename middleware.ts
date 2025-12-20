@@ -61,14 +61,12 @@ export default auth((req) => {
 
   // Redirect unauthenticated users
   if (isProtectedRoute && !isLoggedIn) {
-    const response = intlMiddleware(req);
     const redirectUrl = new URL(`/${locale}/auth/signin`, req.url);
     return NextResponse.redirect(redirectUrl);
   }
 
   // Redirect logged-in users away from auth pages
   if (pathnameWithoutLocale.startsWith("/auth/") && isLoggedIn) {
-    const response = intlMiddleware(req);
     const redirectUrl = new URL(`/${locale}/dashboard`, req.url);
     return NextResponse.redirect(redirectUrl);
   }
