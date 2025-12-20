@@ -114,7 +114,7 @@ export function useHandRaise(room: Room | undefined) {
     const handleDataReceived = (
       payload: Uint8Array,
       participant: any,
-      _kind: DataPacket_Kind,
+      _kind?: DataPacket_Kind,
       topic?: string
     ) => {
       if (topic !== "hand-raise") return;
