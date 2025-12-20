@@ -4,7 +4,7 @@
  * Handles automatic recording of video sessions using LiveKit Egress API
  */
 
-import { EgressClient, EncodedFileOutput, RoomCompositeEgressRequest } from 'livekit-server-sdk';
+import { EgressClient, EncodedFileOutput } from 'livekit-server-sdk';
 
 const egressClient = new EgressClient(
   process.env.LIVEKIT_URL!,
@@ -64,15 +64,6 @@ export async function startRecording(config: RecordingConfig): Promise<string> {
     } as unknown as EncodedFileOutput;
 
     // Create room composite egress (records entire room view)
-    const request: RoomCompositeEgressRequest = {
-      roomName,
-      layout: 'grid', // 'grid', 'speaker', or 'single-speaker'
-      audioOnly: false,
-      videoOnly: false,
-      customBaseUrl: '', // Optional: custom layout URL
-      file: output,
-    };
-
     const egress = await egressClient.startRoomCompositeEgress(roomName, output, {
       layout: 'grid',
       audioOnly: false,
