@@ -158,7 +158,6 @@ export async function createMembershipCheckout({
         },
         product_data: {
           name: `${communityName} Membership`,
-          description: `Monthly membership to ${communityName}`,
         },
       },
       {
