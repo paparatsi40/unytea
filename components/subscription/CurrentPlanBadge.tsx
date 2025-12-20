@@ -4,13 +4,21 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 import { Badge } from "@/components/ui/badge";
 import { Crown, Zap, Sparkles } from "lucide-react";
 
+// Extend the user type to include subscription properties
+interface UserWithSubscription {
+  subscriptionPlan?: string;
+  subscriptionStatus?: string;
+}
+
 export function CurrentPlanBadge() {
   const { user } = useCurrentUser();
 
   if (!user) return null;
 
-  const plan = (user as any).subscriptionPlan || "FREE";
-  const status = (user as any).subscriptionStatus || "ACTIVE";
+  // Type assertion to user with subscription properties
+  const userWithSub = user as UserWithSubscription;
+  const plan = userWithSub.subscriptionPlan || "FREE";
+  const status = userWithSub.subscriptionStatus || "ACTIVE";
 
   const getPlanConfig = (planName: string) => {
     switch (planName) {
