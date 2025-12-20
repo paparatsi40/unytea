@@ -115,7 +115,7 @@ export async function getRecordingStatus(egressId: string): Promise<RecordingInf
               recording.status === EgressStatus.EGRESS_FAILED ? 'failed' : 'active',
       startedAt: Number(recording.startedAt),
       endedAt: recording.endedAt ? Number(recording.endedAt) : undefined,
-      fileUrl: recording.file?.location,
+      fileUrl: (recording as any).file?.location,
       error: recording.error,
     };
   } catch (error) {
@@ -138,7 +138,7 @@ export async function listRoomRecordings(roomName: string): Promise<RecordingInf
               recording.status === EgressStatus.EGRESS_FAILED ? 'failed' : 'active',
       startedAt: Number(recording.startedAt),
       endedAt: recording.endedAt ? Number(recording.endedAt) : undefined,
-      fileUrl: recording.file?.location,
+      fileUrl: (recording as any).file?.location,
       error: recording.error,
     }));
   } catch (error) {
