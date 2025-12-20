@@ -540,7 +540,6 @@ function VideoCallInterface({
               onSendMessage={handleSendMessage}
               onPinMessage={isModerator ? handlePinMessageAction : undefined}
               onMarkAnswered={isModerator ? handleMarkAnsweredAction : undefined}
-              currentUserId={userId}
               isModerator={isModerator}
             />
           </motion.div>
