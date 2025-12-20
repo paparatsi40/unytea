@@ -554,7 +554,6 @@ function VideoCallInterface({
             currentUserId={userId}
             onVote={handleVote}
             onClose={() => setActivePoll(null)}
-            isModerator={isModerator}
             key={pollRevision}
           />
         </div>
