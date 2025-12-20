@@ -67,7 +67,7 @@ export function rateLimit(config: RateLimitConfig) {
 // Helper to get IP from request
 export function getIP(request: NextRequest): string {
   const xff = request.headers.get("x-forwarded-for");
-  return xff ? xff.split(",")[0] : request.ip || "unknown";
+  return xff ? xff.split(",")[0] : (request as any).ip || "unknown";
 }
 
 // Helper to get user identifier (IP + User-Agent for anonymous, userId for authenticated)
