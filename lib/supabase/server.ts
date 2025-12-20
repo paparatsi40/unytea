@@ -130,7 +130,8 @@ export function createClient() {
       // Convert table names to Prisma model names
       const modelMap: Record<string, string> = {
         communities: "community",
-        community_members: "communityMember",
+        community_members: "member",
+        members: "member",
         users: "user",
         mentor_sessions: "mentorSession",
       };
