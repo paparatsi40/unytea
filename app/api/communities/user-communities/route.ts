@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import { getCurrentUserId } from "@/lib/auth-utils";
 import { prisma } from "@/lib/prisma";
 
+/**
+ * GET /api/communities/user-communities
+ * Fetches all communities where the user is owner or member
+ * Uses Prisma (not Supabase)
+ */
 export async function GET() {
   try {
     const userId = await getCurrentUserId();
