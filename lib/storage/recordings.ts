@@ -187,7 +187,7 @@ export async function getRecordingMetadata(
  * Generate thumbnail from video (requires FFmpeg or external service)
  * For now, returns a placeholder
  */
-export async function generateThumbnail(videoUrl: string): Promise<string> {
+export async function generateThumbnail(_videoUrl: string): Promise<string> {
   // TODO: Implement thumbnail generation
   // Options:
   // 1. Use FFmpeg in Lambda/Worker
