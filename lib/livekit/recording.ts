@@ -61,7 +61,7 @@ export async function startRecording(config: RecordingConfig): Promise<string> {
         endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
         bucket: process.env.R2_BUCKET_NAME!,
       },
-    } as EncodedFileOutput;
+    } as unknown as EncodedFileOutput;
 
     // Create room composite egress (records entire room view)
     const request: RoomCompositeEgressRequest = {
