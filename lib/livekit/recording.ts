@@ -50,8 +50,8 @@ export async function startRecording(config: RecordingConfig): Promise<string> {
     console.log(`🎬 Starting recording for room: ${roomName}`);
 
     // Configure output to R2/S3
-    const output: EncodedFileOutput = {
-      fileType: 'MP4', // or 'WEBM', 'OGG'
+    const output = {
+      fileType: 'MP4' as const, // or 'WEBM', 'OGG'
       filepath: `${outputPath}/recording.mp4`,
       // If using S3/R2 directly
       s3: {
@@ -61,7 +61,7 @@ export async function startRecording(config: RecordingConfig): Promise<string> {
         endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
         bucket: process.env.R2_BUCKET_NAME!,
       },
-    };
+    } as EncodedFileOutput;
 
     // Create room composite egress (records entire room view)
     const request: RoomCompositeEgressRequest = {
