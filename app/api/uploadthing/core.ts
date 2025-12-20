@@ -43,13 +43,26 @@ export const ourFileRouter = {
     } 
   })
     .middleware(async () => {
-      const userId = await getCurrentUserId();
-      if (!userId) throw new Error("Unauthorized");
-      return { userId };
+      try {
+        console.log("🖼️ Community branding upload middleware started");
+        const userId = await getCurrentUserId();
+        console.log("📝 User ID:", userId);
+        
+        if (!userId) {
+          console.error("❌ No user ID found - user not authenticated");
+          throw new Error("Unauthorized - Please sign in");
+        }
+        
+        console.log("✅ User authenticated:", userId);
+        return { userId };
+      } catch (error) {
+        console.error("❌ Middleware error:", error);
+        throw error;
+      }
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      console.log("Community branding upload complete for userId:", metadata.userId);
-      console.log("File URL:", file.url);
+      console.log("✅ Community branding upload complete for userId:", metadata.userId);
+      console.log("📁 File URL:", file.url);
       return { uploadedBy: metadata.userId, url: file.url };
     }),
 
