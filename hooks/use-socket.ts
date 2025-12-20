@@ -5,26 +5,46 @@ import { io, Socket } from "socket.io-client";
 
 let socket: Socket | null = null;
 
+// Check if we're in a production environment that doesn't support WebSockets (like Vercel)
+const SOCKET_DISABLED = process.env.NEXT_PUBLIC_DISABLE_SOCKET === "true" || 
+  (typeof window !== "undefined" && window.location.hostname.includes("vercel.app")) ||
+  (typeof window !== "undefined" && window.location.hostname.includes("unytea.com"));
+
 export function useSocket() {
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
+    // Skip socket initialization if disabled or in production
+    if (SOCKET_DISABLED) {
+      console.log("Socket.IO disabled in production environment");
+      return;
+    }
+
     // Initialize socket connection
     if (!socket) {
-      socket = io({
-        path: "/api/socket",
-        addTrailingSlash: false,
-      });
+      try {
+        socket = io({
+          path: "/api/socket",
+          addTrailingSlash: false,
+        });
 
-      socket.on("connect", () => {
-        console.log("Socket connected:", socket?.id);
-        setIsConnected(true);
-      });
+        socket.on("connect", () => {
+          console.log("Socket connected:", socket?.id);
+          setIsConnected(true);
+        });
 
-      socket.on("disconnect", () => {
-        console.log("Socket disconnected");
-        setIsConnected(false);
-      });
+        socket.on("disconnect", () => {
+          console.log("Socket disconnected");
+          setIsConnected(false);
+        });
+
+        socket.on("connect_error", (error) => {
+          console.log("Socket connection error (this is expected in production):", error.message);
+          setIsConnected(false);
+        });
+      } catch (error) {
+        console.log("Socket initialization failed (this is expected in production):", error);
+      }
     }
 
     return () => {
@@ -33,8 +53,8 @@ export function useSocket() {
   }, []);
 
   return {
-    socket,
-    isConnected,
+    socket: SOCKET_DISABLED ? null : socket,
+    isConnected: SOCKET_DISABLED ? false : isConnected,
   };
 }
 
