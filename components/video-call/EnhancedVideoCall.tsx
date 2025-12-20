@@ -439,7 +439,7 @@ function VideoCallInterface({
     question: string,
     options: string[],
     duration?: number,
-    isQuiz?: boolean,
+    _isQuiz?: boolean,
     correctAnswer?: string
   ) => {
     const poll: Poll = {
