@@ -116,7 +116,7 @@ class PrismaQueryBuilder<T> implements QueryBuilder<T> {
     }
   }
 
-  private parseSelectFields(fields: string): any {
+  private parseSelectFields(_fields: string): any {
     // Simple parser for relations like "*, owner:users(id, name)"
     // For now, return empty object (select all)
     // TODO: Implement proper parsing if needed
