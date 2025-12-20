@@ -78,12 +78,19 @@ class PrismaQueryBuilder<T> implements QueryBuilder<T> {
 
   private async execute(): Promise<{ data: any; error: any }> {
     try {
+      console.log("🔍 Executing query for table:", this.tableName);
+      console.log("📋 Where conditions:", this.whereConditions);
+      
       // @ts-ignore - Dynamic Prisma access
       const model = prisma[this.tableName];
 
       if (!model) {
-        throw new Error(`Table ${this.tableName} not found`);
+        console.error("❌ Table not found:", this.tableName);
+        console.error("Available models:", Object.keys(prisma).filter(k => !k.startsWith('$') && !k.startsWith('_')));
+        throw new Error(`Table ${this.tableName} not found at C.execute`);
       }
+
+      console.log("✅ Model found:", this.tableName);
 
       const query: any = {
         where: this.whereConditions,
