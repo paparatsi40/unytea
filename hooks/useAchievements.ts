@@ -5,7 +5,7 @@ import { checkAndUnlockAchievements } from "@/app/actions/achievements";
 import { AchievementDefinition } from "@/lib/achievements-data";
 
 export function useAchievementChecker(userId: string | undefined) {
-  const [newAchievement, setNewAchievement] = useState<AchievementDefinition | null>(null);
+  const [, setNewAchievement] = useState<AchievementDefinition | null>(null);
   const [showNotification, setShowNotification] = useState(false);
 
   useEffect(() => {
