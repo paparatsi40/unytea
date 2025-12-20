@@ -227,7 +227,7 @@ export async function canSendMessage(
  */
 export const Permissions = {
   // Community permissions
-  canCreateCommunity: async (userId: string) => {
+  canCreateCommunity: async (_userId: string) => {
     // Anyone can create a community
     return true;
   },
