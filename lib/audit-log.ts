@@ -63,8 +63,8 @@ export async function createAuditLog(data: AuditLogData) {
  * Get audit logs for a user
  */
 export async function getUserAuditLogs(
-  userId: string,
-  options?: {
+  _userId: string,
+  _options?: {
     limit?: number;
     actions?: AuditAction[];
     communityId?: string;
@@ -79,8 +79,8 @@ export async function getUserAuditLogs(
  * Get audit logs for a community
  */
 export async function getCommunityAuditLogs(
-  communityId: string,
-  options?: {
+  _communityId: string,
+  _options?: {
     limit?: number;
     actions?: AuditAction[];
   }
