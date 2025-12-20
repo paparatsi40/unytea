@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { checkAndUnlockAchievements } from "@/app/actions/achievements";
-import { AchievementDefinition } from "@/lib/achievements-data";
 
 export function useAchievementChecker(userId: string | undefined) {
   const [showNotification, setShowNotification] = useState(false);
