@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
  * GET /api/communities/user-communities
  * Fetches all communities where the user is owner or member
  * Uses Prisma (not Supabase)
+ * Last updated: 2024-12-19 - Fixed communityMember mapping
  */
 export async function GET() {
   try {
