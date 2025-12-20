@@ -41,10 +41,10 @@ export async function startRecording(config: RecordingConfig): Promise<string> {
       roomName,
       sessionId,
       outputPath = `sessions/${sessionId}`,
-      width = 1920,
-      height = 1080,
-      videoCodec = 'H264',
-      audioCodec = 'AAC',
+      width: _width = 1920,
+      height: _height = 1080,
+      videoCodec: _videoCodec = 'H264',
+      audioCodec: _audioCodec = 'AAC',
     } = config;
 
     console.log(`🎬 Starting recording for room: ${roomName}`);
