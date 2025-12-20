@@ -1,6 +1,8 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = process.env.RESEND_API_KEY 
+  ? new Resend(process.env.RESEND_API_KEY)
+  : null;
 
 const FROM_EMAIL = process.env.EMAIL_FROM || "Unytea <noreply@unytea.com>";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -17,6 +19,11 @@ export async function sendEmail({
   subject: string;
   html: string;
 }) {
+  if (!resend) {
+    console.warn("⚠️ Resend not initialized - email not sent");
+    return { success: false, error: "Email service not configured" };
+  }
+  
   try {
     await resend.emails.send({
       from: FROM_EMAIL,
@@ -45,6 +52,11 @@ export async function sendPasswordResetEmail({
   name: string;
   resetUrl: string;
 }) {
+  if (!resend) {
+    console.warn("⚠️ Resend not initialized - email not sent");
+    return { success: false, error: "Email service not configured" };
+  }
+  
   try {
     await resend.emails.send({
       from: FROM_EMAIL,
@@ -71,6 +83,11 @@ export async function sendWelcomeEmail({
   to: string;
   name: string;
 }) {
+  if (!resend) {
+    console.warn("⚠️ Resend not initialized - email not sent");
+    return { success: false, error: "Email service not configured" };
+  }
+  
   try {
     await resend.emails.send({
       from: FROM_EMAIL,
@@ -104,6 +121,11 @@ export async function sendSessionReminderEmail({
   sessionTime: string;
   sessionUrl: string;
 }) {
+  if (!resend) {
+    console.warn("⚠️ Resend not initialized - email not sent");
+    return { success: false, error: "Email service not configured" };
+  }
+  
   try {
     await resend.emails.send({
       from: FROM_EMAIL,
