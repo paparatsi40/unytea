@@ -13,9 +13,11 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [color, setColor] = useState("#000000");
-  const [lineWidth, setLineWidth] = useState(2);
+  const [lineWidth, setLineWidth] = useState(3);
   const [tool, setTool] = useState<"pen" | "eraser">("pen");
   const [isLoading, setIsLoading] = useState(true);
+  const [lastX, setLastX] = useState(0);
+  const [lastY, setLastY] = useState(0);
 
   // Load saved whiteboard state
   useEffect(() => {
@@ -71,41 +73,62 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
     return () => clearInterval(saveInterval);
   }, [sessionId, isModerator]);
 
+  const getCanvasCoordinates = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return { x: 0, y: 0 };
+
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    return {
+      x: (e.clientX - rect.left) * scaleX,
+      y: (e.clientY - rect.top) * scaleY,
+    };
+  };
+
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!isModerator) return;
+    
+    const { x, y } = getCanvasCoordinates(e);
+    setLastX(x);
+    setLastY(y);
     setIsDrawing(true);
-    draw(e);
   };
 
   const stopDrawing = () => {
+    if (!isDrawing) return;
     setIsDrawing(false);
+    
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
-    ctx?.beginPath();
+    if (ctx) {
+      ctx.closePath();
+    }
   };
 
   const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!isDrawing && e.type !== "mousedown") return;
-    if (!isModerator) return;
+    if (!isDrawing || !isModerator) return;
 
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const ctx = canvas?.getContext("2d");
+    if (!canvas || !ctx) return;
 
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const { x, y } = getCanvasCoordinates(e);
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    ctx.lineWidth = tool === "eraser" ? lineWidth * 5 : lineWidth;
-    ctx.lineCap = "round";
     ctx.strokeStyle = tool === "eraser" ? "#ffffff" : color;
+    ctx.lineWidth = tool === "eraser" ? lineWidth * 10 : lineWidth;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
 
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
     ctx.lineTo(x, y);
     ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(x, y);
+    ctx.closePath();
+
+    setLastX(x);
+    setLastY(y);
   };
 
   const clearCanvas = () => {
@@ -113,7 +136,8 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
     if (ctx && canvas) {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
   };
 
@@ -129,14 +153,14 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
     <div className="h-full w-full flex flex-col bg-white">
       {/* Toolbar */}
       {isModerator && (
-        <div className="flex items-center gap-2 border-b border-gray-200 p-3">
+        <div className="flex items-center gap-2 border-b border-gray-200 p-3 flex-wrap">
           <Button
             size="sm"
             variant={tool === "pen" ? "default" : "outline"}
             onClick={() => setTool("pen")}
           >
             <Pencil className="h-4 w-4 mr-1" />
-            Pen
+            Draw
           </Button>
           
           <Button
@@ -145,30 +169,30 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
             onClick={() => setTool("eraser")}
           >
             <Eraser className="h-4 w-4 mr-1" />
-            Eraser
+            Erase
           </Button>
 
-          <div className="flex items-center gap-2 ml-4">
-            <label className="text-sm font-medium">Color:</label>
+          <div className="flex items-center gap-2">
             <input
               type="color"
               value={color}
               onChange={(e) => setColor(e.target.value)}
-              className="h-8 w-16 cursor-pointer rounded border border-gray-300"
+              className="h-8 w-12 cursor-pointer rounded border border-gray-300"
+              title="Color"
             />
           </div>
 
-          <div className="flex items-center gap-2 ml-4">
-            <label className="text-sm font-medium">Size:</label>
+          <div className="flex items-center gap-2">
+            <label className="text-xs font-medium text-gray-600">Size:</label>
             <input
               type="range"
               min="1"
-              max="10"
+              max="20"
               value={lineWidth}
               onChange={(e) => setLineWidth(Number(e.target.value))}
-              className="w-24"
+              className="w-20"
             />
-            <span className="text-sm text-gray-600 w-6">{lineWidth}</span>
+            <span className="text-xs text-gray-600 w-6">{lineWidth}</span>
           </div>
 
           <Button
@@ -184,12 +208,13 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
       )}
 
       {/* Canvas */}
-      <div className="flex-1 relative overflow-hidden">
+      <div className="flex-1 relative overflow-hidden bg-white">
         <canvas
           ref={canvasRef}
-          width={1920}
-          height={1080}
-          className="absolute inset-0 w-full h-full cursor-crosshair"
+          width={2400}
+          height={1350}
+          className="absolute inset-0 w-full h-full cursor-crosshair touch-none"
+          style={{ imageRendering: "crisp-edges" }}
           onMouseDown={startDrawing}
           onMouseUp={stopDrawing}
           onMouseMove={draw}
