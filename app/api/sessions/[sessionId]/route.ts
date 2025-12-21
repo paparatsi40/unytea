@@ -34,6 +34,20 @@ export async function GET(
             email: true,
           },
         },
+        community: {
+          select: {
+            id: true,
+            name: true,
+            ownerId: true,
+            members: {
+              where: { userId: session.user.id },
+              select: {
+                id: true,
+                role: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -44,12 +58,18 @@ export async function GET(
       );
     }
 
-    // Verify user is mentor or mentee
-    const isParticipant =
-      session.user.id === mentorSession.mentorId ||
-      session.user.id === mentorSession.menteeId;
-
-    if (!isParticipant) {
+    // Verify user has access to this session
+    const isMentor = session.user.id === mentorSession.mentorId;
+    const isMentee = session.user.id === mentorSession.menteeId;
+    
+    // If session belongs to a community, check if user is a member
+    let isCommunityMember = false;
+    if (mentorSession.communityId && mentorSession.community) {
+      isCommunityMember = mentorSession.community.members.length > 0 || mentorSession.community.ownerId === session.user.id;
+    }
+    
+    // Allow access if user is mentor, mentee, or community member
+    if (!isMentor && !isMentee && !isCommunityMember) {
       return NextResponse.json(
         { error: "You are not authorized to view this session" },
         { status: 403 }

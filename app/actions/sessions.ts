@@ -201,6 +201,20 @@ export async function getSession(sessionId: string) {
             username: true,
           },
         },
+        community: {
+          select: {
+            id: true,
+            name: true,
+            ownerId: true,
+            members: {
+              where: { userId },
+              select: {
+                id: true,
+                role: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -208,8 +222,18 @@ export async function getSession(sessionId: string) {
       return { success: false, error: "Session not found" };
     }
 
-    // Check if user is participant
-    if (session.mentorId !== userId && session.menteeId !== userId) {
+    // Check if user has access to this session
+    const isMentor = session.mentorId === userId;
+    const isMentee = session.menteeId === userId;
+    
+    // If session belongs to a community, check if user is a member
+    let isCommunityMember = false;
+    if (session.communityId && session.community) {
+      isCommunityMember = session.community.members.length > 0 || session.community.ownerId === userId;
+    }
+    
+    // Allow access if user is mentor, mentee, or community member
+    if (!isMentor && !isMentee && !isCommunityMember) {
       return { success: false, error: "Not authorized to view this session" };
     }
 
