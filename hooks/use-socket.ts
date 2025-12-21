@@ -5,45 +5,44 @@ import { io, Socket } from "socket.io-client";
 
 let socket: Socket | null = null;
 
-// Check if we're in a production environment that doesn't support WebSockets (like Vercel)
-const SOCKET_DISABLED = process.env.NEXT_PUBLIC_DISABLE_SOCKET === "true" || 
-  (typeof window !== "undefined" && window.location.hostname.includes("vercel.app")) ||
-  (typeof window !== "undefined" && window.location.hostname.includes("unytea.com"));
+// Socket.IO server URL - Railway for production, local for development
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 
+  (typeof window !== "undefined" && window.location.hostname === "localhost" 
+    ? "http://localhost:3001" 
+    : "https://unytea-socketio-production.up.railway.app");
 
 export function useSocket() {
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    // Skip socket initialization if disabled or in production
-    if (SOCKET_DISABLED) {
-      console.log("Socket.IO disabled in production environment");
-      return;
-    }
-
     // Initialize socket connection
     if (!socket) {
       try {
-        socket = io({
-          path: "/api/socket",
-          addTrailingSlash: false,
+        console.log("🔌 Connecting to Socket.IO server:", SOCKET_URL);
+        
+        socket = io(SOCKET_URL, {
+          transports: ['websocket', 'polling'],
+          reconnection: true,
+          reconnectionDelay: 1000,
+          reconnectionAttempts: 5,
         });
 
         socket.on("connect", () => {
-          console.log("Socket connected:", socket?.id);
+          console.log("✅ Socket connected:", socket?.id);
           setIsConnected(true);
         });
 
         socket.on("disconnect", () => {
-          console.log("Socket disconnected");
+          console.log("❌ Socket disconnected");
           setIsConnected(false);
         });
 
         socket.on("connect_error", (error) => {
-          console.log("Socket connection error (this is expected in production):", error.message);
+          console.log("⚠️ Socket connection error:", error.message);
           setIsConnected(false);
         });
       } catch (error) {
-        console.log("Socket initialization failed (this is expected in production):", error);
+        console.log("❌ Socket initialization failed:", error);
       }
     }
 
@@ -53,8 +52,8 @@ export function useSocket() {
   }, []);
 
   return {
-    socket: SOCKET_DISABLED ? null : socket,
-    isConnected: SOCKET_DISABLED ? false : isConnected,
+    socket,
+    isConnected,
   };
 }
 
