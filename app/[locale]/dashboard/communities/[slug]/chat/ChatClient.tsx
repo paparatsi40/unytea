@@ -69,10 +69,14 @@ export default function CommunityChatClient({ slug, communityName }: { slug: str
       console.log("Fetching community with slug:", slug);
       const response = await fetch(`/api/communities/${slug}`);
       const data = await response.json();
-      if (data.success) {
+      
+      // API returns { community: {...} } directly, not { success: true, community: {...} }
+      if (data.community) {
         setCommunity(data.community);
         setCommunityId(data.community.id);
-        console.log("Community ID set:", data.community.id);
+        console.log("✅ Community ID set:", data.community.id);
+      } else {
+        console.error("❌ No community found in response:", data);
       }
     } catch (error) {
       console.error("Error fetching community:", error);
