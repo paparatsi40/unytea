@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 
 let socket: Socket | null = null;
+let isSocketConnected = false; // Global connection state
 
 // Socket.IO server URL - Railway for production, local for development
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 
@@ -29,31 +30,44 @@ export function useSocket() {
 
         socket.on("connect", () => {
           console.log("✅ Socket connected:", socket?.id);
+          isSocketConnected = true;
           setIsConnected(true);
         });
 
         socket.on("disconnect", () => {
           console.log("❌ Socket disconnected");
+          isSocketConnected = false;
           setIsConnected(false);
         });
 
         socket.on("connect_error", (error) => {
           console.log("⚠️ Socket connection error:", error.message);
+          isSocketConnected = false;
           setIsConnected(false);
         });
       } catch (error) {
         console.log("❌ Socket initialization failed:", error);
       }
+    } else {
+      // Socket already exists, sync with global state
+      setIsConnected(socket.connected);
     }
 
+    // Poll for connection state changes
+    const interval = setInterval(() => {
+      if (socket && socket.connected !== isConnected) {
+        setIsConnected(socket.connected);
+      }
+    }, 500);
+
     return () => {
-      // Don't disconnect on component unmount, keep connection alive
+      clearInterval(interval);
     };
   }, []);
 
   return {
     socket,
-    isConnected,
+    isConnected: socket?.connected || isConnected,
   };
 }
 
