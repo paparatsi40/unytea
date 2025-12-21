@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Loader2, Eraser, Pencil, Undo, Trash2 } from "lucide-react";
+import { Loader2, Eraser, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type Props = {
