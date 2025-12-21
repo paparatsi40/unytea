@@ -60,7 +60,7 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
 
   // Custom UI overrides for read-only mode
   const uiOverrides: TLUiOverrides = {
-    tools(editor, tools) {
+    tools(_editor, tools) {
       if (!isModerator) {
         // Hide all tools for non-moderators (view-only mode)
         return {};
