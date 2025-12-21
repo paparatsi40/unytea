@@ -43,7 +43,20 @@ export default function CommunityChatClient({ slug, communityName }: { slug: str
 
   // Socket.IO real-time setup
   useEffect(() => {
-    if (!socket || !isConnected || !communityId) return;
+    console.log("🔍 Socket.IO effect triggered:", { 
+      socket: !!socket, 
+      isConnected, 
+      communityId 
+    });
+
+    if (!socket || !isConnected || !communityId) {
+      console.log("⏸️ Waiting for Socket.IO setup:", {
+        hasSocket: !!socket,
+        isConnected,
+        hasCommunityId: !!communityId
+      });
+      return;
+    }
 
     console.log("🔌 Setting up Socket.IO for community chat:", communityId);
 
@@ -59,6 +72,7 @@ export default function CommunityChatClient({ slug, communityName }: { slug: str
     socket.on("message:new", handleNewMessage);
 
     return () => {
+      console.log("🧹 Cleaning up Socket.IO listeners");
       socket.off("message:new", handleNewMessage);
       socket.emit("leave:community", communityId);
     };
