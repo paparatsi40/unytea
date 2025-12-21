@@ -1,7 +1,22 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { getCurrentUserId } from "@/lib/auth-utils";
 
-const f = createUploadthing();
+// Initialize UploadThing with explicit configuration
+const f = createUploadthing({
+  errorFormatter: (err) => {
+    console.error("📤 UploadThing error:", err);
+    return {
+      message: err.message,
+      code: err.code,
+    };
+  },
+});
+
+console.log("🔧 UploadThing initialized");
+console.log("📋 Environment variables:");
+console.log("  - UPLOADTHING_SECRET:", process.env.UPLOADTHING_SECRET ? `✅ Set (${process.env.UPLOADTHING_SECRET.substring(0, 10)}...)` : "❌ Missing");
+console.log("  - UPLOADTHING_APP_ID:", process.env.UPLOADTHING_APP_ID ? `✅ Set (${process.env.UPLOADTHING_APP_ID})` : "❌ Missing");
+console.log("  - UPLOADTHING_TOKEN:", process.env.UPLOADTHING_TOKEN ? `✅ Set (length: ${process.env.UPLOADTHING_TOKEN.length})` : "❌ Missing");
 
 export const ourFileRouter = {
   // Avatar uploader for profile pictures
