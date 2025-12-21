@@ -13,13 +13,9 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
     
-    console.log("📝 Signup attempt for:", body.email)
-    
     // Validate input
     const validatedData = signUpSchema.parse(body)
     const { name, email, password } = validatedData
-
-    console.log("✅ Input validated successfully")
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
@@ -27,19 +23,14 @@ export async function POST(request: Request) {
     })
 
     if (existingUser) {
-      console.log("⚠️ User already exists:", email)
       return NextResponse.json(
         { error: "Email already registered" },
         { status: 400 }
       )
     }
 
-    console.log("✅ User doesn't exist, creating new user...")
-
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10)
-
-    console.log("✅ Password hashed successfully")
 
     // Create user
     const user = await prisma.user.create({
@@ -50,8 +41,6 @@ export async function POST(request: Request) {
         isOnboarded: true, // Skip onboarding for now
       },
     })
-
-    console.log("✅ User created successfully:", user.email)
 
     return NextResponse.json(
       { 
@@ -66,7 +55,6 @@ export async function POST(request: Request) {
     )
   } catch (error) {
     if (error instanceof z.ZodError) {
-      console.error("❌ Validation error:", error.errors)
       return NextResponse.json(
         { error: error.errors[0].message },
         { status: 400 }

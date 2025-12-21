@@ -11,7 +11,6 @@ const { GET: originalGET, POST: originalPOST } = createRouteHandler({
 
 export async function GET(req: NextRequest) {
   try {
-    console.log("📤 UploadThing GET request");
     return await originalGET(req);
   } catch (error) {
     console.error("❌ UploadThing GET error:", error);
@@ -25,12 +24,6 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    console.log("📤 UploadThing POST request");
-    console.log("📋 Environment check:");
-    console.log("  - UPLOADTHING_SECRET:", process.env.UPLOADTHING_SECRET ? "✅ Set" : "❌ Missing");
-    console.log("  - UPLOADTHING_APP_ID:", process.env.UPLOADTHING_APP_ID ? "✅ Set" : "❌ Missing");
-    console.log("  - UPLOADTHING_TOKEN:", process.env.UPLOADTHING_TOKEN ? "✅ Set" : "❌ Missing");
-    
     return await originalPOST(req);
   } catch (error) {
     console.error("❌ UploadThing POST error:", error);

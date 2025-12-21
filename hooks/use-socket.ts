@@ -18,8 +18,6 @@ export function useSocket() {
     // Initialize socket connection
     if (!socket) {
       try {
-        console.log("🔌 Connecting to Socket.IO server:", SOCKET_URL);
-        
         socket = io(SOCKET_URL, {
           transports: ['websocket', 'polling'],
           reconnection: true,
@@ -28,21 +26,19 @@ export function useSocket() {
         });
 
         socket.on("connect", () => {
-          console.log("✅ Socket connected:", socket?.id);
           setIsConnected(true);
         });
 
         socket.on("disconnect", () => {
-          console.log("❌ Socket disconnected");
           setIsConnected(false);
         });
 
         socket.on("connect_error", (error) => {
-          console.log("⚠️ Socket connection error:", error.message);
+          console.error("Socket connection error:", error.message);
           setIsConnected(false);
         });
       } catch (error) {
-        console.log("❌ Socket initialization failed:", error);
+        console.error("Socket initialization failed:", error);
       }
     } else {
       // Socket already exists, sync with global state

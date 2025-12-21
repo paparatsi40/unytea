@@ -12,12 +12,6 @@ const f = createUploadthing({
   },
 });
 
-console.log("🔧 UploadThing initialized");
-console.log("📋 Environment variables:");
-console.log("  - UPLOADTHING_SECRET:", process.env.UPLOADTHING_SECRET ? `✅ Set (${process.env.UPLOADTHING_SECRET.substring(0, 10)}...)` : "❌ Missing");
-console.log("  - UPLOADTHING_APP_ID:", process.env.UPLOADTHING_APP_ID ? `✅ Set (${process.env.UPLOADTHING_APP_ID})` : "❌ Missing");
-console.log("  - UPLOADTHING_TOKEN:", process.env.UPLOADTHING_TOKEN ? `✅ Set (length: ${process.env.UPLOADTHING_TOKEN.length})` : "❌ Missing");
-
 export const ourFileRouter = {
   // Avatar uploader for profile pictures
   avatarUploader: f({ 
@@ -32,8 +26,6 @@ export const ourFileRouter = {
       return { userId };
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      console.log("Avatar upload complete for userId:", metadata.userId);
-      console.log("File URL:", file.url);
       return { uploadedBy: metadata.userId, url: file.url };
     }),
 
@@ -45,8 +37,6 @@ export const ourFileRouter = {
       return { userId };
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      console.log("Upload complete for userId:", metadata.userId);
-      console.log("File URL:", file.url);
       return { uploadedBy: metadata.userId, url: file.url };
     }),
 
@@ -59,25 +49,18 @@ export const ourFileRouter = {
   })
     .middleware(async () => {
       try {
-        console.log("🖼️ Community branding upload middleware started");
         const userId = await getCurrentUserId();
-        console.log("📝 User ID:", userId);
         
         if (!userId) {
-          console.error("❌ No user ID found - user not authenticated");
           throw new Error("Unauthorized - Please sign in");
         }
         
-        console.log("✅ User authenticated:", userId);
         return { userId };
       } catch (error) {
-        console.error("❌ Middleware error:", error);
         throw error;
       }
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      console.log("✅ Community branding upload complete for userId:", metadata.userId);
-      console.log("📁 File URL:", file.url);
       return { uploadedBy: metadata.userId, url: file.url };
     }),
 
@@ -92,8 +75,6 @@ export const ourFileRouter = {
       return { userId };
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      console.log("Document upload complete for userId:", metadata.userId);
-      console.log("File URL:", file.url);
       return { uploadedBy: metadata.userId, url: file.url };
     }),
 
@@ -108,8 +89,6 @@ export const ourFileRouter = {
       return { userId };
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      console.log("Media upload complete for userId:", metadata.userId);
-      console.log("File URL:", file.url);
       return { uploadedBy: metadata.userId, url: file.url };
     }),
 } satisfies FileRouter;

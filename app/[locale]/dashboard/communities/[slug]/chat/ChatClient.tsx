@@ -43,36 +43,19 @@ export default function CommunityChatClient({ slug, communityName }: { slug: str
 
   // Socket.IO real-time setup
   useEffect(() => {
-    console.log("🔍 Socket.IO effect triggered:", { 
-      socket: !!socket, 
-      isConnected, 
-      communityId 
-    });
-
-    if (!socket || !isConnected || !communityId) {
-      console.log("⏸️ Waiting for Socket.IO setup:", {
-        hasSocket: !!socket,
-        isConnected,
-        hasCommunityId: !!communityId
-      });
-      return;
-    }
-
-    console.log("🔌 Setting up Socket.IO for community chat:", communityId);
+    if (!socket || !isConnected || !communityId) return;
 
     // Join the community room
     socket.emit("join:community", communityId);
 
     // Listen for new messages
     const handleNewMessage = (message: Message) => {
-      console.log("💬 New message received:", message);
       setMessages((prev) => [...prev, message]);
     };
 
     socket.on("message:new", handleNewMessage);
 
     return () => {
-      console.log("🧹 Cleaning up Socket.IO listeners");
       socket.off("message:new", handleNewMessage);
       socket.emit("leave:community", communityId);
     };
@@ -80,7 +63,6 @@ export default function CommunityChatClient({ slug, communityName }: { slug: str
 
   const fetchCommunity = async () => {
     try {
-      console.log("Fetching community with slug:", slug);
       const response = await fetch(`/api/communities/${slug}`);
       const data = await response.json();
       
@@ -88,9 +70,6 @@ export default function CommunityChatClient({ slug, communityName }: { slug: str
       if (data.community) {
         setCommunity(data.community);
         setCommunityId(data.community.id);
-        console.log("✅ Community ID set:", data.community.id);
-      } else {
-        console.error("❌ No community found in response:", data);
       }
     } catch (error) {
       console.error("Error fetching community:", error);
