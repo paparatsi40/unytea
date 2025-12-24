@@ -40,7 +40,7 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
     const loadFabric = async () => {
       try {
         console.log("🎨 Loading Fabric.js...");
-        const { Canvas, IText, Rect, Circle, Line } = await import("fabric");
+        const { Canvas } = await import("fabric");
         console.log("✅ Fabric.js loaded successfully");
         setFabricLoaded(true);
         
