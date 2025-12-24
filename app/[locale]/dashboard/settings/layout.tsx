@@ -16,9 +16,9 @@ const settingsNav = [
   { name: "Integrations", href: "/dashboard/settings/integrations", icon: Zap, description: "Connect third-party services" },
 ];
 
-function getLocaleFromPathname(pathname: string) {
-  // pathname ejemplo: "/en/dashboard/settings/billing"
-  const seg = pathname.split("/").filter(Boolean)[0];
+function getLocaleFromPathname(pathname: string | null) {
+  const safe = pathname ?? "/en";
+  const seg = safe.split("/").filter(Boolean)[0];
   return seg || "en";
 }
 
