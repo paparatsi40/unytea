@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { fabric } from "fabric";
+import { Canvas, IText, Rect, Circle, Line } from "fabric";
 import { 
   Loader2, 
   Pencil, 
   Type, 
   Square, 
-  Circle, 
+  Circle as CircleIcon, 
   Minus,
   MousePointer,
   Trash2, 
@@ -27,7 +27,7 @@ type Props = {
 
 export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const fabricRef = useRef<fabric.Canvas | null>(null);
+  const fabricRef = useRef<Canvas | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [tool, setTool] = useState<Tool>("draw");
   const [color, setColor] = useState("#000000");
@@ -39,7 +39,7 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
   useEffect(() => {
     if (!canvasRef.current || fabricRef.current) return;
 
-    const canvas = new fabric.Canvas(canvasRef.current, {
+    const canvas = new Canvas(canvasRef.current, {
       width: 1920,
       height: 1080,
       backgroundColor: "#ffffff",
@@ -73,7 +73,7 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
   }, []);
 
   // Load whiteboard state
-  const loadWhiteboard = async (canvas: fabric.Canvas) => {
+  const loadWhiteboard = async (canvas: Canvas) => {
     try {
       const response = await fetch(`/api/sessions/${sessionId}/whiteboard`);
       if (response.ok) {
@@ -119,7 +119,7 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
   }, [sessionId, isModerator]);
 
   // Save to history
-  const saveToHistory = (canvas: fabric.Canvas) => {
+  const saveToHistory = (canvas: Canvas) => {
     const json = JSON.stringify(canvas.toJSON());
     setHistory((prev) => {
       const newHistory = prev.slice(0, historyStep + 1);
@@ -148,7 +148,7 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
     const canvas = fabricRef.current;
     if (!canvas || !isModerator) return;
 
-    const text = new fabric.IText("Double click to edit", {
+    const text = new IText("Double click to edit", {
       left: 100,
       top: 100,
       fill: color,
@@ -165,7 +165,7 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
     const canvas = fabricRef.current;
     if (!canvas || !isModerator) return;
 
-    const rect = new fabric.Rect({
+    const rect = new Rect({
       left: 100,
       top: 100,
       width: 200,
@@ -184,7 +184,7 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
     const canvas = fabricRef.current;
     if (!canvas || !isModerator) return;
 
-    const circle = new fabric.Circle({
+    const circle = new Circle({
       left: 100,
       top: 100,
       radius: 50,
@@ -202,7 +202,7 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
     const canvas = fabricRef.current;
     if (!canvas || !isModerator) return;
 
-    const line = new fabric.Line([50, 50, 200, 50], {
+    const line = new Line([50, 50, 200, 50], {
       stroke: color,
       strokeWidth: strokeWidth,
     });
@@ -341,7 +341,7 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
             variant="outline"
             onClick={handleAddCircle}
           >
-            <Circle className="h-4 w-4 mr-1" />
+            <CircleIcon className="h-4 w-4 mr-1" />
             Circle
           </Button>
 
