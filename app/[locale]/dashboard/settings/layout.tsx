@@ -3,17 +3,60 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { User, Bell, Shield, CreditCard, Palette, Zap, DollarSign } from "lucide-react";
-import { Settings } from "lucide-react";
+import {
+  User,
+  Bell,
+  Shield,
+  CreditCard,
+  Palette,
+  Zap,
+  DollarSign,
+  Settings,
+} from "lucide-react";
 
 const settingsNav = [
-  { name: "Profile", href: "/dashboard/settings/profile", icon: User, description: "Manage your personal information" },
-  { name: "Notifications", href: "/dashboard/settings/notifications", icon: Bell, description: "Configure notification preferences" },
-  { name: "Security", href: "/dashboard/settings/security", icon: Shield, description: "Password and authentication" },
-  { name: "Payments", href: "/dashboard/settings/payments", icon: DollarSign, description: "Earn from paid communities" },
-  { name: "Billing", href: "/dashboard/settings/billing", icon: CreditCard, description: "Manage subscription and payments" },
-  { name: "Appearance", href: "/dashboard/settings/appearance", icon: Palette, description: "Customize your experience" },
-  { name: "Integrations", href: "/dashboard/settings/integrations", icon: Zap, description: "Connect third-party services" },
+  {
+    name: "Profile",
+    href: "/dashboard/settings/profile",
+    icon: User,
+    description: "Manage your personal information",
+  },
+  {
+    name: "Notifications",
+    href: "/dashboard/settings/notifications",
+    icon: Bell,
+    description: "Configure notification preferences",
+  },
+  {
+    name: "Security",
+    href: "/dashboard/settings/security",
+    icon: Shield,
+    description: "Password and authentication",
+  },
+  {
+    name: "Payments",
+    href: "/dashboard/settings/payments",
+    icon: DollarSign,
+    description: "Earn from paid communities",
+  },
+  {
+    name: "Billing",
+    href: "/dashboard/settings/billing",
+    icon: CreditCard,
+    description: "Manage subscription and payments",
+  },
+  {
+    name: "Appearance",
+    href: "/dashboard/settings/appearance",
+    icon: Palette,
+    description: "Customize your experience",
+  },
+  {
+    name: "Integrations",
+    href: "/dashboard/settings/integrations",
+    icon: Zap,
+    description: "Connect third-party services",
+  },
 ];
 
 function getLocaleFromPathname(pathname: string | null) {
@@ -22,8 +65,13 @@ function getLocaleFromPathname(pathname: string | null) {
   return seg || "en";
 }
 
-export default function SettingsLayout({ children }: { children: React.ReactNode }) {
+export default function SettingsLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
+  const safePathname = pathname ?? "";
   const locale = getLocaleFromPathname(pathname);
 
   return (
@@ -43,19 +91,18 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
 
       {/* Navigation */}
       <div className="flex gap-6">
+        {/* Sidebar */}
         <aside className="w-64 shrink-0">
           <nav className="space-y-1">
             {settingsNav.map((item) => {
               const Icon = item.icon;
 
               // pathname trae /en/... entonces active si termina con el href base
-              const isActive = pathname.endsWith(item.href);
+              const isActive = safePathname.endsWith(item.href);
 
               // href final con locale
               const href = `/${locale}${item.href}`;
 
-              // Si billing existe (según tu screenshot, sí existe), puedes dejar prefetch normal.
-              // Si algún día una ruta no existe, pon prefetch={false} en esa en particular.
               return (
                 <Link
                   key={item.href}
@@ -70,7 +117,9 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
                   <Icon className="h-5 w-5 shrink-0 mt-0.5" />
                   <div>
                     <div className="font-medium">{item.name}</div>
-                    <div className="text-sm text-muted-foreground">{item.description}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {item.description}
+                    </div>
                   </div>
                 </Link>
               );
@@ -78,6 +127,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
           </nav>
         </aside>
 
+        {/* Main content */}
         <div className="flex-1">{children}</div>
       </div>
     </div>
