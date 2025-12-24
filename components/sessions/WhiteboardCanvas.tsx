@@ -24,24 +24,36 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fabricCanvasRef = useRef<any>(null);
   const initializingRef = useRef(false);
-  
+  const [isClient, setIsClient] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const [tool, setTool] = useState<Tool>("draw");
   const [color, setColor] = useState("#000000");
   const [strokeWidth, setStrokeWidth] = useState(2);
 
+  // Ensure we're on the client
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   // Initialize canvas
   useEffect(() => {
+    if (!isClient) {
+      console.log("⏳ Waiting for client-side rendering...");
+      return;
+    }
+
     let mounted = true;
     
     const initCanvas = async () => {
       // Prevent multiple initializations
       if (initializingRef.current || fabricCanvasRef.current) {
+        console.log("⚠️ Already initializing or initialized");
         return;
       }
       
       // Wait for canvas ref
       if (!canvasRef.current) {
+        console.log("⚠️ Canvas ref not available yet");
         return;
       }
 
@@ -76,13 +88,14 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
         }
       } catch (error) {
         console.error("❌ Failed to initialize canvas:", error);
+        setIsReady(true); // Show UI anyway
       } finally {
         initializingRef.current = false;
       }
     };
 
-    // Small delay to ensure DOM is ready
-    const timer = setTimeout(initCanvas, 100);
+    // Larger delay to ensure DOM is fully ready
+    const timer = setTimeout(initCanvas, 500);
 
     return () => {
       mounted = false;
@@ -92,7 +105,7 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
         fabricCanvasRef.current = null;
       }
     };
-  }, []);
+  }, [isClient]);
 
   // Update drawing settings
   useEffect(() => {
