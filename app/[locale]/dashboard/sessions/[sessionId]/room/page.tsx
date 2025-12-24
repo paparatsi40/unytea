@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getSession } from "@/app/actions/sessions";
 import { VideoRoom } from "@/components/sessions/VideoRoom";
 import { BackButton } from "@/components/navigation/BackButton";
+import { getLocale } from "next-intl/server";
 
 export default async function SessionRoomPage({
   params,
@@ -14,11 +15,13 @@ export default async function SessionRoomPage({
     redirect("/login");
   }
 
-  const { sessionId } = await params;
+  const locale = await getLocale();
+
+  const { sessionId } = params;
   const result = await getSession(sessionId);
 
   if (!result.success || !result.session) {
-    redirect("/dashboard/sessions");
+    redirect(`/${locale}/dashboard/sessions`);
   }
 
   const videoSession = result.session;
@@ -28,8 +31,8 @@ export default async function SessionRoomPage({
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
           <p className="text-lg text-destructive">Invalid session</p>
-          <BackButton 
-            fallbackUrl="/dashboard/sessions"
+          <BackButton
+            fallbackUrl={`/${locale}/dashboard/sessions`}
             label="Back to sessions"
             className="mt-4"
           />
@@ -42,8 +45,8 @@ export default async function SessionRoomPage({
     <div className="min-h-screen bg-background p-4">
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
-        <BackButton 
-          fallbackUrl="/dashboard/sessions"
+        <BackButton
+          fallbackUrl={`/${locale}/dashboard/sessions`}
           label="Back to Sessions"
         />
 
@@ -58,17 +61,15 @@ export default async function SessionRoomPage({
           )}
         </div>
 
-        <div className="w-32" /> {/* Spacer for centering */}
+        <div className="w-32" />
       </div>
 
-      {/* Video Room - onLeave is now optional, handles navigation internally */}
-      <VideoRoom 
-        roomName={videoSession.roomId} 
+      <VideoRoom
+        roomName={videoSession.roomId}
         sessionId={sessionId}
         userId={session.user.id}
         mentorId={videoSession.mentorId}
       />
-
     </div>
   );
 }

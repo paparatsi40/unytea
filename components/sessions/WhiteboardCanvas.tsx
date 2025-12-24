@@ -21,6 +21,7 @@ type Props = {
 };
 
 export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) {
+  const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fabricCanvasRef = useRef<any>(null);
 
@@ -53,18 +54,16 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
 
         fabricCanvasRef.current = fabricCanvas;
 
-        // Default: draw mode initially
+        // Default: draw mode
         fabricCanvas.isDrawingMode = true;
+        fabricCanvas.selection = false;
+        updateObjectInteractivity(fabricCanvas, false);
+
         if (fabricCanvas.freeDrawingBrush) {
           fabricCanvas.freeDrawingBrush.color = color;
           fabricCanvas.freeDrawingBrush.width = strokeWidth;
         }
 
-        // Prevent selection in draw mode
-        fabricCanvas.selection = false;
-        updateObjectInteractivity(fabricCanvas, false);
-
-        // Make sure it renders after init
         fabricCanvas.renderAll();
       } catch (err) {
         console.error("❌ Failed to initialize Fabric canvas:", err);
@@ -81,34 +80,42 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Resize Fabric canvas to container
+  // Resize Fabric canvas to our container (NOT the Fabric wrapper)
   useEffect(() => {
     const canvas = fabricCanvasRef.current;
-    if (!canvas || !canvasRef.current) return;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
 
-    const resize = () => {
-      const parent = canvasRef.current?.parentElement;
-      if (!parent) return;
-
-      const rect = parent.getBoundingClientRect();
-      // Avoid 0 sizes during transitions
+    const applySize = () => {
+      const rect = container.getBoundingClientRect();
       if (rect.width < 10 || rect.height < 10) return;
 
+      // Backstore + CSS size
       canvas.setWidth(rect.width);
       canvas.setHeight(rect.height);
-      canvas.renderAll();
+
+      // Ensure Fabric's wrapper matches container too
+      if (canvas.wrapperEl) {
+        canvas.wrapperEl.style.width = `${rect.width}px`;
+        canvas.wrapperEl.style.height = `${rect.height}px`;
+      }
+
+      // Important after resizing
+      canvas.calcOffset();
+      canvas.requestRenderAll?.() ?? canvas.renderAll();
     };
 
-    // Resize now + on window resize
-    resize();
-    window.addEventListener("resize", resize);
+    // ResizeObserver handles fullscreen/tabs/layout changes reliably
+    const ro = new ResizeObserver(() => applySize());
+    ro.observe(container);
 
-    // Also resize after next paint (helps on tab/fullscreen transitions)
-    const raf = requestAnimationFrame(resize);
+    // Also apply once immediately (and next frame)
+    applySize();
+    const raf = requestAnimationFrame(applySize);
 
     return () => {
       cancelAnimationFrame(raf);
-      window.removeEventListener("resize", resize);
+      ro.disconnect();
     };
   }, [isReady]);
 
@@ -130,7 +137,7 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
       canvas.freeDrawingBrush.width = strokeWidth;
     }
 
-    canvas.renderAll();
+    canvas.requestRenderAll?.() ?? canvas.renderAll();
   }, [tool, color, strokeWidth]);
 
   const handleAddText = async () => {
@@ -140,7 +147,7 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
     try {
       const { IText } = await import("fabric");
 
-      // Important: exit drawing mode so IText can edit properly
+      // Exit drawing mode so text edits properly
       canvas.isDrawingMode = false;
       setTool("select");
 
@@ -154,7 +161,7 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
 
       canvas.add(text);
       canvas.setActiveObject(text);
-      canvas.renderAll();
+      canvas.requestRenderAll?.() ?? canvas.renderAll();
     } catch (err) {
       console.error("Failed to add text:", err);
     }
@@ -182,7 +189,7 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
       canvas.add(rect);
       setTool("select");
       canvas.setActiveObject(rect);
-      canvas.renderAll();
+      canvas.requestRenderAll?.() ?? canvas.renderAll();
     } catch (err) {
       console.error("Failed to add rectangle:", err);
     }
@@ -209,7 +216,7 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
       canvas.add(circle);
       setTool("select");
       canvas.setActiveObject(circle);
-      canvas.renderAll();
+      canvas.requestRenderAll?.() ?? canvas.renderAll();
     } catch (err) {
       console.error("Failed to add circle:", err);
     }
@@ -224,7 +231,7 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
 
     canvas.remove(...active);
     canvas.discardActiveObject();
-    canvas.renderAll();
+    canvas.requestRenderAll?.() ?? canvas.renderAll();
   };
 
   const handleClear = () => {
@@ -234,7 +241,7 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
     canvas.remove(...canvas.getObjects());
     canvas.backgroundColor = "#ffffff";
     canvas.discardActiveObject();
-    canvas.renderAll();
+    canvas.requestRenderAll?.() ?? canvas.renderAll();
   };
 
   const handleExport = () => {
@@ -276,11 +283,7 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
             Draw
           </Button>
 
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleAddText}
-          >
+          <Button size="sm" variant="outline" onClick={handleAddText}>
             <Type className="h-4 w-4 mr-1" />
             Text
           </Button>
@@ -330,7 +333,12 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
             Export
           </Button>
 
-          <Button size="sm" variant="destructive" onClick={handleClear} className="ml-auto">
+          <Button
+            size="sm"
+            variant="destructive"
+            onClick={handleClear}
+            className="ml-auto"
+          >
             <Trash2 className="h-4 w-4 mr-1" />
             Clear All
           </Button>
@@ -338,11 +346,9 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
       )}
 
       {/* Canvas area */}
-      <div className="flex-1 relative overflow-hidden bg-gray-100">
-        <canvas
-          ref={canvasRef}
-          className="absolute inset-0"
-        />
+      <div ref={containerRef} className="flex-1 relative overflow-hidden bg-gray-100">
+        {/* Important: DO NOT absolute-position the canvas. Let Fabric wrap it. */}
+        <canvas ref={canvasRef} />
 
         {!isReady && (
           <div className="absolute inset-0 flex items-center justify-center bg-white">
