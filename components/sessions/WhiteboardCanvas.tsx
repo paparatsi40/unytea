@@ -75,7 +75,10 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
   // Load whiteboard state
   const loadWhiteboard = async (canvas: Canvas) => {
     try {
-      const response = await fetch(`/api/sessions/${sessionId}/whiteboard`);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      const response = await fetch(`/api/sessions/${sessionId}/whiteboard`, { signal: controller.signal });
+      clearTimeout(timeoutId);
       if (response.ok) {
         const data = await response.json();
         if (data.canvasData) {
@@ -83,14 +86,17 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
             canvas.renderAll();
             setIsLoading(false);
           });
-        } else {
-          setIsLoading(false);
+          return;
         }
-      } else {
-        setIsLoading(false);
       }
+      // If no data or error, just show empty canvas
+      setIsLoading(false);
     } catch (error) {
-      console.error("Error loading whiteboard:", error);
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.log('Request timed out');
+      } else {
+        console.error("Error loading whiteboard:", error);
+      }
       setIsLoading(false);
     }
   };
