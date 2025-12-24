@@ -39,11 +39,18 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
   useEffect(() => {
     const loadFabric = async () => {
       try {
+        console.log("🎨 Loading Fabric.js...");
         const fabric = await import("fabric");
+        console.log("✅ Fabric.js loaded successfully");
         setFabricLoaded(true);
         
-        if (!canvasRef.current || fabricRef.current) return;
+        if (!canvasRef.current || fabricRef.current) {
+          console.log("⚠️ Canvas ref not ready or already initialized");
+          setIsLoading(false);
+          return;
+        }
 
+        console.log("🖼️ Initializing canvas...");
         const canvas = new fabric.Canvas(canvasRef.current, {
           width: 1920,
           height: 1080,
@@ -51,6 +58,8 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
           isDrawingMode: tool === "draw",
           selection: tool === "select",
         });
+
+        console.log("✅ Canvas initialized");
 
         // Configure drawing brush
         if (canvas.freeDrawingBrush) {
@@ -61,7 +70,9 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
         fabricRef.current = canvas;
 
         // Load saved whiteboard
+        console.log("📥 Loading saved whiteboard data...");
         await loadWhiteboard(canvas);
+        console.log("✅ Whiteboard loaded");
 
         // Save to history on object added
         canvas.on("object:added", () => {
@@ -72,7 +83,7 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
           saveToHistory(canvas);
         });
       } catch (error) {
-        console.error("Error loading Fabric.js:", error);
+        console.error("❌ Error loading Fabric.js:", error);
         setIsLoading(false);
       }
     };
@@ -89,30 +100,41 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
   // Load whiteboard state
   const loadWhiteboard = async (canvas: any) => {
     try {
+      console.log("🔄 Fetching whiteboard data from API...");
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      const timeoutId = setTimeout(() => {
+        console.log("⏱️ Request timeout - aborting");
+        controller.abort();
+      }, 5000);
       
       const response = await fetch(`/api/sessions/${sessionId}/whiteboard`, { 
         signal: controller.signal 
       });
       
       clearTimeout(timeoutId);
+      console.log("📡 API response status:", response.status);
       
       if (response.ok) {
         const data = await response.json();
+        console.log("📦 Received data:", data);
         if (data.canvasData) {
+          console.log("📥 Loading canvas data...");
           canvas.loadFromJSON(data.canvasData, () => {
             canvas.renderAll();
+            console.log("✅ Canvas data loaded and rendered");
             setIsLoading(false);
           });
           return;
+        } else {
+          console.log("⚠️ No canvas data found");
         }
       }
     } catch (error) {
-      // Silently fail - just show empty canvas
+      console.log("⚠️ Error loading whiteboard (showing empty canvas):", error);
     }
     
     // Always set loading to false after timeout or error
+    console.log("✅ Showing empty canvas");
     setIsLoading(false);
   };
 
