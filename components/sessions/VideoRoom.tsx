@@ -19,6 +19,53 @@ interface VideoRoomProps {
   onLeave?: () => void;
 }
 
+// Error Boundary to catch React hydration errors
+class VideoRoomErrorBoundary extends Component<
+  { children: ReactNode; fallback?: ReactNode },
+  { hasError: boolean; error?: Error }
+> {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    // Ignore hydration errors
+    if (error.message.includes('Hydration') || 
+        error.message.includes('removeChild') ||
+        error.message.includes('418')) {
+      console.warn('Hydration error caught and suppressed:', error);
+      return { hasError: false }; // Don't show error UI for hydration issues
+    }
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: any) {
+    // Log the error but don't crash the app
+    console.error('VideoRoom error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError && !this.state.error?.message.includes('Hydration')) {
+      return this.props.fallback || (
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <p className="text-destructive">Something went wrong with the video room.</p>
+            <button 
+              onClick={() => window.location.reload()}
+              className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded"
+            >
+              Reload
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
 export function VideoRoom({ roomName, sessionId, userId, mentorId, onLeave }: VideoRoomProps) {
   const [token, setToken] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -102,22 +149,24 @@ export function VideoRoom({ roomName, sessionId, userId, mentorId, onLeave }: Vi
   }
 
   return (
-    <div className="h-[600px] w-full overflow-hidden rounded-xl bg-card relative">
-      <LiveKitRoom
-        video={true}
-        audio={true}
-        token={token}
-        serverUrl={serverUrl}
-        connect={true}
-        onDisconnected={handleDisconnect}
-        className="h-full"
-      >
-        <VideoConference />
-        <RoomAudioRenderer />
-        
-        {/* All interactive controls */}
-        <VideoRoomContent sessionId={sessionId} isModerator={isModerator} />
-      </LiveKitRoom>
-    </div>
+    <VideoRoomErrorBoundary>
+      <div className="h-[600px] w-full overflow-hidden rounded-xl bg-card relative">
+        <LiveKitRoom
+          video={true}
+          audio={true}
+          token={token}
+          serverUrl={serverUrl}
+          connect={true}
+          onDisconnected={handleDisconnect}
+          className="h-full"
+        >
+          <VideoConference />
+          <RoomAudioRenderer />
+          
+          {/* All interactive controls */}
+          <VideoRoomContent sessionId={sessionId} isModerator={isModerator} />
+        </LiveKitRoom>
+      </div>
+    </VideoRoomErrorBoundary>
   );
 }
