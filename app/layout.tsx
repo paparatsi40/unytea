@@ -119,6 +119,7 @@ export default function RootLayout({
 }) {
   return (
     <html suppressHydrationWarning>
+      <head />
       <body
         className={`${GeistSans.variable} ${GeistMono.variable} font-sans antialiased`}
       >

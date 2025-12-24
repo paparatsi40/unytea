@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRoomContext } from "@livekit/components-react";
 import { PresentationIcon, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,7 @@ export function VideoRoomContent({ sessionId, isModerator }: Props) {
   const { queue, isHandRaised, raiseHand, lowerHand, clearAllHands } = useHandRaise(room);
   const [showContentPanel, setShowContentPanel] = useState(false);
   const [contentPanelFullscreen, setContentPanelFullscreen] = useState(false);
+  const contentPanelRef = useRef<HTMLDivElement>(null);
 
   const handleToggleHand = () => {
     if (isHandRaised) {
@@ -55,8 +56,13 @@ export function VideoRoomContent({ sessionId, isModerator }: Props) {
 
       {/* Content Panel - right side */}
       {showContentPanel && !contentPanelFullscreen && (
-        <div className="absolute top-0 right-0 h-full w-1/2 z-20 shadow-2xl">
+        <div 
+          ref={contentPanelRef}
+          key="content-panel-side"
+          className="absolute top-0 right-0 h-full w-1/2 z-20 shadow-2xl"
+        >
           <ContentPanel
+            key={sessionId}
             sessionId={sessionId}
             isModerator={isModerator}
             isFullscreen={contentPanelFullscreen}
@@ -67,8 +73,12 @@ export function VideoRoomContent({ sessionId, isModerator }: Props) {
 
       {/* Content Panel - fullscreen */}
       {showContentPanel && contentPanelFullscreen && (
-        <div className="fixed inset-0 z-50">
+        <div 
+          key="content-panel-fullscreen"
+          className="fixed inset-0 z-50"
+        >
           <ContentPanel
+            key={sessionId}
             sessionId={sessionId}
             isModerator={isModerator}
             isFullscreen={contentPanelFullscreen}
