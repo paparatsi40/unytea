@@ -20,7 +20,7 @@ type Props = {
   isModerator: boolean;
 };
 
-export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
+export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fabricCanvasRef = useRef<any>(null);
   const initializingRef = useRef(false);
