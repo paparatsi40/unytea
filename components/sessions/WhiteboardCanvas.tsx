@@ -255,6 +255,7 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
     const dataURL = canvas.toDataURL({
       format: "png",
       quality: 1,
+      multiplier: 1,
     });
 
     const link = document.createElement("a");
