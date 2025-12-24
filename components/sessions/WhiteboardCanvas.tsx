@@ -1,9 +1,24 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { ReactSketchCanvas, ReactSketchCanvasRef } from "react-sketch-canvas";
-import { Loader2, Eraser, Pencil, Trash2, Undo, Redo, Download } from "lucide-react";
+import { fabric } from "fabric";
+import { 
+  Loader2, 
+  Pencil, 
+  Type, 
+  Square, 
+  Circle, 
+  Minus,
+  MousePointer,
+  Trash2, 
+  Undo, 
+  Redo, 
+  Download,
+  Eraser
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+type Tool = "select" | "draw" | "text" | "rectangle" | "circle" | "line" | "eraser";
 
 type Props = {
   sessionId: string;
@@ -11,80 +26,252 @@ type Props = {
 };
 
 export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
-  const canvasRef = useRef<ReactSketchCanvasRef>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fabricRef = useRef<fabric.Canvas | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [tool, setTool] = useState<Tool>("draw");
   const [color, setColor] = useState("#000000");
-  const [strokeWidth, setStrokeWidth] = useState(4);
-  const [tool, setTool] = useState<"pen" | "eraser">("pen");
+  const [strokeWidth, setStrokeWidth] = useState(2);
+  const [history, setHistory] = useState<string[]>([]);
+  const [historyStep, setHistoryStep] = useState(0);
 
-  // Load saved whiteboard state
+  // Initialize Fabric.js canvas
   useEffect(() => {
-    const loadWhiteboardState = async () => {
-      try {
-        const response = await fetch(`/api/sessions/${sessionId}/whiteboard`);
-        if (response.ok) {
-          const data = await response.json();
-          if (data.paths && canvasRef.current) {
-            await canvasRef.current.loadPaths(data.paths);
-          }
+    if (!canvasRef.current || fabricRef.current) return;
+
+    const canvas = new fabric.Canvas(canvasRef.current, {
+      width: 1920,
+      height: 1080,
+      backgroundColor: "#ffffff",
+      isDrawingMode: tool === "draw",
+      selection: tool === "select",
+    });
+
+    // Configure drawing brush
+    if (canvas.freeDrawingBrush) {
+      canvas.freeDrawingBrush.color = color;
+      canvas.freeDrawingBrush.width = strokeWidth;
+    }
+
+    fabricRef.current = canvas;
+
+    // Load saved whiteboard
+    loadWhiteboard(canvas);
+
+    // Save to history on object added
+    canvas.on("object:added", () => {
+      saveToHistory(canvas);
+    });
+
+    canvas.on("object:modified", () => {
+      saveToHistory(canvas);
+    });
+
+    return () => {
+      canvas.dispose();
+    };
+  }, []);
+
+  // Load whiteboard state
+  const loadWhiteboard = async (canvas: fabric.Canvas) => {
+    try {
+      const response = await fetch(`/api/sessions/${sessionId}/whiteboard`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.canvasData) {
+          canvas.loadFromJSON(data.canvasData, () => {
+            canvas.renderAll();
+            setIsLoading(false);
+          });
+        } else {
+          setIsLoading(false);
         }
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Error loading whiteboard:", error);
+      } else {
         setIsLoading(false);
       }
-    };
+    } catch (error) {
+      console.error("Error loading whiteboard:", error);
+      setIsLoading(false);
+    }
+  };
 
-    loadWhiteboardState();
-  }, [sessionId]);
-
-  // Auto-save whiteboard state
+  // Auto-save whiteboard
   useEffect(() => {
-    if (!isModerator || !canvasRef.current) return;
+    if (!fabricRef.current || !isModerator) return;
 
     const saveInterval = setInterval(async () => {
+      const canvas = fabricRef.current;
+      if (!canvas) return;
+
       try {
-        const paths = await canvasRef.current?.exportPaths();
-        
+        const canvasData = canvas.toJSON();
         await fetch(`/api/sessions/${sessionId}/whiteboard`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ paths }),
+          body: JSON.stringify({ canvasData }),
         });
       } catch (error) {
         console.error("Error saving whiteboard:", error);
       }
-    }, 5000); // Save every 5 seconds
+    }, 5000);
 
     return () => clearInterval(saveInterval);
   }, [sessionId, isModerator]);
 
-  const handleClear = () => {
-    if (!isModerator) return;
-    canvasRef.current?.clearCanvas();
+  // Save to history
+  const saveToHistory = (canvas: fabric.Canvas) => {
+    const json = JSON.stringify(canvas.toJSON());
+    setHistory((prev) => {
+      const newHistory = prev.slice(0, historyStep + 1);
+      newHistory.push(json);
+      return newHistory;
+    });
+    setHistoryStep((prev) => prev + 1);
+  };
+
+  // Update tool
+  useEffect(() => {
+    const canvas = fabricRef.current;
+    if (!canvas) return;
+
+    canvas.isDrawingMode = tool === "draw";
+    canvas.selection = tool === "select";
+
+    if (canvas.freeDrawingBrush) {
+      canvas.freeDrawingBrush.color = color;
+      canvas.freeDrawingBrush.width = strokeWidth;
+    }
+  }, [tool, color, strokeWidth]);
+
+  // Tool handlers
+  const handleAddText = () => {
+    const canvas = fabricRef.current;
+    if (!canvas || !isModerator) return;
+
+    const text = new fabric.IText("Double click to edit", {
+      left: 100,
+      top: 100,
+      fill: color,
+      fontSize: 24,
+      fontFamily: "Arial",
+    });
+
+    canvas.add(text);
+    canvas.setActiveObject(text);
+    canvas.renderAll();
+  };
+
+  const handleAddRectangle = () => {
+    const canvas = fabricRef.current;
+    if (!canvas || !isModerator) return;
+
+    const rect = new fabric.Rect({
+      left: 100,
+      top: 100,
+      width: 200,
+      height: 100,
+      fill: "transparent",
+      stroke: color,
+      strokeWidth: strokeWidth,
+    });
+
+    canvas.add(rect);
+    canvas.setActiveObject(rect);
+    canvas.renderAll();
+  };
+
+  const handleAddCircle = () => {
+    const canvas = fabricRef.current;
+    if (!canvas || !isModerator) return;
+
+    const circle = new fabric.Circle({
+      left: 100,
+      top: 100,
+      radius: 50,
+      fill: "transparent",
+      stroke: color,
+      strokeWidth: strokeWidth,
+    });
+
+    canvas.add(circle);
+    canvas.setActiveObject(circle);
+    canvas.renderAll();
+  };
+
+  const handleAddLine = () => {
+    const canvas = fabricRef.current;
+    if (!canvas || !isModerator) return;
+
+    const line = new fabric.Line([50, 50, 200, 50], {
+      stroke: color,
+      strokeWidth: strokeWidth,
+    });
+
+    canvas.add(line);
+    canvas.setActiveObject(line);
+    canvas.renderAll();
   };
 
   const handleUndo = () => {
-    if (!isModerator) return;
-    canvasRef.current?.undo();
+    if (historyStep <= 0) return;
+    
+    const canvas = fabricRef.current;
+    if (!canvas) return;
+
+    const previousState = history[historyStep - 1];
+    canvas.loadFromJSON(previousState, () => {
+      canvas.renderAll();
+      setHistoryStep((prev) => prev - 1);
+    });
   };
 
   const handleRedo = () => {
-    if (!isModerator) return;
-    canvasRef.current?.redo();
+    if (historyStep >= history.length - 1) return;
+    
+    const canvas = fabricRef.current;
+    if (!canvas) return;
+
+    const nextState = history[historyStep + 1];
+    canvas.loadFromJSON(nextState, () => {
+      canvas.renderAll();
+      setHistoryStep((prev) => prev + 1);
+    });
   };
 
-  const handleExport = async () => {
-    try {
-      const imageData = await canvasRef.current?.exportImage("png");
-      if (imageData) {
-        const link = document.createElement("a");
-        link.href = imageData;
-        link.download = `whiteboard-${sessionId}.png`;
-        link.click();
-      }
-    } catch (error) {
-      console.error("Error exporting whiteboard:", error);
+  const handleClear = () => {
+    const canvas = fabricRef.current;
+    if (!canvas || !isModerator) return;
+
+    canvas.clear();
+    canvas.backgroundColor = "#ffffff";
+    canvas.renderAll();
+    saveToHistory(canvas);
+  };
+
+  const handleExport = () => {
+    const canvas = fabricRef.current;
+    if (!canvas) return;
+
+    const dataURL = canvas.toDataURL({
+      format: "png",
+      quality: 1,
+    });
+
+    const link = document.createElement("a");
+    link.href = dataURL;
+    link.download = `whiteboard-${sessionId}.png`;
+    link.click();
+  };
+
+  const handleDeleteSelected = () => {
+    const canvas = fabricRef.current;
+    if (!canvas || !isModerator) return;
+
+    const activeObjects = canvas.getActiveObjects();
+    if (activeObjects.length) {
+      canvas.remove(...activeObjects);
+      canvas.discardActiveObject();
+      canvas.renderAll();
     }
   };
 
@@ -103,43 +290,68 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
         <div className="flex items-center gap-2 border-b border-gray-200 p-3 flex-wrap bg-gray-50">
           <Button
             size="sm"
-            variant={tool === "pen" ? "default" : "outline"}
-            onClick={() => setTool("pen")}
+            variant={tool === "select" ? "default" : "outline"}
+            onClick={() => setTool("select")}
+          >
+            <MousePointer className="h-4 w-4 mr-1" />
+            Select
+          </Button>
+
+          <Button
+            size="sm"
+            variant={tool === "draw" ? "default" : "outline"}
+            onClick={() => setTool("draw")}
           >
             <Pencil className="h-4 w-4 mr-1" />
             Draw
           </Button>
-          
+
+          <Button
+            size="sm"
+            variant={tool === "text" ? "default" : "outline"}
+            onClick={() => {
+              setTool("text");
+              handleAddText();
+            }}
+          >
+            <Type className="h-4 w-4 mr-1" />
+            Text
+          </Button>
+
           <Button
             size="sm"
             variant={tool === "eraser" ? "default" : "outline"}
-            onClick={() => {
-              setTool("eraser");
-              canvasRef.current?.eraseMode(true);
-            }}
+            onClick={() => setTool("eraser")}
           >
             <Eraser className="h-4 w-4 mr-1" />
-            Erase
-          </Button>
-
-          <div className="h-6 w-px bg-gray-300 mx-1" />
-
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleUndo}
-          >
-            <Undo className="h-4 w-4 mr-1" />
-            Undo
+            Eraser
           </Button>
 
           <Button
             size="sm"
             variant="outline"
-            onClick={handleRedo}
+            onClick={handleAddRectangle}
           >
-            <Redo className="h-4 w-4 mr-1" />
-            Redo
+            <Square className="h-4 w-4 mr-1" />
+            Rectangle
+          </Button>
+
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleAddCircle}
+          >
+            <Circle className="h-4 w-4 mr-1" />
+            Circle
+          </Button>
+
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleAddLine}
+          >
+            <Minus className="h-4 w-4 mr-1" />
+            Line
           </Button>
 
           <div className="h-6 w-px bg-gray-300 mx-1" />
@@ -148,11 +360,7 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
             <input
               type="color"
               value={color}
-              onChange={(e) => {
-                setColor(e.target.value);
-                setTool("pen");
-                canvasRef.current?.eraseMode(false);
-              }}
+              onChange={(e) => setColor(e.target.value)}
               className="h-8 w-12 cursor-pointer rounded border border-gray-300"
               title="Color"
             />
@@ -176,6 +384,37 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
           <Button
             size="sm"
             variant="outline"
+            onClick={handleUndo}
+            disabled={historyStep <= 0}
+          >
+            <Undo className="h-4 w-4 mr-1" />
+            Undo
+          </Button>
+
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleRedo}
+            disabled={historyStep >= history.length - 1}
+          >
+            <Redo className="h-4 w-4 mr-1" />
+            Redo
+          </Button>
+
+          <div className="h-6 w-px bg-gray-300 mx-1" />
+
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleDeleteSelected}
+          >
+            <Trash2 className="h-4 w-4 mr-1" />
+            Delete
+          </Button>
+
+          <Button
+            size="sm"
+            variant="outline"
             onClick={handleExport}
           >
             <Download className="h-4 w-4 mr-1" />
@@ -189,28 +428,19 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
             className="ml-auto"
           >
             <Trash2 className="h-4 w-4 mr-1" />
-            Clear
+            Clear All
           </Button>
         </div>
       )}
 
       {/* Canvas */}
-      <div className="flex-1 relative overflow-hidden bg-white">
-        <ReactSketchCanvas
-          ref={canvasRef}
-          strokeWidth={strokeWidth}
-          strokeColor={tool === "eraser" ? "#ffffff" : color}
-          canvasColor="#ffffff"
-          style={{
-            border: "none",
-            borderRadius: "0",
-            width: "100%",
-            height: "100%",
+      <div className="flex-1 relative overflow-auto bg-gray-100 flex items-center justify-center">
+        <canvas 
+          ref={canvasRef} 
+          className="shadow-lg"
+          style={{ 
             pointerEvents: isModerator ? "auto" : "none",
           }}
-          exportWithBackgroundImage={false}
-          allowOnlyPointerType="all"
-          withTimestamp={false}
         />
       </div>
 
@@ -218,7 +448,7 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
       {!isModerator && (
         <div className="border-t border-gray-200 bg-gray-50 px-4 py-2">
           <p className="text-xs text-gray-500 text-center">
-            🔒 View-only mode • Only the moderator can draw
+             View-only mode • Only the moderator can edit
           </p>
         </div>
       )}
