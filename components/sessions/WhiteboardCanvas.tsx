@@ -206,11 +206,11 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
             borderRadius: "0",
             width: "100%",
             height: "100%",
+            pointerEvents: isModerator ? "auto" : "none",
           }}
           exportWithBackgroundImage={false}
           allowOnlyPointerType="all"
           withTimestamp={false}
-          readOnly={!isModerator}
         />
       </div>
 
