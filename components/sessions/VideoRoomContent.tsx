@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { useRoomContext } from "@livekit/components-react";
 import { PresentationIcon, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
