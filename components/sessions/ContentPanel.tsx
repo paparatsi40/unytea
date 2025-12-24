@@ -1,19 +1,36 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { 
   PenTool, 
   FileText, 
   Video, 
   Upload,
   Maximize2,
-  Minimize2
+  Minimize2,
+  Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { WhiteboardCanvas } from "./WhiteboardCanvas";
 import { FileViewer } from "./FileViewer";
 import { VideoEmbed } from "./VideoEmbed";
+
+// Load WhiteboardCanvas only on client to avoid hydration issues
+const WhiteboardCanvas = dynamic(
+  () => import("./WhiteboardCanvas").then(mod => ({ default: mod.WhiteboardCanvas })),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="flex h-full items-center justify-center bg-white">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-purple-500 mx-auto mb-2" />
+          <p className="text-sm text-gray-500">Loading whiteboard...</p>
+        </div>
+      </div>
+    )
+  }
+);
 
 type ContentType = "whiteboard" | "files" | "video" | "none";
 
