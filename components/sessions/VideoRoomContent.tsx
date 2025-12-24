@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useRoomContext } from "@livekit/components-react";
 import { PresentationIcon, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -20,14 +20,10 @@ export function VideoRoomContent({ sessionId, isModerator }: Props) {
   const { queue, isHandRaised, raiseHand, lowerHand, clearAllHands } = useHandRaise(room);
   const [showContentPanel, setShowContentPanel] = useState(false);
   const [contentPanelFullscreen, setContentPanelFullscreen] = useState(false);
-  const contentPanelRef = useRef<HTMLDivElement>(null);
 
   const handleToggleHand = () => {
-    if (isHandRaised) {
-      lowerHand();
-    } else {
-      raiseHand();
-    }
+    if (isHandRaised) lowerHand();
+    else raiseHand();
   };
 
   return (
@@ -35,7 +31,7 @@ export function VideoRoomContent({ sessionId, isModerator }: Props) {
       {/* Content Panel Toggle - top left */}
       <div className="absolute top-4 left-4 z-10">
         <Button
-          onClick={() => setShowContentPanel(!showContentPanel)}
+          onClick={() => setShowContentPanel((v) => !v)}
           variant={showContentPanel ? "default" : "outline"}
           size="sm"
           className="shadow-lg"
@@ -54,35 +50,20 @@ export function VideoRoomContent({ sessionId, isModerator }: Props) {
         </Button>
       </div>
 
-      {/* Content Panel - right side */}
-      {showContentPanel && !contentPanelFullscreen && (
-        <div 
-          ref={contentPanelRef}
-          key="content-panel-side"
-          className="absolute top-0 right-0 h-full w-1/2 z-20 shadow-2xl"
+      {/* Content Panel - single mount */}
+      {showContentPanel && (
+        <div
+          className={`z-50 bg-white shadow-2xl ${
+            contentPanelFullscreen
+              ? "fixed inset-0"
+              : "absolute top-0 right-0 h-full w-1/2"
+          }`}
         >
           <ContentPanel
-            key={sessionId}
             sessionId={sessionId}
             isModerator={isModerator}
             isFullscreen={contentPanelFullscreen}
-            onToggleFullscreen={() => setContentPanelFullscreen(!contentPanelFullscreen)}
-          />
-        </div>
-      )}
-
-      {/* Content Panel - fullscreen */}
-      {showContentPanel && contentPanelFullscreen && (
-        <div 
-          key="content-panel-fullscreen"
-          className="fixed inset-0 z-50"
-        >
-          <ContentPanel
-            key={sessionId}
-            sessionId={sessionId}
-            isModerator={isModerator}
-            isFullscreen={contentPanelFullscreen}
-            onToggleFullscreen={() => setContentPanelFullscreen(!contentPanelFullscreen)}
+            onToggleFullscreen={() => setContentPanelFullscreen((v) => !v)}
           />
         </div>
       )}
@@ -98,7 +79,11 @@ export function VideoRoomContent({ sessionId, isModerator }: Props) {
       </div>
 
       {/* Hand Raise Queue - top right (adjust position if content panel is open) */}
-      <div className={`absolute top-4 z-10 transition-all ${showContentPanel && !contentPanelFullscreen ? 'right-[calc(50%+1rem)]' : 'right-4'}`}>
+      <div
+        className={`absolute top-4 z-10 transition-all ${
+          showContentPanel && !contentPanelFullscreen ? "right-[calc(50%+1rem)]" : "right-4"
+        }`}
+      >
         <HandRaiseQueue
           queue={queue}
           onLowerHand={lowerHand}

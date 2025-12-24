@@ -1,14 +1,14 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { 
-  Loader2, 
-  Pencil, 
-  Type, 
-  Square, 
-  Circle as CircleIcon, 
+import { useEffect, useRef, useState } from "react";
+import {
+  Loader2,
+  Pencil,
+  Type,
+  Square,
+  Circle as CircleIcon,
   MousePointer,
-  Trash2, 
+  Trash2,
   Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -23,50 +23,22 @@ type Props = {
 export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fabricCanvasRef = useRef<any>(null);
-  const initializingRef = useRef(false);
-  const [isClient, setIsClient] = useState(false);
+
   const [isReady, setIsReady] = useState(false);
   const [tool, setTool] = useState<Tool>("draw");
   const [color, setColor] = useState("#000000");
   const [strokeWidth, setStrokeWidth] = useState(2);
 
-  // Ensure we're on the client
+  // Initialize Fabric once
   useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  // Initialize canvas
-  useEffect(() => {
-    if (!isClient) {
-      console.log("⏳ Waiting for client-side rendering...");
-      return;
-    }
-
     let mounted = true;
-    
-    const initCanvas = async () => {
-      // Prevent multiple initializations
-      if (initializingRef.current || fabricCanvasRef.current) {
-        console.log("⚠️ Already initializing or initialized");
-        return;
-      }
-      
-      // Wait for canvas ref
-      if (!canvasRef.current) {
-        console.log("⚠️ Canvas ref not available yet");
-        return;
-      }
 
-      initializingRef.current = true;
-      console.log("🎨 Initializing Fabric.js canvas...");
+    (async () => {
+      if (!canvasRef.current || fabricCanvasRef.current) return;
 
       try {
         const { Canvas } = await import("fabric");
-        
-        if (!mounted || fabricCanvasRef.current) {
-          console.log("⚠️ Component unmounted or already initialized");
-          return;
-        }
+        if (!mounted || !canvasRef.current) return;
 
         const fabricCanvas = new Canvas(canvasRef.current, {
           width: 1200,
@@ -81,31 +53,20 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
         }
 
         fabricCanvasRef.current = fabricCanvas;
-        console.log("✅ Canvas initialized successfully");
-        
-        if (mounted) {
-          setIsReady(true);
-        }
       } catch (error) {
         console.error("❌ Failed to initialize canvas:", error);
-        setIsReady(true); // Show UI anyway
       } finally {
-        initializingRef.current = false;
+        if (mounted) setIsReady(true);
       }
-    };
-
-    // Larger delay to ensure DOM is fully ready
-    const timer = setTimeout(initCanvas, 500);
+    })();
 
     return () => {
       mounted = false;
-      clearTimeout(timer);
-      if (fabricCanvasRef.current) {
-        fabricCanvasRef.current.dispose();
-        fabricCanvasRef.current = null;
-      }
+      fabricCanvasRef.current?.dispose();
+      fabricCanvasRef.current = null;
     };
-  }, [isClient]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Update drawing settings
   useEffect(() => {
@@ -121,7 +82,6 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
     }
   }, [tool, color, strokeWidth]);
 
-  // Tool handlers
   const handleAddText = async () => {
     const canvas = fabricCanvasRef.current;
     if (!canvas || !isModerator) return;
@@ -155,7 +115,7 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
         height: 100,
         fill: "transparent",
         stroke: color,
-        strokeWidth: strokeWidth,
+        strokeWidth,
       });
       canvas.add(rect);
       canvas.setActiveObject(rect);
@@ -177,7 +137,7 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
         radius: 50,
         fill: "transparent",
         stroke: color,
-        strokeWidth: strokeWidth,
+        strokeWidth,
       });
       canvas.add(circle);
       canvas.setActiveObject(circle);
@@ -191,7 +151,8 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
     const canvas = fabricCanvasRef.current;
     if (!canvas || !isModerator) return;
 
-    canvas.clear();
+    // Clear objects without nuking canvas internals
+    canvas.remove(...canvas.getObjects());
     canvas.backgroundColor = "#ffffff";
     canvas.renderAll();
   };
@@ -223,25 +184,6 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
       canvas.renderAll();
     }
   };
-
-  if (!isReady) {
-    return (
-      <div className="h-full w-full flex flex-col bg-white relative">
-        {/* Canvas - always render but hidden during init */}
-        <div className="absolute inset-0 opacity-0 pointer-events-none">
-          <canvas ref={canvasRef} />
-        </div>
-        
-        {/* Loading overlay */}
-        <div className="flex h-full items-center justify-center">
-          <div className="text-center">
-            <Loader2 className="h-8 w-8 animate-spin text-purple-500 mx-auto mb-2" />
-            <p className="text-sm text-gray-500">Initializing whiteboard...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="h-full w-full flex flex-col bg-white">
@@ -278,20 +220,12 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
             Text
           </Button>
 
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleAddRectangle}
-          >
+          <Button size="sm" variant="outline" onClick={handleAddRectangle}>
             <Square className="h-4 w-4 mr-1" />
             Rectangle
           </Button>
 
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleAddCircle}
-          >
+          <Button size="sm" variant="outline" onClick={handleAddCircle}>
             <CircleIcon className="h-4 w-4 mr-1" />
             Circle
           </Button>
@@ -321,46 +255,41 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
 
           <div className="h-6 w-px bg-gray-300 mx-1" />
 
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleDelete}
-          >
+          <Button size="sm" variant="outline" onClick={handleDelete}>
             <Trash2 className="h-4 w-4 mr-1" />
             Delete
           </Button>
 
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleExport}
-          >
+          <Button size="sm" variant="outline" onClick={handleExport}>
             <Download className="h-4 w-4 mr-1" />
             Export
           </Button>
 
-          <Button
-            size="sm"
-            variant="destructive"
-            onClick={handleClear}
-            className="ml-auto"
-          >
+          <Button size="sm" variant="destructive" onClick={handleClear} className="ml-auto">
             <Trash2 className="h-4 w-4 mr-1" />
             Clear All
           </Button>
         </div>
       )}
 
-      {/* Canvas */}
+      {/* Canvas area */}
       <div className="flex-1 relative overflow-auto bg-gray-100 flex items-center justify-center p-4">
-        <canvas 
+        <canvas
           ref={canvasRef}
-          className="shadow-lg border border-gray-300"
-          style={{ 
-            maxWidth: "100%",
-            maxHeight: "100%",
-          }}
+          width={1200}
+          height={700}
+          className={`shadow-lg border border-gray-300 ${isReady ? "opacity-100" : "opacity-0"}`}
+          style={{ maxWidth: "100%", maxHeight: "100%" }}
         />
+
+        {!isReady && (
+          <div className="absolute inset-0 flex items-center justify-center bg-white">
+            <div className="text-center">
+              <Loader2 className="h-8 w-8 animate-spin text-purple-500 mx-auto mb-2" />
+              <p className="text-sm text-gray-500">Initializing whiteboard...</p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* View-only indicator */}
