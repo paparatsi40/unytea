@@ -7,13 +7,9 @@ import {
   Type, 
   Square, 
   Circle as CircleIcon, 
-  Minus,
   MousePointer,
   Trash2, 
-  Undo, 
-  Redo, 
   Download,
-  Eraser
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
