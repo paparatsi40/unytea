@@ -37,21 +37,29 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
 
   // Load Fabric.js dynamically
   useEffect(() => {
+    if (fabricRef.current) {
+      console.log("⚠️ Canvas already initialized, skipping");
+      return;
+    }
+
+    if (!canvasRef.current) {
+      console.log("⚠️ Canvas ref not ready yet, waiting...");
+      return;
+    }
+
     const loadFabric = async () => {
       try {
         console.log("🎨 Loading Fabric.js...");
         const { Canvas } = await import("fabric");
         console.log("✅ Fabric.js loaded successfully");
-        setFabricLoaded(true);
         
-        if (!canvasRef.current || fabricRef.current) {
-          console.log("⚠️ Canvas ref not ready or already initialized");
-          setIsLoading(false);
+        if (fabricRef.current) {
+          console.log("⚠️ Canvas already initialized during load, skipping");
           return;
         }
 
         console.log("🖼️ Initializing canvas...");
-        const canvas = new Canvas(canvasRef.current, {
+        const canvas = new Canvas(canvasRef.current!, {
           width: 1920,
           height: 1080,
           backgroundColor: "#ffffff",
@@ -68,6 +76,7 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
         }
 
         fabricRef.current = canvas;
+        setFabricLoaded(true);
 
         // Load saved whiteboard
         console.log("📥 Loading saved whiteboard data...");
@@ -92,10 +101,12 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
 
     return () => {
       if (fabricRef.current) {
+        console.log("🧹 Cleaning up canvas");
         fabricRef.current.dispose();
+        fabricRef.current = null;
       }
     };
-  }, []);
+  }, [canvasRef.current]);
 
   // Load whiteboard state
   const loadWhiteboard = async (canvas: any) => {
