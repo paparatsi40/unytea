@@ -22,7 +22,7 @@ const nextConfig = {
     optimizePackageImports: ["lucide-react", "@radix-ui/react-icons"],
   },
   // Optimize for production
-  reactStrictMode: true,
+  reactStrictMode: false,
   // Compression
   compress: true,
   // Production source maps (disable for smaller builds)
@@ -81,7 +81,7 @@ const nextConfig = {
           },
           {
             key: "Permissions-Policy",
-            value: "camera=(), microphone=(), geolocation=()",
+            value: "camera=(self), microphone=(self), geolocation=()",
           },
           {
             key: "Content-Security-Policy",
