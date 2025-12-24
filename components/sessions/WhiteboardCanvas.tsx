@@ -226,10 +226,18 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
 
   if (!isReady) {
     return (
-      <div className="flex h-full items-center justify-center bg-white">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin text-purple-500 mx-auto mb-2" />
-          <p className="text-sm text-gray-500">Initializing whiteboard...</p>
+      <div className="h-full w-full flex flex-col bg-white relative">
+        {/* Canvas - always render but hidden during init */}
+        <div className="absolute inset-0 opacity-0 pointer-events-none">
+          <canvas ref={canvasRef} />
+        </div>
+        
+        {/* Loading overlay */}
+        <div className="flex h-full items-center justify-center">
+          <div className="text-center">
+            <Loader2 className="h-8 w-8 animate-spin text-purple-500 mx-auto mb-2" />
+            <p className="text-sm text-gray-500">Initializing whiteboard...</p>
+          </div>
         </div>
       </div>
     );
