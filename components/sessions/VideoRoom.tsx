@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Component, ReactNode, useEffect, useState } from "react";
 import {
   LiveKitRoom,
   VideoConference,
