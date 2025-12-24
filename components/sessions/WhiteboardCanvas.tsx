@@ -40,7 +40,7 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
     const loadFabric = async () => {
       try {
         console.log("🎨 Loading Fabric.js...");
-        const fabric = await import("fabric");
+        const { Canvas, IText, Rect, Circle, Line } = await import("fabric");
         console.log("✅ Fabric.js loaded successfully");
         setFabricLoaded(true);
         
@@ -51,7 +51,7 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
         }
 
         console.log("🖼️ Initializing canvas...");
-        const canvas = new fabric.Canvas(canvasRef.current, {
+        const canvas = new Canvas(canvasRef.current, {
           width: 1920,
           height: 1080,
           backgroundColor: "#ffffff",
@@ -191,8 +191,8 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
     const canvas = fabricRef.current;
     if (!canvas || !isModerator || !fabricLoaded) return;
 
-    const fabric = await import("fabric");
-    const text = new fabric.IText("Double click to edit", {
+    const { IText } = await import("fabric");
+    const text = new IText("Double click to edit", {
       left: 100,
       top: 100,
       fill: color,
@@ -209,8 +209,8 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
     const canvas = fabricRef.current;
     if (!canvas || !isModerator || !fabricLoaded) return;
 
-    const fabric = await import("fabric");
-    const rect = new fabric.Rect({
+    const { Rect } = await import("fabric");
+    const rect = new Rect({
       left: 100,
       top: 100,
       width: 200,
@@ -229,8 +229,8 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
     const canvas = fabricRef.current;
     if (!canvas || !isModerator || !fabricLoaded) return;
 
-    const fabric = await import("fabric");
-    const circle = new fabric.Circle({
+    const { Circle } = await import("fabric");
+    const circle = new Circle({
       left: 100,
       top: 100,
       radius: 50,
@@ -248,8 +248,8 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
     const canvas = fabricRef.current;
     if (!canvas || !isModerator || !fabricLoaded) return;
 
-    const fabric = await import("fabric");
-    const line = new fabric.Line([50, 50, 200, 50], {
+    const { Line } = await import("fabric");
+    const line = new Line([50, 50, 200, 50], {
       stroke: color,
       strokeWidth: strokeWidth,
     });
