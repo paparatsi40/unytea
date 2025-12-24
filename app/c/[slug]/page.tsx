@@ -176,7 +176,7 @@ export default async function PublicCommunityPage({
       <footer className="mt-24 border-t border-border bg-white py-12">
         <div className="container mx-auto px-4 text-center">
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} {community.name}. Powered by Unytea.
+            © 2025 {community.name}. Powered by Unytea.
           </p>
         </div>
       </footer>
