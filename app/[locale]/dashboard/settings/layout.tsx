@@ -1,6 +1,6 @@
 "use client";
 
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { User, Bell, Shield, CreditCard, Palette, Zap, DollarSign } from "lucide-react";
@@ -11,46 +11,55 @@ const settingsNav = [
   { name: "Notifications", href: "/dashboard/settings/notifications", icon: Bell, description: "Configure notification preferences" },
   { name: "Security", href: "/dashboard/settings/security", icon: Shield, description: "Password and authentication" },
   { name: "Payments", href: "/dashboard/settings/payments", icon: DollarSign, description: "Earn from paid communities" },
-
-  // Si esta ruta NO existe todavía, pon prefetch={false} (o quítala del menú)
   { name: "Billing", href: "/dashboard/settings/billing", icon: CreditCard, description: "Manage subscription and payments" },
-
   { name: "Appearance", href: "/dashboard/settings/appearance", icon: Palette, description: "Customize your experience" },
   { name: "Integrations", href: "/dashboard/settings/integrations", icon: Zap, description: "Connect third-party services" },
 ];
 
+function getLocaleFromPathname(pathname: string) {
+  // pathname ejemplo: "/en/dashboard/settings/billing"
+  const seg = pathname.split("/").filter(Boolean)[0];
+  return seg || "en";
+}
+
 export default function SettingsLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const locale = getLocaleFromPathname(pathname);
 
   return (
     <div className="space-y-6 p-8">
+      {/* Header */}
       <div className="flex items-center gap-3">
         <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-500/10">
           <Settings className="h-6 w-6 text-gray-500" />
         </div>
         <div>
           <h1 className="text-4xl font-bold text-foreground">Settings</h1>
-          <p className="text-base text-muted-foreground">Manage your account and preferences</p>
+          <p className="text-base text-muted-foreground">
+            Manage your account and preferences
+          </p>
         </div>
       </div>
 
+      {/* Navigation */}
       <div className="flex gap-6">
         <aside className="w-64 shrink-0">
           <nav className="space-y-1">
             {settingsNav.map((item) => {
               const Icon = item.icon;
 
-              // pathname trae /en/... entonces checamos “termina con”
+              // pathname trae /en/... entonces active si termina con el href base
               const isActive = pathname.endsWith(item.href);
 
-              const isBilling = item.href === "/dashboard/settings/billing";
+              // href final con locale
+              const href = `/${locale}${item.href}`;
 
+              // Si billing existe (según tu screenshot, sí existe), puedes dejar prefetch normal.
+              // Si algún día una ruta no existe, pon prefetch={false} en esa en particular.
               return (
                 <Link
                   key={item.href}
-                  href={item.href}
-                  // evita 404 spam si billing todavía no existe:
-                  prefetch={isBilling ? false : undefined}
+                  href={href}
                   className={cn(
                     "flex items-start gap-3 rounded-lg px-3 py-2.5 text-base transition-colors",
                     isActive
