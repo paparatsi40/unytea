@@ -27,6 +27,7 @@ type Props = {
 export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fabricRef = useRef<any>(null);
+  const [isMounted, setIsMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [fabricLoaded, setFabricLoaded] = useState(false);
   const [tool, setTool] = useState<Tool>("draw");
@@ -35,16 +36,32 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
   const [history, setHistory] = useState<string[]>([]);
   const [historyStep, setHistoryStep] = useState(0);
 
+  // Set mounted flag
+  useEffect(() => {
+    setIsMounted(true);
+    return () => setIsMounted(false);
+  }, []);
+
   // Load Fabric.js dynamically
   useEffect(() => {
+    if (!isMounted) {
+      console.log("⚠️ Component not mounted yet");
+      return;
+    }
+
     if (fabricRef.current) {
       console.log("⚠️ Canvas already initialized, skipping");
       return;
     }
 
     if (!canvasRef.current) {
-      console.log("⚠️ Canvas ref not ready yet, waiting...");
-      return;
+      console.log("⚠️ Canvas ref not ready yet, retrying...");
+      const timer = setTimeout(() => {
+        // Trigger re-run after a short delay
+        setIsMounted(false);
+        setTimeout(() => setIsMounted(true), 10);
+      }, 100);
+      return () => clearTimeout(timer);
     }
 
     const loadFabric = async () => {
@@ -106,7 +123,7 @@ export function WhiteboardCanvas({ sessionId, isModerator }: Props) {
         fabricRef.current = null;
       }
     };
-  }, [canvasRef.current]);
+  }, [isMounted]);
 
   // Load whiteboard state
   const loadWhiteboard = async (canvas: any) => {
