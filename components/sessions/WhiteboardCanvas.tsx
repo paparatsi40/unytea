@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-type Tool = "select" | "draw" | "text" | "rectangle" | "circle" | "line" | "eraser";
+type Tool = "select" | "draw" | "text" | "rectangle" | "circle";
 
 type Props = {
   sessionId: string;
@@ -29,7 +29,14 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
   const [color, setColor] = useState("#000000");
   const [strokeWidth, setStrokeWidth] = useState(2);
 
-  // Initialize Fabric once
+  const updateObjectInteractivity = (canvas: any, enabled: boolean) => {
+    canvas.getObjects().forEach((obj: any) => {
+      obj.selectable = enabled;
+      obj.evented = enabled;
+    });
+  };
+
+  // Init Fabric once
   useEffect(() => {
     let mounted = true;
 
@@ -41,20 +48,26 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
         if (!mounted || !canvasRef.current) return;
 
         const fabricCanvas = new Canvas(canvasRef.current, {
-          width: 1200,
-          height: 700,
           backgroundColor: "#ffffff",
         });
 
+        fabricCanvasRef.current = fabricCanvas;
+
+        // Default: draw mode initially
         fabricCanvas.isDrawingMode = true;
         if (fabricCanvas.freeDrawingBrush) {
           fabricCanvas.freeDrawingBrush.color = color;
           fabricCanvas.freeDrawingBrush.width = strokeWidth;
         }
 
-        fabricCanvasRef.current = fabricCanvas;
-      } catch (error) {
-        console.error("❌ Failed to initialize canvas:", error);
+        // Prevent selection in draw mode
+        fabricCanvas.selection = false;
+        updateObjectInteractivity(fabricCanvas, false);
+
+        // Make sure it renders after init
+        fabricCanvas.renderAll();
+      } catch (err) {
+        console.error("❌ Failed to initialize Fabric canvas:", err);
       } finally {
         if (mounted) setIsReady(true);
       }
@@ -68,18 +81,56 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Update drawing settings
+  // Resize Fabric canvas to container
+  useEffect(() => {
+    const canvas = fabricCanvasRef.current;
+    if (!canvas || !canvasRef.current) return;
+
+    const resize = () => {
+      const parent = canvasRef.current?.parentElement;
+      if (!parent) return;
+
+      const rect = parent.getBoundingClientRect();
+      // Avoid 0 sizes during transitions
+      if (rect.width < 10 || rect.height < 10) return;
+
+      canvas.setWidth(rect.width);
+      canvas.setHeight(rect.height);
+      canvas.renderAll();
+    };
+
+    // Resize now + on window resize
+    resize();
+    window.addEventListener("resize", resize);
+
+    // Also resize after next paint (helps on tab/fullscreen transitions)
+    const raf = requestAnimationFrame(resize);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", resize);
+    };
+  }, [isReady]);
+
+  // Tool + brush updates
   useEffect(() => {
     const canvas = fabricCanvasRef.current;
     if (!canvas) return;
 
-    canvas.isDrawingMode = tool === "draw";
-    canvas.selection = tool === "select";
+    const isSelect = tool === "select";
+    const isDraw = tool === "draw";
+
+    canvas.isDrawingMode = isDraw;
+    canvas.selection = isSelect;
+
+    updateObjectInteractivity(canvas, isSelect);
 
     if (canvas.freeDrawingBrush) {
       canvas.freeDrawingBrush.color = color;
       canvas.freeDrawingBrush.width = strokeWidth;
     }
+
+    canvas.renderAll();
   }, [tool, color, strokeWidth]);
 
   const handleAddText = async () => {
@@ -88,17 +139,24 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
 
     try {
       const { IText } = await import("fabric");
+
+      // Important: exit drawing mode so IText can edit properly
+      canvas.isDrawingMode = false;
+      setTool("select");
+
       const text = new IText("Double click to edit", {
-        left: 100,
-        top: 100,
+        left: 80,
+        top: 80,
         fill: color,
         fontSize: 24,
+        editable: true,
       });
+
       canvas.add(text);
       canvas.setActiveObject(text);
       canvas.renderAll();
-    } catch (error) {
-      console.error("Failed to add text:", error);
+    } catch (err) {
+      console.error("Failed to add text:", err);
     }
   };
 
@@ -108,20 +166,25 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
 
     try {
       const { Rect } = await import("fabric");
+
       const rect = new Rect({
-        left: 100,
-        top: 100,
-        width: 200,
-        height: 100,
+        left: 80,
+        top: 120,
+        width: 220,
+        height: 120,
         fill: "transparent",
         stroke: color,
         strokeWidth,
+        selectable: true,
+        evented: true,
       });
+
       canvas.add(rect);
+      setTool("select");
       canvas.setActiveObject(rect);
       canvas.renderAll();
-    } catch (error) {
-      console.error("Failed to add rectangle:", error);
+    } catch (err) {
+      console.error("Failed to add rectangle:", err);
     }
   };
 
@@ -131,29 +194,46 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
 
     try {
       const { Circle } = await import("fabric");
+
       const circle = new Circle({
-        left: 100,
-        top: 100,
-        radius: 50,
+        left: 80,
+        top: 120,
+        radius: 60,
         fill: "transparent",
         stroke: color,
         strokeWidth,
+        selectable: true,
+        evented: true,
       });
+
       canvas.add(circle);
+      setTool("select");
       canvas.setActiveObject(circle);
       canvas.renderAll();
-    } catch (error) {
-      console.error("Failed to add circle:", error);
+    } catch (err) {
+      console.error("Failed to add circle:", err);
     }
+  };
+
+  const handleDelete = () => {
+    const canvas = fabricCanvasRef.current;
+    if (!canvas || !isModerator) return;
+
+    const active = canvas.getActiveObjects();
+    if (!active.length) return;
+
+    canvas.remove(...active);
+    canvas.discardActiveObject();
+    canvas.renderAll();
   };
 
   const handleClear = () => {
     const canvas = fabricCanvasRef.current;
     if (!canvas || !isModerator) return;
 
-    // Clear objects without nuking canvas internals
     canvas.remove(...canvas.getObjects());
     canvas.backgroundColor = "#ffffff";
+    canvas.discardActiveObject();
     canvas.renderAll();
   };
 
@@ -171,18 +251,6 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
     link.href = dataURL;
     link.download = `whiteboard-${Date.now()}.png`;
     link.click();
-  };
-
-  const handleDelete = () => {
-    const canvas = fabricCanvasRef.current;
-    if (!canvas || !isModerator) return;
-
-    const activeObjects = canvas.getActiveObjects();
-    if (activeObjects.length) {
-      canvas.remove(...activeObjects);
-      canvas.discardActiveObject();
-      canvas.renderAll();
-    }
   };
 
   return (
@@ -211,10 +279,7 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
           <Button
             size="sm"
             variant="outline"
-            onClick={() => {
-              setTool("text");
-              handleAddText();
-            }}
+            onClick={handleAddText}
           >
             <Type className="h-4 w-4 mr-1" />
             Text
@@ -273,13 +338,10 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
       )}
 
       {/* Canvas area */}
-      <div className="flex-1 relative overflow-auto bg-gray-100 flex items-center justify-center p-4">
+      <div className="flex-1 relative overflow-hidden bg-gray-100">
         <canvas
           ref={canvasRef}
-          width={1200}
-          height={700}
-          className={`shadow-lg border border-gray-300 ${isReady ? "opacity-100" : "opacity-0"}`}
-          style={{ maxWidth: "100%", maxHeight: "100%" }}
+          className="absolute inset-0"
         />
 
         {!isReady && (
@@ -292,7 +354,6 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
         )}
       </div>
 
-      {/* View-only indicator */}
       {!isModerator && (
         <div className="border-t border-gray-200 bg-gray-50 px-4 py-2">
           <p className="text-xs text-gray-500 text-center">

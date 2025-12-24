@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Play, Trash2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -8,52 +8,64 @@ type Props = {
   isModerator: boolean;
 };
 
+type Platform = "youtube" | "vimeo" | null;
+
+function extractVideo(url: string): { platform: Platform; id: string | null } {
+  const u = url.trim();
+
+  // YouTube patterns: watch?v=, youtu.be/, embed/, shorts/
+  const ytPatterns = [
+    /(?:youtube\.com\/watch\?v=)([^&\n?#]+)/i,
+    /(?:youtu\.be\/)([^&\n?#]+)/i,
+    /(?:youtube\.com\/embed\/)([^&\n?#]+)/i,
+    /(?:youtube\.com\/shorts\/)([^&\n?#]+)/i,
+  ];
+
+  for (const p of ytPatterns) {
+    const m = u.match(p);
+    if (m?.[1]) return { platform: "youtube", id: m[1] };
+  }
+
+  // Vimeo patterns: vimeo.com/123, player.vimeo.com/video/123
+  const vimeoPatterns = [
+    /vimeo\.com\/(\d+)/i,
+    /player\.vimeo\.com\/video\/(\d+)/i,
+  ];
+
+  for (const p of vimeoPatterns) {
+    const m = u.match(p);
+    if (m?.[1]) return { platform: "vimeo", id: m[1] };
+  }
+
+  return { platform: null, id: null };
+}
+
 export function VideoEmbed({ isModerator }: Props) {
   const [videoUrl, setVideoUrl] = useState("");
   const [currentVideo, setCurrentVideo] = useState<string | null>(null);
   const [error, setError] = useState("");
 
-  const extractVideoId = (url: string): { platform: "youtube" | "vimeo" | null; id: string | null } => {
-    // YouTube patterns
-    const youtubePatterns = [
-      /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/,
-      /youtube\.com\/embed\/([^&\n?#]+)/,
-    ];
-
-    for (const pattern of youtubePatterns) {
-      const match = url.match(pattern);
-      if (match) return { platform: "youtube", id: match[1] };
-    }
-
-    // Vimeo patterns
-    const vimeoPattern = /vimeo\.com\/(\d+)/;
-    const vimeoMatch = url.match(vimeoPattern);
-    if (vimeoMatch) return { platform: "vimeo", id: vimeoMatch[1] };
-
-    return { platform: null, id: null };
-  };
+  const parsed = useMemo(() => extractVideo(videoUrl), [videoUrl]);
 
   const handleAddVideo = () => {
     setError("");
-    
-    if (!videoUrl.trim()) {
+
+    const raw = videoUrl.trim();
+    if (!raw) {
       setError("Please enter a video URL");
       return;
     }
 
-    const { platform, id } = extractVideoId(videoUrl);
-
+    const { platform, id } = extractVideo(raw);
     if (!platform || !id) {
       setError("Invalid video URL. Please use YouTube or Vimeo links.");
       return;
     }
 
-    let embedUrl = "";
-    if (platform === "youtube") {
-      embedUrl = `https://www.youtube.com/embed/${id}?autoplay=0`;
-    } else if (platform === "vimeo") {
-      embedUrl = `https://player.vimeo.com/video/${id}`;
-    }
+    const embedUrl =
+      platform === "youtube"
+        ? `https://www.youtube.com/embed/${id}?autoplay=0`
+        : `https://player.vimeo.com/video/${id}`;
 
     setCurrentVideo(embedUrl);
     setVideoUrl("");
@@ -62,6 +74,7 @@ export function VideoEmbed({ isModerator }: Props) {
   const handleRemoveVideo = () => {
     setCurrentVideo(null);
     setVideoUrl("");
+    setError("");
   };
 
   return (
@@ -79,13 +92,21 @@ export function VideoEmbed({ isModerator }: Props) {
                 placeholder="Paste YouTube or Vimeo URL..."
                 className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-200"
               />
-              {error && (
-                <p className="mt-1 text-xs text-red-500">{error}</p>
-              )}
+
+              {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+
               <p className="mt-1 text-xs text-gray-500">
-                Supported: YouTube (youtube.com, youtu.be) and Vimeo (vimeo.com)
+                Supported: YouTube (youtube.com, youtu.be, shorts) and Vimeo (vimeo.com)
               </p>
+
+              {/* Hint opcional: muestra si reconoce la URL */}
+              {videoUrl.trim() && !error && (
+                <p className="mt-1 text-xs text-gray-400">
+                  {parsed.platform ? `Detected: ${parsed.platform}` : "Not recognized yet"}
+                </p>
+              )}
             </div>
+
             <Button onClick={handleAddVideo} size="sm">
               <Plus className="h-4 w-4 mr-2" />
               Add Video
@@ -105,10 +126,11 @@ export function VideoEmbed({ isModerator }: Props) {
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
+                referrerPolicy="strict-origin-when-cross-origin"
                 title="Embedded video"
               />
             </div>
-            
+
             {isModerator && (
               <Button
                 variant="destructive"

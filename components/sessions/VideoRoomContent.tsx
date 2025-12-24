@@ -78,7 +78,7 @@ export function VideoRoomContent({ sessionId, isModerator }: Props) {
         <HandRaiseButton isRaised={isHandRaised} onToggle={handleToggleHand} />
       </div>
 
-      {/* Hand Raise Queue - top right (adjust position if content panel is open) */}
+      {/* Hand Raise Queue - top right */}
       <div
         className={`absolute top-4 z-10 transition-all ${
           showContentPanel && !contentPanelFullscreen ? "right-[calc(50%+1rem)]" : "right-4"
