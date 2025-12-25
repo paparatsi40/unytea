@@ -174,7 +174,7 @@ export async function getUserSessions() {
 /**
  * Get a specific session
  */
-export async function getSession(sessionId: string) {
+export async function getSession(sessionId?: string) {
   try {
     const userId = await getCurrentUserId();
 
@@ -182,24 +182,19 @@ export async function getSession(sessionId: string) {
       return { success: false, error: "Not authenticated" };
     }
 
+    // ✅ Guardrail: evita llamar Prisma con undefined/null/empty
+    if (!sessionId || typeof sessionId !== "string") {
+      return { success: false, error: "Missing sessionId" };
+    }
+
     const session = await prisma.mentorSession.findUnique({
       where: { id: sessionId },
       include: {
         mentor: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
-            username: true,
-          },
+          select: { id: true, name: true, image: true, username: true },
         },
         mentee: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
-            username: true,
-          },
+          select: { id: true, name: true, image: true, username: true },
         },
         community: {
           select: {
@@ -208,10 +203,7 @@ export async function getSession(sessionId: string) {
             ownerId: true,
             members: {
               where: { userId },
-              select: {
-                id: true,
-                role: true,
-              },
+              select: { id: true, role: true },
             },
           },
         },
@@ -222,17 +214,15 @@ export async function getSession(sessionId: string) {
       return { success: false, error: "Session not found" };
     }
 
-    // Check if user has access to this session
     const isMentor = session.mentorId === userId;
     const isMentee = session.menteeId === userId;
-    
-    // If session belongs to a community, check if user is a member
+
     let isCommunityMember = false;
     if (session.communityId && session.community) {
-      isCommunityMember = session.community.members.length > 0 || session.community.ownerId === userId;
+      isCommunityMember =
+        session.community.members.length > 0 || session.community.ownerId === userId;
     }
-    
-    // Allow access if user is mentor, mentee, or community member
+
     if (!isMentor && !isMentee && !isCommunityMember) {
       return { success: false, error: "Not authorized to view this session" };
     }

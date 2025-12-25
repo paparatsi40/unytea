@@ -3,15 +3,29 @@
 import { Calendar, Clock, Video, Users } from "lucide-react";
 import { format } from "date-fns";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 interface SessionCardProps {
   session: any;
   isPast?: boolean;
 }
 
+function getLocaleFromPathname(pathname: string | null) {
+  const safe = pathname ?? "/en";
+  const seg = safe.split("/").filter(Boolean)[0];
+  return seg || "en";
+}
+
 export function SessionCard({ session, isPast = false }: SessionCardProps) {
+  const pathname = usePathname();
+  const locale = getLocaleFromPathname(pathname);
+
   const sessionDate = new Date(session.scheduledAt);
-  const canJoin = !isPast && new Date() >= new Date(sessionDate.getTime() - 5 * 60 * 1000);
+  const canJoin =
+    !isPast && new Date() >= new Date(sessionDate.getTime() - 5 * 60 * 1000);
+
+  const roomHref = `/${locale}/dashboard/sessions/${session.id}/room`;
+  const detailsHref = `/${locale}/dashboard/sessions/${session.id}`;
 
   return (
     <div className="group relative overflow-hidden rounded-xl border border-border/50 bg-card p-6 transition-all hover:border-border hover:shadow-lg">
@@ -29,7 +43,7 @@ export function SessionCard({ session, isPast = false }: SessionCardProps) {
           }`}
         >
           {session.status === "IN_PROGRESS" && "● "}
-          {session.status.replace("_", " ")}
+          {String(session.status).replace("_", " ")}
         </span>
       </div>
 
@@ -67,7 +81,7 @@ export function SessionCard({ session, isPast = false }: SessionCardProps) {
       {/* Actions */}
       {canJoin && session.status === "SCHEDULED" && (
         <Link
-          href={`/dashboard/sessions/${session.id}/room`}
+          href={roomHref}
           className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
         >
           <Video className="h-4 w-4" />
@@ -77,7 +91,7 @@ export function SessionCard({ session, isPast = false }: SessionCardProps) {
 
       {!canJoin && session.status === "SCHEDULED" && (
         <Link
-          href={`/dashboard/sessions/${session.id}/room`}
+          href={roomHref}
           className="flex w-full items-center justify-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-semibold transition-colors hover:bg-muted"
         >
           <Video className="h-4 w-4" />
@@ -87,7 +101,7 @@ export function SessionCard({ session, isPast = false }: SessionCardProps) {
 
       {session.status === "IN_PROGRESS" && (
         <Link
-          href={`/dashboard/sessions/${session.id}/room`}
+          href={roomHref}
           className="flex w-full animate-pulse items-center justify-center gap-2 rounded-lg bg-green-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-600"
         >
           <Video className="h-4 w-4" />
@@ -97,7 +111,7 @@ export function SessionCard({ session, isPast = false }: SessionCardProps) {
 
       {isPast && session.status === "COMPLETED" && (
         <Link
-          href={`/dashboard/sessions/${session.id}`}
+          href={detailsHref}
           className="flex w-full items-center justify-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-semibold transition-colors hover:bg-muted"
         >
           View Details
