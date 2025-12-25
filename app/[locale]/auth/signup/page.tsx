@@ -22,7 +22,7 @@ export default function SignUpPage() {
   const handleOAuthSignIn = async (provider: "google" | "github") => {
     try {
       setIsLoading(true)
-      await signIn(provider, { callbackUrl: `/dashboard` })
+      await signIn(provider, { callbackUrl: `/${locale}/dashboard` })
     } catch (error) {
       toast.error("Something went wrong. Please try again.")
     } finally {
@@ -77,7 +77,7 @@ export default function SignUpPage() {
         toast.error("Error signing in. Please try again.")
       } else {
         toast.success("Account created successfully!")
-        router.push(`/dashboard`)
+        router.push(`/${locale}/dashboard`)
       }
     } catch (error) {
       toast.error("Something went wrong. Please try again.")

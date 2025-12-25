@@ -13,7 +13,7 @@ export default function SignInPage() {
   const searchParams = useSearchParams()
   const params = useParams()
   const locale = params?.locale || 'en'
-  const callbackUrl = searchParams?.get("callbackUrl") || `/dashboard`
+  const callbackUrl = searchParams?.get("callbackUrl") || `/${locale}/dashboard`
   
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
