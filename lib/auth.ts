@@ -36,12 +36,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   session: {
     strategy: "jwt",
   },
-  pages: {
-    signIn: "/auth/signin",
-    error: "/auth/error",
-    verifyRequest: "/auth/verify",
-    newUser: "/dashboard", // Changed from /onboarding
-  },
+  // Removed pages config - let middleware handle locale-aware redirects
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,

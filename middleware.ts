@@ -30,6 +30,13 @@ export default auth((req) => {
   const localeMatch = pathname.match(localeRegex);
   const locale = localeMatch ? localeMatch[1] : defaultLocale;
 
+  // If no locale in path, redirect to path with locale
+  if (!localeMatch && pathname !== "/" && !pathname.startsWith("/api")) {
+    const newUrl = new URL(`/${locale}${pathname}`, req.url);
+    newUrl.search = req.nextUrl.search;
+    return NextResponse.redirect(newUrl);
+  }
+
   // Remove locale prefix for route checks
   // e.g. /en/auth/signup → /auth/signup
   const pathnameWithoutLocale = localeMatch
@@ -59,9 +66,10 @@ export default auth((req) => {
     pathnameWithoutLocale.startsWith("/dashboard") ||
     pathnameWithoutLocale.startsWith("/onboarding");
 
-  // Redirect unauthenticated users
+  // Redirect unauthenticated users to signin with locale
   if (isProtectedRoute && !isLoggedIn) {
     const redirectUrl = new URL(`/${locale}/auth/signin`, req.url);
+    redirectUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(redirectUrl);
   }
 
