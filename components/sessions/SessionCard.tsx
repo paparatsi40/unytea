@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import { Calendar, Clock, Video, Users } from "lucide-react";
 import { format } from "date-fns";
 import Link from "next/link";
@@ -20,16 +21,24 @@ export function SessionCard({ session, isPast = false }: SessionCardProps) {
   const pathname = usePathname();
   const locale = getLocaleFromPathname(pathname);
 
-  const sessionDate = new Date(session.scheduledAt);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  const sessionDate = useMemo(() => new Date(session.scheduledAt), [session.scheduledAt]);
+
   const canJoin =
     !isPast && new Date() >= new Date(sessionDate.getTime() - 5 * 60 * 1000);
 
   const roomHref = `/${locale}/dashboard/sessions/${session.id}/room`;
   const detailsHref = `/${locale}/dashboard/sessions/${session.id}`;
 
+  // Evita hydration mismatch: en SSR mostramos vacío, en client ya formateamos
+  const formattedDate = mounted
+    ? format(sessionDate, "MMM dd, yyyy 'at' h:mm a")
+    : "";
+
   return (
     <div className="group relative overflow-hidden rounded-xl border border-border/50 bg-card p-6 transition-all hover:border-border hover:shadow-lg">
-      {/* Status Badge */}
       <div className="absolute right-4 top-4">
         <span
           className={`rounded-full px-3 py-1 text-xs font-semibold ${
@@ -47,7 +56,6 @@ export function SessionCard({ session, isPast = false }: SessionCardProps) {
         </span>
       </div>
 
-      {/* Title */}
       <h3 className="mb-2 pr-20 text-lg font-bold text-foreground">
         {session.title}
       </h3>
@@ -58,11 +66,11 @@ export function SessionCard({ session, isPast = false }: SessionCardProps) {
         </p>
       )}
 
-      {/* Info */}
       <div className="mb-4 space-y-2 text-sm text-muted-foreground">
         <div className="flex items-center gap-2">
           <Calendar className="h-4 w-4" />
-          <span>{format(sessionDate, "MMM dd, yyyy 'at' h:mm a")}</span>
+          {/* suppressHydrationWarning por si el server puso algo distinto */}
+          <span suppressHydrationWarning>{formattedDate}</span>
         </div>
 
         <div className="flex items-center gap-2">
@@ -78,7 +86,6 @@ export function SessionCard({ session, isPast = false }: SessionCardProps) {
         )}
       </div>
 
-      {/* Actions */}
       {canJoin && session.status === "SCHEDULED" && (
         <Link
           href={roomHref}

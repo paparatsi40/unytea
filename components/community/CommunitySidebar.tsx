@@ -28,51 +28,24 @@ export function CommunitySidebar({ communityId, slug, userId, isOwner, locale }:
   const pathname = usePathname();
 
   const links = [
-    {
-      href: `/${locale}/dashboard/communities/${slug}/feed`,
-      label: "Feed",
-      icon: Home,
-    },
-    {
-      href: `/${locale}/dashboard/communities/${slug}/chat`,
-      label: "Chat",
-      icon: MessageSquare,
-    },
-    {
-      href: `/${locale}/dashboard/communities/${slug}/sessions`,
-      label: "Sessions",
-      icon: Video,
-    },
-    {
-      href: `/${locale}/dashboard/communities/${slug}/courses`,
-      label: "Courses",
-      icon: BookOpen,
-    },
-    {
-      href: `/${locale}/dashboard/communities/${slug}/leaderboard`,
-      label: "Leaderboard",
-      icon: Trophy,
-    },
-    {
-      href: `/${locale}/dashboard/communities/${slug}/members`,
-      label: "Members",
-      icon: Users,
-    },
+    { href: `/${locale}/dashboard/communities/${slug}/feed`, label: "Feed", icon: Home },
+    { href: `/${locale}/dashboard/communities/${slug}/chat`, label: "Chat", icon: MessageSquare },
+    { href: `/${locale}/dashboard/communities/${slug}/sessions`, label: "Sessions", icon: Video },
+    { href: `/${locale}/dashboard/communities/${slug}/courses`, label: "Courses", icon: BookOpen },
+    { href: `/${locale}/dashboard/communities/${slug}/leaderboard`, label: "Leaderboard", icon: Trophy },
+    { href: `/${locale}/dashboard/communities/${slug}/members`, label: "Members", icon: Users },
   ];
 
   return (
     <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-card/50 backdrop-blur-xl">
-      {/* Logo */}
       <div className="flex h-16 items-center border-b border-border px-6">
         <Link href={`/${locale}/dashboard`} className="flex items-center space-x-2">
           <Logo iconSize={40} />
         </Link>
       </div>
 
-      {/* Community Switcher */}
       <CommunitySwitcher currentCommunityId={communityId} userId={userId} locale={locale} />
 
-      {/* Navigation */}
       <nav className="flex-1 space-y-1 px-3 py-4">
         {links.map((link) => {
           const Icon = link.icon;
@@ -95,7 +68,6 @@ export function CommunitySidebar({ communityId, slug, userId, isOwner, locale }:
           );
         })}
 
-        {/* Settings Link (Only for owners) */}
         {isOwner && (
           <>
             <div className="my-2 border-t border-border" />
@@ -115,7 +87,6 @@ export function CommunitySidebar({ communityId, slug, userId, isOwner, locale }:
         )}
       </nav>
 
-      {/* Back to Dashboard Button */}
       <div className="border-t border-border px-3 py-4">
         <Link
           href={`/${locale}/dashboard`}
@@ -126,17 +97,15 @@ export function CommunitySidebar({ communityId, slug, userId, isOwner, locale }:
         </Link>
       </div>
 
-      {/* Footer */}
       <div className="border-t border-border p-4">
         <div className="rounded-lg bg-gradient-to-br from-primary/10 to-purple-600/10 p-4">
-          <p className="text-sm font-semibold text-foreground">
-            Upgrade Community
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Unlock premium features
-          </p>
+          <p className="text-sm font-semibold text-foreground">Upgrade Community</p>
+          <p className="mt-1 text-xs text-muted-foreground">Unlock premium features</p>
+
+          {/* ✅ En lugar de ruta inexistente por comunidad, manda a Billing global */}
           <Link
-            href={`/${locale}/dashboard/communities/${slug}/settings/billing`}
+            href={`/${locale}/dashboard/settings/billing`}
+            prefetch={false}
             className="mt-3 block w-full rounded-md bg-primary px-3 py-2 text-center text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
           >
             Upgrade Now
