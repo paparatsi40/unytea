@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
+import { getLocale } from "next-intl/server"
 
 /**
  * Server-side: Require authentication and redirect if not authenticated
@@ -10,7 +11,8 @@ export async function requireAuth() {
   const session = await auth()
   
   if (!session?.user) {
-    redirect("/auth/signin")
+    const locale = await getLocale()
+    redirect(`/${locale}/auth/signin`)
   }
   
   return session
@@ -73,7 +75,8 @@ export async function requireOnboarded() {
   const session = await requireAuth()
   
   if (!session.user.isOnboarded) {
-    redirect("/onboarding")
+    const locale = await getLocale()
+    redirect(`/${locale}/onboarding`)
   }
   
   return session

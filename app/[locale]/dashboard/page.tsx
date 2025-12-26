@@ -26,7 +26,7 @@ export default async function DashboardPage({
   const t = await getTranslations('dashboard');
   
   if (!session?.user?.id) {
-    redirect("/auth/signin");
+    redirect(`/${locale}/auth/signin`);
   }
 
   // Fetch communities where user is owner

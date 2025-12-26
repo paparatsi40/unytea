@@ -11,11 +11,11 @@ export default async function SessionRoomPage({
   params: { sessionId: string };
 }) {
   const session = await auth();
-  if (!session?.user?.id) {
-    redirect("/login");
-  }
-
   const locale = await getLocale();
+  
+  if (!session?.user?.id) {
+    redirect(`/${locale}/auth/signin`);
+  }
 
   const { sessionId } = params;
   const result = await getSession(sessionId);
