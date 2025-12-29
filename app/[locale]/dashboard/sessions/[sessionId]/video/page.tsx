@@ -123,7 +123,7 @@ export default function SessionVideoPage() {
           if (!alreadyHasFeedback) {
             setShowFeedbackModal(true);
           } else {
-            router.push("/dashboard/sessions");
+            router.back();
           }
         }, 3000);
         return;
@@ -138,7 +138,7 @@ export default function SessionVideoPage() {
     if (!alreadyHasFeedback) {
       setShowFeedbackModal(true);
     } else {
-      router.push("/dashboard/sessions");
+      router.back();
     }
   }
 
@@ -154,7 +154,7 @@ export default function SessionVideoPage() {
 
   function handleFeedbackClose() {
     setShowFeedbackModal(false);
-    router.push("/dashboard/sessions");
+    router.back();
   }
 
   if (loading) {
@@ -172,7 +172,7 @@ export default function SessionVideoPage() {
           <h2 className="text-xl font-bold text-red-900">Error</h2>
           <p className="mt-2 text-red-700">{error || "Session not found"}</p>
           <Button
-            onClick={() => router.push("/dashboard/sessions")}
+            onClick={() => router.back()}
             variant="outline"
             className="mt-4"
           >
@@ -197,7 +197,7 @@ export default function SessionVideoPage() {
             Only the mentor and mentee can join this video call.
           </p>
           <Button
-            onClick={() => router.push("/dashboard/sessions")}
+            onClick={() => router.back()}
             variant="outline"
             className="mt-4"
           >
@@ -312,7 +312,7 @@ export default function SessionVideoPage() {
         </div>
         <Button
           variant="ghost"
-          onClick={() => router.push("/dashboard/sessions")}
+          onClick={() => router.back()}
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back

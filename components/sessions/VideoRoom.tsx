@@ -102,8 +102,12 @@ export function VideoRoom({
   }, [roomName]);
 
   const handleDisconnect = () => {
-    if (onLeave) onLeave();
-    else router.push("/dashboard/sessions");
+    if (onLeave) {
+      onLeave();
+    } else {
+      // Go back or to dashboard instead of non-existent /dashboard/sessions
+      router.back();
+    }
   };
 
   if (isLoading) {
