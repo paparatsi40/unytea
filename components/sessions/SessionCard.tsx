@@ -30,7 +30,6 @@ export function SessionCard({ session, isPast = false }: SessionCardProps) {
     !isPast && new Date() >= new Date(sessionDate.getTime() - 5 * 60 * 1000);
 
   const roomHref = `/${locale}/dashboard/sessions/${session.id}/room`;
-  const detailsHref = `/${locale}/dashboard/sessions/${session.id}`;
 
   // Evita hydration mismatch: en SSR mostramos vacío, en client ya formateamos
   const formattedDate = mounted
@@ -117,12 +116,10 @@ export function SessionCard({ session, isPast = false }: SessionCardProps) {
       )}
 
       {isPast && session.status === "COMPLETED" && (
-        <Link
-          href={detailsHref}
-          className="flex w-full items-center justify-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-semibold transition-colors hover:bg-muted"
-        >
-          View Details
-        </Link>
+        <div className="flex w-full items-center justify-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-semibold text-muted-foreground">
+          <Calendar className="h-4 w-4" />
+          Session Completed
+        </div>
       )}
     </div>
   );

@@ -18,10 +18,44 @@ export default async function SessionRoomPage({
   }
 
   const { sessionId } = params;
+  
+  // Check if sessionId is valid
+  if (!sessionId || sessionId === 'undefined') {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <p className="text-lg text-destructive">Invalid session ID</p>
+          <BackButton
+            fallbackUrl={`/${locale}/dashboard`}
+            label="Back to Dashboard"
+            className="mt-4"
+          />
+        </div>
+      </div>
+    );
+  }
+  
   const result = await getSession(sessionId);
 
   if (!result.success || !result.session) {
-    redirect(`/${locale}/dashboard`);
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center max-w-md">
+          <p className="text-lg text-destructive mb-2">Session not found</p>
+          <p className="text-sm text-muted-foreground mb-4">
+            {result.error || "Unable to load this session. It may have been deleted or you don't have access to it."}
+          </p>
+          <p className="text-xs text-muted-foreground mb-4">
+            Session ID: {sessionId}
+          </p>
+          <BackButton
+            fallbackUrl={`/${locale}/dashboard`}
+            label="Back to Dashboard"
+            className="mt-4"
+          />
+        </div>
+      </div>
+    );
   }
 
   const videoSession = result.session;
@@ -30,7 +64,7 @@ export default async function SessionRoomPage({
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <p className="text-lg text-destructive">Invalid session</p>
+          <p className="text-lg text-destructive">Invalid session - No room ID</p>
           <BackButton
             fallbackUrl={`/${locale}/dashboard`}
             label="Back to Dashboard"
