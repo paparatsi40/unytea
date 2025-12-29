@@ -14,6 +14,14 @@ const intlMiddleware = createIntlMiddleware({
 export default auth((req) => {
   const isLoggedIn = !!req.auth;
   const pathname = req.nextUrl.pathname;
+  const hostname = req.headers.get("host") || "";
+
+  // Redirect vercel.app to custom domain
+  if (hostname.includes("vercel.app")) {
+    const newUrl = new URL(req.url);
+    newUrl.host = "www.unytea.com";
+    return NextResponse.redirect(newUrl, 308); // 308 Permanent Redirect
+  }
 
   // Skip API routes and static files
   if (
