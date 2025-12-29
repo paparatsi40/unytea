@@ -8,7 +8,7 @@ import { getLocale } from "next-intl/server";
 export default async function SessionRoomPage({
   params,
 }: {
-  params: { sessionId: string };
+  params: Promise<{ sessionId: string }>;
 }) {
   const session = await auth();
   const locale = await getLocale();
@@ -17,7 +17,7 @@ export default async function SessionRoomPage({
     redirect(`/${locale}/auth/signin`);
   }
 
-  const { sessionId } = params;
+  const { sessionId } = await params;
   
   // Check if sessionId is valid
   if (!sessionId || sessionId === 'undefined') {
