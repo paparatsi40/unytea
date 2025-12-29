@@ -93,6 +93,7 @@ const nextConfig = {
               "font-src 'self' data: https://vercel.live https://*.vercel.live",
               "connect-src 'self' wss: ws: https://sea1.ingest.uploadthing.com https://uploadthing.com https://utfs.io https://*.livekit.cloud https://*.livekit.io wss://*.livekit.cloud https://vercel.live https://*.vercel.live",
               "frame-src 'self' https://vercel.live https://*.vercel.live https://www.youtube.com https://youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://vimeo.com",
+              "object-src 'self' data: https://utfs.io https://*.uploadthing.com",
               "frame-ancestors 'self'",
               "base-uri 'self'",
               "form-action 'self'",
