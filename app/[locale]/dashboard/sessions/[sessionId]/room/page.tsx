@@ -21,7 +21,7 @@ export default async function SessionRoomPage({
   const result = await getSession(sessionId);
 
   if (!result.success || !result.session) {
-    redirect(`/${locale}/dashboard/sessions`);
+    redirect(`/${locale}/dashboard`);
   }
 
   const videoSession = result.session;
@@ -32,8 +32,8 @@ export default async function SessionRoomPage({
         <div className="text-center">
           <p className="text-lg text-destructive">Invalid session</p>
           <BackButton
-            fallbackUrl={`/${locale}/dashboard/sessions`}
-            label="Back to sessions"
+            fallbackUrl={`/${locale}/dashboard`}
+            label="Back to Dashboard"
             className="mt-4"
           />
         </div>
@@ -46,8 +46,8 @@ export default async function SessionRoomPage({
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
         <BackButton
-          fallbackUrl={`/${locale}/dashboard/sessions`}
-          label="Back to Sessions"
+          fallbackUrl={`/${locale}/dashboard`}
+          label="Back to Dashboard"
         />
 
         <div className="text-center">
