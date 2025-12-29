@@ -45,26 +45,29 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
       if (!canvasRef.current || fabricCanvasRef.current) return;
 
       try {
-        const { Canvas } = await import("fabric");
+        const { Canvas, PencilBrush } = await import("fabric");
         if (!mounted || !canvasRef.current) return;
 
         const fabricCanvas = new Canvas(canvasRef.current, {
           backgroundColor: "#ffffff",
+          isDrawingMode: true, // Start in drawing mode by default
         });
+
+        // Explicitly create and configure the brush
+        const brush = new PencilBrush(fabricCanvas);
+        brush.color = color;
+        brush.width = strokeWidth;
+        fabricCanvas.freeDrawingBrush = brush;
 
         fabricCanvasRef.current = fabricCanvas;
 
         // Default: draw mode
-        fabricCanvas.isDrawingMode = true;
         fabricCanvas.selection = false;
         updateObjectInteractivity(fabricCanvas, false);
 
-        if (fabricCanvas.freeDrawingBrush) {
-          fabricCanvas.freeDrawingBrush.color = color;
-          fabricCanvas.freeDrawingBrush.width = strokeWidth;
-        }
-
         fabricCanvas.renderAll();
+        
+        console.log("✅ Whiteboard initialized in drawing mode");
       } catch (err) {
         console.error("❌ Failed to initialize Fabric canvas:", err);
       } finally {
@@ -127,18 +130,36 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
     const isSelect = tool === "select";
     const isDraw = tool === "draw";
 
+    console.log(`🔧 Switching to tool: ${tool}, drawing mode: ${isDraw}`);
+
     canvas.isDrawingMode = isDraw;
     canvas.selection = isSelect;
 
     updateObjectInteractivity(canvas, isSelect);
 
-    if (isDraw && canvas.freeDrawingBrush) {
-      canvas.freeDrawingBrush.color = color;
-      canvas.freeDrawingBrush.width = strokeWidth;
+    if (isDraw) {
+      // Ensure brush exists and is properly configured
+      if (!canvas.freeDrawingBrush) {
+        (async () => {
+          const { PencilBrush } = await import("fabric");
+          canvas.freeDrawingBrush = new PencilBrush(canvas);
+        })();
+      }
+      
+      if (canvas.freeDrawingBrush) {
+        canvas.freeDrawingBrush.color = color;
+        canvas.freeDrawingBrush.width = strokeWidth;
+        console.log(`🎨 Brush configured: color=${color}, width=${strokeWidth}`);
+      }
       
       // Ensure the canvas is interactive for drawing
       if (canvas.upperCanvasEl) {
+        canvas.upperCanvasEl.style.cursor = 'crosshair';
         canvas.upperCanvasEl.style.pointerEvents = 'auto';
+      }
+    } else if (isSelect) {
+      if (canvas.upperCanvasEl) {
+        canvas.upperCanvasEl.style.cursor = 'default';
       }
     }
 
