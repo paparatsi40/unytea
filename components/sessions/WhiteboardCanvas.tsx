@@ -132,9 +132,14 @@ export function WhiteboardCanvas({ sessionId: _sessionId, isModerator }: Props) 
 
     updateObjectInteractivity(canvas, isSelect);
 
-    if (canvas.freeDrawingBrush) {
+    if (isDraw && canvas.freeDrawingBrush) {
       canvas.freeDrawingBrush.color = color;
       canvas.freeDrawingBrush.width = strokeWidth;
+      
+      // Ensure the canvas is interactive for drawing
+      if (canvas.upperCanvasEl) {
+        canvas.upperCanvasEl.style.pointerEvents = 'auto';
+      }
     }
 
     canvas.requestRenderAll?.() ?? canvas.renderAll();
