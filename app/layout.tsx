@@ -4,6 +4,12 @@ import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import "@uploadthing/react/styles.css";
+import { CSPNonceProvider } from "@/components/csp-nonce-provider";
+import {
+  OrganizationSchema,
+  WebsiteSchema,
+  SoftwareApplicationSchema,
+} from "@/components/seo/structured-data";
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -118,8 +124,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html suppressHydrationWarning>
-      <head />
+    <html suppressHydrationWarning lang="en">
+      <head>
+        <CSPNonceProvider />
+        {/* Structured Data for SEO */}
+        <OrganizationSchema />
+        <WebsiteSchema />
+        <SoftwareApplicationSchema />
+      </head>
       <body
         className={`${GeistSans.variable} ${GeistMono.variable} font-sans antialiased`}
       >

@@ -83,23 +83,8 @@ const nextConfig = {
             key: "Permissions-Policy",
             value: "camera=(self), microphone=(self), geolocation=()",
           },
-          {
-            key: "Content-Security-Policy",
-            value: [
-              "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live https://*.vercel.live",
-              "style-src 'self' 'unsafe-inline' https://vercel.live https://*.vercel.live",
-              "img-src 'self' data: https:",
-              "font-src 'self' data: https://vercel.live https://*.vercel.live",
-              "connect-src 'self' wss: ws: https://sea1.ingest.uploadthing.com https://uploadthing.com https://utfs.io https://*.livekit.cloud https://*.livekit.io wss://*.livekit.cloud https://vercel.live https://*.vercel.live",
-              "frame-src 'self' data: blob: https://vercel.live https://*.vercel.live https://www.youtube.com https://youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://vimeo.com https://utfs.io https://*.uploadthing.com",
-              "object-src 'self' data: blob: https://utfs.io https://*.uploadthing.com",
-              "media-src 'self' data: blob: https://utfs.io https://*.uploadthing.com",
-              "frame-ancestors 'self'",
-              "base-uri 'self'",
-              "form-action 'self'",
-            ].join("; "),
-          },
+          // CSP is now handled dynamically in middleware.ts with nonce
+          // This provides better security by eliminating 'unsafe-inline'
         ],
       },
     ];

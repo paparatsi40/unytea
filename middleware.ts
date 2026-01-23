@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import createIntlMiddleware from "next-intl/middleware";
 import { locales, defaultLocale } from "./i18n";
 import { auth } from "@/lib/auth";
+import { generateNonce, buildCSP } from "@/lib/csp";
 
 // Create the intl middleware
 const intlMiddleware = createIntlMiddleware({
@@ -22,6 +23,10 @@ export default auth((req) => {
     newUrl.host = "www.unytea.com";
     return NextResponse.redirect(newUrl, 308); // 308 Permanent Redirect
   }
+
+  // Generate nonce for CSP
+  const nonce = generateNonce();
+  const csp = buildCSP(nonce);
 
   // Skip API routes and static files
   if (
@@ -88,7 +93,13 @@ export default auth((req) => {
   }
 
   // Apply next-intl middleware for all other cases
-  return intlMiddleware(req);
+  const response = intlMiddleware(req);
+  
+  // Add CSP and nonce to response headers
+  response.headers.set("Content-Security-Policy", csp);
+  response.headers.set("x-nonce", nonce);
+  
+  return response;
 });
 
 export const config = {
