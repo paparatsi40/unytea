@@ -38,7 +38,7 @@ const contentTypeIcons = {
   ASSIGNMENT: ClipboardCheck,
 };
 
-export function LessonManager({ module, courseId, locale }: LessonManagerProps) {
+export function LessonManager({ module }: LessonManagerProps) {
   const [lessons, setLessons] = useState(module.lessons || []);
   const [isAdding, setIsAdding] = useState(false);
   const [editingLesson, setEditingLesson] = useState<string | null>(null);
