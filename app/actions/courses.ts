@@ -598,49 +598,6 @@ export async function getUserEnrollments() {
 }
 
 /**
- * Update a course
- */
-export async function updateCourse(courseId: string, data: {
-  title?: string;
-  description?: string;
-  imageUrl?: string;
-  isPaid?: boolean;
-  price?: number;
-  isPublished?: boolean;
-}) {
-  try {
-    const userId = await getCurrentUserId();
-
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
-
-    const course = await prisma.course.findUnique({
-      where: { id: courseId },
-      include: { community: true },
-    });
-
-    if (!course || course.community.ownerId !== userId) {
-      return { success: false, error: "Unauthorized" };
-    }
-
-    const updatedCourse = await prisma.course.update({
-      where: { id: courseId },
-      data: {
-        ...data,
-        publishedAt: data.isPublished && !course.isPublished ? new Date() : course.publishedAt,
-      },
-    });
-
-    revalidatePath(`/dashboard/courses/${courseId}`);
-    return { success: true, course: updatedCourse };
-  } catch (error) {
-    console.error("Error updating course:", error);
-    return { success: false, error: "Failed to update course" };
-  }
-}
-
-/**
  * Update a module
  */
 export async function updateModule(moduleId: string, data: {
