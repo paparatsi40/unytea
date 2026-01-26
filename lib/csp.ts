@@ -32,8 +32,8 @@ export function buildCSP(nonce: string): string {
     // Note: mantener unsafe-inline en styles es aceptable, el riesgo XSS es principalmente en scripts
     `style-src 'self' 'unsafe-inline' https://vercel.live https://*.vercel.live`,
     
-    // Images: self + data URIs + any HTTPS
-    "img-src 'self' data: https: blob:",
+    // Images: self + data URIs + any HTTPS (includes Cloudinary)
+    "img-src 'self' data: https: blob: https://*.cloudinary.com",
     
     // Fonts: self + data URIs + vercel live
     "font-src 'self' data: https://vercel.live https://*.vercel.live",
@@ -43,6 +43,8 @@ export function buildCSP(nonce: string): string {
       "connect-src 'self'",
       "https://www.unytea.com",
       "wss://www.unytea.com",
+      "https://*.vercel.app",
+      "wss://*.vercel.app",
       "ws://localhost:*",
       "wss://localhost:*",
       "https://sea1.ingest.uploadthing.com",
@@ -53,6 +55,8 @@ export function buildCSP(nonce: string): string {
       "wss://*.livekit.cloud",
       "https://vercel.live",
       "https://*.vercel.live",
+      "https://*.cloudinary.com",
+      "https://api.cloudinary.com",
     ].join(" "),
     
     // Frames: self + video embeds + uploadthing
