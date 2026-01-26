@@ -100,7 +100,11 @@ export function CoursesPageClient({
           >
             {/* Course Image */}
             <div className="relative h-48 overflow-hidden bg-gradient-to-br from-primary/20 via-purple-500/20 to-pink-500/20">
-              <Link href={`/${locale}/dashboard/courses/${course.id}`}>
+              <Link href={
+                isOwner && !course.isPublished 
+                  ? `/${locale}/dashboard/courses/${course.id}/edit`
+                  : `/${locale}/dashboard/courses/${course.id}`
+              }>
                 {course.imageUrl ? (
                   <img
                     src={course.imageUrl}
@@ -197,11 +201,17 @@ export function CoursesPageClient({
               </div>
 
               {/* CTA Button */}
-              <Link href={`/${locale}/dashboard/courses/${course.id}`}>
+              <Link href={
+                isOwner && !course.isPublished 
+                  ? `/${locale}/dashboard/courses/${course.id}/edit`
+                  : `/${locale}/dashboard/courses/${course.id}`
+              }>
                 <Button className="w-full bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground transition-all">
-                  {course.isEnrolled 
-                    ? (course.isCompleted ? "Review Course" : "Continue Learning")
-                    : "View Course"
+                  {isOwner && !course.isPublished
+                    ? "Edit Course"
+                    : course.isEnrolled 
+                      ? (course.isCompleted ? "Review Course" : "Continue Learning")
+                      : "View Course"
                   }
                 </Button>
               </Link>
