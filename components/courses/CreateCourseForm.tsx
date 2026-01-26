@@ -145,8 +145,8 @@ export function CreateCourseForm({ communityId, slug, locale }: CreateCourseForm
         throw new Error(result.error || "Failed to create course");
       }
 
-      // Redirect to the new course
-      router.push(`/${locale}/dashboard/courses/${result.course.id}`);
+      // Redirect to the courses list in the community
+      router.push(`/${locale}/dashboard/communities/${slug}/courses`);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create course");
