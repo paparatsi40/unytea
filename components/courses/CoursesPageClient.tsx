@@ -15,6 +15,7 @@ type Course = {
   imageUrl: string | null;
   isPaid: boolean;
   price: number;
+  isPublished: boolean;
   isArchived: boolean;
   _count: {
     enrollments: number;
@@ -125,8 +126,15 @@ export function CoursesPageClient({
                 </div>
               )}
               
+              {/* Draft Badge (only for owners on unpublished courses) */}
+              {isOwner && !course.isPublished && (
+                <div className="absolute top-4 left-4 rounded-full bg-amber-500/90 px-3 py-1 text-xs font-semibold text-white backdrop-blur-xl">
+                  📝 Draft
+                </div>
+              )}
+
               {/* Enrollment Badge */}
-              {course.isEnrolled && (
+              {course.isEnrolled && course.isPublished && (
                 <div className="absolute top-4 left-4 rounded-full bg-primary/90 px-3 py-1 text-xs font-semibold text-primary-foreground backdrop-blur-xl">
                   {course.isCompleted ? "✓ Completed" : "Enrolled"}
                 </div>

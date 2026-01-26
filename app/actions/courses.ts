@@ -598,6 +598,218 @@ export async function getUserEnrollments() {
 }
 
 /**
+ * Update a course
+ */
+export async function updateCourse(courseId: string, data: {
+  title?: string;
+  description?: string;
+  imageUrl?: string;
+  isPaid?: boolean;
+  price?: number;
+  isPublished?: boolean;
+}) {
+  try {
+    const userId = await getCurrentUserId();
+
+    if (!userId) {
+      return { success: false, error: "Not authenticated" };
+    }
+
+    const course = await prisma.course.findUnique({
+      where: { id: courseId },
+      include: { community: true },
+    });
+
+    if (!course || course.community.ownerId !== userId) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const updatedCourse = await prisma.course.update({
+      where: { id: courseId },
+      data: {
+        ...data,
+        publishedAt: data.isPublished && !course.isPublished ? new Date() : course.publishedAt,
+      },
+    });
+
+    revalidatePath(`/dashboard/courses/${courseId}`);
+    return { success: true, course: updatedCourse };
+  } catch (error) {
+    console.error("Error updating course:", error);
+    return { success: false, error: "Failed to update course" };
+  }
+}
+
+/**
+ * Update a module
+ */
+export async function updateModule(moduleId: string, data: {
+  title?: string;
+  description?: string;
+  position?: number;
+}) {
+  try {
+    const userId = await getCurrentUserId();
+
+    if (!userId) {
+      return { success: false, error: "Not authenticated" };
+    }
+
+    const module = await prisma.module.findUnique({
+      where: { id: moduleId },
+      include: {
+        course: {
+          include: { community: true },
+        },
+      },
+    });
+
+    if (!module || module.course.community.ownerId !== userId) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const updatedModule = await prisma.module.update({
+      where: { id: moduleId },
+      data,
+    });
+
+    revalidatePath(`/dashboard/courses/${module.courseId}`);
+    return { success: true, module: updatedModule };
+  } catch (error) {
+    console.error("Error updating module:", error);
+    return { success: false, error: "Failed to update module" };
+  }
+}
+
+/**
+ * Delete a module
+ */
+export async function deleteModule(moduleId: string) {
+  try {
+    const userId = await getCurrentUserId();
+
+    if (!userId) {
+      return { success: false, error: "Not authenticated" };
+    }
+
+    const module = await prisma.module.findUnique({
+      where: { id: moduleId },
+      include: {
+        course: {
+          include: { community: true },
+        },
+      },
+    });
+
+    if (!module || module.course.community.ownerId !== userId) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    await prisma.module.delete({
+      where: { id: moduleId },
+    });
+
+    revalidatePath(`/dashboard/courses/${module.courseId}`);
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting module:", error);
+    return { success: false, error: "Failed to delete module" };
+  }
+}
+
+/**
+ * Update a lesson
+ */
+export async function updateLesson(lessonId: string, data: {
+  title?: string;
+  content?: string;
+  contentType?: "TEXT" | "VIDEO" | "AUDIO" | "QUIZ" | "ASSIGNMENT";
+  videoUrl?: string;
+  duration?: number;
+  position?: number;
+  isFree?: boolean;
+  isPublished?: boolean;
+}) {
+  try {
+    const userId = await getCurrentUserId();
+
+    if (!userId) {
+      return { success: false, error: "Not authenticated" };
+    }
+
+    const lesson = await prisma.lesson.findUnique({
+      where: { id: lessonId },
+      include: {
+        module: {
+          include: {
+            course: {
+              include: { community: true },
+            },
+          },
+        },
+      },
+    });
+
+    if (!lesson || lesson.module.course.community.ownerId !== userId) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const updatedLesson = await prisma.lesson.update({
+      where: { id: lessonId },
+      data,
+    });
+
+    revalidatePath(`/dashboard/courses/${lesson.module.courseId}`);
+    return { success: true, lesson: updatedLesson };
+  } catch (error) {
+    console.error("Error updating lesson:", error);
+    return { success: false, error: "Failed to update lesson" };
+  }
+}
+
+/**
+ * Delete a lesson
+ */
+export async function deleteLesson(lessonId: string) {
+  try {
+    const userId = await getCurrentUserId();
+
+    if (!userId) {
+      return { success: false, error: "Not authenticated" };
+    }
+
+    const lesson = await prisma.lesson.findUnique({
+      where: { id: lessonId },
+      include: {
+        module: {
+          include: {
+            course: {
+              include: { community: true },
+            },
+          },
+        },
+      },
+    });
+
+    if (!lesson || lesson.module.course.community.ownerId !== userId) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const courseId = lesson.module.courseId;
+
+    await prisma.lesson.delete({
+      where: { id: lessonId },
+    });
+
+    revalidatePath(`/dashboard/courses/${courseId}`);
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting lesson:", error);
+    return { success: false, error: "Failed to delete lesson" };
+  }
+}
+
+/**
  * Get all available courses for browsing
  */
 export async function getAvailableCourses() {

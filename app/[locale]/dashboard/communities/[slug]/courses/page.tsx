@@ -53,12 +53,13 @@ export default async function CommunityCoursesPage({
     redirect(`/${locale}/dashboard/communities/${slug}`);
   }
 
-  // Fetch ACTIVE courses
+  // Fetch ACTIVE courses (published + drafts for owners)
   const activeCourses = await prisma.course.findMany({
     where: {
       communityId: community.id,
-      isPublished: true,
       isArchived: false,
+      // Owners see all courses (published + draft), members only see published
+      ...(isOwner ? {} : { isPublished: true }),
     },
     include: {
       _count: {
