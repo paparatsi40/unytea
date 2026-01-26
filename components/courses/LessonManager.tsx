@@ -83,7 +83,7 @@ export function LessonManager({ module }: LessonManagerProps) {
         content: newLesson.content || newLesson.videoUrl || "No content",
         contentType: newLesson.contentType,
         videoUrl: newLesson.contentType === "VIDEO" ? newLesson.videoUrl : undefined,
-        duration: newLesson.duration ? parseInt(newLesson.duration) : undefined,
+        duration: newLesson.duration ? parseInt(newLesson.duration) * 60 : undefined, // Convert minutes to seconds
         position: lessons.length,
         isFree: newLesson.isFree,
       });
@@ -113,7 +113,7 @@ export function LessonManager({ module }: LessonManagerProps) {
         content: editData.content || editData.videoUrl || "No content",
         contentType: editData.contentType,
         videoUrl: editData.contentType === "VIDEO" ? editData.videoUrl : undefined,
-        duration: editData.duration ? parseInt(editData.duration) : undefined,
+        duration: editData.duration ? parseInt(editData.duration) * 60 : undefined, // Convert minutes to seconds
         isFree: editData.isFree,
       });
 
