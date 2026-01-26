@@ -23,7 +23,7 @@ interface ModuleManagerProps {
 }
 
 export function ModuleManager({ course, locale }: ModuleManagerProps) {
-  const [modules, setModules] = useState(course.modules || []);
+  const modules = course.modules || [];
   const [expandedModules, setExpandedModules] = useState<string[]>([]);
   const [isCreating, setIsCreating] = useState(false);
   const [newModule, setNewModule] = useState({ title: "", description: "" });
