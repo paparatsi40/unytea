@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { use, useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Settings, Palette, Users, AlertTriangle, Save, Image as ImageIcon, Globe, Lock, Upload, Sparkles } from "lucide-react";
@@ -56,6 +56,10 @@ export default function CommunitySettingsPage({
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [slugState, setSlugState] = useState("");
+
+  // Refs for file inputs
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
 
   const { startUpload } = useUploadThing("communityBranding");
 
@@ -113,15 +117,29 @@ export default function CommunitySettingsPage({
     if (!file) return;
 
     try {
+      console.log('📤 Starting logo upload:', file.name, file.size, 'bytes');
       setUploading('logo');
       toast.loading('Uploading logo...', { id: 'logo-upload' });
 
+      // Validate file size (max 8MB as per uploadthing config)
+      if (file.size > 8 * 1024 * 1024) {
+        throw new Error('File too large. Maximum size is 8MB');
+      }
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        throw new Error('Please select an image file');
+      }
+
       const uploadResult = await startUpload([file]);
+      console.log('📥 Upload result:', uploadResult);
+      
       if (!uploadResult || uploadResult.length === 0) {
-        throw new Error('Upload failed');
+        throw new Error('Upload failed - no file returned');
       }
 
       const imageUrl = uploadResult[0].url;
+      console.log('✅ Logo uploaded:', imageUrl);
 
       // Update community in database
       const response = await fetch(`/api/communities/${slug}/branding`, {
@@ -130,13 +148,20 @@ export default function CommunitySettingsPage({
         body: JSON.stringify({ imageUrl }),
       });
 
-      if (!response.ok) throw new Error('Failed to update logo');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update logo');
+      }
 
       setCommunity(prev => prev ? { ...prev, imageUrl } : null);
       toast.success('Logo updated successfully!', { id: 'logo-upload' });
+      
+      // Reset input so the same file can be selected again
+      e.target.value = '';
     } catch (error) {
-      console.error('Error uploading logo:', error);
-      toast.error('Failed to upload logo', { id: 'logo-upload' });
+      console.error('❌ Error uploading logo:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      toast.error(`Failed to upload logo: ${errorMessage}`, { id: 'logo-upload' });
     } finally {
       setUploading(null);
     }
@@ -148,15 +173,29 @@ export default function CommunitySettingsPage({
     if (!file) return;
 
     try {
+      console.log('📤 Starting cover upload:', file.name, file.size, 'bytes');
       setUploading('cover');
       toast.loading('Uploading cover...', { id: 'cover-upload' });
 
+      // Validate file size (max 8MB as per uploadthing config)
+      if (file.size > 8 * 1024 * 1024) {
+        throw new Error('File too large. Maximum size is 8MB');
+      }
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        throw new Error('Please select an image file');
+      }
+
       const uploadResult = await startUpload([file]);
+      console.log('📥 Upload result:', uploadResult);
+      
       if (!uploadResult || uploadResult.length === 0) {
-        throw new Error('Upload failed');
+        throw new Error('Upload failed - no file returned');
       }
 
       const coverImageUrl = uploadResult[0].url;
+      console.log('✅ Cover uploaded:', coverImageUrl);
 
       // Update community in database
       const response = await fetch(`/api/communities/${slug}/branding`, {
@@ -165,13 +204,20 @@ export default function CommunitySettingsPage({
         body: JSON.stringify({ coverImageUrl }),
       });
 
-      if (!response.ok) throw new Error('Failed to update cover');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update cover');
+      }
 
       setCommunity(prev => prev ? { ...prev, coverImageUrl } : null);
       toast.success('Cover updated successfully!', { id: 'cover-upload' });
+      
+      // Reset input so the same file can be selected again
+      e.target.value = '';
     } catch (error) {
-      console.error('Error uploading cover:', error);
-      toast.error('Failed to upload cover', { id: 'cover-upload' });
+      console.error('❌ Error uploading cover:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      toast.error(`Failed to upload cover: ${errorMessage}`, { id: 'cover-upload' });
     } finally {
       setUploading(null);
     }
@@ -507,15 +553,19 @@ export default function CommunitySettingsPage({
                   <label className="text-sm font-semibold text-foreground">Community Logo</label>
                   <div className="relative">
                     <input
+                      ref={logoInputRef}
                       type="file"
                       accept="image/*"
                       onChange={handleLogoUpload}
                       disabled={uploading === 'logo'}
                       className="hidden"
-                      id="logo-upload"
                     />
-                    <label
-                      htmlFor="logo-upload"
+                    <div
+                      onClick={() => {
+                        if (uploading !== 'logo') {
+                          logoInputRef.current?.click();
+                        }
+                      }}
                       className="relative aspect-square rounded-xl border-2 border-dashed border-border bg-accent/50 overflow-hidden group cursor-pointer hover:border-primary transition-colors flex flex-col items-center justify-center"
                     >
                       {community.imageUrl ? (
@@ -550,7 +600,7 @@ export default function CommunitySettingsPage({
                           )}
                         </div>
                       )}
-                    </label>
+                    </div>
                   </div>
                   <p className="text-xs text-muted-foreground">
                     Recommended: Square image, at least 400x400px
@@ -562,15 +612,19 @@ export default function CommunitySettingsPage({
                   <label className="text-sm font-semibold text-foreground">Cover Image</label>
                   <div className="relative">
                     <input
+                      ref={coverInputRef}
                       type="file"
                       accept="image/*"
                       onChange={handleCoverUpload}
                       disabled={uploading === 'cover'}
                       className="hidden"
-                      id="cover-upload"
                     />
-                    <label
-                      htmlFor="cover-upload"
+                    <div
+                      onClick={() => {
+                        if (uploading !== 'cover') {
+                          coverInputRef.current?.click();
+                        }
+                      }}
                       className="relative aspect-square rounded-xl border-2 border-dashed border-border bg-accent/50 overflow-hidden group cursor-pointer hover:border-primary transition-colors flex flex-col items-center justify-center"
                     >
                       {community.coverImageUrl ? (
@@ -605,7 +659,7 @@ export default function CommunitySettingsPage({
                           )}
                         </div>
                       )}
-                    </label>
+                    </div>
                   </div>
                   <p className="text-xs text-muted-foreground">
                     Recommended: Wide image, at least 1200x400px

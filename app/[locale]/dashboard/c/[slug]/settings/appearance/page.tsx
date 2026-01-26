@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -83,6 +83,10 @@ export default function AppearanceSettingsPage() {
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
 
+  // Refs for file inputs
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
+
   // Uploadthing hook
   const { startUpload } = useUploadThing("communityBranding");
 
@@ -125,20 +129,33 @@ export default function AppearanceSettingsPage() {
     type: "logo" | "cover"
   ) => {
     try {
+      console.log(`📤 Starting ${type} upload:`, file.name, file.size, "bytes");
+      
       if (type === "logo") {
         setUploadingLogo(true);
       } else {
         setUploadingCover(true);
       }
 
+      toast.loading(`Uploading ${type}...`, { id: `${type}-upload` });
+
+      // Validate file size
+      const maxSize = type === "logo" ? 5 * 1024 * 1024 : 10 * 1024 * 1024; // 5MB for logo, 10MB for cover
+      if (file.size > maxSize) {
+        throw new Error(`File too large. Max size is ${maxSize / (1024 * 1024)}MB`);
+      }
+
       // Upload to Uploadthing
       const uploadedFiles = await startUpload([file]);
       
+      console.log(`📥 Upload response for ${type}:`, uploadedFiles);
+      
       if (!uploadedFiles || uploadedFiles.length === 0) {
-        throw new Error("Upload failed");
+        throw new Error("Upload failed - no file returned");
       }
 
       const uploadedUrl = uploadedFiles[0].url;
+      console.log(`✅ ${type} uploaded successfully:`, uploadedUrl);
 
       // Set the URL
       if (type === "logo") {
@@ -147,10 +164,11 @@ export default function AppearanceSettingsPage() {
         setCoverUrl(uploadedUrl);
       }
 
-      toast.success(`${type === "logo" ? "Logo" : "Cover"} uploaded successfully!`);
+      toast.success(`${type === "logo" ? "Logo" : "Cover"} uploaded successfully!`, { id: `${type}-upload` });
     } catch (error) {
-      console.error("Upload error:", error);
-      toast.error(`Failed to upload ${type === "logo" ? "logo" : "cover"}`);
+      console.error(`❌ Upload error for ${type}:`, error);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      toast.error(`Failed to upload ${type === "logo" ? "logo" : "cover"}: ${errorMessage}`, { id: `${type}-upload` });
     } finally {
       if (type === "logo") {
         setUploadingLogo(false);
@@ -262,7 +280,11 @@ export default function AppearanceSettingsPage() {
                 <div className="space-y-3">
                   <div
                     className="border-2 border-dashed rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer"
-                    onClick={() => !uploadingLogo && document.getElementById("logo-upload")?.click()}
+                    onClick={() => {
+                      if (!uploadingLogo) {
+                        logoInputRef.current?.click();
+                      }
+                    }}
                   >
                     {uploadingLogo ? (
                       <div className="space-y-3">
@@ -309,14 +331,18 @@ export default function AppearanceSettingsPage() {
                     )}
                   </div>
                   <input
-                    id="logo-upload"
+                    ref={logoInputRef}
                     type="file"
                     accept="image/png,image/jpeg,image/webp"
                     className="hidden"
                     disabled={uploadingLogo}
                     onChange={(e) => {
                       const file = e.target.files?.[0];
-                      if (file) handleImageUpload(file, "logo");
+                      if (file) {
+                        handleImageUpload(file, "logo");
+                        // Reset input so the same file can be selected again
+                        e.target.value = '';
+                      }
                     }}
                   />
                   <p className="text-xs text-muted-foreground">
@@ -379,7 +405,11 @@ export default function AppearanceSettingsPage() {
                 <div className="space-y-3">
                   <div
                     className="border-2 border-dashed rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer"
-                    onClick={() => !uploadingCover && document.getElementById("cover-upload")?.click()}
+                    onClick={() => {
+                      if (!uploadingCover) {
+                        coverInputRef.current?.click();
+                      }
+                    }}
                   >
                     {uploadingCover ? (
                       <div className="space-y-3">
@@ -426,14 +456,18 @@ export default function AppearanceSettingsPage() {
                     )}
                   </div>
                   <input
-                    id="cover-upload"
+                    ref={coverInputRef}
                     type="file"
                     accept="image/png,image/jpeg,image/webp"
                     className="hidden"
                     disabled={uploadingCover}
                     onChange={(e) => {
                       const file = e.target.files?.[0];
-                      if (file) handleImageUpload(file, "cover");
+                      if (file) {
+                        handleImageUpload(file, "cover");
+                        // Reset input so the same file can be selected again
+                        e.target.value = '';
+                      }
                     }}
                   />
                   <p className="text-xs text-muted-foreground">

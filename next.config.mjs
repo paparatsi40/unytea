@@ -87,10 +87,11 @@ const nextConfig = {
             key: "Cross-Origin-Opener-Policy",
             value: "same-origin",
           },
-          {
-            key: "Cross-Origin-Embedder-Policy",
-            value: "require-corp",
-          },
+          // COEP disabled to allow UploadThing and other third-party services
+          // {
+          //   key: "Cross-Origin-Embedder-Policy",
+          //   value: "require-corp",
+          // },
           // CSP is now handled dynamically in middleware.ts with nonce
           // This provides better security by eliminating 'unsafe-inline'
         ],

@@ -49,18 +49,28 @@ export const ourFileRouter = {
   })
     .middleware(async () => {
       try {
+        console.log("🖼️ [communityBranding] Middleware - checking authentication");
         const userId = await getCurrentUserId();
         
         if (!userId) {
+          console.log("❌ [communityBranding] No user ID found");
           throw new Error("Unauthorized - Please sign in");
         }
         
+        console.log("✅ [communityBranding] User authenticated:", userId);
         return { userId };
       } catch (error) {
+        console.error("❌ [communityBranding] Middleware error:", error);
         throw error;
       }
     })
     .onUploadComplete(async ({ metadata, file }) => {
+      console.log("✅ [communityBranding] Upload complete!", {
+        uploadedBy: metadata.userId,
+        url: file.url,
+        name: file.name,
+        size: file.size
+      });
       return { uploadedBy: metadata.userId, url: file.url };
     }),
 
