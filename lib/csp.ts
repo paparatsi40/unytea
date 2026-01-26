@@ -57,6 +57,8 @@ export function buildCSP(nonce: string): string {
       "https://*.vercel.live",
       "https://*.cloudinary.com",
       "https://api.cloudinary.com",
+      "https://*.up.railway.app",
+      "wss://*.up.railway.app",
     ].join(" "),
     
     // Frames: self + video embeds + uploadthing

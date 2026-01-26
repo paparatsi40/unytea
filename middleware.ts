@@ -18,11 +18,13 @@ export default auth((req) => {
   const hostname = req.headers.get("host") || "";
 
   // Redirect vercel.app to custom domain
-  if (hostname.includes("vercel.app")) {
-    const newUrl = new URL(req.url);
-    newUrl.host = "www.unytea.com";
-    return NextResponse.redirect(newUrl, 308); // 308 Permanent Redirect
-  }
+  // DISABLED: This causes CORS issues with fetch/API calls
+  // Keep both domains working to avoid preflight request failures
+  // if (hostname.includes("vercel.app")) {
+  //   const newUrl = new URL(req.url);
+  //   newUrl.host = "www.unytea.com";
+  //   return NextResponse.redirect(newUrl, 308); // 308 Permanent Redirect
+  // }
 
   // Generate nonce for CSP
   const nonce = generateNonce();
