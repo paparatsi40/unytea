@@ -368,7 +368,7 @@ export async function createLesson(data: {
   moduleId: string;
   title: string;
   content: string;
-  contentType?: "TEXT" | "VIDEO" | "AUDIO";
+  contentType?: "TEXT" | "VIDEO" | "AUDIO" | "QUIZ" | "ASSIGNMENT";
   videoUrl?: string;
   duration?: number;
   position: number;
