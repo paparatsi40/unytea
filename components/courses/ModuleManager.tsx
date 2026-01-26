@@ -7,7 +7,8 @@ import {
   ChevronRight,
   Edit,
   Trash2,
-  GripVertical
+  GripVertical,
+  BookOpen
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
