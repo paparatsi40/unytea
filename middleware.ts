@@ -15,11 +15,11 @@ const intlMiddleware = createIntlMiddleware({
 export default auth((req) => {
   const isLoggedIn = !!req.auth;
   const pathname = req.nextUrl.pathname;
-  const hostname = req.headers.get("host") || "";
 
   // Redirect vercel.app to custom domain
   // DISABLED: This causes CORS issues with fetch/API calls
   // Keep both domains working to avoid preflight request failures
+  // const hostname = req.headers.get("host") || "";
   // if (hostname.includes("vercel.app")) {
   //   const newUrl = new URL(req.url);
   //   newUrl.host = "www.unytea.com";
