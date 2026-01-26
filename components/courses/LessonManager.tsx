@@ -39,7 +39,7 @@ const contentTypeIcons = {
 };
 
 export function LessonManager({ module }: LessonManagerProps) {
-  const [lessons, setLessons] = useState(module.lessons || []);
+  const lessons = module.lessons || [];
   const [isAdding, setIsAdding] = useState(false);
   const [editingLesson, setEditingLesson] = useState<string | null>(null);
   const [newLesson, setNewLesson] = useState({
