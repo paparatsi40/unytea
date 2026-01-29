@@ -23,6 +23,7 @@ interface CoursePageClientProps {
   isOwner: boolean;
   enrollment: any;
   whatYouWillLearn: string[];
+  locale?: string;
   testimonials: any[];
   previewVideoUrl?: string | null;
   upgradeCourse?: any;
@@ -41,11 +42,28 @@ export function CoursePageClient({
   upgradeCourse,
   moduleCount,
   lessonCount,
+  locale = "en",
 }: CoursePageClientProps) {
   const [activeTab, setActiveTab] = useState<"overview" | "curriculum" | "reviews">("overview");
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+      {/* Draft Preview Banner */}
+      {isOwner && !course.isPublished && (
+        <div className="bg-amber-500 text-white py-3 px-4">
+          <div className="container mx-auto flex items-center justify-between">
+            <span className="font-medium">
+              📝 DRAFT PREVIEW - Only you can see this course
+            </span>
+            <Link href={`/${locale}/dashboard/courses/${course.id}/edit`}>
+              <button className="px-4 py-1 bg-white text-amber-600 rounded-md font-medium hover:bg-amber-50 transition-colors">
+                Back to Edit
+              </button>
+            </Link>
+          </div>
+        </div>
+      )}
+
       {/* Compact Header Banner */}
       <section
         className={`w-full px-0 py-6 ${

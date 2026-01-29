@@ -6,15 +6,16 @@ import { CoursePageClient } from "@/components/courses/CoursePageClient";
 export default async function CoursePage({
   params,
 }: {
-  params: { courseId: string };
+  params: Promise<{ courseId: string; locale: string }>;
 }) {
+  const { courseId, locale } = await params;
   const session = await auth();
   
   if (!session?.user) {
     redirect("/auth/signin");
   }
 
-  const result = await getCourse(params.courseId);
+  const result = await getCourse(courseId);
 
   if (!result.success || !result.course) {
     notFound();
@@ -54,6 +55,7 @@ export default async function CoursePage({
       upgradeCourse={upgradeCourse}
       moduleCount={moduleCount}
       lessonCount={lessonCount}
+      locale={locale}
     />
   );
 }
