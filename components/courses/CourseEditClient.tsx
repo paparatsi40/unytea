@@ -57,10 +57,10 @@ export function CourseEditClient({ course, locale }: CourseEditClientProps) {
         <div className="container py-4">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <Link href={`/${locale}/dashboard/courses/${course.id}`}>
+              <Link href={`/${locale}/dashboard/communities/${course.community.slug}/courses`}>
                 <Button variant="ghost" size="sm">
                   <ChevronLeft className="h-4 w-4 mr-1" />
-                  Back to Course
+                  Back to Courses
                 </Button>
               </Link>
               <div>

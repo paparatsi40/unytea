@@ -183,6 +183,7 @@ export async function getCourse(courseId: string) {
           select: {
             id: true,
             name: true,
+            slug: true,
             ownerId: true,
           },
         },
