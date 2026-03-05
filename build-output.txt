@@ -1,0 +1,24 @@
+
+> mentorly-web@0.1.0 build
+> next build
+
+  ▲ Next.js 14.2.33
+  - Environments: .env.local, .env
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+ ⨯ ESLint: Invalid Options: - Unknown options: useEslintrc, extensions - 'extensions' has been removed.
+Failed to compile.
+
+./app/(dashboard)/dashboard/settings/profile/page.tsx:27:25
+Type error: Property 'firstName' does not exist on type '{ id: string; username?: string | null | undefined; isOnboarded: boolean; role?: string | undefined; } & User'.
+
+  25 |             <img
+  26 |               src={user.image}
+> 27 |               alt={user.firstName || user.name || "User"}
+     |                         ^
+  28 |               className="h-24 w-24 rounded-full border-4 border-border object-cover"
+  29 |             />
+  30 |           ) : (
+Next.js build worker exited with code: 1 and signal: null

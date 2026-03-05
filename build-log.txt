@@ -1,0 +1,24 @@
+
+> mentorly-web@0.1.0 build
+> next build
+
+  Γû▓ Next.js 14.2.33
+  - Environments: .env.local, .env
+
+   Creating an optimized production build ...
+ Γ£ô Compiled successfully
+   Linting and checking validity of types ...
+ Γ¿» ESLint: Invalid Options: - Unknown options: useEslintrc, extensions - 'extensions' has been removed.
+Failed to compile.
+
+./app/api/communities/[slug]/posts/route.ts:78:13
+Type error: Object literal may only specify known properties, and 'imageUrl' does not exist in type 'UserSelect<DefaultArgs>'.
+
+  76 |             firstName: true,
+  77 |             lastName: true,
+> 78 |             imageUrl: true,
+     |             ^
+  79 |           },
+  80 |         },
+  81 |         _count: {
+Next.js build worker exited with code: 1 and signal: null
