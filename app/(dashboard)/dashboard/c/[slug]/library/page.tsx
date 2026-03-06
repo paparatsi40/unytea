@@ -55,6 +55,11 @@ export default function LibraryPage() {
     sortBy: "createdAt",
     sortOrder: "desc",
   });
+  const [pagination, setPagination] = useState({
+    page: 1,
+    hasMore: false,
+    total: 0,
+  });
 
   // Fetch initial data
   const fetchData = useCallback(async () => {
