@@ -37,15 +37,19 @@ export function LanguageSelector() {
 
   const handleLocaleChange = (newLocale: string) => {
     localStorage.setItem("locale", newLocale);
+    setCurrentLocale(newLocale);
+    
+    // Check if we're on an i18n route
     const isI18nRoute = locales.some(l => pathname.startsWith(`/${l.code}`));
     
     if (isI18nRoute) {
+      // Replace current locale in pathname with new one and navigate
       const newPathname = pathname.replace(/^\/(en|es|fr)/, `/${newLocale}`);
       router.push(newPathname);
-    } else {
-      router.push(`/${newLocale}`);
+      router.refresh();
     }
-    router.refresh();
+    // If on dashboard/auth (no i18n), stay on current page
+    // The locale preference is saved and will apply to public pages
   };
 
   const currentLocaleData = locales.find((l) => l.code === currentLocale);
