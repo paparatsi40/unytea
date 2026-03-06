@@ -16,9 +16,11 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { NotificationCenter } from "@/components/notifications/NotificationCenter";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { useTranslations } from "next-intl";
 
 export function DashboardHeader() {
   const { user } = useCurrentUser();
+  const t = useTranslations();
 
   const getInitials = (name?: string | null) => {
     if (!name) return "U";
@@ -39,7 +41,7 @@ export function DashboardHeader() {
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Search communities, courses, members..."
+              placeholder={t("common.search")}
               className="h-10 w-full rounded-lg border border-border bg-background pl-10 pr-4 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </div>
@@ -49,10 +51,8 @@ export function DashboardHeader() {
         <div className="flex items-center space-x-4">
           {/* Messages */}
           <Link href="/dashboard/messages">
-            <Button variant="ghost" size="icon" className="relative">
+            <Button variant="ghost" size="icon" className="relative" aria-label={t("navigation.messages")}>
               <MessageSquare className="h-5 w-5" />
-              {/* Unread badge - we can make this dynamic later */}
-              {/* <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-purple-500"></span> */}
             </Button>
           </Link>
 
@@ -68,14 +68,14 @@ export function DashboardHeader() {
               <button className="flex items-center space-x-3 focus:outline-none">
                 <div className="text-right">
                   <p className="text-sm font-semibold text-foreground">
-                    {user?.name || "User"}
+                    {user?.name || t("navigation.profile")}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {user?.email}
                   </p>
                 </div>
                 <Avatar className="h-10 w-10 cursor-pointer ring-2 ring-border hover:ring-primary transition-all">
-                  <AvatarImage src={user?.image || undefined} alt={user?.name || "User"} />
+                  <AvatarImage src={user?.image || undefined} alt={user?.name || t("navigation.profile")} />
                   <AvatarFallback className="bg-gradient-to-br from-purple-600 to-pink-600 text-white font-semibold">
                     {getInitials(user?.name)}
                   </AvatarFallback>
@@ -83,11 +83,11 @@ export function DashboardHeader() {
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuLabel>{t("dashboard.welcome")}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem>
                 <UserIcon className="mr-2 h-4 w-4" />
-                <span>Profile</span>
+                <span>{t("navigation.profile")}</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
@@ -95,7 +95,7 @@ export function DashboardHeader() {
                 className="text-red-600 focus:text-red-600"
               >
                 <LogOut className="mr-2 h-4 w-4" />
-                <span>Sign out</span>
+                <span>{t("navigation.logout")}</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

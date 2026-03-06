@@ -6,11 +6,13 @@ import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Chrome, Github, Mail, Lock, ArrowRight, Sparkles } from "lucide-react"
 import { toast } from "react-hot-toast"
+import { useTranslations } from "next-intl"
 
 export function SignInContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams?.get("callbackUrl") || "/dashboard"
+  const t = useTranslations()
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -21,7 +23,7 @@ export function SignInContent() {
       setIsLoading(true)
       await signIn(provider, { callbackUrl })
     } catch {
-      toast.error("Something went wrong. Please try again.")
+      toast.error(t("common.error"))
     } finally {
       setIsLoading(false)
     }
@@ -31,7 +33,7 @@ export function SignInContent() {
     e.preventDefault()
 
     if (!email || !password) {
-      toast.error("Please fill in all fields")
+      toast.error(t("auth.fillAllFields"))
       return
     }
 
@@ -44,13 +46,13 @@ export function SignInContent() {
       })
 
       if (result?.error) {
-        toast.error("Invalid email or password")
+        toast.error(t("auth.invalidCredentials"))
       } else {
-        toast.success("Welcome back!")
+        toast.success(t("auth.welcomeBack"))
         router.push(callbackUrl)
       }
     } catch {
-      toast.error("Something went wrong. Please try again.")
+      toast.error(t("common.error"))
     } finally {
       setIsLoading(false)
     }
@@ -70,10 +72,10 @@ export function SignInContent() {
             </span>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome back
+            {t("auth.welcomeBack")}
           </h1>
           <p className="text-gray-600">
-            Sign in to continue to your communities
+            {t("auth.signInSubtitle")}
           </p>
         </div>
 
@@ -87,7 +89,7 @@ export function SignInContent() {
               className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white border-2 border-gray-200 rounded-xl hover:border-purple-300 hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
             >
               <Chrome className="w-5 h-5 text-gray-700 group-hover:text-purple-600 transition-colors" />
-              <span className="font-medium text-gray-700">Continue with Google</span>
+              <span className="font-medium text-gray-700">{t("auth.continueWithGoogle")}</span>
             </button>
 
             <button
@@ -96,7 +98,7 @@ export function SignInContent() {
               className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white border-2 border-gray-200 rounded-xl hover:border-purple-300 hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
             >
               <Github className="w-5 h-5 text-gray-700 group-hover:text-purple-600 transition-colors" />
-              <span className="font-medium text-gray-700">Continue with GitHub</span>
+              <span className="font-medium text-gray-700">{t("auth.continueWithGitHub")}</span>
             </button>
           </div>
 
@@ -106,7 +108,7 @@ export function SignInContent() {
               <div className="w-full border-t border-gray-200" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-gray-500">or continue with email</span>
+              <span className="px-4 bg-white text-gray-500">{t("auth.orContinueWith")}</span>
             </div>
           </div>
 
@@ -114,7 +116,7 @@ export function SignInContent() {
           <form onSubmit={handleCredentialsSignIn} className="space-y-4">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email
+                {t("auth.email")}
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -123,7 +125,7 @@ export function SignInContent() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
+                  placeholder={t("auth.emailPlaceholder")}
                   disabled={isLoading}
                   className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 transition-all outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                 />
@@ -132,7 +134,7 @@ export function SignInContent() {
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                Password
+                {t("auth.password")}
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -157,7 +159,7 @@ export function SignInContent() {
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
-                  Sign In
+                  {t("auth.signIn")}
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </>
               )}
@@ -168,14 +170,14 @@ export function SignInContent() {
         {/* Footer Links */}
         <div className="mt-6 text-center space-y-2">
           <p className="text-sm text-gray-600">
-            Don&apos;t have an account?{" "}
+            {t("auth.noAccount")}{" "}
             <Link href="/auth/signup" className="text-purple-600 hover:text-purple-700 font-medium">
-              Sign up
+              {t("navigation.signup")}
             </Link>
           </p>
           <p className="text-sm text-gray-500">
             <Link href="/auth/forgot-password" className="hover:text-gray-700">
-              Forgot password?
+              {t("auth.forgotPassword")}
             </Link>
           </p>
         </div>

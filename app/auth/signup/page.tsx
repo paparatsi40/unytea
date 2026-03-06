@@ -6,9 +6,11 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Chrome, Github, Mail, Lock, User, ArrowRight, Sparkles, Check } from "lucide-react"
 import { toast } from "react-hot-toast"
+import { useTranslations } from "next-intl"
 
 export default function SignUpPage() {
   const router = useRouter()
+  const t = useTranslations()
   
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
@@ -21,7 +23,7 @@ export default function SignUpPage() {
       setIsLoading(true)
       await signIn(provider, { callbackUrl: "/onboarding" })
     } catch {
-      toast.error("Something went wrong. Please try again.")
+      toast.error(t("common.error"))
     } finally {
       setIsLoading(false)
     }
@@ -32,17 +34,17 @@ export default function SignUpPage() {
     
     // Validation
     if (!name || !email || !password || !confirmPassword) {
-      toast.error("Please fill in all fields")
+      toast.error(t("auth.fillAllFields"))
       return
     }
 
     if (password.length < 8) {
-      toast.error("Password must be at least 8 characters")
+      toast.error(t("auth.passwordTooShort"))
       return
     }
 
     if (password !== confirmPassword) {
-      toast.error("Passwords do not match")
+      toast.error(t("auth.passwordsDoNotMatch"))
       return
     }
 
@@ -59,7 +61,7 @@ export default function SignUpPage() {
       const data = await response.json()
 
       if (!response.ok) {
-        toast.error(data.error || "Something went wrong")
+        toast.error(data.error || t("common.error"))
         return
       }
 
@@ -71,13 +73,13 @@ export default function SignUpPage() {
       })
 
       if (result?.error) {
-        toast.error("Error signing in. Please try again.")
+        toast.error(t("auth.signInError"))
       } else {
-        toast.success("Account created successfully!")
+        toast.success(t("auth.accountCreated"))
         router.push("/onboarding")
       }
     } catch {
-      toast.error("Something went wrong. Please try again.")
+      toast.error(t("common.error"))
     } finally {
       setIsLoading(false)
     }
