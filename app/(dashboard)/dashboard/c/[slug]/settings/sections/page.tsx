@@ -206,7 +206,7 @@ export default function SectionsManagerPage() {
           order: 0
         }
       ]);
-    } catch (_error) {
+    } catch {
       toast.error("Failed to load sections");
     } finally {
       setIsLoading(false);
@@ -269,7 +269,7 @@ export default function SectionsManagerPage() {
       
       await new Promise(resolve => setTimeout(resolve, 1000)); // Mock delay
       toast.success("Sections saved successfully!");
-    } catch (_error) {
+    } catch {
       toast.error("Failed to save sections");
     } finally {
       setIsSaving(false);
