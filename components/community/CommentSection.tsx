@@ -17,7 +17,7 @@ type Comment = {
   };
   replies?: Comment[];
   _count: {
-    replies: number;
+    replies?: number;
     reactions: number;
   };
 };
