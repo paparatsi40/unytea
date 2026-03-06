@@ -45,7 +45,7 @@ export async function getCommunityMembers(
   }
 ) {
   try {
-    const where: any = {
+    const where: { communityId: string; status: string; user?: { name?: { contains: string; mode: string; }; }; } = {
       communityId,
       status: "ACTIVE",
     };

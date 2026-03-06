@@ -141,15 +141,15 @@ Important Instructions:
       response: aiResponse,
       timestamp: new Date().toISOString(),
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("AI Chat API error:", error);
-    console.error("Error details:", error.message);
-    console.error("Error stack:", error.stack);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    console.error("Error details:", errorMessage);
     
     return NextResponse.json(
       { 
         error: "Failed to process chat message",
-        details: process.env.NODE_ENV === "development" ? error.message : undefined
+        details: process.env.NODE_ENV === "development" ? errorMessage : undefined
       },
       { status: 500 }
     );

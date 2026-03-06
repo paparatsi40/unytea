@@ -24,7 +24,7 @@ import {
   Sparkles
 } from "lucide-react";
 import { toast } from "sonner";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
 
 // Available section types
 const SECTION_TYPES = [
@@ -168,7 +168,7 @@ const SECTION_TYPES = [
 type Section = {
   id: string;
   type: string;
-  content: any;
+  content: Record<string, unknown>;
   visible: boolean;
   order: number;
 };
@@ -213,7 +213,7 @@ export default function SectionsManagerPage() {
     }
   };
 
-  const handleDragEnd = (result: any) => {
+  const handleDragEnd = (result: DropResult) => {
     if (!result.destination) return;
 
     const items = Array.from(sections);

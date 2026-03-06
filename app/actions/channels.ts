@@ -77,7 +77,7 @@ export async function getChannelMessages(channelId: string, limit = 50) {
 /**
  * Send a message to a channel
  */
-export async function sendChannelMessage(channelId: string, content: string, attachments?: any) {
+export async function sendChannelMessage(channelId: string, content: string, attachments?: unknown) {
   try {
     const userId = await getCurrentUserId();
 

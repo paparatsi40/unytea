@@ -14,7 +14,7 @@ export async function createNotification(data: {
   type: NotificationType;
   title: string;
   message: string;
-  data?: any;
+  data?: Record<string, unknown>;
 }) {
   try {
     const notification = await prisma.notification.create({
@@ -49,7 +49,7 @@ export async function notifyUser(params: {
   type: NotificationType;
   title: string;
   message: string;
-  data?: any;
+  data?: Record<string, unknown>;
 }) {
   return createNotification(params);
 }

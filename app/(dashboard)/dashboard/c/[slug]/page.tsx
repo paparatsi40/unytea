@@ -29,8 +29,10 @@ interface PageProps {
   };
 }
 
+import { Community } from "@prisma/client";
+
 // Component for Join Community UI - PUBLIC LANDING PAGE
-function JoinCommunityView({ community, stats }: { community: any; stats?: any }) {
+function JoinCommunityView({ community, stats }: { community: Community; stats?: Record<string, number> }) {
   async function handleJoin() {
     "use server";
     const session = await auth();
