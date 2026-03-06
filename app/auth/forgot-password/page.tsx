@@ -17,7 +17,7 @@ export default function ForgotPasswordPage() {
               <Sparkles className="w-6 h-6 text-white" />
             </div>
             <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Mentorly
+              Unytea
             </span>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">

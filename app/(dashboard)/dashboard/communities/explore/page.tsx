@@ -81,7 +81,7 @@ export default async function ExplorePage() {
             Explore Communities
           </h1>
           <p className="mt-2 text-muted-foreground">
-            Discover and join amazing communities on Mentorly
+            Discover and join amazing communities on Unytea
           </p>
         </div>
 

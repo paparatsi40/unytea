@@ -14,7 +14,7 @@ export default function SignInPage() {
                 <div className="w-6 h-6 bg-white/30 rounded-full animate-pulse" />
               </div>
               <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                Mentorly
+                Unytea
               </span>
             </div>
             <div className="h-8 w-48 bg-gray-200 rounded animate-pulse mx-auto mb-2" />

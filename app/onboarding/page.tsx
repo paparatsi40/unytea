@@ -25,7 +25,7 @@ export default function OnboardingPage() {
   const steps = [
     {
       number: 1,
-      title: "Welcome to Mentorly! 🎉",
+      title: "Welcome to Unytea! 🎉",
       description: "Let's get you set up in just a few steps",
       icon: User,
       fields: (
