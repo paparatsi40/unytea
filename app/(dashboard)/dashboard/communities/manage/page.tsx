@@ -67,7 +67,7 @@ export default function ManageCommunitiesPage() {
           variant: "destructive",
         });
       }
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: "Error",
         description: "An unexpected error occurred",
