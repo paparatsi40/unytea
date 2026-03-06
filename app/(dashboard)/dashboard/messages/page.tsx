@@ -6,16 +6,16 @@ import { MessageThread } from "@/components/messages/MessageThread";
 
 interface OtherUser {
   id: string;
-  name?: string | null;
-  firstName?: string | null;
-  lastName?: string | null;
-  username?: string | null;
-  image?: string | null;
+  name: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  username: string | null;
+  image: string | null;
 }
 
 export default function MessagesPage() {
   const [activeConversationId, setActiveConversationId] = useState<string>();
-  const [activeOtherUser, setActiveOtherUser] = useState<OtherUser | undefined>();
+  const [activeOtherUser, setActiveOtherUser] = useState<OtherUser | null>(null);
 
   const handleSelectConversation = (conversationId: string, otherUser: OtherUser) => {
     setActiveConversationId(conversationId);
