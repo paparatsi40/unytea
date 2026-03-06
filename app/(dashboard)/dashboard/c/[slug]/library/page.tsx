@@ -361,13 +361,16 @@ export default function LibraryPage() {
                 setIsSubmitting(true);
                 
                 const result = await createResource(communitySlug, {
-                  title: uploadForm.title,
-                  description: uploadForm.description,
-                  type: uploadForm.type,
-                  categoryId: uploadForm.categoryId || undefined,
-                  fileUrl: uploadedFiles[0]?.url || uploadForm.fileUrl,
-                  slug: uploadForm.title.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""),
-                });
+                title: uploadForm.title,
+                description: uploadForm.description,
+                type: uploadForm.type,
+                categoryId: uploadForm.categoryId || undefined,
+                fileUrl: uploadedFiles[0]?.url || uploadForm.fileUrl,
+                slug: uploadForm.title.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""),
+                tags: [],
+                isPublic: false,
+                status: "DRAFT",
+              });
                 
                 if (result.success) {
                   toast.success("Recurso subido exitosamente");
