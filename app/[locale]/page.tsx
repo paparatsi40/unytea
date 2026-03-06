@@ -113,12 +113,71 @@ export default async function Home() {
           <div className="relative slide-up-fade" style={{ animationDelay: "0.4s" }}>
             <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-purple-500/20 blur-3xl -z-10" />
             <div className="glass-strong rounded-2xl p-2 shadow-smooth-xl">
-              <div className="bg-gradient-to-br from-primary/10 to-purple-500/10 rounded-xl aspect-video flex items-center justify-center">
-                <div className="text-center">
-                  <Sparkles className="w-16 h-16 mx-auto mb-4 text-primary" />
-                  <p className="text-lg font-medium text-muted-foreground">
-                    ☕ Your Community Space Awaits
-                  </p>
+              <div className="bg-gradient-to-br from-background to-muted/50 rounded-xl overflow-hidden">
+                {/* Mock Dashboard UI */}
+                <div className="p-6">
+                  {/* Header */}
+                  <div className="flex items-center justify-between mb-6 pb-4 border-b border-border/50">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-primary to-purple-600 rounded-xl flex items-center justify-center">
+                        <Sparkles className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold">Design Masters</h3>
+                        <p className="text-xs text-muted-foreground">1,247 members</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                        <span className="text-xs">🔔</span>
+                      </div>
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600" />
+                    </div>
+                  </div>
+                  
+                  {/* Content Grid */}
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {/* Post Card 1 */}
+                    <div className="glass rounded-xl p-4 space-y-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-pink-400 to-rose-500" />
+                        <div>
+                          <p className="text-sm font-medium">Sarah Chen</p>
+                          <p className="text-xs text-muted-foreground">2 hours ago</p>
+                        </div>
+                      </div>
+                      <p className="text-sm text-muted-foreground">Just launched our new design system! 🎨 Check out the color palette...</p>
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                        <span>❤️ 24</span>
+                        <span>💬 8</span>
+                        <span>👁️ 156</span>
+                      </div>
+                    </div>
+                    
+                    {/* Post Card 2 */}
+                    <div className="glass rounded-xl p-4 space-y-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500" />
+                        <div>
+                          <p className="text-sm font-medium">Marcus Johnson</p>
+                          <p className="text-xs text-muted-foreground">5 hours ago</p>
+                        </div>
+                      </div>
+                      <p className="text-sm text-muted-foreground">Hosting a live session tomorrow at 3PM EST on UX research methods! ☕</p>
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">Live Session</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Bottom Stats */}
+                  <div className="mt-6 pt-4 border-t border-border/50 flex items-center justify-between text-xs text-muted-foreground">
+                    <div className="flex items-center gap-4">
+                      <span className="flex items-center gap-1">👥 24 online</span>
+                      <span className="flex items-center gap-1">📊 3 active sessions</span>
+                    </div>
+                    <span className="text-primary font-medium">Join the conversation →</span>
+                  </div>
                 </div>
               </div>
             </div>
