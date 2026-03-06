@@ -54,6 +54,7 @@ export default function SessionVideoPage() {
   }, [sessionId]);
 
   async function checkFeedbackStatus() {
+    if (!sessionId) return;
     try {
       const hasFeedback = await hasSubmittedFeedback(sessionId);
       setAlreadyHasFeedback(hasFeedback);
@@ -63,6 +64,7 @@ export default function SessionVideoPage() {
   }
 
   async function fetchSession() {
+    if (!sessionId) return;
     try {
       setLoading(true);
       const response = await fetch(`/api/sessions/${sessionId}`);
