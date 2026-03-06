@@ -73,7 +73,7 @@ const COLOR_PRESETS = [
 export default function AppearanceSettingsPage() {
   const params = useParams();
   // const router = useRouter();
-  const slug = params.slug as string;
+  // const slug = params.slug as string;
 
   const [layout, setLayout] = useState("MODERN_GRID");
   const [primaryColor, setPrimaryColor] = useState("#3b82f6");
