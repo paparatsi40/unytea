@@ -479,6 +479,10 @@ export default function LibraryPage() {
                         const result = await createResourceCategory(communitySlug, {
                           name: newCategoryName.trim(),
                           slug: newCategoryName.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""),
+                          description: null,
+                          icon: null,
+                          color: null,
+                          position: 0,
                         });
                         
                         if (result.success && result.data) {
