@@ -41,8 +41,13 @@ export const ourFileRouter = {
     text: { maxFileSize: "2MB", maxFileCount: 5 },
   })
     .middleware(async () => {
+      console.log("[UploadThing] Document upload attempt");
       const userId = await getCurrentUserId();
-      if (!userId) throw new Error("Unauthorized");
+      console.log("[UploadThing] User ID:", userId);
+      if (!userId) {
+        console.error("[UploadThing] Unauthorized - no user ID");
+        throw new Error("Unauthorized");
+      }
       return { userId };
     })
     .onUploadComplete(async ({ metadata, file }) => {
@@ -57,8 +62,13 @@ export const ourFileRouter = {
     audio: { maxFileSize: "8MB", maxFileCount: 3 },
   })
     .middleware(async () => {
+      console.log("[UploadThing] Media upload attempt");
       const userId = await getCurrentUserId();
-      if (!userId) throw new Error("Unauthorized");
+      console.log("[UploadThing] User ID:", userId);
+      if (!userId) {
+        console.error("[UploadThing] Unauthorized - no user ID");
+        throw new Error("Unauthorized");
+      }
       return { userId };
     })
     .onUploadComplete(async ({ metadata, file }) => {
