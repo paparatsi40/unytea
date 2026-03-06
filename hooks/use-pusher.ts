@@ -92,7 +92,7 @@ export function usePusher(channelId: string, userId: string) {
       };
 
       // Trigger event via server API
-      const response = await fetch("/api/pusher/trigger", {
+      const response = await fetch("/api/pusher", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -127,7 +127,7 @@ export function usePusher(channelId: string, userId: string) {
   const sendTyping = useCallback(async () => {
     if (!channelRef.current) return;
 
-    await fetch("/api/pusher/trigger", {
+    await fetch("/api/pusher", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
