@@ -4,6 +4,8 @@ import { GeistMono } from "geist/font/mono";
 import { SessionProvider } from "next-auth/react";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages } from "next-intl/server";
 
 export const metadata: Metadata = {
   title: {
@@ -52,36 +54,42 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
+  params: { locale }
 }: Readonly<{
   children: React.ReactNode;
+  params: { locale: string };
 }>) {
+  const messages = await getMessages();
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <body
         className={`${GeistSans.variable} ${GeistMono.variable} font-sans antialiased`}
       >
-        <SessionProvider>
-          {children}
-          <Toaster 
-            position="top-right"
-            toastOptions={{
-              duration: 4000,
-              style: {
-                background: 'hsl(224 71% 4%)',
-                color: 'hsl(213 31% 91%)',
-                border: '1px solid hsl(215 27.9% 16.9%)',
-              },
-              success: {
-                iconTheme: {
-                  primary: 'hsl(263 70% 50%)',
-                  secondary: 'white',
+        <NextIntlClientProvider messages={messages} locale={locale}>
+          <SessionProvider>
+            {children}
+            <Toaster 
+              position="top-right"
+              toastOptions={{
+                duration: 4000,
+                style: {
+                  background: 'hsl(224 71% 4%)',
+                  color: 'hsl(213 31% 91%)',
+                  border: '1px solid hsl(215 27.9% 16.9%)',
                 },
-              },
-            }}
-          />
-        </SessionProvider>
+                success: {
+                  iconTheme: {
+                    primary: 'hsl(263 70% 50%)',
+                    secondary: 'white',
+                  },
+                },
+              }}
+            />
+          </SessionProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );
