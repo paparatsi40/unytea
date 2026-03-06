@@ -39,7 +39,7 @@ interface CommunityStats {
 }
 
 // Component for Join Community UI - PUBLIC LANDING PAGE
-function JoinCommunityView({ community, stats }: { community: Community; stats?: CommunityStats }) {
+function JoinCommunityView({ community, stats }: { community: Community; stats?: CommunityStats | null }) {
   async function handleJoin() {
     "use server";
     const session = await auth();
