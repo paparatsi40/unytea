@@ -8,6 +8,7 @@ interface OtherUser {
   id: string;
   name?: string | null;
   firstName?: string | null;
+  lastName?: string | null;
   username?: string | null;
   image?: string | null;
 }
