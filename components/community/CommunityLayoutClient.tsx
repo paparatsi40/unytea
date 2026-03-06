@@ -1,10 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
-import Link from "next/link";
-import { CommunityActions } from "@/components/community/CommunityActions";
-import { Users, TrendingUp, Hash, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 import { PremiumCommunityHeader } from "@/components/community/PremiumCommunityHeader";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { AIChatWidget } from "@/components/ai/AIChatWidget";
@@ -37,7 +35,6 @@ export function CommunityLayoutClient({
 }) {
   const { user, isLoading } = useCurrentUser();
   const router = useRouter();
-  const pathname = usePathname();
   const [community, setCommunity] = useState<Community | null>(null);
   const [membership, setMembership] = useState<Membership>(null);
   const [loading, setLoading] = useState(true);
