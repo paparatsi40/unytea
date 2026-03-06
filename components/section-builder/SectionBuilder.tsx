@@ -371,7 +371,7 @@ export function SectionBuilder({
                   }
                   setGeneratingAI(true);
                   try {
-                    const faqs = await generateCommunityFAQs(communityName, communityDescription);
+                    const faqs = await generateCommunityFAQs(communityName, communityDescription ?? null);
                     const updates: Record<string, string> = {};
                     faqs.forEach((faq, i) => {
                       updates[`q${i + 1}`] = faq.q;
@@ -379,7 +379,7 @@ export function SectionBuilder({
                     });
                     updateProps(selected.id, updates);
                     toast.success("FAQs generated with AI!");
-                  } catch (error) {
+                  } catch {
                     toast.error("Failed to generate FAQs");
                   } finally {
                     setGeneratingAI(false);
