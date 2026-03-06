@@ -55,7 +55,6 @@ export default function LibraryPage() {
     sortBy: "createdAt",
     sortOrder: "desc",
   });
-  });
 
   // Fetch initial data
   const fetchData = useCallback(async () => {
