@@ -324,6 +324,10 @@ export async function createResource(
       },
     });
 
+    console.log("[createResource] Resource created with communityId:", access.community.id);
+    console.log("[createResource] Resource ID:", resource.id);
+    console.log("[createResource] Resource slug:", resource.slug);
+
     revalidatePath(`/dashboard/c/${communitySlug}/library`);
 
     return {
