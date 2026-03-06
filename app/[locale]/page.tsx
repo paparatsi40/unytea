@@ -185,6 +185,57 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* Featured Communities */}
+      <section className="py-16 px-4 bg-gradient-to-b from-primary/5 to-background">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Communities That Trust Unytea
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Join thousands of thriving communities already building something special
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            {featuredCommunities.map((community) => (
+              <div
+                key={community.name}
+                className="group relative overflow-hidden rounded-2xl glass-strong card-hover"
+              >
+                {/* Community Image */}
+                <div 
+                  className="aspect-square bg-cover bg-center"
+                  style={{ 
+                    backgroundImage: `linear-gradient(135deg, ${community.gradient.from}, ${community.gradient.to})` 
+                  }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  
+                  {/* Content Overlay */}
+                  <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-lg">
+                        {community.emoji}
+                      </div>
+                    </div>
+                    <h3 className="font-semibold text-sm mb-1">{community.name}</h3>
+                    <div className="flex items-center gap-2 text-xs text-white/80">
+                      <span>{community.members.toLocaleString()} members</span>
+                      <span>•</span>
+                      <span className="flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
+                        {community.online} online
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Features Grid */}
       <section id="features" className="py-20 px-4">
         <div className="container mx-auto max-w-6xl">
@@ -364,6 +415,66 @@ export default async function Home() {
     </div>
   );
 }
+
+// Featured Communities data
+const featuredCommunities = [
+  {
+    name: "Design Masters",
+    members: 1247,
+    online: 42,
+    emoji: "🎨",
+    gradient: { from: "#9333ea", to: "#ec4899" },
+  },
+  {
+    name: "Code Wizards",
+    members: 3892,
+    online: 156,
+    emoji: "⚡",
+    gradient: { from: "#3b82f6", to: "#8b5cf6" },
+  },
+  {
+    name: "Fitness Tribe",
+    members: 2156,
+    online: 89,
+    emoji: "💪",
+    gradient: { from: "#f97316", to: "#ef4444" },
+  },
+  {
+    name: "Mindful Living",
+    members: 876,
+    online: 34,
+    emoji: "🧘",
+    gradient: { from: "#10b981", to: "#14b8a6" },
+  },
+  {
+    name: "Startup Hub",
+    members: 5634,
+    online: 234,
+    emoji: "🚀",
+    gradient: { from: "#6366f1", to: "#8b5cf6" },
+  },
+  {
+    name: "Photo Pros",
+    members: 1543,
+    online: 67,
+    emoji: "📸",
+    gradient: { from: "#f59e0b", to: "#fbbf24" },
+  },
+  {
+    name: "Music Makers",
+    members: 2341,
+    online: 98,
+    emoji: "🎵",
+    gradient: { from: "#ec4899", to: "#f43f5e" },
+  },
+  {
+    name: "Crypto Circle",
+    members: 4521,
+    online: 312,
+    emoji: "₿",
+    gradient: { from: "#14b8a6", to: "#06b6d4" },
+  },
+];
 
 // Features data
 const features = [
