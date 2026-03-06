@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { NotificationCenter } from "@/components/notifications/NotificationCenter";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 export function DashboardHeader() {
   const { user } = useCurrentUser();
@@ -57,6 +58,9 @@ export function DashboardHeader() {
 
           {/* Notifications */}
           <NotificationCenter />
+
+          {/* Language Selector */}
+          <LanguageSelector />
 
           {/* User Menu */}
           <DropdownMenu>
