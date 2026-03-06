@@ -31,7 +31,7 @@ interface LivePollProps {
   currentUserId: string;
   onVote: (pollId: string, optionId: string) => void;
   onClose?: () => void;
-  isModerator?: boolean;
+  _isModerator?: boolean;
 }
 
 export function LivePoll({
