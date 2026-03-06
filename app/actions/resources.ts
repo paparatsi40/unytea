@@ -431,6 +431,11 @@ export async function getResources(
       communityId: access.community.id,
     };
 
+    console.log("[getResources] Community ID:", access.community.id);
+    console.log("[getResources] User ID:", session.user.id);
+    console.log("[getResources] User role:", access.member.role);
+    console.log("[getResources] isAdmin:", isAdmin);
+
     // Filtros opcionales
     if (validated.type) where.type = validated.type;
     if (validated.categoryId) where.categoryId = validated.categoryId;
@@ -457,6 +462,8 @@ export async function getResources(
         { authorId: session.user.id },
       ];
     }
+
+    console.log("[getResources] Where clause:", JSON.stringify(where, null, 2));
 
     const skip = (validated.page - 1) * validated.limit;
 
@@ -485,6 +492,12 @@ export async function getResources(
       }),
       prisma.resource.count({ where }),
     ]);
+
+    console.log("[getResources] Total resources found:", total);
+    console.log("[getResources] Resources count:", resources.length);
+    if (resources.length > 0) {
+      console.log("[getResources] First resource:", resources[0].title, "by", resources[0].authorId);
+    }
 
     // Verificar si hay más resultados
     const hasMore = skip + resources.length < total;
