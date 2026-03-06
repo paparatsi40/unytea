@@ -16,6 +16,7 @@ import { ImageUploader } from "@/components/ui/image-uploader";
 import { Button } from "@/components/ui/button";
 import { generateCommunityFAQs } from "@/app/actions/ai-content";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 /** ========== Utils ========== */
 
@@ -27,7 +28,7 @@ function deepClone<T>(obj: T): T {
 
 /** ========== Section Renderer ========== */
 
-function renderSection(section: SectionInstance) {
+function renderSection(section: SectionInstance, t: ReturnType<typeof useTranslations>) {
   switch (section.type) {
     case "hero":
       return <HeroRender {...section.props} />;
@@ -46,11 +47,11 @@ function renderSection(section: SectionInstance) {
     case "gallery":
       return <GalleryRender {...section.props} />;
     case "pricing":
-      return <div className="p-8 text-center text-gray-500">Pricing section coming soon</div>;
+      return <div className="p-8 text-center text-gray-500">{t("common.comingSoon")}</div>;
     case "video":
-      return <div className="p-8 text-center text-gray-500">Video section coming soon</div>;
+      return <div className="p-8 text-center text-gray-500">{t("common.comingSoon")}</div>;
     default:
-      return <div className="p-8 text-center text-gray-500">Unknown section type</div>;
+      return <div className="p-8 text-center text-gray-500">{t("sectionBuilder.unknownSection")}</div>;
   }
 }
 
@@ -69,6 +70,7 @@ export function SectionBuilder({
   communityName,
   communityDescription
 }: SectionBuilderProps) {
+  const t = useTranslations();
   const [sections, setSections] = useState<SectionInstance[]>(initialSections);
 
   // Sync sections when initialSections changes (e.g., after loading from API)
@@ -166,7 +168,7 @@ export function SectionBuilder({
       {/* LEFT: Palette */}
       <aside className="w-72 shrink-0 overflow-y-auto rounded-2xl border border-border bg-card p-4">
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-sm font-bold">Sections</h3>
+          <h3 className="text-sm font-bold">{t("sectionBuilder.sections")}</h3>
           <div className="flex gap-2">
             <Button
               variant="outline"
@@ -263,7 +265,7 @@ export function SectionBuilder({
                     <button
                       className="rounded p-0.5 hover:bg-black/10"
                       onClick={() => move(s.id, 1)}
-                      title="Move down"
+                      title={t("common.moveDown")}
                       disabled={idx === sections.length - 1}
                     >
                       <ChevronDown className="h-3 w-3" />
@@ -271,7 +273,7 @@ export function SectionBuilder({
                     <button
                       className="rounded p-0.5 hover:bg-black/10"
                       onClick={() => duplicateSection(s.id)}
-                      title="Duplicate"
+                      title={t("common.duplicate")}
                     >
                       <Copy className="h-3 w-3" />
                     </button>
@@ -327,7 +329,7 @@ export function SectionBuilder({
                   : "hover:ring-2 hover:ring-gray-300 hover:ring-offset-2",
               ].join(" ")}
             >
-              {renderSection(s)}
+              {renderSection(s, t)}
             </div>
           ))}
         </div>
@@ -335,11 +337,11 @@ export function SectionBuilder({
 
       {/* RIGHT: Properties */}
       <aside className="w-80 shrink-0 overflow-y-auto rounded-2xl border border-border bg-card p-4">
-        <h3 className="mb-4 text-sm font-bold">Properties</h3>
+        <h3 className="mb-4 text-sm font-bold">{t("sectionBuilder.properties")}</h3>
 
         {!selected && (
           <p className="text-xs text-muted-foreground">
-            Select a section to edit its properties
+            {t("sectionBuilder.selectSection")}
           </p>
         )}
 
@@ -503,7 +505,7 @@ export function SectionBuilder({
                 ) : (
                   sections.map((s) => (
                     <div key={s.id}>
-                      {renderSection(s)}
+                      {renderSection(s, t)}
                     </div>
                   ))
                 )}
