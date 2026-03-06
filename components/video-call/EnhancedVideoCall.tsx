@@ -194,7 +194,6 @@ function VideoCallInterface({
       }
     };
 
-    // @ts-expect-error - Listener type mismatch but works at runtime
     room.on(RoomEvent.DataReceived, handleDataReceived);
 
     return () => {
