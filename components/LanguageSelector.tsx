@@ -77,7 +77,11 @@ export function LanguageSelector() {
         {locales.map((l) => (
           <DropdownMenuItem
             key={l.code}
-            onClick={() => handleLocaleChange(l.code)}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleLocaleChange(l.code);
+            }}
             className={`gap-2 ${l.code === currentLocale ? "bg-accent" : ""}`}
           >
             <span>{l.flag}</span>
