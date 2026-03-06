@@ -17,36 +17,37 @@ import {
 import { useUploadThing } from "@/lib/uploadthing";
 import { toast } from "sonner";
 import { BookOpen } from "lucide-react";
+import { useTranslations } from "next-intl";
 
-const steps = [
+const getSteps = (t: ReturnType<typeof useTranslations>) => [
   {
     id: 1,
-    title: "Basic Information",
-    description: "Let's start with the essentials",
+    title: t("communities.stepBasicInfo"),
+    description: t("communities.stepBasicInfoDesc"),
     icon: Users,
   },
   {
     id: 2,
-    title: "Appearance",
-    description: "Make it uniquely yours",
+    title: t("communities.stepAppearance"),
+    description: t("communities.stepAppearanceDesc"),
     icon: Palette,
   },
   {
     id: 3,
-    title: "Layout & Theme",
-    description: "Choose your style",
+    title: t("communities.stepLayout"),
+    description: t("communities.stepLayoutDesc"),
     icon: Sparkles,
   },
   {
     id: 4,
-    title: "Settings",
-    description: "Configure your community",
+    title: t("communities.stepSettings"),
+    description: t("communities.stepSettingsDesc"),
     icon: SettingsIcon,
   },
   {
     id: 5,
-    title: "Preview",
-    description: "Review before creating",
+    title: t("communities.stepPreview"),
+    description: t("communities.stepPreviewDesc"),
     icon: Sparkles,
   },
 ];
@@ -54,6 +55,8 @@ const steps = [
 export default function NewCommunityPage() {
   const router = useRouter();
   const { user } = useCurrentUser();
+  const t = useTranslations();
+  const steps = getSteps(t);
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
@@ -104,10 +107,10 @@ export default function NewCommunityPage() {
         setFormData({ ...formData, coverImageUrl: uploadedUrl });
       }
 
-      toast.success(`${type === "logo" ? "Logo" : "Cover"} uploaded successfully!`);
+      toast.success(t("communities.uploadSuccess", { type: type === "logo" ? t("communities.logo") : t("communities.cover") }));
     } catch (error) {
       console.error("Upload error:", error);
-      toast.error(`Failed to upload ${type === "logo" ? "logo" : "cover"}`);
+      toast.error(t("communities.uploadFailed", { type: type === "logo" ? t("communities.logo") : t("communities.cover") }));
     } finally {
       if (type === "logo") {
         setUploadingLogo(false);
@@ -131,12 +134,12 @@ export default function NewCommunityPage() {
 
   const handleSubmit = async () => {
     if (!user) {
-      alert("You must be signed in to create a community");
+      alert(t("auth.signInRequired"));
       return;
     }
 
     if (!formData.name) {
-      alert("Community name is required");
+      alert(t("communities.nameRequired"));
       return;
     }
 
@@ -194,12 +197,12 @@ export default function NewCommunityPage() {
         window.location.href = redirectUrl;
       } else {
         console.error("❌ Failed to create community:", result.error);
-        alert(result.error || "Failed to create community");
+        alert(result.error || t("communities.createFailed"));
         setIsSubmitting(false);
       }
     } catch (error) {
       console.error("💥 Error creating community:", error);
-      alert(error instanceof Error ? error.message : "Failed to create community");
+      alert(error instanceof Error ? error.message : t("communities.createFailed"));
       setIsSubmitting(false);
     }
   };
@@ -301,7 +304,7 @@ export default function NewCommunityPage() {
                     setFormData({ ...formData, name: e.target.value })
                   }
                   className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  placeholder="My Awesome Community"
+                  placeholder={t("communities.namePlaceholder")}
                   maxLength={50}
                 />
                 <p className="mt-1 text-xs text-muted-foreground">
@@ -320,7 +323,7 @@ export default function NewCommunityPage() {
                     setFormData({ ...formData, description: e.target.value })
                   }
                   className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  placeholder="Tell people what your community is about..."
+                  placeholder={t("communities.descriptionPlaceholder")}
                   rows={4}
                   maxLength={500}
                 />
