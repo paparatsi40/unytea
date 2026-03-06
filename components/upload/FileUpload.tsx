@@ -26,7 +26,7 @@ export function FileUpload({
 
   const handleUploadComplete = (res: any) => {
     const uploadedFiles = res.map((file: any) => ({
-      url: file.url,
+      url: file.ufsUrl || file.url, // Use ufsUrl (v9) with fallback to url (legacy)
       name: file.name,
     }));
 
