@@ -5,23 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
 import { joinCommunity } from "@/app/actions/communities";
 import Link from "next/link";
-import { Users, Lock, ArrowLeft, BookOpen, CheckCircle, TrendingUp, Award, Zap, Target } from "lucide-react";
-
-// Import all layout components
-import { ModernGridLayout } from "@/components/community/layouts/ModernGridLayout";
-import { ClassicForumLayout } from "@/components/community/layouts/ClassicForumLayout";
-import { AcademyLayout } from "@/components/community/layouts/AcademyLayout";
-import { DashboardLayout } from "@/components/community/layouts/DashboardLayout";
-import { MinimalistLayout } from "@/components/community/layouts/MinimalistLayout";
-
-// Layout component mapping
-const LAYOUT_COMPONENTS = {
-  MODERN_GRID: ModernGridLayout,
-  CLASSIC_FORUM: ClassicForumLayout,
-  ACADEMY: AcademyLayout,
-  DASHBOARD: DashboardLayout,
-  MINIMALIST: MinimalistLayout,
-} as const;
+import { Lock, ArrowLeft } from "lucide-react";
 
 interface PageProps {
   params: {
