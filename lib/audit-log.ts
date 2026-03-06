@@ -1,5 +1,3 @@
-import { prisma } from "@/lib/prisma";
-
 export type AuditAction =
   | "USER_LOGIN"
   | "USER_LOGOUT"

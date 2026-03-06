@@ -20,7 +20,7 @@ export default function SignUpPage() {
     try {
       setIsLoading(true)
       await signIn(provider, { callbackUrl: "/onboarding" })
-    } catch (error) {
+    } catch (_error) {
       toast.error("Something went wrong. Please try again.")
     } finally {
       setIsLoading(false)
@@ -76,7 +76,7 @@ export default function SignUpPage() {
         toast.success("Account created successfully!")
         router.push("/onboarding")
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error("Something went wrong. Please try again.")
     } finally {
       setIsLoading(false)

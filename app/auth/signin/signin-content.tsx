@@ -20,7 +20,7 @@ export function SignInContent() {
     try {
       setIsLoading(true)
       await signIn(provider, { callbackUrl })
-    } catch (error) {
+    } catch (_error) {
       toast.error("Something went wrong. Please try again.")
     } finally {
       setIsLoading(false)
@@ -49,7 +49,7 @@ export function SignInContent() {
         toast.success("Welcome back!")
         router.push(callbackUrl)
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error("Something went wrong. Please try again.")
     } finally {
       setIsLoading(false)
