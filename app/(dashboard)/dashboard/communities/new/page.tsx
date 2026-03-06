@@ -13,9 +13,6 @@ import {
   Palette,
   Settings as SettingsIcon,
   Sparkles,
-  Link as LinkIcon,
-  X,
-  Image as ImageIcon,
   Loader2,
 } from "lucide-react";
 import { useUploadThing } from "@/lib/uploadthing";
