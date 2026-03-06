@@ -8,8 +8,7 @@ import {
   Bookmark, 
   Send, 
   Pin,
-  CheckCircle,
-  X
+  CheckCircle
 } from "lucide-react";
 
 export type ChatMessageType = "general" | "question" | "resource";
@@ -256,7 +255,7 @@ function ChatMessageComponent({
   onPin,
   onMarkAnswered,
 }: ChatMessageComponentProps) {
-  const isOwn = message.userId === currentUserId;
+  const _isOwn = message.userId === currentUserId;
   const isQuestion = message.type === "question";
   const isResource = message.type === "resource";
 

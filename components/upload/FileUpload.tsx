@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { UploadDropzone } from "@/lib/uploadthing";
+import { UploadDropzone } from "@uploadthing/react";
 import { X, File, Image as ImageIcon, FileText, Loader2 } from "lucide-react";
 
 type FileUploadProps = {

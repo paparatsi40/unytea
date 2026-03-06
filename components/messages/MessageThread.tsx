@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { MessageBubble } from "./MessageBubble";
 import { MessageInput } from "./MessageInput";
 import { getConversationMessages, markMessagesAsRead } from "@/app/actions/messages";
-import { Loader2, MoreVertical, Ban } from "lucide-react";
+import { Loader2, MoreVertical } from "lucide-react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 
 interface MessageThreadProps {

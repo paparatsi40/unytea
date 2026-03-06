@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, Filter, Users, TrendingUp, Award } from "lucide-react";
+import { Search, Users } from "lucide-react";
 import { MemberCard } from "./MemberCard";
 import { getCommunityMembers } from "@/app/actions/members";
 

@@ -4,15 +4,6 @@ import { NextResponse } from "next/server"
 export default auth((req) => {
   const isLoggedIn = !!req.auth
   const pathname = req.nextUrl.pathname
-
-  // Public routes (accessible without auth)
-  const isPublicRoute = 
-    pathname === "/" ||
-    pathname.startsWith("/auth/") ||
-    pathname.startsWith("/api/auth/") ||
-    pathname.startsWith("/c/")  
-
-  // Protected routes (require auth)
   const isProtectedRoute = 
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/onboarding")

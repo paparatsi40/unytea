@@ -40,10 +40,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   pages: {
     signIn: "/auth/signin",
-    signUp: "/auth/signup",
     error: "/auth/error",
     verifyRequest: "/auth/verify",
-    newUser: "/dashboard", // Changed from /onboarding
+    newUser: "/dashboard",
   },
   providers: [
     Google({

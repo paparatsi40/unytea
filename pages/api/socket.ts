@@ -3,7 +3,7 @@ import { NextApiResponseWithSocket, initSocket } from "@/lib/socket";
 import { setSocketInstance } from "@/lib/socket-instance";
 
 export default function handler(
-  req: NextApiRequest,
+  _req: NextApiRequest,
   res: NextApiResponseWithSocket
 ) {
   if (res.socket.server.io) {

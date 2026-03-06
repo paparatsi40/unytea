@@ -4,14 +4,9 @@ import { useEffect, useState } from "react";
 import {
   LiveKitRoom,
   VideoConference,
-  GridLayout,
-  ParticipantTile,
   RoomAudioRenderer,
-  ControlBar,
-  useTracks,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
-import { Track } from "livekit-client";
 import { Loader2 } from "lucide-react";
 
 interface VideoRoomProps {
