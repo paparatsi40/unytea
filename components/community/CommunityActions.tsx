@@ -8,6 +8,7 @@ import { joinCommunity, leaveCommunity } from "@/app/actions/communities";
 import { Button } from "@/components/ui/button";
 import { Settings, UserPlus, UserMinus, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
+import { useTranslations } from "next-intl";
 
 interface CommunityActionsProps {
   communityId: string;
@@ -26,6 +27,7 @@ export function CommunityActions({
 }: CommunityActionsProps) {
   const router = useRouter();
   const { user } = useCurrentUser();
+  const t = useTranslations();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleJoin = async () => {
@@ -89,7 +91,7 @@ export function CommunityActions({
           className="flex items-center space-x-2"
         >
           <Loader2 className="h-4 w-4 animate-spin" />
-          <span>Pending Approval</span>
+          <span>{t("communities.pendingApproval")}</span>
         </Button>
       ) : isMember ? (
         <>

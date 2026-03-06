@@ -37,7 +37,9 @@
     "signInRequired": "You must be signed in to create a community",
     "signInError": "Error signing in. Please try again.",
     "passwordTooShort": "Password must be at least 8 characters",
-    "passwordsDoNotMatch": "Passwords do not match"
+    "passwordsDoNotMatch": "Passwords do not match",
+    "resetPassword": "Reset Password",
+    "passwordResetComingSoon": "Password reset functionality is coming soon. For now, please contact an administrator to reset your password."
   },
   "dashboard": {
     "welcome": "Welcome",
@@ -73,13 +75,7 @@
     "welcomeMessagePlaceholder": "Welcome message for new members...",
     "createSuccess": "Community created successfully!",
     "joinSuccess": "Successfully joined the community!",
-    "youOwn": "You Own",
-    "totalCommunities": "Total Communities",
-    "totalMembers": "Total Members",
-    "totalPosts": "Total Posts",
-    "allCommunities": "All Communities",
-    "mostMembers": "Most Members",
-    "mostActive": "Most Active",
+    "leaveSuccess": "Successfully left the community",
     "createFailed": "Failed to create community",
     "nameRequired": "Community name is required",
     "logo": "Logo",
@@ -95,7 +91,18 @@
     "stepSettings": "Settings",
     "stepSettingsDesc": "Configure your community",
     "stepPreview": "Preview",
-    "stepPreviewDesc": "Review before creating"
+    "stepPreviewDesc": "Review before creating",
+    "youOwn": "You Own",
+    "totalCommunities": "Total Communities",
+    "totalMembers": "Total Members",
+    "totalPosts": "Total Posts",
+    "allCommunities": "All Communities",
+    "mostMembers": "Most Members",
+    "mostActive": "Most Active",
+    "joinFailed": "Failed to join community",
+    "leaveFailed": "Failed to leave community",
+    "leaveConfirm": "Are you sure you want to leave this community? You'll need to request to join again.",
+    "pendingApproval": "Pending Approval"
   },
   "sectionBuilder": {
     "title": "Landing Page Builder",
@@ -205,6 +212,12 @@
     "rights": "All rights reserved",
     "moveUp": "Move up",
     "moveDown": "Move down",
-    "duplicate": "Duplicate"
+    "duplicate": "Duplicate",
+    "recent": "Recent",
+    "alphabetical": "Alphabetical",
+    "of": "of",
+    "featureInDevelopment": "Feature in Development",
+    "needHelp": "Need help?",
+    "contactSupport": "Contact support"
   }
 }
