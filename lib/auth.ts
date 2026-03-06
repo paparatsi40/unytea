@@ -15,12 +15,16 @@ declare module "next-auth" {
       username?: string | null
       isOnboarded: boolean
       role?: string
+      firstName?: string | null
+      lastName?: string | null
     } & DefaultSession["user"]
   }
 
   interface User {
     username?: string | null
     isOnboarded: boolean
+    firstName?: string | null
+    lastName?: string | null
   }
 }
 
@@ -79,13 +83,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           }
 
           return {
-            id: user.id,
-            email: user.email,
-            name: user.name,
-            image: user.image,
-            username: user.username,
-            isOnboarded: user.isOnboarded,
-          }
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        image: user.image,
+        username: user.username,
+        isOnboarded: user.isOnboarded,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      }
         } catch {
           return null
         }
@@ -121,6 +127,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.id = user.id
         token.username = user.username
         token.isOnboarded = user.isOnboarded
+        token.firstName = user.firstName
+        token.lastName = user.lastName
       }
 
       // Update token on session update
@@ -135,6 +143,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = token.id as string
         session.user.username = token.username as string | null
         session.user.isOnboarded = token.isOnboarded as boolean
+        session.user.firstName = token.firstName as string | null
+        session.user.lastName = token.lastName as string | null
       }
 
       return session
