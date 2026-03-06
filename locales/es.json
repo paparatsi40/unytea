@@ -177,7 +177,8 @@
     "profile": "Perfil",
     "logout": "Cerrar sesión",
     "signIn": "Iniciar sesión",
-    "signUp": "Registrarse"
+    "signUp": "Registrarse",
+    "signup": "Registrarse"
   },
   "common": {
     "loading": "Cargando...",
@@ -263,7 +264,15 @@
     "passwordsDontMatch": "Las contraseñas no coinciden",
     "forgotPassword": "¿Olvidaste tu contraseña?",
     "resetPassword": "Restablecer Contraseña",
-    "checkEmail": "Revisa tu correo para instrucciones"
+    "checkEmail": "Revisa tu correo para instrucciones",
+    "welcomeBack": "Bienvenido de Nuevo",
+    "signInSubtitle": "Inicia sesión para continuar a tu comunidad",
+    "continueWithGoogle": "Continuar con Google",
+    "continueWithGitHub": "Continuar con GitHub",
+    "orContinueWith": "o continuar con",
+    "emailPlaceholder": "Ingresa tu correo electrónico",
+    "fillAllFields": "Por favor completa todos los campos",
+    "noAccount": "¿No tienes una cuenta?"
   },
   "sectionBuilder": {
     "sections": "Secciones",

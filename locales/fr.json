@@ -177,7 +177,8 @@
     "profile": "Profil",
     "logout": "Se déconnecter",
     "signIn": "Se connecter",
-    "signUp": "S'inscrire"
+    "signUp": "S'inscrire",
+    "signup": "S'inscrire"
   },
   "common": {
     "loading": "Chargement...",
@@ -263,7 +264,15 @@
     "passwordsDontMatch": "Les mots de passe ne correspondent pas",
     "forgotPassword": "Mot de passe oublié?",
     "resetPassword": "Réinitialiser le Mot de Passe",
-    "checkEmail": "Vérifiez votre email pour les instructions"
+    "checkEmail": "Vérifiez votre email pour les instructions",
+    "welcomeBack": "Bon Retour",
+    "signInSubtitle": "Connectez-vous pour continuer vers votre communauté",
+    "continueWithGoogle": "Continuer avec Google",
+    "continueWithGitHub": "Continuer avec GitHub",
+    "orContinueWith": "ou continuer avec",
+    "emailPlaceholder": "Entrez votre email",
+    "fillAllFields": "Veuillez remplir tous les champs",
+    "noAccount": "Vous n'avez pas de compte ?"
   },
   "sectionBuilder": {
     "sections": "Sections",

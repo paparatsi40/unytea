@@ -177,7 +177,8 @@
     "profile": "Profile",
     "logout": "Log out",
     "signIn": "Sign In",
-    "signUp": "Sign Up"
+    "signUp": "Sign Up",
+    "signup": "Sign Up"
   },
   "common": {
     "loading": "Loading...",
@@ -263,7 +264,15 @@
     "passwordsDontMatch": "Passwords don't match",
     "forgotPassword": "Forgot Password?",
     "resetPassword": "Reset Password",
-    "checkEmail": "Check your email for reset instructions"
+    "checkEmail": "Check your email for reset instructions",
+    "welcomeBack": "Welcome Back",
+    "signInSubtitle": "Sign in to continue to your community",
+    "continueWithGoogle": "Continue with Google",
+    "continueWithGitHub": "Continue with GitHub",
+    "orContinueWith": "or continue with",
+    "emailPlaceholder": "Enter your email",
+    "fillAllFields": "Please fill in all fields",
+    "noAccount": "Don't have an account?"
   },
   "sectionBuilder": {
     "sections": "Sections",
