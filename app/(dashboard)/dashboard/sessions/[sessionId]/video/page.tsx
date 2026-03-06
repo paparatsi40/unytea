@@ -85,6 +85,7 @@ export default function SessionVideoPage() {
   }
 
   async function handleJoinCall() {
+    if (!sessionId) return;
     setInCall(true);
     
     // Track session join and award points
@@ -105,6 +106,12 @@ export default function SessionVideoPage() {
   }
 
   async function handleLeaveCall() {
+    if (!sessionId) {
+      setInCall(false);
+      router.push("/dashboard/sessions");
+      return;
+    }
+    
     // Track session leave and award bonus points if stayed full duration
     try {
       const result = await trackSessionLeave(sessionId);
@@ -143,6 +150,7 @@ export default function SessionVideoPage() {
   }
 
   async function handleFeedbackSubmit(rating: number, comment?: string) {
+    if (!sessionId) return;
     try {
       await submitSessionFeedback(sessionId, rating, comment);
       setAlreadyHasFeedback(true);
