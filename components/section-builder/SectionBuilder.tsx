@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState, useEffect } from "react";
 import { ChevronUp, ChevronDown, Trash2, Copy, Save } from "lucide-react";
 import { SectionInstance, SectionType, FieldDef } from "./types";
 import { SECTIONS, SECTION_ORDER } from "./sections";
@@ -60,18 +60,24 @@ interface SectionBuilderProps {
 }
 
 export function SectionBuilder({ initialSections = [], onSave }: SectionBuilderProps) {
-  const [sections, setSections] = useState<SectionInstance[]>(
-    initialSections.length > 0
-      ? initialSections
-      : [
-          { id: uid(), type: "hero", props: deepClone(SECTIONS.hero.defaultProps) },
-          { id: uid(), type: "features", props: deepClone(SECTIONS.features.defaultProps) },
-          { id: uid(), type: "cta", props: deepClone(SECTIONS.cta.defaultProps) },
-        ]
-  );
+  const [sections, setSections] = useState<SectionInstance[]>(initialSections);
 
-  const [selectedId, setSelectedId] = useState<string | null>(sections[0]?.id ?? null);
+  // Sync sections when initialSections changes (e.g., after loading from API)
+  useEffect(() => {
+    setSections(initialSections);
+  }, [initialSections]);
+
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+
+  // Update selectedId when sections change
+  useEffect(() => {
+    if (sections.length > 0 && !sections.find((s) => s.id === selectedId)) {
+      setSelectedId(sections[0].id);
+    } else if (sections.length === 0) {
+      setSelectedId(null);
+    }
+  }, [sections, selectedId]);
 
   const selected = useMemo(
     () => sections.find((s) => s.id === selectedId) || null,
