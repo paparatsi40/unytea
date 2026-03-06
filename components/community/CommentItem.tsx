@@ -13,13 +13,12 @@ type Comment = {
   createdAt: Date;
   author: {
     id: string;
-    firstName: string | null;
-    lastName: string | null;
+    name: string | null;
     image: string | null;
   };
   replies?: Comment[];
   _count: {
-    replies: number;
+    replies?: number;
     reactions: number;
   };
 };
@@ -41,7 +40,7 @@ export function CommentItem({
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const authorName = `${comment.author.firstName || ""} ${comment.author.lastName || ""}`.trim() || "Anonymous";
+  const authorName = comment.author.name || "Anonymous";
   const timeAgo = formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true });
   const isAuthor = user?.id === comment.author.id;
 
