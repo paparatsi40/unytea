@@ -75,7 +75,7 @@ export function FileUpload({
             </div>
           )}
 
-          {/* @ts-ignore - UploadDropzone type generics are complex */}
+          {/* @ts-expect-error - UploadDropzone type generics are complex */}
           <UploadDropzone
             endpoint={endpoint}
             onClientUploadComplete={handleUploadComplete}

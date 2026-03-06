@@ -194,11 +194,11 @@ function VideoCallInterface({
       }
     };
 
-    // @ts-ignore - Listener type mismatch but works at runtime
+    // @ts-expect-error - Listener type mismatch but works at runtime
     room.on(RoomEvent.DataReceived, handleDataReceived);
 
     return () => {
-      // @ts-ignore
+      // @ts-expect-error
       room.off(RoomEvent.DataReceived, handleDataReceived);
     };
   }, [room]);
