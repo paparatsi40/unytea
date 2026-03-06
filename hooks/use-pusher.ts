@@ -14,7 +14,7 @@ interface PusherMessage {
 type MessageHandler = (message: PusherMessage) => void;
 type ConnectionHandler = (state: "connected" | "disconnected") => void;
 
-export function usePusher(communityId: string, userId: string) {
+export function usePusher(channelId: string, userId: string) {
   const pusherRef = useRef<PusherClient | null>(null);
   const channelRef = useRef<ReturnType<PusherClient["subscribe"]> | null>(null);
   const messageHandlersRef = useRef<Set<MessageHandler>>(new Set());
@@ -23,7 +23,7 @@ export function usePusher(communityId: string, userId: string) {
 
   // Initialize Pusher connection
   useEffect(() => {
-    if (!communityId || !userId) return;
+    if (!channelId || !userId) return;
 
     // Initialize Pusher client
     const pusher = new PusherClient(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
@@ -38,8 +38,8 @@ export function usePusher(communityId: string, userId: string) {
 
     pusherRef.current = pusher;
 
-    // Subscribe to community channel
-    const channelName = `private-community-${communityId}`;
+    // Subscribe to channel
+    const channelName = `private-channel-${channelId}`;
     const channel = pusher.subscribe(channelName);
     channelRef.current = channel;
 
@@ -74,7 +74,7 @@ export function usePusher(communityId: string, userId: string) {
       pusherRef.current = null;
       channelRef.current = null;
     };
-  }, [communityId, userId]);
+  }, [channelId, userId]);
 
   // Send message
   const sendMessage = useCallback(
@@ -96,7 +96,7 @@ export function usePusher(communityId: string, userId: string) {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          channel: `private-community-${communityId}`,
+          channel: `private-channel-${channelId}`,
           event: "message",
           data: message,
         }),
@@ -108,7 +108,7 @@ export function usePusher(communityId: string, userId: string) {
 
       return message;
     },
-    [communityId, userId]
+    [channelId, userId]
   );
 
   // Subscribe to messages
@@ -131,12 +131,12 @@ export function usePusher(communityId: string, userId: string) {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        channel: `private-community-${communityId}`,
+        channel: `private-channel-${channelId}`,
         event: "typing",
         data: { userId },
       }),
     });
-  }, [communityId, userId]);
+  }, [channelId, userId]);
 
   return {
     sendMessage,

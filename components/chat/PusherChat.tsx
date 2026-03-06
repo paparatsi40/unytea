@@ -9,7 +9,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { usePusher } from "@/hooks/use-pusher";
 import { useCurrentUser } from "@/hooks/use-current-user";
-import { formatMessageTime } from "@/lib/date-utils";
 
 interface Message {
   id: string;
@@ -20,14 +19,14 @@ interface Message {
 }
 
 interface PusherChatProps {
-  communityId: string;
-  communityName: string;
+  channelId: string;
+  channelName: string;
 }
 
-export function PusherChat({ communityId, communityName }: PusherChatProps) {
+export function PusherChat({ channelId, channelName }: PusherChatProps) {
   const { user } = useCurrentUser();
   const { sendMessage, onMessage, isConnected } = usePusher(
-    communityId,
+    channelId,
     user?.id || ""
   );
 
@@ -109,7 +108,7 @@ export function PusherChat({ communityId, communityName }: PusherChatProps) {
         <div className="flex items-center gap-2">
           <Users className="h-5 w-5 text-muted-foreground" />
           <div>
-            <h3 className="font-semibold">{communityName}</h3>
+            <h3 className="font-semibold">{channelName}</h3>
             <p className="text-xs text-muted-foreground">
               {isConnected ? (
                 <span className="flex items-center gap-1 text-green-500">
