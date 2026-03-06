@@ -281,10 +281,26 @@ export function SectionBuilder({ initialSections = [], onSave }: SectionBuilderP
       </aside>
 
       {/* CENTER: Preview */}
-      <main className="flex-1 overflow-y-auto rounded-2xl border border-border bg-gray-50 p-8">
-        <div className="mx-auto max-w-5xl space-y-8">
+      <main className="flex-1 overflow-y-auto rounded-2xl border border-border bg-gray-50 p-4">
+        {/* Preview Header */}
+        <div className="mb-4 flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3 rounded-t-xl">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-semibold text-gray-700">Live Preview</span>
+            <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-medium text-green-700">
+              {sections.length} sections
+            </span>
+          </div>
+          <span className="text-xs text-gray-400">
+            Click any section to edit
+          </span>
+        </div>
+
+        <div 
+          className="mx-auto max-w-5xl origin-top scale-[0.85] transform"
+          style={{ width: '117.65%' }} // Compensate scale: 100/0.85 = 117.65%
+        >
           {sections.length === 0 && (
-            <div className="rounded-lg border border-dashed border-border p-12 text-center">
+            <div className="rounded-lg border border-dashed border-border bg-white p-12 text-center">
               <p className="text-sm text-muted-foreground">
                 Add sections from the left panel to build your landing page
               </p>
@@ -297,6 +313,14 @@ export function SectionBuilder({ initialSections = [], onSave }: SectionBuilderP
               className={[
                 "cursor-pointer transition-all",
                 selectedId === s.id
+                  ? "ring-4 ring-primary ring-offset-2"
+                  : "hover:ring-2 hover:ring-gray-300 hover:ring-offset-2",
+              ].join(" ")}
+            >
+              {renderSection(s)}
+            </div>
+          ))}
+        </div>
                   ? "ring-4 ring-primary ring-offset-4 ring-offset-gray-50"
                   : "hover:ring-2 hover:ring-gray-300 hover:ring-offset-2 hover:ring-offset-gray-50",
               ].join(" ")}
