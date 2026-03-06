@@ -376,7 +376,7 @@ export default function LibraryPage() {
                 slug: uploadForm.title.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""),
                 tags: [],
                 isPublic: false,
-                status: "DRAFT",
+                status: "PUBLISHED",
               });
                 
                 if (result.success) {
