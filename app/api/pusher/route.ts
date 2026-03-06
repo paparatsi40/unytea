@@ -22,15 +22,15 @@ export async function POST(req: Request) {
   const socketId = body.get("socket_id") as string;
   const channel = body.get("channel_name") as string;
 
-  // Extract communityId from channel name (format: private-community-{id})
-  const match = channel.match(/^private-community-(\w+)$/);
+  // Extract channelId from channel name (format: private-channel-{id})
+  const match = channel.match(/^private-channel-(\w+)$/);
   if (!match) {
     return NextResponse.json({ error: "Invalid channel" }, { status: 400 });
   }
 
-  const communityId = match[1];
+  const channelId = match[1];
 
-  // Authorize the user for this community channel
+  // Authorize the user for this channel
   const authResponse = pusher.authorizeChannel(socketId, channel, {
     user_id: session.user.id,
     user_info: {
