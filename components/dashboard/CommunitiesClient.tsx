@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Plus, Users, TrendingUp, Crown, Lock, Loader2, Search, Grid3x3, List, Sparkles, Dumbbell, Briefcase, Code, BookOpen, Palette } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 type Community = {
   id: string;
@@ -35,6 +36,7 @@ const categories = [
 export function CommunitiesClient() {
   const { user, isLoading } = useCurrentUser();
   const router = useRouter();
+  const t = useTranslations();
   const [communities, setCommunities] = useState<Community[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -113,7 +115,7 @@ export function CommunitiesClient() {
       <div className="flex min-h-[400px] items-center justify-center">
         <div className="text-center">
           <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />
-          <p className="mt-4 text-muted-foreground">Loading communities...</p>
+          <p className="mt-4 text-muted-foreground">{t("common.loading")}</p>
         </div>
       </div>
     );
@@ -284,9 +286,9 @@ export function CommunitiesClient() {
             onChange={(e) => setFilterPrivacy(e.target.value as any)}
             className="rounded-lg border border-border bg-background px-4 py-2 text-sm"
           >
-            <option value="all">All Communities</option>
-            <option value="public">Public</option>
-            <option value="private">Private</option>
+            <option value="all">{t("communities.allCommunities")}</option>
+            <option value="public">{t("communities.public")}</option>
+            <option value="private">{t("communities.private")}</option>
           </select>
 
           {/* Sort */}
@@ -295,10 +297,10 @@ export function CommunitiesClient() {
             onChange={(e) => setSortBy(e.target.value as any)}
             className="rounded-lg border border-border bg-background px-4 py-2 text-sm"
           >
-            <option value="recent">Recent</option>
-            <option value="members">Most Members</option>
-            <option value="posts">Most Active</option>
-            <option value="name">Alphabetical</option>
+            <option value="recent">{t("common.recent")}</option>
+            <option value="members">{t("communities.mostMembers")}</option>
+            <option value="posts">{t("communities.mostActive")}</option>
+            <option value="name">{t("common.alphabetical")}</option>
           </select>
 
           {/* View Toggle */}
