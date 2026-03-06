@@ -7,6 +7,15 @@ import { ResourceGrid } from "@/components/library/ResourceGrid";
 import { CategorySidebar } from "@/components/library/CategorySidebar";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Library,
   Upload,
@@ -14,6 +23,7 @@ import {
   Clock,
   Sparkles,
   BookOpen,
+  X,
 } from "lucide-react";
 import {
   getResources,
@@ -22,7 +32,9 @@ import {
   getContinueWatching,
   toggleResourceLike,
   deleteResource,
+  createResource,
 } from "@/app/actions/resources";
+import { FileUpload } from "@/components/upload/FileUpload";
 import { toast } from "sonner";
 import type { ResourceType } from "@prisma/client";
 
@@ -52,6 +64,18 @@ export default function LibraryPage() {
     hasMore: false,
     total: 0,
   });
+  
+  // Upload modal state
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [uploadForm, setUploadForm] = useState({
+    title: "",
+    description: "",
+    type: "DOCUMENT" as ResourceType,
+    categoryId: "",
+    fileUrl: "",
+  });
+  const [uploadedFiles, setUploadedFiles] = useState<{ url: string; name: string }[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Early return after all hooks are declared
   if (!communitySlug) {
@@ -228,7 +252,10 @@ export default function LibraryPage() {
                 <BookOpen className="w-4 h-4" />
                 Mis favoritos
               </Button>
-              <Button className="gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
+              <Button 
+                className="gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                onClick={() => setIsUploadModalOpen(true)}
+              >
                 <Upload className="w-4 h-4" />
                 Subir recurso
               </Button>
@@ -302,6 +329,178 @@ export default function LibraryPage() {
           </main>
         </div>
       </div>
+
+      {/* Upload Resource Modal */}
+      {isUploadModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-lg shadow-xl">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b">
+              <div>
+                <h2 className="text-xl font-semibold flex items-center gap-2">
+                  <Upload className="w-5 h-5" />
+                  Subir nuevo recurso
+                </h2>
+                <p className="text-sm text-gray-500 mt-1">
+                  Completa la información y sube tu archivo a la biblioteca
+                </p>
+              </div>
+              <button
+                onClick={() => setIsUploadModalOpen(false)}
+                className="p-2 hover:bg-gray-100 rounded-full"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form
+              onSubmit={async (e: React.FormEvent) => {
+                e.preventDefault();
+                if (!communitySlug) return;
+                
+                setIsSubmitting(true);
+                
+                const result = await createResource(communitySlug, {
+                  title: uploadForm.title,
+                  description: uploadForm.description,
+                  type: uploadForm.type,
+                  categoryId: uploadForm.categoryId || undefined,
+                  fileUrl: uploadedFiles[0]?.url || uploadForm.fileUrl,
+                  slug: uploadForm.title.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""),
+                });
+                
+                if (result.success) {
+                  toast.success("Recurso subido exitosamente");
+                  setIsUploadModalOpen(false);
+                  setUploadForm({
+                    title: "",
+                    description: "",
+                    type: "DOCUMENT",
+                    categoryId: "",
+                    fileUrl: "",
+                  });
+                  setUploadedFiles([]);
+                  fetchData(); // Refresh the list
+                } else {
+                  toast.error(result.error || "Error al subir el recurso");
+                }
+                
+                setIsSubmitting(false);
+              }}
+              className="p-6 space-y-6"
+            >
+              {/* Title */}
+              <div className="space-y-2">
+                <Label htmlFor="title">Título *</Label>
+                <Input
+                  id="title"
+                  value={uploadForm.title}
+                  onChange={(e) => setUploadForm({ ...uploadForm, title: e.target.value })}
+                  placeholder="Ej: Introducción al curso"
+                  required
+                />
+              </div>
+
+              {/* Description */}
+              <div className="space-y-2">
+                <Label htmlFor="description">Descripción</Label>
+                <textarea
+                  id="description"
+                  value={uploadForm.description}
+                  onChange={(e) => setUploadForm({ ...uploadForm, description: e.target.value })}
+                  placeholder="Describe el contenido de este recurso..."
+                  rows={3}
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+
+              {/* Type */}
+              <div className="space-y-2">
+                <Label htmlFor="type">Tipo de recurso *</Label>
+                <Select
+                  value={uploadForm.type}
+                  onValueChange={(value: string) => setUploadForm({ ...uploadForm, type: value as ResourceType })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona el tipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="DOCUMENT">Documento (PDF, Word, etc.)</SelectItem>
+                    <SelectItem value="VIDEO">Video</SelectItem>
+                    <SelectItem value="AUDIO">Audio</SelectItem>
+                    <SelectItem value="IMAGE">Imagen</SelectItem>
+                    <SelectItem value="LINK">Link externo</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Category */}
+              <div className="space-y-2">
+                <Label htmlFor="category">Categoría</Label>
+                <Select
+                  value={uploadForm.categoryId}
+                  onValueChange={(value: string) => setUploadForm({ ...uploadForm, categoryId: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona una categoría (opcional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Sin categoría</SelectItem>
+                    {categories.map((cat) => (
+                      <SelectItem key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* File Upload */}
+              <div className="space-y-2">
+                <Label>Archivo *</Label>
+                <FileUpload
+                  endpoint={uploadForm.type === "DOCUMENT" ? "documentUploader" : uploadForm.type === "VIDEO" || uploadForm.type === "AUDIO" ? "mediaUploader" : "imageUploader"}
+                  onUploadComplete={(files) => setUploadedFiles(files)}
+                  onUploadError={(error: Error) => toast.error(error.message)}
+                  maxFiles={1}
+                  value={uploadedFiles}
+                  onChange={setUploadedFiles}
+                />
+              </div>
+
+              {/* Actions */}
+              <div className="flex justify-end gap-3 pt-4 border-t">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsUploadModalOpen(false)}
+                  disabled={isSubmitting}
+                >
+                  <X className="w-4 h-4 mr-2" />
+                  Cancelar
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={!uploadForm.title || uploadedFiles.length === 0 || isSubmitting}
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <span className="animate-spin mr-2">⏳</span>
+                      Subiendo...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-4 h-4 mr-2" />
+                      Subir recurso
+                    </>
+                  )}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

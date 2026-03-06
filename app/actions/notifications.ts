@@ -3,7 +3,6 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { getCurrentUserId } from "@/lib/auth-utils";
-import { getSocketInstance } from "@/lib/socket-instance";
 import { NotificationType, Prisma } from "@prisma/client";
 
 /**
@@ -27,11 +26,11 @@ export async function createNotification(data: {
       },
     });
 
-    // Emit WebSocket event for instant delivery
-    const io = getSocketInstance();
-    if (io) {
-      io.to(`user:${data.userId}`).emit("notification:new", notification);
-    }
+    // WebSocket events disabled - using Pusher for real-time updates
+    // const io = getSocketInstance();
+    // if (io) {
+    //   io.to(`user:${data.userId}`).emit("notification:new", notification);
+    // }
 
     return { success: true, notification };
   } catch (error) {

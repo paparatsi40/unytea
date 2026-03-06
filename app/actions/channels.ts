@@ -4,7 +4,6 @@ import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { getCurrentUserId } from "@/lib/auth-utils";
-import { getSocketInstance } from "@/lib/socket-instance";
 
 /**
  * Get or create default channels for a community
@@ -115,11 +114,11 @@ export async function sendChannelMessage(channelId: string, content: string, att
       data: { points: { increment: 1 } },
     });
 
-    // Emit WebSocket event for real-time update
-    const io = getSocketInstance();
-    if (io) {
-      io.to(`channel:${channelId}`).emit("message:new", message);
-    }
+    // WebSocket events disabled - using Pusher for real-time updates
+    // const io = getSocketInstance();
+    // if (io) {
+    //   io.to(`channel:${channelId}`).emit("message:new", message);
+    // }
 
     revalidatePath("/c/[slug]/chat/[channel]");
 
@@ -158,11 +157,11 @@ export async function deleteChannelMessage(messageId: string) {
       where: { id: messageId },
     });
 
-    // Emit WebSocket event for real-time update
-    const io = getSocketInstance();
-    if (io) {
-      io.to(`channel:${message.channelId}`).emit("message:deleted", { messageId });
-    }
+    // WebSocket events disabled - using Pusher for real-time updates
+    // const io = getSocketInstance();
+    // if (io) {
+    //   io.to(`channel:${message.channelId}`).emit("message:deleted", { messageId });
+    // }
 
     revalidatePath("/c/[slug]/chat/[channel]");
 
