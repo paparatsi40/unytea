@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { getCurrentUserId } from "@/lib/auth-utils";
 import { getSocketInstance } from "@/lib/socket-instance";
@@ -92,7 +93,7 @@ export async function sendChannelMessage(channelId: string, content: string, att
     const message = await prisma.channelMessage.create({
       data: {
         content: content.trim(),
-        attachments: attachments || null,
+        attachments: attachments ? (attachments as Prisma.InputJsonValue) : Prisma.JsonNull,
         authorId: userId,
         channelId,
       },
