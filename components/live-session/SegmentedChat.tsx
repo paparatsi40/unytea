@@ -256,6 +256,7 @@ function ChatMessageComponent({
   onMarkAnswered,
 }: ChatMessageComponentProps) {
   const _isOwn = message.userId === currentUserId;
+  void _isOwn; // Mark as intentionally unused
   const isQuestion = message.type === "question";
   const isResource = message.type === "resource";
 

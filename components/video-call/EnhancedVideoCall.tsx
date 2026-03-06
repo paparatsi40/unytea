@@ -6,10 +6,9 @@ import {
   VideoConference,
   RoomAudioRenderer,
   useRoomContext,
-  useDataChannel,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
-import { Loader2, MessageSquare, BarChart3, Smile, X } from "lucide-react";
+import { Loader2, MessageSquare, BarChart3, X } from "lucide-react";
 import { RoomEvent, DataPacket_Kind } from "livekit-client";
 import { LiveReactions } from "@/components/live-session/LiveReactions";
 import { SegmentedChat, ChatMessage, ChatMessageType } from "@/components/live-session/SegmentedChat";
@@ -150,8 +149,8 @@ function VideoCallInterface({
   const [reactions, setReactions] = useState<Reaction[]>([]);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [activePoll, setActivePoll] = useState<Poll | null>(null);
-  const [pinnedMessages, setPinnedMessages] = useState<Set<string>>(new Set());
-  const [answeredQuestions, setAnsweredQuestions] = useState<Set<string>>(new Set());
+  const [pinnedMessages, _setPinnedMessages] = useState<Set<string>>(new Set());
+  const [answeredQuestions, _setAnsweredQuestions] = useState<Set<string>>(new Set());
 
   // UI State
   const [showChat, setShowChat] = useState(false);
@@ -163,8 +162,8 @@ function VideoCallInterface({
 
     const handleDataReceived = (
       payload: Uint8Array,
-      participant: any,
-      kind: DataPacket_Kind
+      _participant: any,
+      _kind: DataPacket_Kind
     ) => {
       try {
         const decoder = new TextDecoder();
@@ -305,7 +304,7 @@ function VideoCallInterface({
     question: string,
     options: string[],
     duration?: number,
-    isQuiz?: boolean,
+    _isQuiz?: boolean,
     correctAnswer?: string
   ) => {
     const poll: Poll = {
@@ -426,7 +425,6 @@ function VideoCallInterface({
               currentUserId={userId}
               onVote={handleVote}
               onClose={() => setActivePoll(null)}
-              isModerator={isModerator}
             />
           </div>
         )}

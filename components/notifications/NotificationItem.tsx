@@ -23,7 +23,7 @@ interface NotificationItemProps {
     type: string;
     title: string;
     message: string;
-    data: any;
+    data?: any;
     isRead: boolean;
     createdAt: Date;
     sender?: {

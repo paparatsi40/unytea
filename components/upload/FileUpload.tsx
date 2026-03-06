@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { UploadDropzone } from "@uploadthing/react";
+import type { OurFileRouter } from "@/app/api/uploadthing/core";
 import { X, File, Image as ImageIcon, FileText, Loader2 } from "lucide-react";
 
 type FileUploadProps = {
@@ -75,7 +76,7 @@ export function FileUpload({
             </div>
           )}
 
-          <UploadDropzone
+          <UploadDropzone<OurFileRouter>
             endpoint={endpoint}
             onClientUploadComplete={handleUploadComplete}
             onUploadError={handleUploadError}
