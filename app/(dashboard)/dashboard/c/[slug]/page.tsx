@@ -44,9 +44,10 @@ function JoinCommunityView({ community, stats }: { community: any; stats?: any }
     }
   }
 
-  const primaryColor = community.primaryColor || "#8B5CF6";
-  const secondaryColor = community.secondaryColor || "#EC4899";
-  const accentColor = community.accentColor || "#F59E0B";
+  // Colors are defined but will be used in future theming feature
+  // const primaryColor = community.primaryColor || "#8B5CF6";
+  // const secondaryColor = community.secondaryColor || "#EC4899";
+  // const accentColor = community.accentColor || "#F59E0B";
 
   // Mock data - en producción esto vendría de la DB
   const testimonials = [
