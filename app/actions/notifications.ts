@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { getCurrentUserId } from "@/lib/auth-utils";
 import { getSocketInstance } from "@/lib/socket-instance";
-import { NotificationType } from "@prisma/client";
+import { NotificationType, Prisma } from "@prisma/client";
 
 /**
  * Create a notification
@@ -23,7 +23,7 @@ export async function createNotification(data: {
         type: data.type,
         title: data.title,
         message: data.message,
-        data: data.data || {},
+        data: (data.data as Prisma.InputJsonValue) || Prisma.JsonNull,
       },
     });
 
