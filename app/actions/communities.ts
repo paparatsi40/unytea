@@ -3,7 +3,6 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { getCurrentUserId } from "@/lib/auth-utils";
-import { redirect } from "next/navigation";
 import { checkAndUnlockAchievements } from "./achievements";
 
 /**
