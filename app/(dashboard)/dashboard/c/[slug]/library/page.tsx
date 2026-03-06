@@ -126,8 +126,8 @@ export default function LibraryPage() {
       setFilters((prev) => ({
         ...prev,
         type: newFilters.type === "ALL" ? undefined : newFilters.type,
-        sortBy: newFilters.sortBy,
-        sortOrder: newFilters.sortOrder,
+        sortBy: newFilters.sortBy ?? prev.sortBy,
+        sortOrder: newFilters.sortOrder ?? prev.sortOrder,
       }));
       setPagination((prev) => ({ ...prev, page: 1 }));
     },
