@@ -69,8 +69,16 @@ export function usePusher(channelId: string, userId: string) {
 
     // Cleanup on unmount
     return () => {
-      pusher.unsubscribe(channelName);
-      pusher.disconnect();
+      try {
+        // Check connection state before unsubscribing
+        if (pusher?.connection?.state === "connected") {
+          pusher.unsubscribe(channelName);
+          pusher.disconnect();
+        }
+      } catch (error) {
+        // Silently ignore errors during cleanup (connection may already be closed)
+        console.debug("[Pusher] Cleanup error (expected):", error);
+      }
       pusherRef.current = null;
       channelRef.current = null;
     };
