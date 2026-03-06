@@ -21,16 +21,15 @@ export function LanguageSelector() {
   const router = useRouter();
   const pathname = usePathname() ?? "/";
   const [currentLocale, setCurrentLocale] = useState("en");
+  const [mounted, setMounted] = useState(false);
 
-  // Detect current locale from pathname or localStorage
   useEffect(() => {
-    // Check pathname first
+    setMounted(true);
+    // Detect current locale from pathname or localStorage
     const pathLocale = locales.find(l => pathname.startsWith(`/${l.code}`));
     if (pathLocale) {
       setCurrentLocale(pathLocale.code);
-      localStorage.setItem("locale", pathLocale.code);
     } else {
-      // Fallback to localStorage or default
       const savedLocale = localStorage.getItem("locale") || "en";
       setCurrentLocale(savedLocale);
     }
@@ -38,23 +37,28 @@ export function LanguageSelector() {
 
   const handleLocaleChange = (newLocale: string) => {
     localStorage.setItem("locale", newLocale);
-    
-    // Check if we're on an i18n route or dashboard route
     const isI18nRoute = locales.some(l => pathname.startsWith(`/${l.code}`));
     
     if (isI18nRoute) {
-      // Replace current locale in pathname with new one
       const newPathname = pathname.replace(/^\/(en|es|fr)/, `/${newLocale}`);
       router.push(newPathname);
     } else {
-      // We're on dashboard/auth route without locale prefix
-      // Redirect to home with new locale, or stay if we want to support dashboard i18n later
       router.push(`/${newLocale}`);
     }
     router.refresh();
   };
 
   const currentLocaleData = locales.find((l) => l.code === currentLocale);
+
+  // Prevent hydration mismatch
+  if (!mounted) {
+    return (
+      <Button variant="ghost" size="sm" className="gap-2">
+        <Globe className="h-4 w-4" />
+        <span className="uppercase text-xs">EN</span>
+      </Button>
+    );
+  }
 
   return (
     <DropdownMenu>
