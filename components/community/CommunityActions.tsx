@@ -111,7 +111,7 @@ export function CommunityActions({
             </Button>
           )}
           {isOwner && (
-            <Link href={`/dashboard/communities/${communitySlug}/settings`}>
+            <Link href={`/dashboard/c/${communitySlug}/settings/sections`}>
               <Button variant="outline" className="flex items-center space-x-2">
                 <Settings className="h-4 w-4" />
                 <span>Settings</span>
