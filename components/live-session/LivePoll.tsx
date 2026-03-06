@@ -82,7 +82,7 @@ export function LivePoll({
   };
 
   const showResults = Boolean(hasVoted || !poll.isActive || poll.showResults);
-  const isExpired = poll.endsAt && Date.now() > poll.endsAt;
+  const isExpired = Boolean(poll.endsAt && Date.now() > poll.endsAt);
 
   // Calculate percentages
   const getPercentage = (votes: number) => {
