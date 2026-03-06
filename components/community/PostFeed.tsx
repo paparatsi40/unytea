@@ -16,7 +16,6 @@ import {
   CheckCircle2
 } from "lucide-react";
 import { PostCard } from "@/components/community/PostCard";
-import { SpectacularFeedHeader } from "@/components/community/SpectacularFeedHeader";
 
 type Post = {
   id: string;
@@ -97,9 +96,6 @@ export function PostFeed({
           </div>
         </div>
       )}
-
-      {/* NEW Spectacular Header with Real Lottie */}
-      <SpectacularFeedHeader postsCount={posts.length} />
 
       {/* Create Post Form - Premium Design */}
       <div className={`group relative overflow-hidden rounded-3xl border transition-all duration-300 ${
