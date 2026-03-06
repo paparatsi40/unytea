@@ -12,21 +12,19 @@ export async function GET(
     // Get community
     const community = await prisma.community.findUnique({
       where: { slug: params.slug },
-      select: {
-        id: true,
-        name: true,
-        slug: true,
-        description: true,
-        imageUrl: true,
-        coverImageUrl: true,
-        isPrivate: true,
-        memberCount: true,
-        postCount: true,
-        landingLayout: true,
+      include: {
+        owner: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          },
+        },
         _count: {
           select: {
             members: true,
             posts: true,
+            courses: true,
           },
         },
       },
@@ -42,9 +40,12 @@ export async function GET(
     // Transform to match expected format
     const communityData = {
       ...community,
+      image: community.imageUrl,
+      coverImage: community.coverImageUrl,
       _count: {
-        members: community._count.members || community.memberCount,
-        posts: community._count.posts || community.postCount,
+        members: community._count.members,
+        posts: community._count.posts,
+        courses: community._count.courses,
       },
     };
 
