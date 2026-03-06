@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useParams } from "next/navigation";
+// import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -71,7 +71,7 @@ const COLOR_PRESETS = [
 ];
 
 export default function AppearanceSettingsPage() {
-  const params = useParams();
+  // const params = useParams();
   // const router = useRouter();
   // const slug = params.slug as string;
 
