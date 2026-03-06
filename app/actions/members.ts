@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { getCurrentUserId } from "@/lib/auth-utils";
+import type { MemberStatus } from "@prisma/client";
 
 // Optimized select for member data
 const memberSelect = {
@@ -45,7 +46,7 @@ export async function getCommunityMembers(
   }
 ) {
   try {
-    const where: { communityId: string; status: string; user?: { name?: { contains: string; mode: string; }; }; } = {
+    const where: { communityId: string; status: MemberStatus; user?: { name?: { contains: string; mode: string; }; }; } = {
       communityId,
       status: "ACTIVE",
     };
