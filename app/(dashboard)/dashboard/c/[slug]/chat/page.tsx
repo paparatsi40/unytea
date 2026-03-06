@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { ChatContainer } from "@/components/chat/ChatContainer";
+import { PusherChat } from "@/components/chat/PusherChat";
 import { AuditoriumSpace } from "@/components/auditorium/AuditoriumSpace";
 import { getOrCreateDefaultChannels, updateChannelPresence } from "@/app/actions/channels";
 import { Loader2, LayoutList, Users } from "lucide-react";
@@ -21,6 +21,7 @@ export default function CommunityChat() {
   
   const [channels, setChannels] = useState<Channel[]>([]);
   const [activeChannelId, setActiveChannelId] = useState<string>("");
+  const [activeChannelName, setActiveChannelName] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"chat" | "auditorium">("chat");
 
@@ -62,15 +63,21 @@ export default function CommunityChat() {
     const result = await getOrCreateDefaultChannels(data.id);
     
     if (result.success && result.channels.length > 0) {
-      setChannels(result.channels as Channel[]);
-      setActiveChannelId(result.channels[0].id);
+      const loadedChannels = result.channels as Channel[];
+      setChannels(loadedChannels);
+      setActiveChannelId(loadedChannels[0].id);
+      setActiveChannelName(loadedChannels[0].name);
     }
     
     setIsLoading(false);
   };
 
   const handleChannelChange = (channelId: string) => {
-    setActiveChannelId(channelId);
+    const channel = channels.find((c) => c.id === channelId);
+    if (channel) {
+      setActiveChannelId(channel.id);
+      setActiveChannelName(channel.name);
+    }
   };
 
   if (isLoading) {
@@ -95,8 +102,12 @@ export default function CommunityChat() {
     );
   }
 
+  // Get active channel name
+  const activeChannel = channels.find((c) => c.id === activeChannelId);
+  const currentChannelName = activeChannel?.name || activeChannelName || "General";
+
   return (
-    <div className="relative">
+    <div className="relative h-full">
       {/* View Toggle Button */}
       <div className="absolute right-4 top-4 z-10 flex items-center space-x-2 rounded-lg border border-gray-200 bg-white p-1 shadow-sm">
         <button
@@ -123,14 +134,31 @@ export default function CommunityChat() {
         </button>
       </div>
 
+      {/* Channel Selector */}
+      {viewMode === "chat" && channels.length > 1 && (
+        <div className="absolute left-4 top-4 z-10">
+          <select
+            value={activeChannelId}
+            onChange={(e) => handleChannelChange(e.target.value)}
+            className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium shadow-sm"
+          >
+            {channels.map((channel) => (
+              <option key={channel.id} value={channel.id}>
+                {channel.emoji} {channel.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
       {/* Content */}
       {viewMode === "chat" ? (
-        <ChatContainer
-          channels={channels}
-          activeChannelId={activeChannelId}
-          communitySlug={slug}
-          onChannelChange={handleChannelChange}
-        />
+        <div className="h-full pt-16">
+          <PusherChat
+            channelId={activeChannelId}
+            channelName={currentChannelName}
+          />
+        </div>
       ) : (
         <div className="min-h-screen bg-gray-50 p-8">
           <AuditoriumSpace channelId={activeChannelId} communitySlug={slug} />
