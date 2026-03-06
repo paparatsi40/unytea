@@ -37,8 +37,8 @@ export const ourFileRouter = {
 
   // Document uploader for resources, attachments
   documentUploader: f({
-    pdf: { maxFileSize: "8MB", maxFileCount: 3 },
-    text: { maxFileSize: "2MB", maxFileCount: 5 },
+    pdf: { maxFileSize: "32MB", maxFileCount: 3 },
+    text: { maxFileSize: "4MB", maxFileCount: 5 },
   })
     .middleware(async () => {
       console.log("[UploadThing] Document upload attempt");
