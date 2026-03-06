@@ -201,17 +201,6 @@ export function PremiumCommunityHeader({
           </Link>
         </div>
       </div>
-
-      {/* Add styles for hiding scrollbar on mobile */}
-      <style jsx>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-      `}</style>
     </div>
   );
 }
