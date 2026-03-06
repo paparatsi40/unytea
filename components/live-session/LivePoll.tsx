@@ -39,7 +39,7 @@ export function LivePoll({
   currentUserId,
   onVote,
   onClose,
-  isModerator = false,
+  _isModerator = false,
 }: LivePollProps) {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [hasVoted, setHasVoted] = useState(false);
