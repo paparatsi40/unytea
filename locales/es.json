@@ -254,6 +254,7 @@
     "email": "Correo electrónico",
     "password": "Contraseña",
     "confirmPassword": "Confirmar Contraseña",
+    "signOut": "Cerrar Sesión",
     "firstName": "Nombre",
     "lastName": "Apellido",
     "signInRequired": "Por favor inicia sesión para continuar",

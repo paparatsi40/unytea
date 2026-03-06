@@ -254,6 +254,7 @@
     "email": "Email",
     "password": "Mot de passe",
     "confirmPassword": "Confirmer le Mot de Passe",
+    "signOut": "Se Déconnecter",
     "firstName": "Prénom",
     "lastName": "Nom",
     "signInRequired": "Veuillez vous connecter pour continuer",

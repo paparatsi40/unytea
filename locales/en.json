@@ -254,6 +254,7 @@
     "email": "Email",
     "password": "Password",
     "confirmPassword": "Confirm Password",
+    "signOut": "Sign Out",
     "firstName": "First Name",
     "lastName": "Last Name",
     "signInRequired": "Please sign in to continue",
