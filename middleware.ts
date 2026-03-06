@@ -16,9 +16,9 @@ export default auth((req) => {
   const isLoggedIn = !!req.auth
   const pathname = req.nextUrl.pathname
 
-  // Skip i18n for API routes, auth callback, and protected routes
+  // Skip i18n for API routes, auth routes, and protected routes
   if (pathname.startsWith("/api") || 
-      pathname.startsWith("/auth/callback") ||
+      pathname.startsWith("/auth") ||
       pathname.startsWith("/dashboard") ||
       pathname.startsWith("/onboarding")) {
     const isProtectedRoute = 
