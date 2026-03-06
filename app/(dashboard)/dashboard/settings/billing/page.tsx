@@ -56,7 +56,7 @@ const plans = [
 ];
 
 export default function BillingPage() {
-  const { user } = useCurrentUser();
+  const { user: _user } = useCurrentUser();
   const t = useTranslations();
   const [isLoading, setIsLoading] = useState<string | null>(null);
 
