@@ -24,6 +24,7 @@ import {
   Sparkles,
   BookOpen,
   X,
+  Plus,
 } from "lucide-react";
 import {
   getResources,
@@ -33,6 +34,7 @@ import {
   toggleResourceLike,
   deleteResource,
   createResource,
+  createResourceCategory,
 } from "@/app/actions/resources";
 import { FileUpload } from "@/components/upload/FileUpload";
 import { toast } from "sonner";
@@ -76,6 +78,11 @@ export default function LibraryPage() {
   });
   const [uploadedFiles, setUploadedFiles] = useState<{ url: string; name: string }[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Create category inline state
+  const [isCreatingCategory, setIsCreatingCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [isCreatingCategorySubmitting, setIsCreatingCategorySubmitting] = useState(false);
 
   // Early return after all hooks are declared
   if (!communitySlug) {
@@ -439,33 +446,92 @@ export default function LibraryPage() {
 
               {/* Category */}
               <div className="space-y-2">
-                <Label htmlFor="category">Categoría</Label>
-                <Select
-                  value={uploadForm.categoryId || "none"}
-                  onValueChange={(value: string) => setUploadForm({ ...uploadForm, categoryId: value === "none" ? "" : value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecciona una categoría (opcional)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">Sin categoría</SelectItem>
-                    {categories.length > 0 ? (
-                      categories.map((cat) => (
-                        <SelectItem key={cat.id} value={cat.id}>
-                          {cat.name}
-                        </SelectItem>
-                      ))
-                    ) : (
-                      <div className="px-2 py-3 text-sm text-gray-400 italic">
-                        No hay categorías disponibles
-                      </div>
-                    )}
-                  </SelectContent>
-                </Select>
-                {categories.length === 0 && (
-                  <p className="text-xs text-gray-400">
-                    Las categorías se crean desde la configuración de la biblioteca
-                  </p>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="category">Categoría</Label>
+                  {!isCreatingCategory && (
+                    <button
+                      type="button"
+                      onClick={() => setIsCreatingCategory(true)}
+                      className="text-xs text-purple-600 hover:text-purple-700 flex items-center gap-1"
+                    >
+                      <Plus className="w-3 h-3" />
+                      Nueva
+                    </button>
+                  )}
+                </div>
+                
+                {isCreatingCategory ? (
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Nombre de categoría..."
+                      value={newCategoryName}
+                      onChange={(e) => setNewCategoryName(e.target.value)}
+                      className="flex-1"
+                      autoFocus
+                    />
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={async () => {
+                        if (!newCategoryName.trim() || !communitySlug) return;
+                        
+                        setIsCreatingCategorySubmitting(true);
+                        const result = await createResourceCategory(communitySlug, {
+                          name: newCategoryName.trim(),
+                          slug: newCategoryName.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""),
+                        });
+                        
+                        if (result.success && result.data) {
+                          toast.success("Categoría creada");
+                          setCategories([...categories, result.data]);
+                          setUploadForm({ ...uploadForm, categoryId: result.data.id });
+                          setNewCategoryName("");
+                          setIsCreatingCategory(false);
+                        } else {
+                          toast.error(result.error || "Error al crear categoría");
+                        }
+                        setIsCreatingCategorySubmitting(false);
+                      }}
+                      disabled={!newCategoryName.trim() || isCreatingCategorySubmitting}
+                      className="bg-gradient-to-r from-purple-600 to-pink-600"
+                    >
+                      {isCreatingCategorySubmitting ? "..." : "Crear"}
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setIsCreatingCategory(false);
+                        setNewCategoryName("");
+                      }}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <Select
+                    value={uploadForm.categoryId || "none"}
+                    onValueChange={(value: string) => setUploadForm({ ...uploadForm, categoryId: value === "none" ? "" : value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecciona una categoría (opcional)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Sin categoría</SelectItem>
+                      {categories.length > 0 ? (
+                        categories.map((cat) => (
+                          <SelectItem key={cat.id} value={cat.id}>
+                            {cat.name}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <div className="px-2 py-3 text-sm text-gray-400 italic">
+                          No hay categorías disponibles
+                        </div>
+                      )}
+                    </SelectContent>
+                  </Select>
                 )}
               </div>
 
