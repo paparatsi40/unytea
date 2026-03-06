@@ -302,6 +302,14 @@ export async function createResource(
     // Si está publicando, establecer publishedAt
     const publishedAt = validated.status === "PUBLISHED" ? new Date() : validated.publishedAt;
 
+    console.log("[createResource] About to execute prisma.resource.create...");
+    console.log("[createResource] Data to insert:", {
+      ...validated,
+      communityId: access.community.id,
+      authorId: session.user.id,
+      publishedAt,
+    });
+
     const resource = await prisma.resource.create({
       data: {
         ...validated,
@@ -324,9 +332,12 @@ export async function createResource(
       },
     });
 
-    console.log("[createResource] Resource created with communityId:", access.community.id);
-    console.log("[createResource] Resource ID:", resource.id);
-    console.log("[createResource] Resource slug:", resource.slug);
+    console.log("[createResource] Resource created successfully:");
+    console.log("[createResource] - ID:", resource.id);
+    console.log("[createResource] - Title:", resource.title);
+    console.log("[createResource] - communityId:", resource.communityId);
+    console.log("[createResource] - authorId:", resource.authorId);
+    console.log("[createResource] - createdAt:", resource.createdAt);
 
     revalidatePath(`/dashboard/c/${communitySlug}/library`);
 
