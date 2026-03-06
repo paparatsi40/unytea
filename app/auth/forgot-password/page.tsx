@@ -2,8 +2,11 @@
 
 import Link from "next/link"
 import { ArrowLeft, Sparkles } from "lucide-react"
+import { useTranslations } from "next-intl"
 
 export default function ForgotPasswordPage() {
+  const t = useTranslations()
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -18,10 +21,10 @@ export default function ForgotPasswordPage() {
             </span>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Reset Password
+            {t("auth.resetPassword")}
           </h1>
           <p className="text-gray-600">
-            Coming soon! For now, contact support.
+            {t("common.comingSoon")}
           </p>
         </div>
 
@@ -32,14 +35,14 @@ export default function ForgotPasswordPage() {
               <span className="text-3xl">🔧</span>
             </div>
             <h2 className="text-xl font-semibold text-gray-900 mb-2">
-              Feature in Development
+              {t("common.featureInDevelopment")}
             </h2>
             <p className="text-gray-600 mb-4">
-              Password reset functionality is coming soon. For now, please contact an administrator to reset your password.
+              {t("auth.passwordResetComingSoon")}
             </p>
             <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 mb-6">
               <p className="text-sm text-purple-800">
-                <strong>Need help?</strong> Email us at support@mentorly.com
+                <strong>{t("common.needHelp")}</strong> {t("common.contactSupport")}
               </p>
             </div>
           </div>
@@ -49,7 +52,7 @@ export default function ForgotPasswordPage() {
             className="inline-flex items-center gap-2 text-purple-600 hover:text-purple-700 font-medium"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to Sign In
+            {t("navigation.back")}
           </Link>
         </div>
       </div>
