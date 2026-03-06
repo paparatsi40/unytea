@@ -14,7 +14,8 @@ export default function LandingPageSettings() {
   const slug = (params?.slug as string) ?? "";
 
   const [loading, setLoading] = useState(true);
-  // const [communityName, setCommunityName] = useState("");
+  const [communityName, setCommunityName] = useState("");
+  const [communityDescription, setCommunityDescription] = useState<string | null>(null);
   const [initialSections, setInitialSections] = useState<SectionInstance[]>([]);
 
   useEffect(() => {
@@ -28,7 +29,8 @@ export default function LandingPageSettings() {
       
       const data = await response.json();
       
-      // setCommunityName(data.name || "");
+      setCommunityName(data.name || "");
+      setCommunityDescription(data.description || null);
       
       // Load existing landing layout or use empty array
       if (data.landingLayout && Array.isArray(data.landingLayout)) {
@@ -108,6 +110,8 @@ export default function LandingPageSettings() {
       <SectionBuilder
         initialSections={initialSections}
         onSave={handleSave}
+        communityName={communityName}
+        communityDescription={communityDescription}
       />
 
       {/* Info Banner */}

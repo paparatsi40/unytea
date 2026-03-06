@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useMemo, useState, useEffect } from "react";
-import { ChevronUp, ChevronDown, Trash2, Copy, Save, Eye, X } from "lucide-react";
+import { ChevronUp, ChevronDown, Trash2, Copy, Save, Eye, X, Sparkles } from "lucide-react";
 import { SectionInstance, SectionType, FieldDef } from "./types";
 import { SECTIONS, SECTION_ORDER } from "./sections";
 import { HeroRender } from "./sections/Hero";
@@ -14,6 +14,8 @@ import { OwnerBioRender } from "./sections/OwnerBio";
 import { GalleryRender } from "./sections/Gallery";
 import { ImageUploader } from "@/components/ui/image-uploader";
 import { Button } from "@/components/ui/button";
+import { generateCommunityFAQs } from "@/app/actions/ai-content";
+import { toast } from "sonner";
 
 /** ========== Utils ========== */
 
@@ -57,9 +59,16 @@ function renderSection(section: SectionInstance) {
 interface SectionBuilderProps {
   initialSections?: SectionInstance[];
   onSave?: (sections: SectionInstance[]) => Promise<void>;
+  communityName?: string;
+  communityDescription?: string | null;
 }
 
-export function SectionBuilder({ initialSections = [], onSave }: SectionBuilderProps) {
+export function SectionBuilder({ 
+  initialSections = [], 
+  onSave,
+  communityName,
+  communityDescription
+}: SectionBuilderProps) {
   const [sections, setSections] = useState<SectionInstance[]>(initialSections);
 
   // Sync sections when initialSections changes (e.g., after loading from API)
@@ -70,6 +79,7 @@ export function SectionBuilder({ initialSections = [], onSave }: SectionBuilderP
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [generatingAI, setGeneratingAI] = useState(false);
 
   // Update selectedId when sections change
   useEffect(() => {
@@ -348,6 +358,49 @@ export function SectionBuilder({ initialSections = [], onSave }: SectionBuilderP
                 </div>
               </div>
             </div>
+
+            {/* AI Generate Button for FAQ */}
+            {selected.type === "faq" && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={async () => {
+                  if (!communityName) {
+                    toast.error("Community name is required to generate FAQs");
+                    return;
+                  }
+                  setGeneratingAI(true);
+                  try {
+                    const faqs = await generateCommunityFAQs(communityName, communityDescription);
+                    const updates: Record<string, string> = {};
+                    faqs.forEach((faq, i) => {
+                      updates[`q${i + 1}`] = faq.q;
+                      updates[`a${i + 1}`] = faq.a;
+                    });
+                    updateProps(selected.id, updates);
+                    toast.success("FAQs generated with AI!");
+                  } catch (error) {
+                    toast.error("Failed to generate FAQs");
+                  } finally {
+                    setGeneratingAI(false);
+                  }
+                }}
+                disabled={generatingAI}
+                className="w-full"
+              >
+                {generatingAI ? (
+                  <>
+                    <Sparkles className="mr-2 h-4 w-4 animate-pulse" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Generate with AI
+                  </>
+                )}
+              </Button>
+            )}
 
             {SECTIONS[selected.type].fields.map((field: FieldDef) => {
               const value = selected.props[field.key] ?? "";
