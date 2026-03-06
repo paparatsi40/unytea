@@ -149,8 +149,8 @@ function VideoCallInterface({
   const [reactions, setReactions] = useState<Reaction[]>([]);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [activePoll, setActivePoll] = useState<Poll | null>(null);
-  const [pinnedMessages, _setPinnedMessages] = useState<Set<string>>(new Set());
-  const [answeredQuestions, _setAnsweredQuestions] = useState<Set<string>>(new Set());
+  const [_pinnedMessages, _setPinnedMessages] = useState<Set<string>>(new Set());
+  const [_answeredQuestions, _setAnsweredQuestions] = useState<Set<string>>(new Set());
 
   // UI State
   const [showChat, setShowChat] = useState(false);
@@ -163,7 +163,7 @@ function VideoCallInterface({
     const handleDataReceived = (
       payload: Uint8Array,
       _participant: any,
-      _kind: DataPacket_Kind
+      _kind: any
     ) => {
       try {
         const decoder = new TextDecoder();
