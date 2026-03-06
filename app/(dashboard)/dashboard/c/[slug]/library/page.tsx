@@ -449,13 +449,24 @@ export default function LibraryPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">Sin categoría</SelectItem>
-                    {categories.map((cat) => (
-                      <SelectItem key={cat.id} value={cat.id}>
-                        {cat.name}
-                      </SelectItem>
-                    ))}
+                    {categories.length > 0 ? (
+                      categories.map((cat) => (
+                        <SelectItem key={cat.id} value={cat.id}>
+                          {cat.name}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <div className="px-2 py-3 text-sm text-gray-400 italic">
+                        No hay categorías disponibles
+                      </div>
+                    )}
                   </SelectContent>
                 </Select>
+                {categories.length === 0 && (
+                  <p className="text-xs text-gray-400">
+                    Las categorías se crean desde la configuración de la biblioteca
+                  </p>
+                )}
               </div>
 
               {/* File Upload */}
