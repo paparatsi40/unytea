@@ -211,13 +211,19 @@ export async function createResource(
   data: CreateResourceInput
 ): Promise<ActionResult<any>> {
   try {
+    console.log("[createResource] Received data:", JSON.stringify(data, null, 2));
+    
     const session = await auth();
     if (!session?.user?.id) {
+      console.log("[createResource] No session found");
       return { success: false, error: "No autorizado", code: "UNAUTHORIZED" };
     }
+    console.log("[createResource] User:", session.user.id);
 
     // Validar input
+    console.log("[createResource] Validating data...");
     const validated = createResourceSchema.parse(data);
+    console.log("[createResource] Validation passed:", validated);
 
     // Verificar permisos
     const access = await checkCommunityAccess(communitySlug, session.user.id, [

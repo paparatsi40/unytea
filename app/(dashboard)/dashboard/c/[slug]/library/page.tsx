@@ -365,19 +365,33 @@ export default function LibraryPage() {
                 e.preventDefault();
                 if (!communitySlug) return;
                 
+                console.log("[DEBUG] Submitting form with uploadedFiles:", uploadedFiles);
+                console.log("[DEBUG] uploadForm.fileUrl:", uploadForm.fileUrl);
+                
                 setIsSubmitting(true);
                 
+                const fileUrl = uploadedFiles[0]?.url || uploadForm.fileUrl;
+                console.log("[DEBUG] Final fileUrl:", fileUrl);
+                
+                if (!fileUrl) {
+                  toast.error("No se ha subido ningún archivo");
+                  setIsSubmitting(false);
+                  return;
+                }
+                
                 const result = await createResource(communitySlug, {
-                title: uploadForm.title,
-                description: uploadForm.description,
-                type: uploadForm.type,
-                categoryId: uploadForm.categoryId || undefined,
-                fileUrl: uploadedFiles[0]?.url || uploadForm.fileUrl,
-                slug: uploadForm.title.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""),
-                tags: [],
-                isPublic: false,
-                status: "PUBLISHED",
-              });
+                  title: uploadForm.title,
+                  description: uploadForm.description,
+                  type: uploadForm.type,
+                  categoryId: uploadForm.categoryId || undefined,
+                  fileUrl: fileUrl,
+                  slug: uploadForm.title.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""),
+                  tags: [],
+                  isPublic: false,
+                  status: "PUBLISHED",
+                });
+                
+                console.log("[DEBUG] createResource result:", result);
                 
                 if (result.success) {
                   toast.success("Recurso subido exitosamente");
@@ -392,6 +406,7 @@ export default function LibraryPage() {
                   setUploadedFiles([]);
                   fetchData(); // Refresh the list
                 } else {
+                  console.error("[DEBUG] createResource failed:", result.error, result.code);
                   toast.error(result.error || "Error al subir el recurso");
                 }
                 
