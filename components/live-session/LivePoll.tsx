@@ -31,7 +31,6 @@ interface LivePollProps {
   currentUserId: string;
   onVote: (pollId: string, optionId: string) => void;
   onClose?: () => void;
-  _isModerator?: boolean;
 }
 
 export function LivePoll({
@@ -39,7 +38,6 @@ export function LivePoll({
   currentUserId,
   onVote,
   onClose,
-  _isModerator = false,
 }: LivePollProps) {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [hasVoted, setHasVoted] = useState(false);
