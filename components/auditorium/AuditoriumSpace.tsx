@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { Users, Maximize2, Minimize2 } from "lucide-react";
 import { getChannelOnlineMembers } from "@/app/actions/channels";
-import { useSocket } from "@/hooks/use-socket";
 
 type OnlineMember = {
   id: string;
@@ -27,40 +26,16 @@ export function AuditoriumSpace({ channelId, communitySlug: _communitySlug }: Pr
   const [members, setMembers] = useState<OnlineMember[]>([]);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [hoveredMember, setHoveredMember] = useState<string | null>(null);
-  const { socket, isConnected } = useSocket();
 
-  // Load initial members
+  // Load members with polling
   useEffect(() => {
     loadOnlineMembers();
+    
+    // Poll every 10 seconds for updates
+    const interval = setInterval(loadOnlineMembers, 10000);
+    
+    return () => clearInterval(interval);
   }, [channelId]);
-
-  // WebSocket: Real-time presence updates
-  useEffect(() => {
-    if (!socket || !isConnected || !channelId) return;
-
-    // Join channel for presence updates
-    socket.emit("join:channel", channelId);
-
-    // Listen for user coming online
-    const handleUserOnline = () => {
-      // Reload members to get the new user
-      loadOnlineMembers();
-    };
-
-    // Listen for user going offline
-    const handleUserOffline = ({ userId }: { userId: string }) => {
-      setMembers((prev) => prev.filter((m) => m.user.id !== userId));
-    };
-
-    socket.on("user:online", handleUserOnline);
-    socket.on("user:offline", handleUserOffline);
-
-    return () => {
-      socket.emit("leave:channel", channelId);
-      socket.off("user:online", handleUserOnline);
-      socket.off("user:offline", handleUserOffline);
-    };
-  }, [socket, isConnected, channelId]);
 
   const loadOnlineMembers = async () => {
     const result = await getChannelOnlineMembers(channelId);

@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { Bell, X, Check, MessageCircle, Users, Trophy, Heart, AlertCircle } from "lucide-react";
 import { getUserNotifications, markNotificationAsRead, markAllNotificationsAsRead, deleteNotification } from "@/app/actions/notifications";
-import { useSocket } from "@/hooks/use-socket";
 import { useCurrentUser } from "@/hooks/use-current-user";
 
 type NotificationType = "MESSAGE" | "COMMENT" | "REACTION" | "NEW_POST" | "NEW_MEMBER" | "ACHIEVEMENT" | "SYSTEM";
@@ -22,40 +21,18 @@ export function NotificationCenter() {
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
-  const { socket, isConnected } = useSocket();
-  const { user } = useCurrentUser();
+  const { user: _user } = useCurrentUser();
+  void _user; // User object available if needed for future features
 
-  // Load initial notifications
+  // Load notifications with polling
   useEffect(() => {
     loadNotifications();
+    
+    // Poll every 30 seconds for new notifications
+    const interval = setInterval(loadNotifications, 30000);
+    
+    return () => clearInterval(interval);
   }, []);
-
-  // WebSocket: Real-time notification updates
-  useEffect(() => {
-    if (!socket || !isConnected || !user?.id) return;
-
-    // Join user's personal room
-    socket.emit("join:user", user.id);
-
-    // Listen for new notifications
-    const handleNewNotification = (notification: Notification) => {
-      setNotifications((prev) => [notification, ...prev]);
-      
-      // Optional: Show browser notification
-      if (Notification.permission === "granted") {
-        new Notification(notification.title, {
-          body: notification.message,
-          icon: "/icon.png",
-        });
-      }
-    };
-
-    socket.on("notification:new", handleNewNotification);
-
-    return () => {
-      socket.off("notification:new", handleNewNotification);
-    };
-  }, [socket, isConnected, user?.id]);
 
   const loadNotifications = async () => {
     setLoading(true);
