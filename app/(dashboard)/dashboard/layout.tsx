@@ -6,13 +6,18 @@ import { AIWidgetProvider } from "@/components/ai/AIWidgetProvider";
 import { NextIntlClientProvider } from "next-intl";
 import { useEffect, useState } from "react";
 
+// Type for nested translation messages
+type Messages = {
+  [key: string]: string | Messages;
+};
+
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const [locale, setLocale] = useState("en");
-  const [messages, setMessages] = useState<Record<string, string> | null>(null);
+  const [messages, setMessages] = useState<Messages | null>(null);
 
   useEffect(() => {
     // Load locale from localStorage or default to 'en'
