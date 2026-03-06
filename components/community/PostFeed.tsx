@@ -4,26 +4,19 @@ import { useState } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { createPost } from "@/app/actions/posts";
 import { Button } from "@/components/ui/button";
-import dynamic from "next/dynamic";
 import { 
   MessageSquare, 
   Heart, 
-  Share2, 
   Send, 
   Image as ImageIcon, 
   Smile,
   Sparkles,
-  TrendingUp,
   Users,
   Zap,
   CheckCircle2
 } from "lucide-react";
-import { PostReactions } from "@/components/community/PostReactions";
 import { PostCard } from "@/components/community/PostCard";
 import { SpectacularFeedHeader } from "@/components/community/SpectacularFeedHeader";
-
-// Dynamically import Lottie to avoid SSR issues
-const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 
 type Post = {
   id: string;
@@ -49,7 +42,7 @@ export function PostFeed({
   communityId: string;
   initialPosts: Post[];
 }) {
-  const { user, isLoading } = useCurrentUser();
+  const { user } = useCurrentUser();
   const [posts, setPosts] = useState(initialPosts);
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -84,27 +77,6 @@ export function PostFeed({
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const getAuthorName = (author: Post["author"]) => {
-    if (author.firstName && author.lastName) {
-      return `${author.firstName} ${author.lastName}`;
-    }
-    return author.firstName || "User";
-  };
-
-  const formatTime = (date: Date) => {
-    const now = new Date();
-    const diff = now.getTime() - new Date(date).getTime();
-    const minutes = Math.floor(diff / 60000);
-    const hours = Math.floor(diff / 3600000);
-    const days = Math.floor(diff / 86400000);
-
-    if (minutes < 1) return "just now";
-    if (minutes < 60) return `${minutes}m ago`;
-    if (hours < 24) return `${hours}h ago`;
-    if (days < 7) return `${days}d ago`;
-    return new Date(date).toLocaleDateString();
   };
 
   return (
