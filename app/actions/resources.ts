@@ -46,6 +46,8 @@ async function checkCommunityAccess(
   userId: string,
   requiredRoles: ("OWNER" | "ADMIN" | "MODERATOR" | "MENTOR" | "MEMBER")[] = ["MEMBER"]
 ): Promise<{ community: any; member: any } | null> {
+  console.log("[checkCommunityAccess] Looking for community:", communitySlug, "user:", userId);
+  
   const community = await prisma.community.findUnique({
     where: { slug: communitySlug },
     include: {
@@ -55,13 +57,31 @@ async function checkCommunityAccess(
     },
   });
 
-  if (!community) return null;
+  if (!community) {
+    console.log("[checkCommunityAccess] Community not found");
+    return null;
+  }
+  
+  console.log("[checkCommunityAccess] Community found:", community.id);
+  console.log("[checkCommunityAccess] Members found:", community.members.length);
+  
+  if (community.members.length > 0) {
+    console.log("[checkCommunityAccess] Member role:", community.members[0].role);
+  }
 
   const member = community.members[0];
-  if (!member) return null;
+  if (!member) {
+    console.log("[checkCommunityAccess] User is not a member");
+    return null;
+  }
 
   const hasAccess = requiredRoles.includes(member.role);
-  if (!hasAccess) return null;
+  if (!hasAccess) {
+    console.log("[checkCommunityAccess] Role not authorized:", member.role, "required:", requiredRoles);
+    return null;
+  }
+  
+  console.log("[checkCommunityAccess] Access granted");
 
   return { community, member };
 }
