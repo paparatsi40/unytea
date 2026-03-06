@@ -33,7 +33,7 @@ export default async function AchievementsPage() {
     );
   }
 
-  const { achievements, byCategory, stats } = result;
+  const { byCategory, stats } = result;
 
   return (
     <div className="container max-w-6xl mx-auto py-8 space-y-8">
