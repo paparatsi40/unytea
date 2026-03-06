@@ -26,7 +26,7 @@ export async function submitSessionFeedback(
   const mentorSession = await prisma.mentorSession.findUnique({
     where: { id: sessionId },
     include: {
-      participation: {
+      participations: {
         where: { userId: session.user.id },
       },
     },
@@ -37,7 +37,7 @@ export async function submitSessionFeedback(
   }
 
   // Check if user participated in the session
-  if (mentorSession.participation.length === 0) {
+  if (mentorSession.participations.length === 0) {
     throw new Error("You did not participate in this session");
   }
 
