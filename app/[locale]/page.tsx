@@ -206,27 +206,27 @@ export default async function Home() {
                 className="group relative overflow-hidden rounded-2xl glass-strong card-hover"
               >
                 {/* Community Image */}
-                <div 
-                  className="aspect-square bg-cover bg-center"
-                  style={{ 
-                    backgroundImage: `linear-gradient(135deg, ${community.gradient.from}, ${community.gradient.to})` 
-                  }}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <div className="aspect-square relative">
+                  <img
+                    src={community.image}
+                    alt={community.name}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
                   
                   {/* Content Overlay */}
                   <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-lg">
+                      <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-xl border border-white/30">
                         {community.emoji}
                       </div>
                     </div>
-                    <h3 className="font-semibold text-sm mb-1">{community.name}</h3>
-                    <div className="flex items-center gap-2 text-xs text-white/80">
+                    <h3 className="font-semibold text-base mb-1">{community.name}</h3>
+                    <div className="flex items-center gap-2 text-xs text-white/90">
                       <span>{t("featured.members", { count: community.members.toLocaleString() })}</span>
                       <span>•</span>
                       <span className="flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
+                        <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
                         {t("featured.online", { count: community.online })}
                       </span>
                     </div>
@@ -424,56 +424,56 @@ const featuredCommunities = [
     members: 1247,
     online: 42,
     emoji: "🎨",
-    gradient: { from: "#9333ea", to: "#ec4899" },
+    image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&h=400&fit=crop",
   },
   {
     name: "Code Wizards",
     members: 3892,
     online: 156,
     emoji: "⚡",
-    gradient: { from: "#3b82f6", to: "#8b5cf6" },
+    image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=400&fit=crop",
   },
   {
     name: "Fitness Tribe",
     members: 2156,
     online: 89,
     emoji: "💪",
-    gradient: { from: "#f97316", to: "#ef4444" },
+    image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&h=400&fit=crop",
   },
   {
     name: "Mindful Living",
     members: 876,
     online: 34,
     emoji: "🧘",
-    gradient: { from: "#10b981", to: "#14b8a6" },
+    image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=400&fit=crop",
   },
   {
     name: "Startup Hub",
     members: 5634,
     online: 234,
     emoji: "🚀",
-    gradient: { from: "#6366f1", to: "#8b5cf6" },
+    image: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=400&h=400&fit=crop",
   },
   {
     name: "Photo Pros",
     members: 1543,
     online: 67,
     emoji: "📸",
-    gradient: { from: "#f59e0b", to: "#fbbf24" },
+    image: "https://images.unsplash.com/photo-1554048612-b6a482bc67e5?w=400&h=400&fit=crop",
   },
   {
     name: "Music Makers",
     members: 2341,
     online: 98,
     emoji: "🎵",
-    gradient: { from: "#ec4899", to: "#f43f5e" },
+    image: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&h=400&fit=crop",
   },
   {
     name: "Crypto Circle",
     members: 4521,
     online: 312,
     emoji: "₿",
-    gradient: { from: "#14b8a6", to: "#06b6d4" },
+    image: "https://images.unsplash.com/photo-1518546305927-5a555bb7020d?w=400&h=400&fit=crop",
   },
 ];
 
