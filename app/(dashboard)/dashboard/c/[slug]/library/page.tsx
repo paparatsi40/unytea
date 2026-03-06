@@ -491,7 +491,7 @@ export default function LibraryPage() {
                           setUploadForm({ ...uploadForm, categoryId: result.data.id });
                           setNewCategoryName("");
                           setIsCreatingCategory(false);
-                        } else {
+                        } else if (!result.success) {
                           toast.error(result.error || "Error al crear categoría");
                         }
                         setIsCreatingCategorySubmitting(false);
