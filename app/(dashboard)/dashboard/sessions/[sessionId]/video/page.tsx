@@ -91,7 +91,7 @@ export default function SessionVideoPage() {
     // Track session join and award points
     try {
       const result = await trackSessionJoin(sessionId);
-      if (result.success && !result.alreadyTracked) {
+      if (result.success && !result.alreadyTracked && result.pointsEarned != null) {
         const notification = formatPointsNotification("JOIN_SESSION", result.pointsEarned);
         addNotification(
           result.pointsEarned,
