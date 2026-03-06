@@ -31,8 +31,15 @@ interface PageProps {
 
 import { Community } from "@prisma/client";
 
+interface CommunityStats {
+  _count: {
+    members: number;
+    posts: number;
+  };
+}
+
 // Component for Join Community UI - PUBLIC LANDING PAGE
-function JoinCommunityView({ community, stats }: { community: Community; stats?: Record<string, number> }) {
+function JoinCommunityView({ community, stats }: { community: Community; stats?: CommunityStats }) {
   async function handleJoin() {
     "use server";
     const session = await auth();
