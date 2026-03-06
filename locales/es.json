@@ -7,7 +7,7 @@
       "dashboard": "Panel",
       "goToDashboard": "Ir al Panel",
       "signIn": "Iniciar Sesión",
-      "startFree": "Empezar Gratis"
+      "startFree": "Comenzar Gratis"
     },
     "hero": {
       "badge": "Ahora en Beta",
@@ -18,12 +18,12 @@
       "description": "Como compartir té con amigos, Unytea hace que construir comunidades sea cálido, humano y genuino.",
       "highlight": "Todo lo que tiene Skool, más el alma que le falta.",
       "cta": {
-        "primary": "Comienza Gratis",
+        "primary": "Comenzar Gratis",
         "secondary": "Ver Demo"
       }
     },
     "preview": {
-      "communityName": "Design Masters",
+      "communityName": "Maestros del Diseño",
       "members": "{count} miembros",
       "post1": {
         "author": "Sarah Chen",
@@ -33,12 +33,12 @@
       "post2": {
         "author": "Marcus Johnson",
         "time": "hace 5 horas",
-        "content": "¡Transmitiendo en vivo mañana a las 3PM sobre métodos de investigación UX!"
+        "content": "¡Sosteniendo una sesión en vivo mañana a las 3PM EST sobre métodos de investigación UX!"
       },
-      "liveSession": "En Vivo",
+      "liveSession": "Sesión en Vivo",
       "online": "{count} en línea",
       "activeSessions": "{count} sesiones activas",
-      "joinConversation": "Únete a la conversación"
+      "joinConversation": "Unirse a la conversación"
     },
     "featured": {
       "title": "Comunidades que Confían en Unytea",
@@ -55,17 +55,17 @@
       "items": {
         "video": {
           "title": "Videollamadas Integradas",
-          "description": "Sesiones 1-a-1 y en grupo con grabación, transcripción y compartir pantalla.",
+          "description": "Sesiones 1-a-1 y en grupo con grabación, transcripción y pantalla compartida.",
           "badge": "Skool no tiene esto"
         },
         "customization": {
           "title": "Personalización Completa",
-          "description": "Dominios personalizados, colores, fuentes y CSS. Tu marca, a tu manera.",
+          "description": "Dominios personalizados, colores, fuentes y CSS. Tu marca, tu estilo.",
           "badge": "Control total"
         },
         "security": {
           "title": "Seguridad Empresarial",
-          "description": "Encriptación end-to-end, 2FA y diseño centrado en la privacidad."
+          "description": "Encriptación de extremo a extremo, 2FA y diseño centrado en la privacidad."
         },
         "multilanguage": {
           "title": "Multi-Idioma",
@@ -74,7 +74,7 @@
         },
         "gamification": {
           "title": "Gamificación Inteligente",
-          "description": "Puntos, insignias y recompensas que realmente motivan el engagement."
+          "description": "Puntos, insignias y recompensas que realmente motivan la participación."
         },
         "analytics": {
           "title": "Analíticas Profundas",
@@ -85,12 +85,12 @@
     },
     "comparison": {
       "title": "¿Por Qué Elegir Unytea sobre Skool?",
-      "subtitle": "Las mismas características principales. Mejor alma. Mitad de precio.",
+      "subtitle": "Mismas características principales. Mejor alma. Mitad de precio.",
       "newBadge": "NUEVO",
       "items": {
         "buddy": {
           "title": "Sistema de Compañeros",
-          "description": "Emparejamiento inteligente de miembros para partnerships de responsabilidad. Skool no tiene esto."
+          "description": "Emparejamiento inteligente de miembros para asociaciones de responsabilidad. Skool no tiene esto."
         },
         "auditorium": {
           "title": "Vista de Auditorio",
@@ -98,15 +98,15 @@
         },
         "videocalls": {
           "title": "Videollamadas Integradas",
-          "description": "Programa, hostea y graba sesiones sin salir de la plataforma. No más links de Zoom."
+          "description": "Programa, sostén y graba sesiones sin salir de la plataforma. No más enlaces de Zoom."
         },
         "brand": {
-          "title": "Tu Marca, A Tu Manera",
-          "description": "Dominios, colores, fuentes y CSS personalizados. Las comunidades de Skool se ven igual."
+          "title": "Tu Marca, Tu Estilo",
+          "description": "Dominios personalizados, colores, fuentes y CSS. Las comunidades de Skool se ven iguales."
         },
         "price": {
           "title": "Mitad de Precio",
-          "description": "$49/mes vs $99 de Skool. Las mismas características, más alma."
+          "description": "$49/mes vs $99 de Skool. Mismas características, más alma."
         },
         "websockets": {
           "title": "WebSockets en Tiempo Real",
@@ -159,9 +159,9 @@
       }
     },
     "cta": {
-      "title": "¿Listo para Unir tu Comunidad?",
-      "description": "Únete a nosotros y experimenta construir comunidades que se sienten como en casa.",
-      "button": "Comienza Gratis"
+      "title": "¿Listo para Unir Tu Comunidad?",
+      "description": "Únete a nosotros y experimenta la construcción de comunidades que se siente como en casa.",
+      "button": "Comenzar Gratis"
     },
     "footer": {
       "slogan": "Donde las Comunidades Se Unen.",
@@ -169,5 +169,114 @@
       "terms": "Términos",
       "contact": "Contacto"
     }
+  },
+  "navigation": {
+    "dashboard": "Panel",
+    "communities": "Comunidades",
+    "messages": "Mensajes",
+    "profile": "Perfil",
+    "logout": "Cerrar sesión",
+    "signIn": "Iniciar sesión",
+    "signUp": "Registrarse"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Ocurrió un error",
+    "search": "Buscar",
+    "searchPlaceholder": "Buscar...",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "submit": "Enviar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "close": "Cerrar",
+    "open": "Abrir",
+    "all": "Todos",
+    "recent": "Recientes",
+    "alphabetical": "Alfabético",
+    "mostPopular": "Más Populares",
+    "comingSoon": "Próximamente"
+  },
+  "dashboard": {
+    "welcome": "Bienvenido de vuelta",
+    "yourCommunities": "Tus Comunidades",
+    "discover": "Descubrir Comunidades",
+    "createCommunity": "Crear Comunidad",
+    "manage": "Gestionar",
+    "settings": "Configuración",
+    "members": "Miembros",
+    "posts": "Publicaciones",
+    "noCommunities": "Aún no te has unido a ninguna comunidad",
+    "browseCommunities": "Explorar Comunidades"
+  },
+  "communities": {
+    "allCommunities": "Todas las Comunidades",
+    "public": "Públicas",
+    "private": "Privadas",
+    "mostMembers": "Más Miembros",
+    "mostActive": "Más Activas",
+    "createNew": "Crear Nueva Comunidad",
+    "namePlaceholder": "Mi Comunidad Increíble",
+    "descriptionPlaceholder": "Cuéntale a la gente de qué se trata tu comunidad...",
+    "nameRequired": "El nombre de la comunidad es requerido",
+    "createFailed": "Error al crear la comunidad",
+    "uploadSuccess": "{type} subido exitosamente",
+    "uploadFailed": "Error al subir {type}",
+    "logo": "Logo",
+    "cover": "Portada",
+    "join": "Unirse",
+    "joinSuccess": "Te uniste exitosamente",
+    "joinFailed": "Error al unirse",
+    "leave": "Salir",
+    "leaveSuccess": "Saliste de la comunidad",
+    "leaveFailed": "Error al salir",
+    "pendingApproval": "Pendiente de Aprobación",
+    "settings": "Configuración",
+    "manage": "Gestionar Comunidad",
+    "totalCommunities": "Total de Comunidades",
+    "totalMembers": "Total de Miembros",
+    "youOwn": "Tus Comunidades",
+    "totalPosts": "Total de Posts",
+    "members": "miembros",
+    "posts": "posts",
+    "stepBasicInfo": "Información Básica",
+    "stepVisualIdentity": "Identidad Visual",
+    "stepCategories": "Categorías",
+    "stepReview": "Revisión"
+  },
+  "auth": {
+    "signIn": "Iniciar Sesión",
+    "signUp": "Registrarse",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar Contraseña",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "signInRequired": "Por favor inicia sesión para continuar",
+    "invalidCredentials": "Credenciales inválidas",
+    "accountCreated": "Cuenta creada exitosamente",
+    "passwordsDontMatch": "Las contraseñas no coinciden",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "resetPassword": "Restablecer Contraseña",
+    "checkEmail": "Revisa tu correo para instrucciones"
+  },
+  "sectionBuilder": {
+    "sections": "Secciones",
+    "properties": "Propiedades",
+    "livePreview": "Vista Previa",
+    "clickToEdit": "Haz clic en cualquier sección para editar",
+    "addSection": "Agregar Sección",
+    "save": "Guardar Página",
+    "preview": "Vista Previa",
+    "closePreview": "Cerrar Vista Previa",
+    "saveAndClose": "Guardar y Cerrar",
+    "unsavedPreview": "Vista Previa sin Guardar",
+    "faqsGenerated": "FAQs generadas con IA",
+    "faqsFailed": "Error al generar FAQs",
+    "unknownSection": "Tipo de sección desconocido"
   }
 }

@@ -6,16 +6,16 @@
       "community": "Communauté",
       "dashboard": "Tableau de Bord",
       "goToDashboard": "Aller au Tableau de Bord",
-      "signIn": "Connexion",
-      "startFree": "Commencer Gratuit"
+      "signIn": "Se Connecter",
+      "startFree": "Commencer Gratuitement"
     },
     "hero": {
       "badge": "Maintenant en Beta",
       "title": {
-        "line1": "Là où les Communautés",
-        "line2": "S'unissent"
+        "line1": "Où les Communautés",
+        "line2": "S'Unissent"
       },
-      "description": "Comme partager du thé avec des amis, Unytea rend la construction communautaire chaleureuse, humaine et authentique.",
+      "description": "Comme partager du thé avec des amis, Unytea rend la construction de communautés chaleureuse, humaine et authentique.",
       "highlight": "Tout ce que Skool a, plus l'âme qui lui manque.",
       "cta": {
         "primary": "Commencer Gratuitement",
@@ -23,26 +23,26 @@
       }
     },
     "preview": {
-      "communityName": "Design Masters",
+      "communityName": "Maîtres du Design",
       "members": "{count} membres",
       "post1": {
         "author": "Sarah Chen",
         "time": "il y a 2 heures",
-        "content": "Nous venons de lancer notre nouveau système de design ! Découvrez la palette de couleurs..."
+        "content": "Nous venons de lancer notre nouveau système de design! Découvrez la palette de couleurs..."
       },
       "post2": {
         "author": "Marcus Johnson",
         "time": "il y a 5 heures",
-        "content": "Session en direct demain à 15h sur les méthodes de recherche UX !"
+        "content": "Session en direct demain à 15h00 sur les méthodes de recherche UX!"
       },
-      "liveSession": "En Direct",
+      "liveSession": "Session en Direct",
       "online": "{count} en ligne",
       "activeSessions": "{count} sessions actives",
       "joinConversation": "Rejoindre la conversation"
     },
     "featured": {
       "title": "Communautés qui Font Confiance à Unytea",
-      "description": "Rejoignez des milliers de communautés prospères qui construisent déjà quelque chose de spécial",
+      "description": "Rejoignez des milliers de communautés florissantes qui construisent déjà quelque chose de spécial",
       "members": "{count} membres",
       "online": "{count} en ligne"
     },
@@ -60,12 +60,12 @@
         },
         "customization": {
           "title": "Personnalisation Complète",
-          "description": "Domaines personnalisés, couleurs, polices et CSS. Votre marque, à votre façon.",
+          "description": "Domaines personnalisés, couleurs, polices et CSS. Votre marque, votre façon.",
           "badge": "Contrôle total"
         },
         "security": {
           "title": "Sécurité Entreprise",
-          "description": "Chiffrement de bout en bout, 2FA et conception axée sur la confidentialité."
+          "description": "Chiffrement de bout en bout, 2FA et design privé dès la conception."
         },
         "multilanguage": {
           "title": "Multi-Langue",
@@ -84,39 +84,39 @@
       }
     },
     "comparison": {
-      "title": "Pourquoi Choisir Unytea plutôt que Skool ?",
-      "subtitle": "Les mêmes fonctionnalités clés. Une meilleure âme. Moitié du prix.",
+      "title": "Pourquoi Choisir Unytea plutôt que Skool?",
+      "subtitle": "Mêmes fonctionnalités principales. Meilleure âme. Moitié du prix.",
       "newBadge": "NOUVEAU",
       "items": {
         "buddy": {
-          "title": "Système de Parrainage",
-          "description": "Appariement intelligent pour les partenariats de responsabilité. Skool n'a pas ça du tout."
+          "title": "Système de Compagnon",
+          "description": "Appariement intelligent des membres pour des partenariats de responsabilité. Skool n'a pas ça du tout."
         },
         "auditorium": {
-          "title": "Vue d'Auditorium",
+          "title": "Vue Auditorium",
           "description": "Présence visuelle montrant qui est en ligne en temps réel. Personne d'autre n'a ça."
         },
         "videocalls": {
           "title": "Visioconférences Intégrées",
-          "description": "Programmez, animez et enregistrez des sessions sans quitter la plateforme. Plus de liens Zoom."
+          "description": "Planifiez, tenez et enregistrez des sessions sans quitter la plateforme. Fini les liens Zoom."
         },
         "brand": {
-          "title": "Votre Marque, à Votre Façon",
-          "description": "Domaines, couleurs, polices et CSS personnalisés. Les communautés Skool se ressemblent toutes."
+          "title": "Votre Marque, Votre Façon",
+          "description": "Domaines personnalisés, couleurs, polices et CSS. Les communautés Skool se ressemblent toutes."
         },
         "price": {
           "title": "Moitié du Prix",
-          "description": "49$/mois contre 99$ pour Skool. Les mêmes fonctionnalités, plus d'âme."
+          "description": "49$/mois contre 99$ de Skool. Mêmes fonctionnalités principales, plus d'âme."
         },
         "websockets": {
-          "title": "WebSockets en Temps Réel",
+          "title": "WebSockets Temps Réel",
           "description": "Performance niveau Discord. Latence 0ms. 90% moins de charge serveur."
         }
       }
     },
     "pricing": {
       "title": "Tarifs Simples et Honnêtes",
-      "subtitle": "Commencez gratuitement. Évoluez à mesure que vous grandissez. Annulez à tout moment.",
+      "subtitle": "Commencez gratuitement. Évoluez en grandissant. Annulez quand vous voulez.",
       "perMonth": "mois",
       "popular": "Le Plus Populaire",
       "cta": "Commencer",
@@ -138,8 +138,8 @@
             "two": "Membres illimités",
             "three": "Personnalisation complète",
             "four": "Visioconférences illimitées",
-            "five": "Système de Parrainage",
-            "six": "Vue d'Auditorium",
+            "five": "Système de Compagnon",
+            "six": "Vue Auditorium",
             "seven": "Domaine personnalisé",
             "eight": "Analyses avancées",
             "nine": "Support prioritaire"
@@ -159,15 +159,124 @@
       }
     },
     "cta": {
-      "title": "Prêt à Unir votre Communauté ?",
-      "description": "Rejoignez-nous et découvrez la construction communautaire qui fait se sentir comme chez soi.",
+      "title": "Prêt à Unir Votre Communauté?",
+      "description": "Rejoignez-nous et découvrez la construction de communautés qui fait comme à la maison.",
       "button": "Commencer Gratuitement"
     },
     "footer": {
-      "slogan": "Là où les Communautés S'unissent.",
+      "slogan": "Où les Communautés S'Unissent.",
       "privacy": "Confidentialité",
       "terms": "Conditions",
       "contact": "Contact"
     }
+  },
+  "navigation": {
+    "dashboard": "Tableau de Bord",
+    "communities": "Communautés",
+    "messages": "Messages",
+    "profile": "Profil",
+    "logout": "Se déconnecter",
+    "signIn": "Se connecter",
+    "signUp": "S'inscrire"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Une erreur s'est produite",
+    "search": "Rechercher",
+    "searchPlaceholder": "Rechercher...",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "create": "Créer",
+    "submit": "Soumettre",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "close": "Fermer",
+    "open": "Ouvrir",
+    "all": "Tous",
+    "recent": "Récents",
+    "alphabetical": "Alphabétique",
+    "mostPopular": "Plus Populaires",
+    "comingSoon": "Bientôt disponible"
+  },
+  "dashboard": {
+    "welcome": "Bon retour",
+    "yourCommunities": "Vos Communautés",
+    "discover": "Découvrir des Communautés",
+    "createCommunity": "Créer une Communauté",
+    "manage": "Gérer",
+    "settings": "Paramètres",
+    "members": "Membres",
+    "posts": "Publications",
+    "noCommunities": "Vous n'avez rejoint aucune communauté",
+    "browseCommunities": "Parcourir les Communautés"
+  },
+  "communities": {
+    "allCommunities": "Toutes les Communautés",
+    "public": "Publiques",
+    "private": "Privées",
+    "mostMembers": "Plus de Membres",
+    "mostActive": "Plus Actives",
+    "createNew": "Créer une Nouvelle Communauté",
+    "namePlaceholder": "Ma Communauté Incroyable",
+    "descriptionPlaceholder": "Dites aux gens ce qu'est votre communauté...",
+    "nameRequired": "Le nom de la communauté est requis",
+    "createFailed": "Échec de la création de la communauté",
+    "uploadSuccess": "{type} téléchargé avec succès",
+    "uploadFailed": "Échec du téléchargement de {type}",
+    "logo": "Logo",
+    "cover": "Couverture",
+    "join": "Rejoindre",
+    "joinSuccess": "Rejoint avec succès",
+    "joinFailed": "Échec de l'adhésion",
+    "leave": "Quitter",
+    "leaveSuccess": "Quitté la communauté",
+    "leaveFailed": "Échec du départ",
+    "pendingApproval": "En Attente d'Approbation",
+    "settings": "Paramètres",
+    "manage": "Gérer la Communauté",
+    "totalCommunities": "Total des Communautés",
+    "totalMembers": "Total des Membres",
+    "youOwn": "Vos Communautés",
+    "totalPosts": "Total des Publications",
+    "members": "membres",
+    "posts": "posts",
+    "stepBasicInfo": "Informations de Base",
+    "stepVisualIdentity": "Identité Visuelle",
+    "stepCategories": "Catégories",
+    "stepReview": "Révision"
+  },
+  "auth": {
+    "signIn": "Se Connecter",
+    "signUp": "S'Inscrire",
+    "email": "Email",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le Mot de Passe",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "signInRequired": "Veuillez vous connecter pour continuer",
+    "invalidCredentials": "Identifiants invalides",
+    "accountCreated": "Compte créé avec succès",
+    "passwordsDontMatch": "Les mots de passe ne correspondent pas",
+    "forgotPassword": "Mot de passe oublié?",
+    "resetPassword": "Réinitialiser le Mot de Passe",
+    "checkEmail": "Vérifiez votre email pour les instructions"
+  },
+  "sectionBuilder": {
+    "sections": "Sections",
+    "properties": "Propriétés",
+    "livePreview": "Aperçu",
+    "clickToEdit": "Cliquez sur une section pour modifier",
+    "addSection": "Ajouter une Section",
+    "save": "Enregistrer la Page",
+    "preview": "Aperçu",
+    "closePreview": "Fermer l'Aperçu",
+    "saveAndClose": "Enregistrer et Fermer",
+    "unsavedPreview": "Aperçu non Enregistré",
+    "faqsGenerated": "FAQs générées avec l'IA",
+    "faqsFailed": "Échec de la génération des FAQs",
+    "unknownSection": "Type de section inconnu"
   }
 }
