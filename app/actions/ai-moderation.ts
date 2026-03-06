@@ -2,7 +2,6 @@
 
 import { moderateContent } from "@/lib/openai";
 import { prisma } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
 
 export interface ModerationResult {
   flagged: boolean;
