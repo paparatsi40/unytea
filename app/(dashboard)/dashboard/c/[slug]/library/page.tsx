@@ -441,14 +441,14 @@ export default function LibraryPage() {
               <div className="space-y-2">
                 <Label htmlFor="category">Categoría</Label>
                 <Select
-                  value={uploadForm.categoryId}
-                  onValueChange={(value: string) => setUploadForm({ ...uploadForm, categoryId: value })}
+                  value={uploadForm.categoryId || "none"}
+                  onValueChange={(value: string) => setUploadForm({ ...uploadForm, categoryId: value === "none" ? "" : value })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecciona una categoría (opcional)" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Sin categoría</SelectItem>
+                    <SelectItem value="none">Sin categoría</SelectItem>
                     {categories.map((cat) => (
                       <SelectItem key={cat.id} value={cat.id}>
                         {cat.name}
