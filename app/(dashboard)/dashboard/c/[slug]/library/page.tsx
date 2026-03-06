@@ -385,7 +385,7 @@ export default function LibraryPage() {
                   type: uploadForm.type,
                   categoryId: uploadForm.categoryId || undefined,
                   fileUrl: fileUrl,
-                  slug: uploadForm.title.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""),
+                  slug: uploadForm.title.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "") + "-" + Date.now(),
                   tags: [],
                   isPublic: false,
                   status: "PUBLISHED",
