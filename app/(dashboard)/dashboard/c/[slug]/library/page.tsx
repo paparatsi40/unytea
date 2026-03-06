@@ -30,15 +30,7 @@ export default function LibraryPage() {
   const params = useParams();
   const communitySlug = params?.slug as string | undefined;
 
-  if (!communitySlug) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p>Community not found</p>
-      </div>
-    );
-  }
-
-  // State
+  // State - MUST declare all hooks before any early returns
   const [resources, setResources] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [popularResources, setPopularResources] = useState<any[]>([]);
@@ -60,6 +52,15 @@ export default function LibraryPage() {
     hasMore: false,
     total: 0,
   });
+
+  // Early return after all hooks are declared
+  if (!communitySlug) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p>Community not found</p>
+      </div>
+    );
+  }
 
   // Fetch initial data
   const fetchData = useCallback(async () => {

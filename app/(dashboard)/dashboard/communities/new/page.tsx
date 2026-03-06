@@ -13,11 +13,9 @@ import {
   Palette,
   Settings as SettingsIcon,
   Sparkles,
-  Loader2,
 } from "lucide-react";
 import { useUploadThing } from "@/lib/uploadthing";
 import { toast } from "sonner";
-import Image from "next/image";
 import { BookOpen } from "lucide-react";
 
 const steps = [
