@@ -41,7 +41,9 @@ export function PusherChat({ channelId, channelName }: PusherChatProps) {
       setMessages((prev) => [...prev, message]);
     });
 
-    return unsubscribe;
+    return () => {
+      unsubscribe();
+    };
   }, [onMessage]);
 
   // Auto-scroll to bottom
