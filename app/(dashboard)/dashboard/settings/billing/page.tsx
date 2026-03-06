@@ -72,9 +72,9 @@ export default function BillingPage() {
     <div className="space-y-8">
       {/* Header */}
       <div className="flex flex-col gap-2">
-        <h2 className="text-3xl font-bold tracking-tight">{t("settings.billing.title", "Billing")}</h2>
+        <h2 className="text-3xl font-bold tracking-tight">{t("settings.billing.title")}</h2>
         <p className="text-muted-foreground">
-          {t("settings.billing.description", "Manage your subscription and billing preferences")}
+          {t("settings.billing.description")}
         </p>
       </div>
 
