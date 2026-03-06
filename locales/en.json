@@ -33,7 +33,11 @@
     "invalidCredentials": "Invalid email or password",
     "welcomeBack": "Welcome back!",
     "accountCreated": "Account created successfully!",
-    "logoutSuccess": "Successfully logged out"
+    "logoutSuccess": "Successfully logged out",
+    "signInRequired": "You must be signed in to create a community",
+    "signInError": "Error signing in. Please try again.",
+    "passwordTooShort": "Password must be at least 8 characters",
+    "passwordsDoNotMatch": "Passwords do not match"
   },
   "dashboard": {
     "welcome": "Welcome",
@@ -69,7 +73,23 @@
     "welcomeMessagePlaceholder": "Welcome message for new members...",
     "createSuccess": "Community created successfully!",
     "joinSuccess": "Successfully joined the community!",
-    "leaveSuccess": "Successfully left the community"
+    "leaveSuccess": "Successfully left the community",
+    "createFailed": "Failed to create community",
+    "nameRequired": "Community name is required",
+    "logo": "Logo",
+    "cover": "Cover",
+    "uploadSuccess": "{type} uploaded successfully!",
+    "uploadFailed": "Failed to upload {type}",
+    "stepBasicInfo": "Basic Information",
+    "stepBasicInfoDesc": "Let's start with the essentials",
+    "stepAppearance": "Appearance",
+    "stepAppearanceDesc": "Make it uniquely yours",
+    "stepLayout": "Layout & Theme",
+    "stepLayoutDesc": "Choose your style",
+    "stepSettings": "Settings",
+    "stepSettingsDesc": "Configure your community",
+    "stepPreview": "Preview",
+    "stepPreviewDesc": "Review before creating"
   },
   "sectionBuilder": {
     "title": "Landing Page Builder",
@@ -109,7 +129,10 @@
     "answer": "Answer",
     "removeQuestion": "Remove question",
     "addOption": "Add Option",
-    "removeOption": "Remove option"
+    "removeOption": "Remove option",
+    "unknownSection": "Unknown section type",
+    "faqsGenerated": "FAQs generated with AI!",
+    "faqsFailed": "Failed to generate FAQs"
   },
   "common": {
     "loading": "Loading...",
@@ -173,6 +196,9 @@
     "terms": "Terms of Service",
     "privacy": "Privacy Policy",
     "cookies": "Cookie Policy",
-    "rights": "All rights reserved"
+    "rights": "All rights reserved",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "duplicate": "Duplicate"
   }
 }
