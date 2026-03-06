@@ -99,7 +99,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account }) {
       // For OAuth providers, ensure user exists in database
       if (account?.provider === "google" || account?.provider === "github") {
         const existingUser = await prisma.user.findUnique({
