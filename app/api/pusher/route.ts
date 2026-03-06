@@ -28,7 +28,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid channel" }, { status: 400 });
   }
 
-  const channelId = match[1];
+  const _channelId = match[1];
+  void _channelId; // Intentionally unused - channel ID validated
 
   // Authorize the user for this channel
   const authResponse = pusher.authorizeChannel(socketId, channel, {
