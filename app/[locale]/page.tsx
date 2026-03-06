@@ -2,9 +2,11 @@ import Link from "next/link";
 import { ArrowRight, Video, Sparkles, Palette, Zap, Shield, Globe, LayoutDashboard } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { getTranslations } from "next-intl/server";
 
 export default async function Home() {
   const session = await auth();
+  const t = await getTranslations("landing");
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-primary/5">
@@ -19,13 +21,13 @@ export default async function Home() {
           </div>
           <div className="hidden md:flex items-center gap-6">
             <Link href="#features" className="text-sm font-medium hover:text-primary transition-colors">
-              Features
+              {t("nav.features")}
             </Link>
             <Link href="#pricing" className="text-sm font-medium hover:text-primary transition-colors">
-              Pricing
+              {t("nav.pricing")}
             </Link>
             <Link href="#community" className="text-sm font-medium hover:text-primary transition-colors">
-              Community
+              {t("nav.community")}
             </Link>
             {session?.user && (
               <Link 
@@ -33,7 +35,7 @@ export default async function Home() {
                 className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10"
               >
                 <LayoutDashboard className="w-4 h-4" />
-                Dashboard
+                {t("nav.dashboard")}
               </Link>
             )}
           </div>
@@ -45,7 +47,7 @@ export default async function Home() {
                 className="btn-hover-lift px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium shadow-smooth flex items-center gap-2"
               >
                 <LayoutDashboard className="w-4 h-4" />
-                Go to Dashboard
+                {t("nav.goToDashboard")}
               </Link>
             ) : (
               <>
@@ -53,13 +55,13 @@ export default async function Home() {
                   href="/auth/signin"
                   className="text-sm font-medium hover:text-primary transition-colors"
                 >
-                  Sign In
+                  {t("nav.signIn")}
                 </Link>
                 <Link
                   href="/auth/signup"
                   className="btn-hover-lift px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium shadow-smooth"
                 >
-                  Start Free
+                  {t("nav.startFree")}
                 </Link>
               </>
             )}
@@ -76,19 +78,19 @@ export default async function Home() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
             </span>
-            <span className="text-sm font-medium">☕ Now in Beta</span>
+            <span className="text-sm font-medium">☕ {t("hero.badge")}</span>
           </div>
 
           {/* Main Headline */}
           <h1 className="text-5xl md:text-7xl font-bold mb-6 slide-up-fade" style={{ animationDelay: "0.1s" }}>
-            Where Communities
+            {t("hero.title.line1")}
             <br />
-            <span className="gradient-text">Unite</span>
+            <span className="gradient-text">{t("hero.title.line2")}</span>
           </h1>
 
           <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto slide-up-fade" style={{ animationDelay: "0.2s" }}>
-            Like sharing tea with friends, Unytea makes community building warm, human, and genuine.
-            <strong className="text-foreground"> Everything Skool has, plus the soul it's missing.</strong>
+            {t("hero.description")}
+            <strong className="text-foreground"> {t("hero.highlight")}</strong>
           </p>
 
           {/* CTA Buttons */}
@@ -97,7 +99,7 @@ export default async function Home() {
               href="/auth/signup"
               className="btn-hover-lift px-8 py-4 bg-primary text-primary-foreground rounded-xl text-lg font-semibold shadow-smooth-lg inline-flex items-center gap-2 group"
             >
-              Start Building Free
+              {t("hero.cta.primary")}
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
@@ -105,7 +107,7 @@ export default async function Home() {
               className="btn-hover-lift px-8 py-4 glass-strong rounded-xl text-lg font-semibold inline-flex items-center gap-2"
             >
               <Video className="w-5 h-5" />
-              Watch Demo
+              {t("hero.cta.secondary")}
             </Link>
           </div>
 
@@ -123,8 +125,8 @@ export default async function Home() {
                         <Sparkles className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <h3 className="font-semibold">Design Masters</h3>
-                        <p className="text-xs text-muted-foreground">1,247 members</p>
+                        <h3 className="font-semibold">{t("preview.communityName")}</h3>
+                        <p className="text-xs text-muted-foreground">{t("preview.members", { count: 1247 })}</p>
                       </div>
                     </div>
                     <div className="flex gap-2">
@@ -142,11 +144,11 @@ export default async function Home() {
                       <div className="flex items-center gap-2">
                         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-pink-400 to-rose-500" />
                         <div>
-                          <p className="text-sm font-medium">Sarah Chen</p>
-                          <p className="text-xs text-muted-foreground">2 hours ago</p>
+                          <p className="text-sm font-medium">{t("preview.post1.author")}</p>
+                          <p className="text-xs text-muted-foreground">{t("preview.post1.time")}</p>
                         </div>
                       </div>
-                      <p className="text-sm text-muted-foreground">Just launched our new design system! 🎨 Check out the color palette...</p>
+                      <p className="text-sm text-muted-foreground">{t("preview.post1.content")}</p>
                       <div className="flex items-center gap-4 text-xs text-muted-foreground">
                         <span>❤️ 24</span>
                         <span>💬 8</span>
@@ -159,13 +161,13 @@ export default async function Home() {
                       <div className="flex items-center gap-2">
                         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500" />
                         <div>
-                          <p className="text-sm font-medium">Marcus Johnson</p>
-                          <p className="text-xs text-muted-foreground">5 hours ago</p>
+                          <p className="text-sm font-medium">{t("preview.post2.author")}</p>
+                          <p className="text-xs text-muted-foreground">{t("preview.post2.time")}</p>
                         </div>
                       </div>
-                      <p className="text-sm text-muted-foreground">Hosting a live session tomorrow at 3PM EST on UX research methods! ☕</p>
-                      <div className="flex items-center gap-2">
-                        <span className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">Live Session</span>
+                      <p className="text-sm text-muted-foreground">{t("preview.post2.content")}</p>
+                      <div className="flex gap-2">
+                        <span className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">{t("preview.liveSession")}</span>
                       </div>
                     </div>
                   </div>
@@ -173,10 +175,10 @@ export default async function Home() {
                   {/* Bottom Stats */}
                   <div className="mt-6 pt-4 border-t border-border/50 flex items-center justify-between text-xs text-muted-foreground">
                     <div className="flex items-center gap-4">
-                      <span className="flex items-center gap-1">👥 24 online</span>
-                      <span className="flex items-center gap-1">📊 3 active sessions</span>
+                      <span className="flex items-center gap-1">👥 {t("preview.online", { count: 24 })}</span>
+                      <span className="flex items-center gap-1">📊 {t("preview.activeSessions", { count: 3 })}</span>
                     </div>
-                    <span className="text-primary font-medium">Join the conversation →</span>
+                    <span className="text-primary font-medium">{t("preview.joinConversation")} →</span>
                   </div>
                 </div>
               </div>
@@ -190,10 +192,10 @@ export default async function Home() {
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Communities That Trust Unytea
+              {t("featured.title")}
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Join thousands of thriving communities already building something special
+              {t("featured.description")}
             </p>
           </div>
           
@@ -221,11 +223,11 @@ export default async function Home() {
                     </div>
                     <h3 className="font-semibold text-sm mb-1">{community.name}</h3>
                     <div className="flex items-center gap-2 text-xs text-white/80">
-                      <span>{community.members.toLocaleString()} members</span>
+                      <span>{t("featured.members", { count: community.members.toLocaleString() })}</span>
                       <span>•</span>
                       <span className="flex items-center gap-1">
                         <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
-                        {community.online} online
+                        {t("featured.online", { count: community.online })}
                       </span>
                     </div>
                   </div>
@@ -241,30 +243,29 @@ export default async function Home() {
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Community with Soul.
+              {t("features.title.line1")}
               <br />
-              <span className="text-primary">Not Just Another Platform.</span>
+              <span className="text-primary">{t("features.title.line2")}</span>
             </h2>
             <p className="text-xl text-muted-foreground">
-              We took what works and added the warmth that's missing.
+              {t("features.subtitle")}
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature, index) => (
+            {features.map((feature) => (
               <div
-                key={feature.title}
+                key={feature.key}
                 className="card-hover glass-strong rounded-2xl p-6"
-                style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
                   <feature.icon className="w-6 h-6 text-primary" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                <p className="text-muted-foreground mb-3">{feature.description}</p>
+                <h3 className="text-xl font-semibold mb-2">{t(`features.items.${feature.key}.title`)}</h3>
+                <p className="text-muted-foreground mb-3">{t(`features.items.${feature.key}.description`)}</p>
                 {feature.badge && (
                   <span className="inline-block px-3 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full">
-                    {feature.badge}
+                    {t(`features.items.${feature.key}.badge`)}
                   </span>
                 )}
               </div>
@@ -277,27 +278,27 @@ export default async function Home() {
       <section className="py-20 px-4 bg-muted/30">
         <div className="container mx-auto max-w-4xl">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">Why Choose Unytea Over Skool?</h2>
+            <h2 className="text-4xl font-bold mb-4">{t("comparison.title")}</h2>
             <p className="text-xl text-muted-foreground">
-              Same core features. Better soul. Half the price.
+              {t("comparison.subtitle")}
             </p>
           </div>
 
           <div className="glass-strong rounded-2xl p-8 space-y-4">
-            {comparisons.map((item, index) => (
+            {comparisons.map((item) => (
               <div
-                key={index}
+                key={item.key}
                 className="flex items-start gap-4 pb-4 border-b border-border/50 last:border-0 last:pb-0"
               >
                 <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <Zap className="w-4 h-4 text-primary" />
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-semibold mb-1">{item.title}</h4>
-                  <p className="text-sm text-muted-foreground">{item.description}</p>
+                  <h4 className="font-semibold mb-1">{t(`comparison.items.${item.key}.title`)}</h4>
+                  <p className="text-sm text-muted-foreground">{t(`comparison.items.${item.key}.description`)}</p>
                 </div>
                 <span className="text-xs font-medium px-3 py-1 bg-primary/10 text-primary rounded-full flex-shrink-0">
-                  NEW
+                  {t("comparison.newBadge")}
                 </span>
               </div>
             ))}
@@ -310,17 +311,17 @@ export default async function Home() {
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Simple, Honest Pricing
+              {t("pricing.title")}
             </h2>
             <p className="text-xl text-muted-foreground">
-              Start free. Scale as you grow. Cancel anytime.
+              {t("pricing.subtitle")}
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {pricingPlans.map((plan) => (
               <div
-                key={plan.name}
+                key={plan.key}
                 className={`glass-strong rounded-2xl p-8 ${
                   plan.featured
                     ? "ring-2 ring-primary shadow-smooth-xl scale-105"
@@ -330,20 +331,20 @@ export default async function Home() {
                 {plan.featured && (
                   <div className="text-center mb-4">
                     <span className="inline-block px-4 py-1 bg-primary text-primary-foreground text-sm font-medium rounded-full">
-                      Most Popular
+                      {t("pricing.popular")}
                     </span>
                   </div>
                 )}
-                <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
+                <h3 className="text-2xl font-bold mb-2">{t(`pricing.plans.${plan.key}.name`)}</h3>
                 <div className="mb-6">
                   <span className="text-4xl font-bold">${plan.price}</span>
-                  <span className="text-muted-foreground">/month</span>
+                  <span className="text-muted-foreground">/{t("pricing.perMonth")}</span>
                 </div>
                 <ul className="space-y-3 mb-8">
-                  {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-2">
+                  {plan.features.map((featureKey) => (
+                    <li key={featureKey} className="flex items-start gap-2">
                       <Zap className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                      <span className="text-sm">{feature}</span>
+                      <span className="text-sm">{t(`pricing.plans.${plan.key}.features.${featureKey}`)}</span>
                     </li>
                   ))}
                 </ul>
@@ -355,7 +356,7 @@ export default async function Home() {
                       : "glass border border-border"
                   }`}
                 >
-                  Get Started
+                  {t("pricing.cta")}
                 </Link>
               </div>
             ))}
@@ -369,16 +370,16 @@ export default async function Home() {
           <div className="glass-strong rounded-3xl p-12 text-center relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-purple-500/10 -z-10" />
             <h2 className="text-4xl font-bold mb-4">
-              Ready to Unite Your Community?
+              {t("cta.title")}
             </h2>
             <p className="text-xl text-muted-foreground mb-8">
-              Join us and experience community building that feels like home. ☕
+              {t("cta.description")}
             </p>
             <Link
               href="/auth/signup"
               className="btn-hover-lift inline-flex items-center gap-2 px-8 py-4 bg-primary text-primary-foreground rounded-xl text-lg font-semibold shadow-smooth-lg"
             >
-              Start Building Free
+              {t("cta.button")}
               <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
@@ -396,17 +397,17 @@ export default async function Home() {
               <span className="font-bold">Unytea</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              2024 Unytea. Where Communities Unite. ☕
+              © 2024 Unytea. {t("footer.slogan")}
             </p>
             <div className="flex gap-6">
               <Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                Privacy
+                {t("footer.privacy")}
               </Link>
               <Link href="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                Terms
+                {t("footer.terms")}
               </Link>
               <Link href="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                Contact
+                {t("footer.contact")}
               </Link>
             </div>
           </div>
@@ -479,113 +480,64 @@ const featuredCommunities = [
 // Features data
 const features = [
   {
+    key: "video",
     icon: Video,
-    title: "Built-in Video Calls",
-    description: "1-on-1 and group sessions with recording, transcription, and screen sharing.",
-    badge: "Skool doesn't have this",
+    badge: true,
   },
   {
+    key: "customization",
     icon: Palette,
-    title: "Complete Customization",
-    description: "Your brand, your colors, your domain. Make it truly yours.",
-    badge: "Skool doesn't have this",
+    badge: true,
   },
   {
-    icon: Sparkles,
-    title: "Buddy System",
-    description: "Smart member matching and accountability partnerships that drive real connections.",
-    badge: "Nobody else has this",
-  },
-  {
-    icon: Zap,
-    title: "Auditorium View",
-    description: "Visual presence showing who's online in real-time. Community that feels alive.",
-    badge: "Nobody else has this",
-  },
-  {
+    key: "security",
     icon: Shield,
-    title: "Real-time Everything",
-    description: "0ms latency with WebSockets. Discord-level performance for your community.",
-    badge: null,
+    badge: false,
   },
   {
+    key: "multilanguage",
     icon: Globe,
-    title: "Modern & Beautiful",
-    description: "2024 design, not 2015. Glassmorphism, smooth animations, delightful UX.",
-    badge: null,
+    badge: true,
+  },
+  {
+    key: "gamification",
+    icon: Zap,
+    badge: false,
+  },
+  {
+    key: "analytics",
+    icon: LayoutDashboard,
+    badge: true,
   },
 ];
 
-// Comparison data
 const comparisons = [
-  {
-    title: "Buddy System",
-    description: "Smart member matching for accountability partnerships. Skool doesn't have this at all.",
-  },
-  {
-    title: "Auditorium View",
-    description: "Visual presence showing who's online in real-time. Nobody else has this.",
-  },
-  {
-    title: "Videocalls Integrated",
-    description: "Schedule, host, and record sessions without leaving the platform. No more Zoom links.",
-  },
-  {
-    title: "Your Brand, Your Way",
-    description: "Custom domains, colors, fonts, and CSS. Skool communities all look the same.",
-  },
-  {
-    title: "Half the Price",
-    description: "$49/month vs Skool's $99. Same core features, more soul.",
-  },
-  {
-    title: "Real-time WebSockets",
-    description: "Discord-level performance. 0ms latency. 90% less server load.",
-  },
+  { key: "buddy" },
+  { key: "auditorium" },
+  { key: "videocalls" },
+  { key: "brand" },
+  { key: "price" },
+  { key: "websockets" },
 ];
 
 // Pricing data
 const pricingPlans = [
   {
-    name: "Free",
+    key: "free",
     price: 0,
     featured: false,
-    features: [
-      "1 community",
-      "Up to 50 members",
-      "Basic community features",
-      "3 video calls/month",
-      "Unytea branding",
-    ],
+    features: ["one", "two", "three", "four", "five"],
   },
   {
-    name: "Professional",
+    key: "pro",
     price: 49,
     featured: true,
-    features: [
-      "1 community",
-      "Unlimited members",
-      "Full customization",
-      "Unlimited video calls",
-      "Buddy System",
-      "Auditorium View",
-      "Custom domain",
-      "Advanced analytics",
-      "Priority support",
-    ],
+    features: ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine"],
   },
   {
-    name: "Premium",
+    key: "premium",
     price: 149,
     featured: false,
-    features: [
-      "3 communities",
-      "Everything in Pro",
-      "White-label",
-      "API access",
-      "Dedicated support",
-      "Custom integrations",
-      "Migration assistance",
-    ],
+    features: ["one", "two", "three", "four", "five", "six"],
   },
 ];

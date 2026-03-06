@@ -1,223 +1,173 @@
 {
-  "navigation": {
-    "dashboard": "Dashboard",
-    "communities": "Communities",
-    "messages": "Messages",
-    "sessions": "Sessions",
-    "courses": "Courses",
-    "analytics": "Analytics",
-    "achievements": "Achievements",
-    "notifications": "Notifications",
-    "settings": "Settings",
-    "profile": "Profile",
-    "logout": "Log out",
-    "login": "Log in",
-    "signup": "Sign up",
-    "back": "Back"
-  },
-  "auth": {
-    "signIn": "Sign In",
-    "signUp": "Sign Up",
-    "signInSubtitle": "Sign in to continue to your communities",
-    "signUpSubtitle": "Create an account to get started",
-    "email": "Email",
-    "emailPlaceholder": "you@example.com",
-    "password": "Password",
-    "forgotPassword": "Forgot password?",
-    "noAccount": "Don't have an account?",
-    "hasAccount": "Already have an account?",
-    "continueWithGoogle": "Continue with Google",
-    "continueWithGitHub": "Continue with GitHub",
-    "orContinueWith": "Or continue with",
-    "fillAllFields": "Please fill in all fields",
-    "invalidCredentials": "Invalid email or password",
-    "welcomeBack": "Welcome back!",
-    "accountCreated": "Account created successfully!",
-    "logoutSuccess": "Successfully logged out",
-    "signInRequired": "You must be signed in to create a community",
-    "signInError": "Error signing in. Please try again.",
-    "passwordTooShort": "Password must be at least 8 characters",
-    "passwordsDoNotMatch": "Passwords do not match",
-    "resetPassword": "Reset Password",
-    "passwordResetComingSoon": "Password reset functionality is coming soon. For now, please contact an administrator to reset your password."
-  },
-  "dashboard": {
-    "welcome": "Welcome",
-    "myCommunities": "My Communities",
-    "discover": "Discover",
-    "createCommunity": "Create Community",
-    "noCommunities": "You haven't joined any communities yet",
-    "exploreCommunities": "Explore communities to get started"
-  },
-  "communities": {
-    "createNew": "Create New Community",
-    "communityName": "Community Name",
-    "description": "Description",
-    "create": "Create",
-    "cancel": "Cancel",
-    "save": "Save",
-    "edit": "Edit",
-    "delete": "Delete",
-    "members": "Members",
-    "posts": "Posts",
-    "join": "Join",
-    "leave": "Leave",
-    "settings": "Settings",
-    "landingPage": "Landing Page",
-    "namePlaceholder": "Enter community name",
-    "descriptionPlaceholder": "Describe your community...",
-    "slug": "URL Slug",
-    "type": "Community Type",
-    "public": "Public",
-    "private": "Private",
-    "paid": "Paid",
-    "welcomeMessage": "Welcome Message",
-    "welcomeMessagePlaceholder": "Welcome message for new members...",
-    "createSuccess": "Community created successfully!",
-    "joinSuccess": "Successfully joined the community!",
-    "leaveSuccess": "Successfully left the community",
-    "createFailed": "Failed to create community",
-    "nameRequired": "Community name is required",
-    "logo": "Logo",
-    "cover": "Cover",
-    "uploadSuccess": "{type} uploaded successfully!",
-    "uploadFailed": "Failed to upload {type}",
-    "stepBasicInfo": "Basic Information",
-    "stepBasicInfoDesc": "Let's start with the essentials",
-    "stepAppearance": "Appearance",
-    "stepAppearanceDesc": "Make it uniquely yours",
-    "stepLayout": "Layout & Theme",
-    "stepLayoutDesc": "Choose your style",
-    "stepSettings": "Settings",
-    "stepSettingsDesc": "Configure your community",
-    "stepPreview": "Preview",
-    "stepPreviewDesc": "Review before creating",
-    "youOwn": "You Own",
-    "totalCommunities": "Total Communities",
-    "totalMembers": "Total Members",
-    "totalPosts": "Total Posts",
-    "allCommunities": "All Communities",
-    "mostMembers": "Most Members",
-    "mostActive": "Most Active",
-    "joinFailed": "Failed to join community",
-    "leaveFailed": "Failed to leave community",
-    "leaveConfirm": "Are you sure you want to leave this community? You'll need to request to join again.",
-    "pendingApproval": "Pending Approval"
-  },
-  "sectionBuilder": {
-    "title": "Landing Page Builder",
-    "subtitle": "Build your landing page with pre-designed sections",
-    "sections": "Sections",
-    "preview": "Preview",
-    "layers": "LAYERS",
-    "properties": "Properties",
-    "addSection": "Add sections from the left panel",
-    "reorder": "Reorder sections using the arrows",
-    "editContent": "Edit content by selecting a section",
-    "selectSection": "Select a section to edit its properties",
-    "livePreview": "Live Preview",
-    "clickToEdit": "Click any section to edit",
-    "unsavedPreview": "Unsaved Preview",
-    "close": "Close Preview",
-    "saveAndClose": "Save & Close",
-    "unsavedChanges": "Changes are not saved until you click Save",
-    "hero": "Hero",
-    "ownerBio": "Owner Bio",
-    "features": "Features",
-    "testimonials": "Testimonials",
-    "pricing": "Pricing",
-    "gallery": "Gallery",
-    "faq": "FAQ",
-    "cta": "Call to Action",
-    "stats": "Stats",
-    "socialLinks": "Social Links",
-    "communityValues": "Community Values",
-    "coursesPreview": "Courses Preview",
-    "eventsPreview": "Events Preview",
-    "membersPreview": "Members Preview",
-    "generateAI": "Generate with AI",
-    "generating": "Generating...",
-    "addQuestion": "Add Question",
-    "question": "Question",
-    "answer": "Answer",
-    "removeQuestion": "Remove question",
-    "addOption": "Add Option",
-    "removeOption": "Remove option",
-    "unknownSection": "Unknown section type",
-    "faqsGenerated": "FAQs generated with AI!",
-    "faqsFailed": "Failed to generate FAQs"
-  },
-  "common": {
-    "loading": "Loading...",
-    "saving": "Saving...",
-    "error": "An error occurred. Please try again.",
-    "success": "Success",
-    "cancel": "Cancel",
-    "confirm": "Confirm",
-    "close": "Close",
-    "open": "Open",
-    "edit": "Edit",
-    "delete": "Delete",
-    "add": "Add",
-    "remove": "Remove",
-    "search": "Search",
-    "searchPlaceholder": "Search...",
-    "filter": "Filter",
-    "sort": "Sort",
-    "show": "Show",
-    "hide": "Hide",
-    "more": "More",
-    "less": "Less",
-    "all": "All",
-    "none": "None",
-    "yes": "Yes",
-    "no": "No",
-    "or": "Or",
-    "and": "And",
-    "with": "With",
-    "by": "By",
-    "next": "Next",
-    "previous": "Previous",
-    "submit": "Submit",
-    "send": "Send",
-    "share": "Share",
-    "copy": "Copy",
-    "copied": "Copied!",
-    "done": "Done",
-    "back": "Back",
-    "continue": "Continue",
-    "skip": "Skip",
-    "retry": "Retry",
-    "view": "View",
-    "details": "Details",
-    "info": "Information",
-    "warning": "Warning",
-    "comingSoon": "Coming Soon",
-    "new": "New",
-    "popular": "Popular",
-    "recommended": "Recommended",
-    "featured": "Featured",
-    "free": "Free",
-    "premium": "Premium",
-    "upgrade": "Upgrade",
-    "learnMore": "Learn More",
-    "getStarted": "Get Started",
-    "contactUs": "Contact Us",
-    "help": "Help",
-    "support": "Support",
-    "feedback": "Feedback",
-    "terms": "Terms of Service",
-    "privacy": "Privacy Policy",
-    "cookies": "Cookie Policy",
-    "rights": "All rights reserved",
-    "moveUp": "Move up",
-    "moveDown": "Move down",
-    "duplicate": "Duplicate",
-    "recent": "Recent",
-    "alphabetical": "Alphabetical",
-    "of": "of",
-    "featureInDevelopment": "Feature in Development",
-    "needHelp": "Need help?",
-    "contactSupport": "Contact support"
+  "landing": {
+    "nav": {
+      "features": "Features",
+      "pricing": "Pricing",
+      "community": "Community",
+      "dashboard": "Dashboard",
+      "goToDashboard": "Go to Dashboard",
+      "signIn": "Sign In",
+      "startFree": "Start Free"
+    },
+    "hero": {
+      "badge": "Now in Beta",
+      "title": {
+        "line1": "Where Communities",
+        "line2": "Unite"
+      },
+      "description": "Like sharing tea with friends, Unytea makes community building warm, human, and genuine.",
+      "highlight": "Everything Skool has, plus the soul it's missing.",
+      "cta": {
+        "primary": "Start Building Free",
+        "secondary": "Watch Demo"
+      }
+    },
+    "preview": {
+      "communityName": "Design Masters",
+      "members": "{count} members",
+      "post1": {
+        "author": "Sarah Chen",
+        "time": "2 hours ago",
+        "content": "Just launched our new design system! Check out the color palette..."
+      },
+      "post2": {
+        "author": "Marcus Johnson",
+        "time": "5 hours ago",
+        "content": "Hosting a live session tomorrow at 3PM EST on UX research methods!"
+      },
+      "liveSession": "Live Session",
+      "online": "{count} online",
+      "activeSessions": "{count} active sessions",
+      "joinConversation": "Join the conversation"
+    },
+    "featured": {
+      "title": "Communities That Trust Unytea",
+      "description": "Join thousands of thriving communities already building something special",
+      "members": "{count} members",
+      "online": "{count} online"
+    },
+    "features": {
+      "title": {
+        "line1": "Community with Soul.",
+        "line2": "Not Just Another Platform."
+      },
+      "subtitle": "We took what works and added the warmth that's missing.",
+      "items": {
+        "video": {
+          "title": "Built-in Video Calls",
+          "description": "1-on-1 and group sessions with recording, transcription, and screen sharing.",
+          "badge": "Skool doesn't have this"
+        },
+        "customization": {
+          "title": "Complete Customization",
+          "description": "Custom domains, colors, fonts, and CSS. Your brand, your way.",
+          "badge": "Full control"
+        },
+        "security": {
+          "title": "Enterprise Security",
+          "description": "End-to-end encryption, 2FA, and privacy-first design."
+        },
+        "multilanguage": {
+          "title": "Multi-Language",
+          "description": "Automatic translation and localization for global communities.",
+          "badge": "Auto-translate"
+        },
+        "gamification": {
+          "title": "Smart Gamification",
+          "description": "Points, badges, and rewards that actually motivate engagement."
+        },
+        "analytics": {
+          "title": "Deep Analytics",
+          "description": "Understand your community with detailed insights and reports.",
+          "badge": "Real-time"
+        }
+      }
+    },
+    "comparison": {
+      "title": "Why Choose Unytea Over Skool?",
+      "subtitle": "Same core features. Better soul. Half the price.",
+      "newBadge": "NEW",
+      "items": {
+        "buddy": {
+          "title": "Buddy System",
+          "description": "Smart member matching for accountability partnerships. Skool doesn't have this at all."
+        },
+        "auditorium": {
+          "title": "Auditorium View",
+          "description": "Visual presence showing who's online in real-time. Nobody else has this."
+        },
+        "videocalls": {
+          "title": "Videocalls Integrated",
+          "description": "Schedule, host, and record sessions without leaving the platform. No more Zoom links."
+        },
+        "brand": {
+          "title": "Your Brand, Your Way",
+          "description": "Custom domains, colors, fonts, and CSS. Skool communities all look the same."
+        },
+        "price": {
+          "title": "Half the Price",
+          "description": "$49/month vs Skool's $99. Same core features, more soul."
+        },
+        "websockets": {
+          "title": "Real-time WebSockets",
+          "description": "Discord-level performance. 0ms latency. 90% less server load."
+        }
+      }
+    },
+    "pricing": {
+      "title": "Simple, Honest Pricing",
+      "subtitle": "Start free. Scale as you grow. Cancel anytime.",
+      "perMonth": "month",
+      "popular": "Most Popular",
+      "cta": "Get Started",
+      "plans": {
+        "free": {
+          "name": "Free",
+          "features": {
+            "one": "1 community",
+            "two": "Up to 50 members",
+            "three": "Basic community features",
+            "four": "3 video calls/month",
+            "five": "Unytea branding"
+          }
+        },
+        "pro": {
+          "name": "Professional",
+          "features": {
+            "one": "1 community",
+            "two": "Unlimited members",
+            "three": "Full customization",
+            "four": "Unlimited video calls",
+            "five": "Buddy System",
+            "six": "Auditorium View",
+            "seven": "Custom domain",
+            "eight": "Advanced analytics",
+            "nine": "Priority support"
+          }
+        },
+        "premium": {
+          "name": "Premium",
+          "features": {
+            "one": "3 communities",
+            "two": "Everything in Pro",
+            "three": "White-label",
+            "four": "API access",
+            "five": "Dedicated support",
+            "six": "Custom integrations"
+          }
+        }
+      }
+    },
+    "cta": {
+      "title": "Ready to Unite Your Community?",
+      "description": "Join us and experience community building that feels like home.",
+      "button": "Start Building Free"
+    },
+    "footer": {
+      "slogan": "Where Communities Unite.",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "contact": "Contact"
+    }
   }
 }

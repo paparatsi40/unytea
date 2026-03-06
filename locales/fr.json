@@ -1,223 +1,173 @@
 {
-  "navigation": {
-    "dashboard": "Tableau de Bord",
-    "communities": "Communautés",
-    "messages": "Messages",
-    "sessions": "Sessions",
-    "courses": "Cours",
-    "analytics": "Analytiques",
-    "achievements": "Réalisations",
-    "notifications": "Notifications",
-    "settings": "Paramètres",
-    "profile": "Profil",
-    "logout": "Se déconnecter",
-    "login": "Se connecter",
-    "signup": "S'inscrire",
-    "back": "Retour"
-  },
-  "auth": {
-    "signIn": "Se Connecter",
-    "signUp": "S'inscrire",
-    "signInSubtitle": "Connectez-vous pour continuer vers vos communautés",
-    "signUpSubtitle": "Créez un compte pour commencer",
-    "email": "E-mail",
-    "emailPlaceholder": "vous@exemple.com",
-    "password": "Mot de passe",
-    "forgotPassword": "Mot de passe oublié?",
-    "noAccount": "Vous n'avez pas de compte?",
-    "hasAccount": "Vous avez déjà un compte?",
-    "continueWithGoogle": "Continuer avec Google",
-    "continueWithGitHub": "Continuer avec GitHub",
-    "orContinueWith": "Ou continuer avec",
-    "fillAllFields": "Veuillez remplir tous les champs",
-    "invalidCredentials": "E-mail ou mot de passe incorrect",
-    "welcomeBack": "Bon retour!",
-    "accountCreated": "Compte créé avec succès!",
-    "logoutSuccess": "Déconnexion réussie",
-    "signInRequired": "Vous devez être connecté pour créer une communauté",
-    "signInError": "Erreur de connexion. Veuillez réessayer.",
-    "passwordTooShort": "Le mot de passe doit contenir au moins 8 caractères",
-    "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
-    "resetPassword": "Réinitialiser le Mot de Passe",
-    "passwordResetComingSoon": "La fonctionnalité de réinitialisation du mot de passe sera bientôt disponible. Pour l'instant, contactez un administrateur."
-  },
-  "dashboard": {
-    "welcome": "Bienvenue",
-    "myCommunities": "Mes Communautés",
-    "discover": "Découvrir",
-    "createCommunity": "Créer une Communauté",
-    "noCommunities": "Vous n'avez rejoint aucune communauté",
-    "exploreCommunities": "Explorez les communautés pour commencer"
-  },
-  "communities": {
-    "createNew": "Créer une Nouvelle Communauté",
-    "communityName": "Nom de la Communauté",
-    "description": "Description",
-    "create": "Créer",
-    "cancel": "Annuler",
-    "save": "Enregistrer",
-    "edit": "Modifier",
-    "delete": "Supprimer",
-    "members": "Membres",
-    "posts": "Publications",
-    "join": "Rejoindre",
-    "leave": "Quitter",
-    "settings": "Paramètres",
-    "landingPage": "Page d'Accueil",
-    "namePlaceholder": "Entrez le nom de la communauté",
-    "descriptionPlaceholder": "Décrivez votre communauté...",
-    "slug": "URL Slug",
-    "type": "Type de Communauté",
-    "public": "Publique",
-    "private": "Privée",
-    "paid": "Payante",
-    "welcomeMessage": "Message de Bienvenue",
-    "welcomeMessagePlaceholder": "Message de bienvenue pour les nouveaux membres...",
-    "createSuccess": "Communauté créée avec succès!",
-    "joinSuccess": "Vous avez rejoint la communauté avec succès!",
-    "leaveSuccess": "Vous avez quitté la communauté avec succès",
-    "createFailed": "Échec de la création de la communauté",
-    "nameRequired": "Le nom de la communauté est requis",
-    "logo": "Logo",
-    "cover": "Couverture",
-    "uploadSuccess": "{type} téléchargé avec succès!",
-    "uploadFailed": "Échec du téléchargement de {type}",
-    "stepBasicInfo": "Informations de Base",
-    "stepBasicInfoDesc": "Commençons par l'essentiel",
-    "stepAppearance": "Apparence",
-    "stepAppearanceDesc": "Rendez-le unique",
-    "stepLayout": "Mise en Page et Thème",
-    "stepLayoutDesc": "Choisissez votre style",
-    "stepSettings": "Paramètres",
-    "stepSettingsDesc": "Configurez votre communauté",
-    "stepPreview": "Aperçu",
-    "stepPreviewDesc": "Vérifiez avant de créer",
-    "youOwn": "Vos Communautés",
-    "totalCommunities": "Total des Communautés",
-    "totalMembers": "Total des Membres",
-    "totalPosts": "Total des Publications",
-    "allCommunities": "Toutes les Communautés",
-    "mostMembers": "Plus de Membres",
-    "mostActive": "Plus Actives",
-    "joinFailed": "Échec de l'adhésion à la communauté",
-    "leaveFailed": "Échec de la sortie de la communauté",
-    "leaveConfirm": "Êtes-vous sûr de vouloir quitter cette communauté? Vous devrez demander à rejoindre à nouveau.",
-    "pendingApproval": "En Attente d'Approbation"
-  },
-  "sectionBuilder": {
-    "title": "Constructeur de Page d'Accueil",
-    "subtitle": "Construisez votre page avec des sections pré-conçues",
-    "sections": "Sections",
-    "preview": "Aperçu",
-    "layers": "COUCHES",
-    "properties": "Propriétés",
-    "addSection": "Ajoutez des sections depuis le panneau gauche",
-    "reorder": "Réorganisez les sections avec les flèches",
-    "editContent": "Modifiez le contenu en sélectionnant une section",
-    "selectSection": "Sélectionnez une section pour modifier ses propriétés",
-    "livePreview": "Aperçu en Direct",
-    "clickToEdit": "Cliquez sur une section pour modifier",
-    "unsavedPreview": "Aperçu Non Enregistré",
-    "close": "Fermer l'Aperçu",
-    "saveAndClose": "Enregistrer et Fermer",
-    "unsavedChanges": "Les modifications ne sont pas enregistrées tant que vous ne cliquez pas sur Enregistrer",
-    "hero": "Hero",
-    "ownerBio": "Biographie du Créateur",
-    "features": "Fonctionnalités",
-    "testimonials": "Témoignages",
-    "pricing": "Tarifs",
-    "gallery": "Galerie",
-    "faq": "FAQ",
-    "cta": "Appel à l'Action",
-    "stats": "Statistiques",
-    "socialLinks": "Réseaux Sociaux",
-    "communityValues": "Valeurs de la Communauté",
-    "coursesPreview": "Aperçu des Cours",
-    "eventsPreview": "Aperçu des Événements",
-    "membersPreview": "Aperçu des Membres",
-    "generateAI": "Générer avec IA",
-    "generating": "Génération...",
-    "addQuestion": "Ajouter une Question",
-    "question": "Question",
-    "answer": "Réponse",
-    "removeQuestion": "Supprimer la question",
-    "addOption": "Ajouter une Option",
-    "removeOption": "Supprimer l'option",
-    "unknownSection": "Type de section inconnu",
-    "faqsGenerated": "FAQs générées avec succès!",
-    "faqsFailed": "Échec de la génération des FAQs"
-  },
-  "common": {
-    "loading": "Chargement...",
-    "saving": "Enregistrement...",
-    "error": "Une erreur s'est produite. Veuillez réessayer.",
-    "success": "Succès",
-    "cancel": "Annuler",
-    "confirm": "Confirmer",
-    "close": "Fermer",
-    "open": "Ouvrir",
-    "edit": "Modifier",
-    "delete": "Supprimer",
-    "add": "Ajouter",
-    "remove": "Retirer",
-    "search": "Rechercher",
-    "searchPlaceholder": "Rechercher...",
-    "filter": "Filtrer",
-    "sort": "Trier",
-    "show": "Afficher",
-    "hide": "Masquer",
-    "more": "Plus",
-    "less": "Moins",
-    "all": "Tous",
-    "none": "Aucun",
-    "yes": "Oui",
-    "no": "Non",
-    "or": "Ou",
-    "and": "Et",
-    "with": "Avec",
-    "by": "Par",
-    "next": "Suivant",
-    "previous": "Précédent",
-    "submit": "Soumettre",
-    "send": "Envoyer",
-    "share": "Partager",
-    "copy": "Copier",
-    "copied": "Copié!",
-    "done": "Terminé",
-    "back": "Retour",
-    "continue": "Continuer",
-    "skip": "Passer",
-    "retry": "Réessayer",
-    "view": "Voir",
-    "details": "Détails",
-    "info": "Information",
-    "warning": "Avertissement",
-    "comingSoon": "Bientôt disponible",
-    "new": "Nouveau",
-    "popular": "Populaire",
-    "recommended": "Recommandé",
-    "featured": "En vedette",
-    "free": "Gratuit",
-    "premium": "Premium",
-    "upgrade": "Améliorer",
-    "learnMore": "En savoir plus",
-    "getStarted": "Commencer",
-    "contactUs": "Contactez-nous",
-    "help": "Aide",
-    "support": "Support",
-    "feedback": "Commentaires",
-    "terms": "Conditions d'utilisation",
-    "privacy": "Politique de confidentialité",
-    "cookies": "Politique des cookies",
-    "rights": "Tous droits réservés",
-    "moveUp": "Déplacer vers le haut",
-    "moveDown": "Déplacer vers le bas",
-    "duplicate": "Dupliquer",
-    "recent": "Récent",
-    "alphabetical": "Alphabétique",
-    "of": "sur",
-    "featureInDevelopment": "Fonction en Développement",
-    "needHelp": "Besoin d'aide?",
-    "contactSupport": "Contactez le support"
+  "landing": {
+    "nav": {
+      "features": "Fonctionnalités",
+      "pricing": "Tarifs",
+      "community": "Communauté",
+      "dashboard": "Tableau de Bord",
+      "goToDashboard": "Aller au Tableau de Bord",
+      "signIn": "Connexion",
+      "startFree": "Commencer Gratuit"
+    },
+    "hero": {
+      "badge": "Maintenant en Beta",
+      "title": {
+        "line1": "Là où les Communautés",
+        "line2": "S'unissent"
+      },
+      "description": "Comme partager du thé avec des amis, Unytea rend la construction communautaire chaleureuse, humaine et authentique.",
+      "highlight": "Tout ce que Skool a, plus l'âme qui lui manque.",
+      "cta": {
+        "primary": "Commencer Gratuitement",
+        "secondary": "Voir la Démo"
+      }
+    },
+    "preview": {
+      "communityName": "Design Masters",
+      "members": "{count} membres",
+      "post1": {
+        "author": "Sarah Chen",
+        "time": "il y a 2 heures",
+        "content": "Nous venons de lancer notre nouveau système de design ! Découvrez la palette de couleurs..."
+      },
+      "post2": {
+        "author": "Marcus Johnson",
+        "time": "il y a 5 heures",
+        "content": "Session en direct demain à 15h sur les méthodes de recherche UX !"
+      },
+      "liveSession": "En Direct",
+      "online": "{count} en ligne",
+      "activeSessions": "{count} sessions actives",
+      "joinConversation": "Rejoindre la conversation"
+    },
+    "featured": {
+      "title": "Communautés qui Font Confiance à Unytea",
+      "description": "Rejoignez des milliers de communautés prospères qui construisent déjà quelque chose de spécial",
+      "members": "{count} membres",
+      "online": "{count} en ligne"
+    },
+    "features": {
+      "title": {
+        "line1": "Communauté avec une Âme.",
+        "line2": "Pas Juste une Autre Plateforme."
+      },
+      "subtitle": "Nous avons pris ce qui fonctionne et ajouté la chaleur qui manque.",
+      "items": {
+        "video": {
+          "title": "Visioconférences Intégrées",
+          "description": "Sessions 1-à-1 et en groupe avec enregistrement, transcription et partage d'écran.",
+          "badge": "Skool n'a pas ça"
+        },
+        "customization": {
+          "title": "Personnalisation Complète",
+          "description": "Domaines personnalisés, couleurs, polices et CSS. Votre marque, à votre façon.",
+          "badge": "Contrôle total"
+        },
+        "security": {
+          "title": "Sécurité Entreprise",
+          "description": "Chiffrement de bout en bout, 2FA et conception axée sur la confidentialité."
+        },
+        "multilanguage": {
+          "title": "Multi-Langue",
+          "description": "Traduction automatique et localisation pour les communautés mondiales.",
+          "badge": "Traduction auto"
+        },
+        "gamification": {
+          "title": "Gamification Intelligente",
+          "description": "Points, badges et récompenses qui motivent réellement l'engagement."
+        },
+        "analytics": {
+          "title": "Analyses Profondes",
+          "description": "Comprenez votre communauté avec des insights détaillés et des rapports.",
+          "badge": "Temps réel"
+        }
+      }
+    },
+    "comparison": {
+      "title": "Pourquoi Choisir Unytea plutôt que Skool ?",
+      "subtitle": "Les mêmes fonctionnalités clés. Une meilleure âme. Moitié du prix.",
+      "newBadge": "NOUVEAU",
+      "items": {
+        "buddy": {
+          "title": "Système de Parrainage",
+          "description": "Appariement intelligent pour les partenariats de responsabilité. Skool n'a pas ça du tout."
+        },
+        "auditorium": {
+          "title": "Vue d'Auditorium",
+          "description": "Présence visuelle montrant qui est en ligne en temps réel. Personne d'autre n'a ça."
+        },
+        "videocalls": {
+          "title": "Visioconférences Intégrées",
+          "description": "Programmez, animez et enregistrez des sessions sans quitter la plateforme. Plus de liens Zoom."
+        },
+        "brand": {
+          "title": "Votre Marque, à Votre Façon",
+          "description": "Domaines, couleurs, polices et CSS personnalisés. Les communautés Skool se ressemblent toutes."
+        },
+        "price": {
+          "title": "Moitié du Prix",
+          "description": "49$/mois contre 99$ pour Skool. Les mêmes fonctionnalités, plus d'âme."
+        },
+        "websockets": {
+          "title": "WebSockets en Temps Réel",
+          "description": "Performance niveau Discord. Latence 0ms. 90% moins de charge serveur."
+        }
+      }
+    },
+    "pricing": {
+      "title": "Tarifs Simples et Honnêtes",
+      "subtitle": "Commencez gratuitement. Évoluez à mesure que vous grandissez. Annulez à tout moment.",
+      "perMonth": "mois",
+      "popular": "Le Plus Populaire",
+      "cta": "Commencer",
+      "plans": {
+        "free": {
+          "name": "Gratuit",
+          "features": {
+            "one": "1 communauté",
+            "two": "Jusqu'à 50 membres",
+            "three": "Fonctionnalités de base",
+            "four": "3 visioconférences/mois",
+            "five": "Marque Unytea"
+          }
+        },
+        "pro": {
+          "name": "Professionnel",
+          "features": {
+            "one": "1 communauté",
+            "two": "Membres illimités",
+            "three": "Personnalisation complète",
+            "four": "Visioconférences illimitées",
+            "five": "Système de Parrainage",
+            "six": "Vue d'Auditorium",
+            "seven": "Domaine personnalisé",
+            "eight": "Analyses avancées",
+            "nine": "Support prioritaire"
+          }
+        },
+        "premium": {
+          "name": "Premium",
+          "features": {
+            "one": "3 communautés",
+            "two": "Tout dans Pro",
+            "three": "White-label",
+            "four": "Accès API",
+            "five": "Support dédié",
+            "six": "Intégrations personnalisées"
+          }
+        }
+      }
+    },
+    "cta": {
+      "title": "Prêt à Unir votre Communauté ?",
+      "description": "Rejoignez-nous et découvrez la construction communautaire qui fait se sentir comme chez soi.",
+      "button": "Commencer Gratuitement"
+    },
+    "footer": {
+      "slogan": "Là où les Communautés S'unissent.",
+      "privacy": "Confidentialité",
+      "terms": "Conditions",
+      "contact": "Contact"
+    }
   }
 }
