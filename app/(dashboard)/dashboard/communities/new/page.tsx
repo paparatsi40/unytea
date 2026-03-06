@@ -13,7 +13,6 @@ import {
   Palette,
   Settings as SettingsIcon,
   Sparkles,
-  Upload,
   Link as LinkIcon,
   X,
   Image as ImageIcon,
