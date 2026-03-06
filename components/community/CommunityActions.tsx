@@ -6,7 +6,7 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 import Link from "next/link";
 import { joinCommunity, leaveCommunity } from "@/app/actions/communities";
 import { Button } from "@/components/ui/button";
-import { Settings, UserPlus, UserMinus, Loader2, Bell } from "lucide-react";
+import { Settings, UserPlus, UserMinus, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 
 interface CommunityActionsProps {
