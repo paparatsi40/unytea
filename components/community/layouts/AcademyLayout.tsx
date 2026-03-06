@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen, Users, Award, Clock, Star, PlayCircle, CheckCircle2, TrendingUp } from "lucide-react";
+import { BookOpen, Users, Award, Star, PlayCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -29,14 +29,12 @@ interface AcademyLayoutProps {
     };
   };
   courses?: any[];
-  members?: any[];
   instructors?: any[];
 }
 
 export function AcademyLayout({
   community,
   courses = [],
-  members = [],
   instructors = [],
 }: AcademyLayoutProps) {
   const primaryColor = community.primaryColor || "#8B5CF6";

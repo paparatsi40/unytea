@@ -20,7 +20,7 @@ export const ourFileRouter = {
   // Community branding uploader (logos & covers)
   communityBranding: f({ 
     image: { 
-      maxFileSize: "10MB", // Larger for high-res covers
+      maxFileSize: "8MB", // Larger for high-res covers
       maxFileCount: 1 
     } 
   })

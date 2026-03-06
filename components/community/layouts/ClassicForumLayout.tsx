@@ -1,6 +1,6 @@
 "use client";
 
-import { MessageSquare, ThumbsUp, Eye, Pin, User, Calendar, TrendingUp } from "lucide-react";
+import { MessageSquare, ThumbsUp, Eye, Pin, User, Calendar } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -121,7 +121,6 @@ export function ClassicForumLayout({
                       post={post}
                       communitySlug={community.slug}
                       primaryColor={primaryColor}
-                      accentColor={accentColor}
                       isPinned
                     />
                   ))}
@@ -137,7 +136,6 @@ export function ClassicForumLayout({
                   post={post}
                   communitySlug={community.slug}
                   primaryColor={primaryColor}
-                  accentColor={accentColor}
                 />
               ))}
             </div>
@@ -270,13 +268,11 @@ function PostCard({
   post,
   communitySlug,
   primaryColor,
-  accentColor,
   isPinned = false,
 }: {
   post: any;
   communitySlug: string;
   primaryColor: string;
-  accentColor: string;
   isPinned?: boolean;
 }) {
   return (

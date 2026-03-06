@@ -2,7 +2,7 @@
 
 import { 
   BarChart3, TrendingUp, Users, MessageSquare, BookOpen, 
-  Award, Clock, Activity, ArrowUp, ArrowDown, Eye, Heart 
+  Award, Activity, ArrowUp, ArrowDown, Eye, Heart 
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";

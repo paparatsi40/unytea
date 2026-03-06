@@ -83,8 +83,8 @@ export default async function PublicCommunityPage({
   const isOwner = session?.user?.id === community.owner.id;
 
   // Parse landing layout
-  const sections: SectionInstance[] = Array.isArray(community.landingLayout)
-    ? community.landingLayout
+  const sections = Array.isArray(community.landingLayout)
+    ? (community.landingLayout as SectionInstance[])
     : [];
 
   return (

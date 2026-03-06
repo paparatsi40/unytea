@@ -37,10 +37,10 @@ export function CommunityActions({
     setIsLoading(true);
 
     try {
-      const result = await joinCommunity(user.id, communityId);
+      const result = await joinCommunity(communityId);
 
       if (result.success) {
-        toast.success(result.message || "Successfully joined!");
+        toast.success("Successfully joined!");
         router.refresh();
       }
     } catch (error) {
@@ -66,10 +66,10 @@ export function CommunityActions({
     setIsLoading(true);
 
     try {
-      const result = await leaveCommunity(user.id, communityId);
+      const result = await leaveCommunity(communityId);
 
       if (result.success) {
-        toast.success(result.message || "Successfully left community");
+        toast.success("Successfully left community");
         router.push("/dashboard/communities");
       }
     } catch (error) {
