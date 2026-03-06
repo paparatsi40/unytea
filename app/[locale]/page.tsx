@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Video, Sparkles, Palette, Zap, Shield, Globe, LayoutDashboard } from "lucide-react";
 import { auth } from "@/lib/auth";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 export default async function Home() {
   const session = await auth();
@@ -37,6 +38,7 @@ export default async function Home() {
             )}
           </div>
           <div className="flex items-center gap-3">
+            <LanguageSelector />
             {session?.user ? (
               <Link
                 href="/dashboard"
