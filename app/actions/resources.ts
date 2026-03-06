@@ -434,7 +434,6 @@ export async function getResources(
     console.log("[getResources] Community ID:", access.community.id);
     console.log("[getResources] User ID:", session.user.id);
     console.log("[getResources] User role:", access.member.role);
-    console.log("[getResources] isAdmin:", isAdmin);
 
     // Filtros opcionales
     if (validated.type) where.type = validated.type;
@@ -455,6 +454,8 @@ export async function getResources(
 
     // Solo mostrar públicos o del autor (para no-admins)
     const isAdmin = ["OWNER", "ADMIN", "MODERATOR"].includes(access.member.role);
+    
+    console.log("[getResources] isAdmin:", isAdmin);
     if (!isAdmin) {
       where.OR = [
         ...(where.OR || []),
