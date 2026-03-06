@@ -5,7 +5,6 @@ import { Send, Loader2, Users, Wifi, WifiOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { usePusher } from "@/hooks/use-pusher";
 import { useCurrentUser } from "@/hooks/use-current-user";
@@ -128,7 +127,10 @@ export function PusherChat({ channelId, channelName }: PusherChatProps) {
       </div>
 
       {/* Messages */}
-      <ScrollArea ref={scrollRef} className="flex-1 p-4">
+      <div
+        ref={scrollRef}
+        className="flex-1 overflow-y-auto p-4"
+      >
         <div className="space-y-4">
           {groupedMessages.length === 0 ? (
             <div className="flex h-40 flex-col items-center justify-center text-muted-foreground">
@@ -198,7 +200,7 @@ export function PusherChat({ channelId, channelName }: PusherChatProps) {
             })
           )}
         </div>
-      </ScrollArea>
+      </div>
 
       {/* Input */}
       <div className="border-t p-4">
