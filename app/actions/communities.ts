@@ -384,14 +384,28 @@ export async function deleteCommunity(communityId: string) {
         where: { communityId },
       });
 
-      // Delete courses and lessons
+      // Delete courses, modules and lessons
       const courses = await tx.course.findMany({
         where: { communityId },
         select: { id: true },
       });
 
       for (const course of courses) {
-        await tx.lesson.deleteMany({
+        // Find modules for this course
+        const modules = await tx.module.findMany({
+          where: { courseId: course.id },
+          select: { id: true },
+        });
+
+        // Delete lessons for each module
+        for (const moduleItem of modules) {
+          await tx.lesson.deleteMany({
+            where: { moduleId: moduleItem.id },
+          });
+        }
+
+        // Delete modules
+        await tx.module.deleteMany({
           where: { courseId: course.id },
         });
       }
