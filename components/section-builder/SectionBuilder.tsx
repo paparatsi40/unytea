@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useMemo, useState, useEffect } from "react";
-import { ChevronUp, ChevronDown, Trash2, Copy, Save } from "lucide-react";
+import { ChevronUp, ChevronDown, Trash2, Copy, Save, Eye, X } from "lucide-react";
 import { SectionInstance, SectionType, FieldDef } from "./types";
 import { SECTIONS, SECTION_ORDER } from "./sections";
 import { HeroRender } from "./sections/Hero";
@@ -69,6 +69,7 @@ export function SectionBuilder({ initialSections = [], onSave }: SectionBuilderP
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
   // Update selectedId when sections change
   useEffect(() => {
@@ -156,26 +157,37 @@ export function SectionBuilder({ initialSections = [], onSave }: SectionBuilderP
       <aside className="w-64 shrink-0 overflow-y-auto rounded-2xl border border-border bg-card p-4">
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-sm font-bold">Sections</h3>
-          {onSave && (
+          <div className="flex gap-2">
             <Button
+              variant="outline"
               size="sm"
-              onClick={handleSave}
-              disabled={saving}
+              onClick={() => setShowPreview(true)}
               className="h-8"
             >
-              {saving ? (
-                <>
-                  <Save className="mr-1 h-3 w-3 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="mr-1 h-3 w-3" />
-                  Save
-                </>
-              )}
+              <Eye className="mr-1 h-3 w-3" />
+              Preview
             </Button>
-          )}
+            {onSave && (
+              <Button
+                size="sm"
+                onClick={handleSave}
+                disabled={saving}
+                className="h-8"
+              >
+                {saving ? (
+                  <>
+                    <Save className="mr-1 h-3 w-3 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="mr-1 h-3 w-3" />
+                    Save
+                  </>
+                )}
+              </Button>
+            )}
+          </div>
         </div>
 
         <div className="space-y-2">
@@ -383,6 +395,80 @@ export function SectionBuilder({ initialSections = [], onSave }: SectionBuilderP
           </div>
         )}
       </aside>
+
+      {/* Preview Modal */}
+      {showPreview && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="flex h-[90vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-gray-200 bg-gray-50 px-6 py-4">
+              <div>
+                <h2 className="text-lg font-bold text-gray-900">Preview</h2>
+                <p className="text-sm text-gray-500">
+                  This is how your landing page will look ({sections.length} sections)
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-800">
+                  Unsaved Preview
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowPreview(false)}
+                >
+                  <X className="h-5 w-5" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Preview Content */}
+            <div className="flex-1 overflow-y-auto bg-gray-50 p-8">
+              <div className="mx-auto max-w-5xl space-y-8">
+                {sections.length === 0 ? (
+                  <div className="rounded-lg border border-dashed border-gray-300 bg-white p-12 text-center">
+                    <p className="text-gray-500">
+                      No sections added yet. Add sections from the builder to see preview.
+                    </p>
+                  </div>
+                ) : (
+                  sections.map((s) => (
+                    <div key={s.id}>
+                      {renderSection(s)}
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-between border-t border-gray-200 bg-gray-50 px-6 py-4">
+              <p className="text-sm text-gray-500">
+                Changes are not saved until you click "Save" in the builder
+              </p>
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowPreview(false)}
+                >
+                  Close Preview
+                </Button>
+                {onSave && (
+                  <Button
+                    onClick={async () => {
+                      await handleSave();
+                      setShowPreview(false);
+                    }}
+                    disabled={saving}
+                  >
+                    {saving ? "Saving..." : "Save & Close"}
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
