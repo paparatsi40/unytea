@@ -124,7 +124,13 @@ export default async function CommunityPage({ params }: PageProps) {
 
   // If not a member, show join page
   if (!membership) {
-    return <JoinCommunityView community={community} stats={community} />;
+    const stats: CommunityStats | null = community._count ? {
+      _count: {
+        members: community._count.members || 0,
+        posts: community._count.posts || 0,
+      }
+    } : null;
+    return <JoinCommunityView community={community} stats={stats} />;
   }
 
   // If membership is pending, show pending message
