@@ -385,7 +385,7 @@ export default function SectionsManagerPage() {
                   className="space-y-3"
                 >
                   {sections.map((section, index) => {
-                    const sectionType = SECTION_TYPES.find(t => t.type === section.type);
+                    const sectionType = SECTION_TYPES.find(t => t.id === section.type);
                     const Icon = sectionType?.icon || LayoutGrid;
 
                     return (
