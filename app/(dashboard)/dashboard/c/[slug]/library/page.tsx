@@ -95,6 +95,7 @@ export default function LibraryPage() {
 
   // Fetch initial data
   const fetchData = useCallback(async () => {
+    console.log("[DEBUG] fetchData called");
     setIsLoading(true);
     try {
       const [resourcesResult, categoriesResult, popularResult, continueResult] =
@@ -111,13 +112,19 @@ export default function LibraryPage() {
           getContinueWatching(communitySlug, 5),
         ]);
 
+      console.log("[DEBUG] getResources result:", resourcesResult);
+
       if (resourcesResult.success) {
+        console.log("[DEBUG] Resources count:", resourcesResult.data.resources.length);
+        console.log("[DEBUG] First resource title:", resourcesResult.data.resources[0]?.title);
         setResources(resourcesResult.data.resources);
         setPagination({
           page: 1,
           hasMore: resourcesResult.data.hasMore,
           total: resourcesResult.data.total,
         });
+      } else {
+        console.error("[DEBUG] getResources failed:", resourcesResult.error);
       }
 
       if (categoriesResult.success) {
