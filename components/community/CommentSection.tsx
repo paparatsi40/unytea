@@ -12,8 +12,7 @@ type Comment = {
   createdAt: Date;
   author: {
     id: string;
-    firstName: string | null;
-    lastName: string | null;
+    name: string | null;
     image: string | null;
   };
   replies?: Comment[];

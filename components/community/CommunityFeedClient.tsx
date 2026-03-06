@@ -8,12 +8,17 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 
 type Post = {
   id: string;
+  title?: string | null;
   content: string;
   createdAt: Date;
   author: {
     id: string;
     name: string | null;
     image: string | null;
+  };
+  _count?: {
+    comments: number;
+    reactions: number;
   };
 };
 

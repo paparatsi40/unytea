@@ -84,7 +84,7 @@ export default async function PublicCommunityPage({
 
   // Parse landing layout
   const sections = Array.isArray(community.landingLayout)
-    ? (community.landingLayout as SectionInstance[])
+    ? (community.landingLayout as unknown as SectionInstance[])
     : [];
 
   return (

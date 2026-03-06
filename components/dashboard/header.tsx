@@ -2,7 +2,7 @@
 
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { signOut } from "next-auth/react";
-import { Bell, Search, LogOut, User as UserIcon, MessageSquare } from "lucide-react";
+import { Search, LogOut, User as UserIcon, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import {

@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen, Clock, Users, CheckCircle2 } from "lucide-react";
+import { BookOpen, Users, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 

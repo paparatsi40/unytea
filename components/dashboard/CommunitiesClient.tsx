@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Plus, Users, TrendingUp, Crown, Lock, Loader2, Search, Grid3x3, List, Filter, SortAsc, Sparkles, Heart, Dumbbell, Briefcase, Code, BookOpen, Palette } from "lucide-react";
+import { Plus, Users, TrendingUp, Crown, Lock, Loader2, Search, Grid3x3, List, Filter, SortAsc, Sparkles, Dumbbell, Briefcase, Code, BookOpen, Palette } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type Community = {

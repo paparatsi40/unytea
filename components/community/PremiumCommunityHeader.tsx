@@ -1,10 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CommunityActions } from "@/components/community/CommunityActions";
-import { MessageCircle, Trophy, Users, Info, Heart, TrendingUp, Hash, Settings, Crown, BookOpen } from "lucide-react";
+import { MessageCircle, Trophy, Users, Heart, TrendingUp, Hash, Crown, BookOpen } from "lucide-react";
 
 type Community = {
   id: string;

@@ -42,7 +42,7 @@ interface CategorySidebarProps {
   totalResources?: number;
 }
 
-const getCategoryIcon = (iconName: string | null, color: string | null) => {
+const getCategoryIcon = (iconName: string | null, _color: string | null) => {
   const icons: Record<string, React.ReactNode> = {
     music: <Music className="w-4 h-4" />,
     video: <Video className="w-4 h-4" />,
