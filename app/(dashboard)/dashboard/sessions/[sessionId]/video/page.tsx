@@ -35,7 +35,7 @@ interface SessionData {
 export default function SessionVideoPage() {
   const params = useParams();
   const router = useRouter();
-  const sessionId = params.sessionId as string;
+  const sessionId = params?.sessionId as string | undefined;
 
   const [session, setSession] = useState<SessionData | null>(null);
   const [loading, setLoading] = useState(true);
