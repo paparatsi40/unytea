@@ -15,9 +15,8 @@ type Post = {
   createdAt: Date;
   author: {
     id: string;
-    firstName: string | null;
-    lastName: string | null;
-    imageUrl: string | null;
+    name: string | null;
+    image: string | null;
   };
   _count?: {
     comments: number;
@@ -35,7 +34,7 @@ export function PremiumPostCard({ post }: { post: Post }) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   
-  const authorName = `${post.author.firstName || ""} ${post.author.lastName || ""}`.trim() || "Anonymous";
+  const authorName = post.author.name || "Anonymous";
   const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
   const isAuthor = user?.id === post.author.id;
 
@@ -98,9 +97,9 @@ export function PremiumPostCard({ post }: { post: Post }) {
         <div className="flex items-center space-x-3">
           {/* Avatar */}
           <div className="relative h-10 w-10 overflow-hidden rounded-full border border-gray-100 bg-gradient-to-br from-purple-500 to-pink-500">
-            {post.author.imageUrl ? (
+            {post.author.image ? (
               <img
-                src={post.author.imageUrl}
+                src={post.author.image}
                 alt={authorName}
                 className="h-full w-full object-cover"
               />
