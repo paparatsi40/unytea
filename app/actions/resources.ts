@@ -509,6 +509,12 @@ export async function getResources(
 
     console.log("[getResources] Where clause:", JSON.stringify(where, null, 2));
 
+    // DEBUG: Check ALL resources in community (no filters)
+    const allResources = await prisma.resource.count({
+      where: { communityId: access.community.id },
+    });
+    console.log("[getResources] ALL resources in community (no filters):", allResources);
+
     const skip = (validated.page - 1) * validated.limit;
 
     const [resources, total] = await Promise.all([
