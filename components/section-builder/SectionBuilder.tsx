@@ -321,14 +321,6 @@ export function SectionBuilder({ initialSections = [], onSave }: SectionBuilderP
             </div>
           ))}
         </div>
-                  ? "ring-4 ring-primary ring-offset-4 ring-offset-gray-50"
-                  : "hover:ring-2 hover:ring-gray-300 hover:ring-offset-2 hover:ring-offset-gray-50",
-              ].join(" ")}
-            >
-              {renderSection(s)}
-            </div>
-          ))}
-        </div>
       </main>
 
       {/* RIGHT: Properties */}
