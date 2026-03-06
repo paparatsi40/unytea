@@ -33,7 +33,13 @@
     "invalidCredentials": "Correo o contraseña incorrectos",
     "welcomeBack": "¡Bienvenido de vuelta!",
     "accountCreated": "¡Cuenta creada exitosamente!",
-    "logoutSuccess": "Sesión cerrada exitosamente"
+    "logoutSuccess": "Sesión cerrada exitosamente",
+    "signInRequired": "Debes iniciar sesión para crear una comunidad",
+    "signInError": "Error al iniciar sesión. Intenta de nuevo.",
+    "passwordTooShort": "La contraseña debe tener al menos 8 caracteres",
+    "passwordsDoNotMatch": "Las contraseñas no coinciden",
+    "resetPassword": "Restablecer Contraseña",
+    "passwordResetComingSoon": "La funcionalidad de restablecimiento de contraseña estará disponible pronto. Por ahora, contacta a un administrador."
   },
   "dashboard": {
     "welcome": "Bienvenido",
@@ -69,7 +75,34 @@
     "welcomeMessagePlaceholder": "Mensaje de bienvenida para nuevos miembros...",
     "createSuccess": "¡Comunidad creada exitosamente!",
     "joinSuccess": "¡Te has unido a la comunidad exitosamente!",
-    "leaveSuccess": "Has salido de la comunidad exitosamente"
+    "leaveSuccess": "Has salido de la comunidad exitosamente",
+    "createFailed": "Error al crear la comunidad",
+    "nameRequired": "El nombre de la comunidad es obligatorio",
+    "logo": "Logo",
+    "cover": "Portada",
+    "uploadSuccess": "¡{type} subido exitosamente!",
+    "uploadFailed": "Error al subir {type}",
+    "stepBasicInfo": "Información Básica",
+    "stepBasicInfoDesc": "Comencemos con lo esencial",
+    "stepAppearance": "Apariencia",
+    "stepAppearanceDesc": "Hazlo único",
+    "stepLayout": "Diseño y Tema",
+    "stepLayoutDesc": "Elige tu estilo",
+    "stepSettings": "Configuración",
+    "stepSettingsDesc": "Configura tu comunidad",
+    "stepPreview": "Vista Previa",
+    "stepPreviewDesc": "Revisa antes de crear",
+    "youOwn": "Tus Comunidades",
+    "totalCommunities": "Total de Comunidades",
+    "totalMembers": "Total de Miembros",
+    "totalPosts": "Total de Publicaciones",
+    "allCommunities": "Todas las Comunidades",
+    "mostMembers": "Más Miembros",
+    "mostActive": "Más Activas",
+    "joinFailed": "Error al unirse a la comunidad",
+    "leaveFailed": "Error al salir de la comunidad",
+    "leaveConfirm": "¿Estás seguro de que quieres salir de esta comunidad? Necesitarás solicitar unirte de nuevo.",
+    "pendingApproval": "Aprobación Pendiente"
   },
   "sectionBuilder": {
     "title": "Constructor de Página de Inicio",
@@ -109,7 +142,10 @@
     "answer": "Respuesta",
     "removeQuestion": "Eliminar pregunta",
     "addOption": "Agregar Opción",
-    "removeOption": "Eliminar opción"
+    "removeOption": "Eliminar opción",
+    "unknownSection": "Tipo de sección desconocido",
+    "faqsGenerated": "¡FAQs generadas con IA!",
+    "faqsFailed": "Error al generar FAQs"
   },
   "common": {
     "loading": "Cargando...",
@@ -173,6 +209,15 @@
     "terms": "Términos de Servicio",
     "privacy": "Política de Privacidad",
     "cookies": "Política de Cookies",
-    "rights": "Todos los derechos reservados"
+    "rights": "Todos los derechos reservados",
+    "moveUp": "Mover arriba",
+    "moveDown": "Mover abajo",
+    "duplicate": "Duplicar",
+    "recent": "Reciente",
+    "alphabetical": "Alfabético",
+    "of": "de",
+    "featureInDevelopment": "Función en Desarrollo",
+    "needHelp": "¿Necesitas ayuda?",
+    "contactSupport": "Contacta soporte"
   }
 }
