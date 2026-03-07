@@ -374,7 +374,12 @@ export async function createResource(
       message: "Recurso creado exitosamente",
     };
   } catch (error) {
-    console.error("[createResource] Error:", error);
+    console.error("[createResource] ERROR DETAILS:", error);
+    console.error("[createResource] ERROR STRING:", String(error));
+    if (error instanceof Error) {
+      console.error("[createResource] ERROR MESSAGE:", error.message);
+      console.error("[createResource] ERROR STACK:", error.stack);
+    }
     if (error instanceof z.ZodError) {
       return { success: false, error: error.errors[0].message, code: "VALIDATION" };
     }
