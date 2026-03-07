@@ -339,6 +339,15 @@ export async function createResource(
     console.log("[createResource] - authorId:", resource.authorId);
     console.log("[createResource] - createdAt:", resource.createdAt);
 
+    // IMMEDIATE VERIFICATION: Check if resource actually exists in DB
+    const verifyResource = await prisma.resource.findUnique({
+      where: { id: resource.id },
+    });
+    console.log("[createResource] VERIFICATION - Resource found in DB:", verifyResource ? "YES" : "NO");
+    if (verifyResource) {
+      console.log("[createResource] VERIFICATION - Resource communityId:", verifyResource.communityId);
+    }
+
     revalidatePath(`/dashboard/c/${communitySlug}/library`);
 
     return {
