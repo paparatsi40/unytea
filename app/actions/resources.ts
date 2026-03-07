@@ -357,6 +357,15 @@ export async function createResource(
     });
     console.log("[createResource] VERIFICATION - Total resources in community after creation:", countResources);
 
+    // Small delay to ensure replication (if using Neon pooler)
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // Second verification after delay
+    const countAfterDelay = await prisma.resource.count({
+      where: { communityId: access.community.id }
+    });
+    console.log("[createResource] VERIFICATION - Total resources after 500ms delay:", countAfterDelay);
+
     revalidatePath(`/dashboard/c/${communitySlug}/library`);
 
     return {
