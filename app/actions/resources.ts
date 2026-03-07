@@ -303,6 +303,7 @@ export async function createResource(
     const publishedAt = validated.status === "PUBLISHED" ? new Date() : validated.publishedAt;
 
     console.log("[createResource] About to execute prisma.resource.create...");
+    console.log("[createResource] Community ID from access:", access.community.id);
     console.log("[createResource] Data to insert:", {
       ...validated,
       communityId: access.community.id,
@@ -338,6 +339,8 @@ export async function createResource(
     console.log("[createResource] - communityId:", resource.communityId);
     console.log("[createResource] - authorId:", resource.authorId);
     console.log("[createResource] - createdAt:", resource.createdAt);
+    console.log("[createResource] - status:", resource.status);
+    console.log("[createResource] - isPublic:", resource.isPublic);
 
     // IMMEDIATE VERIFICATION: Check if resource actually exists in DB
     const verifyResource = await prisma.resource.findUnique({
@@ -347,6 +350,12 @@ export async function createResource(
     if (verifyResource) {
       console.log("[createResource] VERIFICATION - Resource communityId:", verifyResource.communityId);
     }
+
+    // Count all resources in this community immediately after creation
+    const countResources = await prisma.resource.count({
+      where: { communityId: access.community.id }
+    });
+    console.log("[createResource] VERIFICATION - Total resources in community after creation:", countResources);
 
     revalidatePath(`/dashboard/c/${communitySlug}/library`);
 
