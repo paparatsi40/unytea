@@ -351,6 +351,10 @@ export async function createResource(
       console.log("[createResource] VERIFICATION - Resource communityId:", verifyResource.communityId);
     }
 
+    // RAW SQL VERIFICATION: Check directly in database
+    const rawResult = await prisma.$queryRaw`SELECT * FROM resources WHERE id = ${resource.id}`;
+    console.log("[createResource] RAW SQL VERIFICATION - Result:", JSON.stringify(rawResult, null, 2));
+
     // Count all resources in this community immediately after creation
     const countResources = await prisma.resource.count({
       where: { communityId: access.community.id }
