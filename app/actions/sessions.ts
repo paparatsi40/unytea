@@ -76,7 +76,15 @@ export async function getUserSessions() {
           { menteeId: userId },
         ],
       },
-      include: {
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        scheduledAt: true,
+        duration: true,
+        status: true,
+        mentorId: true,
+        menteeId: true,
         mentor: {
           select: {
             id: true,
