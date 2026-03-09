@@ -16,13 +16,17 @@ export async function POST() {
       );
     }
 
-    // Get user's Stripe customer ID
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+    // Get user's Stripe customer ID from their subscription
+    const subscription = await prisma.subscription.findFirst({
+      where: { 
+        userId: session.user.id,
+        stripeCustomerId: { not: null }
+      },
+      orderBy: { createdAt: 'desc' },
       select: { stripeCustomerId: true },
     });
 
-    if (!user?.stripeCustomerId) {
+    if (!subscription?.stripeCustomerId) {
       return NextResponse.json(
         { error: "No Stripe customer found" },
         { status: 400 }
@@ -31,7 +35,7 @@ export async function POST() {
 
     // Create portal session
     const portalSession = await createStripeCustomerPortal({
-      customerId: user.stripeCustomerId,
+      customerId: subscription.stripeCustomerId,
     });
 
     return NextResponse.json({ url: portalSession.url });
