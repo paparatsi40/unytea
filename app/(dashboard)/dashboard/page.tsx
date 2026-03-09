@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useToast } from "@/hooks/use-toast";
 import {
-  Home,
   Users,
   BookOpen,
   Video,
@@ -18,6 +17,12 @@ import {
   MoreHorizontal,
   Clock,
   Play,
+  CheckCircle,
+  CreditCard,
+  Loader2,
+  ArrowLeft,
+  Sparkles,
+} from "lucide-react";
   CheckCircle2,
   Sparkles,
 } from "lucide-react";
