@@ -19,20 +19,17 @@ import {
   Shield,
   Globe,
   Clock,
-  Calendar,
   ChevronDown,
-  ChevronUp,
   Quote,
-  Menu,
-  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default async function Home() {
   const session = await auth();
-  const t = await getTranslations("landing");
+  // const t = await getTranslations("landing");
 
   return (
     <div className="min-h-screen bg-background">
