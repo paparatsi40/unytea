@@ -93,7 +93,7 @@ export async function POST(request: Request) {
             stripeSubscriptionId: subscriptionId,
           },
           create: {
-            userId: user.id,
+            userId: userId,
             planId: plan.id,
             stripeSubscriptionId: subscriptionId,
             stripeCustomerId: customerId,
