@@ -17,7 +17,6 @@ export default function SessionRoomPage({
   const { user, isLoading: isAuthLoading } = useCurrentUser();
   const [videoSession, setVideoSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // Check auth
@@ -44,22 +43,6 @@ export default function SessionRoomPage({
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
           <p className="text-lg">Loading session...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <p className="text-lg text-destructive">{error}</p>
-          <Link
-            href="/dashboard/sessions"
-            className="mt-4 text-sm text-primary hover:underline"
-          >
-            Back to sessions
-          </Link>
         </div>
       </div>
     );
