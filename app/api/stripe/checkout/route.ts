@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { stripe, getStripeSession, getOrCreateStripeCustomer } from "@/lib/stripe";
-import { prisma } from "@/lib/prisma";
+import { getStripeSession, getOrCreateStripeCustomer } from "@/lib/stripe";
 
 export const dynamic = "force-dynamic";
 
@@ -25,8 +24,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // Get or create Stripe customer
-    const customer = await getOrCreateStripeCustomer({
+    // Get or create Stripe customer (ensures customer exists in Stripe)
+    await getOrCreateStripeCustomer({
       userId: session.user.id,
       email: session.user.email,
       name: session.user.name,
@@ -37,7 +36,6 @@ export async function POST(request: Request) {
       priceId,
       userId: session.user.id,
       userEmail: session.user.email,
-      userName: session.user.name,
     });
 
     return NextResponse.json({ url: checkoutSession.url });

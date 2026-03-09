@@ -70,7 +70,7 @@ type Subscription = {
 };
 
 export default function BillingPage() {
-  const { user: _user, isLoading: userLoading } = useCurrentUser();
+  const { user: _user } = useCurrentUser();
   const t = useTranslations();
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const [subscription, setSubscription] = useState<Subscription | null>(null);

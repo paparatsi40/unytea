@@ -9,12 +9,10 @@ export const getStripeSession = async ({
   priceId,
   userId,
   userEmail,
-  userName,
 }: {
   priceId: string;
   userId: string;
   userEmail: string;
-  userName?: string | null;
 }) => {
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
