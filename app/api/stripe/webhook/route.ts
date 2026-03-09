@@ -45,15 +45,9 @@ export async function POST(request: Request) {
           break;
         }
 
-        // Update user with stripe customer ID
-        await prisma.user.update({
-          where: { id: userId },
-          data: {
-            stripeCustomerId: customerId,
-          },
-        });
-
-        console.log(`✅ Updated user ${userId} with Stripe customer ID ${customerId}`);
+        // The stripeCustomerId will be stored in the Subscription record
+        // when the subscription is created (invoice.payment_succeeded)
+        console.log(`✅ Checkout completed for user ${userId}, customer ${customerId}`);
         break;
       }
 
@@ -62,15 +56,20 @@ export async function POST(request: Request) {
         const subscriptionId = invoice.subscription;
         const customerId = invoice.customer;
         
-        // Find user by stripe customer ID
-        const user = await prisma.user.findFirst({
+        // Find existing subscription by stripeCustomerId to get userId
+        const existingSubscription = await prisma.subscription.findFirst({
           where: { stripeCustomerId: customerId },
+          orderBy: { createdAt: 'desc' },
         });
 
-        if (!user) {
-          console.error(`No user found with Stripe customer ID: ${customerId}`);
+        // If no existing subscription, we need to get userId from checkout session
+        // This should be handled by the checkout.session.completed event first
+        if (!existingSubscription) {
+          console.error(`No existing subscription found for customer: ${customerId}. User may not have completed checkout yet.`);
           break;
         }
+
+        const userId = existingSubscription.userId;
 
         // Get subscription details from Stripe
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
@@ -111,7 +110,7 @@ export async function POST(request: Request) {
           },
         });
 
-        console.log(`✅ Subscription ${subscriptionId} updated for user ${user.id}`);
+        console.log(`✅ Subscription ${subscriptionId} updated for user ${userId}`);
         break;
       }
 
