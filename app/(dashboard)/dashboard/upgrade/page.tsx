@@ -7,22 +7,22 @@ import { toast } from "sonner";
 
 const plans = [
   {
-    name: "Starter",
-    price: 29,
-    priceId: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID || "",
+    name: "Free",
+    price: 0,
+    priceId: "", // Free plan doesn't need a Stripe price
     icon: Zap,
     color: "from-blue-500 to-cyan-500",
     features: [
-      "1 community",
-      "100 members max",
-      "Basic features",
-      "Email support",
+      "Join up to 3 communities",
+      "Basic profile features",
+      "Community feed access",
+      "Direct messaging",
     ],
   },
   {
-    name: "Pro",
+    name: "Professional",
     price: 49,
-    priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || "",
+    priceId: process.env.NEXT_PUBLIC_STRIPE_PROFESSIONAL_PRICE_ID || "",
     icon: Sparkles,
     color: "from-purple-500 to-pink-500",
     popular: true,
@@ -32,12 +32,13 @@ const plans = [
       "All features",
       "Priority support",
       "Custom domain",
+      "Analytics dashboard",
     ],
   },
   {
-    name: "Business",
-    price: 99,
-    priceId: process.env.NEXT_PUBLIC_STRIPE_BUSINESS_PRICE_ID || "",
+    name: "Premium",
+    price: 149,
+    priceId: process.env.NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID || "",
     icon: Crown,
     color: "from-orange-500 to-red-500",
     features: [
@@ -46,6 +47,7 @@ const plans = [
       "White-label options",
       "API access",
       "Dedicated support",
+      "Advanced analytics",
     ],
   },
 ];
