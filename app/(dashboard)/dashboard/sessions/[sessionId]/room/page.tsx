@@ -1,29 +1,71 @@
-import { auth } from "@/lib/auth";
-import { redirect } from "next/navigation";
+"use client";
+
 import { getSession } from "@/app/actions/sessions";
 import { VideoRoom } from "@/components/sessions/VideoRoom";
+import { useCurrentUser } from "@/hooks/use-current-user";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-export default async function SessionRoomPage({
+export default function SessionRoomPage({
   params,
 }: {
   params: { sessionId: string };
 }) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    redirect("/auth/signin");
+  const router = useRouter();
+  const { user, isLoading: isAuthLoading } = useCurrentUser();
+  const [videoSession, setVideoSession] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Check auth
+    if (!isAuthLoading && !user) {
+      router.push("/auth/signin");
+      return;
+    }
+
+    if (!isAuthLoading && user) {
+      // Get session data
+      getSession(params.sessionId).then((result) => {
+        if (!result.success || !result.session) {
+          router.push("/dashboard/sessions");
+          return;
+        }
+        setVideoSession(result.session);
+        setLoading(false);
+      });
+    }
+  }, [params.sessionId, user, isAuthLoading, router]);
+
+  if (isAuthLoading || loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <p className="text-lg">Loading session...</p>
+        </div>
+      </div>
+    );
   }
 
-  const result = await getSession(params.sessionId);
-
-  if (!result.success || !result.session) {
-    redirect("/dashboard/sessions");
+  if (error) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <p className="text-lg text-destructive">{error}</p>
+          <Link
+            href="/dashboard/sessions"
+            className="mt-4 text-sm text-primary hover:underline"
+          >
+            Back to sessions
+          </Link>
+        </div>
+      </div>
+    );
   }
 
-  const videoSession = result.session;
-
-  if (!videoSession.roomId) {
+  if (!videoSession?.roomId) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
@@ -69,7 +111,7 @@ export default async function SessionRoomPage({
       <VideoRoom
         roomName={videoSession.roomId}
         onLeave={() => {
-          window.location.href = "/dashboard/sessions";
+          router.push("/dashboard/sessions");
         }}
       />
     </div>
