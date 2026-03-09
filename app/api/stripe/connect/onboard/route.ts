@@ -58,7 +58,11 @@ export async function POST() {
         data: { stripeConnectAccountId: account.id },
       });
 
-      user = { ...user, stripeConnectAccountId: account.id };
+      // Re-fetch user to get updated data with proper types
+      user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { stripeConnectAccountId: true, email: true },
+      });
     }
 
     // Create onboarding link
