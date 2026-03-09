@@ -23,9 +23,16 @@ export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
     async function getToken() {
       try {
         setIsLoading(true);
-        const response = await fetch(
-          `/api/livekit/token?room=${encodeURIComponent(roomName)}`
-        );
+        const response = await fetch("/api/livekit/token", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            roomName: roomName,
+            participantName: "Participant",
+          }),
+        });
 
         if (!response.ok) {
           throw new Error("Failed to get token");
