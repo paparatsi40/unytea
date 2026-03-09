@@ -5,26 +5,36 @@ import createIntlMiddleware from "next-intl/middleware"
 const locales = ["en", "es", "fr"]
 const defaultLocale = "en"
 
-// Create i18n middleware with no URL prefix
+// Create i18n middleware
 const intlMiddleware = createIntlMiddleware({
   locales,
   defaultLocale,
-  localePrefix: "never",
+  localePrefix: "always",
 })
 
 export default auth((req) => {
   const isLoggedIn = !!req.auth
   const pathname = req.nextUrl.pathname
 
-  // Skip i18n for API routes only
-  if (pathname.startsWith("/api") || pathname.startsWith("/_next")) {
+  // Skip i18n for API routes and protected routes
+  if (pathname.startsWith("/api") || 
+      pathname.startsWith("/auth") ||
+      pathname.startsWith("/dashboard") ||
+      pathname.startsWith("/onboarding")) {
+    const isProtectedRoute = 
+      pathname.startsWith("/dashboard") ||
+      pathname.startsWith("/onboarding")
+
+    if (isProtectedRoute && !isLoggedIn) {
+      return NextResponse.redirect(new URL("/auth/signin", req.url))
+    }
     return NextResponse.next()
   }
 
-  // Apply i18n middleware to ALL routes (no URL prefix)
+  // Apply i18n middleware to public routes only
   const intlResponse = intlMiddleware(req)
   
-  // Check auth for protected routes
+  // Check if we need auth redirect
   const isProtectedRoute = 
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/onboarding")
@@ -33,7 +43,6 @@ export default auth((req) => {
     return NextResponse.redirect(new URL("/auth/signin", req.url))
   }
 
-  // Redirect authenticated users away from auth pages
   if (pathname.startsWith("/auth/") && isLoggedIn && !pathname.includes("callback")) {
     return NextResponse.redirect(new URL("/dashboard", req.url))
   }
