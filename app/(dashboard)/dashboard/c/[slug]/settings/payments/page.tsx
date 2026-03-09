@@ -77,8 +77,6 @@ export default function CommunityPaymentsPage() {
       setIsConnecting(false);
     }
   };
-    }
-  };
 
   const handleSaveSettings = async () => {
     setIsSaving(true);
