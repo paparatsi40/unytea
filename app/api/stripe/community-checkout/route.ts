@@ -95,8 +95,6 @@ export async function POST(req: Request) {
 
     // Calculate platform fee (5%)
     const platformFeePercent = 5;
-    const _platformFeeAmount = Math.round(unitAmount * (platformFeePercent / 100));
-    const _ownerAmount = unitAmount - _platformFeeAmount;
 
     // Create checkout session with transfer to community owner
     const checkoutSession = await stripe.checkout.sessions.create({
