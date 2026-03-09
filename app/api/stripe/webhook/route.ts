@@ -82,7 +82,6 @@ export async function POST(request: Request) {
               where: { id: existingMember.id },
               data: { 
                 status: "ACTIVE",
-                role: existingMember.role === "PENDING" ? "MEMBER" : existingMember.role,
               },
             });
           } else {
