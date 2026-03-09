@@ -1,6 +1,8 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
-import { auth } from "@/lib/auth";
-import { LanguageSelector } from "@/components/LanguageSelector";
+import { useRouter } from "next/navigation";
 import {
   Sparkles,
   LayoutDashboard,
@@ -20,14 +22,16 @@ import {
   Clock,
   ChevronDown,
   Quote,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-export default async function Home() {
-  const session = await auth();
+export default function Home() {
+  const [showDemoModal, setShowDemoModal] = useState(false);
+  const router = useRouter();
   // const t = await getTranslations("landing");
 
   return (
@@ -54,42 +58,15 @@ export default async function Home() {
             <Link href="#faq" className="text-sm font-medium hover:text-primary transition-colors">
               FAQ
             </Link>
-            {session?.user && (
-              <Link 
-                href="/dashboard" 
-                className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10"
-              >
-                <LayoutDashboard className="w-4 h-4" />
-                Dashboard
-              </Link>
-            )}
           </div>
           <div className="flex items-center gap-3">
-            <LanguageSelector />
-            {session?.user ? (
-              <Link
-                href="/dashboard"
-                className="btn-hover-lift px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium shadow-smooth flex items-center gap-2"
-              >
-                <LayoutDashboard className="w-4 h-4" />
-                Go to Dashboard
-              </Link>
-            ) : (
-              <>
-                <Link
-                  href="/auth/signin"
-                  className="hidden sm:block text-sm font-medium hover:text-primary transition-colors"
-                >
-                  Sign In
-                </Link>
-                <Link
-                  href="/auth/signup"
-                  className="btn-hover-lift px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium shadow-smooth"
-                >
-                  Start Free
-                </Link>
-              </>
-            )}
+            <Link
+              href="/dashboard"
+              className="btn-hover-lift px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium shadow-smooth flex items-center gap-2"
+            >
+              <LayoutDashboard className="w-4 h-4" />
+              Go to Dashboard
+            </Link>
           </div>
         </div>
       </nav>
@@ -135,13 +112,16 @@ export default async function Home() {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
               <Link
-                href="/auth/signup"
+                href="/dashboard/upgrade"
                 className="btn-hover-lift px-8 py-4 bg-primary text-primary-foreground rounded-xl text-lg font-semibold shadow-smooth-lg inline-flex items-center gap-2 group"
               >
                 Start Free Trial
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <button className="btn-hover-lift px-8 py-4 glass-strong rounded-xl text-lg font-semibold inline-flex items-center gap-2 group">
+              <button 
+                onClick={() => setShowDemoModal(true)}
+                className="btn-hover-lift px-8 py-4 glass-strong rounded-xl text-lg font-semibold inline-flex items-center gap-2 group"
+              >
                 <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
                   <Play className="w-5 h-5 text-primary fill-primary" />
                 </div>
@@ -661,18 +641,21 @@ export default async function Home() {
             Join 10,000+ creators who are already engaging, teaching, and growing with Unytea.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/auth/signup">
+            <Link href="/dashboard/upgrade">
               <Button size="lg" className="btn-hover-lift px-8 py-6 text-lg">
                 Start Free Trial
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
-            <Link href="#demo">
-              <Button size="lg" variant="outline" className="px-8 py-6 text-lg">
-                <Play className="w-5 h-5 mr-2" />
-                Watch Demo
-              </Button>
-            </Link>
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="px-8 py-6 text-lg"
+              onClick={() => setShowDemoModal(true)}
+            >
+              <Play className="w-5 h-5 mr-2" />
+              Watch Demo
+            </Button>
           </div>
           <p className="text-sm text-muted-foreground mt-6">
             No credit card required • 14-day free trial • Cancel anytime
@@ -746,6 +729,36 @@ export default async function Home() {
           </div>
         </div>
       </footer>
+      {/* Demo Video Modal */}
+      {showDemoModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="relative w-full max-w-4xl bg-background rounded-2xl overflow-hidden shadow-2xl">
+            <button
+              onClick={() => setShowDemoModal(false)}
+              className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <div className="aspect-video bg-gradient-to-br from-primary/20 to-purple-600/20 flex items-center justify-center">
+              <div className="text-center">
+                <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4">
+                  <Play className="w-10 h-10 text-primary fill-primary" />
+                </div>
+                <p className="text-lg font-medium">Demo Video Coming Soon</p>
+                <p className="text-muted-foreground mt-2">
+                  We&apos;re preparing an amazing demo video for you!
+                </p>
+                <Button 
+                  onClick={() => setShowDemoModal(false)}
+                  className="mt-6"
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
