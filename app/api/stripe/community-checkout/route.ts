@@ -89,10 +89,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Get price details from Stripe
-    const stripePrice = await stripe.prices.retrieve(priceId);
-    const unitAmount = stripePrice.unit_amount || 0;
-
     // Calculate platform fee (5%)
     const platformFeePercent = 5;
 
