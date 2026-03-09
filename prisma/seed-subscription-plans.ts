@@ -3,7 +3,7 @@
  * Run with: npx ts-node prisma/seed-subscription-plans.ts
  */
 
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, BillingInterval } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -12,7 +12,7 @@ const plans = [
     name: "Free",
     description: "For individuals getting started",
     price: 0,
-    interval: "MONTHLY",
+    interval: BillingInterval.MONTHLY,
     features: [
       "Join up to 3 communities",
       "Basic profile features",
@@ -27,7 +27,7 @@ const plans = [
     name: "Professional",
     description: "For community creators - Best value",
     price: 4900, // $49.00 in cents
-    interval: "MONTHLY",
+    interval: BillingInterval.MONTHLY,
     features: [
       "1 community",
       "Unlimited members",
@@ -46,7 +46,7 @@ const plans = [
     name: "Premium",
     description: "For power users with multiple communities",
     price: 14900, // $149.00 in cents
-    interval: "MONTHLY",
+    interval: BillingInterval.MONTHLY,
     features: [
       "3 communities",
       "Unlimited members",
