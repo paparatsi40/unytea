@@ -178,7 +178,8 @@
     "logout": "Log out",
     "signIn": "Sign In",
     "signUp": "Sign Up",
-    "signup": "Sign Up"
+    "signup": "Sign Up",
+    "back": "Back"
   },
   "common": {
     "loading": "Loading...",
@@ -200,7 +201,10 @@
     "recent": "Recent",
     "alphabetical": "Alphabetical",
     "mostPopular": "Most Popular",
-    "comingSoon": "Coming soon"
+    "comingSoon": "Coming soon",
+    "featureInDevelopment": "Feature in Development",
+    "needHelp": "Need help?",
+    "contactSupport": "Contact our support team for assistance."
   },
   "dashboard": {
     "welcome": "Welcome back",
@@ -264,6 +268,7 @@
     "passwordsDontMatch": "Passwords don't match",
     "forgotPassword": "Forgot Password?",
     "resetPassword": "Reset Password",
+    "passwordResetComingSoon": "Password reset functionality is coming soon! We're working hard to make it available.",
     "checkEmail": "Check your email for reset instructions",
     "welcomeBack": "Welcome Back",
     "signInSubtitle": "Sign in to continue to your community",
