@@ -401,6 +401,7 @@ model Course {
   isPublished     Boolean      @default(false)
   publishedAt     DateTime?
   enrollmentCount Int          @default(0)
+  stripePriceId   String?
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
   communityId     String
@@ -465,6 +466,23 @@ model Enrollment {
   @@index([userId])
   @@index([courseId])
   @@map("enrollments")
+}
+
+model CoursePurchase {
+  id              String   @id @default(cuid())
+  userId          String
+  courseId        String
+  amount          Float
+  currency        String   @default("USD")
+  stripeSessionId String?
+  status          String   @default("pending") // pending, completed, refunded
+  purchasedAt     DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([userId, courseId])
+  @@index([userId])
+  @@index([courseId])
+  @@map("course_purchases")
 }
 
 model LessonProgress {

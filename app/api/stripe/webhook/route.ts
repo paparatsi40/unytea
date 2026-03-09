@@ -46,8 +46,50 @@ export async function POST(request: Request) {
           break;
         }
 
-        // If this is a community membership checkout, the membership
-        // will be created when the subscription is created (invoice.payment_succeeded)
+        // Handle course purchase
+        if (type === "course_purchase") {
+          const courseId = session.metadata?.courseId;
+          
+          if (courseId) {
+            // Update purchase status to completed
+            await prisma.coursePurchase.updateMany({
+              where: {
+                userId,
+                courseId,
+                stripeSessionId: session.id,
+              },
+              data: {
+                status: "completed",
+              },
+            });
+
+            // Create enrollment for the course
+            await prisma.enrollment.upsert({
+              where: {
+                userId_courseId: {
+                  userId,
+                  courseId,
+                },
+              },
+              update: {},
+              create: {
+                userId,
+                courseId,
+                progress: 0,
+                enrolledAt: new Date(),
+              },
+            });
+
+            // Increment enrollment count
+            await prisma.course.update({
+              where: { id: courseId },
+              data: { enrollmentCount: { increment: 1 } },
+            });
+
+            console.log(`✅ Course purchase completed for user ${userId}, course ${courseId}`);
+          }
+        }
+
         console.log(`✅ Checkout completed for user ${userId}, customer ${customerId}, type: ${type || 'platform'}`);
         break;
       }
