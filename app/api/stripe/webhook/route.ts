@@ -39,7 +39,6 @@ export async function POST(request: Request) {
         // Get user ID from metadata
         const userId = session.metadata?.userId;
         const customerId = session.customer;
-        const subscriptionId = session.subscription;
         
         if (!userId) {
           console.error("No userId found in session metadata");
