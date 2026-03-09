@@ -30,9 +30,18 @@ export async function POST() {
 
     // Create Stripe Connect account if doesn't exist
     if (!user?.stripeConnectAccountId) {
+      const email = user?.email || session.user.email;
+      
+      if (!email) {
+        return NextResponse.json(
+          { error: "User email is required for Stripe Connect" },
+          { status: 400 }
+        );
+      }
+      
       const account = await stripe.accounts.create({
         type: "standard",
-        email: user?.email || session.user.email,
+        email,
         capabilities: {
           card_payments: { requested: true },
           transfers: { requested: true },
