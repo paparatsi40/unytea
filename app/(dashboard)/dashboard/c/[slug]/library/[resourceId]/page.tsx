@@ -32,7 +32,6 @@ import {
   getResourceById,
   toggleResourceLike,
   deleteResource,
-  incrementResourceView,
 } from "@/app/actions/resources";
 import type { ResourceType } from "@prisma/client";
 
@@ -77,8 +76,6 @@ export default function ResourceDetailPage() {
       const result = await getResourceById(resourceId, communitySlug);
       if (result.success) {
         setResource(result.data);
-        // Increment view count
-        await incrementResourceView(resourceId);
       } else {
         toast.error(result.error || "Error al cargar el recurso");
       }
@@ -121,7 +118,6 @@ export default function ResourceDetailPage() {
     const result = await deleteResource(resourceId);
     if (result.success) {
       toast.success("Recurso eliminado");
-      // Redirect to library page
       window.location.href = `/dashboard/c/${communitySlug}/library`;
     } else {
       toast.error(result.error || "Error al eliminar el recurso");
@@ -330,66 +326,67 @@ export default function ResourceDetailPage() {
                   Descargar / Ver recurso
                 </Button>
               )}
-
-              {resource.type === "VIDEO" && resource.fileUrl && (
-                <div className="w-full bg-black rounded-xl overflow-hidden aspect-video">
-                  <video
-                    src={resource.fileUrl}
-                    controls
-                    className="w-full h-full"
-                    poster="/video-poster.png"
-                  >
-                    Tu navegador no soporta el elemento video.
-                  </video>
-                </div>
-              )}
-
-              {resource.type === "IMAGE" && resource.fileUrl && (
-                <div className="w-full rounded-xl overflow-hidden border">
-                  <img
-                    src={resource.fileUrl}
-                    alt={resource.title}
-                    className="w-full h-auto max-h-[600px] object-contain"
-                  />
-                </div>
-              )}
-
-              {resource.type === "AUDIO" && resource.fileUrl && (
-                <div className="w-full bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6">
-                  <audio src={resource.fileUrl} controls className="w-full">
-                    Tu navegador no soporta el elemento audio.
-                  </audio>
-                </div>
-              )}
-
-              {resource.type === "LINK" && resource.fileUrl && (
-                <div className="w-full bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-6">
-                  <p className="text-sm text-muted-foreground mb-2">Enlace externo:</p>
-                  <a
-                    href={resource.fileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-orange-600 hover:underline break-all"
-                  >
-                    {resource.fileUrl}
-                  </a>
-                </div>
-              )}
-
-              {resource.type === "DOCUMENT" && resource.fileUrl && (
-                <div className="w-full bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6">
-                  <p className="text-sm text-muted-foreground mb-2">Archivo de documento</p>
-                  <a
-                    href={resource.fileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline break-all"
-                  >
-                    {resource.fileUrl}
-                  </a>
-                </div>
-              )}
             </div>
+
+            {/* Media Players */}
+            {resource.type === "VIDEO" && resource.fileUrl && (
+              <div className="w-full bg-black rounded-xl overflow-hidden aspect-video mb-6">
+                <video
+                  src={resource.fileUrl}
+                  controls
+                  className="w-full h-full"
+                  poster="/video-poster.png"
+                >
+                  Tu navegador no soporta el elemento video.
+                </video>
+              </div>
+            )}
+
+            {resource.type === "AUDIO" && resource.fileUrl && (
+              <div className="w-full bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 mb-6">
+                <audio src={resource.fileUrl} controls className="w-full">
+                  Tu navegador no soporta el elemento audio.
+                </audio>
+              </div>
+            )}
+
+            {resource.type === "IMAGE" && resource.fileUrl && (
+              <div className="w-full rounded-xl overflow-hidden border mb-6">
+                <img
+                  src={resource.fileUrl}
+                  alt={resource.title}
+                  className="w-full h-auto max-h-[600px] object-contain"
+                />
+              </div>
+            )}
+
+            {resource.type === "LINK" && resource.fileUrl && (
+              <div className="w-full bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-6 mb-6">
+                <p className="text-sm text-muted-foreground mb-2">Enlace externo:</p>
+                <a
+                  href={resource.fileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-orange-600 hover:underline break-all"
+                >
+                  {resource.fileUrl}
+                </a>
+              </div>
+            )}
+
+            {resource.type === "DOCUMENT" && resource.fileUrl && (
+              <div className="w-full bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 mb-6">
+                <p className="text-sm text-muted-foreground mb-2">Archivo de documento</p>
+                <a
+                  href={resource.fileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline break-all"
+                >
+                  {resource.fileUrl}
+                </a>
+              </div>
+            )}
 
             {/* Additional Info */}
             {resource.tags && resource.tags.length > 0 && (
