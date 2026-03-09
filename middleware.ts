@@ -11,62 +11,60 @@ const intlMiddleware = createIntlMiddleware({
   localePrefix: "always"
 })
 
-function getLocaleFromPath(pathname: string) {
-  const seg = pathname.split("/")[1]
-  return (locales as readonly string[]).includes(seg) ? seg : defaultLocale
-}
-
-function stripLocale(pathname: string) {
-  const seg = pathname.split("/")[1]
-  if ((locales as readonly string[]).includes(seg)) {
-    const rest = pathname.split("/").slice(2).join("/")
-    return "/" + rest
-  }
-  return pathname
-}
-
 export default auth((req) => {
   const isLoggedIn = !!req.auth
   const pathname = req.nextUrl.pathname
 
-  // Si la ruta no tiene locale, dejar que next-intl la maneje primero
+  // Detectar locale en la ruta
   const firstSegment = pathname.split("/")[1]
   const hasLocale = (locales as readonly string[]).includes(firstSegment)
 
-  // Si NO tiene locale (ej: /auth/signin), aplicar intlMiddleware primero
-  // que redirigirá a /en/auth/signin
-  if (!hasLocale) {
-    const intlResponse = intlMiddleware(req)
-    // Si next-intl redirige (por falta de locale), retornar esa respuesta
-    if (intlResponse.status === 307 || intlResponse.status === 308) {
-      return intlResponse
+  // Rutas que NO deben tener prefijo de locale (dashboard, onboarding están fuera de [locale])
+  const isProtectedRoute = pathname.startsWith("/dashboard") || pathname.startsWith("/onboarding")
+  
+  // Si es ruta protegida sin locale: manejar protección SIN redirigir a /{locale}/dashboard
+  if (isProtectedRoute && !hasLocale) {
+    // Protección: ruta protegida sin sesión -> /auth/signin (sin locale)
+    if (!isLoggedIn) {
+      return NextResponse.redirect(new URL("/auth/signin", req.url))
     }
+    // Usuario logueado: continuar sin aplicar intlMiddleware (dashboard está fuera de [locale])
+    return NextResponse.next()
   }
 
-  // Ahora procesar con locale detectado
-  const locale = getLocaleFromPath(pathname)
-  const normalizedPath = stripLocale(pathname)
-
-  const isAuthRoute = normalizedPath.startsWith("/auth")
-  const isProtectedRoute =
-    normalizedPath.startsWith("/dashboard") || normalizedPath.startsWith("/onboarding")
-
-  // Protección: ruta protegida sin sesión -> /{locale}/auth/signin
-  if (isProtectedRoute && !isLoggedIn) {
-    return NextResponse.redirect(new URL(`/${locale}/auth/signin`, req.url))
-  }
-
-  // Ya logueado en auth -> /{locale}/dashboard
-  if (isAuthRoute && isLoggedIn && !normalizedPath.includes("callback")) {
-    return NextResponse.redirect(new URL(`/${locale}/dashboard`, req.url))
-  }
-
-  // Para rutas con locale, aplicar intlMiddleware para headers/cookies
+  // Para rutas con locale (incluyendo /{locale}/auth/*)
   if (hasLocale) {
+    const locale = firstSegment
+    const normalizedPath = "/" + pathname.split("/").slice(2).join("/")
+    
+    const isAuthRoute = normalizedPath.startsWith("/auth")
+    const isProtectedWithLocale = normalizedPath.startsWith("/dashboard") || normalizedPath.startsWith("/onboarding")
+    
+    // Protección con locale: redirigir a /{locale}/auth/signin
+    if (isProtectedWithLocale && !isLoggedIn) {
+      return NextResponse.redirect(new URL(`/${locale}/auth/signin`, req.url))
+    }
+    
+    // Ya logueado en auth con locale -> /{locale}/dashboard
+    if (isAuthRoute && isLoggedIn && !normalizedPath.includes("callback")) {
+      return NextResponse.redirect(new URL(`/${locale}/dashboard`, req.url))
+    }
+    
     return intlMiddleware(req)
   }
 
-  // Ruta sin locale que no necesita redirect (no debería pasar)
+  // Rutas públicas sin locale (como /auth/*): aplicar intlMiddleware para redirigir a /{locale}/*
+  const intlResponse = intlMiddleware(req)
+  if (intlResponse.status === 307 || intlResponse.status === 308) {
+    return intlResponse
+  }
+  
+  // Ya logueado en auth sin locale -> /dashboard
+  const isAuthRoute = pathname.startsWith("/auth")
+  if (isAuthRoute && isLoggedIn && !pathname.includes("callback")) {
+    return NextResponse.redirect(new URL("/dashboard", req.url))
+  }
+
   return NextResponse.next()
 })
 
