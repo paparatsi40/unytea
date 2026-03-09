@@ -12,7 +12,7 @@ export default async function SessionRoomPage({
 }) {
   const session = await auth();
   if (!session?.user?.id) {
-    redirect("/login");
+    redirect("/auth/signin");
   }
 
   const result = await getSession(params.sessionId);

@@ -13,7 +13,7 @@ export const metadata = {
 export default async function CoursesPage() {
   const session = await auth();
   if (!session?.user?.id) {
-    redirect("/login");
+    redirect("/auth/signin");
   }
 
   const result = await getUserEnrollments();

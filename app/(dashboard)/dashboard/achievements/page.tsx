@@ -12,7 +12,7 @@ export const metadata = {
 export default async function AchievementsPage() {
   const session = await auth();
   if (!session?.user?.id) {
-    redirect("/login");
+    redirect("/auth/signin");
   }
 
   const result = await getUserAchievements(session.user.id);
