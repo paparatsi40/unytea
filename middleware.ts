@@ -2,49 +2,67 @@ import { auth } from "@/lib/auth"
 import { NextResponse } from "next/server"
 import createIntlMiddleware from "next-intl/middleware"
 
-const locales = ["en", "es", "fr"]
+const locales = ["en", "es", "fr"] as const
 const defaultLocale = "en"
 
-// Create i18n middleware
 const intlMiddleware = createIntlMiddleware({
-  locales,
+  locales: [...locales],
   defaultLocale,
   localePrefix: "always",
 })
 
+function getLocaleFromPath(pathname: string) {
+  const found = locales.find(
+    (l) => pathname === `/${l}` || pathname.startsWith(`/${l}/`)
+  )
+  return found ?? defaultLocale
+}
+
+function stripLocale(pathname: string, locale: string) {
+  if (pathname === `/${locale}`) return "/"
+  if (pathname.startsWith(`/${locale}/`)) return pathname.slice(locale.length + 1)
+  return pathname
+}
+
 export default auth((req) => {
-  const isLoggedIn = !!req.auth
   const pathname = req.nextUrl.pathname
 
-  // Skip i18n for API routes and protected routes
-  if (pathname.startsWith("/api") || 
-      pathname.startsWith("/auth") ||
-      pathname.startsWith("/dashboard") ||
-      pathname.startsWith("/onboarding")) {
-    const isProtectedRoute = 
-      pathname.startsWith("/dashboard") ||
-      pathname.startsWith("/onboarding")
-
-    if (isProtectedRoute && !isLoggedIn) {
-      return NextResponse.redirect(new URL("/auth/signin", req.url))
-    }
+  // No tocar assets / next internals / api
+  if (
+    pathname.startsWith("/api") ||
+    pathname.startsWith("/_next") ||
+    pathname === "/favicon.ico"
+  ) {
     return NextResponse.next()
   }
 
-  // Apply i18n middleware to public routes only
+  // Primero aplica i18n (para que siempre exista /en, /es, /fr)
   const intlResponse = intlMiddleware(req)
-  
-  // Check if we need auth redirect
-  const isProtectedRoute = 
-    pathname.startsWith("/dashboard") ||
-    pathname.startsWith("/onboarding")
+
+  const isLoggedIn = !!req.auth
+  const locale = getLocaleFromPath(pathname)
+  const pathnameWithoutLocale = stripLocale(pathname, locale)
+
+  const isProtectedRoute =
+    pathnameWithoutLocale.startsWith("/dashboard") ||
+    pathnameWithoutLocale.startsWith("/onboarding")
 
   if (isProtectedRoute && !isLoggedIn) {
-    return NextResponse.redirect(new URL("/auth/signin", req.url))
+    const url = req.nextUrl.clone()
+    url.pathname = `/${locale}/auth/signin`
+    // opcional: callback
+    url.searchParams.set("callbackUrl", pathname)
+    return NextResponse.redirect(url)
   }
 
-  if (pathname.startsWith("/auth/") && isLoggedIn && !pathname.includes("callback")) {
-    return NextResponse.redirect(new URL("/dashboard", req.url))
+  if (
+    pathnameWithoutLocale.startsWith("/auth/") &&
+    isLoggedIn &&
+    !pathnameWithoutLocale.includes("callback")
+  ) {
+    const url = req.nextUrl.clone()
+    url.pathname = `/${locale}/dashboard`
+    return NextResponse.redirect(url)
   }
 
   return intlResponse
@@ -52,6 +70,7 @@ export default auth((req) => {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    // Excluye archivos con extensión y rutas internas típicas
+    "/((?!api|_next|favicon.ico|.*\\..*).*)",
   ],
 }
