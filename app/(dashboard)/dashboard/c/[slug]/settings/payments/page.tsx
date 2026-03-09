@@ -5,10 +5,9 @@ import { useParams } from "next/navigation";
 import { CreditCard, Check, AlertCircle, ExternalLink, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
 export default function CommunityPaymentsPage() {
@@ -237,12 +236,14 @@ export default function CommunityPaymentsPage() {
                 Require payment to join this community
               </p>
             </div>
-            <Switch
+            <input
+              type="checkbox"
               id="isPaid"
               checked={settings.isPaid}
-              onCheckedChange={(checked) =>
-                setSettings((prev) => ({ ...prev, isPaid: checked }))
+              onChange={(e) =>
+                setSettings((prev) => ({ ...prev, isPaid: e.target.checked }))
               }
+              className="h-5 w-5 rounded border-gray-300 text-sky-600 focus:ring-sky-500"
             />
           </div>
 
