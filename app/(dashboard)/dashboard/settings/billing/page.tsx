@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { CreditCard, Check, Sparkles, Zap, Crown } from "lucide-react";
+import { useState, useEffect } from "react";
+import { CreditCard, Check, Sparkles, Zap, Crown, Loader2, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 const plans = [
   {
@@ -55,18 +56,78 @@ const plans = [
   },
 ];
 
+type Subscription = {
+  id: string;
+  status: string;
+  plan: {
+    name: string;
+    description: string | null;
+    price: number;
+  };
+  currentPeriodEnd: string;
+  cancelAtPeriodEnd: boolean;
+};
+
 export default function BillingPage() {
-  const { user: _user } = useCurrentUser();
+  const { user: _user, isLoading: userLoading } = useCurrentUser();
   const t = useTranslations();
   const [isLoading, setIsLoading] = useState<string | null>(null);
+  const [subscription, setSubscription] = useState<Subscription | null>(null);
+  const [isPortalLoading, setIsPortalLoading] = useState(false);
+
+  useEffect(() => {
+    fetchSubscription();
+  }, []);
+
+  const fetchSubscription = async () => {
+    try {
+      const response = await fetch("/api/user/subscription");
+      if (response.ok) {
+        const data = await response.json();
+        setSubscription(data.subscription);
+      }
+    } catch (error) {
+      console.error("Error fetching subscription:", error);
+    }
+  };
+
+  const handleManageSubscription = async () => {
+    try {
+      setIsPortalLoading(true);
+      const response = await fetch("/api/stripe/portal", {
+        method: "POST",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create portal session");
+      }
+
+      const { url } = await response.json();
+      if (url) {
+        window.location.href = url;
+      }
+    } catch (error) {
+      console.error("Portal error:", error);
+      toast.error("Failed to open billing portal");
+    } finally {
+      setIsPortalLoading(false);
+    }
+  };
 
   const handleUpgrade = (plan: string) => {
+    if (plan === "Free") return;
+    
     setIsLoading(plan);
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(null);
-    }, 1500);
+    // Redirect to upgrade page with selected plan
+    window.location.href = `/dashboard/upgrade?plan=${plan.toLowerCase()}`;
   };
+
+  const getCurrentPlanName = () => {
+    if (!subscription) return "Free";
+    return subscription.plan.name;
+  };
+
+  const isSubscribed = subscription && ["ACTIVE", "TRIALING"].includes(subscription.status);
 
   return (
     <div className="space-y-8">
@@ -81,12 +142,39 @@ export default function BillingPage() {
       {/* Current Plan */}
       <Card className="border-primary/20 bg-primary/5">
         <CardHeader>
-          <div className="flex items-center gap-2">
-            <Crown className="h-5 w-5 text-primary" />
-            <CardTitle>Free Plan</CardTitle>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Crown className="h-5 w-5 text-primary" />
+              <CardTitle>Current Plan: {getCurrentPlanName()}</CardTitle>
+            </div>
+            {isSubscribed && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleManageSubscription}
+                disabled={isPortalLoading}
+              >
+                {isPortalLoading ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <ExternalLink className="mr-2 h-4 w-4" />
+                )}
+                Manage Subscription
+              </Button>
+            )}
           </div>
           <CardDescription>
-            You are currently on the Free plan. Upgrade to unlock more features.
+            {subscription ? (
+              <div className="space-y-1">
+                <p>Status: <span className={subscription.status === "ACTIVE" ? "text-green-600" : "text-yellow-600"}>{subscription.status}</span></p>
+                <p>Renews: {new Date(subscription.currentPeriodEnd).toLocaleDateString()}</p>
+                {subscription.cancelAtPeriodEnd && (
+                  <p className="text-red-600">Will cancel at period end</p>
+                )}
+              </div>
+            ) : (
+              "You are currently on the Free plan. Upgrade to unlock more features."
+            )}
           </CardDescription>
         </CardHeader>
       </Card>

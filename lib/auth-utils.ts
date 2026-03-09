@@ -80,8 +80,93 @@ export async function requireOnboarded() {
 }
 
 /**
- * Check if user is member of a community
+ * Server-side: Check if user has an active subscription
  */
+export async function hasActiveSubscription(userId?: string | null) {
+  if (!userId) {
+    const currentUserId = await getCurrentUserId();
+    if (!currentUserId) return false;
+    userId = currentUserId;
+  }
+
+  const subscription = await prisma.subscription.findFirst({
+    where: {
+      userId: userId,
+      status: {
+        in: ["ACTIVE", "TRIALING"],
+      },
+      currentPeriodEnd: {
+        gt: new Date(), // Not expired
+      },
+    },
+  });
+
+  return !!subscription;
+}
+
+/**
+ * Server-side: Get user's subscription with plan details
+ */
+export async function getUserSubscription(userId?: string | null) {
+  if (!userId) {
+    const currentUserId = await getCurrentUserId();
+    if (!currentUserId) return null;
+    userId = currentUserId;
+  }
+
+  const subscription = await prisma.subscription.findFirst({
+    where: {
+      userId: userId,
+    },
+    include: {
+      plan: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return subscription;
+}
+
+/**
+ * Server-side: Check if user can create more communities based on plan
+ */
+export async function canCreateCommunity(userId?: string | null) {
+  if (!userId) {
+    const currentUserId = await getCurrentUserId();
+    if (!currentUserId) return false;
+    userId = currentUserId;
+  }
+
+  // Count user's owned communities
+  const ownedCommunities = await prisma.community.count({
+    where: {
+      ownerId: userId,
+    },
+  });
+
+  // Get user's subscription
+  const subscription = await getUserSubscription(userId);
+  
+  if (!subscription || subscription.status !== "ACTIVE") {
+    // Free plan: max 1 community
+    return ownedCommunities < 1;
+  }
+
+  // Check plan limits
+  const planName = subscription.plan.name.toLowerCase();
+  
+  if (planName.includes("starter")) {
+    return ownedCommunities < 1;
+  } else if (planName.includes("pro")) {
+    return ownedCommunities < 1;
+  } else if (planName.includes("business")) {
+    return ownedCommunities < 3;
+  }
+
+  return false;
+}
 export async function isMemberOfCommunity(communityId: string) {
   const userId = await getCurrentUserId()
   

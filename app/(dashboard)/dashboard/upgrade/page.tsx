@@ -1,50 +1,96 @@
 "use client";
 
-import { Check, Sparkles, Zap, Crown } from "lucide-react";
+import { useState } from "react";
+import { Check, Sparkles, Zap, Crown, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+
+const plans = [
+  {
+    name: "Starter",
+    price: 29,
+    priceId: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID || "",
+    icon: Zap,
+    color: "from-blue-500 to-cyan-500",
+    features: [
+      "1 community",
+      "100 members max",
+      "Basic features",
+      "Email support",
+    ],
+  },
+  {
+    name: "Pro",
+    price: 49,
+    priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || "",
+    icon: Sparkles,
+    color: "from-purple-500 to-pink-500",
+    popular: true,
+    features: [
+      "1 community",
+      "Unlimited members",
+      "All features",
+      "Priority support",
+      "Custom domain",
+    ],
+  },
+  {
+    name: "Business",
+    price: 99,
+    priceId: process.env.NEXT_PUBLIC_STRIPE_BUSINESS_PRICE_ID || "",
+    icon: Crown,
+    color: "from-orange-500 to-red-500",
+    features: [
+      "3 communities",
+      "Unlimited everything",
+      "White-label options",
+      "API access",
+      "Dedicated support",
+    ],
+  },
+];
 
 export default function UpgradePage() {
-  const plans = [
-    {
-      name: "Starter",
-      price: 29,
-      icon: Zap,
-      color: "from-blue-500 to-cyan-500",
-      features: [
-        "1 community",
-        "100 members max",
-        "Basic features",
-        "Email support",
-      ],
-    },
-    {
-      name: "Pro",
-      price: 49,
-      icon: Sparkles,
-      color: "from-purple-500 to-pink-500",
-      popular: true,
-      features: [
-        "1 community",
-        "Unlimited members",
-        "All features",
-        "Priority support",
-        "Custom domain",
-      ],
-    },
-    {
-      name: "Business",
-      price: 99,
-      icon: Crown,
-      color: "from-orange-500 to-red-500",
-      features: [
-        "3 communities",
-        "Unlimited everything",
-        "White-label options",
-        "API access",
-        "Dedicated support",
-      ],
-    },
-  ];
+  const [isLoading, setIsLoading] = useState<string | null>(null);
+
+  const handleSubscribe = async (planName: string, priceId: string) => {
+    if (!priceId) {
+      toast.error("Stripe price ID not configured");
+      return;
+    }
+
+    try {
+      setIsLoading(planName);
+      
+      const response = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          priceId,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to create checkout session");
+      }
+
+      const { url } = await response.json();
+      
+      if (url) {
+        window.location.href = url;
+      } else {
+        throw new Error("No checkout URL received");
+      }
+    } catch (error) {
+      console.error("Checkout error:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to start checkout");
+    } finally {
+      setIsLoading(null);
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -113,8 +159,19 @@ export default function UpgradePage() {
                     : ""
                 }`}
                 variant={plan.popular ? "default" : "outline"}
+                onClick={() => handleSubscribe(plan.name, plan.priceId)}
+                disabled={isLoading === plan.name || !plan.priceId}
               >
-                {plan.popular ? "Get Started" : "Choose Plan"}
+                {isLoading === plan.name ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Loading...
+                  </>
+                ) : !plan.priceId ? (
+                  "Not Available"
+                ) : (
+                  `Get ${plan.name}`
+                )}
               </Button>
             </div>
           );
