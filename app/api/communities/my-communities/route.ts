@@ -16,42 +16,48 @@ export async function GET() {
       );
     }
 
-    // Get all communities where user is the owner
-    const communities = await prisma.community.findMany({
+    // Get all communities where user is the owner OR a member
+    const memberships = await prisma.member.findMany({
       where: {
-        ownerId: userId,
+        userId: userId,
+        status: "ACTIVE",
       },
-      select: {
-        id: true,
-        name: true,
-        slug: true,
-        description: true,
-        imageUrl: true,
-        coverImageUrl: true,
-        createdAt: true,
-        _count: {
+      include: {
+        community: {
           select: {
-            members: true,
-            posts: true,
+            id: true,
+            name: true,
+            slug: true,
+            description: true,
+            imageUrl: true,
+            coverImageUrl: true,
+            createdAt: true,
+            _count: {
+              select: {
+                members: true,
+                posts: true,
+              },
+            },
           },
         },
       },
       orderBy: {
-        createdAt: "desc",
+        joinedAt: "desc",
       },
     });
 
     // Format the response
-    const formattedCommunities = communities.map((community) => ({
-      id: community.id,
-      name: community.name,
-      slug: community.slug,
-      description: community.description,
-      imageUrl: community.imageUrl,
-      coverImageUrl: community.coverImageUrl,
-      memberCount: community._count.members,
-      postCount: community._count.posts,
-      createdAt: community.createdAt,
+    const formattedCommunities = memberships.map((membership) => ({
+      id: membership.community.id,
+      name: membership.community.name,
+      slug: membership.community.slug,
+      description: membership.community.description,
+      imageUrl: membership.community.imageUrl,
+      coverImageUrl: membership.community.coverImageUrl,
+      memberCount: membership.community._count.members,
+      postCount: membership.community._count.posts,
+      createdAt: membership.community.createdAt,
+      role: membership.role,
     }));
 
     return NextResponse.json({
