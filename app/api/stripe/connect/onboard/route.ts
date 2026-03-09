@@ -65,9 +65,17 @@ export async function POST() {
       });
     }
 
+    // Ensure user has Stripe Connect account
+    if (!user?.stripeConnectAccountId) {
+      return NextResponse.json(
+        { error: "Failed to retrieve Stripe Connect account" },
+        { status: 500 }
+      );
+    }
+
     // Create onboarding link
     const accountLink = await stripe.accountLinks.create({
-      account: user.stripeConnectAccountId!,
+      account: user.stripeConnectAccountId,
       refresh_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/settings/payments?step=onboarding`,
       return_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/settings/payments?step=complete`,
       type: "account_onboarding",
