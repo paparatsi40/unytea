@@ -8,11 +8,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
 
 export default function CommunityPaymentsPage() {
-  const params = useParams();
-  const slug = params?.slug as string;
+  const _params = useParams();
   const { toast } = useToast();
   
   const [isLoading, setIsLoading] = useState(true);
@@ -45,8 +43,8 @@ export default function CommunityPaymentsPage() {
         // TODO: Fetch community payment settings
         // This would need a new API endpoint
         
-      } catch (error) {
-        console.error("Error loading payment data:", error);
+      } catch (_error) {
+        console.error("Error loading payment data:", _error);
       } finally {
         setIsLoading(false);
       }
@@ -68,7 +66,7 @@ export default function CommunityPaymentsPage() {
       } else {
         throw new Error("Failed to create onboarding link");
       }
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: "Error",
         description: "Failed to start Stripe Connect onboarding. Please try again.",
@@ -89,7 +87,7 @@ export default function CommunityPaymentsPage() {
         title: "Success",
         description: "Payment settings saved successfully.",
       });
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: "Error",
         description: "Failed to save settings. Please try again.",
