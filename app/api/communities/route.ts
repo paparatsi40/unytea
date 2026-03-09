@@ -91,7 +91,7 @@ export async function GET() {
       );
     }
 
-    console.log("?? API: Fetching communities for user:", userId);
+    console.log("📥 API: Fetching communities for user:", userId);
 
     // Get all communities where user is a member
     const memberships = await prisma.member.findMany({
@@ -124,16 +124,54 @@ export async function GET() {
       },
     });
 
-    console.log("? API: Found memberships:", memberships.length);
+    console.log("✅ API: Found memberships:", memberships.length);
 
-    const communities = memberships.map((m) => ({
+    const myCommunities = memberships.map((m) => ({
       ...m.community,
       role: m.role,
     }));
 
-    return NextResponse.json(communities);
+    // Get IDs of communities user is already a member of
+    const myCommunityIds = myCommunities.map((c) => c.id);
+
+    // Get public communities where user is NOT a member (for exploration)
+    const exploreCommunities = await prisma.community.findMany({
+      where: {
+        isPrivate: false,
+        id: {
+          notIn: myCommunityIds.length > 0 ? myCommunityIds : [""],
+        },
+      },
+      include: {
+        owner: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            image: true,
+          },
+        },
+        _count: {
+          select: {
+            members: true,
+            posts: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: 20,
+    });
+
+    console.log("✅ API: Found explore communities:", exploreCommunities.length);
+
+    return NextResponse.json({
+      myCommunities,
+      exploreCommunities,
+    });
   } catch (error) {
-    console.error("? API Error:", error);
+    console.error("❌ API Error:", error);
     return NextResponse.json(
       { error: "Failed to fetch communities" },
       { status: 500 }

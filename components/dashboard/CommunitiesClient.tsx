@@ -38,6 +38,7 @@ export function CommunitiesClient() {
   const router = useRouter();
   const t = useTranslations();
   const [communities, setCommunities] = useState<Community[]>([]);
+  const [exploreCommunities, setExploreCommunities] = useState<Community[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
@@ -73,7 +74,17 @@ export function CommunitiesClient() {
         }
         
         const data = await response.json();
-        setCommunities(data);
+        console.log("📥 API Response:", data);
+        
+        // Handle new API response format with myCommunities and exploreCommunities
+        if (data.myCommunities && data.exploreCommunities) {
+          setCommunities(data.myCommunities);
+          setExploreCommunities(data.exploreCommunities);
+        } else {
+          // Fallback for old format (just array)
+          setCommunities(Array.isArray(data) ? data : []);
+          setExploreCommunities([]);
+        }
       } catch (err) {
         console.error("❌ Error fetching communities:", err);
         setError(err instanceof Error ? err.message : "Failed to load communities");
@@ -613,26 +624,107 @@ export function CommunitiesClient() {
           )}
         </div>
       ) : (
-        /* Empty State */
-        <div className="flex min-h-[400px] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-gradient-to-br from-card/50 to-accent/20 p-12 text-center">
-          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-primary/5">
-            <Users className="h-10 w-10 text-primary" />
+        /* Empty State - Show Explore Communities if available */
+        exploreCommunities.length > 0 ? (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold text-foreground">Discover Communities</h2>
+              <p className="mt-2 text-muted-foreground">Join a community to get started</p>
+            </div>
+            
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {exploreCommunities.map((community) => (
+                <Link
+                  key={community.id}
+                  href={`/dashboard/c/${community.slug}`}
+                  className="group relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl"
+                >
+                  {/* Cover Image */}
+                  <div className="absolute inset-0 h-32 overflow-hidden">
+                    {community.coverImageUrl ? (
+                      <img
+                        src={community.coverImageUrl}
+                        alt=""
+                        className="h-full w-full object-cover opacity-20 transition-transform group-hover:scale-110"
+                      />
+                    ) : (
+                      <div className="h-full w-full bg-gradient-to-br from-primary/10 to-purple-500/10" />
+                    )}
+                  </div>
+
+                  {/* Content */}
+                  <div className="relative pt-20">
+                    {/* Community Image */}
+                    <div className="absolute -top-4 left-6 h-20 w-20 overflow-hidden rounded-2xl border-4 border-card shadow-lg">
+                      {community.imageUrl ? (
+                        <img
+                          src={community.imageUrl}
+                          alt={community.name}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary to-purple-600">
+                          <Users className="h-8 w-8 text-white" />
+                        </div>
+                      )}
+                    </div>
+
+                    <h3 className="mb-1 text-xl font-bold text-foreground group-hover:text-primary">
+                      {community.name}
+                    </h3>
+                    
+                    {community.description && (
+                      <p className="mb-3 line-clamp-2 text-sm text-muted-foreground">
+                        {community.description}
+                      </p>
+                    )}
+
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        <Users className="h-4 w-4" />
+                        {community._count?.members || 0} members
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <TrendingUp className="h-4 w-4" />
+                        {community._count?.posts || 0} posts
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            <div className="text-center">
+              <p className="text-muted-foreground">or</p>
+              <Link href="/dashboard/communities/new" className="mt-2 inline-block">
+                <Button variant="outline" size="lg">
+                  <Plus className="mr-2 h-5 w-5" />
+                  Create Your Own Community
+                </Button>
+              </Link>
+            </div>
           </div>
-          <h2 className="mb-2 text-2xl font-bold text-foreground">
-            {searchQuery ? "No communities found" : "No communities yet"}
-          </h2>
-          <p className="mb-6 max-w-md text-muted-foreground">
-            {searchQuery
-              ? "Try adjusting your search or filters"
-              : "Create your first community to start building your audience"}
-          </p>
-          <Link href="/dashboard/communities/new">
-            <Button size="lg" className="bg-gradient-to-r from-primary to-primary/80 shadow-lg">
-              <Plus className="mr-2 h-5 w-5" />
-              Create Community
-            </Button>
-          </Link>
-        </div>
+        ) : (
+          <div className="flex min-h-[400px] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-gradient-to-br from-card/50 to-accent/20 p-12 text-center">
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-primary/5">
+              <Users className="h-10 w-10 text-primary" />
+            </div>
+            <h2 className="mb-2 text-2xl font-bold text-foreground">
+              {searchQuery ? "No communities found" : "No communities yet"}
+            </h2>
+            <p className="mb-6 max-w-md text-muted-foreground">
+              {searchQuery
+                ? "Try adjusting your search or filters"
+                : "Create your first community to start building your audience"}
+            </p>
+            <Link href="/dashboard/communities/new">
+              <Button size="lg" className="bg-gradient-to-r from-primary to-primary/80 shadow-lg">
+                <Plus className="mr-2 h-5 w-5" />
+                Create Community
+              </Button>
+            </Link>
+          </div>
+        )
       )}
     </div>
   );
