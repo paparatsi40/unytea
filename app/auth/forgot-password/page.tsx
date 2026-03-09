@@ -5,16 +5,7 @@ import { ArrowLeft, Sparkles } from "lucide-react"
 import { useTranslations } from "next-intl"
 
 export default function ForgotPasswordPage() {
-  // Safe translation with fallback
   const t = useTranslations()
-  
-  const safeT = (key: string, fallback: string) => {
-    try {
-      return t(key)
-    } catch {
-      return fallback
-    }
-  }
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 flex items-center justify-center p-4">
@@ -30,10 +21,10 @@ export default function ForgotPasswordPage() {
             </span>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            {safeT("auth.resetPassword", "Reset Password")}
+            {t("auth.resetPassword")}
           </h1>
           <p className="text-gray-600">
-            {safeT("common.comingSoon", "Coming soon")}
+            {t("common.comingSoon")}
           </p>
         </div>
 
@@ -44,14 +35,14 @@ export default function ForgotPasswordPage() {
               <span className="text-3xl">🔧</span>
             </div>
             <h2 className="text-xl font-semibold text-gray-900 mb-2">
-              {safeT("common.featureInDevelopment", "Feature in Development")}
+              {t("common.featureInDevelopment")}
             </h2>
             <p className="text-gray-600 mb-4">
-              {safeT("auth.passwordResetComingSoon", "Password reset functionality is coming soon! We're working hard to make it available.")}
+              {t("auth.passwordResetComingSoon")}
             </p>
             <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 mb-6">
               <p className="text-sm text-purple-800">
-                <strong>{safeT("common.needHelp", "Need help?")}</strong> {safeT("common.contactSupport", "Contact our support team for assistance.")}
+                <strong>{t("common.needHelp")}</strong> {t("common.contactSupport")}
               </p>
             </div>
           </div>
@@ -61,7 +52,7 @@ export default function ForgotPasswordPage() {
             className="inline-flex items-center gap-2 text-purple-600 hover:text-purple-700 font-medium"
           >
             <ArrowLeft className="w-4 h-4" />
-            {safeT("navigation.back", "Back")}
+            {t("navigation.back")}
           </Link>
         </div>
       </div>
