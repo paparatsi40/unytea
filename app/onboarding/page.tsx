@@ -3,16 +3,75 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useCurrentUser } from "@/hooks/use-current-user";
-import { Check, User, Briefcase, Target } from "lucide-react";
+import { Check, User, Briefcase, Target, Sparkles, Zap, Crown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+
+const plans = [
+  {
+    id: "free",
+    name: "Free",
+    price: 0,
+    priceId: "",
+    description: "Perfect for getting started",
+    features: [
+      "Join up to 3 communities",
+      "Basic profile features",
+      "Community feed access",
+      "Direct messaging",
+    ],
+    icon: Sparkles,
+    popular: false,
+  },
+  {
+    id: "professional",
+    name: "Professional",
+    price: 49,
+    priceId: process.env.NEXT_PUBLIC_STRIPE_PROFESSIONAL_PRICE_ID || "",
+    description: "Best for community creators",
+    features: [
+      "1 community (yours)",
+      "Unlimited members",
+      "Video calls & streaming",
+      "Course builder",
+      "AI assistant",
+      "Analytics dashboard",
+      "Priority support",
+    ],
+    icon: Zap,
+    popular: true,
+  },
+  {
+    id: "premium",
+    name: "Premium",
+    price: 149,
+    priceId: process.env.NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID || "",
+    description: "For power users with multiple communities",
+    features: [
+      "3 communities (yours)",
+      "All Professional features",
+      "White-label options",
+      "Advanced analytics",
+      "API access",
+      "Dedicated support",
+      "Custom integrations",
+    ],
+    icon: Crown,
+    popular: false,
+  },
+];
 
 export default function OnboardingPage() {
   const router = useRouter();
   const { user, isLoading } = useCurrentUser();
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     role: "",
     goals: "",
+    selectedPlan: "free",
   });
 
   useEffect(() => {
@@ -100,6 +159,80 @@ export default function OnboardingPage() {
         </div>
       ),
     },
+    {
+      number: 4,
+      title: "Choose Your Plan",
+      description: "Select the plan that fits your needs (you can change later)",
+      icon: Sparkles,
+      fields: (
+        <div className="space-y-4">
+          <div className="grid gap-4">
+            {plans.map((plan) => {
+              const Icon = plan.icon;
+              const isSelected = formData.selectedPlan === plan.id;
+              return (
+                <Card
+                  key={plan.id}
+                  onClick={() => setFormData({ ...formData, selectedPlan: plan.id })}
+                  className={`p-4 cursor-pointer transition-all ${
+                    isSelected
+                      ? "border-primary ring-2 ring-primary/20"
+                      : "border-border hover:border-primary/50"
+                  } ${plan.popular ? "relative" : ""}`}
+                >
+                  {plan.popular && (
+                    <Badge className="absolute -top-2 left-4 bg-primary text-primary-foreground">
+                      Most Popular
+                    </Badge>
+                  )}
+                  <div className="flex items-start gap-4">
+                    <div
+                      className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                        isSelected ? "bg-primary text-primary-foreground" : "bg-muted"
+                      }`}
+                    >
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-semibold">{plan.name}</h3>
+                        <div className="text-right">
+                          <span className="text-lg font-bold">
+                            {plan.price === 0 ? "Free" : `$${plan.price}`}
+                          </span>
+                          {plan.price > 0 && (
+                            <span className="text-muted-foreground text-sm">/month</span>
+                          )}
+                        </div>
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {plan.description}
+                      </p>
+                      <ul className="mt-3 space-y-1">
+                        {plan.features.slice(0, 3).map((feature, i) => (
+                          <li key={i} className="flex items-center gap-2 text-sm">
+                            <Check className="w-4 h-4 text-primary flex-shrink-0" />
+                            <span>{feature}</span>
+                          </li>
+                        ))}
+                        {plan.features.length > 3 && (
+                          <li className="text-sm text-muted-foreground pl-6">
+                            +{plan.features.length - 3} more features
+                          </li>
+                        )}
+                      </ul>
+                    </div>
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+          <p className="text-sm text-muted-foreground text-center">
+            All paid plans include a 14-day free trial. No credit card required to start.
+          </p>
+        </div>
+      ),
+    },
   ];
 
   const currentStepData = steps[currentStep - 1];
@@ -120,8 +253,9 @@ export default function OnboardingPage() {
   };
 
   const handleComplete = async () => {
+    setIsSubmitting(true);
     try {
-      // Update user onboarding status
+      // Update user onboarding status with selected plan
       const response = await fetch("/api/user/onboarding", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -129,16 +263,39 @@ export default function OnboardingPage() {
           fullName: formData.fullName,
           role: formData.role,
           goals: formData.goals,
+          selectedPlan: formData.selectedPlan,
         }),
       });
 
       if (response.ok) {
+        // If user selected a paid plan, redirect to checkout
+        const selectedPlanData = plans.find((p) => p.id === formData.selectedPlan);
+        if (selectedPlanData && selectedPlanData.price > 0 && selectedPlanData.priceId) {
+          // Redirect to Stripe checkout
+          const checkoutResponse = await fetch("/api/stripe/checkout", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              priceId: selectedPlanData.priceId,
+            }),
+          });
+
+          const checkoutData = await checkoutResponse.json();
+          if (checkoutData.url) {
+            window.location.href = checkoutData.url;
+            return;
+          }
+        }
+        
+        // Otherwise go to dashboard
         router.push("/dashboard");
       }
     } catch (error) {
       console.error("Error completing onboarding:", error);
       // For now, redirect anyway
       router.push("/dashboard");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -150,6 +307,8 @@ export default function OnboardingPage() {
         return formData.role.trim().length > 0;
       case 3:
         return formData.goals.trim().length > 0;
+      case 4:
+        return formData.selectedPlan.length > 0;
       default:
         return false;
     }
@@ -157,96 +316,87 @@ export default function OnboardingPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
 
-  if (!user) {
-    router.push("/auth/signin");
-    return null;
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
-      <div className="w-full max-w-2xl">
-        {/* Progress Steps */}
-        <div className="mb-8 flex items-center justify-center">
-          {steps.map((step, index) => (
-            <div key={step.number} className="flex items-center">
-              <div
-                className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all ${
-                  step.number < currentStep
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : step.number === currentStep
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border bg-background text-muted-foreground"
-                }`}
-              >
-                {step.number < currentStep ? (
-                  <Check className="h-5 w-5" />
-                ) : (
-                  <span className="text-sm font-semibold">{step.number}</span>
-                )}
-              </div>
-              {index < steps.length - 1 && (
-                <div
-                  className={`w-16 h-0.5 mx-2 transition-all ${
-                    step.number < currentStep ? "bg-primary" : "bg-border"
-                  }`}
-                />
-              )}
-            </div>
-          ))}
+    <div className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-2xl mx-auto">
+        {/* Progress Bar */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium text-muted-foreground">
+              Step {currentStep} of {steps.length}
+            </span>
+            <span className="text-sm font-medium text-muted-foreground">
+              {Math.round((currentStep / steps.length) * 100)}%
+            </span>
+          </div>
+          <div className="w-full bg-muted rounded-full h-2">
+            <div
+              className="bg-primary h-2 rounded-full transition-all duration-300"
+              style={{ width: `${(currentStep / steps.length) * 100}%` }}
+            />
+          </div>
         </div>
 
-        {/* Card */}
-        <div className="bg-card/50 backdrop-blur-xl rounded-2xl shadow-2xl border border-border p-8">
+        {/* Step Content */}
+        <div className="bg-card rounded-2xl shadow-lg p-8 border">
           {/* Icon */}
-          <div className="flex justify-center mb-6">
-            <div className="p-4 rounded-full bg-primary/10">
-              <Icon className="h-8 w-8 text-primary" />
-            </div>
+          <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
+            <Icon className="w-8 h-8 text-primary" />
           </div>
 
-          {/* Title */}
-          <h2 className="text-2xl font-bold text-center text-foreground mb-2">
-            {currentStepData.title}
-          </h2>
-          <p className="text-center text-muted-foreground mb-8">
+          {/* Title & Description */}
+          <h1 className="text-2xl font-bold mb-2">{currentStepData.title}</h1>
+          <p className="text-muted-foreground mb-8">
             {currentStepData.description}
           </p>
 
           {/* Fields */}
-          <div className="mb-8">{currentStepData.fields}</div>
+          {currentStepData.fields}
 
-          {/* Buttons */}
-          <div className="flex gap-4">
+          {/* Navigation */}
+          <div className="flex gap-4 mt-8">
             {currentStep > 1 && (
-              <button
-                onClick={handleBack}
-                className="flex-1 px-6 py-3 rounded-lg border border-border bg-background text-foreground hover:bg-accent transition-colors font-medium"
-              >
+              <Button variant="outline" onClick={handleBack} className="flex-1">
                 Back
-              </button>
+              </Button>
             )}
-            <button
+            <Button
               onClick={handleNext}
-              disabled={!isStepValid()}
-              className="flex-1 px-6 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={!isStepValid() || isSubmitting}
+              className="flex-1"
             >
-              {currentStep === steps.length ? "Get Started" : "Continue"}
-            </button>
+              {isSubmitting ? (
+                <div className="flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  Setting up...
+                </div>
+              ) : currentStep === steps.length ? (
+                formData.selectedPlan === "free" ? (
+                  "Start Free"
+                ) : (
+                  "Start Free Trial"
+                )
+              ) : (
+                "Continue"
+              )}
+            </Button>
           </div>
+        </div>
 
-          {/* Step indicator */}
-          <div className="mt-6 text-center text-sm text-muted-foreground">
-            Step {currentStep} of {steps.length}
-          </div>
+        {/* Skip Option */}
+        <div className="text-center mt-6">
+          <button
+            onClick={() => router.push("/dashboard")}
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Skip for now →
+          </button>
         </div>
       </div>
     </div>

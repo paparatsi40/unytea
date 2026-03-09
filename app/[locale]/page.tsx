@@ -110,7 +110,7 @@ export default function Home() {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
               <Link
-                href="/dashboard/upgrade"
+                href="/auth/signup"
                 className="btn-hover-lift px-8 py-4 bg-primary text-primary-foreground rounded-xl text-lg font-semibold shadow-smooth-lg inline-flex items-center gap-2 group"
               >
                 Start Free Trial
@@ -639,7 +639,7 @@ export default function Home() {
             Join 10,000+ creators who are already engaging, teaching, and growing with Unytea.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/dashboard/upgrade">
+            <Link href="/auth/signup">
               <Button size="lg" className="btn-hover-lift px-8 py-6 text-lg">
                 Start Free Trial
                 <ArrowRight className="w-5 h-5 ml-2" />
