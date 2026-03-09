@@ -39,15 +39,16 @@ export async function POST(request: Request) {
         // Get user ID from metadata
         const userId = session.metadata?.userId;
         const customerId = session.customer;
+        const type = session.metadata?.type;
         
         if (!userId) {
           console.error("No userId found in session metadata");
           break;
         }
 
-        // The stripeCustomerId will be stored in the Subscription record
-        // when the subscription is created (invoice.payment_succeeded)
-        console.log(`✅ Checkout completed for user ${userId}, customer ${customerId}`);
+        // If this is a community membership checkout, the membership
+        // will be created when the subscription is created (invoice.payment_succeeded)
+        console.log(`✅ Checkout completed for user ${userId}, customer ${customerId}, type: ${type || 'platform'}`);
         break;
       }
 
@@ -56,61 +57,105 @@ export async function POST(request: Request) {
         const subscriptionId = invoice.subscription;
         const customerId = invoice.customer;
         
-        // Find existing subscription by stripeCustomerId to get userId
-        const existingSubscription = await prisma.subscription.findFirst({
-          where: { stripeCustomerId: customerId },
-          orderBy: { createdAt: 'desc' },
-        });
-
-        // If no existing subscription, we need to get userId from checkout session
-        // This should be handled by the checkout.session.completed event first
-        if (!existingSubscription) {
-          console.error(`No existing subscription found for customer: ${customerId}. User may not have completed checkout yet.`);
-          break;
-        }
-
-        const userId = existingSubscription.userId;
-
-        // Get subscription details from Stripe
+        // Get subscription details from Stripe to check metadata
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-        
-        // Get price ID from subscription
         const priceId = subscription.items.data[0]?.price.id;
         
-        // Find subscription plan by stripePriceId
-        const plan = await prisma.subscriptionPlan.findFirst({
-          where: { stripePriceId: priceId },
-        });
+        // Check if this is a community membership
+        const type = subscription.metadata?.type;
+        const communityId = subscription.metadata?.communityId;
+        const userId = subscription.metadata?.userId;
+        
+        if (type === "community_membership" && communityId && userId) {
+          // Handle community membership
+          // Check if user is already a member
+          const existingMember = await prisma.member.findFirst({
+            where: {
+              userId: userId,
+              communityId: communityId,
+            },
+          });
 
-        if (!plan) {
-          console.error(`No subscription plan found with price ID: ${priceId}`);
-          break;
+          if (existingMember) {
+            // Update existing member to ACTIVE
+            await prisma.member.update({
+              where: { id: existingMember.id },
+              data: { 
+                status: "ACTIVE",
+                role: existingMember.role === "PENDING" ? "MEMBER" : existingMember.role,
+              },
+            });
+          } else {
+            // Create new member
+            await prisma.member.create({
+              data: {
+                userId: userId,
+                communityId: communityId,
+                role: "MEMBER",
+                status: "ACTIVE",
+              },
+            });
+            
+            // Increment member count
+            await prisma.community.update({
+              where: { id: communityId },
+              data: { memberCount: { increment: 1 } },
+            });
+          }
+
+          console.log(`✅ Community membership created for user ${userId} in community ${communityId}`);
+        } else {
+          // Handle platform subscription (existing logic)
+          // Find existing subscription by stripeCustomerId to get userId
+          const existingSubscription = await prisma.subscription.findFirst({
+            where: { stripeCustomerId: customerId },
+            orderBy: { createdAt: 'desc' },
+          });
+
+          // If no existing subscription, we need to get userId from checkout session
+          // This should be handled by the checkout.session.completed event first
+          if (!existingSubscription) {
+            console.error(`No existing subscription found for customer: ${customerId}. User may not have completed checkout yet.`);
+            break;
+          }
+
+          const platformUserId = existingSubscription.userId;
+
+          // Find subscription plan by stripePriceId
+          const plan = await prisma.subscriptionPlan.findFirst({
+            where: { stripePriceId: priceId },
+          });
+
+          if (!plan) {
+            console.error(`No subscription plan found with price ID: ${priceId}`);
+            break;
+          }
+
+          // Update or create subscription in database
+          await prisma.subscription.upsert({
+            where: {
+              stripeSubscriptionId: subscriptionId,
+            },
+            create: {
+              userId: platformUserId,
+              planId: plan.id,
+              stripeSubscriptionId: subscriptionId,
+              stripeCustomerId: customerId,
+              status: "ACTIVE",
+              currentPeriodStart: new Date(subscription.current_period_start * 1000),
+              currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+              cancelAtPeriodEnd: subscription.cancel_at_period_end,
+            },
+            update: {
+              status: "ACTIVE",
+              currentPeriodStart: new Date(subscription.current_period_start * 1000),
+              currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+              cancelAtPeriodEnd: subscription.cancel_at_period_end,
+            },
+          });
+
+          console.log(`✅ Platform subscription ${subscriptionId} updated for user ${platformUserId}`);
         }
-
-        // Update or create subscription in database
-        await prisma.subscription.upsert({
-          where: {
-            stripeSubscriptionId: subscriptionId,
-          },
-          create: {
-            userId: userId,
-            planId: plan.id,
-            stripeSubscriptionId: subscriptionId,
-            stripeCustomerId: customerId,
-            status: "ACTIVE",
-            currentPeriodStart: new Date(subscription.current_period_start * 1000),
-            currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-            cancelAtPeriodEnd: subscription.cancel_at_period_end,
-          },
-          update: {
-            status: "ACTIVE",
-            currentPeriodStart: new Date(subscription.current_period_start * 1000),
-            currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-            cancelAtPeriodEnd: subscription.cancel_at_period_end,
-          },
-        });
-
-        console.log(`✅ Subscription ${subscriptionId} updated for user ${userId}`);
         break;
       }
 

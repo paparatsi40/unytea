@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useParams } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Settings, Palette, Users, Shield, Bell, Sliders, Eye } from "lucide-react";
+import { Settings, Palette, Users, Shield, Bell, Sliders, Eye, CreditCard } from "lucide-react";
 
 export default function CommunitySettingsLayout({
   children,
