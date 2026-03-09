@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { generateChatCompletion, AI_CONFIG, ChatMessage } from "@/lib/openai";
 import { prisma } from "@/lib/prisma";
+export const dynamic = 'force-dynamic';
+
+
+
+
+
 
 export async function POST(request: NextRequest) {
   try {

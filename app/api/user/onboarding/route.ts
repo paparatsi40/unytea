@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server"
 import { getCurrentUserId } from "@/lib/auth-utils"
 import { prisma } from "@/lib/prisma"
+export const dynamic = 'force-dynamic';
+
+
+
+
+
 
 export async function POST(request: Request) {
   try {

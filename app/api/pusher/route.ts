@@ -1,6 +1,12 @@
 import Pusher from "pusher";
 import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
+export const dynamic = 'force-dynamic';
+
+
+
+
+
 
 const pusher = new Pusher({
   appId: process.env.PUSHER_APP_ID!,

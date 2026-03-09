@@ -1,5 +1,11 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { getCurrentUserId } from "@/lib/auth-utils";
+export const dynamic = 'force-dynamic';
+
+
+
+
+
 
 const f = createUploadthing();
 

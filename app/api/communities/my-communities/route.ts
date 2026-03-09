@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { getCurrentUserId } from "@/lib/auth-utils";
 import { prisma } from "@/lib/prisma";
 
+// Force dynamic rendering - uses headers/cookies via auth()
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const userId = await getCurrentUserId();
