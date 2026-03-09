@@ -23,9 +23,6 @@ import {
   ArrowLeft,
   Sparkles,
 } from "lucide-react";
-  CheckCircle2,
-  Sparkles,
-} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
