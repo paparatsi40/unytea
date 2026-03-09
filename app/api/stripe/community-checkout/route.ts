@@ -77,8 +77,8 @@ export async function POST(req: Request) {
     // Get or create Stripe customer for user
     const customer = await getOrCreateStripeCustomer({
       userId: session.user.id,
-      userEmail: session.user.email!,
-      userName: session.user.name || undefined,
+      email: session.user.email!,
+      name: session.user.name || undefined,
     });
 
     // Check if community owner has Stripe Connect
