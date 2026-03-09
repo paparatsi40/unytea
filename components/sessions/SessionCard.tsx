@@ -1,17 +1,40 @@
 "use client";
 
-import { Calendar, Clock, Video, Users } from "lucide-react";
+import { useState } from "react";
+import { Calendar, Clock, Video, Users, Play } from "lucide-react";
 import { format } from "date-fns";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { startSession } from "@/app/actions/sessions";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 interface SessionCardProps {
   session: any;
   isPast?: boolean;
+  currentUserId?: string;
 }
 
-export function SessionCard({ session, isPast = false }: SessionCardProps) {
+export function SessionCard({ session, isPast = false, currentUserId }: SessionCardProps) {
+  const router = useRouter();
+  const [isStarting, setIsStarting] = useState(false);
+  
   const sessionDate = new Date(session.scheduledAt);
   const canJoin = !isPast && new Date() >= new Date(sessionDate.getTime() - 5 * 60 * 1000);
+  const isMentor = currentUserId && session.mentorId === currentUserId;
+
+  const handleStartSession = async () => {
+    setIsStarting(true);
+    const result = await startSession(session.id);
+    
+    if (result.success) {
+      toast.success("Session started!");
+      router.push(`/dashboard/sessions/${session.id}/room`);
+    } else {
+      toast.error(result.error || "Failed to start session");
+      setIsStarting(false);
+    }
+  };
 
   return (
     <div className="group relative overflow-hidden rounded-xl border border-border/50 bg-card p-6 transition-all hover:border-border hover:shadow-lg">
@@ -65,6 +88,17 @@ export function SessionCard({ session, isPast = false }: SessionCardProps) {
       </div>
 
       {/* Actions */}
+      {isMentor && session.status === "SCHEDULED" && (
+        <Button
+          onClick={handleStartSession}
+          disabled={isStarting}
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-700 mb-3"
+        >
+          <Play className="h-4 w-4" />
+          {isStarting ? "Starting..." : "Start Session"}
+        </Button>
+      )}
+
       {canJoin && session.status === "SCHEDULED" && (
         <Link
           href={`/dashboard/sessions/${session.id}/room`}

@@ -82,8 +82,8 @@ export default async function SessionsPage() {
           </div>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {upcoming.map((session) => (
-              <SessionCard key={session.id} session={session} />
+            {upcoming.map((s) => (
+              <SessionCard key={s.id} session={s} currentUserId={session?.user?.id} />
             ))}
           </div>
         )}
@@ -101,8 +101,8 @@ export default async function SessionsPage() {
           </div>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {past.map((session) => (
-              <SessionCard key={session.id} session={session} isPast />
+            {past.map((s) => (
+              <SessionCard key={s.id} session={s} isPast currentUserId={session?.user?.id} />
             ))}
           </div>
         </div>
