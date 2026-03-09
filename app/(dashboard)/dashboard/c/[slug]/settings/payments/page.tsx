@@ -57,21 +57,26 @@ export default function CommunityPaymentsPage() {
       const res = await fetch("/api/stripe/connect/onboard", {
         method: "POST",
       });
-      
+
       if (res.ok) {
         const { url } = await res.json();
         window.location.href = url;
       } else {
-        throw new Error("Failed to create onboarding link");
+        const errorData = await res.json();
+        console.error("Stripe Connect error:", errorData);
+        throw new Error(errorData.details || errorData.error || "Failed to create onboarding link");
       }
-    } catch (_error) {
+    } catch (error: any) {
+      console.error("Connect error:", error);
       toast({
         title: "Error",
-        description: "Failed to start Stripe Connect onboarding. Please try again.",
+        description: error.message || "Failed to connect with Stripe. Please try again.",
         variant: "destructive",
       });
     } finally {
       setIsConnecting(false);
+    }
+  };
     }
   };
 
