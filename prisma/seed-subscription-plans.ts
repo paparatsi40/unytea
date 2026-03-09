@@ -20,8 +20,7 @@ const plans = [
       "Direct messaging",
     ],
     stripePriceId: "", // Free plan doesn't need a Stripe price
-    maxCommunities: 3,
-    maxMembersPerCommunity: 50,
+    communityId: "", // Will be set later or use a default community
   },
   {
     name: "Professional",
@@ -39,8 +38,7 @@ const plans = [
       "AI assistance",
     ],
     stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PROFESSIONAL_PRICE_ID || "price_professional_placeholder",
-    maxCommunities: 1,
-    maxMembersPerCommunity: null, // Unlimited
+    communityId: "", // Will be set later or use a default community
   },
   {
     name: "Premium",
@@ -57,13 +55,40 @@ const plans = [
       "All Professional features",
     ],
     stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID || "price_premium_placeholder",
-    maxCommunities: 3,
-    maxMembersPerCommunity: null, // Unlimited
+    communityId: "", // Will be set later or use a default community
   },
 ];
 
 async function main() {
   console.log("🌱 Seeding subscription plans...\n");
+
+  // Find or create a system community for subscription plans
+  let systemCommunity = await prisma.community.findFirst({
+    where: { slug: "system-plans" },
+  });
+
+  if (!systemCommunity) {
+    console.log("🏗️  Creating system community for subscription plans...");
+    
+    // Find any user to be the owner
+    const firstUser = await prisma.user.findFirst();
+    
+    if (!firstUser) {
+      console.error("❌ No users found. Please create a user first.");
+      process.exit(1);
+    }
+
+    systemCommunity = await prisma.community.create({
+      data: {
+        name: "System Plans",
+        slug: "system-plans",
+        description: "System community for managing subscription plans",
+        ownerId: firstUser.id,
+        isPrivate: true,
+      },
+    });
+    console.log(`✅ Created system community: ${systemCommunity.id}`);
+  }
 
   for (const plan of plans) {
     const existingPlan = await prisma.subscriptionPlan.findFirst({
@@ -83,8 +108,7 @@ async function main() {
         interval: plan.interval,
         features: plan.features,
         stripePriceId: plan.stripePriceId || null,
-        maxCommunities: plan.maxCommunities,
-        maxMembersPerCommunity: plan.maxMembersPerCommunity,
+        communityId: systemCommunity.id,
       },
     });
 
