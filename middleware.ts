@@ -16,28 +16,28 @@ export default auth((req) => {
   const isLoggedIn = !!req.auth
   const pathname = req.nextUrl.pathname
 
-  // Skip i18n for API routes only
-  if (pathname.startsWith("/api") || pathname.startsWith("/_next")) {
+  // Skip i18n for API routes and dashboard routes
+  if (pathname.startsWith("/api") || 
+      pathname.startsWith("/_next") ||
+      pathname.startsWith("/dashboard") ||
+      pathname.startsWith("/onboarding")) {
+    
+    // Check auth for protected routes
+    const isProtectedRoute = 
+      pathname.startsWith("/dashboard") ||
+      pathname.startsWith("/onboarding")
+
+    if (isProtectedRoute && !isLoggedIn) {
+      return NextResponse.redirect(new URL("/auth/signin", req.url))
+    }
+    
     return NextResponse.next()
   }
 
-  // Apply i18n middleware to ALL routes (including auth and dashboard)
+  // Apply i18n middleware to auth and public routes
   const intlResponse = intlMiddleware(req)
   
-  // If i18n redirected/rewrote, respect that
-  if (intlResponse.status !== 200 || intlResponse.headers.get("x-middleware-rewrite")) {
-    // Continue with auth checks on the rewritten request
-  }
-  
-  // Check if we need auth redirect
-  const isProtectedRoute = 
-    pathname.startsWith("/dashboard") ||
-    pathname.startsWith("/onboarding")
-
-  if (isProtectedRoute && !isLoggedIn) {
-    return NextResponse.redirect(new URL("/auth/signin", req.url))
-  }
-
+  // Redirect authenticated users away from auth pages
   if (pathname.startsWith("/auth/") && isLoggedIn && !pathname.includes("callback")) {
     return NextResponse.redirect(new URL("/dashboard", req.url))
   }
