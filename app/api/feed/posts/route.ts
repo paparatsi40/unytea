@@ -83,23 +83,36 @@ export async function GET() {
     });
 
     // Format posts for the feed
-    const formattedPosts = posts.map((post) => ({
-      id: post.id,
-      author: {
-        name: post.author.name || "Anonymous",
-        avatar: post.author.image || "",
-        role: "Member",
-        community: post.community.name,
-      },
-      content: post.content,
-      image: post.images?.[0] || null,
-      likes: post._count.reactions,
-      comments: post._count.comments,
-      shares: 0,
-      timestamp: formatTimestamp(post.createdAt),
-      isLiked: post.reactions.length > 0,
-      tags: post.tags || [],
-    }));
+    const formattedPosts = posts.map((post) => {
+      // Parse attachments to get images
+      let image = null;
+      try {
+        const attachments = post.attachments as any;
+        if (attachments && attachments.images && attachments.images.length > 0) {
+          image = attachments.images[0];
+        }
+      } catch {
+        // Ignore parsing errors
+      }
+      
+      return {
+        id: post.id,
+        author: {
+          name: post.author.name || "Anonymous",
+          avatar: post.author.image || "",
+          role: "Member",
+          community: post.community.name,
+        },
+        content: post.content,
+        image: image,
+        likes: post._count.reactions,
+        comments: post._count.comments,
+        shares: 0,
+        timestamp: formatTimestamp(post.createdAt),
+        isLiked: post.reactions.length > 0,
+        tags: [],
+      };
+    });
 
     return NextResponse.json({ posts: formattedPosts });
   } catch (error: any) {

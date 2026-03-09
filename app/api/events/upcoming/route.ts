@@ -26,20 +26,13 @@ export async function GET() {
     const mentorSessions = await prisma.mentorSession.findMany({
       where: {
         mentorId: userId,
-        startTime: {
+        scheduledAt: {
           gte: now,
         },
-        status: "scheduled",
-      },
-      include: {
-        community: {
-          select: {
-            name: true,
-          },
-        },
+        status: "SCHEDULED",
       },
       orderBy: {
-        startTime: "asc",
+        scheduledAt: "asc",
       },
       take: 5,
     });
@@ -48,20 +41,13 @@ export async function GET() {
     const menteeSessions = await prisma.mentorSession.findMany({
       where: {
         menteeId: userId,
-        startTime: {
+        scheduledAt: {
           gte: now,
         },
-        status: "scheduled",
-      },
-      include: {
-        community: {
-          select: {
-            name: true,
-          },
-        },
+        status: "SCHEDULED",
       },
       orderBy: {
-        startTime: "asc",
+        scheduledAt: "asc",
       },
       take: 5,
     });
@@ -69,8 +55,8 @@ export async function GET() {
     // Combine and format events
     const allSessions = [...mentorSessions, ...menteeSessions];
     
-    const events = allSessions.map((session) => {
-      const startTime = new Date(session.startTime);
+    const events = allSessions.map((s) => {
+      const startTime = new Date(s.scheduledAt);
       const diff = startTime.getTime() - now.getTime();
       const hours = Math.floor(diff / 3600000);
       const days = Math.floor(diff / 86400000);
@@ -87,11 +73,11 @@ export async function GET() {
       }
 
       return {
-        id: session.id,
-        title: session.title,
+        id: s.id,
+        title: s.title,
         type: "session" as const,
         time: timeLabel,
-        community: session.community?.name,
+        community: null, // MentorSession doesn't have community relation
       };
     });
 

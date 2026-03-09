@@ -45,7 +45,7 @@ interface PurchaseStatus {
 
 export default function CourseDetailPage() {
   const params = useParams();
-  const courseId = params.courseId as string;
+  const courseId = params?.courseId as string | undefined;
   const { toast } = useToast();
 
   const [course, setCourse] = useState<Course | null>(null);
@@ -54,7 +54,9 @@ export default function CourseDetailPage() {
   const [isPurchasing, setIsPurchasing] = useState(false);
 
   useEffect(() => {
-    loadCourseData();
+    if (courseId) {
+      loadCourseData();
+    }
   }, [courseId]);
 
   const loadCourseData = async () => {

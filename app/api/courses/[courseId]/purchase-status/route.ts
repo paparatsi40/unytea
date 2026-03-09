@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
  * GET /api/courses/[courseId]/purchase-status
  */
 export async function GET(
-  req: Request,
+  _req: Request,
   { params }: { params: { courseId: string } }
 ) {
   try {

@@ -46,7 +46,7 @@ export async function GET() {
         },
         lessonProgress: {
           where: {
-            completed: true,
+            isCompleted: true,
           },
           select: {
             lessonId: true,
