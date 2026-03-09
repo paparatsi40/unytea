@@ -29,10 +29,21 @@ export default auth((req) => {
   const isLoggedIn = !!req.auth
   const pathname = req.nextUrl.pathname
 
-  // 1) Aplicar i18n SIEMPRE (excepto assets/api via matcher)
-  const intlResponse = intlMiddleware(req)
+  // Si la ruta no tiene locale, dejar que next-intl la maneje primero
+  const firstSegment = pathname.split("/")[1]
+  const hasLocale = (locales as readonly string[]).includes(firstSegment)
 
-  // 2) Normalizar ruta para checks (sin /en, /es, /fr)
+  // Si NO tiene locale (ej: /auth/signin), aplicar intlMiddleware primero
+  // que redirigirá a /en/auth/signin
+  if (!hasLocale) {
+    const intlResponse = intlMiddleware(req)
+    // Si next-intl redirige (por falta de locale), retornar esa respuesta
+    if (intlResponse.status === 307 || intlResponse.status === 308) {
+      return intlResponse
+    }
+  }
+
+  // Ahora procesar con locale detectado
   const locale = getLocaleFromPath(pathname)
   const normalizedPath = stripLocale(pathname)
 
@@ -40,18 +51,23 @@ export default auth((req) => {
   const isProtectedRoute =
     normalizedPath.startsWith("/dashboard") || normalizedPath.startsWith("/onboarding")
 
-  // 3) Protección: si no hay sesión y es ruta protegida -> /{locale}/auth/signin
+  // Protección: ruta protegida sin sesión -> /{locale}/auth/signin
   if (isProtectedRoute && !isLoggedIn) {
     return NextResponse.redirect(new URL(`/${locale}/auth/signin`, req.url))
   }
 
-  // 4) Si ya está logueado y entra a /auth/* (excepto callback) -> /{locale}/dashboard
+  // Ya logueado en auth -> /{locale}/dashboard
   if (isAuthRoute && isLoggedIn && !normalizedPath.includes("callback")) {
     return NextResponse.redirect(new URL(`/${locale}/dashboard`, req.url))
   }
 
-  // 5) Continuar con headers/cookies de next-intl
-  return intlResponse
+  // Para rutas con locale, aplicar intlMiddleware para headers/cookies
+  if (hasLocale) {
+    return intlMiddleware(req)
+  }
+
+  // Ruta sin locale que no necesita redirect (no debería pasar)
+  return NextResponse.next()
 })
 
 export const config = {
