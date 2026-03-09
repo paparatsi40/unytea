@@ -17,10 +17,7 @@ import {
   MoreHorizontal,
   Clock,
   Play,
-  CheckCircle,
-  CreditCard,
-  Loader2,
-  ArrowLeft,
+  CheckCircle2,
   Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -144,7 +141,7 @@ export default function DashboardPage() {
         });
         loadDashboardData();
       }
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: "Error",
         description: "Failed to create post. Please try again.",
