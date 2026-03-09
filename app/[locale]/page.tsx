@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   Sparkles,
   LayoutDashboard,
@@ -31,7 +30,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function Home() {
   const [showDemoModal, setShowDemoModal] = useState(false);
-  const router = useRouter();
   // const t = await getTranslations("landing");
 
   return (
