@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { LanguageSelector } from "@/components/LanguageSelector";
-import { getTranslations } from "next-intl/server";
 import {
   Sparkles,
   LayoutDashboard,
