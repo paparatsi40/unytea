@@ -40,6 +40,12 @@ export default function CommunitySettingsLayout({
       description: "Manage roles and permissions",
     },
     {
+      name: "Payments",
+      href: `/dashboard/c/${slug}/settings/payments`,
+      icon: CreditCard,
+      description: "Configure membership pricing",
+    },
+    {
       name: "Moderation",
       href: `/dashboard/c/${slug}/settings/moderation`,
       icon: Shield,
