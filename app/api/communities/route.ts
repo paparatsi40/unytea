@@ -37,7 +37,7 @@ export async function POST(req: Request) {
     });
 
     if (existingCommunity) {
-      slug = ${slug}-;
+      slug = `${slug}-${Date.now()}`;
     }
 
     console.log("? Creating with slug:", slug);
