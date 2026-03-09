@@ -14,7 +14,6 @@ import {
   Clock,
   FileText,
   Video,
-  Image as ImageIcon,
   Music,
   Link as LinkIcon,
   Share2,
@@ -39,7 +38,6 @@ const resourceTypeIcons: Record<ResourceType, typeof FileText> = {
   DOCUMENT: FileText,
   VIDEO: Video,
   AUDIO: Music,
-  IMAGE: ImageIcon,
   LINK: LinkIcon,
 };
 
@@ -47,7 +45,6 @@ const resourceTypeLabels: Record<ResourceType, string> = {
   DOCUMENT: "Documento",
   VIDEO: "Video",
   AUDIO: "Audio",
-  IMAGE: "Imagen",
   LINK: "Enlace",
 };
 
@@ -55,7 +52,6 @@ const resourceTypeColors: Record<ResourceType, string> = {
   DOCUMENT: "from-blue-500 to-blue-600",
   VIDEO: "from-red-500 to-red-600",
   AUDIO: "from-green-500 to-green-600",
-  IMAGE: "from-purple-500 to-purple-600",
   LINK: "from-orange-500 to-orange-600",
 };
 
@@ -347,16 +343,6 @@ export default function ResourceDetailPage() {
                 <audio src={resource.fileUrl} controls className="w-full">
                   Tu navegador no soporta el elemento audio.
                 </audio>
-              </div>
-            )}
-
-            {resource.type === "IMAGE" && resource.fileUrl && (
-              <div className="w-full rounded-xl overflow-hidden border mb-6">
-                <img
-                  src={resource.fileUrl}
-                  alt={resource.title}
-                  className="w-full h-auto max-h-[600px] object-contain"
-                />
               </div>
             )}
 
