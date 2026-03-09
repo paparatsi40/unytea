@@ -8,69 +8,55 @@ const defaultLocale = "en"
 const intlMiddleware = createIntlMiddleware({
   locales: [...locales],
   defaultLocale,
-  localePrefix: "always",
+  localePrefix: "always"
 })
 
 function getLocaleFromPath(pathname: string) {
-  const found = locales.find(
-    (l) => pathname === `/${l}` || pathname.startsWith(`/${l}/`)
-  )
-  return found ?? defaultLocale
+  const seg = pathname.split("/")[1]
+  return (locales as readonly string[]).includes(seg) ? seg : defaultLocale
 }
 
-function stripLocale(pathname: string, locale: string) {
-  if (pathname === `/${locale}`) return "/"
-  if (pathname.startsWith(`/${locale}/`)) return pathname.slice(locale.length + 1)
+function stripLocale(pathname: string) {
+  const seg = pathname.split("/")[1]
+  if ((locales as readonly string[]).includes(seg)) {
+    const rest = pathname.split("/").slice(2).join("/")
+    return "/" + rest
+  }
   return pathname
 }
 
 export default auth((req) => {
+  const isLoggedIn = !!req.auth
   const pathname = req.nextUrl.pathname
 
-  // No tocar assets / next internals / api
-  if (
-    pathname.startsWith("/api") ||
-    pathname.startsWith("/_next") ||
-    pathname === "/favicon.ico"
-  ) {
-    return NextResponse.next()
-  }
-
-  // Primero aplica i18n (para que siempre exista /en, /es, /fr)
+  // 1) Aplicar i18n SIEMPRE (excepto assets/api via matcher)
   const intlResponse = intlMiddleware(req)
 
-  const isLoggedIn = !!req.auth
+  // 2) Normalizar ruta para checks (sin /en, /es, /fr)
   const locale = getLocaleFromPath(pathname)
-  const pathnameWithoutLocale = stripLocale(pathname, locale)
+  const normalizedPath = stripLocale(pathname)
 
+  const isAuthRoute = normalizedPath.startsWith("/auth")
   const isProtectedRoute =
-    pathnameWithoutLocale.startsWith("/dashboard") ||
-    pathnameWithoutLocale.startsWith("/onboarding")
+    normalizedPath.startsWith("/dashboard") || normalizedPath.startsWith("/onboarding")
 
+  // 3) Protección: si no hay sesión y es ruta protegida -> /{locale}/auth/signin
   if (isProtectedRoute && !isLoggedIn) {
-    const url = req.nextUrl.clone()
-    url.pathname = `/${locale}/auth/signin`
-    // opcional: callback
-    url.searchParams.set("callbackUrl", pathname)
-    return NextResponse.redirect(url)
+    return NextResponse.redirect(new URL(`/${locale}/auth/signin`, req.url))
   }
 
-  if (
-    pathnameWithoutLocale.startsWith("/auth/") &&
-    isLoggedIn &&
-    !pathnameWithoutLocale.includes("callback")
-  ) {
-    const url = req.nextUrl.clone()
-    url.pathname = `/${locale}/dashboard`
-    return NextResponse.redirect(url)
+  // 4) Si ya está logueado y entra a /auth/* (excepto callback) -> /{locale}/dashboard
+  if (isAuthRoute && isLoggedIn && !normalizedPath.includes("callback")) {
+    return NextResponse.redirect(new URL(`/${locale}/dashboard`, req.url))
   }
 
+  // 5) Continuar con headers/cookies de next-intl
   return intlResponse
 })
 
 export const config = {
   matcher: [
-    // Excluye archivos con extensión y rutas internas típicas
-    "/((?!api|_next|favicon.ico|.*\\..*).*)",
-  ],
+    // Excluye Next.js internals, assets estáticos e API
+    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"
+  ]
 }
