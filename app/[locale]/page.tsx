@@ -4,9 +4,12 @@ import { useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { useSession } from "next-auth/react";
 import {
   Sparkles,
   LayoutDashboard,
+  LogIn,
+  UserPlus,
   ArrowRight,
   Play,
   Star,
@@ -33,6 +36,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 export default function Home() {
   const [showDemoModal, setShowDemoModal] = useState(false);
   const t = useTranslations("landing");
+  const authT = useTranslations("auth");
+  const { data: session } = useSession();
+  const isLoggedIn = !!session?.user;
 
   return (
     <div className="min-h-screen bg-background">
@@ -61,13 +67,32 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-3">
             <LanguageSelector />
-            <Link
-              href="/dashboard"
-              className="btn-hover-lift px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium shadow-smooth flex items-center gap-2"
-            >
-              <LayoutDashboard className="w-4 h-4" />
-              {t("nav.goToDashboard")}
-            </Link>
+            {isLoggedIn ? (
+              <Link
+                href="/dashboard"
+                className="btn-hover-lift px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium shadow-smooth flex items-center gap-2"
+              >
+                <LayoutDashboard className="w-4 h-4" />
+                {t("nav.goToDashboard")}
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/auth/signin"
+                  className="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors"
+                >
+                  <LogIn className="w-4 h-4" />
+                  {authT("signIn")}
+                </Link>
+                <Link
+                  href="/auth/signup"
+                  className="btn-hover-lift px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium shadow-smooth flex items-center gap-2"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  {authT("signUp")}
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </nav>
