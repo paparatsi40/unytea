@@ -641,38 +641,38 @@ export default function Home() {
       <section id="faq" className="py-20 px-4 bg-muted/30">
         <div className="container mx-auto max-w-3xl">
           <div className="text-center mb-16">
-            <Badge className="mb-4">FAQ</Badge>
-            <h2 className="text-4xl font-bold mb-4">Common Questions</h2>
+            <Badge className="mb-4">{t("faq.badge")}</Badge>
+            <h2 className="text-4xl font-bold mb-4">{t("faq.title")}</h2>
             <p className="text-xl text-muted-foreground">
-              Everything you need to know about Unytea
+              {t("faq.subtitle")}
             </p>
           </div>
 
           <div className="space-y-4">
             {[
               {
-                question: "Can I migrate from Skool or other platforms?",
-                answer: "Absolutely! We offer free migration assistance from Skool, Circle, Facebook Groups, and other platforms. Our team will help you transfer your members, content, and data seamlessly.",
+                question: t("faq.q1"),
+                answer: t("faq.a1"),
               },
               {
-                question: "Do I need technical skills to use Unytea?",
-                answer: "Not at all! Unytea is designed to be user-friendly for everyone. Our drag-and-drop builder and intuitive interface mean you can set up your community in minutes, no coding required.",
+                question: t("faq.q2"),
+                answer: t("faq.a2"),
               },
               {
-                question: "How does the 14-day free trial work?",
-                answer: "You get full access to all Professional features for 14 days. No credit card required to start. At the end of your trial, choose the plan that fits your needs or continue with our free tier.",
+                question: t("faq.q3"),
+                answer: t("faq.a3"),
               },
               {
-                question: "Can I monetize my community?",
-                answer: "Yes! Unytea has built-in monetization features including paid memberships, course sales, and subscription billing. We integrate with Stripe for secure payment processing with just 5% platform fee.",
+                question: t("faq.q4"),
+                answer: t("faq.a4"),
               },
               {
-                question: "What support options are available?",
-                answer: "Free plans include community support. Professional plans get priority email support with 24-hour response time. Premium plans get dedicated support with 4-hour response time and a dedicated success manager.",
+                question: t("faq.q5"),
+                answer: t("faq.a5"),
               },
               {
-                question: "Is my data secure?",
-                answer: "Security is our top priority. We're SOC 2 compliant, GDPR ready, and use enterprise-grade encryption. Your data is stored securely and never shared with third parties.",
+                question: t("faq.q6"),
+                answer: t("faq.a6"),
               },
             ].map((faq, i) => (
               <FAQItem key={i} question={faq.question} answer={faq.answer} />
@@ -685,17 +685,15 @@ export default function Home() {
       <section className="py-20 px-4">
         <div className="container mx-auto max-w-4xl text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Ready to Build Your
-            <br />
-            <span className="gradient-text">Dream Community?</span>
+            {t("cta.title")}
           </h2>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Join 10,000+ creators who are already engaging, teaching, and growing with Unytea.
+            {t("cta.subtitle")}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/auth/signup">
               <Button size="lg" className="btn-hover-lift px-8 py-6 text-lg">
-                Start Free Trial
+                {t("cta.primary")}
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
@@ -706,11 +704,11 @@ export default function Home() {
               onClick={() => setShowDemoModal(true)}
             >
               <Play className="w-5 h-5 mr-2" />
-              Watch Demo
+              {t("cta.secondary")}
             </Button>
           </div>
           <p className="text-sm text-muted-foreground mt-6">
-            No credit card required • 14-day free trial • Cancel anytime
+            {t("cta.guarantee")}
           </p>
         </div>
       </section>
@@ -727,7 +725,7 @@ export default function Home() {
                 <span className="text-xl font-bold">Unytea</span>
               </div>
               <p className="text-sm text-muted-foreground mb-4">
-                The modern platform for creators to build, engage, and monetize their communities.
+                {t("footer.description")}
               </p>
               <div className="flex gap-4">
                 {["twitter", "linkedin", "youtube", "instagram"].map((social) => (

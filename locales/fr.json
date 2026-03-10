@@ -135,6 +135,7 @@
       "guarantee": "Tous les plans incluent un essai gratuit de 14 jours. Aucune carte de crédit requise."
     },
     "faq": {
+      "badge": "FAQ",
       "title": "Questions Courantes",
       "subtitle": "Tout ce que vous devez savoir sur Unytea",
       "q1": "Puis-je migrer depuis Skool ou d'autres plateformes ?",

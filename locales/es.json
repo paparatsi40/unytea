@@ -135,6 +135,7 @@
       "guarantee": "Todos los planes incluyen prueba de 14 días. No requiere tarjeta de crédito."
     },
     "faq": {
+      "badge": "FAQ",
       "title": "Preguntas Frecuentes",
       "subtitle": "Todo lo que necesitas saber sobre Unytea",
       "q1": "¿Puedo migrar desde Skool u otras plataformas?",

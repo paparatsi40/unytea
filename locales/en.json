@@ -135,6 +135,7 @@
       "guarantee": "All plans include a 14-day free trial. No credit card required."
     },
     "faq": {
+      "badge": "FAQ",
       "title": "Common Questions",
       "subtitle": "Everything you need to know about Unytea",
       "q1": "Can I migrate from Skool or other platforms?",
