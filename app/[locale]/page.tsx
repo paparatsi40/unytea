@@ -81,24 +81,24 @@ export default function Home() {
         <div className="container mx-auto px-4 relative z-10 py-20 lg:py-28">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center max-w-7xl mx-auto">
             {/* Left Column - Content */}
-            <div className="text-center lg:text-left">
+            <div className="text-center lg:text-left animate-fade-in-up">
               {/* Trust Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6 animate-fade-in" style={{ animationDelay: '0.2s' }}>
                 <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                 <span className="text-sm font-medium">{t("hero.badge")}</span>
               </div>
 
               {/* Main Headline */}
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
                 {t("hero.title")}
               </h1>
 
-              <p className="text-lg md:text-xl text-muted-foreground mb-6 max-w-xl mx-auto lg:mx-0">
+              <p className="text-lg md:text-xl text-muted-foreground mb-6 max-w-xl mx-auto lg:mx-0 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
                 {t("hero.description")}
               </p>
 
               {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start items-center mb-6">
+              <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start items-center mb-6 animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
                 <Link
                   href="/auth/signup"
                   className="btn-hover-lift px-6 py-3 bg-primary text-primary-foreground rounded-xl text-base font-semibold shadow-smooth-lg inline-flex items-center gap-2 group"
@@ -140,8 +140,8 @@ export default function Home() {
             </div>
 
             {/* Right Column - Dashboard Mockup */}
-            <div className="relative hidden lg:block">
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-border/50 bg-card">
+            <div className="relative hidden lg:block animate-slide-in-right" style={{ animationDelay: '0.6s' }}>
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-border/50 bg-card animate-float">
                 {/* Mockup Header */}
                 <div className="flex items-center gap-2 px-4 py-3 border-b border-border/50 bg-muted/50">
                   <div className="flex gap-1.5">
