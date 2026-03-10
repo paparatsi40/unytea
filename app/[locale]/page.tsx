@@ -59,6 +59,7 @@ export default function Home() {
             </Link>
           </div>
           <div className="flex items-center gap-3">
+            <LanguageSelector />
             <Link
               href="/dashboard"
               className="btn-hover-lift px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium shadow-smooth flex items-center gap-2"
