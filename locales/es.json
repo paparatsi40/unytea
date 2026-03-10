@@ -202,34 +202,39 @@
     },
     "quickActions": {
       "title": "Acciones Rápidas",
-      "createPost": "Crear Post",
-      "startCourse": "Iniciar Curso",
+      "createPost": "Crear Publicación",
+      "continueLearning": "Continuar Aprendiendo",
       "newMessage": "Nuevo Mensaje",
       "scheduleSession": "Programar Sesión"
     },
-    "upcomingSessions": {
-      "title": "Próximas Sesiones",
-      "empty": "No hay sesiones próximas",
-      "join": "Unirse"
-    },
-    "recentActivity": {
-      "title": "Actividad Reciente",
-      "empty": "No hay actividad reciente"
-    },
-    "courseProgress": {
+    "continueLearning": {
       "title": "Continuar Aprendiendo",
       "empty": "No hay cursos en progreso",
-      "continue": "Continuar"
+      "progress": "Completado"
     },
-    "achievements": {
-      "title": "Logros Recientes",
-      "empty": "Desbloquea tu primer logro"
+    "feed": {
+      "createPost": "Crear Publicación",
+      "placeholder": "¿Qué tienes en mente? Comparte con tu comunidad...",
+      "post": "Publicar",
+      "empty": "Aún no hay publicaciones",
+      "beFirst": "¡Sé el primero en compartir algo con tu comunidad!",
+      "loadMore": "Cargar más"
     },
-    "trending": {
-      "title": "Comunidades Tendencia",
+    "upcomingEvents": {
+      "title": "Próximos Eventos",
+      "empty": "No hay eventos próximos",
       "join": "Unirse"
     },
-    "events": {
+    "trendingCommunities": {
+      "title": "Comunidades en Tendencia",
+      "join": "Unirse",
+      "viewAll": "Ver todas"
+    },
+    "dailyStreak": {
+      "title": "Racha Diaria",
+      "days": "días"
+    }
+  },
       "title": "Próximos Eventos",
       "empty": "No hay eventos próximos"
     },

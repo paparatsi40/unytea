@@ -203,13 +203,38 @@
     "quickActions": {
       "title": "Quick Actions",
       "createPost": "Create Post",
-      "startCourse": "Start Course",
+      "continueLearning": "Continue Learning",
       "newMessage": "New Message",
       "scheduleSession": "Schedule Session"
     },
-    "upcomingSessions": {
-      "title": "Upcoming Sessions",
-      "empty": "No upcoming sessions",
+    "continueLearning": {
+      "title": "Continue Learning",
+      "empty": "No courses in progress",
+      "progress": "Complete"
+    },
+    "feed": {
+      "createPost": "Create Post",
+      "placeholder": "What's on your mind? Share with your community...",
+      "post": "Post",
+      "empty": "No posts yet",
+      "beFirst": "Be the first to share something with your community!",
+      "loadMore": "Load more"
+    },
+    "upcomingEvents": {
+      "title": "Upcoming Events",
+      "empty": "No upcoming events",
+      "join": "Join"
+    },
+    "trendingCommunities": {
+      "title": "Trending Communities",
+      "join": "Join",
+      "viewAll": "View all"
+    },
+    "dailyStreak": {
+      "title": "Daily Streak",
+      "days": "days"
+    }
+  },
       "join": "Join"
     },
     "recentActivity": {

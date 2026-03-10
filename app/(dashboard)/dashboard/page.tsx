@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -73,6 +74,7 @@ interface Achievement {
 export default function DashboardPage() {
   const { user } = useCurrentUser();
   const { toast } = useToast();
+  const t = useTranslations("dashboard");
   const [posts, setPosts] = useState<Post[]>([]);
   const [courses, setCourses] = useState<CourseProgress[]>([]);
   const [events, setEvents] = useState<UpcomingEvent[]>([]);
@@ -176,7 +178,7 @@ export default function DashboardPage() {
       {/* Welcome Section */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-foreground">
-          Welcome back{user?.name ? `, ${user.name.split(' ')[0]}` : ''}! 👋
+          {t("welcome")}{user?.name ? `, ${user.name.split(' ')[0]}` : ''}! 👋
         </h1>
         <p className="mt-2 text-muted-foreground">
           Here's what's happening in your communities today.
@@ -189,13 +191,13 @@ export default function DashboardPage() {
           {/* Quick Actions */}
           <Card>
             <CardHeader className="pb-3">
-              <h3 className="font-semibold text-foreground">Quick Actions</h3>
+              <h3 className="font-semibold text-foreground">{t("quickActions.title")}</h3>
             </CardHeader>
             <CardContent className="space-y-2">
               <Link href="/dashboard/communities">
                 <Button variant="outline" className="w-full justify-start gap-2">
                   <Plus className="h-4 w-4" />
-                  Create Post
+                  {t("quickActions.createPost")}
                 </Button>
               </Link>
               <Link href="/dashboard/courses">

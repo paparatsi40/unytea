@@ -163,7 +163,11 @@
       "product": "Produit",
       "resources": "Ressources",
       "company": "Entreprise",
-      "legal": "Mentions Légales",
+      "legal": {
+        "privacy": "Politique de Confidentialité",
+        "terms": "Conditions d'Utilisation",
+        "cookies": "Politique des Cookies"
+      },
       "rights": "Tous droits réservés.",
       "links": {
         "features": "Fonctionnalités",
@@ -178,11 +182,6 @@
         "careers": "Carrières",
         "contact": "Contact",
         "privacy": "Confidentialité"
-      },
-      "legal": {
-        "privacy": "Politique de Confidentialité",
-        "terms": "Conditions d'Utilisation",
-        "cookies": "Politique des Cookies"
       }
     },
     "demoModal": {
@@ -193,7 +192,7 @@
   },
   "dashboard": {
     "title": "Tableau de Bord",
-    "welcome": "Bienvenue de retour",
+    "welcome": "Bienvenue",
     "stats": {
       "communities": "Communautés",
       "sessions": "Sessions",
@@ -202,46 +201,35 @@
     },
     "quickActions": {
       "title": "Actions Rapides",
-      "createPost": "Créer un Post",
-      "startCourse": "Commencer un Cours",
+      "createPost": "Créer Publication",
+      "continueLearning": "Continuer Apprendre",
       "newMessage": "Nouveau Message",
-      "scheduleSession": "Programmer une Session"
+      "scheduleSession": "Programmer Session"
     },
-    "upcomingSessions": {
-      "title": "Sessions à Venir",
-      "empty": "Pas de sessions à venir",
-      "join": "Rejoindre"
-    },
-    "recentActivity": {
-      "title": "Activité Récente",
-      "empty": "Pas d'activité récente"
-    },
-    "courseProgress": {
-      "title": "Continuer l'Apprentissage",
-      "empty": "Pas de cours en cours",
-      "continue": "Continuer"
-    },
-    "achievements": {
-      "title": "Réalisations Récentes",
-      "empty": "Débloquez votre première réalisation"
-    },
-    "trending": {
-      "title": "Communautés Tendance",
-      "join": "Rejoindre"
-    },
-    "events": {
-      "title": "Événements à Venir",
-      "empty": "Pas d'événements à venir"
+    "continueLearning": {
+      "title": "Continuer Apprendre",
+      "empty": "Aucun cours en cours",
+      "progress": "Terminé"
     },
     "feed": {
-      "title": "Fil Communautaire",
-      "createPlaceholder": "À quoi pensez-vous ?",
+      "createPost": "Créer Publication",
+      "placeholder": "Qu'avez-vous en tête ? Partagez avec votre communauté...",
       "post": "Publier",
-      "like": "J'aime",
-      "comment": "Commenter",
-      "share": "Partager"
+      "empty": "Aucune publication encore",
+      "beFirst": "Soyez le premier à partager quelque chose !",
+      "loadMore": "Charger plus"
     },
-    "streak": {
+    "upcomingEvents": {
+      "title": "Événements à Venir",
+      "empty": "Aucun événement à venir",
+      "join": "Rejoindre"
+    },
+    "trendingCommunities": {
+      "title": "Communautés Tendance",
+      "join": "Rejoindre",
+      "viewAll": "Voir tout"
+    },
+    "dailyStreak": {
       "title": "Série Quotidienne",
       "days": "jours"
     }
