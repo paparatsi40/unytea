@@ -69,92 +69,149 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Hero Section with Video Background */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Video Background */}
-        <div className="absolute inset-0 z-0">
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="w-full h-full object-cover"
-            poster="/hero-poster.jpg"
-          >
-            <source src="/hero-video.mp4" type="video/mp4" />
-          </video>
-          <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background" />
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-purple-600/20" />
-        </div>
+      {/* Hero Section - Compact with 2-column layout */}
+      <section className="relative min-h-[85vh] flex items-center overflow-hidden">
+        {/* Background Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-purple-600/5 to-background" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background/80" />
 
-        <div className="container mx-auto px-4 relative z-10 pt-32 pb-20">
-          <div className="max-w-4xl mx-auto text-center">
-            {/* Trust Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-8 animate-pulse">
-              <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-              <span className="text-sm font-medium">Trusted by 10,000+ creators worldwide</span>
-            </div>
+        <div className="container mx-auto px-4 relative z-10 py-20 lg:py-28">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center max-w-7xl mx-auto">
+            {/* Left Column - Content */}
+            <div className="text-center lg:text-left">
+              {/* Trust Badge */}
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
+                <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                <span className="text-sm font-medium">Trusted by 10,000+ creators</span>
+              </div>
 
-            {/* Main Headline */}
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              Build Your
-              <br />
-              <span className="gradient-text">Dream Community</span>
-            </h1>
+              {/* Main Headline */}
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
+                Build Your
+                <br />
+                <span className="gradient-text">Dream Community</span>
+              </h1>
 
-            <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              The all-in-one platform for creators, coaches, and educators. 
-              Engage, teach, and monetize your audience—without limits.
-            </p>
+              <p className="text-lg md:text-xl text-muted-foreground mb-6 max-w-xl mx-auto lg:mx-0">
+                The all-in-one platform for creators, coaches, and educators. 
+                Engage, teach, and monetize—without limits.
+              </p>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-              <Link
-                href="/auth/signup"
-                className="btn-hover-lift px-8 py-4 bg-primary text-primary-foreground rounded-xl text-lg font-semibold shadow-smooth-lg inline-flex items-center gap-2 group"
-              >
-                Start Free Trial
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <button 
-                onClick={() => setShowDemoModal(true)}
-                className="btn-hover-lift px-8 py-4 glass-strong rounded-xl text-lg font-semibold inline-flex items-center gap-2 group"
-              >
-                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                  <Play className="w-5 h-5 text-primary fill-primary" />
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start items-center mb-6">
+                <Link
+                  href="/auth/signup"
+                  className="btn-hover-lift px-6 py-3 bg-primary text-primary-foreground rounded-xl text-base font-semibold shadow-smooth-lg inline-flex items-center gap-2 group"
+                >
+                  Start Free Trial
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
+                <button 
+                  onClick={() => setShowDemoModal(true)}
+                  className="btn-hover-lift px-6 py-3 glass-strong rounded-xl text-base font-semibold inline-flex items-center gap-2 group"
+                >
+                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                    <Play className="w-4 h-4 text-primary fill-primary" />
+                  </div>
+                  Watch Demo
+                </button>
+              </div>
+
+              {/* Social Proof */}
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-6 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <div className="flex -space-x-2">
+                    {[1, 2, 3, 4].map((i) => (
+                      <Avatar key={i} className="w-7 h-7 border-2 border-background">
+                        <AvatarImage src={`https://i.pravatar.cc/150?img=${i + 10}`} />
+                        <AvatarFallback>U{i}</AvatarFallback>
+                      </Avatar>
+                    ))}
+                  </div>
+                  <span>10,000+ members</span>
                 </div>
-                Watch Demo
-              </button>
-            </div>
-
-            {/* Social Proof */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-8 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <div className="flex -space-x-2">
-                  {[1, 2, 3, 4].map((i) => (
-                    <Avatar key={i} className="w-8 h-8 border-2 border-background">
-                      <AvatarImage src={`https://i.pravatar.cc/150?img=${i + 10}`} />
-                      <AvatarFallback>U{i}</AvatarFallback>
-                    </Avatar>
+                <div className="flex items-center gap-0.5">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                   ))}
+                  <span className="ml-2">4.9/5 rating</span>
                 </div>
-                <span>Join 10,000+ members</span>
               </div>
-              <div className="flex items-center gap-1">
-                <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                <span className="ml-2">4.9/5 rating</span>
+            </div>
+
+            {/* Right Column - Dashboard Mockup */}
+            <div className="relative hidden lg:block">
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-border/50 bg-card">
+                {/* Mockup Header */}
+                <div className="flex items-center gap-2 px-4 py-3 border-b border-border/50 bg-muted/50">
+                  <div className="flex gap-1.5">
+                    <div className="w-3 h-3 rounded-full bg-red-400" />
+                    <div className="w-3 h-3 rounded-full bg-yellow-400" />
+                    <div className="w-3 h-3 rounded-full bg-green-400" />
+                  </div>
+                  <div className="flex-1 text-center">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-background text-xs text-muted-foreground">
+                      <span className="w-3 h-3 rounded-full bg-primary/20" />
+                      unytea.com/dashboard
+                    </div>
+                  </div>
+                </div>
+                {/* Mockup Content */}
+                <div className="p-4 space-y-3">
+                  {/* Stats Row */}
+                  <div className="grid grid-cols-3 gap-3">
+                    {[
+                      { label: "Members", value: "2,847", icon: Users },
+                      { label: "Revenue", value: "$12.4K", icon: Zap },
+                      { label: "Engagement", value: "94%", icon: TrendingUp },
+                    ].map((stat, i) => (
+                      <div key={i} className="bg-muted/50 rounded-lg p-3">
+                        <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
+                          <stat.icon className="w-3 h-3" />
+                          {stat.label}
+                        </div>
+                        <div className="text-lg font-bold">{stat.value}</div>
+                      </div>
+                    ))}
+                  </div>
+                  {/* Feed Preview */}
+                  <div className="space-y-2">
+                    {[1, 2].map((i) => (
+                      <div key={i} className="flex gap-3 p-3 bg-muted/30 rounded-lg">
+                        <div className="w-8 h-8 rounded-full bg-primary/20 flex-shrink-0" />
+                        <div className="flex-1 space-y-1.5">
+                          <div className="h-3 bg-muted rounded w-1/3" />
+                          <div className="h-2 bg-muted/50 rounded w-full" />
+                          <div className="h-2 bg-muted/50 rounded w-2/3" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  {/* Course Card */}
+                  <div className="flex gap-3 p-3 bg-gradient-to-r from-primary/5 to-purple-600/5 rounded-lg border border-primary/10">
+                    <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
+                      <BookOpen className="w-6 h-6 text-primary" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-medium text-sm">Community Mastery</div>
+                      <div className="text-xs text-muted-foreground">247 students enrolled</div>
+                      <div className="mt-2 h-1.5 bg-muted rounded-full overflow-hidden">
+                        <div className="h-full w-3/4 bg-primary rounded-full" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
+              {/* Decorative Elements */}
+              <div className="absolute -top-4 -right-4 w-24 h-24 bg-primary/20 rounded-full blur-2xl" />
+              <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-purple-600/20 rounded-full blur-2xl" />
             </div>
           </div>
         </div>
 
         {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <ChevronDown className="w-6 h-6 text-muted-foreground" />
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 animate-bounce">
+          <ChevronDown className="w-5 h-5 text-muted-foreground" />
         </div>
       </section>
 
