@@ -31,9 +31,6 @@ export async function GET() {
       take: 3,
       include: {
         participations: {
-          where: {
-            status: "CONFIRMED",
-          },
           select: {
             id: true,
           },
