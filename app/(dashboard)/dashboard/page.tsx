@@ -343,7 +343,7 @@ export default function DashboardPage() {
               {activities.length === 0 ? (
                 <div className="text-center py-8">
                   <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
-                    <TrendingUp className="h-8 w-8 text-muted-foreground" />
+                    <BarChart3 className="h-8 w-8 text-muted-foreground" />
                   </div>
                   <h3 className="font-semibold text-lg mb-2">No activity yet</h3>
                   <p className="text-muted-foreground mb-4">
