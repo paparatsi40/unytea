@@ -17,13 +17,8 @@ import {
   Users,
   Video,
   BookOpen,
-  MessageSquare,
   TrendingUp,
-  Award,
   X,
-  Monitor,
-  Presentation,
-  Mic,
   CreditCard,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
