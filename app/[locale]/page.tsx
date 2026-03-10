@@ -301,33 +301,33 @@ export default function Home() {
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <FeatureCard
-              icon={Video}
+              image="https://images.unsplash.com/photo-1609220136736-443140cffec6?w=400&q=80"
               title="Live Sessions"
               description="Interactive video calls with whiteboard, screen sharing, and recordings."
               highlighted
             />
             <FeatureCard
-              icon={BookOpen}
+              image="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=400&q=80"
               title="Courses"
               description="Create, host, and sell courses with progress tracking and certificates."
             />
             <FeatureCard
-              icon={MessageSquare}
+              image="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&q=80"
               title="Community Feed"
               description="Engage your members with posts, comments, reactions, and direct messaging."
             />
             <FeatureCard
-              icon={Presentation}
+              image="https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=400&q=80"
               title="Whiteboard"
               description="Collaborate visually in real-time during live sessions."
             />
             <FeatureCard
-              icon={Monitor}
+              image="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&q=80"
               title="Screen Sharing"
               description="Present slides, demos, and tutorials seamlessly."
             />
             <FeatureCard
-              icon={Mic}
+              image="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&q=80"
               title="AI Assistant"
               description="Get AI-powered suggestions, moderation, and content ideas."
             />
@@ -345,17 +345,17 @@ export default function Home() {
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             <UseCaseCard
-              icon={Users}
+              image="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&q=80"
               title="Coaching Communities"
               features={["Weekly group calls", "Paid memberships", "Student discussions", "1-on-1 scheduling"]}
             />
             <UseCaseCard
-              icon={BookOpen}
+              image="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&q=80"
               title="Learning Communities"
               features={["Online courses", "Live workshops", "Community support", "Progress tracking"]}
             />
             <UseCaseCard
-              icon={Award}
+              image="https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&q=80"
               title="Expert Communities"
               features={["Mastermind groups", "Live Q&A sessions", "Premium content", "Direct access"]}
             />
@@ -632,14 +632,22 @@ export default function Home() {
 
 // COMPONENTES AUXILIARES
 
-function FeatureCard({ icon: Icon, title, description, highlighted = false }: { icon: any; title: string; description: string; highlighted?: boolean }) {
+function FeatureCard({ image, title, description, highlighted = false }: { image: string; title: string; description: string; highlighted?: boolean }) {
   return (
     <div className={`group relative p-6 rounded-xl border transition-all duration-300 hover:shadow-xl hover:scale-[1.02] overflow-hidden ${highlighted ? 'border-primary bg-gradient-to-br from-primary/10 to-purple-100' : 'bg-gradient-to-br from-white to-gray-50'}`}>
       {/* Background decoration */}
       <div className={`absolute top-0 right-0 w-32 h-32 opacity-10 rounded-full -translate-y-1/2 translate-x-1/2 transition-transform group-hover:scale-150 ${highlighted ? 'bg-primary' : 'bg-gray-400'}`} />
       
-      <div className={`relative w-12 h-12 rounded-xl flex items-center justify-center mb-4 shadow-md ${highlighted ? 'bg-gradient-to-br from-primary to-purple-600 text-white' : 'bg-gradient-to-br from-gray-100 to-gray-200'}`}>
-        <Icon className="w-6 h-6" />
+      {/* Image */}
+      <div className="relative w-full h-32 rounded-xl mb-4 overflow-hidden shadow-md">
+        <img 
+          src={image} 
+          alt={title}
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+        />
+        {highlighted && (
+          <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent" />
+        )}
       </div>
       <h3 className="relative font-semibold text-lg mb-2">{title}</h3>
       <p className="relative text-muted-foreground text-sm">{description}</p>
@@ -647,7 +655,7 @@ function FeatureCard({ icon: Icon, title, description, highlighted = false }: { 
   );
 }
 
-function UseCaseCard({ icon: Icon, title, features }: { icon: any; title: string; features: string[] }) {
+function UseCaseCard({ image, title, features }: { image: string; title: string; features: string[] }) {
   return (
     <div className="group relative bg-gradient-to-br from-white to-gray-50 p-6 rounded-xl border hover:shadow-xl hover:scale-[1.02] transition-all duration-300 overflow-hidden">
       {/* Gradient overlay on hover */}
@@ -657,8 +665,13 @@ function UseCaseCard({ icon: Icon, title, features }: { icon: any; title: string
       <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/5 rounded-full group-hover:scale-150 transition-transform duration-500" />
       
       <div className="relative">
-        <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-primary/10 rounded-xl flex items-center justify-center mb-4 shadow-sm">
-          <Icon className="w-6 h-6 text-primary" />
+        {/* Image */}
+        <div className="w-full h-40 rounded-xl overflow-hidden mb-4 shadow-sm">
+          <img 
+            src={image} 
+            alt={title}
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+          />
         </div>
         <h3 className="font-semibold text-lg mb-4">{title}</h3>
         <ul className="space-y-2">
