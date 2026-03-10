@@ -291,8 +291,8 @@ export default function DashboardPage() {
                 {/* Progress Steps */}
                 <div className="bg-muted/30 rounded-2xl p-6 mb-8">
                   <div className="flex items-center justify-between mb-4">
-                    <span className="text-sm font-medium text-muted-foreground">Launch Progress</span>
-                    <span className="text-sm font-bold text-primary">0%</span>
+                    <span className="text-sm font-medium text-muted-foreground">Launch progress</span>
+                    <span className="text-sm font-bold text-primary">0 / 3 steps completed</span>
                   </div>
                   <div className="h-2 bg-muted rounded-full overflow-hidden mb-6">
                     <div className="h-full bg-gradient-to-r from-primary to-purple-500 rounded-full transition-all duration-500" style={{ width: '0%' }} />
@@ -334,7 +334,7 @@ export default function DashboardPage() {
                 <Link href="/dashboard/communities" className="inline-block">
                   <Button size="lg" className="gap-2 px-10 py-7 text-lg shadow-xl shadow-primary/25 hover:shadow-2xl hover:shadow-primary/30 transition-all">
                     <Plus className="h-5 w-5" />
-                    Start Your Community
+                    Create Your First Community
                     <ArrowRight className="h-5 w-5" />
                   </Button>
                 </Link>
@@ -643,7 +643,7 @@ export default function DashboardPage() {
                   <Link href="/dashboard/communities">
                     <Button size="lg" className="gap-2">
                       <Plus className="h-5 w-5" />
-                      Create Your Community
+                      Create Your First Community
                     </Button>
                   </Link>
                 </div>
