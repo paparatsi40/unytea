@@ -166,10 +166,10 @@ export function CommunitiesClient() {
         {/* Title */}
         <div className="absolute left-1/2 top-6 z-20 -translate-x-1/2 text-center">
           <h2 className="mb-1 text-5xl font-bold text-white drop-shadow-2xl">
-            Explore Communities
+            Your Communities
           </h2>
           <p className="text-lg text-white/80">
-            Find your perfect community
+            Manage and grow your community business
           </p>
         </div>
 
@@ -267,7 +267,7 @@ export function CommunitiesClient() {
         {/* Create Button */}
         <div className="absolute right-8 top-6 z-30">
           <Link href="/dashboard/communities/new">
-            <Button size="lg" className="bg-white text-gray-900 shadow-2xl hover:bg-gray-100">
+            <Button size="lg" className="bg-white text-gray-900 shadow-2xl hover:bg-gray-100 hover:scale-105 transition-all">
               <Plus className="mr-2 h-5 w-5" />
               Create Community
             </Button>
@@ -346,7 +346,7 @@ export function CommunitiesClient() {
           <div className="group rounded-2xl border border-border bg-gradient-to-br from-card to-card/50 p-6 shadow-sm transition-all hover:scale-105 hover:shadow-xl">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Total Communities</p>
+                <p className="text-sm font-medium text-muted-foreground">Communities</p>
                 <p className="mt-2 text-3xl font-bold text-foreground">{communities.length}</p>
               </div>
               <div className="rounded-xl bg-primary/10 p-3 transition-transform group-hover:rotate-12">
@@ -358,7 +358,7 @@ export function CommunitiesClient() {
           <div className="group rounded-2xl border border-border bg-gradient-to-br from-card to-card/50 p-6 shadow-sm transition-all hover:scale-105 hover:shadow-xl">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Total Members</p>
+                <p className="text-sm font-medium text-muted-foreground">Members</p>
                 <p className="mt-2 text-3xl font-bold text-foreground">{totalMembers}</p>
               </div>
               <div className="rounded-xl bg-green-500/10 p-3 transition-transform group-hover:rotate-12">
@@ -370,7 +370,7 @@ export function CommunitiesClient() {
           <div className="group rounded-2xl border border-border bg-gradient-to-br from-card to-card/50 p-6 shadow-sm transition-all hover:scale-105 hover:shadow-xl">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">You Own</p>
+                <p className="text-sm font-medium text-muted-foreground">Owned</p>
                 <p className="mt-2 text-3xl font-bold text-foreground">{ownedCommunities}</p>
               </div>
               <div className="rounded-xl bg-amber-500/10 p-3 transition-transform group-hover:rotate-12">
@@ -382,11 +382,71 @@ export function CommunitiesClient() {
           <div className="group rounded-2xl border border-border bg-gradient-to-br from-card to-card/50 p-6 shadow-sm transition-all hover:scale-105 hover:shadow-xl">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Total Posts</p>
+                <p className="text-sm font-medium text-muted-foreground">Posts</p>
                 <p className="mt-2 text-3xl font-bold text-foreground">{totalPosts}</p>
               </div>
               <div className="rounded-xl bg-blue-500/10 p-3 transition-transform group-hover:rotate-12">
                 <TrendingUp className="h-6 w-6 text-blue-500" />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 📈 GROWTH INSIGHTS WIDGET */}
+      {communities.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Quick Tips */}
+          <div className="lg:col-span-3">
+            <div className="rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50 p-6 shadow-sm">
+              <div className="flex items-start gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg">
+                  <TrendingUp className="h-6 w-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-bold text-lg text-amber-900 mb-2">
+                    Grow your community faster
+                  </h3>
+                  <div className="grid sm:grid-cols-3 gap-3">
+                    <div className="flex items-center gap-2 text-sm text-amber-800">
+                      <div className="h-6 w-6 rounded-full bg-amber-200 flex items-center justify-center text-xs font-bold">1</div>
+                      <span>Invite your first members</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-amber-800">
+                      <div className="h-6 w-6 rounded-full bg-amber-200 flex items-center justify-center text-xs font-bold">2</div>
+                      <span>Schedule your first live session</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-amber-800">
+                      <div className="h-6 w-6 rounded-full bg-amber-200 flex items-center justify-center text-xs font-bold">3</div>
+                      <span>Post your first content</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Mini Stats */}
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+            <h4 className="font-semibold text-sm text-muted-foreground mb-3">Community Growth</h4>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm">Members</span>
+                <span className="font-bold text-green-600">{totalMembers}</span>
+              </div>
+              <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                <div className="h-full bg-green-500 rounded-full" style={{ width: `${Math.min((totalMembers / 100) * 100, 100)}%` }} />
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm">Posts</span>
+                <span className="font-bold text-blue-600">{totalPosts}</span>
+              </div>
+              <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                <div className="h-full bg-blue-500 rounded-full" style={{ width: `${Math.min((totalPosts / 50) * 100, 100)}%` }} />
+              </div>
+              <div className="flex justify-between items-center text-xs text-muted-foreground pt-1">
+                <span>Engagement rate</span>
+                <span className="font-medium">{communities.length > 0 ? Math.round((totalPosts / Math.max(totalMembers, 1)) * 100) : 0}%</span>
               </div>
             </div>
           </div>
@@ -479,6 +539,20 @@ export function CommunitiesClient() {
                             <TrendingUp className="h-4 w-4" />
                             <span className="text-sm font-semibold">{community._count.posts}</span>
                           </div>
+                        </div>
+                        
+                        {/* Quick Actions */}
+                        <div className="flex items-center gap-2">
+                          {community.role === "OWNER" && (
+                            <Link
+                              href={`/dashboard/c/${community.slug}/settings`}
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <Button size="sm" variant="secondary" className="bg-white/90 text-gray-900 hover:bg-white">
+                                Manage
+                              </Button>
+                            </Link>
+                          )}
                         </div>
                       </div>
                     </div>
