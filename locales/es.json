@@ -234,21 +234,5 @@
       "title": "Racha Diaria",
       "days": "días"
     }
-  },
-      "title": "Próximos Eventos",
-      "empty": "No hay eventos próximos"
-    },
-    "feed": {
-      "title": "Feed de Comunidad",
-      "createPlaceholder": "¿Qué estás pensando?",
-      "post": "Publicar",
-      "like": "Me gusta",
-      "comment": "Comentar",
-      "share": "Compartir"
-    },
-    "streak": {
-      "title": "Racha Diaria",
-      "days": "días"
-    }
   }
 }
