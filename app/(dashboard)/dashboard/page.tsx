@@ -477,7 +477,7 @@ export default function DashboardPage() {
                   members={metrics.members}
                   revenue={metrics.revenue}
                   engagement={metrics.engagement}
-                  communityName={myCommunities[0]?.name || "My Community"}
+                  communityName={metrics.communities > 0 ? "My Community" : "My Community"}
                 />
               </CardContent>
             </Card>

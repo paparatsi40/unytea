@@ -3,7 +3,6 @@
 import { useRef, useState } from "react";
 import { toPng } from "html-to-image";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Share2, Download, X, Sparkles } from "lucide-react";
 import { Building2, Users, DollarSign, TrendingUp } from "lucide-react";
 
