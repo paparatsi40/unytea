@@ -1,4 +1,23 @@
 {
+  "auth": {
+    "welcomeBack": "Bienvenido de Vuelta",
+    "signinSubtitle": "Inicia sesión en tu cuenta de Unytea",
+    "continueWithGoogle": "Continuar con Google",
+    "continueWithGitHub": "Continuar con GitHub",
+    "orContinueWith": "o continuar con",
+    "email": "Correo electrónico",
+    "emailPlaceholder": "Ingresa tu correo",
+    "password": "Contraseña",
+    "signIn": "Iniciar Sesión",
+    "noAccount": "¿No tienes cuenta?",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "fillAllFields": "Por favor completa todos los campos",
+    "passwordTooShort": "La contraseña debe tener al menos 8 caracteres",
+    "passwordsDoNotMatch": "Las contraseñas no coinciden",
+    "invalidCredentials": "Correo o contraseña inválidos",
+    "signInError": "Error al iniciar sesión",
+    "accountCreated": "¡Cuenta creada exitosamente!"
+  },
   "landing": {
     "nav": {
       "features": "Funcionalidades",
