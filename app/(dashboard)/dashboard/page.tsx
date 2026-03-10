@@ -262,114 +262,166 @@ export default function DashboardPage() {
         {/* Left Column - Onboarding & Quick Actions */}
         <div className="space-y-6">
           {/* Interactive Onboarding Checklist */}
-          <Card className="border-primary/20">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center gap-2">
-                    <Target className="h-5 w-5 text-primary" />
-                    {completedSteps === 0 ? "Getting Started" : 
-                     completedSteps === steps.length ? "All Steps Complete!" : 
-                     `Step ${activeStep?.number} of ${steps.length}`}
-                  </CardTitle>
-                  <CardDescription>
-                    {completedSteps === 0 ? "Complete these steps to launch your community" :
-                     completedSteps === steps.length ? "You've built a thriving community business!" :
-                     "Continue building your community business"}
-                  </CardDescription>
+          {metrics?.communities === 0 ? (
+            // NO COMMUNITY - Dominant CTA
+            <Card className="border-2 border-primary/30 shadow-xl shadow-primary/10 overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/20 to-purple-500/20 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-amber-400/20 to-orange-500/20 rounded-full translate-y-1/2 -translate-x-1/2 blur-2xl"></div>
+              
+              <CardContent className="p-8 relative">
+                <div className="text-center">
+                  {/* Large Icon */}
+                  <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-lg shadow-primary/30">
+                    <Rocket className="h-10 w-10 text-white" />
+                  </div>
+                  
+                  {/* Main Headline */}
+                  <h2 className="text-2xl md:text-3xl font-bold mb-3">
+                    Start your community business
+                  </h2>
+                  <p className="text-lg text-muted-foreground mb-2">
+                    Create your first community in under 2 minutes
+                  </p>
+                  <p className="text-sm text-muted-foreground mb-8 max-w-sm mx-auto">
+                    Join 10,000+ creators building thriving communities with live sessions, courses, and engaged members.
+                  </p>
+                  
+                  {/* CTA Button */}
+                  <Link href="/dashboard/communities" className="inline-block">
+                    <Button size="lg" className="gap-2 px-8 py-6 text-lg shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all">
+                      <Plus className="h-5 w-5" />
+                      Create Your Community
+                      <ArrowRight className="h-5 w-5" />
+                    </Button>
+                  </Link>
+                  
+                  {/* Trust indicators */}
+                  <div className="flex items-center justify-center gap-6 mt-6 text-sm text-muted-foreground">
+                    <span className="flex items-center gap-1">
+                      <CheckCircle2 className="h-4 w-4 text-green-500" />
+                      Free to start
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <CheckCircle2 className="h-4 w-4 text-green-500" />
+                      No credit card
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <CheckCircle2 className="h-4 w-4 text-green-500" />
+                      Cancel anytime
+                    </span>
+                  </div>
                 </div>
-                {completedSteps > 0 && (
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                    <span className="text-lg font-bold text-primary">{completedSteps}/{steps.length}</span>
+              </CardContent>
+            </Card>
+          ) : (
+            // HAS COMMUNITY - Show checklist
+            <Card className="border-primary/20">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Target className="h-5 w-5 text-primary" />
+                      {completedSteps === steps.length ? "All Steps Complete!" : 
+                       `Step ${activeStep?.number} of ${steps.length}`}
+                    </CardTitle>
+                    <CardDescription>
+                      {completedSteps === steps.length ? "You've built a thriving community business!" :
+                       "Continue building your community business"}
+                    </CardDescription>
                   </div>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {steps.map((step) => (
-                <div 
-                  key={step.number}
-                  className={`flex items-start gap-4 p-4 rounded-xl transition-all ${
-                    step.completed 
-                      ? "bg-green-50/50 border border-green-100" 
-                      : step.active
-                        ? "bg-gradient-to-r from-primary/10 to-primary/5 border-2 border-primary/30 shadow-md"
-                        : "bg-muted/30 border border-transparent"
-                  }`}
-                >
-                  {/* Step Icon/Number */}
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                    step.completed 
-                      ? "bg-green-500 text-white" 
-                      : step.active
-                        ? "bg-primary text-white shadow-lg shadow-primary/25"
-                        : "bg-muted text-muted-foreground"
-                  }`}>
-                    {step.completed ? (
-                      <CheckCircle2 className="h-6 w-6" />
-                    ) : (
-                      <step.icon className="h-6 w-6" />
-                    )}
-                  </div>
-
-                  {/* Step Content */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h4 className={`font-semibold ${
-                        step.completed ? "text-green-700" : 
-                        step.active ? "text-primary" : "text-muted-foreground"
-                      }`}>
-                        {step.number}. {step.title}
-                      </h4>
-                      {step.completed && (
-                        <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
-                          Done
-                        </span>
-                      )}
-                      {step.active && (
-                        <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full animate-pulse">
-                          Next
-                        </span>
+                  {completedSteps > 0 && (
+                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                      <span className="text-lg font-bold text-primary">{completedSteps}/{steps.length}</span>
+                    </div>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {steps.map((step) => (
+                  <div 
+                    key={step.number}
+                    className={`flex items-start gap-4 p-4 rounded-xl transition-all ${
+                      step.completed 
+                        ? "bg-green-50/50 border border-green-100" 
+                        : step.active
+                          ? "bg-gradient-to-r from-primary/10 to-primary/5 border-2 border-primary/30 shadow-md"
+                          : "bg-muted/30 border border-transparent"
+                    }`}
+                  >
+                    {/* Step Icon/Number */}
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                      step.completed 
+                        ? "bg-green-500 text-white" 
+                        : step.active
+                          ? "bg-primary text-white shadow-lg shadow-primary/25"
+                          : "bg-muted text-muted-foreground"
+                    }`}>
+                      {step.completed ? (
+                        <CheckCircle2 className="h-6 w-6" />
+                      ) : (
+                        <step.icon className="h-6 w-6" />
                       )}
                     </div>
-                    <p className={`text-sm mt-1 ${
-                      step.completed || step.active ? "text-muted-foreground" : "text-muted-foreground/60"
-                    }`}>
-                      {step.description}
-                    </p>
-                    
-                    {/* Action Button */}
-                    {(step.active || (!step.completed && !steps.some(s => s.active))) && (
-                      <Link href={step.link} className="mt-3 inline-block">
-                        <Button 
-                          size="sm" 
-                          className={step.active ? "" : "bg-muted hover:bg-muted/80"}
-                          variant={step.active ? "default" : "outline"}
-                        >
-                          {step.action}
-                          <ArrowRight className="h-4 w-4 ml-1" />
-                        </Button>
-                      </Link>
-                    )}
+
+                    {/* Step Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h4 className={`font-semibold ${
+                          step.completed ? "text-green-700" : 
+                          step.active ? "text-primary" : "text-muted-foreground"
+                        }`}>
+                          {step.number}. {step.title}
+                        </h4>
+                        {step.completed && (
+                          <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                            Done
+                          </span>
+                        )}
+                        {step.active && (
+                          <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full animate-pulse">
+                            Next
+                          </span>
+                        )}
+                      </div>
+                      <p className={`text-sm mt-1 ${
+                        step.completed || step.active ? "text-muted-foreground" : "text-muted-foreground/60"
+                      }`}>
+                        {step.description}
+                      </p>
+                      
+                      {/* Action Button */}
+                      {(step.active || (!step.completed && !steps.some(s => s.active))) && (
+                        <Link href={step.link} className="mt-3 inline-block">
+                          <Button 
+                            size="sm" 
+                            className={step.active ? "" : "bg-muted hover:bg-muted/80"}
+                            variant={step.active ? "default" : "outline"}
+                          >
+                            {step.action}
+                            <ArrowRight className="h-4 w-4 ml-1" />
+                          </Button>
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                ))}
+
+                {/* Progress Bar */}
+                <div className="mt-4 pt-4 border-t">
+                  <div className="flex items-center justify-between text-sm mb-2">
+                    <span className="text-muted-foreground">Your progress</span>
+                    <span className="font-medium">{Math.round((completedSteps / steps.length) * 100)}% complete</span>
+                  </div>
+                  <div className="h-2 bg-muted rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-primary to-primary/70 rounded-full transition-all duration-500"
+                      style={{ width: `${(completedSteps / steps.length) * 100}%` }}
+                    />
                   </div>
                 </div>
-              ))}
-
-              {/* Progress Bar */}
-              <div className="mt-4 pt-4 border-t">
-                <div className="flex items-center justify-between text-sm mb-2">
-                  <span className="text-muted-foreground">Your progress</span>
-                  <span className="font-medium">{Math.round((completedSteps / steps.length) * 100)}% complete</span>
-                </div>
-                <div className="h-2 bg-muted rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-gradient-to-r from-primary to-primary/70 rounded-full transition-all duration-500"
-                    style={{ width: `${(completedSteps / steps.length) * 100}%` }}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Celebration Card - Shows when milestones reached */}
           {celebration && (
