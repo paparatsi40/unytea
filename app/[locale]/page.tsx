@@ -570,33 +570,66 @@ export default function Home() {
         </div>
       </section>
 
-      {/* REPLACE TOOLS */}
-      <section className="py-16 bg-gray-50">
+      {/* REPLACE TOOLS - CONSOLIDATE EVERYTHING */}
+      <section className="py-20 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
         <div className="container mx-auto px-4">
-          <p className="text-center text-muted-foreground mb-8 text-lg">
-            Replace tools like
-          </p>
-          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12">
-            <div className="flex items-center gap-2 text-gray-500">
-              <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">Z</div>
-              <span className="font-medium">Zoom</span>
+          <div className="text-center mb-12">
+            <Badge className="mb-4 bg-white/10 text-white border-white/20 hover:bg-white/20">
+              Consolidate Your Stack
+            </Badge>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Stop paying for 5 different tools
+            </h2>
+            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+              Replace your entire software stack with one powerful platform
+            </p>
+          </div>
+          
+          {/* Tools being replaced */}
+          <div className="flex flex-wrap justify-center items-center gap-4 md:gap-6 mb-10">
+            {[
+              { name: "Zoom", color: "bg-blue-500", icon: "Z", desc: "Video calls" },
+              { name: "Kajabi", color: "bg-orange-500", icon: "K", desc: "Courses" },
+              { name: "Facebook Groups", color: "bg-blue-600", icon: "f", desc: "Community" },
+              { name: "Slack", color: "bg-purple-600", icon: "S", desc: "Chat" },
+              { name: "Skool", color: "bg-green-500", icon: "S", desc: "Memberships" },
+            ].map((tool) => (
+              <div key={tool.name} className="group flex items-center gap-3 bg-white/10 backdrop-blur-sm px-4 py-3 rounded-xl border border-white/10 hover:bg-white/20 transition-all">
+                <div className={`w-10 h-10 ${tool.color} rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-lg`}>
+                  {tool.icon}
+                </div>
+                <div>
+                  <div className="font-semibold text-sm">{tool.name}</div>
+                  <div className="text-xs text-gray-400">{tool.desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          {/* Arrow pointing to Unytea */}
+          <div className="flex justify-center mb-8">
+            <div className="flex items-center gap-4 text-gray-400">
+              <div className="h-px w-16 bg-gradient-to-r from-transparent to-gray-500" />
+              <ArrowDown className="w-6 h-6 animate-bounce" />
+              <div className="h-px w-16 bg-gradient-to-l from-transparent to-gray-500" />
             </div>
-            <div className="flex items-center gap-2 text-gray-500">
-              <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">K</div>
-              <span className="font-medium">Kajabi</span>
+          </div>
+          
+          {/* Unytea solution */}
+          <div className="text-center">
+            <div className="inline-flex items-center gap-3 bg-gradient-to-r from-primary to-purple-600 px-8 py-4 rounded-2xl shadow-2xl">
+              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-lg">
+                <Sparkles className="w-7 h-7 text-primary" />
+              </div>
+              <div className="text-left">
+                <div className="font-bold text-xl">Unytea</div>
+                <div className="text-sm text-white/80">One platform. Everything you need.</div>
+              </div>
             </div>
-            <div className="flex items-center gap-2 text-gray-500">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">f</div>
-              <span className="font-medium">Facebook Groups</span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-500">
-              <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">S</div>
-              <span className="font-medium">Slack</span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-500">
-              <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">S</div>
-              <span className="font-medium">Skool</span>
-            </div>
+            
+            <p className="mt-6 text-gray-400 text-sm">
+              Save $300+/month • No more integrations • Everything connected
+            </p>
           </div>
         </div>
       </section>
