@@ -255,46 +255,55 @@ export default function Home() {
               They focus on posts and discussions. But modern communities need more:
             </p>
             <div className="grid md:grid-cols-3 gap-6">
-              <div className="bg-white p-6 rounded-xl shadow-sm">
-                <div className="w-full h-32 rounded-xl overflow-hidden mb-4 bg-gray-100 relative">
+              <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <div className="w-full h-40 rounded-xl overflow-hidden mb-4 bg-gradient-to-br from-gray-100 to-gray-200 relative group">
                   <img 
-                    src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=400&q=80" 
-                    alt="Boring meeting without interaction"
-                    className="w-full h-full object-cover opacity-70"
+                    src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=400&q=80" 
+                    alt="Boring meeting"
+                    className="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <X className="w-12 h-12 text-red-500 bg-white/80 rounded-full p-2" />
+                    <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center shadow-lg">
+                      <X className="w-8 h-8 text-white" strokeWidth={3} />
+                    </div>
                   </div>
                 </div>
-                <h3 className="font-semibold mb-2">Live interaction</h3>
+                <h3 className="font-semibold mb-2 text-lg">Live interaction</h3>
                 <p className="text-sm text-muted-foreground">Missing real-time video, whiteboard, screen sharing</p>
               </div>
-              <div className="bg-white p-6 rounded-xl shadow-sm">
-                <div className="w-full h-32 rounded-xl overflow-hidden mb-4 bg-gray-100 relative">
+              <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <div className="w-full h-40 rounded-xl overflow-hidden mb-4 bg-gradient-to-br from-gray-100 to-gray-200 relative group">
                   <img 
-                    src="https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=400&q=80" 
-                    alt="Disorganized learning materials"
-                    className="w-full h-full object-cover opacity-70"
+                    src="https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?auto=format&fit=crop&w=400&q=80" 
+                    alt="Disorganized materials"
+                    className="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <X className="w-12 h-12 text-red-500 bg-white/80 rounded-full p-2" />
+                    <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center shadow-lg">
+                      <X className="w-8 h-8 text-white" strokeWidth={3} />
+                    </div>
                   </div>
                 </div>
-                <h3 className="font-semibold mb-2">Structured learning</h3>
+                <h3 className="font-semibold mb-2 text-lg">Structured learning</h3>
                 <p className="text-sm text-muted-foreground">No integrated courses or workshops</p>
               </div>
-              <div className="bg-white p-6 rounded-xl shadow-sm">
-                <div className="w-full h-32 rounded-xl overflow-hidden mb-4 bg-gray-100 relative">
+              <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <div className="w-full h-40 rounded-xl overflow-hidden mb-4 bg-gradient-to-br from-gray-100 to-gray-200 relative group">
                   <img 
-                    src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&q=80" 
-                    alt="Complex payment setup"
-                    className="w-full h-full object-cover opacity-70"
+                    src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=400&q=80" 
+                    alt="Complex payments"
+                    className="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <X className="w-12 h-12 text-red-500 bg-white/80 rounded-full p-2" />
+                    <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center shadow-lg">
+                      <X className="w-8 h-8 text-white" strokeWidth={3} />
+                    </div>
                   </div>
                 </div>
-                <h3 className="font-semibold mb-2">Monetization tools</h3>
+                <h3 className="font-semibold mb-2 text-lg">Monetization tools</h3>
                 <p className="text-sm text-muted-foreground">Complex payment setups, high fees</p>
               </div>
             </div>
@@ -649,19 +658,31 @@ export default function Home() {
 // COMPONENTES AUXILIARES
 
 function FeatureCard({ image, title, description, highlighted = false }: { image: string; title: string; description: string; highlighted?: boolean }) {
+  const [imgError, setImgError] = useState(false);
+  
   return (
     <div className={`group relative p-6 rounded-xl border transition-all duration-300 hover:shadow-xl hover:scale-[1.02] overflow-hidden ${highlighted ? 'border-primary bg-gradient-to-br from-primary/10 to-purple-100' : 'bg-gradient-to-br from-white to-gray-50'}`}>
       {/* Background decoration */}
       <div className={`absolute top-0 right-0 w-32 h-32 opacity-10 rounded-full -translate-y-1/2 translate-x-1/2 transition-transform group-hover:scale-150 ${highlighted ? 'bg-primary' : 'bg-gray-400'}`} />
       
-      {/* Image */}
-      <div className="relative w-full h-32 rounded-xl mb-4 overflow-hidden shadow-md">
-        <img 
-          src={image} 
-          alt={title}
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-        />
-        {highlighted && (
+      {/* Image container with gradient fallback */}
+      <div className={`relative w-full h-32 rounded-xl mb-4 overflow-hidden shadow-md ${imgError ? 'bg-gradient-to-br from-gray-200 to-gray-300' : ''}`}>
+        {!imgError && (
+          <img 
+            src={image} 
+            alt={title}
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+            onError={() => setImgError(true)}
+          />
+        )}
+        {imgError && (
+          <div className="w-full h-full flex items-center justify-center">
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${highlighted ? 'bg-primary/20' : 'bg-gray-300'}`}>
+              <Sparkles className={`w-6 h-6 ${highlighted ? 'text-primary' : 'text-gray-500'}`} />
+            </div>
+          </div>
+        )}
+        {highlighted && !imgError && (
           <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent" />
         )}
       </div>
@@ -672,6 +693,8 @@ function FeatureCard({ image, title, description, highlighted = false }: { image
 }
 
 function UseCaseCard({ image, title, features }: { image: string; title: string; features: string[] }) {
+  const [imgError, setImgError] = useState(false);
+  
   return (
     <div className="group relative bg-gradient-to-br from-white to-gray-50 p-6 rounded-xl border hover:shadow-xl hover:scale-[1.02] transition-all duration-300 overflow-hidden">
       {/* Gradient overlay on hover */}
@@ -681,13 +704,22 @@ function UseCaseCard({ image, title, features }: { image: string; title: string;
       <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/5 rounded-full group-hover:scale-150 transition-transform duration-500" />
       
       <div className="relative">
-        {/* Image */}
-        <div className="w-full h-40 rounded-xl overflow-hidden mb-4 shadow-sm">
-          <img 
-            src={image} 
-            alt={title}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-          />
+        {/* Image with fallback */}
+        <div className={`w-full h-40 rounded-xl overflow-hidden mb-4 shadow-sm ${imgError ? 'bg-gradient-to-br from-gray-200 to-gray-300' : ''}`}>
+          {!imgError ? (
+            <img 
+              src={image} 
+              alt={title}
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+              onError={() => setImgError(true)}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center">
+                <Users className="w-8 h-8 text-primary/60" />
+              </div>
+            </div>
+          )}
         </div>
         <h3 className="font-semibold text-lg mb-4">{title}</h3>
         <ul className="space-y-2">
