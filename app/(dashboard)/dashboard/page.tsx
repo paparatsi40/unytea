@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useToast } from "@/hooks/use-toast";
+import { GamificationWidget } from "@/components/dashboard/GamificationWidget";
 import {
   Users,
   BookOpen,
@@ -220,6 +221,9 @@ export default function DashboardPage() {
               </Link>
             </CardContent>
           </Card>
+
+          {/* Gamification Widget */}
+          {user?.id && <GamificationWidget userId={user.id} />}
 
           {/* Course Progress Widget */}
           {courses.length > 0 && (
