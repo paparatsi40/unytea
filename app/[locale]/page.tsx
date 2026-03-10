@@ -221,19 +221,19 @@ export default function Home() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
               <p className="text-4xl md:text-5xl font-bold gradient-text">10K+</p>
-              <p className="text-muted-foreground mt-2">Active Communities</p>
+              <p className="text-muted-foreground mt-2">{t("stats.communities")}</p>
             </div>
             <div>
               <p className="text-4xl md:text-5xl font-bold gradient-text">500K+</p>
-              <p className="text-muted-foreground mt-2">Members Engaged</p>
+              <p className="text-muted-foreground mt-2">{t("stats.members")}</p>
             </div>
             <div>
               <p className="text-4xl md:text-5xl font-bold gradient-text">$2M+</p>
-              <p className="text-muted-foreground mt-2">Revenue Generated</p>
+              <p className="text-muted-foreground mt-2">{t("stats.revenue")}</p>
             </div>
             <div>
               <p className="text-4xl md:text-5xl font-bold gradient-text">98%</p>
-              <p className="text-muted-foreground mt-2">Satisfaction Rate</p>
+              <p className="text-muted-foreground mt-2">{t("stats.satisfaction")}</p>
             </div>
           </div>
         </div>
