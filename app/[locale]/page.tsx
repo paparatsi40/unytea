@@ -20,7 +20,6 @@ import {
   MessageSquare,
   TrendingUp,
   Award,
-  Shield,
   X,
   Monitor,
   Presentation,
