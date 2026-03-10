@@ -24,7 +24,6 @@ import {
   Monitor,
   Presentation,
   Mic,
-  DollarSign,
   CreditCard,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
