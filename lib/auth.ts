@@ -54,7 +54,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     signIn: "/auth/signin",
     error: "/auth/error",
     verifyRequest: "/auth/verify",
-    newUser: "/dashboard",
+    newUser: "/onboarding",
   },
   providers: [
     Google({
@@ -118,14 +118,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         })
 
         if (!existingUser) {
-          // Create user if doesn't exist
+          // Create user if doesn't exist - will go through onboarding
           await prisma.user.create({
             data: {
               email: user.email!,
               name: user.name,
               image: user.image,
               emailVerified: new Date(),
-              isOnboarded: true, // Set to true to skip onboarding
+              isOnboarded: false, // Let user go through onboarding
             },
           })
         }
@@ -172,7 +172,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         where: { id: user.id },
         data: { 
           lastActiveAt: new Date(),
-          isOnboarded: true, // Mark as onboarded on first signin
+          // Don't mark as onboarded here - let the onboarding page do it
         },
       })
     },
