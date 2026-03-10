@@ -76,11 +76,11 @@ export default function OnboardingPage() {
   });
 
   useEffect(() => {
-    // If user is already onboarded, redirect to dashboard
-    if (user?.isOnboarded) {
+    // Only check after user data has loaded
+    if (!isLoading && user?.isOnboarded === true) {
       router.push("/dashboard");
     }
-  }, [user, router]);
+  }, [user?.isOnboarded, isLoading, router]);
 
   const steps = [
     {
