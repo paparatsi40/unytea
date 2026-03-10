@@ -103,7 +103,7 @@ export default function Home() {
                 </span>
               </h1>
               <p className="text-xl text-muted-foreground mb-8 max-w-xl">
-                Run your entire community business with live sessions, courses, and discussions — all in one place.
+                Host live sessions, courses, and community discussions — all in one place.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Link
@@ -308,7 +308,7 @@ export default function Home() {
               </div>
             </div>
             <p className="text-xl font-medium mt-12">
-              That&apos;s where <span className="text-primary font-bold">Unytea</span> is different.
+              <span className="text-primary font-bold">Unytea</span> was built for modern community businesses.
             </p>
           </div>
         </div>
@@ -325,34 +325,38 @@ export default function Home() {
             </p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Live Sessions - Hero Feature (larger card) */}
+            <div className="md:col-span-2 lg:col-span-1 lg:row-span-2">
+              <FeatureCard
+                image="https://images.unsplash.com/photo-1609220136736-443140cffec6?auto=format&fit=crop&w=600&q=80"
+                title="🎥 Live Sessions"
+                description="Interactive video calls with whiteboard, screen sharing, and recordings. Our most loved feature."
+                highlighted
+                large
+              />
+            </div>
             <FeatureCard
-              image="https://images.unsplash.com/photo-1609220136736-443140cffec6?w=400&q=80"
-              title="Live Sessions"
-              description="Interactive video calls with whiteboard, screen sharing, and recordings."
-              highlighted
-            />
-            <FeatureCard
-              image="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=400&q=80"
+              image="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=400&q=80"
               title="Courses"
               description="Create, host, and sell courses with progress tracking and certificates."
             />
             <FeatureCard
-              image="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&q=80"
+              image="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=400&q=80"
               title="Community Feed"
               description="Engage your members with posts, comments, reactions, and direct messaging."
             />
             <FeatureCard
-              image="https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=400&q=80"
+              image="https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=400&q=80"
               title="Whiteboard"
               description="Collaborate visually in real-time during live sessions."
             />
             <FeatureCard
-              image="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&q=80"
+              image="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=400&q=80"
               title="Screen Sharing"
               description="Present slides, demos, and tutorials seamlessly."
             />
             <FeatureCard
-              image="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&q=80"
+              image="https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=400&q=80"
               title="AI Assistant"
               description="Get AI-powered suggestions, moderation, and content ideas."
             />
@@ -433,7 +437,7 @@ export default function Home() {
             <ComparisonRow feature="Whiteboard" skool="✗" unytea="✓" highlighted />
             <ComparisonRow feature="Screen Sharing" skool="✗" unytea="✓" highlighted />
             <ComparisonRow feature="AI Assistant" skool="✗" unytea="✓" highlighted />
-            <ComparisonRow feature="Video Calls" skool="✗" unytea="✓" highlighted />
+            <ComparisonRow feature="Live Video Sessions" skool="✗" unytea="✓" highlighted />
             <ComparisonRow feature="Custom Domain" skool="✗" unytea="✓" />
             <ComparisonRow feature="Transaction Fee" skool="10%" unytea="3-5%" highlighted />
           </div>
@@ -543,7 +547,7 @@ export default function Home() {
             <PricingCard
               name="Creator"
               price={49}
-              description="For serious creators"
+              description="Best for monetizing communities"
               features={["1 community", "Unlimited members", "Live sessions", "Full courses", "3% transaction fee"]}
               popular
               cta="Start Free Trial"
@@ -562,6 +566,77 @@ export default function Home() {
               features={["Multiple communities", "White-label", "API access", "Unlimited admins", "0% transaction fee"]}
               cta="Contact Sales"
             />
+          </div>
+        </div>
+      </section>
+
+      {/* REPLACE TOOLS */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <p className="text-center text-muted-foreground mb-8 text-lg">
+            Replace tools like
+          </p>
+          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12">
+            <div className="flex items-center gap-2 text-gray-500">
+              <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">Z</div>
+              <span className="font-medium">Zoom</span>
+            </div>
+            <div className="flex items-center gap-2 text-gray-500">
+              <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">K</div>
+              <span className="font-medium">Kajabi</span>
+            </div>
+            <div className="flex items-center gap-2 text-gray-500">
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">f</div>
+              <span className="font-medium">Facebook Groups</span>
+            </div>
+            <div className="flex items-center gap-2 text-gray-500">
+              <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">S</div>
+              <span className="font-medium">Slack</span>
+            </div>
+            <div className="flex items-center gap-2 text-gray-500">
+              <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">S</div>
+              <span className="font-medium">Skool</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* MIGRATION FROM SKOOL */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-10">
+              <Badge className="mb-4 bg-green-100 text-green-700 hover:bg-green-100">Easy Migration</Badge>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                Switch from Skool in minutes
+              </h2>
+              <p className="text-lg text-muted-foreground">
+                We make it simple to bring your community to Unytea
+              </p>
+            </div>
+            <div className="grid md:grid-cols-3 gap-6">
+              <div className="text-center p-6 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100">
+                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Users className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="font-semibold mb-2">Import Members</h3>
+                <p className="text-sm text-muted-foreground">One-click CSV import of all your members and their data</p>
+              </div>
+              <div className="text-center p-6 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100">
+                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <BookOpen className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="font-semibold mb-2">Move Your Courses</h3>
+                <p className="text-sm text-muted-foreground">Transfer your course content seamlessly with our migration tool</p>
+              </div>
+              <div className="text-center p-6 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100">
+                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Sparkles className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="font-semibold mb-2">Keep Your Community</h3>
+                <p className="text-sm text-muted-foreground">All posts, discussions, and engagement preserved</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
