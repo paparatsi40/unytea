@@ -21,7 +21,8 @@ export default function SignUpPage() {
   const handleOAuthSignIn = async (provider: "google" | "github") => {
     try {
       setIsLoading(true)
-      await signIn(provider, { callbackUrl: "/onboarding" })
+      // Add newUser flag for OAuth callback handling
+      await signIn(provider, { callbackUrl: "/onboarding?newUser=true" })
     } catch {
       toast.error(t("common.error"))
     } finally {
@@ -76,7 +77,8 @@ export default function SignUpPage() {
         toast.error(t("auth.signInError"))
       } else {
         toast.success(t("auth.accountCreated"))
-        router.push("/onboarding")
+        // Redirect to onboarding with flag to prevent middleware interference
+        router.push("/onboarding?newUser=true")
       }
     } catch {
       toast.error(t("common.error"))

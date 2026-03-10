@@ -58,10 +58,10 @@ export default auth((req) => {
     return intlResponse
   }
   
-  // Ya logueado en auth sin locale -> /dashboard (excepto onboarding)
+  // Ya logueado en auth sin locale -> /dashboard (excepto si va a onboarding)
   const isAuthRoute = pathname.startsWith("/auth")
-  const isGoingToOnboarding = req.headers.get("referer")?.includes("/onboarding") || 
-                              req.nextUrl.searchParams.has("onboarding")
+  const isGoingToOnboarding = req.nextUrl.searchParams.has("newUser") || 
+                              req.headers.get("referer")?.includes("/onboarding")
   if (isAuthRoute && isLoggedIn && !pathname.includes("callback") && !isGoingToOnboarding) {
     return NextResponse.redirect(new URL("/dashboard", req.url))
   }
