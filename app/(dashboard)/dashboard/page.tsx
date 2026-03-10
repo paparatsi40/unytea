@@ -4,14 +4,12 @@ import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useToast } from "@/hooks/use-toast";
-import { GamificationWidget } from "@/components/dashboard/GamificationWidget";
 import {
   Users,
   BookOpen,
   Video,
   Calendar,
   TrendingUp,
-  Award,
   Plus,
   MessageSquare,
   Heart,
@@ -21,39 +19,34 @@ import {
   Play,
   CheckCircle2,
   Sparkles,
+  Building2,
+  DollarSign,
+  BarChart3,
+  ArrowRight,
+  ChevronRight,
+  Target,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import Link from "next/link";
 
 // Types
-interface Post {
-  id: string;
-  author: {
-    name: string;
-    avatar: string;
-    role: string;
-    community?: string;
-  };
-  content: string;
-  image?: string;
-  likes: number;
-  comments: number;
-  shares: number;
-  timestamp: string;
-  isLiked: boolean;
-  tags?: string[];
+interface BusinessMetrics {
+  communities: number;
+  members: number;
+  revenue: number;
+  engagement: number;
 }
 
-interface CourseProgress {
+interface RecentActivity {
   id: string;
-  title: string;
-  progress: number;
-  imageUrl?: string;
-  totalLessons: number;
-  completedLessons: number;
+  type: "member_joined" | "course_completed" | "post_created" | "session_scheduled" | "revenue";
+  description: string;
+  time: string;
+  value?: string;
 }
 
 interface UpcomingEvent {
@@ -61,27 +54,18 @@ interface UpcomingEvent {
   title: string;
   type: "session" | "live" | "deadline";
   time: string;
-  community?: string;
-}
-
-interface Achievement {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  unlockedAt: string;
+  community: string;
+  attendees?: number;
 }
 
 export default function DashboardPage() {
   const { user } = useCurrentUser();
   const { toast } = useToast();
   const t = useTranslations("dashboard");
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [courses, setCourses] = useState<CourseProgress[]>([]);
+  const [metrics, setMetrics] = useState<BusinessMetrics | null>(null);
+  const [activities, setActivities] = useState<RecentActivity[]>([]);
   const [events, setEvents] = useState<UpcomingEvent[]>([]);
-  const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [newPostContent, setNewPostContent] = useState("");
 
   // Load dashboard data
   useEffect(() => {
@@ -92,32 +76,25 @@ export default function DashboardPage() {
     try {
       setIsLoading(true);
       
-      // Load feed posts
-      const postsRes = await fetch("/api/feed/posts");
-      if (postsRes.ok) {
-        const postsData = await postsRes.json();
-        setPosts(postsData.posts || []);
+      // Load business metrics
+      const metricsRes = await fetch("/api/dashboard/metrics");
+      if (metricsRes.ok) {
+        const metricsData = await metricsRes.json();
+        setMetrics(metricsData);
       }
 
-      // Load course progress
-      const coursesRes = await fetch("/api/courses/progress");
-      if (coursesRes.ok) {
-        const coursesData = await coursesRes.json();
-        setCourses(coursesData.courses || []);
+      // Load recent activity
+      const activityRes = await fetch("/api/dashboard/activity");
+      if (activityRes.ok) {
+        const activityData = await activityRes.json();
+        setActivities(activityData.activities || []);
       }
 
       // Load upcoming events
-      const eventsRes = await fetch("/api/events/upcoming");
+      const eventsRes = await fetch("/api/dashboard/events");
       if (eventsRes.ok) {
         const eventsData = await eventsRes.json();
         setEvents(eventsData.events || []);
-      }
-
-      // Load recent achievements
-      const achievementsRes = await fetch("/api/achievements/recent");
-      if (achievementsRes.ok) {
-        const achievementsData = await achievementsRes.json();
-        setAchievements(achievementsData.achievements || []);
       }
     } catch (error) {
       console.error("Error loading dashboard:", error);
@@ -126,45 +103,50 @@ export default function DashboardPage() {
     }
   };
 
-  const handleCreatePost = async () => {
-    if (!newPostContent.trim()) return;
-
-    try {
-      const res = await fetch("/api/posts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: newPostContent }),
-      });
-
-      if (res.ok) {
-        setNewPostContent("");
-        toast({
-          title: "Post created!",
-          description: "Your post has been published to the community.",
-        });
-        loadDashboardData();
-      }
-    } catch (_error) {
-      toast({
-        title: "Error",
-        description: "Failed to create post. Please try again.",
-        variant: "destructive",
-      });
+  // Determine next best action based on user state
+  const getNextBestAction = () => {
+    if (!metrics) return null;
+    
+    if (metrics.communities === 0) {
+      return {
+        title: "Create your first community",
+        description: "Start building your community business today",
+        action: "Create Community",
+        link: "/dashboard/communities",
+        priority: "high",
+      };
     }
+    
+    if (metrics.members === 0) {
+      return {
+        title: "Invite your first members",
+        description: "Your community is ready. Time to bring people in!",
+        action: "Invite Members",
+        link: "/dashboard/communities",
+        priority: "high",
+      };
+    }
+    
+    if (metrics.revenue === 0) {
+      return {
+        title: "Turn on paid memberships",
+        description: "Start monetizing your community with paid plans",
+        action: "Set Up Pricing",
+        link: "/dashboard/settings/billing",
+        priority: "medium",
+      };
+    }
+    
+    return {
+      title: "Schedule your next live session",
+      description: "Keep your community engaged with live content",
+      action: "Schedule Session",
+      link: "/dashboard/sessions",
+      priority: "medium",
+    };
   };
 
-  const handleLikePost = async (postId: string) => {
-    try {
-      await fetch(`/api/posts/${postId}/like`, { method: "POST" });
-      setPosts(posts.map(post => 
-        post.id === postId 
-          ? { ...post, isLiked: !post.isLiked, likes: post.isLiked ? post.likes - 1 : post.likes + 1 }
-          : post
-      ));
-    } catch (error) {
-      console.error("Error liking post:", error);
-    }
-  };
+  const nextAction = getNextBestAction();
 
   if (isLoading) {
     return (
@@ -182,245 +164,130 @@ export default function DashboardPage() {
           {t("welcome")}{user?.name ? `, ${user.name.split(' ')[0]}` : ''}! 👋
         </h1>
         <p className="mt-2 text-muted-foreground">
-          Here's what's happening in your communities today.
+          Here's how your community business is performing today.
         </p>
       </div>
 
+      {/* Business Metrics - Host Priority #1 */}
+      {metrics && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Communities</p>
+                  <p className="text-2xl font-bold">{metrics.communities}</p>
+                </div>
+                <Building2 className="h-8 w-8 text-blue-600" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Total Members</p>
+                  <p className="text-2xl font-bold">{metrics.members}</p>
+                </div>
+                <Users className="h-8 w-8 text-green-600" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Revenue</p>
+                  <p className="text-2xl font-bold">${metrics.revenue.toLocaleString()}</p>
+                </div>
+                <DollarSign className="h-8 w-8 text-purple-600" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Engagement</p>
+                  <p className="text-2xl font-bold">{metrics.engagement}%</p>
+                </div>
+                <BarChart3 className="h-8 w-8 text-orange-600" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Next Best Action - Host Priority #2 */}
+      {nextAction && (
+        <Card className="mb-8 border-primary/20 bg-primary/5">
+          <CardContent className="p-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+                  <Target className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg">{nextAction.title}</h3>
+                  <p className="text-muted-foreground">{nextAction.description}</p>
+                </div>
+              </div>
+              <Link href={nextAction.link}>
+                <Button className="gap-2">
+                  {nextAction.action}
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Sidebar - Quick Actions & Navigation */}
+        {/* Left Column - Quick Actions & Navigation */}
         <div className="space-y-6">
-          {/* Quick Actions */}
+          {/* Quick Actions - Host Focused */}
           <Card>
             <CardHeader className="pb-3">
-              <h3 className="font-semibold text-foreground">{t("quickActions.title")}</h3>
+              <h3 className="font-semibold text-foreground">Quick Actions</h3>
             </CardHeader>
             <CardContent className="space-y-2">
               <Link href="/dashboard/communities">
-                <Button variant="outline" className="w-full justify-start gap-2">
+                <Button variant="outline" className="w-full justify-start gap-2 hover:bg-primary/10 hover:border-primary/30 transition-all">
                   <Plus className="h-4 w-4" />
-                  {t("quickActions.createPost")}
+                  Create Community
                 </Button>
               </Link>
-              <Link href="/dashboard/courses">
-                <Button variant="outline" className="w-full justify-start gap-2">
-                  <Play className="h-4 w-4" />
-                  Continue Learning
+              <Link href="/dashboard/communities">
+                <Button variant="outline" className="w-full justify-start gap-2 hover:bg-green-50 hover:border-green-200 transition-all">
+                  <Users className="h-4 w-4" />
+                  Invite Members
                 </Button>
               </Link>
-              <Link href="/dashboard/messages">
-                <Button variant="outline" className="w-full justify-start gap-2">
-                  <MessageSquare className="h-4 w-4" />
-                  Send Message
+              <Link href="/dashboard/courses/create">
+                <Button variant="outline" className="w-full justify-start gap-2 hover:bg-orange-50 hover:border-orange-200 transition-all">
+                  <BookOpen className="h-4 w-4" />
+                  Create Course
                 </Button>
               </Link>
               <Link href="/dashboard/sessions">
-                <Button variant="outline" className="w-full justify-start gap-2">
+                <Button variant="outline" className="w-full justify-start gap-2 hover:bg-purple-50 hover:border-purple-200 transition-all">
                   <Video className="h-4 w-4" />
-                  Start Session
+                  Start Live Session
+                </Button>
+              </Link>
+              <Link href="/dashboard/analytics">
+                <Button variant="outline" className="w-full justify-start gap-2 hover:bg-blue-50 hover:border-blue-200 transition-all">
+                  <BarChart3 className="h-4 w-4" />
+                  View Analytics
                 </Button>
               </Link>
             </CardContent>
           </Card>
 
-          {/* Gamification Widget */}
-          {user?.id && <GamificationWidget userId={user.id} />}
-
-          {/* Course Progress Widget */}
-          {courses.length > 0 && (
-            <Card>
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-foreground">Continue Learning</h3>
-                  <BookOpen className="h-4 w-4 text-muted-foreground" />
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {courses.slice(0, 3).map((course) => (
-                  <div key={course.id} className="space-y-2">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary/20 to-purple-500/20 flex items-center justify-center">
-                        <BookOpen className="h-5 w-5 text-primary" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate">{course.title}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {course.completedLessons}/{course.totalLessons} lessons
-                        </p>
-                      </div>
-                    </div>
-                    <div className="h-2 bg-muted rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-gradient-to-r from-primary to-purple-500 transition-all"
-                        style={{ width: `${course.progress}%` }}
-                      />
-                    </div>
-                  </div>
-                ))}
-                <Link href="/dashboard/courses">
-                  <Button variant="ghost" size="sm" className="w-full text-primary">
-                    View All Courses
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Recent Achievements */}
-          {achievements.length > 0 && (
-            <Card>
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-foreground">Recent Achievements</h3>
-                  <Award className="h-4 w-4 text-muted-foreground" />
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {achievements.slice(0, 3).map((achievement) => (
-                  <div key={achievement.id} className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-white text-lg">
-                      {achievement.icon}
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm">{achievement.name}</p>
-                      <p className="text-xs text-muted-foreground">{achievement.description}</p>
-                    </div>
-                  </div>
-                ))}
-                <Link href="/dashboard/achievements">
-                  <Button variant="ghost" size="sm" className="w-full text-primary">
-                    View All
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-
-        {/* Main Feed */}
-        <div className="space-y-6">
-          {/* Create Post */}
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex gap-3">
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src={user?.image || undefined} />
-                  <AvatarFallback>{user?.name?.[0] || "U"}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <textarea
-                    placeholder="What's on your mind? Share with your community..."
-                    className="w-full p-3 rounded-lg border border-border bg-transparent resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 min-h-[80px]"
-                    value={newPostContent}
-                    onChange={(e) => setNewPostContent(e.target.value)}
-                  />
-                  <div className="flex justify-end mt-2">
-                    <Button 
-                      onClick={handleCreatePost}
-                      disabled={!newPostContent.trim()}
-                      size="sm"
-                    >
-                      <Sparkles className="h-4 w-4 mr-2" />
-                      Post
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Feed Posts */}
-          {posts.length === 0 ? (
-            <Card className="p-8 text-center">
-              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
-                <MessageSquare className="h-8 w-8 text-muted-foreground" />
-              </div>
-              <h3 className="font-semibold text-lg mb-2">No posts yet</h3>
-              <p className="text-muted-foreground mb-4">
-                Join communities to see posts from members, or create your own!
-              </p>
-              <Link href="/dashboard/communities">
-                <Button>Explore Communities</Button>
-              </Link>
-            </Card>
-          ) : (
-            posts.map((post) => (
-              <Card key={post.id} className="overflow-hidden">
-                <CardContent className="p-0">
-                  {/* Post Header */}
-                  <div className="p-4 flex items-start gap-3">
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage src={post.author.avatar} />
-                      <AvatarFallback>{post.author.name[0]}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold text-sm">{post.author.name}</span>
-                        <span className="text-muted-foreground text-sm">•</span>
-                        <span className="text-muted-foreground text-sm">{post.author.role}</span>
-                      </div>
-                      {post.author.community && (
-                        <p className="text-xs text-primary">{post.author.community}</p>
-                      )}
-                      <p className="text-xs text-muted-foreground">{post.timestamp}</p>
-                    </div>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </div>
-
-                  {/* Post Content */}
-                  <div className="px-4 pb-3">
-                    <p className="text-foreground whitespace-pre-wrap">{post.content}</p>
-                    {post.tags && (
-                      <div className="flex gap-2 mt-2">
-                        {post.tags.map((tag) => (
-                          <Badge key={tag} variant="secondary" className="text-xs">
-                            #{tag}
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Post Image */}
-                  {post.image && (
-                    <div className="px-4 pb-3">
-                      <img
-                        src={post.image}
-                        alt="Post content"
-                        className="rounded-lg w-full object-cover max-h-[400px]"
-                      />
-                    </div>
-                  )}
-
-                  {/* Post Actions */}
-                  <div className="px-4 py-3 border-t border-border flex items-center gap-6">
-                    <button
-                      onClick={() => handleLikePost(post.id)}
-                      className={`flex items-center gap-2 text-sm transition-colors ${
-                        post.isLiked ? "text-red-500" : "text-muted-foreground hover:text-red-500"
-                      }`}
-                    >
-                      <Heart className={`h-4 w-4 ${post.isLiked ? "fill-current" : ""}`} />
-                      <span>{post.likes}</span>
-                    </button>
-                    <button className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
-                      <MessageSquare className="h-4 w-4" />
-                      <span>{post.comments}</span>
-                    </button>
-                    <button className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
-                      <Share2 className="h-4 w-4" />
-                      <span>{post.shares}</span>
-                    </button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </div>
-
-        {/* Right Sidebar - Upcoming & Stats */}
-        <div className="space-y-6">
           {/* Upcoming Events */}
           {events.length > 0 && (
             <Card>
@@ -431,115 +298,160 @@ export default function DashboardPage() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
-                {events.slice(0, 4).map((event) => (
-                  <div key={event.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                      event.type === "session" ? "bg-blue-100 text-blue-600" :
-                      event.type === "live" ? "bg-red-100 text-red-600" :
-                      "bg-yellow-100 text-yellow-600"
-                    }`}>
-                      {event.type === "session" ? <Video className="h-5 w-5" /> :
-                       event.type === "live" ? <Play className="h-5 w-5" /> :
-                       <Clock className="h-5 w-5" />}
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium text-sm line-clamp-1">{event.title}</p>
-                      <p className="text-xs text-muted-foreground">{event.time}</p>
-                      {event.community && (
-                        <p className="text-xs text-primary">{event.community}</p>
+                {events.slice(0, 3).map((event) => (
+                  <div key={event.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
+                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      {event.type === "session" ? (
+                        <Video className="h-5 w-5 text-primary" />
+                      ) : event.type === "live" ? (
+                        <Play className="h-5 w-5 text-primary" />
+                      ) : (
+                        <Clock className="h-5 w-5 text-primary" />
                       )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm truncate">{event.title}</p>
+                      <p className="text-xs text-muted-foreground">{event.community}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Clock className="h-3 w-3 text-muted-foreground" />
+                        <span className="text-xs text-muted-foreground">{event.time}</span>
+                        {event.attendees && (
+                          <>
+                            <span className="text-muted-foreground">•</span>
+                            <span className="text-xs text-muted-foreground">{event.attendees} attending</span>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}
                 <Link href="/dashboard/sessions">
                   <Button variant="ghost" size="sm" className="w-full text-primary">
-                    View Calendar
+                    View All Sessions
                   </Button>
                 </Link>
               </CardContent>
             </Card>
           )}
+        </div>
 
-          {/* Trending Communities */}
+        {/* Main Content - Recent Activity */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Recent Activity Feed */}
           <Card>
-            <CardHeader className="pb-3">
+            <CardHeader>
               <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-foreground">Trending</h3>
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                <div>
+                  <CardTitle>Recent Activity</CardTitle>
+                  <CardDescription>What's happening in your communities</CardDescription>
+                </div>
+                <Button variant="outline" size="sm">View All</Button>
               </div>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center text-white font-bold">
-                  M
+            <CardContent>
+              {activities.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+                    <TrendingUp className="h-8 w-8 text-muted-foreground" />
+                  </div>
+                  <h3 className="font-semibold text-lg mb-2">No activity yet</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Start building your community to see activity here!
+                  </p>
+                  <Link href="/dashboard/communities">
+                    <Button>Create Community</Button>
+                  </Link>
                 </div>
-                <div className="flex-1">
-                  <p className="font-medium text-sm">Marketing Pros</p>
-                  <p className="text-xs text-muted-foreground">+124 members this week</p>
+              ) : (
+                <div className="space-y-4">
+                  {activities.slice(0, 5).map((activity) => (
+                    <div key={activity.id} className="flex items-start gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
+                        activity.type === "member_joined" ? "bg-green-100" :
+                        activity.type === "revenue" ? "bg-purple-100" :
+                        activity.type === "course_completed" ? "bg-blue-100" :
+                        "bg-orange-100"
+                      }`}>
+                        {activity.type === "member_joined" ? (
+                          <Users className="h-5 w-5 text-green-600" />
+                        ) : activity.type === "revenue" ? (
+                          <DollarSign className="h-5 w-5 text-purple-600" />
+                        ) : activity.type === "course_completed" ? (
+                          <CheckCircle2 className="h-5 w-5 text-blue-600" />
+                        ) : activity.type === "session_scheduled" ? (
+                          <Video className="h-5 w-5 text-orange-600" />
+                        ) : (
+                          <MessageSquare className="h-5 w-5 text-orange-600" />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm">{activity.description}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-xs text-muted-foreground">{activity.time}</span>
+                          {activity.value && (
+                            <>
+                              <span className="text-muted-foreground">•</span>
+                              <span className="text-xs font-medium text-green-600">{activity.value}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
-              <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-400 to-pink-600 flex items-center justify-center text-white font-bold">
-                  D
-                </div>
-                <div className="flex-1">
-                  <p className="font-medium text-sm">Design Hub</p>
-                  <p className="text-xs text-muted-foreground">+89 members this week</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-400 to-cyan-600 flex items-center justify-center text-white font-bold">
-                  T
-                </div>
-                <div className="flex-1">
-                  <p className="font-medium text-sm">Tech Leaders</p>
-                  <p className="text-xs text-muted-foreground">+67 members this week</p>
-                </div>
-              </div>
+              )}
             </CardContent>
           </Card>
 
-          {/* Daily Challenge / Streak */}
-          <Card className="bg-gradient-to-br from-primary/5 to-purple-500/5">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center">
-                  <CheckCircle2 className="h-6 w-6 text-white" />
+          {/* Getting Started Guide */}
+          {!metrics || metrics.communities === 0 ? (
+            <Card className="border-primary/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  Getting Started
+                </CardTitle>
+                <CardDescription>Follow these steps to launch your community</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-start gap-4">
+                    <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold flex-shrink-0">
+                      1
+                    </div>
+                    <div>
+                      <p className="font-medium">Create your community</p>
+                      <p className="text-sm text-muted-foreground">Set up your community name, description, and branding</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <div className="w-8 h-8 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-sm font-bold flex-shrink-0">
+                      2
+                    </div>
+                    <div>
+                      <p className="font-medium text-muted-foreground">Invite your first members</p>
+                      <p className="text-sm text-muted-foreground">Share your community link or invite people directly</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <div className="w-8 h-8 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-sm font-bold flex-shrink-0">
+                      3
+                    </div>
+                    <div>
+                      <p className="font-medium text-muted-foreground">Publish your first content</p>
+                      <p className="text-sm text-muted-foreground">Create a post, course, or schedule a live session</p>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-semibold">Daily Streak</p>
-                  <p className="text-2xl font-bold text-primary">5 days 🔥</p>
-                </div>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Complete a lesson or post today to keep your streak alive!
-              </p>
-              <div className="mt-3 flex gap-1">
-                {[1, 2, 3, 4, 5, 6, 7].map((day) => (
-                  <div
-                    key={day}
-                    className={`flex-1 h-2 rounded-full ${
-                      day <= 5 ? "bg-primary" : "bg-muted"
-                    }`}
-                  />
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Invite Friends */}
-          <Card>
-            <CardContent className="p-4">
-              <h3 className="font-semibold mb-2">Grow Your Network</h3>
-              <p className="text-sm text-muted-foreground mb-3">
-                Invite friends and earn rewards when they join.
-              </p>
-              <Button variant="outline" className="w-full" size="sm">
-                <Users className="h-4 w-4 mr-2" />
-                Invite Friends
-              </Button>
-            </CardContent>
-          </Card>
+                <Link href="/dashboard/communities" className="mt-6 block">
+                  <Button className="w-full">
+                    Start Step 1: Create Community
+                    <ChevronRight className="h-4 w-4 ml-2" />
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          ) : null}
         </div>
       </div>
     </div>
