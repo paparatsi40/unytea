@@ -301,14 +301,14 @@ export default function Home() {
       <section id="features" className="py-20 px-4 bg-muted/30">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
-            <Badge className="mb-4">Curriculum</Badge>
+            <Badge className="mb-4">{t("features.badge")}</Badge>
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Everything You Need to
+              {t("features.title")}
               <br />
-              <span className="gradient-text">Build & Scale</span>
+              <span className="gradient-text">{t("features.subtitle")}</span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              A complete ecosystem to create, engage, and monetize your community
+              {t("features.description")}
             </p>
           </div>
 
