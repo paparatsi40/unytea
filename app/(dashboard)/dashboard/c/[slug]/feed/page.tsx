@@ -139,11 +139,11 @@ const mockLiveSessions: LiveSession[] = [
 
 export default function CommunityFeedPage() {
   const params = useParams();
-  const slug = params?.slug as string;
+  const _slug = params?.slug as string; // Available for future API calls
   const { user } = useCurrentUser();
   
   const [posts, setPosts] = useState<Post[]>(mockPosts);
-  const [liveSessions, setLiveSessions] = useState<LiveSession[]>(mockLiveSessions);
+  const [liveSessions] = useState<LiveSession[]>(mockLiveSessions);
   const [activeFilter, setActiveFilter] = useState<"all" | "updates" | "gems" | "fun" | "discussion">("all");
   const [newPostContent, setNewPostContent] = useState("");
   const [isPosting, setIsPosting] = useState(false);
