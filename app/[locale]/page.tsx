@@ -579,21 +579,21 @@ export default function Home() {
               Consolidate Your Stack
             </Badge>
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Stop paying for 5 different tools
+              Replace your entire community stack
             </h2>
             <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-              Replace your entire software stack with one powerful platform
+              Run your entire community business with one platform
             </p>
           </div>
           
           {/* Tools being replaced */}
           <div className="flex flex-wrap justify-center items-center gap-4 md:gap-6 mb-10">
             {[
-              { name: "Zoom", color: "bg-blue-500", icon: "Z", desc: "Video calls" },
-              { name: "Kajabi", color: "bg-orange-500", icon: "K", desc: "Courses" },
-              { name: "Facebook Groups", color: "bg-blue-600", icon: "f", desc: "Community" },
-              { name: "Slack", color: "bg-purple-600", icon: "S", desc: "Chat" },
-              { name: "Skool", color: "bg-green-500", icon: "S", desc: "Memberships" },
+              { name: "Zoom", color: "bg-blue-500", icon: "Z", feature: "→ Live sessions" },
+              { name: "Kajabi", color: "bg-orange-500", icon: "K", feature: "→ Courses" },
+              { name: "Facebook", color: "bg-blue-600", icon: "f", feature: "→ Community" },
+              { name: "Slack", color: "bg-purple-600", icon: "S", feature: "→ Chat" },
+              { name: "Skool", color: "bg-green-500", icon: "S", feature: "→ Memberships" },
             ].map((tool) => (
               <div key={tool.name} className="group flex items-center gap-3 bg-white/10 backdrop-blur-sm px-4 py-3 rounded-xl border border-white/10 hover:bg-white/20 transition-all">
                 <div className={`w-10 h-10 ${tool.color} rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-lg`}>
@@ -601,7 +601,7 @@ export default function Home() {
                 </div>
                 <div>
                   <div className="font-semibold text-sm">{tool.name}</div>
-                  <div className="text-xs text-gray-400">{tool.desc}</div>
+                  <div className="text-xs text-green-400 font-medium">{tool.feature}</div>
                 </div>
               </div>
             ))}
@@ -628,9 +628,51 @@ export default function Home() {
               </div>
             </div>
             
-            <p className="mt-6 text-gray-400 text-sm">
-              Save $300+/month • No more integrations • Everything connected
+            <p className="mt-6 text-gray-400 text-base">
+              No integrations. No complexity. Just one platform.
             </p>
+            <p className="mt-2 text-gray-500 text-sm">
+              Save $300+/month • Cancel 5 subscriptions • Everything connected
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* COMMUNITY TEMPLATES */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-10">
+            <Badge className="mb-4">Start Fast</Badge>
+            <h2 className="text-3xl font-bold mb-4">Start with proven templates</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Launch your community in minutes with pre-built templates
+            </p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            <div className="bg-white p-6 rounded-xl border hover:shadow-lg transition-all text-center">
+              <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <Video className="w-7 h-7 text-blue-600" />
+              </div>
+              <h3 className="font-semibold text-lg mb-2">Coaching Communities</h3>
+              <p className="text-sm text-muted-foreground mb-4">Group calls, 1-on-1 scheduling, progress tracking</p>
+              <div className="text-xs text-green-600 font-medium">✓ Ready in 2 minutes</div>
+            </div>
+            <div className="bg-white p-6 rounded-xl border hover:shadow-lg transition-all text-center">
+              <div className="w-14 h-14 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <BookOpen className="w-7 h-7 text-orange-600" />
+              </div>
+              <h3 className="font-semibold text-lg mb-2">Course Communities</h3>
+              <p className="text-sm text-muted-foreground mb-4">Lessons, assignments, discussions, certificates</p>
+              <div className="text-xs text-green-600 font-medium">✓ Ready in 2 minutes</div>
+            </div>
+            <div className="bg-white p-6 rounded-xl border hover:shadow-lg transition-all text-center">
+              <div className="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <Users className="w-7 h-7 text-purple-600" />
+              </div>
+              <h3 className="font-semibold text-lg mb-2">Membership Communities</h3>
+              <p className="text-sm text-muted-foreground mb-4">Exclusive content, member tiers, recurring revenue</p>
+              <div className="text-xs text-green-600 font-medium">✓ Ready in 2 minutes</div>
+            </div>
           </div>
         </div>
       </section>
