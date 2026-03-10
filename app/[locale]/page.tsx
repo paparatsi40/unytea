@@ -91,8 +91,6 @@ export default function Home() {
               {/* Main Headline */}
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
                 {t("hero.title")}
-                <br />
-                <span className="gradient-text">{t("hero.subtitle")}</span>
               </h1>
 
               <p className="text-lg md:text-xl text-muted-foreground mb-6 max-w-xl mx-auto lg:mx-0">
@@ -303,15 +301,12 @@ export default function Home() {
       <section id="features" className="py-20 px-4 bg-muted/30">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
-            <Badge className="mb-4">{t("features.badge")}</Badge>
+            <Badge className="mb-4">Curriculum</Badge>
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
               {t("features.title")}
               <br />
               <span className="gradient-text">{t("features.subtitle")}</span>
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              {t("features.description")}
-            </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
