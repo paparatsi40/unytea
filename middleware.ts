@@ -40,14 +40,14 @@ export default auth((req) => {
     const isAuthRoute = normalizedPath.startsWith("/auth")
     const isProtectedWithLocale = normalizedPath.startsWith("/dashboard") || normalizedPath.startsWith("/onboarding")
     
-    // Protección con locale: redirigir a /{locale}/auth/signin
+    // Protección con locale: redirigir a /auth/signin (sin locale)
     if (isProtectedWithLocale && !isLoggedIn) {
-      return NextResponse.redirect(new URL(`/${locale}/auth/signin`, req.url))
+      return NextResponse.redirect(new URL("/auth/signin", req.url))
     }
     
-    // Ya logueado en auth con locale -> /{locale}/dashboard
+    // Ya logueado en auth con locale -> /dashboard (sin locale, dashboard está fuera de [locale])
     if (isAuthRoute && isLoggedIn && !normalizedPath.includes("callback")) {
-      return NextResponse.redirect(new URL(`/${locale}/dashboard`, req.url))
+      return NextResponse.redirect(new URL("/dashboard", req.url))
     }
     
     return intlMiddleware(req)
