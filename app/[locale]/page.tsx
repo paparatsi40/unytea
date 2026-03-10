@@ -15,33 +15,28 @@ import {
   Star,
   CheckCircle,
   Users,
-  Zap,
   Video,
   BookOpen,
   MessageSquare,
   TrendingUp,
   Award,
   Shield,
-  Globe,
-  Clock,
-  ChevronDown,
-  Quote,
   X,
   Monitor,
   Presentation,
   Mic,
   DollarSign,
   CreditCard,
-  ChevronRight,
+  Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export default function Home() {
   const [showDemoModal, setShowDemoModal] = useState(false);
-  const t = useTranslations("landing");
+  // const t = useTranslations("landing"); // TODO: Implementar traducciones para nueva landing
   const authT = useTranslations("auth");
   const { data: session } = useSession();
   const isLoggedIn = !!session?.user;
