@@ -234,41 +234,5 @@
       "title": "Daily Streak",
       "days": "days"
     }
-  },
-      "join": "Join"
-    },
-    "recentActivity": {
-      "title": "Recent Activity",
-      "empty": "No recent activity"
-    },
-    "courseProgress": {
-      "title": "Continue Learning",
-      "empty": "No courses in progress",
-      "continue": "Continue"
-    },
-    "achievements": {
-      "title": "Recent Achievements",
-      "empty": "Unlock your first achievement"
-    },
-    "trending": {
-      "title": "Trending Communities",
-      "join": "Join"
-    },
-    "events": {
-      "title": "Upcoming Events",
-      "empty": "No upcoming events"
-    },
-    "feed": {
-      "title": "Community Feed",
-      "createPlaceholder": "What's on your mind?",
-      "post": "Post",
-      "like": "Like",
-      "comment": "Comment",
-      "share": "Share"
-    },
-    "streak": {
-      "title": "Daily Streak",
-      "days": "days"
-    }
   }
 }
