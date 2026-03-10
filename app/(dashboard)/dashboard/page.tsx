@@ -260,98 +260,149 @@ export default function DashboardPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column - Onboarding & Quick Actions */}
-        <div className="space-y-6">
-          {/* Interactive Onboarding Checklist */}
-          {metrics?.communities === 0 ? (
-            // NO COMMUNITY - Dominant CTA
-            <Card className="border-2 border-primary/30 shadow-xl shadow-primary/10 overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/20 to-purple-500/20 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
-              <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-amber-400/20 to-orange-500/20 rounded-full translate-y-1/2 -translate-x-1/2 blur-2xl"></div>
-              
-              <CardContent className="p-8 relative">
-                <div className="text-center">
-                  {/* Large Icon */}
-                  <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-lg shadow-primary/30">
-                    <Rocket className="h-10 w-10 text-white" />
-                  </div>
-                  
-                  {/* Main Headline */}
-                  <h2 className="text-2xl md:text-3xl font-bold mb-3">
-                    Start your community business
-                  </h2>
-                  <p className="text-lg text-muted-foreground mb-2">
-                    Create your first community in under 2 minutes
-                  </p>
-                  <p className="text-sm text-muted-foreground mb-8 max-w-sm mx-auto">
-                    Join creators building thriving communities with live sessions, courses, and engaged members.
-                  </p>
-                  
-                  {/* CTA Button */}
-                  <Link href="/dashboard/communities" className="inline-block">
-                    <Button size="lg" className="gap-2 px-8 py-6 text-lg shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all">
-                      <Plus className="h-5 w-5" />
-                      Create Your Community
-                      <ArrowRight className="h-5 w-5" />
-                    </Button>
-                  </Link>
-                  
-                  {/* Trust indicators */}
-                  <div className="flex items-center justify-center gap-6 mt-6 text-sm text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <CheckCircle2 className="h-4 w-4 text-green-500" />
-                      Free to start
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <CheckCircle2 className="h-4 w-4 text-green-500" />
-                      No credit card
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <CheckCircle2 className="h-4 w-4 text-green-500" />
-                      Cancel anytime
-                    </span>
-                  </div>
+      {/* MAIN CONTENT - Stacked layout for better activation */}
+      <div className="space-y-6">
+        
+        {/* ROW 1: Launch Your Community - Full Width Dominant */}
+        {metrics?.communities === 0 ? (
+          // NO COMMUNITY - Full width dominant CTA
+          <Card className="border-2 border-primary/30 shadow-xl shadow-primary/10 overflow-hidden relative">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary/20 to-purple-500/20 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-amber-400/20 to-orange-500/20 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl"></div>
+            
+            <CardContent className="p-10 md:p-12 relative">
+              <div className="max-w-2xl mx-auto text-center">
+                {/* Large Icon */}
+                <div className="w-24 h-24 mx-auto mb-8 rounded-2xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-xl shadow-primary/30">
+                  <Rocket className="h-12 w-12 text-white" />
                 </div>
-              </CardContent>
-            </Card>
-          ) : (
-            // HAS COMMUNITY - Show checklist
-            <Card className="border-primary/20">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <Target className="h-5 w-5 text-primary" />
-                      {completedSteps === steps.length ? "All Steps Complete!" : 
-                       `Step ${activeStep?.number} of ${steps.length}`}
-                    </CardTitle>
-                    <CardDescription>
-                      {completedSteps === steps.length ? "You've built a thriving community business!" :
-                       "Continue building your community business"}
-                    </CardDescription>
+                
+                {/* Main Headline */}
+                <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                  Launch your community business
+                </h2>
+                <p className="text-xl text-muted-foreground mb-3">
+                  Create your first community in under 2 minutes
+                </p>
+                <p className="text-base text-muted-foreground mb-10 max-w-lg mx-auto">
+                  Join creators building thriving communities with live sessions, courses, and engaged members.
+                </p>
+                
+                {/* Progress Steps */}
+                <div className="bg-muted/30 rounded-2xl p-6 mb-8">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-sm font-medium text-muted-foreground">Launch Progress</span>
+                    <span className="text-sm font-bold text-primary">0%</span>
                   </div>
-                  {completedSteps > 0 && (
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                      <span className="text-lg font-bold text-primary">{completedSteps}/{steps.length}</span>
+                  <div className="h-2 bg-muted rounded-full overflow-hidden mb-6">
+                    <div className="h-full bg-gradient-to-r from-primary to-purple-500 rounded-full transition-all duration-500" style={{ width: '0%' }} />
+                  </div>
+                  
+                  {/* Steps */}
+                  <div className="grid md:grid-cols-3 gap-4 text-left">
+                    <div className="flex items-start gap-3 p-3 rounded-xl bg-primary/10 border border-primary/20">
+                      <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold flex-shrink-0">
+                        1
+                      </div>
+                      <div>
+                        <p className="font-semibold text-sm">Create community</p>
+                        <p className="text-xs text-muted-foreground">Next step →</p>
+                      </div>
                     </div>
-                  )}
+                    <div className="flex items-start gap-3 p-3 rounded-xl bg-muted/50 opacity-60">
+                      <div className="w-8 h-8 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-sm font-bold flex-shrink-0">
+                        2
+                      </div>
+                      <div>
+                        <p className="font-semibold text-sm">Invite members</p>
+                        <p className="text-xs text-muted-foreground">Pending</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3 p-3 rounded-xl bg-muted/50 opacity-60">
+                      <div className="w-8 h-8 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-sm font-bold flex-shrink-0">
+                        3
+                      </div>
+                      <div>
+                        <p className="font-semibold text-sm">Host live session</p>
+                        <p className="text-xs text-muted-foreground">Pending</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
+                
+                {/* CTA Button */}
+                <Link href="/dashboard/communities" className="inline-block">
+                  <Button size="lg" className="gap-2 px-10 py-7 text-lg shadow-xl shadow-primary/25 hover:shadow-2xl hover:shadow-primary/30 transition-all">
+                    <Plus className="h-5 w-5" />
+                    Start Your Community
+                    <ArrowRight className="h-5 w-5" />
+                  </Button>
+                </Link>
+                
+                {/* Trust indicators */}
+                <div className="flex items-center justify-center gap-8 mt-8 text-sm text-muted-foreground">
+                  <span className="flex items-center gap-1">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    Free to start
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    No credit card
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    Cancel anytime
+                  </span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          // HAS COMMUNITY - Show progress with completion status
+          <Card className="border-primary/20">
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2 text-xl">
+                    <Target className="h-5 w-5 text-primary" />
+                    {completedSteps === steps.length ? "🎉 All Steps Complete!" : `Launch Progress: ${Math.round((completedSteps / steps.length) * 100)}%`}
+                  </CardTitle>
+                  <CardDescription>
+                    {completedSteps === steps.length 
+                      ? "You've successfully launched your community business!" 
+                      : `Step ${activeStep?.number || completedSteps + 1} of ${steps.length}: ${activeStep?.title || steps[completedSteps]?.title}`}
+                  </CardDescription>
+                </div>
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
+                  <span className="text-lg font-bold text-primary">{completedSteps}/{steps.length}</span>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Progress Bar */}
+              <div className="mb-6">
+                <div className="h-3 bg-muted rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-primary via-purple-500 to-pink-500 rounded-full transition-all duration-500"
+                    style={{ width: `${(completedSteps / steps.length) * 100}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Steps Grid */}
+              <div className="grid md:grid-cols-3 gap-4">
                 {steps.map((step) => (
                   <div 
                     key={step.number}
-                    className={`flex items-start gap-4 p-4 rounded-xl transition-all ${
+                    className={`flex items-start gap-3 p-4 rounded-xl transition-all ${
                       step.completed 
-                        ? "bg-green-50/50 border border-green-100" 
+                        ? "bg-green-50 border border-green-200" 
                         : step.active
-                          ? "bg-gradient-to-r from-primary/10 to-primary/5 border-2 border-primary/30 shadow-md"
-                          : "bg-muted/30 border border-transparent"
+                          ? "bg-gradient-to-r from-primary/10 to-purple-50 border-2 border-primary/30 shadow-md"
+                          : "bg-muted/30 opacity-70"
                     }`}
                   >
-                    {/* Step Icon/Number */}
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
                       step.completed 
                         ? "bg-green-500 text-white" 
                         : step.active
@@ -359,71 +410,37 @@ export default function DashboardPage() {
                           : "bg-muted text-muted-foreground"
                     }`}>
                       {step.completed ? (
-                        <CheckCircle2 className="h-6 w-6" />
+                        <CheckCircle2 className="h-5 w-5" />
                       ) : (
-                        <step.icon className="h-6 w-6" />
+                        <span className="font-bold">{step.number}</span>
                       )}
                     </div>
 
-                    {/* Step Content */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h4 className={`font-semibold ${
-                          step.completed ? "text-green-700" : 
-                          step.active ? "text-primary" : "text-muted-foreground"
-                        }`}>
-                          {step.number}. {step.title}
-                        </h4>
-                        {step.completed && (
-                          <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
-                            Done
-                          </span>
-                        )}
-                        {step.active && (
-                          <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full animate-pulse">
-                            Next
-                          </span>
-                        )}
-                      </div>
-                      <p className={`text-sm mt-1 ${
-                        step.completed || step.active ? "text-muted-foreground" : "text-muted-foreground/60"
+                      <h4 className={`font-semibold ${
+                        step.completed ? "text-green-700" : 
+                        step.active ? "text-primary" : "text-muted-foreground"
                       }`}>
+                        {step.title}
+                      </h4>
+                      <p className="text-xs text-muted-foreground mt-1">
                         {step.description}
                       </p>
-                      
-                      {/* Action Button */}
                       {(step.active || (!step.completed && !steps.some(s => s.active))) && (
-                        <Link href={step.link} className="mt-3 inline-block">
-                          <Button 
-                            size="sm" 
-                            className={step.active ? "" : "bg-muted hover:bg-muted/80"}
-                            variant={step.active ? "default" : "outline"}
-                          >
+                        <Link href={step.link} className="mt-2 inline-block">
+                          <Button size="sm" variant={step.active ? "default" : "outline"}>
                             {step.action}
-                            <ArrowRight className="h-4 w-4 ml-1" />
+                            <ArrowRight className="h-3 w-3 ml-1" />
                           </Button>
                         </Link>
                       )}
                     </div>
                   </div>
                 ))}
-
-                {/* Progress Bar */}
-                <div className="mt-4 pt-4 border-t">
-                  <div className="flex items-center justify-between text-sm mb-2">
-                    <span className="text-muted-foreground">Your progress</span>
-                    <span className="font-medium">{Math.round((completedSteps / steps.length) * 100)}% complete</span>
-                  </div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-gradient-to-r from-primary to-primary/70 rounded-full transition-all duration-500"
-                      style={{ width: `${(completedSteps / steps.length) * 100}%` }}
-                    />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
           {/* Celebration Card - Shows when milestones reached */}
           {celebration && (
