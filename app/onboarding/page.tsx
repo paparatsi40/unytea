@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { Check, User, Briefcase, Target, Sparkles, Zap, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -66,7 +65,7 @@ const plans = [
 export default function OnboardingPage() {
   const router = useRouter();
   const { user, isLoading } = useCurrentUser();
-  const t = useTranslations("onboarding");
+  // const t = useTranslations("onboarding");
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({

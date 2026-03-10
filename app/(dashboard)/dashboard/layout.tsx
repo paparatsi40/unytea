@@ -6,10 +6,8 @@ import { AIWidgetProvider } from "@/components/ai/AIWidgetProvider";
 import { NextIntlClientProvider } from "next-intl";
 import { useEffect, useState } from "react";
 
-// Type for nested translation messages
-type Messages = {
-  [key: string]: string | Messages;
-};
+// Type for nested translation messages - flexible structure
+type Messages = Record<string, any>;
 
 // Default English messages fallback
 const fallbackMessages: Messages = {
