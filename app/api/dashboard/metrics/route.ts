@@ -34,31 +34,37 @@ export async function GET() {
     });
     const members = memberships.length;
 
-    // Get revenue from subscriptions (simplified calculation)
+    // Get revenue from community memberships (simplified)
+    // Look for subscriptions to communities owned by this user
+    const communityPlans = await prisma.subscriptionPlan.findMany({
+      where: {
+        community: {
+          ownerId: userId,
+        },
+      },
+      select: {
+        id: true,
+        price: true,
+      },
+    });
+
+    const planIds = communityPlans.map(p => p.id);
+    
     const subscriptions = await prisma.subscription.findMany({
       where: {
-        user: {
-          memberships: {
-            some: {
-              community: {
-                ownerId: userId,
-              },
-            },
-          },
+        planId: {
+          in: planIds,
         },
         status: "ACTIVE",
       },
       select: {
-        plan: {
-          select: {
-            price: true,
-          },
-        },
+        planId: true,
       },
     });
 
     const revenue = subscriptions.reduce((total, sub) => {
-      return total + (sub.plan?.price || 0);
+      const plan = communityPlans.find(p => p.id === sub.planId);
+      return total + (plan?.price || 0);
     }, 0);
 
     // Calculate engagement rate (posts + comments in last 30 days)

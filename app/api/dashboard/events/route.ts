@@ -14,12 +14,10 @@ export async function GET() {
 
     const userId = session.user.id;
 
-    // Get upcoming mentor sessions
+    // Get upcoming mentor sessions where user is mentor
     const sessions = await prisma.mentorSession.findMany({
       where: {
-        community: {
-          ownerId: userId,
-        },
+        mentorId: userId,
         scheduledAt: {
           gte: new Date(),
         },
@@ -32,17 +30,17 @@ export async function GET() {
       },
       take: 3,
       include: {
-        community: {
-          select: {
-            name: true,
-          },
-        },
-        enrollments: {
+        participations: {
           where: {
             status: "CONFIRMED",
           },
           select: {
             id: true,
+          },
+        },
+        mentee: {
+          select: {
+            name: true,
           },
         },
       },
@@ -54,8 +52,8 @@ export async function GET() {
       title: session.title,
       type: session.status === "IN_PROGRESS" ? "live" : "session" as const,
       time: formatTime(session.scheduledAt),
-      community: session.community.name,
-      attendees: session.enrollments.length,
+      community: session.mentee?.name || "Session",
+      attendees: session.participations.length,
     }));
 
     return NextResponse.json({ events });
