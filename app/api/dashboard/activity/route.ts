@@ -82,11 +82,6 @@ export async function GET() {
       },
       take: 2,
       include: {
-        user: {
-          select: {
-            name: true,
-          },
-        },
         course: {
           select: {
             title: true,
@@ -94,6 +89,21 @@ export async function GET() {
         },
       },
     });
+
+    // Get user names for completions
+    const userIds = recentCompletions.map(c => c.userId);
+    const users = await prisma.user.findMany({
+      where: {
+        id: {
+          in: userIds,
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+    const userMap = new Map(users.map(u => [u.id, u.name]));
 
     // Combine and format activities
     const activities = [
@@ -112,7 +122,7 @@ export async function GET() {
       ...recentCompletions.map((enrollment) => ({
         id: `course-${enrollment.id}`,
         type: "course_completed" as const,
-        description: `${enrollment.user.name} completed ${enrollment.course.title}`,
+        description: `${userMap.get(enrollment.userId) || "Someone"} completed ${enrollment.course.title}`,
         time: formatTime(enrollment.updatedAt),
       })),
     ].sort((a, b) => {
