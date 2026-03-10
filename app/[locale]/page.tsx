@@ -109,7 +109,7 @@ export default function Home() {
                 </span>
               </h1>
               <p className="text-xl text-muted-foreground mb-8 max-w-xl">
-                Host live sessions, courses, and discussions — all in one place.
+                Run your entire community business with live sessions, courses, and discussions — all in one place.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Link
@@ -124,53 +124,126 @@ export default function Home() {
                   className="px-8 py-4 border-2 border-border rounded-xl font-semibold hover:border-primary transition-colors flex items-center justify-center gap-2"
                 >
                   <Play className="w-5 h-5" />
-                  See How It Works
+                  Watch Demo
                 </button>
               </div>
               <p className="text-sm text-muted-foreground mt-4">
-                ✓ 14-day free trial &nbsp;•&nbsp; ✓ No credit card required
+                ✓ 14-day free trial &nbsp;•&nbsp; ✓ No credit card required &nbsp;•&nbsp; ✓ Launch in minutes
               </p>
             </div>
+            {/* Mock del producto - lado derecho */}
             <div className="relative">
-              <div className="relative bg-white rounded-2xl shadow-2xl p-6 border">
-                <div className="flex items-center gap-2 mb-4 pb-4 border-b">
+              <div className="relative bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl shadow-2xl p-6 border border-gray-700 text-white overflow-hidden">
+                {/* Browser chrome */}
+                <div className="flex items-center gap-2 mb-4 pb-4 border-b border-gray-700">
                   <div className="w-3 h-3 rounded-full bg-red-400" />
                   <div className="w-3 h-3 rounded-full bg-yellow-400" />
                   <div className="w-3 h-3 rounded-full bg-green-400" />
-                  <span className="ml-4 text-sm text-muted-foreground">unytea.com/dashboard</span>
+                  <span className="ml-4 text-sm text-gray-400">unytea.com/live/community-masterclass</span>
                 </div>
-                <div className="grid grid-cols-3 gap-4 mb-4">
-                  <div className="bg-purple-50 p-4 rounded-xl text-center">
-                    <Users className="w-6 h-6 mx-auto mb-2 text-primary" />
-                    <div className="text-2xl font-bold">2,847</div>
-                    <div className="text-xs text-muted-foreground">Members</div>
-                  </div>
-                  <div className="bg-green-50 p-4 rounded-xl text-center">
-                    <DollarSign className="w-6 h-6 mx-auto mb-2 text-green-600" />
-                    <div className="text-2xl font-bold">$12.4K</div>
-                    <div className="text-xs text-muted-foreground">Revenue</div>
-                  </div>
-                  <div className="bg-orange-50 p-4 rounded-xl text-center">
-                    <TrendingUp className="w-6 h-6 mx-auto mb-2 text-orange-600" />
-                    <div className="text-2xl font-bold">94%</div>
-                    <div className="text-xs text-muted-foreground">Engagement</div>
-                  </div>
-                </div>
-                <div className="bg-gray-50 p-4 rounded-xl">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                      <Video className="w-5 h-5 text-primary" />
+                
+                {/* Live session header */}
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="relative">
+                      <div className="absolute -inset-1 bg-red-500 rounded-full animate-pulse" />
+                      <div className="relative px-3 py-1 bg-red-500 rounded-full text-xs font-bold">LIVE</div>
                     </div>
                     <div>
-                      <div className="font-medium">Live Session Starting</div>
-                      <div className="text-sm text-muted-foreground">Community Masterclass - 247 joined</div>
+                      <div className="font-semibold">Community Masterclass</div>
+                      <div className="text-sm text-gray-400">How to Scale Your Coaching Business</div>
                     </div>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-primary h-2 rounded-full" style={{ width: '75%' }} />
+                  <div className="flex items-center gap-2 text-sm text-gray-400">
+                    <Users className="w-4 h-4" />
+                    <span>247 attending</span>
                   </div>
                 </div>
+                
+                {/* Video grid */}
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  <div className="bg-gray-700 rounded-xl aspect-video flex items-center justify-center relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-purple-500/20" />
+                    <div className="relative w-16 h-16 bg-primary rounded-full flex items-center justify-center">
+                      <Video className="w-8 h-8" />
+                    </div>
+                    <div className="absolute bottom-2 left-2 px-2 py-1 bg-black/50 rounded text-xs">You (Host)</div>
+                  </div>
+                  <div className="bg-gray-700 rounded-xl aspect-video flex items-center justify-center relative">
+                    <div className="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center">
+                      <span className="text-lg">👩</span>
+                    </div>
+                    <div className="absolute bottom-2 left-2 px-2 py-1 bg-black/50 rounded text-xs">Sarah M.</div>
+                  </div>
+                  <div className="bg-gray-700 rounded-xl aspect-video flex items-center justify-center relative">
+                    <div className="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center">
+                      <span className="text-lg">👨</span>
+                    </div>
+                    <div className="absolute bottom-2 left-2 px-2 py-1 bg-black/50 rounded text-xs">Mike R.</div>
+                  </div>
+                  <div className="bg-gray-700 rounded-xl aspect-video flex items-center justify-center relative">
+                    <div className="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center">
+                      <span className="text-lg">👩</span>
+                    </div>
+                    <div className="absolute bottom-2 left-2 px-2 py-1 bg-black/50 rounded text-xs">Lisa K.</div>
+                    <div className="absolute bottom-2 right-2 px-2 py-1 bg-gray-800 rounded text-xs">+24 more</div>
+                  </div>
+                </div>
+                
+                {/* Chat preview */}
+                <div className="bg-gray-800 rounded-xl p-3">
+                  <div className="space-y-2 text-sm">
+                    <div className="flex gap-2">
+                      <span className="text-gray-500">Mike:</span>
+                      <span className="text-gray-300">This is exactly what I needed! 🔥</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <span className="text-gray-500">Sarah:</span>
+                      <span className="text-gray-300">Great tips on pricing</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <span className="text-gray-500">Lisa:</span>
+                      <span className="text-gray-300">Can you share the template?</span>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Glow effect */}
+                <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary/30 rounded-full blur-3xl" />
+                <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl" />
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Feature bullets - quick understanding */}
+      <section className="py-8 bg-white border-y">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-wrap justify-center gap-6 text-sm font-medium text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
+                <CheckCircle className="w-3 h-3 text-green-600" />
+              </div>
+              <span>Live sessions</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
+                <CheckCircle className="w-3 h-3 text-green-600" />
+              </div>
+              <span>Courses</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
+                <CheckCircle className="w-3 h-3 text-green-600" />
+              </div>
+              <span>Community discussions</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
+                <CheckCircle className="w-3 h-3 text-green-600" />
+              </div>
+              <span>Built-in monetization</span>
             </div>
           </div>
         </div>
