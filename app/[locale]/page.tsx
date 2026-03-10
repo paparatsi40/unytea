@@ -11,6 +11,7 @@ import {
   LogIn,
   UserPlus,
   ArrowRight,
+  ArrowDown,
   Play,
   Star,
   CheckCircle,
