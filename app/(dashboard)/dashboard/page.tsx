@@ -20,6 +20,11 @@ import {
   ArrowRight,
   ChevronRight,
   Target,
+  Rocket,
+  Crown,
+  Zap,
+  TrendingUp,
+  Award,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -48,6 +53,17 @@ interface UpcomingEvent {
   time: string;
   community: string;
   attendees?: number;
+}
+
+interface OnboardingStep {
+  number: number;
+  title: string;
+  description: string;
+  action: string;
+  link: string;
+  icon: any;
+  completed: boolean;
+  active: boolean;
 }
 
 export default function DashboardPage() {
@@ -94,50 +110,82 @@ export default function DashboardPage() {
     }
   };
 
-  // Determine next best action based on user state
-  const getNextBestAction = () => {
-    if (!metrics) return null;
-    
-    if (metrics.communities === 0) {
-      return {
-        title: "Create your first community",
-        description: "Start building your community business today",
+  // Generate onboarding steps based on user progress
+  const getOnboardingSteps = (): OnboardingStep[] => {
+    if (!metrics) return [];
+
+    const steps: OnboardingStep[] = [
+      {
+        number: 1,
+        title: "Create your community",
+        description: "Set up your community name, description, and branding",
         action: "Create Community",
         link: "/dashboard/communities",
-        priority: "high",
-      };
-    }
+        icon: Building2,
+        completed: metrics.communities > 0,
+        active: metrics.communities === 0,
+      },
+      {
+        number: 2,
+        title: "Invite your first members",
+        description: "Share your community link or invite people directly",
+        action: "Invite Members",
+        link: "/dashboard/communities",
+        icon: Users,
+        completed: metrics.members > 0,
+        active: metrics.communities > 0 && metrics.members === 0,
+      },
+      {
+        number: 3,
+        title: "Publish your first content",
+        description: "Create a post, course, or schedule a live session",
+        action: "Create Content",
+        link: "/dashboard/communities",
+        icon: Zap,
+        completed: metrics.members > 0 && activities.length > 0,
+        active: metrics.members > 0,
+      },
+    ];
+
+    return steps;
+  };
+
+  // Get celebration message based on progress
+  const getCelebrationMessage = () => {
+    if (!metrics) return null;
+
+    if (metrics.communities === 0) return null;
     
     if (metrics.members === 0) {
       return {
-        title: "Invite your first members",
-        description: "Your community is ready. Time to bring people in!",
-        action: "Invite Members",
-        link: "/dashboard/communities",
-        priority: "high",
+        title: "Your community is live! 🎉",
+        subtitle: "Now invite your first members",
+        icon: Rocket,
+        color: "from-green-500 to-emerald-600",
       };
     }
     
     if (metrics.revenue === 0) {
       return {
-        title: "Turn on paid memberships",
-        description: "Start monetizing your community with paid plans",
-        action: "Set Up Pricing",
-        link: "/dashboard/settings/billing",
-        priority: "medium",
+        title: "Your community is growing! 📈",
+        subtitle: "Time to monetize with paid plans",
+        icon: TrendingUp,
+        color: "from-blue-500 to-indigo-600",
       };
     }
-    
+
     return {
-      title: "Schedule your next live session",
-      description: "Keep your community engaged with live content",
-      action: "Schedule Session",
-      link: "/dashboard/sessions",
-      priority: "medium",
+      title: "Your community business is thriving! 🚀",
+      subtitle: "Keep the momentum with live sessions",
+      icon: Crown,
+      color: "from-purple-500 to-pink-600",
     };
   };
 
-  const nextAction = getNextBestAction();
+  const steps = getOnboardingSteps();
+  const celebration = getCelebrationMessage();
+  const activeStep = steps.find(s => s.active);
+  const completedSteps = steps.filter(s => s.completed).length;
 
   if (isLoading) {
     return (
@@ -212,35 +260,149 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Next Best Action - Host Priority #2 */}
-      {nextAction && (
-        <Card className="mb-8 border-primary/20 bg-primary/5">
-          <CardContent className="p-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
-                  <Target className="h-6 w-6 text-white" />
-                </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Column - Onboarding & Quick Actions */}
+        <div className="space-y-6">
+          {/* Interactive Onboarding Checklist */}
+          <Card className="border-primary/20">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-semibold text-lg">{nextAction.title}</h3>
-                  <p className="text-muted-foreground">{nextAction.description}</p>
+                  <CardTitle className="flex items-center gap-2">
+                    <Target className="h-5 w-5 text-primary" />
+                    {completedSteps === 0 ? "Getting Started" : 
+                     completedSteps === steps.length ? "All Steps Complete!" : 
+                     `Step ${activeStep?.number} of ${steps.length}`}
+                  </CardTitle>
+                  <CardDescription>
+                    {completedSteps === 0 ? "Complete these steps to launch your community" :
+                     completedSteps === steps.length ? "You've built a thriving community business!" :
+                     "Continue building your community business"}
+                  </CardDescription>
+                </div>
+                {completedSteps > 0 && (
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                    <span className="text-lg font-bold text-primary">{completedSteps}/{steps.length}</span>
+                  </div>
+                )}
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {steps.map((step) => (
+                <div 
+                  key={step.number}
+                  className={`flex items-start gap-4 p-4 rounded-xl transition-all ${
+                    step.completed 
+                      ? "bg-green-50/50 border border-green-100" 
+                      : step.active
+                        ? "bg-gradient-to-r from-primary/10 to-primary/5 border-2 border-primary/30 shadow-md"
+                        : "bg-muted/30 border border-transparent"
+                  }`}
+                >
+                  {/* Step Icon/Number */}
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                    step.completed 
+                      ? "bg-green-500 text-white" 
+                      : step.active
+                        ? "bg-primary text-white shadow-lg shadow-primary/25"
+                        : "bg-muted text-muted-foreground"
+                  }`}>
+                    {step.completed ? (
+                      <CheckCircle2 className="h-6 w-6" />
+                    ) : (
+                      <step.icon className="h-6 w-6" />
+                    )}
+                  </div>
+
+                  {/* Step Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h4 className={`font-semibold ${
+                        step.completed ? "text-green-700" : 
+                        step.active ? "text-primary" : "text-muted-foreground"
+                      }`}>
+                        {step.number}. {step.title}
+                      </h4>
+                      {step.completed && (
+                        <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                          Done
+                        </span>
+                      )}
+                      {step.active && (
+                        <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full animate-pulse">
+                          Next
+                        </span>
+                      )}
+                    </div>
+                    <p className={`text-sm mt-1 ${
+                      step.completed || step.active ? "text-muted-foreground" : "text-muted-foreground/60"
+                    }`}>
+                      {step.description}
+                    </p>
+                    
+                    {/* Action Button */}
+                    {(step.active || (!step.completed && !steps.some(s => s.active))) && (
+                      <Link href={step.link} className="mt-3 inline-block">
+                        <Button 
+                          size="sm" 
+                          className={step.active ? "" : "bg-muted hover:bg-muted/80"}
+                          variant={step.active ? "default" : "outline"}
+                        >
+                          {step.action}
+                          <ArrowRight className="h-4 w-4 ml-1" />
+                        </Button>
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              ))}
+
+              {/* Progress Bar */}
+              <div className="mt-4 pt-4 border-t">
+                <div className="flex items-center justify-between text-sm mb-2">
+                  <span className="text-muted-foreground">Your progress</span>
+                  <span className="font-medium">{Math.round((completedSteps / steps.length) * 100)}% complete</span>
+                </div>
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-primary to-primary/70 rounded-full transition-all duration-500"
+                    style={{ width: `${(completedSteps / steps.length) * 100}%` }}
+                  />
                 </div>
               </div>
-              <Link href={nextAction.link}>
-                <Button className="gap-2">
-                  {nextAction.action}
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+            </CardContent>
+          </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column - Quick Actions & Navigation */}
-        <div className="space-y-6">
-          {/* Quick Actions - Host Focused */}
+          {/* Celebration Card - Shows when milestones reached */}
+          {celebration && (
+            <Card className={`bg-gradient-to-r ${celebration.color} text-white border-0 shadow-lg`}>
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                    <celebration.icon className="h-7 w-7 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg">{celebration.title}</h3>
+                    <p className="text-white/90">{celebration.subtitle}</p>
+                    {activeStep && (
+                      <Link href={activeStep.link} className="mt-3 inline-block">
+                        <Button 
+                          variant="secondary" 
+                          size="sm"
+                          className="bg-white text-gray-900 hover:bg-white/90"
+                        >
+                          {activeStep.action}
+                          <ArrowRight className="h-4 w-4 ml-1" />
+                        </Button>
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Quick Actions */}
           <Card>
             <CardHeader className="pb-3">
               <h3 className="font-semibold text-foreground">Quick Actions</h3>
@@ -279,51 +441,80 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          {/* Upcoming Events */}
-          {events.length > 0 && (
-            <Card>
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-foreground">Upcoming</h3>
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {events.slice(0, 3).map((event) => (
-                  <div key={event.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                      {event.type === "session" ? (
-                        <Video className="h-5 w-5 text-primary" />
-                      ) : event.type === "live" ? (
-                        <Play className="h-5 w-5 text-primary" />
-                      ) : (
-                        <Clock className="h-5 w-5 text-primary" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm truncate">{event.title}</p>
-                      <p className="text-xs text-muted-foreground">{event.community}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <Clock className="h-3 w-3 text-muted-foreground" />
-                        <span className="text-xs text-muted-foreground">{event.time}</span>
-                        {event.attendees && (
-                          <>
-                            <span className="text-muted-foreground">•</span>
-                            <span className="text-xs text-muted-foreground">{event.attendees} attending</span>
-                          </>
-                        )}
-                      </div>
-                    </div>
+          {/* Upcoming Live Sessions - Highlighted */}
+          <Card className="border-purple-200 bg-gradient-to-br from-purple-50/50 to-white">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center">
+                    <Play className="h-4 w-4 text-purple-600" />
                   </div>
-                ))}
+                  <div>
+                    <h3 className="font-semibold text-foreground">Upcoming Live</h3>
+                    <p className="text-xs text-muted-foreground">Your next sessions</p>
+                  </div>
+                </div>
                 <Link href="/dashboard/sessions">
-                  <Button variant="ghost" size="sm" className="w-full text-primary">
-                    View All Sessions
+                  <Button variant="ghost" size="sm" className="text-purple-600">
+                    View All
                   </Button>
                 </Link>
-              </CardContent>
-            </Card>
-          )}
+              </div>
+            </CardHeader>
+            <CardContent>
+              {events.length > 0 ? (
+                <div className="space-y-3">
+                  {events.slice(0, 2).map((event) => (
+                    <div key={event.id} className="flex items-start gap-3 p-3 rounded-xl bg-white border border-purple-100 shadow-sm hover:shadow-md transition-all">
+                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                        event.type === "live" 
+                          ? "bg-red-100 text-red-600 animate-pulse" 
+                          : "bg-purple-100 text-purple-600"
+                      }`}>
+                        {event.type === "live" ? (
+                          <Play className="h-5 w-5 fill-current" />
+                        ) : (
+                          <Video className="h-5 w-5" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium text-sm truncate">{event.title}</p>
+                          {event.type === "live" && (
+                            <span className="text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full font-medium">
+                              LIVE
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground">{event.community}</p>
+                        <div className="flex items-center gap-3 mt-1.5">
+                          <span className="text-xs font-medium text-purple-600">{event.time}</span>
+                          {event.attendees && (
+                            <span className="text-xs text-muted-foreground flex items-center gap-1">
+                              <Users className="h-3 w-3" />
+                              {event.attendees} attending
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-6">
+                  <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-3">
+                    <Calendar className="h-6 w-6 text-purple-600" />
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-3">No upcoming sessions</p>
+                  <Link href="/dashboard/sessions">
+                    <Button size="sm" variant="outline" className="border-purple-200 text-purple-600">
+                      Schedule One
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
 
         {/* Main Content - Recent Activity */}
@@ -341,16 +532,19 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               {activities.length === 0 ? (
-                <div className="text-center py-8">
-                  <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
-                    <BarChart3 className="h-8 w-8 text-muted-foreground" />
+                <div className="text-center py-12">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center mx-auto mb-4">
+                    <Sparkles className="h-10 w-10 text-primary" />
                   </div>
                   <h3 className="font-semibold text-lg mb-2">No activity yet</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Start building your community to see activity here!
+                  <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
+                    Your community business journey starts here. Create your first community to see activity!
                   </p>
                   <Link href="/dashboard/communities">
-                    <Button>Create Community</Button>
+                    <Button size="lg" className="gap-2">
+                      <Plus className="h-5 w-5" />
+                      Create Your Community
+                    </Button>
                   </Link>
                 </div>
               ) : (
@@ -394,55 +588,34 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          {/* Getting Started Guide */}
-          {!metrics || metrics.communities === 0 ? (
-            <Card className="border-primary/20">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-primary" />
-                  Getting Started
-                </CardTitle>
-                <CardDescription>Follow these steps to launch your community</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-start gap-4">
-                    <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold flex-shrink-0">
-                      1
-                    </div>
-                    <div>
-                      <p className="font-medium">Create your community</p>
-                      <p className="text-sm text-muted-foreground">Set up your community name, description, and branding</p>
-                    </div>
+          {/* Achievement/Gamification Section - Optional */}
+          {completedSteps > 0 && (
+            <Card className="bg-gradient-to-br from-amber-50 to-yellow-50 border-amber-200">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 flex items-center justify-center shadow-lg shadow-amber-200">
+                    <Award className="h-8 w-8 text-white" />
                   </div>
-                  <div className="flex items-start gap-4">
-                    <div className="w-8 h-8 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-sm font-bold flex-shrink-0">
-                      2
-                    </div>
-                    <div>
-                      <p className="font-medium text-muted-foreground">Invite your first members</p>
-                      <p className="text-sm text-muted-foreground">Share your community link or invite people directly</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-4">
-                    <div className="w-8 h-8 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-sm font-bold flex-shrink-0">
-                      3
-                    </div>
-                    <div>
-                      <p className="font-medium text-muted-foreground">Publish your first content</p>
-                      <p className="text-sm text-muted-foreground">Create a post, course, or schedule a live session</p>
+                  <div>
+                    <h3 className="font-bold text-lg text-amber-900">Community Builder</h3>
+                    <p className="text-amber-700">You've completed {completedSteps} milestones!</p>
+                    <div className="flex items-center gap-2 mt-2">
+                      {steps.filter(s => s.completed).map((s) => (
+                        <div key={s.number} className="w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center text-xs font-bold">
+                          {s.number}
+                        </div>
+                      ))}
+                      {steps.filter(s => !s.completed).map((s) => (
+                        <div key={s.number} className="w-8 h-8 rounded-full bg-amber-200 text-amber-600 flex items-center justify-center text-xs font-bold">
+                          {s.number}
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
-                <Link href="/dashboard/communities" className="mt-6 block">
-                  <Button className="w-full">
-                    Start Step 1: Create Community
-                    <ChevronRight className="h-4 w-4 ml-2" />
-                  </Button>
-                </Link>
               </CardContent>
             </Card>
-          ) : null}
+          )}
         </div>
       </div>
     </div>
