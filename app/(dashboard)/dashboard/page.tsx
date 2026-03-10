@@ -283,7 +283,7 @@ export default function DashboardPage() {
                     Create your first community in under 2 minutes
                   </p>
                   <p className="text-sm text-muted-foreground mb-8 max-w-sm mx-auto">
-                    Join 10,000+ creators building thriving communities with live sessions, courses, and engaged members.
+                    Join creators building thriving communities with live sessions, courses, and engaged members.
                   </p>
                   
                   {/* CTA Button */}
@@ -586,9 +586,9 @@ export default function DashboardPage() {
                   <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center mx-auto mb-4">
                     <Sparkles className="h-10 w-10 text-primary" />
                   </div>
-                  <h3 className="font-semibold text-lg mb-2">No activity yet</h3>
+                  <h3 className="font-semibold text-lg mb-2">Your community activity will appear here</h3>
                   <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
-                    Your community business journey starts here. Create your first community to see activity!
+                    Once members start joining and engaging, you'll see their activity in real-time.
                   </p>
                   <Link href="/dashboard/communities">
                     <Button size="lg" className="gap-2">
