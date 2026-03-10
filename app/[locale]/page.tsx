@@ -732,16 +732,16 @@ export default function Home() {
 
 // COMPONENTES AUXILIARES
 
-function FeatureCard({ image, title, description, highlighted = false }: { image: string; title: string; description: string; highlighted?: boolean }) {
+function FeatureCard({ image, title, description, highlighted = false, large = false }: { image: string; title: string; description: string; highlighted?: boolean; large?: boolean }) {
   const [imgError, setImgError] = useState(false);
   
   return (
-    <div className={`group relative p-6 rounded-xl border transition-all duration-300 hover:shadow-xl hover:scale-[1.02] overflow-hidden ${highlighted ? 'border-primary bg-gradient-to-br from-primary/10 to-purple-100' : 'bg-gradient-to-br from-white to-gray-50'}`}>
+    <div className={`group relative p-6 rounded-xl border transition-all duration-300 hover:shadow-xl hover:scale-[1.02] overflow-hidden ${highlighted ? 'border-primary bg-gradient-to-br from-primary/10 to-purple-100' : 'bg-gradient-to-br from-white to-gray-50'} ${large ? 'h-full flex flex-col' : ''}`}>
       {/* Background decoration */}
       <div className={`absolute top-0 right-0 w-32 h-32 opacity-10 rounded-full -translate-y-1/2 translate-x-1/2 transition-transform group-hover:scale-150 ${highlighted ? 'bg-primary' : 'bg-gray-400'}`} />
       
       {/* Image container with gradient fallback */}
-      <div className={`relative w-full h-32 rounded-xl mb-4 overflow-hidden shadow-md ${imgError ? 'bg-gradient-to-br from-gray-200 to-gray-300' : ''}`}>
+      <div className={`relative w-full rounded-xl mb-4 overflow-hidden shadow-md ${large ? 'h-48' : 'h-32'} ${imgError ? 'bg-gradient-to-br from-gray-200 to-gray-300' : ''}`}>
         {!imgError && (
           <img 
             src={image} 
@@ -761,8 +761,8 @@ function FeatureCard({ image, title, description, highlighted = false }: { image
           <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent" />
         )}
       </div>
-      <h3 className="relative font-semibold text-lg mb-2">{title}</h3>
-      <p className="relative text-muted-foreground text-sm">{description}</p>
+      <h3 className={`relative font-semibold mb-2 ${large ? 'text-xl' : 'text-lg'}`}>{title}</h3>
+      <p className={`relative text-muted-foreground ${large ? 'text-base flex-grow' : 'text-sm'}`}>{description}</p>
     </div>
   );
 }
