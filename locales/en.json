@@ -163,7 +163,7 @@
       "product": "Product",
       "resources": "Resources",
       "company": "Company",
-      "legal": "Legal",
+      "legalLabel": "Legal",
       "rights": "All rights reserved.",
       "links": {
         "features": "Features",
@@ -233,6 +233,91 @@
     "dailyStreak": {
       "title": "Daily Streak",
       "days": "days"
+    }
+  },
+  "onboarding": {
+    "title": "Welcome to Unytea!",
+    "subtitle": "Let's get you set up in just a few steps",
+    "steps": {
+      "1": {
+        "title": "Welcome to Unytea! 🎉",
+        "description": "Let's get you set up in just a few steps",
+        "fullName": "Full Name",
+        "fullNamePlaceholder": "John Doe"
+      },
+      "2": {
+        "title": "What brings you here?",
+        "description": "Tell us about your role",
+        "role": "Your Role",
+        "rolePlaceholder": "Select your role...",
+        "roles": {
+          "coach": "Coach / Mentor",
+          "creator": "Course Creator",
+          "founder": "Community Founder",
+          "educator": "Educator",
+          "other": "Other"
+        }
+      },
+      "3": {
+        "title": "What are your goals?",
+        "description": "Help us personalize your experience",
+        "goals": "Tell us about your goals",
+        "goalsPlaceholder": "I want to build a thriving community and share my knowledge..."
+      },
+      "4": {
+        "title": "Choose Your Plan",
+        "description": "Select the plan that fits your needs",
+        "free": {
+          "name": "Free",
+          "description": "Perfect for getting started",
+          "features": [
+            "Join up to 3 communities",
+            "Basic profile features",
+            "Community feed access",
+            "Direct messaging"
+          ]
+        },
+        "professional": {
+          "name": "Professional",
+          "description": "Best for community creators",
+          "popular": "Most Popular",
+          "features": [
+            "1 community (yours)",
+            "Unlimited members",
+            "Video calls & streaming",
+            "Course builder",
+            "AI assistant",
+            "Analytics dashboard",
+            "Priority support"
+          ]
+        },
+        "premium": {
+          "name": "Premium",
+          "description": "For power users with multiple communities",
+          "features": [
+            "3 communities (yours)",
+            "All Professional features",
+            "White-label options",
+            "Advanced analytics",
+            "API access",
+            "Dedicated support",
+            "Custom integrations"
+          ]
+        }
+      }
+    },
+    "navigation": {
+      "back": "Back",
+      "next": "Next",
+      "getStarted": "Get Started",
+      "processing": "Processing...",
+      "step": "Step",
+      "of": "of"
+    },
+    "success": {
+      "title": "You're all set! 🎉",
+      "description": "Welcome to Unytea. Your journey starts now.",
+      "cta": "Go to Dashboard"
     }
   }
 }

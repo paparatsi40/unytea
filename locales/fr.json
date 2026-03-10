@@ -233,5 +233,90 @@
       "title": "Série Quotidienne",
       "days": "jours"
     }
+  },
+  "onboarding": {
+    "title": "Bienvenue sur Unytea !",
+    "subtitle": "Configurons votre compte en quelques étapes",
+    "steps": {
+      "1": {
+        "title": "Bienvenue sur Unytea ! 🎉",
+        "description": "Configurons votre compte en quelques étapes",
+        "fullName": "Nom Complet",
+        "fullNamePlaceholder": "Jean Dupont"
+      },
+      "2": {
+        "title": "Que vous amène ici ?",
+        "description": "Parlez-nous de votre rôle",
+        "role": "Votre Rôle",
+        "rolePlaceholder": "Sélectionnez votre rôle...",
+        "roles": {
+          "coach": "Coach / Mentor",
+          "creator": "Créateur de Cours",
+          "founder": "Fondateur de Communauté",
+          "educator": "Éducateur",
+          "other": "Autre"
+        }
+      },
+      "3": {
+        "title": "Quels sont vos objectifs ?",
+        "description": "Aidez-nous à personnaliser votre expérience",
+        "goals": "Parlez-nous de vos objectifs",
+        "goalsPlaceholder": "Je veux construire une communauté prospère et partager mes connaissances..."
+      },
+      "4": {
+        "title": "Choisissez Votre Plan",
+        "description": "Sélectionnez le plan qui correspond à vos besoins",
+        "free": {
+          "name": "Gratuit",
+          "description": "Parfait pour commencer",
+          "features": [
+            "Rejoindre jusqu'à 3 communautés",
+            "Fonctions de profil de base",
+            "Accès au fil d'actualité",
+            "Messagerie directe"
+          ]
+        },
+        "professional": {
+          "name": "Professionnel",
+          "description": "Le meilleur pour les créateurs de communauté",
+          "popular": "Plus Populaire",
+          "features": [
+            "1 communauté (la vôtre)",
+            "Membres illimités",
+            "Visioconférences et streaming",
+            "Constructeur de cours",
+            "Assistant IA",
+            "Tableau de bord d'analyses",
+            "Support prioritaire"
+          ]
+        },
+        "premium": {
+          "name": "Premium",
+          "description": "Pour les utilisateurs avancés avec plusieurs communautés",
+          "features": [
+            "3 communautés (les vôtres)",
+            "Toutes les fonctions Professionnelles",
+            "Options de marque blanche",
+            "Analyses avancées",
+            "Accès API",
+            "Support dédié",
+            "Intégrations personnalisées"
+          ]
+        }
+      }
+    },
+    "navigation": {
+      "back": "Retour",
+      "next": "Suivant",
+      "getStarted": "Commencer",
+      "processing": "Traitement...",
+      "step": "Étape",
+      "of": "sur"
+    },
+    "success": {
+      "title": "Tout est prêt ! 🎉",
+      "description": "Bienvenue sur Unytea. Votre voyage commence maintenant.",
+      "cta": "Aller au Tableau de Bord"
+    }
   }
 }

@@ -163,7 +163,7 @@
       "product": "Producto",
       "resources": "Recursos",
       "company": "Empresa",
-      "legal": "Legal",
+      "legalLabel": "Legal",
       "rights": "Todos los derechos reservados.",
       "links": {
         "features": "Funcionalidades",
@@ -233,6 +233,91 @@
     "dailyStreak": {
       "title": "Racha Diaria",
       "days": "días"
+    }
+  },
+  "onboarding": {
+    "title": "¡Bienvenido a Unytea!",
+    "subtitle": "Configurémonos en solo unos pasos",
+    "steps": {
+      "1": {
+        "title": "¡Bienvenido a Unytea! 🎉",
+        "description": "Configurémonos en solo unos pasos",
+        "fullName": "Nombre Completo",
+        "fullNamePlaceholder": "Juan Pérez"
+      },
+      "2": {
+        "title": "¿Qué te trae aquí?",
+        "description": "Cuéntanos sobre tu rol",
+        "role": "Tu Rol",
+        "rolePlaceholder": "Selecciona tu rol...",
+        "roles": {
+          "coach": "Coach / Mentor",
+          "creator": "Creador de Cursos",
+          "founder": "Fundador de Comunidad",
+          "educator": "Educador",
+          "other": "Otro"
+        }
+      },
+      "3": {
+        "title": "¿Cuáles son tus objetivos?",
+        "description": "Ayúdanos a personalizar tu experiencia",
+        "goals": "Cuéntanos sobre tus objetivos",
+        "goalsPlaceholder": "Quiero construir una comunidad próspera y compartir mi conocimiento..."
+      },
+      "4": {
+        "title": "Elige Tu Plan",
+        "description": "Selecciona el plan que se ajuste a tus necesidades",
+        "free": {
+          "name": "Gratis",
+          "description": "Perfecto para comenzar",
+          "features": [
+            "Unirte hasta 3 comunidades",
+            "Funciones básicas de perfil",
+            "Acceso al feed de comunidad",
+            "Mensajería directa"
+          ]
+        },
+        "professional": {
+          "name": "Profesional",
+          "description": "Lo mejor para creadores de comunidad",
+          "popular": "Más Popular",
+          "features": [
+            "1 comunidad (tuya)",
+            "Miembros ilimitados",
+            "Video llamadas y streaming",
+            "Constructor de cursos",
+            "Asistente AI",
+            "Panel de analíticas",
+            "Soporte prioritario"
+          ]
+        },
+        "premium": {
+          "name": "Premium",
+          "description": "Para usuarios avanzados con múltiples comunidades",
+          "features": [
+            "3 comunidades (tuyas)",
+            "Todas las funciones Profesionales",
+            "Opciones de marca blanca",
+            "Analíticas avanzadas",
+            "Acceso a API",
+            "Soporte dedicado",
+            "Integraciones personalizadas"
+          ]
+        }
+      }
+    },
+    "navigation": {
+      "back": "Atrás",
+      "next": "Siguiente",
+      "getStarted": "Comenzar",
+      "processing": "Procesando...",
+      "step": "Paso",
+      "of": "de"
+    },
+    "success": {
+      "title": "¡Todo listo! 🎉",
+      "description": "Bienvenido a Unytea. Tu viaje comienza ahora.",
+      "cta": "Ir al Dashboard"
     }
   }
 }
