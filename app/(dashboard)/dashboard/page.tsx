@@ -294,9 +294,12 @@ export default function DashboardPage() {
                     <span className="text-sm font-medium text-muted-foreground">Launch progress</span>
                     <span className="text-sm font-bold text-primary">0 / 3 steps completed</span>
                   </div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden mb-6">
+                  <div className="h-2 bg-muted rounded-full overflow-hidden mb-4">
                     <div className="h-full bg-gradient-to-r from-primary to-purple-500 rounded-full transition-all duration-500" style={{ width: '0%' }} />
                   </div>
+                  <p className="text-sm text-muted-foreground mb-6">
+                    Complete these steps to launch your community.
+                  </p>
                   
                   {/* Steps */}
                   <div className="grid md:grid-cols-3 gap-4 text-left">
@@ -370,7 +373,11 @@ export default function DashboardPage() {
                   <CardDescription>
                     {completedSteps === steps.length 
                       ? "You've successfully launched your community business!" 
-                      : `Step ${activeStep?.number || completedSteps + 1} of ${steps.length}: ${activeStep?.title || steps[completedSteps]?.title}`}
+                      : completedSteps === 1 
+                        ? "Step 1 complete ✅ Next step: Invite your first members"
+                        : completedSteps === 2
+                          ? "Step 2 complete ✅ Final step: Host your first live session"
+                          : `Step ${activeStep?.number || completedSteps + 1} of ${steps.length}: ${activeStep?.title || steps[completedSteps]?.title}`}
                   </CardDescription>
                 </div>
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
