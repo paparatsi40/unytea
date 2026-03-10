@@ -3,8 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { LanguageSelector } from "@/components/LanguageSelector";
 import { useSession } from "next-auth/react";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import {
   Sparkles,
   LayoutDashboard,
@@ -27,6 +27,12 @@ import {
   ChevronDown,
   Quote,
   X,
+  Monitor,
+  Presentation,
+  Mic,
+  DollarSign,
+  CreditCard,
+  ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -42,8 +48,8 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 glass-strong border-b">
+      {/* 1️⃣ HERO SECTION */}
+      <nav className="fixed top-0 w-full z-50 glass-strong border-b bg-white/80 backdrop-blur-md">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-gradient-to-br from-primary to-purple-600 rounded-lg flex items-center justify-center">
@@ -53,16 +59,13 @@ export default function Home() {
           </div>
           <div className="hidden md:flex items-center gap-6">
             <Link href="#features" className="text-sm font-medium hover:text-primary transition-colors">
-              {t("nav.features")}
+              Features
             </Link>
-            <Link href="#testimonials" className="text-sm font-medium hover:text-primary transition-colors">
-              {t("nav.testimonials")}
+            <Link href="#comparison" className="text-sm font-medium hover:text-primary transition-colors">
+              vs Skool
             </Link>
             <Link href="#pricing" className="text-sm font-medium hover:text-primary transition-colors">
-              {t("nav.pricing")}
-            </Link>
-            <Link href="#faq" className="text-sm font-medium hover:text-primary transition-colors">
-              {t("nav.faq")}
+              Pricing
             </Link>
           </div>
           <div className="flex items-center gap-3">
@@ -73,7 +76,7 @@ export default function Home() {
                 className="btn-hover-lift px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium shadow-smooth flex items-center gap-2"
               >
                 <LayoutDashboard className="w-4 h-4" />
-                {t("nav.goToDashboard")}
+                Go to Dashboard
               </Link>
             ) : (
               <>
@@ -97,740 +100,463 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Hero Section - Compact with 2-column layout */}
-      <section className="relative min-h-[85vh] flex items-center overflow-hidden">
-        {/* Background Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-purple-600/5 to-background" />
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background/80" />
-
-        <div className="container mx-auto px-4 relative z-10 py-20 lg:py-28">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center max-w-7xl mx-auto">
-            {/* Left Column - Content */}
-            <div className="text-center lg:text-left animate-fade-in-up">
-              {/* Trust Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                <span className="text-sm font-medium">{t("hero.badge")}</span>
+      {/* Hero Content */}
+      <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-50 via-white to-pink-50 opacity-70" />
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary mb-6">
+                <Star className="w-4 h-4" />
+                <span className="text-sm font-medium">Trusted by creators worldwide</span>
               </div>
-
-              {/* Main Headline */}
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
-                {t("hero.title")}
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+                Build a community that{" "}
+                <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+                  learns live
+                </span>
               </h1>
-
-              <p className="text-lg md:text-xl text-muted-foreground mb-6 max-w-xl mx-auto lg:mx-0 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-                {t("hero.description")}
+              <p className="text-xl text-muted-foreground mb-8 max-w-xl">
+                Host live sessions, courses, and discussions — all in one place.
               </p>
-
-              {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start items-center mb-6 animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Link
                   href="/auth/signup"
-                  className="btn-hover-lift px-6 py-3 bg-primary text-primary-foreground rounded-xl text-base font-semibold shadow-smooth-lg inline-flex items-center gap-2 group"
+                  className="btn-hover-lift px-8 py-4 bg-primary text-primary-foreground rounded-xl font-semibold shadow-lg flex items-center justify-center gap-2"
                 >
-                  {t("hero.cta.primary")}
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  Create Your Community Free
+                  <ArrowRight className="w-5 h-5" />
                 </Link>
-                <button 
+                <button
                   onClick={() => setShowDemoModal(true)}
-                  className="btn-hover-lift px-6 py-3 glass-strong rounded-xl text-base font-semibold inline-flex items-center gap-2 group"
+                  className="px-8 py-4 border-2 border-border rounded-xl font-semibold hover:border-primary transition-colors flex items-center justify-center gap-2"
                 >
-                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                    <Play className="w-4 h-4 text-primary fill-primary" />
-                  </div>
-                  {t("hero.cta.secondary")}
+                  <Play className="w-5 h-5" />
+                  See How It Works
                 </button>
               </div>
-
-              {/* Social Proof */}
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-6 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <div className="flex -space-x-2">
-                    {[1, 2, 3, 4].map((i) => (
-                      <Avatar key={i} className="w-7 h-7 border-2 border-background">
-                        <AvatarImage src={`https://i.pravatar.cc/150?img=${i + 10}`} />
-                        <AvatarFallback>U{i}</AvatarFallback>
-                      </Avatar>
-                    ))}
-                  </div>
-                  <span>{t("hero.socialProof.members")}</span>
-                </div>
-                <div className="flex items-center gap-0.5">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                  ))}
-                  <span className="ml-2">{t("hero.socialProof.rating")}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Column - Dashboard Mockup */}
-            <div className="relative hidden lg:block animate-slide-in-right" style={{ animationDelay: '0.6s' }}>
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-border/50 bg-card animate-float">
-                {/* Mockup Header */}
-                <div className="flex items-center gap-2 px-4 py-3 border-b border-border/50 bg-muted/50">
-                  <div className="flex gap-1.5">
-                    <div className="w-3 h-3 rounded-full bg-red-400" />
-                    <div className="w-3 h-3 rounded-full bg-yellow-400" />
-                    <div className="w-3 h-3 rounded-full bg-green-400" />
-                  </div>
-                  <div className="flex-1 text-center">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-background text-xs text-muted-foreground">
-                      <span className="w-3 h-3 rounded-full bg-primary/20" />
-                      unytea.com/dashboard
-                    </div>
-                  </div>
-                </div>
-                {/* Mockup Content */}
-                <div className="p-4 space-y-3">
-                  {/* Stats Row */}
-                  <div className="grid grid-cols-3 gap-3">
-                    {[
-                      { label: "Members", value: "2,847", icon: Users },
-                      { label: "Revenue", value: "$12.4K", icon: Zap },
-                      { label: "Engagement", value: "94%", icon: TrendingUp },
-                    ].map((stat, i) => (
-                      <div key={i} className="bg-muted/50 rounded-lg p-3">
-                        <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
-                          <stat.icon className="w-3 h-3" />
-                          {stat.label}
-                        </div>
-                        <div className="text-lg font-bold">{stat.value}</div>
-                      </div>
-                    ))}
-                  </div>
-                  {/* Feed Preview */}
-                  <div className="space-y-2">
-                    {[1, 2].map((i) => (
-                      <div key={i} className="flex gap-3 p-3 bg-muted/30 rounded-lg">
-                        <div className="w-8 h-8 rounded-full bg-primary/20 flex-shrink-0" />
-                        <div className="flex-1 space-y-1.5">
-                          <div className="h-3 bg-muted rounded w-1/3" />
-                          <div className="h-2 bg-muted/50 rounded w-full" />
-                          <div className="h-2 bg-muted/50 rounded w-2/3" />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  {/* Course Card */}
-                  <div className="flex gap-3 p-3 bg-gradient-to-r from-primary/5 to-purple-600/5 rounded-lg border border-primary/10">
-                    <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
-                      <BookOpen className="w-6 h-6 text-primary" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="font-medium text-sm">Community Mastery</div>
-                      <div className="text-xs text-muted-foreground">247 students enrolled</div>
-                      <div className="mt-2 h-1.5 bg-muted rounded-full overflow-hidden">
-                        <div className="h-full w-3/4 bg-primary rounded-full" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {/* Decorative Elements */}
-              <div className="absolute -top-4 -right-4 w-24 h-24 bg-primary/20 rounded-full blur-2xl" />
-              <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-purple-600/20 rounded-full blur-2xl" />
-            </div>
-          </div>
-        </div>
-
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 animate-bounce">
-          <ChevronDown className="w-5 h-5 text-muted-foreground" />
-        </div>
-      </section>
-
-      {/* Social Proof Numbers */}
-      <section className="py-16 px-4 border-y border-border/50 bg-muted/30">
-        <div className="container mx-auto max-w-6xl">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div>
-              <p className="text-4xl md:text-5xl font-bold gradient-text">10K+</p>
-              <p className="text-muted-foreground mt-2">{t("stats.communities")}</p>
-            </div>
-            <div>
-              <p className="text-4xl md:text-5xl font-bold gradient-text">500K+</p>
-              <p className="text-muted-foreground mt-2">{t("stats.members")}</p>
-            </div>
-            <div>
-              <p className="text-4xl md:text-5xl font-bold gradient-text">$2M+</p>
-              <p className="text-muted-foreground mt-2">{t("stats.revenue")}</p>
-            </div>
-            <div>
-              <p className="text-4xl md:text-5xl font-bold gradient-text">98%</p>
-              <p className="text-muted-foreground mt-2">{t("stats.satisfaction")}</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Instructor Spotlight */}
-      <section className="py-20 px-4">
-        <div className="container mx-auto max-w-6xl">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="relative">
-              <div className="absolute -inset-4 bg-gradient-to-r from-primary/20 to-purple-600/20 rounded-3xl blur-2xl" />
-              <div className="relative aspect-square rounded-2xl overflow-hidden">
-                <img
-                  src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=600&h=600&fit=crop"
-                  alt="Lead Instructor"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              {/* Floating Badge */}
-              <div className="absolute -bottom-4 -right-4 bg-card rounded-xl p-4 shadow-xl border">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
-                    <CheckCircle className="w-6 h-6 text-green-600" />
-                  </div>
-                  <div>
-                    <p className="font-semibold">Verified Expert</p>
-                    <p className="text-sm text-muted-foreground">10+ years experience</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="space-y-6">
-              <Badge className="bg-primary/10 text-primary hover:bg-primary/20">Meet Your Guide</Badge>
-              <h2 className="text-4xl font-bold">Learn from Industry Leaders</h2>
-              <p className="text-lg text-muted-foreground">
-                Our platform brings together the world's best creators, coaches, and educators. 
-                Connect directly with experts who have built 7-figure businesses and helped 
-                thousands of students succeed.
+              <p className="text-sm text-muted-foreground mt-4">
+                ✓ 14-day free trial &nbsp;•&nbsp; ✓ No credit card required
               </p>
-              <ul className="space-y-4">
-                {[
-                  "Direct access to top industry experts",
-                  "Live Q&A sessions every week",
-                  "Personalized feedback on your work",
-                  "Exclusive insider strategies",
-                ].map((item, i) => (
-                  <li key={i} className="flex items-center gap-3">
-                    <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link href="/auth/signup">
-                <Button size="lg" className="mt-4">
-                  Join the Community
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </Link>
+            </div>
+            <div className="relative">
+              <div className="relative bg-white rounded-2xl shadow-2xl p-6 border">
+                <div className="flex items-center gap-2 mb-4 pb-4 border-b">
+                  <div className="w-3 h-3 rounded-full bg-red-400" />
+                  <div className="w-3 h-3 rounded-full bg-yellow-400" />
+                  <div className="w-3 h-3 rounded-full bg-green-400" />
+                  <span className="ml-4 text-sm text-muted-foreground">unytea.com/dashboard</span>
+                </div>
+                <div className="grid grid-cols-3 gap-4 mb-4">
+                  <div className="bg-purple-50 p-4 rounded-xl text-center">
+                    <Users className="w-6 h-6 mx-auto mb-2 text-primary" />
+                    <div className="text-2xl font-bold">2,847</div>
+                    <div className="text-xs text-muted-foreground">Members</div>
+                  </div>
+                  <div className="bg-green-50 p-4 rounded-xl text-center">
+                    <DollarSign className="w-6 h-6 mx-auto mb-2 text-green-600" />
+                    <div className="text-2xl font-bold">$12.4K</div>
+                    <div className="text-xs text-muted-foreground">Revenue</div>
+                  </div>
+                  <div className="bg-orange-50 p-4 rounded-xl text-center">
+                    <TrendingUp className="w-6 h-6 mx-auto mb-2 text-orange-600" />
+                    <div className="text-2xl font-bold">94%</div>
+                    <div className="text-xs text-muted-foreground">Engagement</div>
+                  </div>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-xl">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                      <Video className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <div className="font-medium">Live Session Starting</div>
+                      <div className="text-sm text-muted-foreground">Community Masterclass - 247 joined</div>
+                    </div>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="bg-primary h-2 rounded-full" style={{ width: '75%' }} />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* What You'll Learn */}
-      <section id="features" className="py-20 px-4 bg-muted/30">
-        <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-16">
-            <Badge className="mb-4">Curriculum</Badge>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              {t("features.title")}
-              <br />
-              <span className="gradient-text">{t("features.subtitle")}</span>
+      {/* 2️⃣ PROBLEMA DEL MERCADO */}
+      <section className="py-20 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="text-center max-w-3xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">
+              Most community platforms are built like{" "}
+              <span className="text-muted-foreground">forums from 2010</span>.
             </h2>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              {
-                icon: Video,
-                title: "Live Sessions",
-                description: "Host video calls, webinars, and 1-on-1 coaching with integrated scheduling.",
-              },
-              {
-                icon: BookOpen,
-                title: "Course Builder",
-                description: "Create structured courses with modules, lessons, quizzes, and progress tracking.",
-              },
-              {
-                icon: MessageSquare,
-                title: "Community Feed",
-                description: "Engaging social feed with posts, reactions, comments, and rich media.",
-              },
-              {
-                icon: Users,
-                title: "Member Management",
-                description: "Advanced roles, permissions, and member analytics at your fingertips.",
-              },
-              {
-                icon: Zap,
-                title: "AI Assistant",
-                description: "Get AI-powered insights, content suggestions, and member matching.",
-              },
-              {
-                icon: TrendingUp,
-                title: "Analytics Dashboard",
-                description: "Track engagement, revenue, growth, and make data-driven decisions.",
-              },
-            ].map((feature, i) => (
-              <Card key={i} className="group hover:shadow-lg transition-all">
-                <CardContent className="p-6">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                    <feature.icon className="w-6 h-6 text-primary" />
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                  <p className="text-muted-foreground">{feature.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Timeline - What Happens After Joining */}
-      <section className="py-20 px-4">
-        <div className="container mx-auto max-w-4xl">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">{t("timeline.title")}</h2>
-            <p className="text-xl text-muted-foreground">
-              {t("timeline.subtitle")}
+            <p className="text-lg text-muted-foreground mb-8">
+              They focus on posts and discussions. But modern communities need more:
+            </p>
+            <div className="grid md:grid-cols-3 gap-6">
+              <div className="bg-white p-6 rounded-xl shadow-sm">
+                <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mb-4">
+                  <X className="w-6 h-6 text-red-600" />
+                </div>
+                <h3 className="font-semibold mb-2">Live interaction</h3>
+                <p className="text-sm text-muted-foreground">Missing real-time video, whiteboard, screen sharing</p>
+              </div>
+              <div className="bg-white p-6 rounded-xl shadow-sm">
+                <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mb-4">
+                  <X className="w-6 h-6 text-red-600" />
+                </div>
+                <h3 className="font-semibold mb-2">Structured learning</h3>
+                <p className="text-sm text-muted-foreground">No integrated courses or workshops</p>
+              </div>
+              <div className="bg-white p-6 rounded-xl shadow-sm">
+                <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mb-4">
+                  <X className="w-6 h-6 text-red-600" />
+                </div>
+                <h3 className="font-semibold mb-2">Monetization tools</h3>
+                <p className="text-sm text-muted-foreground">Complex payment setups, high fees</p>
+              </div>
+            </div>
+            <p className="text-xl font-medium mt-12">
+              That&apos;s where <span className="text-primary font-bold">Unytea</span> is different.
             </p>
           </div>
+        </div>
+      </section>
 
-          <div className="space-y-8">
-            {[
-              {
-                step: "01",
-                title: t("timeline.day1.title"),
-                description: t("timeline.day1.description"),
-                time: t("timeline.day1.time"),
-              },
-              {
-                step: "02",
-                title: t("timeline.setup.title"),
-                description: t("timeline.setup.description"),
-                time: t("timeline.setup.time"),
-              },
-              {
-                step: "03",
-                title: t("timeline.invite.title"),
-                description: t("timeline.invite.description"),
-                time: t("timeline.invite.time"),
-              },
-              {
-                step: "04",
-                title: t("timeline.launch.title"),
-                description: t("timeline.launch.description"),
-                time: t("timeline.launch.time"),
-              },
-              {
-                step: "05",
-                title: t("timeline.ongoing.title"),
-                description: t("timeline.ongoing.description"),
-                time: t("timeline.ongoing.time"),
-              },
-            ].map((item, i) => (
-              <div key={i} className="flex gap-6">
-                <div className="flex flex-col items-center">
-                  <div className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
-                    {item.step}
-                  </div>
-                  {i < 4 && <div className="w-0.5 flex-1 bg-border mt-2" />}
-                </div>
-                <div className="flex-1 pb-8">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-xl font-semibold">{item.title}</h3>
-                    <Badge variant="outline" className="text-xs">
-                      <Clock className="w-3 h-3 mr-1" />
-                      {item.time}
-                    </Badge>
-                  </div>
-                  <p className="text-muted-foreground">{item.description}</p>
-                </div>
-              </div>
-            ))}
+      {/* 3️⃣ TU SOLUCIÓN - FEATURES */}
+      <section id="features" className="py-20">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <Badge className="mb-4">Features</Badge>
+            <h2 className="text-4xl font-bold mb-4">Everything you need to run a community business</h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              One platform. All your tools. Zero integration headaches.
+            </p>
           </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <FeatureCard
+              icon={Video}
+              title="Live Sessions"
+              description="Interactive video calls with whiteboard, screen sharing, and recordings."
+              highlighted
+            />
+            <FeatureCard
+              icon={BookOpen}
+              title="Courses"
+              description="Create, host, and sell courses with progress tracking and certificates."
+            />
+            <FeatureCard
+              icon={MessageSquare}
+              title="Community Feed"
+              description="Engage your members with posts, comments, reactions, and direct messaging."
+            />
+            <FeatureCard
+              icon={Presentation}
+              title="Whiteboard"
+              description="Collaborate visually in real-time during live sessions."
+            />
+            <FeatureCard
+              icon={Monitor}
+              title="Screen Sharing"
+              description="Present slides, demos, and tutorials seamlessly."
+            />
+            <FeatureCard
+              icon={Mic}
+              title="AI Assistant"
+              description="Get AI-powered suggestions, moderation, and content ideas."
+            />
+          </div>
+        </div>
+      </section>
 
+      {/* 4️⃣ CASOS DE USO */}
+      <section className="py-20 bg-gradient-to-br from-purple-50 to-pink-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <Badge className="mb-4">Use Cases</Badge>
+            <h2 className="text-4xl font-bold mb-4">Communities built on Unytea</h2>
+            <p className="text-xl text-muted-foreground">See how different creators use our platform</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            <UseCaseCard
+              icon={Users}
+              title="Coaching Communities"
+              features={["Weekly group calls", "Paid memberships", "Student discussions", "1-on-1 scheduling"]}
+            />
+            <UseCaseCard
+              icon={BookOpen}
+              title="Learning Communities"
+              features={["Online courses", "Live workshops", "Community support", "Progress tracking"]}
+            />
+            <UseCaseCard
+              icon={Award}
+              title="Expert Communities"
+              features={["Mastermind groups", "Live Q&A sessions", "Premium content", "Direct access"]}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* 5️⃣ HOW IT WORKS - SIMPLIFICADO */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <Badge className="mb-4">Simple Process</Badge>
+            <h2 className="text-4xl font-bold mb-4">Launch your community in minutes</h2>
+            <p className="text-xl text-muted-foreground">No technical skills required</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            <StepCard number={1} title="Create" description="Set up your community with your brand, colors, and custom domain." />
+            <StepCard number={2} title="Invite" description="Share your link and invite your first members in seconds." />
+            <StepCard number={3} title="Go Live" description="Host your first live session, course, or workshop immediately." />
+          </div>
           <div className="text-center mt-12">
             <Link href="/auth/signup">
-              <Button size="lg" className="btn-hover-lift">
-                Start Your Journey
-                <ArrowRight className="w-4 h-4 ml-2" />
+              <Button size="lg" className="px-8">
+                Start Building Free <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section id="testimonials" className="py-20 px-4 bg-muted/30">
-        <div className="container mx-auto max-w-6xl">
+      {/* 6️⃣ COMPARACIÓN - SECCIÓN CRÍTICA */}
+      <section id="comparison" className="py-20 bg-muted/30">
+        <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <Badge className="mb-4">{t("testimonials.badge")}</Badge>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              {t("testimonials.title")}
-              <br />
-              <span className="gradient-text">{t("testimonials.subtitle")}</span>
-            </h2>
+            <Badge className="mb-4">Comparison</Badge>
+            <h2 className="text-4xl font-bold mb-4">Why creators choose Unytea</h2>
+            <p className="text-xl text-muted-foreground">See how we compare to other platforms</p>
           </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              {
-                quote: t("testimonials.quote1"),
-                author: t("testimonials.author1"),
-                role: t("testimonials.role1"),
-                avatar: "https://i.pravatar.cc/150?img=5",
-                rating: 5,
-              },
-              {
-                quote: t("testimonials.quote2"),
-                author: t("testimonials.author2"),
-                role: t("testimonials.role2"),
-                avatar: "https://i.pravatar.cc/150?img=11",
-                rating: 5,
-              },
-              {
-                quote: t("testimonials.quote3"),
-                author: t("testimonials.author3"),
-                role: t("testimonials.role3"),
-                avatar: "https://i.pravatar.cc/150?img=9",
-                rating: 5,
-              },
-            ].map((testimonial, i) => (
-              <Card key={i} className="relative overflow-hidden">
-                <CardContent className="p-6">
-                  <Quote className="w-8 h-8 text-primary/20 absolute top-4 right-4" />
-                  <div className="flex gap-1 mb-4">
-                    {Array.from({ length: testimonial.rating }).map((_, j) => (
-                      <Star key={j} className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                    ))}
-                  </div>
-                  <p className="text-foreground mb-6 relative z-10">"{testimonial.quote}"</p>
-                  <div className="flex items-center gap-3">
-                    <Avatar>
-                      <AvatarImage src={testimonial.avatar} />
-                      <AvatarFallback>{testimonial.author[0]}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-semibold text-sm">{testimonial.author}</p>
-                      <p className="text-xs text-muted-foreground">{testimonial.role}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div className="grid grid-cols-3 bg-muted/50 p-4 font-semibold">
+              <div>Feature</div>
+              <div className="text-center">Skool</div>
+              <div className="text-center text-primary">Unytea</div>
+            </div>
+            <ComparisonRow feature="Community Feed" skool="✓" unytea="✓" />
+            <ComparisonRow feature="Courses" skool="✓" unytea="✓" />
+            <ComparisonRow feature="Live Sessions" skool="✗" unytea="✓" highlighted />
+            <ComparisonRow feature="Whiteboard" skool="✗" unytea="✓" highlighted />
+            <ComparisonRow feature="Screen Sharing" skool="✗" unytea="✓" highlighted />
+            <ComparisonRow feature="AI Assistant" skool="✗" unytea="✓" highlighted />
+            <ComparisonRow feature="Video Calls" skool="✗" unytea="✓" highlighted />
+            <ComparisonRow feature="Custom Domain" skool="✗" unytea="✓" />
+            <ComparisonRow feature="Transaction Fee" skool="10%" unytea="3-5%" highlighted />
           </div>
+          <p className="text-center text-muted-foreground mt-6 text-sm">
+            Used by creators switching from Skool, Circle, Mighty Networks, and Facebook Groups
+          </p>
         </div>
       </section>
 
-      {/* Trust Badges & Certifications */}
-      <section className="py-16 px-4 border-y border-border/50">
-        <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-12">
-            <h3 className="text-2xl font-bold mb-2">{t("trust.title")}</h3>
-            <p className="text-muted-foreground">{t("trust.subtitle")}</p>
-          </div>
-          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-60">
-            <div className="flex items-center gap-2">
-              <Shield className="w-8 h-8" />
-              <span className="font-semibold">{t("trust.soc2")}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Globe className="w-8 h-8" />
-              <span className="font-semibold">{t("trust.gdpr")}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Award className="w-8 h-8" />
-              <span className="font-semibold">{t("trust.uptime")}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Users className="w-8 h-8" />
-              <span className="font-semibold">{t("trust.support")}</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing */}
-      <section id="pricing" className="py-20 px-4">
-        <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-16">
-            <Badge className="mb-4">{t("pricing.badge")}</Badge>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              {t("pricing.title")}
-              <br />
-              <span className="gradient-text">{t("pricing.subtitle")}</span>
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              {t("pricing.description")}
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {/* Free Plan */}
-            <Card className="relative">
-              <CardContent className="p-8">
-                <h3 className="text-xl font-semibold mb-2">{t("pricing.free.name")}</h3>
-                <p className="text-muted-foreground mb-4">{t("pricing.free.description")}</p>
-                <div className="mb-6">
-                  <span className="text-4xl font-bold">$0</span>
-                  <span className="text-muted-foreground">/month</span>
-                </div>
-                <ul className="space-y-3 mb-8">
-                  {[
-                    "1 Community",
-                    "Up to 100 members",
-                    "Basic features",
-                    "Community support",
-                  ].map((feature, i) => (
-                    <li key={i} className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="w-4 h-4 text-primary" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/auth/signup">
-                  <Button variant="outline" className="w-full">{t("pricing.free.cta")}</Button>
-                </Link>
-              </CardContent>
-            </Card>
-
-            {/* Pro Plan */}
-            <Card className="relative border-primary ring-2 ring-primary/20 scale-105">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <Badge className="bg-primary text-primary-foreground">{t("pricing.professional.badge")}</Badge>
+      {/* 7️⃣ MONETIZACIÓN */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <Badge className="mb-4">Monetization</Badge>
+              <h2 className="text-4xl font-bold mb-6">
+                Turn your community into a business
+              </h2>
+              <p className="text-lg text-muted-foreground mb-8">
+                Members can pay for access to your content, courses, and live sessions. All powered by Stripe.
+              </p>
+              <div className="space-y-4">
+                <MonetizationItem icon={Users} title="Paid Memberships" description="Charge monthly or annual access fees" />
+                <MonetizationItem icon={BookOpen} title="Courses" description="Sell one-time or drip courses" />
+                <MonetizationItem icon={Video} title="Workshops" description="Host paid live sessions and events" />
+                <MonetizationItem icon={CreditCard} title="Low Fees" description="Just 3-5% platform fee + Stripe processing" />
               </div>
-              <CardContent className="p-8">
-                <h3 className="text-xl font-semibold mb-2">{t("pricing.professional.name")}</h3>
-                <p className="text-muted-foreground mb-4">{t("pricing.professional.description")}</p>
-                <div className="mb-6">
-                  <span className="text-4xl font-bold">$49</span>
-                  <span className="text-muted-foreground">/month</span>
+            </div>
+            <div className="bg-gradient-to-br from-purple-100 to-pink-100 p-8 rounded-2xl">
+              <div className="bg-white p-6 rounded-xl shadow-lg">
+                <div className="flex items-center justify-between mb-6">
+                  <span className="font-medium">Monthly Revenue</span>
+                  <Badge variant="secondary">This Month</Badge>
                 </div>
-                <ul className="space-y-3 mb-8">
-                  {[
-                    "1 Community",
-                    "Unlimited members",
-                    "Video calls & streaming",
-                    "Course builder",
-                    "AI assistant",
-                    "Analytics dashboard",
-                    "Priority support",
-                  ].map((feature, i) => (
-                    <li key={i} className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="w-4 h-4 text-primary" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/auth/signup">
-                  <Button className="w-full">{t("pricing.professional.cta")}</Button>
-                </Link>
-              </CardContent>
-            </Card>
-
-            {/* Premium Plan */}
-            <Card className="relative">
-              <CardContent className="p-8">
-                <h3 className="text-xl font-semibold mb-2">{t("pricing.premium.name")}</h3>
-                <p className="text-muted-foreground mb-4">{t("pricing.premium.description")}</p>
-                <div className="mb-6">
-                  <span className="text-4xl font-bold">$149</span>
-                  <span className="text-muted-foreground">/month</span>
+                <div className="text-4xl font-bold mb-2">$12,450</div>
+                <div className="flex items-center text-green-600 text-sm mb-6">
+                  <TrendingUp className="w-4 h-4 mr-1" />
+                  +23% from last month
                 </div>
-                <ul className="space-y-3 mb-8">
-                  {[
-                    "3 Communities",
-                    "Unlimited members",
-                    "White-label option",
-                    "Advanced analytics",
-                    "API access",
-                    "Dedicated support",
-                    "Custom integrations",
-                  ].map((feature, i) => (
-                    <li key={i} className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="w-4 h-4 text-primary" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/auth/signup">
-                  <Button variant="outline" className="w-full">{t("pricing.premium.cta")}</Button>
-                </Link>
-              </CardContent>
-            </Card>
+                <div className="space-y-3">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Memberships</span>
+                    <span className="font-medium">$8,200</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Courses</span>
+                    <span className="font-medium">$3,150</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Workshops</span>
+                    <span className="font-medium">$1,100</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-
-          <p className="text-center text-muted-foreground mt-8">
-            {t("pricing.guarantee")}
-          </p>
         </div>
       </section>
 
-      {/* FAQ */}
-      <section id="faq" className="py-20 px-4 bg-muted/30">
-        <div className="container mx-auto max-w-3xl">
+      {/* 8️⃣ TESTIMONIALS */}
+      <section className="py-20 bg-muted/30">
+        <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <Badge className="mb-4">{t("faq.badge")}</Badge>
-            <h2 className="text-4xl font-bold mb-4">{t("faq.title")}</h2>
-            <p className="text-xl text-muted-foreground">
-              {t("faq.subtitle")}
-            </p>
+            <Badge className="mb-4">Testimonials</Badge>
+            <h2 className="text-4xl font-bold mb-4">Loved by creators</h2>
+            <p className="text-xl text-muted-foreground">See what our users say about Unytea</p>
           </div>
-
-          <div className="space-y-4">
-            {[
-              {
-                question: t("faq.q1"),
-                answer: t("faq.a1"),
-              },
-              {
-                question: t("faq.q2"),
-                answer: t("faq.a2"),
-              },
-              {
-                question: t("faq.q3"),
-                answer: t("faq.a3"),
-              },
-              {
-                question: t("faq.q4"),
-                answer: t("faq.a4"),
-              },
-              {
-                question: t("faq.q5"),
-                answer: t("faq.a5"),
-              },
-              {
-                question: t("faq.q6"),
-                answer: t("faq.a6"),
-              },
-            ].map((faq, i) => (
-              <FAQItem key={i} question={faq.question} answer={faq.answer} />
-            ))}
+          <div className="grid md:grid-cols-3 gap-8">
+            <TestimonialCard
+              quote="Unytea helped me consolidate my coaching community, courses, and live sessions into one platform. Game changer!"
+              author="Sarah Chen"
+              role="Business Coach"
+              rating={5}
+            />
+            <TestimonialCard
+              quote="The live sessions feature is incredible. My students love the interactive whiteboard and screen sharing."
+              author="Marcus Johnson"
+              role="Course Creator"
+              rating={5}
+            />
+            <TestimonialCard
+              quote="Finally switched from Skool and never looked back. The video features alone justify the move."
+              author="Emma Williams"
+              role="Community Founder"
+              rating={5}
+            />
           </div>
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section className="py-20 px-4">
-        <div className="container mx-auto max-w-4xl text-center">
+      {/* 9️⃣ PRICING */}
+      <section id="pricing" className="py-20">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <Badge className="mb-4">Pricing</Badge>
+            <h2 className="text-4xl font-bold mb-4">Simple, transparent pricing</h2>
+            <p className="text-xl text-muted-foreground">Start free, upgrade when you&apos;re ready</p>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+            <PricingCard
+              name="Start"
+              price={0}
+              description="Perfect for testing"
+              features={["1 community", "Up to 50 members", "Basic courses", "Community feed", "5% transaction fee"]}
+              cta="Get Started"
+            />
+            <PricingCard
+              name="Creator"
+              price={49}
+              description="For serious creators"
+              features={["1 community", "Unlimited members", "Live sessions", "Full courses", "3% transaction fee"]}
+              popular
+              cta="Start Free Trial"
+            />
+            <PricingCard
+              name="Business"
+              price={99}
+              description="For growing businesses"
+              features={["1 community", "Custom domain", "Advanced analytics", "5 admins", "1% transaction fee"]}
+              cta="Start Free Trial"
+            />
+            <PricingCard
+              name="Pro"
+              price={199}
+              description="For enterprises"
+              features={["Multiple communities", "White-label", "API access", "Unlimited admins", "0% transaction fee"]}
+              cta="Contact Sales"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* 🔟 CTA FINAL */}
+      <section className="py-20 bg-gradient-to-br from-primary to-purple-600 text-white">
+        <div className="container mx-auto px-4 text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            {t("cta.title")}
+            Start building your community today
           </h2>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            {t("cta.subtitle")}
+          <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
+            Create your community, invite members, and host your first live session — all in less than 5 minutes.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/auth/signup">
-              <Button size="lg" className="btn-hover-lift px-8 py-6 text-lg">
-                {t("cta.primary")}
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-            </Link>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="px-8 py-6 text-lg"
-              onClick={() => setShowDemoModal(true)}
-            >
-              <Play className="w-5 h-5 mr-2" />
-              {t("cta.secondary")}
-            </Button>
-          </div>
-          <p className="text-sm text-muted-foreground mt-6">
-            {t("cta.guarantee")}
+          <Link
+            href="/auth/signup"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-primary rounded-xl font-bold text-lg hover:bg-white/90 transition-colors"
+          >
+            Create Your Community Free
+            <ArrowRight className="w-5 h-5" />
+          </Link>
+          <p className="text-sm mt-6 opacity-80">
+            ✓ 14-day free trial &nbsp;•&nbsp; ✓ No credit card required &nbsp;•&nbsp; ✓ Cancel anytime
           </p>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t py-16 px-4 bg-card">
-        <div className="container mx-auto max-w-6xl">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
-            <div className="col-span-2 md:col-span-1">
+      {/* FOOTER */}
+      <footer className="py-12 border-t bg-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
+            <div>
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-8 h-8 bg-gradient-to-br from-primary to-purple-600 rounded-lg flex items-center justify-center">
                   <Sparkles className="w-5 h-5 text-white" />
                 </div>
                 <span className="text-xl font-bold">Unytea</span>
               </div>
-              <p className="text-sm text-muted-foreground mb-4">
-                {t("footer.description")}
+              <p className="text-sm text-muted-foreground">
+                The live platform for community-based learning.
               </p>
-              <div className="flex gap-4">
-                {["twitter", "linkedin", "youtube", "instagram"].map((social) => (
-                  <Link
-                    key={social}
-                    href={`https://${social}.com/unytea`}
-                    className="w-8 h-8 rounded-full bg-muted flex items-center justify-center hover:bg-primary/20 transition-colors"
-                  >
-                    <span className="text-xs font-bold uppercase">{social[0]}</span>
-                  </Link>
-                ))}
-              </div>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">{t("footer.product")}</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="#features" className="hover:text-foreground transition-colors">{t("footer.links.features")}</Link></li>
-                <li><Link href="#pricing" className="hover:text-foreground transition-colors">{t("footer.links.pricing")}</Link></li>
-                <li><Link href="#" className="hover:text-foreground transition-colors">{t("footer.links.changelog")}</Link></li>
-                <li><Link href="#" className="hover:text-foreground transition-colors">{t("footer.links.roadmap")}</Link></li>
+              <h4 className="font-semibold mb-4">Product</h4>
+              <ul className="space-y-2 text-sm">
+                <li><Link href="#features" className="text-muted-foreground hover:text-foreground">Features</Link></li>
+                <li><Link href="#pricing" className="text-muted-foreground hover:text-foreground">Pricing</Link></li>
+                <li><Link href="#" className="text-muted-foreground hover:text-foreground">Changelog</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">{t("footer.resources")}</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="#" className="hover:text-foreground transition-colors">{t("footer.links.documentation")}</Link></li>
-                <li><Link href="#" className="hover:text-foreground transition-colors">{t("footer.links.api")}</Link></li>
-                <li><Link href="#" className="hover:text-foreground transition-colors">{t("footer.links.community")}</Link></li>
-                <li><Link href="#" className="hover:text-foreground transition-colors">{t("footer.links.blog")}</Link></li>
+              <h4 className="font-semibold mb-4">Resources</h4>
+              <ul className="space-y-2 text-sm">
+                <li><Link href="#" className="text-muted-foreground hover:text-foreground">Documentation</Link></li>
+                <li><Link href="#" className="text-muted-foreground hover:text-foreground">Community</Link></li>
+                <li><Link href="#" className="text-muted-foreground hover:text-foreground">Blog</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">{t("footer.company")}</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="#" className="hover:text-foreground transition-colors">{t("footer.links.about")}</Link></li>
-                <li><Link href="#" className="hover:text-foreground transition-colors">{t("footer.links.careers")}</Link></li>
-                <li><Link href="#" className="hover:text-foreground transition-colors">{t("footer.links.contact")}</Link></li>
-                <li><Link href="#" className="hover:text-foreground transition-colors">{t("footer.links.privacy")}</Link></li>
+              <h4 className="font-semibold mb-4">Legal</h4>
+              <ul className="space-y-2 text-sm">
+                <li><Link href="#" className="text-muted-foreground hover:text-foreground">Privacy</Link></li>
+                <li><Link href="#" className="text-muted-foreground hover:text-foreground">Terms</Link></li>
+                <li><Link href="#" className="text-muted-foreground hover:text-foreground">Cookies</Link></li>
               </ul>
             </div>
           </div>
-          <div className="pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-muted-foreground">
-              © 2025 Unytea. {t("footer.rights")}
-            </p>
-            <div className="flex gap-6 text-sm text-muted-foreground">
-              <Link href="#" className="hover:text-foreground transition-colors">{t("footer.legal.privacy")}</Link>
-              <Link href="#" className="hover:text-foreground transition-colors">{t("footer.legal.terms")}</Link>
-              <Link href="#" className="hover:text-foreground transition-colors">{t("footer.legal.cookies")}</Link>
-            </div>
+          <div className="pt-8 border-t text-center text-sm text-muted-foreground">
+            © 2025 Unytea. All rights reserved.
           </div>
         </div>
       </footer>
-      {/* Demo Video Modal */}
+
+      {/* DEMO MODAL */}
       {showDemoModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-          <div className="relative w-full max-w-4xl bg-background rounded-2xl overflow-hidden shadow-2xl">
-            <button
-              onClick={() => setShowDemoModal(false)}
-              className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70 transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-            <div className="aspect-video bg-gradient-to-br from-primary/20 to-purple-600/20 flex items-center justify-center">
-              <div className="text-center">
-                <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4">
-                  <Play className="w-10 h-10 text-primary fill-primary" />
-                </div>
-                <p className="text-lg font-medium">Demo Video Coming Soon</p>
-                <p className="text-muted-foreground mt-2">
-                  We&apos;re preparing an amazing demo video for you!
-                </p>
-                <Button 
-                  onClick={() => setShowDemoModal(false)}
-                  className="mt-6"
-                >
-                  Close
-                </Button>
-              </div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full text-center">
+            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Play className="w-8 h-8 text-primary" />
             </div>
+            <h3 className="text-2xl font-bold mb-2">Demo Video Coming Soon</h3>
+            <p className="text-muted-foreground mb-6">
+              We&apos;re preparing an amazing demo video showcasing all Unytea features.
+            </p>
+            <Button onClick={() => setShowDemoModal(false)} className="w-full">
+              Got it
+            </Button>
           </div>
         </div>
       )}
@@ -838,17 +564,126 @@ export default function Home() {
   );
 }
 
-// FAQ Accordion Component
-function FAQItem({ question, answer }: { question: string; answer: string }) {
+// COMPONENTES AUXILIARES
+
+function FeatureCard({ icon: Icon, title, description, highlighted = false }: { icon: any; title: string; description: string; highlighted?: boolean }) {
   return (
-    <details className="group bg-card rounded-lg border border-border overflow-hidden">
-      <summary className="flex items-center justify-between p-6 cursor-pointer list-none hover:bg-muted/50 transition-colors">
-        <span className="font-semibold text-lg pr-4">{question}</span>
-        <ChevronDown className="w-5 h-5 text-muted-foreground group-open:rotate-180 transition-transform flex-shrink-0" />
-      </summary>
-      <div className="px-6 pb-6 text-muted-foreground">
-        {answer}
+    <div className={`p-6 rounded-xl border transition-all hover:shadow-lg ${highlighted ? 'border-primary bg-primary/5' : 'bg-white'}`}>
+      <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${highlighted ? 'bg-primary text-white' : 'bg-muted'}`}>
+        <Icon className="w-6 h-6" />
       </div>
-    </details>
+      <h3 className="font-semibold text-lg mb-2">{title}</h3>
+      <p className="text-muted-foreground text-sm">{description}</p>
+    </div>
+  );
+}
+
+function UseCaseCard({ icon: Icon, title, features }: { icon: any; title: string; features: string[] }) {
+  return (
+    <div className="bg-white p-6 rounded-xl border hover:shadow-lg transition-shadow">
+      <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
+        <Icon className="w-6 h-6 text-primary" />
+      </div>
+      <h3 className="font-semibold text-lg mb-4">{title}</h3>
+      <ul className="space-y-2">
+        {features.map((feature, i) => (
+          <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
+            <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+            {feature}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function StepCard({ number, title, description }: { number: number; title: string; description: string }) {
+  return (
+    <div className="text-center">
+      <div className="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+        {number}
+      </div>
+      <h3 className="font-semibold text-lg mb-2">{title}</h3>
+      <p className="text-muted-foreground text-sm">{description}</p>
+    </div>
+  );
+}
+
+function ComparisonRow({ feature, skool, unytea, highlighted = false }: { feature: string; skool: string; unytea: string; highlighted?: boolean }) {
+  return (
+    <div className={`grid grid-cols-3 p-4 border-t ${highlighted ? 'bg-primary/5' : ''}`}>
+      <div className="font-medium">{feature}</div>
+      <div className="text-center">{skool === '✓' ? <span className="text-green-600">✓</span> : skool === '✗' ? <span className="text-red-400">✗</span> : <span className="text-muted-foreground">{skool}</span>}</div>
+      <div className="text-center font-medium text-primary">{unytea === '✓' ? <span className="text-green-600">✓</span> : <span className="text-muted-foreground">{unytea}</span>}</div>
+    </div>
+  );
+}
+
+function MonetizationItem({ icon: Icon, title, description }: { icon: any; title: string; description: string }) {
+  return (
+    <div className="flex items-start gap-4">
+      <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+        <Icon className="w-5 h-5 text-primary" />
+      </div>
+      <div>
+        <h4 className="font-medium">{title}</h4>
+        <p className="text-sm text-muted-foreground">{description}</p>
+      </div>
+    </div>
+  );
+}
+
+function TestimonialCard({ quote, author, role, rating }: { quote: string; author: string; role: string; rating: number }) {
+  return (
+    <div className="bg-white p-6 rounded-xl border">
+      <div className="flex gap-1 mb-4">
+        {Array.from({ length: rating }).map((_, i) => (
+          <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+        ))}
+      </div>
+      <p className="text-muted-foreground mb-4 italic">&ldquo;{quote}&rdquo;</p>
+      <div className="flex items-center gap-3">
+        <Avatar className="w-10 h-10">
+          <AvatarFallback>{author[0]}</AvatarFallback>
+        </Avatar>
+        <div>
+          <div className="font-medium">{author}</div>
+          <div className="text-sm text-muted-foreground">{role}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PricingCard({ name, price, description, features, popular = false, cta }: { name: string; price: number; description: string; features: string[]; popular?: boolean; cta: string }) {
+  return (
+    <div className={`relative p-6 rounded-xl border ${popular ? 'border-primary ring-2 ring-primary/20 scale-105' : 'bg-white'}`}>
+      {popular && (
+        <Badge className="absolute -top-2 left-1/2 -translate-x-1/2 bg-primary text-white">
+          Most Popular
+        </Badge>
+      )}
+      <div className="text-center mb-6">
+        <h3 className="font-semibold text-lg">{name}</h3>
+        <div className="mt-2">
+          <span className="text-4xl font-bold">${price}</span>
+          {price > 0 && <span className="text-muted-foreground">/month</span>}
+        </div>
+        <p className="text-sm text-muted-foreground mt-1">{description}</p>
+      </div>
+      <ul className="space-y-3 mb-6">
+        {features.map((feature, i) => (
+          <li key={i} className="flex items-center gap-2 text-sm">
+            <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+            {feature}
+          </li>
+        ))}
+      </ul>
+      <Link href="/auth/signup">
+        <Button className="w-full" variant={popular ? 'default' : 'outline'}>
+          {cta}
+        </Button>
+      </Link>
+    </div>
   );
 }
