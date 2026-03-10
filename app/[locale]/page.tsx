@@ -256,22 +256,43 @@ export default function Home() {
             </p>
             <div className="grid md:grid-cols-3 gap-6">
               <div className="bg-white p-6 rounded-xl shadow-sm">
-                <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mb-4">
-                  <X className="w-6 h-6 text-red-600" />
+                <div className="w-full h-32 rounded-xl overflow-hidden mb-4 bg-gray-100 relative">
+                  <img 
+                    src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=400&q=80" 
+                    alt="Boring meeting without interaction"
+                    className="w-full h-full object-cover opacity-70"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <X className="w-12 h-12 text-red-500 bg-white/80 rounded-full p-2" />
+                  </div>
                 </div>
                 <h3 className="font-semibold mb-2">Live interaction</h3>
                 <p className="text-sm text-muted-foreground">Missing real-time video, whiteboard, screen sharing</p>
               </div>
               <div className="bg-white p-6 rounded-xl shadow-sm">
-                <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mb-4">
-                  <X className="w-6 h-6 text-red-600" />
+                <div className="w-full h-32 rounded-xl overflow-hidden mb-4 bg-gray-100 relative">
+                  <img 
+                    src="https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=400&q=80" 
+                    alt="Disorganized learning materials"
+                    className="w-full h-full object-cover opacity-70"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <X className="w-12 h-12 text-red-500 bg-white/80 rounded-full p-2" />
+                  </div>
                 </div>
                 <h3 className="font-semibold mb-2">Structured learning</h3>
                 <p className="text-sm text-muted-foreground">No integrated courses or workshops</p>
               </div>
               <div className="bg-white p-6 rounded-xl shadow-sm">
-                <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mb-4">
-                  <X className="w-6 h-6 text-red-600" />
+                <div className="w-full h-32 rounded-xl overflow-hidden mb-4 bg-gray-100 relative">
+                  <img 
+                    src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&q=80" 
+                    alt="Complex payment setup"
+                    className="w-full h-full object-cover opacity-70"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <X className="w-12 h-12 text-red-500 bg-white/80 rounded-full p-2" />
+                  </div>
                 </div>
                 <h3 className="font-semibold mb-2">Monetization tools</h3>
                 <p className="text-sm text-muted-foreground">Complex payment setups, high fees</p>
