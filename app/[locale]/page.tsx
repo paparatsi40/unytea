@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { LanguageSelector } from "@/components/language-selector";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import {
   Sparkles,
   LayoutDashboard,
