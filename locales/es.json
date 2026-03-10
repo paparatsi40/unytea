@@ -1,292 +1,220 @@
 {
   "landing": {
     "nav": {
-      "features": "Características",
+      "features": "Funcionalidades",
+      "testimonials": "Testimonios",
       "pricing": "Precios",
-      "community": "Comunidad",
+      "faq": "FAQ",
       "dashboard": "Panel",
-      "goToDashboard": "Ir al Panel",
-      "signIn": "Iniciar Sesión",
-      "startFree": "Comenzar Gratis"
+      "goToDashboard": "Ir al Panel"
     },
     "hero": {
-      "badge": "Ahora en Beta",
-      "title": {
-        "line1": "Donde las Comunidades",
-        "line2": "Se Unen"
-      },
-      "description": "Como compartir té con amigos, Unytea hace que construir comunidades sea cálido, humano y genuino.",
-      "highlight": "Todo lo que tiene Skool, más el alma que le falta.",
+      "badge": "Confiado por 10,000+ creadores",
+      "title": "Construye tu Comunidad Soñada",
+      "description": "La plataforma todo-en-uno para creadores, coaches y educadores. Engage, enseña y monetiza—sin límites.",
       "cta": {
-        "primary": "Comenzar Gratis",
+        "primary": "Comenzar Prueba Gratis",
         "secondary": "Ver Demo"
+      },
+      "socialProof": {
+        "members": "10,000+ miembros",
+        "rating": "4.9/5 calificación"
       }
     },
-    "preview": {
-      "communityName": "Maestros del Diseño",
-      "members": "{count} miembros",
-      "post1": {
-        "author": "Sarah Chen",
-        "time": "hace 2 horas",
-        "content": "¡Acabamos de lanzar nuestro nuevo sistema de diseño! Mira la paleta de colores..."
-      },
-      "post2": {
-        "author": "Marcus Johnson",
-        "time": "hace 5 horas",
-        "content": "¡Sosteniendo una sesión en vivo mañana a las 3PM EST sobre métodos de investigación UX!"
-      },
-      "liveSession": "Sesión en Vivo",
-      "online": "{count} en línea",
-      "activeSessions": "{count} sesiones activas",
-      "joinConversation": "Unirse a la conversación"
+    "stats": {
+      "communities": "Comunidades Activas",
+      "members": "Miembros Conectados",
+      "revenue": "Ingresos Generados",
+      "satisfaction": "Tasa de Satisfacción"
     },
-    "featured": {
-      "title": "Comunidades que Confían en Unytea",
-      "description": "Únete a miles de comunidades prósperas que ya están construyendo algo especial",
-      "members": "{count} miembros",
-      "online": "{count} en línea"
+    "instructor": {
+      "badge": "Creador Destacado",
+      "verified": "Creador Verificado",
+      "bio": "Sarah ayuda a coaches a construir comunidades prósperas. 50K+ estudiantes enseñados."
     },
     "features": {
-      "title": {
-        "line1": "Comunidad con Alma.",
-        "line2": "No Solo Otra Plataforma."
+      "title": "Todo lo que Necesitas",
+      "subtitle": "Todas las herramientas para construir, interactuar y monetizar tu comunidad",
+      "video": {
+        "title": "Video Integrado",
+        "description": "Llamadas 1-a-1 y grupales con grabación"
       },
-      "subtitle": "Tomamos lo que funciona y añadimos la calidez que falta.",
-      "items": {
-        "video": {
-          "title": "Videollamadas Integradas",
-          "description": "Sesiones 1-a-1 y en grupo con grabación, transcripción y pantalla compartida.",
-          "badge": "Skool no tiene esto"
-        },
-        "customization": {
-          "title": "Personalización Completa",
-          "description": "Dominios personalizados, colores, fuentes y CSS. Tu marca, tu estilo.",
-          "badge": "Control total"
-        },
-        "security": {
-          "title": "Seguridad Empresarial",
-          "description": "Encriptación de extremo a extremo, 2FA y diseño centrado en la privacidad."
-        },
-        "multilanguage": {
-          "title": "Multi-Idioma",
-          "description": "Traducción automática y localización para comunidades globales.",
-          "badge": "Auto-traducir"
-        },
-        "gamification": {
-          "title": "Gamificación Inteligente",
-          "description": "Puntos, insignias y recompensas que realmente motivan la participación."
-        },
-        "analytics": {
-          "title": "Analíticas Profundas",
-          "description": "Entiende tu comunidad con insights detallados y reportes.",
-          "badge": "Tiempo real"
-        }
+      "courses": {
+        "title": "Constructor de Cursos",
+        "description": "Crea y vende cursos fácilmente"
+      },
+      "community": {
+        "title": "Feed de Comunidad",
+        "description": "Interactúa con posts, comentarios, reacciones"
+      },
+      "ai": {
+        "title": "Asistente AI",
+        "description": "Obtén ayuda con contenido y moderación"
+      },
+      "analytics": {
+        "title": "Analíticas",
+        "description": "Rastrea crecimiento y engagement"
+      },
+      "monetize": {
+        "title": "Monetización",
+        "description": "Membresías pagadas y cursos"
       }
     },
-    "comparison": {
-      "title": "¿Por Qué Elegir Unytea sobre Skool?",
-      "subtitle": "Mismas características principales. Mejor alma. Mitad de precio.",
-      "newBadge": "NUEVO",
-      "items": {
-        "buddy": {
-          "title": "Sistema de Compañeros",
-          "description": "Emparejamiento inteligente de miembros para asociaciones de responsabilidad. Skool no tiene esto."
-        },
-        "auditorium": {
-          "title": "Vista de Auditorio",
-          "description": "Presencia visual mostrando quién está en línea en tiempo real. Nadie más tiene esto."
-        },
-        "videocalls": {
-          "title": "Videollamadas Integradas",
-          "description": "Programa, sostén y graba sesiones sin salir de la plataforma. No más enlaces de Zoom."
-        },
-        "brand": {
-          "title": "Tu Marca, Tu Estilo",
-          "description": "Dominios personalizados, colores, fuentes y CSS. Las comunidades de Skool se ven iguales."
-        },
-        "price": {
-          "title": "Mitad de Precio",
-          "description": "$49/mes vs $99 de Skool. Mismas características, más alma."
-        },
-        "websockets": {
-          "title": "WebSockets en Tiempo Real",
-          "description": "Rendimiento nivel Discord. Latencia 0ms. 90% menos carga en servidor."
-        }
+    "timeline": {
+      "title": "Tu Viaje Comienza Aquí",
+      "day1": {
+        "title": "Día 1: Regístrate",
+        "description": "Crea tu cuenta en 30 segundos"
+      },
+      "week1": {
+        "title": "Semana 1: Construye",
+        "description": "Configura tu comunidad e invita miembros"
+      },
+      "week2": {
+        "title": "Semana 2: Interactúa",
+        "description": "Inicia conversaciones y organiza sesiones"
+      },
+      "month1": {
+        "title": "Mes 1: Monetiza",
+        "description": "Lanza cursos y membresías pagadas"
+      },
+      "ongoing": {
+        "title": "Continuo: Crece",
+        "description": "Escala con AI y analíticas"
       }
+    },
+    "testimonials": {
+      "title": "Amado por Creadores",
+      "subtitle": "Mira lo que dicen nuestros constructores de comunidad",
+      "quote1": "Unytea me ayudó a crecer de 0 a 5,000 miembros en 3 meses. ¡Las funciones de video son revolucionarias!",
+      "author1": "Sarah Chen",
+      "role1": "Coach y Fundadora de Comunidad",
+      "quote2": "Finalmente una plataforma que entiende a los creadores. El constructor de cursos es intuitivo y mis estudiantes lo aman.",
+      "author2": "Marcus Johnson",
+      "role2": "Creador de Cursos",
+      "quote3": "Cambié de Skool y nunca miré atrás. Mejores funciones, menor precio, soporte increíble.",
+      "author3": "Emily Rodriguez",
+      "role3": "Educadora y Mentora"
+    },
+    "trust": {
+      "title": "Confiado por Líderes de la Industria",
+      "subtitle": "Seguro, confiable y construido para escalar",
+      "soc2": "Certificado SOC 2",
+      "gdpr": "Cumple GDPR",
+      "uptime": "99.99% Uptime",
+      "support": "Soporte 24/7"
     },
     "pricing": {
-      "title": "Precios Simples y Honestos",
-      "subtitle": "Comienza gratis. Escala mientras creces. Cancela cuando quieras.",
-      "perMonth": "mes",
-      "popular": "Más Popular",
-      "cta": "Comenzar",
-      "plans": {
-        "free": {
-          "name": "Gratis",
-          "features": {
-            "one": "1 comunidad",
-            "two": "Hasta 50 miembros",
-            "three": "Características básicas",
-            "four": "3 videollamadas/mes",
-            "five": "Marca Unytea"
-          }
-        },
-        "pro": {
-          "name": "Profesional",
-          "features": {
-            "one": "1 comunidad",
-            "two": "Miembros ilimitados",
-            "three": "Personalización completa",
-            "four": "Videollamadas ilimitadas",
-            "five": "Sistema de Compañeros",
-            "six": "Vista de Auditorio",
-            "seven": "Dominio personalizado",
-            "eight": "Analíticas avanzadas",
-            "nine": "Soporte prioritario"
-          }
-        },
-        "premium": {
-          "name": "Premium",
-          "features": {
-            "one": "3 comunidades",
-            "two": "Todo en Pro",
-            "three": "White-label",
-            "four": "Acceso a API",
-            "five": "Soporte dedicado",
-            "six": "Integraciones personalizadas"
-          }
-        }
-      }
+      "title": "Precios Simples y Transparentes",
+      "subtitle": "Comienza gratis, actualiza cuando estés listo",
+      "free": {
+        "name": "Gratis",
+        "description": "Para individuos comenzando",
+        "cta": "Comenzar"
+      },
+      "professional": {
+        "name": "Profesional",
+        "badge": "Más Popular",
+        "description": "Para creadores en crecimiento",
+        "cta": "Comenzar Prueba Gratis"
+      },
+      "premium": {
+        "name": "Premium",
+        "description": "Para usuarios avanzados",
+        "cta": "Comenzar Prueba Gratis"
+      },
+      "guarantee": "Todos los planes incluyen prueba de 14 días. No requiere tarjeta de crédito."
+    },
+    "faq": {
+      "title": "Preguntas Frecuentes",
+      "subtitle": "Todo lo que necesitas saber sobre Unytea",
+      "q1": "¿Puedo migrar desde Skool u otras plataformas?",
+      "a1": "¡Absolutamente! Ofrecemos asistencia de migración gratuita desde Skool, Circle, Facebook Groups y otras plataformas. Nuestro equipo te ayudará a transferir tus miembros, contenido y datos sin problemas.",
+      "q2": "¿Necesito habilidades técnicas para usar Unytea?",
+      "a2": "¡Para nada! Unytea está diseñado para ser fácil de usar para todos. Nuestro constructor drag-and-drop e interfaz intuitiva te permiten configurar tu comunidad en minutos, sin necesidad de programar.",
+      "q3": "¿Cómo funciona la prueba gratuita de 14 días?",
+      "a3": "Obtienes acceso completo a todas las funciones Profesionales por 14 días. No requiere tarjeta de crédito para comenzar. Al finalizar tu prueba, elige el plan que se ajuste a tus necesidades o continúa con nuestro plan gratuito.",
+      "q4": "¿Puedo monetizar mi comunidad?",
+      "a4": "¡Sí! Unytea tiene funciones de monetización integradas incluyendo membresías pagadas, venta de cursos y facturación de suscripciones. Nos integramos con Stripe para procesamiento seguro de pagos con solo 5% de comisión de plataforma.",
+      "q5": "¿Qué opciones de soporte están disponibles?",
+      "a5": "Los planes gratuitos incluyen soporte de comunidad. Los planes Profesionales obtienen soporte prioritario por email con tiempo de respuesta de 24 horas. Los planes Premium obtienen soporte dedicado con tiempo de respuesta de 4 horas y un gerente de éxito dedicado.",
+      "q6": "¿Mis datos están seguros?",
+      "a6": "La seguridad es nuestra máxima prioridad. Somos compatibles con SOC 2, cumplimos GDPR, y usamos encriptación de grado empresarial. Tus datos se almacenan de forma segura y nunca se comparten con terceros."
     },
     "cta": {
-      "title": "¿Listo para Unir Tu Comunidad?",
-      "description": "Únete a nosotros y experimenta la construcción de comunidades que se siente como en casa.",
-      "button": "Comenzar Gratis"
+      "title": "¿Listo para Construir tu Comunidad Soñada?",
+      "subtitle": "Únete a 10,000+ creadores que ya están interactuando, enseñando y creciendo con Unytea.",
+      "primary": "Comenzar Prueba Gratis",
+      "secondary": "Ver Demo",
+      "guarantee": "No requiere tarjeta de crédito • Prueba de 14 días • Cancela cuando quieras"
     },
     "footer": {
-      "slogan": "Donde las Comunidades Se Unen.",
-      "privacy": "Privacidad",
-      "terms": "Términos",
-      "contact": "Contacto"
+      "description": "La plataforma moderna para que los creadores construyan, interactúen y monetizen sus comunidades.",
+      "product": "Producto",
+      "resources": "Recursos",
+      "company": "Empresa",
+      "legal": "Legal",
+      "rights": "Todos los derechos reservados."
+    },
+    "demoModal": {
+      "title": "Video Demo Próximamente",
+      "description": "¡Estamos preparando un video demo increíble para ti!",
+      "close": "Cerrar"
     }
   },
-  "navigation": {
-    "dashboard": "Panel",
-    "communities": "Comunidades",
-    "messages": "Mensajes",
-    "profile": "Perfil",
-    "logout": "Cerrar sesión",
-    "signIn": "Iniciar sesión",
-    "signUp": "Registrarse",
-    "signup": "Registrarse"
-  },
-  "common": {
-    "loading": "Cargando...",
-    "error": "Ocurrió un error",
-    "search": "Buscar",
-    "searchPlaceholder": "Buscar...",
-    "save": "Guardar",
-    "cancel": "Cancelar",
-    "delete": "Eliminar",
-    "edit": "Editar",
-    "create": "Crear",
-    "submit": "Enviar",
-    "back": "Atrás",
-    "next": "Siguiente",
-    "previous": "Anterior",
-    "close": "Cerrar",
-    "open": "Abrir",
-    "all": "Todos",
-    "recent": "Recientes",
-    "alphabetical": "Alfabético",
-    "mostPopular": "Más Populares",
-    "comingSoon": "Próximamente"
-  },
   "dashboard": {
+    "title": "Panel",
     "welcome": "Bienvenido de vuelta",
-    "yourCommunities": "Tus Comunidades",
-    "discover": "Descubrir Comunidades",
-    "createCommunity": "Crear Comunidad",
-    "manage": "Gestionar",
-    "settings": "Configuración",
-    "members": "Miembros",
-    "posts": "Publicaciones",
-    "noCommunities": "Aún no te has unido a ninguna comunidad",
-    "browseCommunities": "Explorar Comunidades"
-  },
-  "communities": {
-    "allCommunities": "Todas las Comunidades",
-    "public": "Públicas",
-    "private": "Privadas",
-    "mostMembers": "Más Miembros",
-    "mostActive": "Más Activas",
-    "createNew": "Crear Nueva Comunidad",
-    "namePlaceholder": "Mi Comunidad Increíble",
-    "descriptionPlaceholder": "Cuéntale a la gente de qué se trata tu comunidad...",
-    "nameRequired": "El nombre de la comunidad es requerido",
-    "createFailed": "Error al crear la comunidad",
-    "uploadSuccess": "{type} subido exitosamente",
-    "uploadFailed": "Error al subir {type}",
-    "logo": "Logo",
-    "cover": "Portada",
-    "join": "Unirse",
-    "joinSuccess": "Te uniste exitosamente",
-    "joinFailed": "Error al unirse",
-    "leave": "Salir",
-    "leaveSuccess": "Saliste de la comunidad",
-    "leaveFailed": "Error al salir",
-    "pendingApproval": "Pendiente de Aprobación",
-    "settings": "Configuración",
-    "manage": "Gestionar Comunidad",
-    "totalCommunities": "Total de Comunidades",
-    "totalMembers": "Total de Miembros",
-    "youOwn": "Tus Comunidades",
-    "totalPosts": "Total de Posts",
-    "members": "miembros",
-    "posts": "posts",
-    "stepBasicInfo": "Información Básica",
-    "stepVisualIdentity": "Identidad Visual",
-    "stepCategories": "Categorías",
-    "stepReview": "Revisión"
-  },
-  "auth": {
-    "signIn": "Iniciar Sesión",
-    "signUp": "Registrarse",
-    "email": "Correo electrónico",
-    "password": "Contraseña",
-    "confirmPassword": "Confirmar Contraseña",
-    "signOut": "Cerrar Sesión",
-    "firstName": "Nombre",
-    "lastName": "Apellido",
-    "signInRequired": "Por favor inicia sesión para continuar",
-    "invalidCredentials": "Credenciales inválidas",
-    "accountCreated": "Cuenta creada exitosamente",
-    "passwordsDontMatch": "Las contraseñas no coinciden",
-    "forgotPassword": "¿Olvidaste tu contraseña?",
-    "resetPassword": "Restablecer Contraseña",
-    "checkEmail": "Revisa tu correo para instrucciones",
-    "welcomeBack": "Bienvenido de Nuevo",
-    "signInSubtitle": "Inicia sesión para continuar a tu comunidad",
-    "continueWithGoogle": "Continuar con Google",
-    "continueWithGitHub": "Continuar con GitHub",
-    "orContinueWith": "o continuar con",
-    "emailPlaceholder": "Ingresa tu correo electrónico",
-    "fillAllFields": "Por favor completa todos los campos",
-    "noAccount": "¿No tienes una cuenta?"
-  },
-  "sectionBuilder": {
-    "sections": "Secciones",
-    "properties": "Propiedades",
-    "livePreview": "Vista Previa",
-    "clickToEdit": "Haz clic en cualquier sección para editar",
-    "addSection": "Agregar Sección",
-    "save": "Guardar Página",
-    "preview": "Vista Previa",
-    "closePreview": "Cerrar Vista Previa",
-    "saveAndClose": "Guardar y Cerrar",
-    "unsavedPreview": "Vista Previa sin Guardar",
-    "faqsGenerated": "FAQs generadas con IA",
-    "faqsFailed": "Error al generar FAQs",
-    "unknownSection": "Tipo de sección desconocido"
+    "stats": {
+      "communities": "Comunidades",
+      "sessions": "Sesiones",
+      "courses": "Cursos",
+      "messages": "Mensajes"
+    },
+    "quickActions": {
+      "title": "Acciones Rápidas",
+      "createPost": "Crear Post",
+      "startCourse": "Iniciar Curso",
+      "newMessage": "Nuevo Mensaje",
+      "scheduleSession": "Programar Sesión"
+    },
+    "upcomingSessions": {
+      "title": "Próximas Sesiones",
+      "empty": "No hay sesiones próximas",
+      "join": "Unirse"
+    },
+    "recentActivity": {
+      "title": "Actividad Reciente",
+      "empty": "No hay actividad reciente"
+    },
+    "courseProgress": {
+      "title": "Continuar Aprendiendo",
+      "empty": "No hay cursos en progreso",
+      "continue": "Continuar"
+    },
+    "achievements": {
+      "title": "Logros Recientes",
+      "empty": "Desbloquea tu primer logro"
+    },
+    "trending": {
+      "title": "Comunidades Tendencia",
+      "join": "Unirse"
+    },
+    "events": {
+      "title": "Próximos Eventos",
+      "empty": "No hay eventos próximos"
+    },
+    "feed": {
+      "title": "Feed de Comunidad",
+      "createPlaceholder": "¿Qué estás pensando?",
+      "post": "Publicar",
+      "like": "Me gusta",
+      "comment": "Comentar",
+      "share": "Compartir"
+    },
+    "streak": {
+      "title": "Racha Diaria",
+      "days": "días"
+    }
   }
 }
