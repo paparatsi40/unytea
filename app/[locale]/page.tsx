@@ -100,7 +100,7 @@ export default function Home() {
             <div className="text-center lg:text-left">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary mb-6">
                 <Star className="w-4 h-4" />
-                <span className="text-sm font-medium">Trusted by creators worldwide</span>
+                <span className="text-sm font-medium">Trusted by creators, coaches, and educators worldwide</span>
               </div>
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
                 Build a community that{" "}
@@ -299,10 +299,12 @@ export default function Home() {
             <h2 className="text-4xl font-bold mb-4">Launch your community in minutes</h2>
             <p className="text-xl text-muted-foreground">No technical skills required</p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-5 gap-6 max-w-6xl mx-auto">
             <StepCard number={1} title="Create" description="Set up your community with your brand, colors, and custom domain." />
             <StepCard number={2} title="Invite" description="Share your link and invite your first members in seconds." />
             <StepCard number={3} title="Go Live" description="Host your first live session, course, or workshop immediately." />
+            <StepCard number={4} title="Launch Course" description="Create and publish your first course with modules and lessons." />
+            <StepCard number={5} title="Monetize" description="Set up pricing, subscriptions, and start earning revenue." />
           </div>
           <div className="text-center mt-12">
             <Link href="/auth/signup">
@@ -351,7 +353,7 @@ export default function Home() {
             <div>
               <Badge className="mb-4">Monetization</Badge>
               <h2 className="text-4xl font-bold mb-6">
-                Turn your community into a business
+                Turn your community into a business with live sessions
               </h2>
               <p className="text-lg text-muted-foreground mb-8">
                 Members can pay for access to your content, courses, and live sessions. All powered by Stripe.
@@ -560,42 +562,56 @@ export default function Home() {
 
 function FeatureCard({ icon: Icon, title, description, highlighted = false }: { icon: any; title: string; description: string; highlighted?: boolean }) {
   return (
-    <div className={`p-6 rounded-xl border transition-all hover:shadow-lg ${highlighted ? 'border-primary bg-primary/5' : 'bg-white'}`}>
-      <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${highlighted ? 'bg-primary text-white' : 'bg-muted'}`}>
+    <div className={`group relative p-6 rounded-xl border transition-all duration-300 hover:shadow-xl hover:scale-[1.02] overflow-hidden ${highlighted ? 'border-primary bg-gradient-to-br from-primary/10 to-purple-100' : 'bg-gradient-to-br from-white to-gray-50'}`}>
+      {/* Background decoration */}
+      <div className={`absolute top-0 right-0 w-32 h-32 opacity-10 rounded-full -translate-y-1/2 translate-x-1/2 transition-transform group-hover:scale-150 ${highlighted ? 'bg-primary' : 'bg-gray-400'}`} />
+      
+      <div className={`relative w-12 h-12 rounded-xl flex items-center justify-center mb-4 shadow-md ${highlighted ? 'bg-gradient-to-br from-primary to-purple-600 text-white' : 'bg-gradient-to-br from-gray-100 to-gray-200'}`}>
         <Icon className="w-6 h-6" />
       </div>
-      <h3 className="font-semibold text-lg mb-2">{title}</h3>
-      <p className="text-muted-foreground text-sm">{description}</p>
+      <h3 className="relative font-semibold text-lg mb-2">{title}</h3>
+      <p className="relative text-muted-foreground text-sm">{description}</p>
     </div>
   );
 }
 
 function UseCaseCard({ icon: Icon, title, features }: { icon: any; title: string; features: string[] }) {
   return (
-    <div className="bg-white p-6 rounded-xl border hover:shadow-lg transition-shadow">
-      <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
-        <Icon className="w-6 h-6 text-primary" />
+    <div className="group relative bg-gradient-to-br from-white to-gray-50 p-6 rounded-xl border hover:shadow-xl hover:scale-[1.02] transition-all duration-300 overflow-hidden">
+      {/* Gradient overlay on hover */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-purple-100 opacity-0 group-hover:opacity-100 transition-opacity" />
+      
+      {/* Decorative circle */}
+      <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/5 rounded-full group-hover:scale-150 transition-transform duration-500" />
+      
+      <div className="relative">
+        <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-primary/10 rounded-xl flex items-center justify-center mb-4 shadow-sm">
+          <Icon className="w-6 h-6 text-primary" />
+        </div>
+        <h3 className="font-semibold text-lg mb-4">{title}</h3>
+        <ul className="space-y-2">
+          {features.map((feature, i) => (
+            <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
+              <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+              {feature}
+            </li>
+          ))}
+        </ul>
       </div>
-      <h3 className="font-semibold text-lg mb-4">{title}</h3>
-      <ul className="space-y-2">
-        {features.map((feature, i) => (
-          <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
-            <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-            {feature}
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }
 
 function StepCard({ number, title, description }: { number: number; title: string; description: string }) {
   return (
-    <div className="text-center">
-      <div className="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
-        {number}
+    <div className="group text-center">
+      <div className="relative w-16 h-16 mx-auto mb-4">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary to-purple-600 rounded-full opacity-20 group-hover:scale-110 transition-transform" />
+        <div className="relative w-full h-full bg-gradient-to-br from-primary to-purple-600 text-white rounded-full flex items-center justify-center text-xl font-bold shadow-lg">
+          {number}
+        </div>
       </div>
-      <h3 className="font-semibold text-lg mb-2">{title}</h3>
+      <h3 className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors">{title}</h3>
       <p className="text-muted-foreground text-sm">{description}</p>
     </div>
   );
