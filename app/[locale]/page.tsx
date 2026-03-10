@@ -360,9 +360,9 @@ export default function Home() {
       <section className="py-20 px-4">
         <div className="container mx-auto max-w-4xl">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Your Journey Starts Here</h2>
+            <h2 className="text-4xl font-bold mb-4">{t("timeline.title")}</h2>
             <p className="text-xl text-muted-foreground">
-              Here's exactly what happens when you join Unytea
+              {t("timeline.subtitle")}
             </p>
           </div>
 
@@ -370,33 +370,33 @@ export default function Home() {
             {[
               {
                 step: "01",
-                title: "Create Your Account",
-                description: "Sign up in 30 seconds. No credit card required for the free trial.",
-                time: "Day 1",
+                title: t("timeline.day1.title"),
+                description: t("timeline.day1.description"),
+                time: t("timeline.day1.time"),
               },
               {
                 step: "02",
-                title: "Set Up Your Community",
-                description: "Choose your layout, customize your branding, and set your community rules.",
-                time: "Day 1-2",
+                title: t("timeline.setup.title"),
+                description: t("timeline.setup.description"),
+                time: t("timeline.setup.time"),
               },
               {
                 step: "03",
-                title: "Invite Your First Members",
-                description: "Use our invite system or share your community link. Watch members join instantly.",
-                time: "Day 2-3",
+                title: t("timeline.invite.title"),
+                description: t("timeline.invite.description"),
+                time: t("timeline.invite.time"),
               },
               {
                 step: "04",
-                title: "Launch Your First Content",
-                description: "Post your first update, create a course, or schedule a live session.",
-                time: "Day 3-5",
+                title: t("timeline.launch.title"),
+                description: t("timeline.launch.description"),
+                time: t("timeline.launch.time"),
               },
               {
                 step: "05",
-                title: "Grow & Monetize",
-                description: "Engage your community, track analytics, and start generating revenue.",
-                time: "Week 2+",
+                title: t("timeline.ongoing.title"),
+                description: t("timeline.ongoing.description"),
+                time: t("timeline.ongoing.time"),
               },
             ].map((item, i) => (
               <div key={i} className="flex gap-6">
@@ -435,34 +435,34 @@ export default function Home() {
       <section id="testimonials" className="py-20 px-4 bg-muted/30">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
-            <Badge className="mb-4">Testimonials</Badge>
+            <Badge className="mb-4">{t("testimonials.badge")}</Badge>
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Loved by Creators
+              {t("testimonials.title")}
               <br />
-              <span className="gradient-text">Worldwide</span>
+              <span className="gradient-text">{t("testimonials.subtitle")}</span>
             </h2>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
             {[
               {
-                quote: "Unytea transformed how I engage with my audience. My community grew 300% in just 3 months!",
-                author: "Sarah Chen",
-                role: "Business Coach",
+                quote: t("testimonials.quote1"),
+                author: t("testimonials.author1"),
+                role: t("testimonials.role1"),
                 avatar: "https://i.pravatar.cc/150?img=5",
                 rating: 5,
               },
               {
-                quote: "The best platform I've used. The AI assistant alone saves me 10 hours every week.",
-                author: "Marcus Johnson",
-                role: "Fitness Creator",
+                quote: t("testimonials.quote2"),
+                author: t("testimonials.author2"),
+                role: t("testimonials.role2"),
                 avatar: "https://i.pravatar.cc/150?img=11",
                 rating: 5,
               },
               {
-                quote: "Finally, a platform that understands creators. The monetization features are incredible.",
-                author: "Emma Williams",
-                role: "Online Educator",
+                quote: t("testimonials.quote3"),
+                author: t("testimonials.author3"),
+                role: t("testimonials.role3"),
                 avatar: "https://i.pravatar.cc/150?img=9",
                 rating: 5,
               },
@@ -497,25 +497,25 @@ export default function Home() {
       <section className="py-16 px-4 border-y border-border/50">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-12">
-            <h3 className="text-2xl font-bold mb-2">Trusted by Industry Leaders</h3>
-            <p className="text-muted-foreground">Secure, reliable, and built for scale</p>
+            <h3 className="text-2xl font-bold mb-2">{t("trust.title")}</h3>
+            <p className="text-muted-foreground">{t("trust.subtitle")}</p>
           </div>
           <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-60">
             <div className="flex items-center gap-2">
               <Shield className="w-8 h-8" />
-              <span className="font-semibold">SOC 2 Compliant</span>
+              <span className="font-semibold">{t("trust.soc2")}</span>
             </div>
             <div className="flex items-center gap-2">
               <Globe className="w-8 h-8" />
-              <span className="font-semibold">GDPR Ready</span>
+              <span className="font-semibold">{t("trust.gdpr")}</span>
             </div>
             <div className="flex items-center gap-2">
               <Award className="w-8 h-8" />
-              <span className="font-semibold">99.99% Uptime</span>
+              <span className="font-semibold">{t("trust.uptime")}</span>
             </div>
             <div className="flex items-center gap-2">
               <Users className="w-8 h-8" />
-              <span className="font-semibold">24/7 Support</span>
+              <span className="font-semibold">{t("trust.support")}</span>
             </div>
           </div>
         </div>
@@ -525,14 +525,14 @@ export default function Home() {
       <section id="pricing" className="py-20 px-4">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
-            <Badge className="mb-4">Pricing</Badge>
+            <Badge className="mb-4">{t("pricing.badge")}</Badge>
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Simple, Transparent
+              {t("pricing.title")}
               <br />
-              <span className="gradient-text">Pricing</span>
+              <span className="gradient-text">{t("pricing.subtitle")}</span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Start free, upgrade when you're ready. No hidden fees, no surprises.
+              {t("pricing.description")}
             </p>
           </div>
 
@@ -540,8 +540,8 @@ export default function Home() {
             {/* Free Plan */}
             <Card className="relative">
               <CardContent className="p-8">
-                <h3 className="text-xl font-semibold mb-2">Free</h3>
-                <p className="text-muted-foreground mb-4">Perfect for getting started</p>
+                <h3 className="text-xl font-semibold mb-2">{t("pricing.free.name")}</h3>
+                <p className="text-muted-foreground mb-4">{t("pricing.free.description")}</p>
                 <div className="mb-6">
                   <span className="text-4xl font-bold">$0</span>
                   <span className="text-muted-foreground">/month</span>
@@ -560,7 +560,7 @@ export default function Home() {
                   ))}
                 </ul>
                 <Link href="/auth/signup">
-                  <Button variant="outline" className="w-full">Get Started</Button>
+                  <Button variant="outline" className="w-full">{t("pricing.free.cta")}</Button>
                 </Link>
               </CardContent>
             </Card>
@@ -568,11 +568,11 @@ export default function Home() {
             {/* Pro Plan */}
             <Card className="relative border-primary ring-2 ring-primary/20 scale-105">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <Badge className="bg-primary text-primary-foreground">Most Popular</Badge>
+                <Badge className="bg-primary text-primary-foreground">{t("pricing.professional.badge")}</Badge>
               </div>
               <CardContent className="p-8">
-                <h3 className="text-xl font-semibold mb-2">Professional</h3>
-                <p className="text-muted-foreground mb-4">For growing creators</p>
+                <h3 className="text-xl font-semibold mb-2">{t("pricing.professional.name")}</h3>
+                <p className="text-muted-foreground mb-4">{t("pricing.professional.description")}</p>
                 <div className="mb-6">
                   <span className="text-4xl font-bold">$49</span>
                   <span className="text-muted-foreground">/month</span>
@@ -594,7 +594,7 @@ export default function Home() {
                   ))}
                 </ul>
                 <Link href="/auth/signup">
-                  <Button className="w-full">Start Free Trial</Button>
+                  <Button className="w-full">{t("pricing.professional.cta")}</Button>
                 </Link>
               </CardContent>
             </Card>
@@ -602,8 +602,8 @@ export default function Home() {
             {/* Premium Plan */}
             <Card className="relative">
               <CardContent className="p-8">
-                <h3 className="text-xl font-semibold mb-2">Premium</h3>
-                <p className="text-muted-foreground mb-4">For power users</p>
+                <h3 className="text-xl font-semibold mb-2">{t("pricing.premium.name")}</h3>
+                <p className="text-muted-foreground mb-4">{t("pricing.premium.description")}</p>
                 <div className="mb-6">
                   <span className="text-4xl font-bold">$149</span>
                   <span className="text-muted-foreground">/month</span>
@@ -625,14 +625,14 @@ export default function Home() {
                   ))}
                 </ul>
                 <Link href="/auth/signup">
-                  <Button variant="outline" className="w-full">Contact Sales</Button>
+                  <Button variant="outline" className="w-full">{t("pricing.premium.cta")}</Button>
                 </Link>
               </CardContent>
             </Card>
           </div>
 
           <p className="text-center text-muted-foreground mt-8">
-            All plans include a 14-day free trial. No credit card required.
+            {t("pricing.guarantee")}
           </p>
         </div>
       </section>

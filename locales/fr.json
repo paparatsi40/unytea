@@ -62,39 +62,46 @@
     },
     "timeline": {
       "title": "Votre Voyage Commence Ici",
+      "subtitle": "Voici exactement ce qui se passe lorsque vous rejoignez Unytea",
       "day1": {
-        "title": "Jour 1: Inscrivez-vous",
-        "description": "Créez votre compte en 30 secondes"
+        "title": "Créez Votre Compte",
+        "description": "Inscrivez-vous en 30 secondes. Aucune carte de crédit requise pour l'essai gratuit.",
+        "time": "Jour 1"
       },
-      "week1": {
-        "title": "Semaine 1: Construisez",
-        "description": "Configurez votre communauté et invitez des membres"
+      "setup": {
+        "title": "Configurez Votre Communauté",
+        "description": "Choisissez votre mise en page, personnalisez votre marque et définissez les règles de votre communauté.",
+        "time": "Jour 1-2"
       },
-      "week2": {
-        "title": "Semaine 2: Engagez",
-        "description": "Démarrez des conversations et organisez des sessions"
+      "invite": {
+        "title": "Invitez Vos Premiers Membres",
+        "description": "Utilisez notre système d'invitation ou partagez le lien de votre communauté. Regardez les membres rejoindre instantanément.",
+        "time": "Jour 2-3"
       },
-      "month1": {
-        "title": "Mois 1: Monétisez",
-        "description": "Lancez des cours et des adhésions payantes"
+      "launch": {
+        "title": "Lancez Votre Premier Contenu",
+        "description": "Publiez votre première mise à jour, créez un cours ou planifiez une session en direct.",
+        "time": "Jour 3-5"
       },
       "ongoing": {
-        "title": "Continuel: Grandissez",
-        "description": "Évoluez avec l'IA et les analytiques"
+        "title": "Grandissez et Monétisez",
+        "description": "Engagez votre communauté, suivez les analytiques et commencez à générer des revenus.",
+        "time": "Semaine 2+"
       }
     },
     "testimonials": {
+      "badge": "Témoignages",
       "title": "Adoré par les Créateurs",
-      "subtitle": "Voyez ce que disent nos constructeurs de communauté",
-      "quote1": "Unytea m'a aidé à passer de 0 à 5,000 membres en 3 mois. Les fonctions vidéo sont révolutionnaires !",
+      "subtitle": "Dans le Monde Entier",
+      "quote1": "Unytea a transformé ma façon d'interagir avec mon audience. Ma communauté a grandi de 300% en seulement 3 mois !",
       "author1": "Sarah Chen",
-      "role1": "Coach et Fondatrice de Communauté",
-      "quote2": "Enfin une plateforme qui comprend les créateurs. Le constructeur de cours est intuitif et mes étudiants l'adorent.",
+      "role1": "Coach d'Affaires",
+      "quote2": "La meilleure plateforme que j'ai utilisée. L'assistant IA seul m'économise 10 heures chaque semaine.",
       "author2": "Marcus Johnson",
-      "role2": "Créateur de Cours",
-      "quote3": "J'ai quitté Skool et je ne regrette rien. Meilleures fonctions, prix plus bas, support incroyable.",
-      "author3": "Emily Rodriguez",
-      "role3": "Éducatrice et Mentore"
+      "role2": "Créateur Fitness",
+      "quote3": "Enfin, une plateforme qui comprend les créateurs. Les fonctions de monétisation sont incroyables.",
+      "author3": "Emma Williams",
+      "role3": "Éducatrice en Ligne"
     },
     "trust": {
       "title": "Fait Confiance par les Leaders de l'Industrie",
@@ -105,11 +112,13 @@
       "support": "Support 24/7"
     },
     "pricing": {
-      "title": "Tarifs Simples et Transparents",
-      "subtitle": "Commencez gratuitement, passez à la version supérieure quand vous êtes prêt",
+      "badge": "Tarifs",
+      "title": "Tarifs Simples et",
+      "subtitle": "Transparents",
+      "description": "Commencez gratuitement, passez à la version supérieure quand vous êtes prêt. Pas de frais cachés, pas de surprises.",
       "free": {
         "name": "Gratuit",
-        "description": "Pour les individus qui commencent",
+        "description": "Parfait pour commencer",
         "cta": "Commencer"
       },
       "professional": {
@@ -121,7 +130,7 @@
       "premium": {
         "name": "Premium",
         "description": "Pour les utilisateurs avancés",
-        "cta": "Commencer l'Essai Gratuit"
+        "cta": "Contacter les Ventes"
       },
       "guarantee": "Tous les plans incluent un essai gratuit de 14 jours. Aucune carte de crédit requise."
     },

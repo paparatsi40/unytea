@@ -62,39 +62,46 @@
     },
     "timeline": {
       "title": "Your Journey Starts Here",
+      "subtitle": "Here's exactly what happens when you join Unytea",
       "day1": {
-        "title": "Day 1: Sign Up",
-        "description": "Create your account in 30 seconds"
+        "title": "Create Your Account",
+        "description": "Sign up in 30 seconds. No credit card required for the free trial.",
+        "time": "Day 1"
       },
-      "week1": {
-        "title": "Week 1: Build",
-        "description": "Set up your community and invite members"
+      "setup": {
+        "title": "Set Up Your Community",
+        "description": "Choose your layout, customize your branding, and set your community rules.",
+        "time": "Day 1-2"
       },
-      "week2": {
-        "title": "Week 2: Engage",
-        "description": "Start conversations and host sessions"
+      "invite": {
+        "title": "Invite Your First Members",
+        "description": "Use our invite system or share your community link. Watch members join instantly.",
+        "time": "Day 2-3"
       },
-      "month1": {
-        "title": "Month 1: Monetize",
-        "description": "Launch courses and paid memberships"
+      "launch": {
+        "title": "Launch Your First Content",
+        "description": "Post your first update, create a course, or schedule a live session.",
+        "time": "Day 3-5"
       },
       "ongoing": {
-        "title": "Ongoing: Grow",
-        "description": "Scale with AI and analytics"
+        "title": "Grow & Monetize",
+        "description": "Engage your community, track analytics, and start generating revenue.",
+        "time": "Week 2+"
       }
     },
     "testimonials": {
+      "badge": "Testimonials",
       "title": "Loved by Creators",
-      "subtitle": "See what our community builders say",
-      "quote1": "Unytea helped me grow from 0 to 5,000 members in 3 months. The video features are game-changing!",
+      "subtitle": "Worldwide",
+      "quote1": "Unytea transformed how I engage with my audience. My community grew 300% in just 3 months!",
       "author1": "Sarah Chen",
-      "role1": "Coach & Community Founder",
-      "quote2": "Finally a platform that understands creators. The course builder is intuitive and my students love it.",
+      "role1": "Business Coach",
+      "quote2": "The best platform I've used. The AI assistant alone saves me 10 hours every week.",
       "author2": "Marcus Johnson",
-      "role2": "Course Creator",
-      "quote3": "I switched from Skool and never looked back. Better features, lower price, amazing support.",
-      "author3": "Emily Rodriguez",
-      "role3": "Educator & Mentor"
+      "role2": "Fitness Creator",
+      "quote3": "Finally, a platform that understands creators. The monetization features are incredible.",
+      "author3": "Emma Williams",
+      "role3": "Online Educator"
     },
     "trust": {
       "title": "Trusted by Industry Leaders",
@@ -105,11 +112,13 @@
       "support": "24/7 Support"
     },
     "pricing": {
-      "title": "Simple, Transparent Pricing",
-      "subtitle": "Start free, upgrade when you're ready",
+      "badge": "Pricing",
+      "title": "Simple, Transparent",
+      "subtitle": "Pricing",
+      "description": "Start free, upgrade when you're ready. No hidden fees, no surprises.",
       "free": {
         "name": "Free",
-        "description": "For individuals getting started",
+        "description": "Perfect for getting started",
         "cta": "Get Started"
       },
       "professional": {
@@ -121,7 +130,7 @@
       "premium": {
         "name": "Premium",
         "description": "For power users",
-        "cta": "Start Free Trial"
+        "cta": "Contact Sales"
       },
       "guarantee": "All plans include a 14-day free trial. No credit card required."
     },

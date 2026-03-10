@@ -62,39 +62,46 @@
     },
     "timeline": {
       "title": "Tu Viaje Comienza Aquí",
+      "subtitle": "Así es exactamente lo que sucede cuando te unes a Unytea",
       "day1": {
-        "title": "Día 1: Regístrate",
-        "description": "Crea tu cuenta en 30 segundos"
+        "title": "Crea Tu Cuenta",
+        "description": "Regístrate en 30 segundos. No se requiere tarjeta de crédito para la prueba gratuita.",
+        "time": "Día 1"
       },
-      "week1": {
-        "title": "Semana 1: Construye",
-        "description": "Configura tu comunidad e invita miembros"
+      "setup": {
+        "title": "Configura Tu Comunidad",
+        "description": "Elige tu diseño, personaliza tu marca y establece las reglas de tu comunidad.",
+        "time": "Día 1-2"
       },
-      "week2": {
-        "title": "Semana 2: Interactúa",
-        "description": "Inicia conversaciones y organiza sesiones"
+      "invite": {
+        "title": "Invita Tus Primeros Miembros",
+        "description": "Usa nuestro sistema de invitaciones o comparte el enlace de tu comunidad. Observa cómo se unen al instante.",
+        "time": "Día 2-3"
       },
-      "month1": {
-        "title": "Mes 1: Monetiza",
-        "description": "Lanza cursos y membresías pagadas"
+      "launch": {
+        "title": "Lanza Tu Primer Contenido",
+        "description": "Publica tu primera actualización, crea un curso o programa una sesión en vivo.",
+        "time": "Día 3-5"
       },
       "ongoing": {
-        "title": "Continuo: Crece",
-        "description": "Escala con AI y analíticas"
+        "title": "Crece y Monetiza",
+        "description": "Interactúa con tu comunidad, sigue las analíticas y comienza a generar ingresos.",
+        "time": "Semana 2+"
       }
     },
     "testimonials": {
+      "badge": "Testimonios",
       "title": "Amado por Creadores",
-      "subtitle": "Mira lo que dicen nuestros constructores de comunidad",
-      "quote1": "Unytea me ayudó a crecer de 0 a 5,000 miembros en 3 meses. ¡Las funciones de video son revolucionarias!",
+      "subtitle": "En Todo el Mundo",
+      "quote1": "Unytea transformó cómo interactúo con mi audiencia. ¡Mi comunidad creció 300% en solo 3 meses!",
       "author1": "Sarah Chen",
-      "role1": "Coach y Fundadora de Comunidad",
-      "quote2": "Finalmente una plataforma que entiende a los creadores. El constructor de cursos es intuitivo y mis estudiantes lo aman.",
+      "role1": "Coach de Negocios",
+      "quote2": "La mejor plataforma que he usado. Solo el asistente AI me ahorra 10 horas cada semana.",
       "author2": "Marcus Johnson",
-      "role2": "Creador de Cursos",
-      "quote3": "Cambié de Skool y nunca miré atrás. Mejores funciones, menor precio, soporte increíble.",
-      "author3": "Emily Rodriguez",
-      "role3": "Educadora y Mentora"
+      "role2": "Creador de Fitness",
+      "quote3": "Finalmente, una plataforma que entiende a los creadores. Las funciones de monetización son increíbles.",
+      "author3": "Emma Williams",
+      "role3": "Educadora Online"
     },
     "trust": {
       "title": "Confiado por Líderes de la Industria",
@@ -105,11 +112,13 @@
       "support": "Soporte 24/7"
     },
     "pricing": {
-      "title": "Precios Simples y Transparentes",
-      "subtitle": "Comienza gratis, actualiza cuando estés listo",
+      "badge": "Precios",
+      "title": "Precios Simples y",
+      "subtitle": "Transparentes",
+      "description": "Comienza gratis, actualiza cuando estés listo. Sin tarifas ocultas, sin sorpresas.",
       "free": {
         "name": "Gratis",
-        "description": "Para individuos comenzando",
+        "description": "Perfecto para comenzar",
         "cta": "Comenzar"
       },
       "professional": {
@@ -121,7 +130,7 @@
       "premium": {
         "name": "Premium",
         "description": "Para usuarios avanzados",
-        "cta": "Comenzar Prueba Gratis"
+        "cta": "Contactar Ventas"
       },
       "guarantee": "Todos los planes incluyen prueba de 14 días. No requiere tarjeta de crédito."
     },
