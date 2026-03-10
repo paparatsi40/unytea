@@ -65,7 +65,7 @@ export async function GET() {
       },
     });
 
-    // Get recent course completions
+    // Get recent course completions (enrollments with completedAt)
     const recentCompletions = await prisma.enrollment.findMany({
       where: {
         course: {
@@ -73,7 +73,9 @@ export async function GET() {
             ownerId: userId,
           },
         },
-        status: "COMPLETED",
+        completedAt: {
+          not: null,
+        },
       },
       orderBy: {
         updatedAt: "desc",
