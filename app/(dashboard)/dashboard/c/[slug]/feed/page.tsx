@@ -1,5 +1,7 @@
 "use client";
 
+// Community Feed - Main social feed for community engagement
+
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
