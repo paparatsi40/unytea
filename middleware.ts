@@ -34,7 +34,7 @@ export default auth((req) => {
 
   // Para rutas con locale (incluyendo /{locale}/auth/*)
   if (hasLocale) {
-    const locale = firstSegment
+    const _locale = firstSegment
     const normalizedPath = "/" + pathname.split("/").slice(2).join("/")
     
     const isAuthRoute = normalizedPath.startsWith("/auth")
