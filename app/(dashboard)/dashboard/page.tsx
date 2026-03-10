@@ -615,8 +615,10 @@ export default function DashboardPage() {
           </Card>
         </div>
 
-        {/* Main Content - Recent Activity */}
-        <div className="lg:col-span-2 space-y-6">
+        {/* ROW 2: Two Column Layout - Quick Actions & Recent Activity */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - Quick Actions */}
+          <div className="space-y-6">
           {/* Recent Activity Feed */}
           <Card>
             <CardHeader>
