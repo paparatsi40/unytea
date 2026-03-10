@@ -3,18 +3,13 @@
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useCurrentUser } from "@/hooks/use-current-user";
-import { useToast } from "@/hooks/use-toast";
 import {
   Users,
   BookOpen,
   Video,
   Calendar,
-  TrendingUp,
   Plus,
   MessageSquare,
-  Heart,
-  Share2,
-  MoreHorizontal,
   Clock,
   Play,
   CheckCircle2,
@@ -28,9 +23,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import Link from "next/link";
 
 // Types
@@ -60,7 +52,6 @@ interface UpcomingEvent {
 
 export default function DashboardPage() {
   const { user } = useCurrentUser();
-  const { toast } = useToast();
   const t = useTranslations("dashboard");
   const [metrics, setMetrics] = useState<BusinessMetrics | null>(null);
   const [activities, setActivities] = useState<RecentActivity[]>([]);
