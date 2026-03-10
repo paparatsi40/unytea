@@ -740,41 +740,41 @@ export default function Home() {
               </div>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Product</h4>
+              <h4 className="font-semibold mb-4">{t("footer.product")}</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="#features" className="hover:text-foreground transition-colors">Features</Link></li>
-                <li><Link href="#pricing" className="hover:text-foreground transition-colors">Pricing</Link></li>
-                <li><Link href="#" className="hover:text-foreground transition-colors">Changelog</Link></li>
-                <li><Link href="#" className="hover:text-foreground transition-colors">Roadmap</Link></li>
+                <li><Link href="#features" className="hover:text-foreground transition-colors">{t("footer.links.features")}</Link></li>
+                <li><Link href="#pricing" className="hover:text-foreground transition-colors">{t("footer.links.pricing")}</Link></li>
+                <li><Link href="#" className="hover:text-foreground transition-colors">{t("footer.links.changelog")}</Link></li>
+                <li><Link href="#" className="hover:text-foreground transition-colors">{t("footer.links.roadmap")}</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Resources</h4>
+              <h4 className="font-semibold mb-4">{t("footer.resources")}</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="#" className="hover:text-foreground transition-colors">Documentation</Link></li>
-                <li><Link href="#" className="hover:text-foreground transition-colors">API Reference</Link></li>
-                <li><Link href="#" className="hover:text-foreground transition-colors">Community</Link></li>
-                <li><Link href="#" className="hover:text-foreground transition-colors">Blog</Link></li>
+                <li><Link href="#" className="hover:text-foreground transition-colors">{t("footer.links.documentation")}</Link></li>
+                <li><Link href="#" className="hover:text-foreground transition-colors">{t("footer.links.api")}</Link></li>
+                <li><Link href="#" className="hover:text-foreground transition-colors">{t("footer.links.community")}</Link></li>
+                <li><Link href="#" className="hover:text-foreground transition-colors">{t("footer.links.blog")}</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Company</h4>
+              <h4 className="font-semibold mb-4">{t("footer.company")}</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="#" className="hover:text-foreground transition-colors">About</Link></li>
-                <li><Link href="#" className="hover:text-foreground transition-colors">Careers</Link></li>
-                <li><Link href="#" className="hover:text-foreground transition-colors">Contact</Link></li>
-                <li><Link href="#" className="hover:text-foreground transition-colors">Privacy</Link></li>
+                <li><Link href="#" className="hover:text-foreground transition-colors">{t("footer.links.about")}</Link></li>
+                <li><Link href="#" className="hover:text-foreground transition-colors">{t("footer.links.careers")}</Link></li>
+                <li><Link href="#" className="hover:text-foreground transition-colors">{t("footer.links.contact")}</Link></li>
+                <li><Link href="#" className="hover:text-foreground transition-colors">{t("footer.links.privacy")}</Link></li>
               </ul>
             </div>
           </div>
           <div className="pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-muted-foreground">
-              © 2025 Unytea. All rights reserved.
+              © 2025 Unytea. {t("footer.rights")}
             </p>
             <div className="flex gap-6 text-sm text-muted-foreground">
-              <Link href="#" className="hover:text-foreground transition-colors">Privacy Policy</Link>
-              <Link href="#" className="hover:text-foreground transition-colors">Terms of Service</Link>
-              <Link href="#" className="hover:text-foreground transition-colors">Cookie Policy</Link>
+              <Link href="#" className="hover:text-foreground transition-colors">{t("footer.legal.privacy")}</Link>
+              <Link href="#" className="hover:text-foreground transition-colors">{t("footer.legal.terms")}</Link>
+              <Link href="#" className="hover:text-foreground transition-colors">{t("footer.legal.cookies")}</Link>
             </div>
           </div>
         </div>

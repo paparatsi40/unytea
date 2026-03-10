@@ -164,7 +164,26 @@
       "resources": "Resources",
       "company": "Company",
       "legal": "Legal",
-      "rights": "All rights reserved."
+      "rights": "All rights reserved.",
+      "links": {
+        "features": "Features",
+        "pricing": "Pricing",
+        "changelog": "Changelog",
+        "roadmap": "Roadmap",
+        "documentation": "Documentation",
+        "api": "API Reference",
+        "community": "Community",
+        "blog": "Blog",
+        "about": "About",
+        "careers": "Careers",
+        "contact": "Contact",
+        "privacy": "Privacy"
+      },
+      "legal": {
+        "privacy": "Privacy Policy",
+        "terms": "Terms of Service",
+        "cookies": "Cookie Policy"
+      }
     },
     "demoModal": {
       "title": "Demo Video Coming Soon",

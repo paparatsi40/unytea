@@ -164,7 +164,26 @@
       "resources": "Ressources",
       "company": "Entreprise",
       "legal": "Mentions Légales",
-      "rights": "Tous droits réservés."
+      "rights": "Tous droits réservés.",
+      "links": {
+        "features": "Fonctionnalités",
+        "pricing": "Tarifs",
+        "changelog": "Journal des Modifications",
+        "roadmap": "Feuille de Route",
+        "documentation": "Documentation",
+        "api": "Référence API",
+        "community": "Communauté",
+        "blog": "Blog",
+        "about": "À Propos",
+        "careers": "Carrières",
+        "contact": "Contact",
+        "privacy": "Confidentialité"
+      },
+      "legal": {
+        "privacy": "Politique de Confidentialité",
+        "terms": "Conditions d'Utilisation",
+        "cookies": "Politique des Cookies"
+      }
     },
     "demoModal": {
       "title": "Vidéo Démo Bientôt Disponible",
