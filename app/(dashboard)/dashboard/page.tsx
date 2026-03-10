@@ -23,9 +23,11 @@ import {
   Zap,
   TrendingUp,
   Award,
+  Share2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { ShareableMetrics } from "@/components/dashboard/ShareableMetrics";
 import Link from "next/link";
 
 // Types
@@ -448,6 +450,35 @@ export default function DashboardPage() {
                     )}
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Share Your Success - Growth Loop */}
+          {metrics && metrics.communities > 0 && (
+            <Card className="border-amber-200 bg-gradient-to-br from-amber-50/50 to-white">
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
+                    <Share2 className="h-4 w-4 text-amber-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-foreground">Share Your Success</h3>
+                    <p className="text-xs text-muted-foreground">Grow your community organically</p>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Your community metrics are worth sharing. Post your progress to attract new members and inspire other creators.
+                </p>
+                <ShareableMetrics
+                  communities={metrics.communities}
+                  members={metrics.members}
+                  revenue={metrics.revenue}
+                  engagement={metrics.engagement}
+                  communityName={myCommunities[0]?.name || "My Community"}
+                />
               </CardContent>
             </Card>
           )}
