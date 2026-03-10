@@ -38,7 +38,7 @@ export async function POST(request: Request) {
         name,
         email,
         password: hashedPassword,
-        isOnboarded: true, // Skip onboarding for now
+        isOnboarded: false, // User needs to complete onboarding
       },
     })
 
