@@ -1,7 +1,7 @@
 {
   "auth": {
     "welcomeBack": "Bienvenido de Vuelta",
-    "signinSubtitle": "Inicia sesión en tu cuenta de Unytea",
+    "signInSubtitle": "Inicia sesión en tu cuenta de Unytea",
     "continueWithGoogle": "Continuar con Google",
     "continueWithGitHub": "Continuar con GitHub",
     "orContinueWith": "o continuar con",
@@ -10,6 +10,7 @@
     "password": "Contraseña",
     "signIn": "Iniciar Sesión",
     "noAccount": "¿No tienes cuenta?",
+    "signUp": "Regístrate",
     "forgotPassword": "¿Olvidaste tu contraseña?",
     "fillAllFields": "Por favor completa todos los campos",
     "passwordTooShort": "La contraseña debe tener al menos 8 caracteres",

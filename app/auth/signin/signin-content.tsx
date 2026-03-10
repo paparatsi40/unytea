@@ -172,7 +172,7 @@ export function SignInContent() {
           <p className="text-sm text-gray-600">
             {t("auth.noAccount")}{" "}
             <Link href="/auth/signup" className="text-purple-600 hover:text-purple-700 font-medium">
-              {t("navigation.signup")}
+              {t("auth.signUp")}
             </Link>
           </p>
           <p className="text-sm text-gray-500">

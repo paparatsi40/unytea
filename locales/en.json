@@ -1,7 +1,7 @@
 {
   "auth": {
     "welcomeBack": "Welcome Back",
-    "signinSubtitle": "Sign in to your Unytea account",
+    "signInSubtitle": "Sign in to your Unytea account",
     "continueWithGoogle": "Continue with Google",
     "continueWithGitHub": "Continue with GitHub",
     "orContinueWith": "or continue with",
@@ -10,6 +10,7 @@
     "password": "Password",
     "signIn": "Sign In",
     "noAccount": "Don't have an account?",
+    "signUp": "Sign Up",
     "forgotPassword": "Forgot password?",
     "fillAllFields": "Please fill in all fields",
     "passwordTooShort": "Password must be at least 8 characters",
