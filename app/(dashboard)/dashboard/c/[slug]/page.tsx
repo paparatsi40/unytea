@@ -179,6 +179,6 @@ export default async function CommunityPage({ params }: PageProps) {
     );
   }
 
-  // If active member or owner, redirect to chat where the navigation tabs are visible
-  redirect(`/dashboard/c/${community.slug}/chat`);
+  // If active member or owner, redirect to FEED (not chat)
+  redirect(`/dashboard/c/${community.slug}/feed`);
 }
