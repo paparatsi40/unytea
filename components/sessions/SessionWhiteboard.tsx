@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { X, Download, Image as ImageIcon, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { X, Image as ImageIcon, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types/types";
