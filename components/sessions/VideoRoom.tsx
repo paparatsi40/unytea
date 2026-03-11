@@ -14,10 +14,21 @@ import { SessionWhiteboard } from "./SessionWhiteboard";
 // Component to show connection status
 function ConnectionStatus() {
   const connectionState = useConnectionState();
+  const isIncognito = typeof window !== 'undefined' && window.navigator.userAgent.includes('Incognito');
   
   return (
-    <div className="absolute top-4 left-4 z-50 rounded-full bg-black/70 px-3 py-1 text-xs text-white">
-      Status: {connectionState}
+    <div className="absolute top-4 right-4 z-40 flex flex-col items-end gap-2">
+      <div className="rounded-full bg-black/70 px-3 py-1 text-xs text-white">
+        Status: {connectionState}
+      </div>
+      {isIncognito && (
+        <div className="max-w-xs rounded-lg bg-amber-600/90 px-3 py-2 text-xs text-white">
+          <span className="font-semibold">⚠️ Modo incógnito detectado</span>
+          <p className="mt-1 text-white/90">
+            Chrome bloquea cámara/micrófono en modo privado. Usa una ventana normal.
+          </p>
+        </div>
+      )}
     </div>
   );
 }
