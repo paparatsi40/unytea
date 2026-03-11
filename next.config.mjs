@@ -91,7 +91,7 @@ const nextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.livekit.cloud https://*.livekit.io",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.livekit.cloud https://*.livekit.io https://vercel.live",
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: https:",
               "media-src 'self' blob: https:",

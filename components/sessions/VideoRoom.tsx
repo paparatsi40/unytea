@@ -32,9 +32,9 @@ function ConnectionStatus({ isVideoEnabled, isAudioEnabled }: { isVideoEnabled: 
 
 // Video grid component using LiveKit's native VideoTrack component
 function VideoGrid() {
-  // Get all camera tracks from all participants (only subscribed/active tracks)
-  const cameraTracks = useTracks([Track.Source.Camera], { onlySubscribed: true });
-  const screenShareTracks = useTracks([Track.Source.ScreenShare], { onlySubscribed: true });
+  // Get all camera tracks from all participants (including pending tracks)
+  const cameraTracks = useTracks([Track.Source.Camera]);
+  const screenShareTracks = useTracks([Track.Source.ScreenShare]);
   
   const allTracks = [...cameraTracks, ...screenShareTracks];
   
@@ -42,10 +42,9 @@ function VideoGrid() {
     return (
       <div className="flex h-full flex-col items-center justify-center">
         <div className="text-center">
-          <VideoOff className="mx-auto mb-4 h-16 w-16 text-gray-400" />
-          <p className="text-gray-300 mb-4 text-lg">Tu cámara está apagada</p>
-          <p className="text-gray-500 mb-6">Haz clic en el botón de abajo para activarla</p>
-          <p className="text-xs text-gray-600">Esperando a que actives la cámara...</p>
+          <Loader2 className="mx-auto mb-4 h-16 w-16 animate-spin text-purple-400" />
+          <p className="text-gray-300 mb-4 text-lg">Iniciando cámara...</p>
+          <p className="text-gray-500 text-sm">Por favor espera un momento</p>
         </div>
       </div>
     );
