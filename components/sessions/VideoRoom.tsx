@@ -11,7 +11,7 @@ import {
   VideoTrack,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
-import { Loader2, Presentation, AlertCircle, VideoOff, Camera, Mic, RefreshCw, Video } from "lucide-react";
+import { Loader2, Presentation, AlertCircle, VideoOff, Camera, Mic, RefreshCw } from "lucide-react";
 import { SessionWhiteboard } from "./SessionWhiteboard";
 import { Track } from "livekit-client";
 
