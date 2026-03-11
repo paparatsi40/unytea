@@ -11,32 +11,54 @@ const nextConfig = {
         hostname: "**",
       },
     ],
-    // Optimize images
     formats: ["image/webp", "image/avif"],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    minimumCacheTTL: 60 * 60 * 24 * 365, // 1 year
+    minimumCacheTTL: 60 * 60 * 24 * 365,
   },
-  // Enable experimental features for better performance
+
   experimental: {
     optimizePackageImports: ["lucide-react", "@radix-ui/react-icons"],
   },
-  // Optimize for production
+
   reactStrictMode: true,
-  // Enable SWC minification
   swcMinify: true,
-  // Compression
   compress: true,
-  // Optimize font loading
   optimizeFonts: true,
-  // Production source maps (disable for smaller builds)
   productionBrowserSourceMaps: false,
-  // Power by header
   poweredByHeader: false,
-  // Headers for caching and security
+
   async headers() {
+    const contentSecurityPolicy = [
+      "default-src 'self'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "frame-ancestors 'self'",
+      "object-src 'none'",
+      "worker-src 'self' blob:",
+      "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live https://*.vercel.app https://*.livekit.cloud https://*.livekit.io",
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data: blob: https:",
+      "media-src 'self' blob: https:",
+      "font-src 'self' data: https:",
+      "frame-src 'self' https://vercel.live",
+      [
+        "connect-src 'self'",
+        "https:",
+        "ws:",
+        "wss:",
+        "https://sea1.ingest.uploadthing.com",
+        "https://uploadthing.com",
+        "https://utfs.io",
+        "https://*.ufs.sh",
+        "https://*.livekit.cloud",
+        "wss://*.livekit.cloud",
+        "https://*.livekit.io",
+        "wss://*.livekit.io",
+      ].join(" "),
+    ].join("; ");
+
     return [
-      // Cache static assets
       {
         source: "/:all*(svg|jpg|jpeg|png|webp|avif|gif|ico)",
         headers: [
@@ -56,7 +78,6 @@ const nextConfig = {
         ],
       },
       {
-        // Apply security headers to all routes
         source: "/:path*",
         headers: [
           {
@@ -85,22 +106,11 @@ const nextConfig = {
           },
           {
             key: "Permissions-Policy",
-            value: "camera=(self), microphone=(self), geolocation=()",
+            value: "camera=*, microphone=*, autoplay=*",
           },
           {
             key: "Content-Security-Policy",
-            value: [
-              "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.livekit.cloud https://*.livekit.io https://vercel.live https://*.vercel.app",
-              "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' data: https:",
-              "media-src 'self' blob: https:",
-              "font-src 'self' data:",
-              "connect-src 'self' wss: ws: https://sea1.ingest.uploadthing.com https://uploadthing.com https://utfs.io https://*.ufs.sh wss://*.livekit.cloud https://*.livekit.io https://*.livekit.cloud",
-              "frame-ancestors 'self'",
-              "base-uri 'self'",
-              "form-action 'self'",
-            ].join("; "),
+            value: contentSecurityPolicy,
           },
         ],
       },
