@@ -3,7 +3,6 @@
 // Community Feed - Main social feed for community engagement
 
 import { useState } from "react";
-import { useParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
