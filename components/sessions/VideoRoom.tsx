@@ -133,6 +133,7 @@ export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
                     username: "Participant",
                     videoEnabled: true,
                     audioEnabled: true,
+                    videoDeviceId: "default"
                   }}
                   onSubmit={handlePreJoinSubmit}
                 />
