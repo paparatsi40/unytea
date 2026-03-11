@@ -5,6 +5,9 @@ import { X, Image as ImageIcon, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
 
+// Import Excalidraw styles
+import "@excalidraw/excalidraw/index.css";
+
 // Dynamic import to avoid SSR issues
 const Excalidraw = dynamic(
   async () => (await import("@excalidraw/excalidraw")).Excalidraw,
@@ -114,7 +117,7 @@ export function SessionWhiteboard({ isOpen, onClose, sessionId }: SessionWhitebo
           </div>
 
           {/* Excalidraw Canvas */}
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 overflow-hidden relative">
             <Excalidraw
               excalidrawAPI={(api) => setExcalidrawAPI(api)}
               theme="light"
