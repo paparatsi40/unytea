@@ -8,7 +8,6 @@ import {
 } from "@livekit/components-react";
 import "@livekit/components-styles";
 import { Loader2 } from "lucide-react";
-import { VideoRoomContent } from "./VideoRoomContent";
 
 interface VideoRoomProps {
   roomName: string;
@@ -89,8 +88,6 @@ export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
       onDisconnected={onLeave}
       className="h-[700px]"
     >
-      <VideoRoomContent />
-
       <VideoConference />
 
       <RoomAudioRenderer />
