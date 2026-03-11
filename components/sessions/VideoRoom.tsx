@@ -176,6 +176,14 @@ export function VideoRoom({ roomName, onLeave, sessionId }: VideoRoomProps) {
 
   return (
     <div className="relative h-[600px] w-full overflow-hidden rounded-xl bg-card">
+      <style jsx global>{`
+        .lk-control-bar {
+          z-index: 100 !important;
+        }
+        .lk-participant-media {
+          z-index: 1;
+        }
+      `}</style>
       <LiveKitRoom
         video={true}
         audio={true}
