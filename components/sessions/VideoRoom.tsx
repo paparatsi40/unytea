@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   LiveKitRoom,
   VideoConference,
@@ -8,10 +8,10 @@ import {
   useConnectionState,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
-import { Loader2, Presentation, AlertCircle, VideoOff, Camera, Mic } from "lucide-react";
+import { Loader2, Presentation, AlertCircle, VideoOff, Camera, Mic, RefreshCw } from "lucide-react";
 import { SessionWhiteboard } from "./SessionWhiteboard";
 
-// Component to show connection and permission status
+// Component to show connection status
 function ConnectionStatus({ isVideoEnabled, isAudioEnabled }: { isVideoEnabled: boolean; isAudioEnabled: boolean }) {
   const connectionState = useConnectionState();
   
@@ -39,6 +39,8 @@ export function VideoRoom({ roomName, onLeave, sessionId }: VideoRoomProps) {
   const [showWhiteboard, setShowWhiteboard] = useState(false);
   const [isVideoEnabled, setIsVideoEnabled] = useState(false);
   const [isAudioEnabled, setIsAudioEnabled] = useState(false);
+  const [isActivating, setIsActivating] = useState(false);
+  const [activationError, setActivationError] = useState("");
 
   useEffect(() => {
     async function getToken() {
@@ -76,6 +78,31 @@ export function VideoRoom({ roomName, onLeave, sessionId }: VideoRoomProps) {
 
     getToken();
   }, [roomName]);
+
+  const activateCamera = useCallback(async () => {
+    setIsActivating(true);
+    setActivationError("");
+    
+    try {
+      // Try to get camera access directly first
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: true, 
+        audio: true 
+      });
+      
+      // If successful, stop the stream (LiveKit will create its own)
+      stream.getTracks().forEach(track => track.stop());
+      
+      // Now enable video in LiveKit
+      setIsVideoEnabled(true);
+      setIsAudioEnabled(true);
+    } catch (err) {
+      console.error("Error accessing camera:", err);
+      setActivationError("No se pudo acceder a la cámara. Por favor verifica los permisos.");
+    } finally {
+      setIsActivating(false);
+    }
+  }, []);
 
   if (isLoading) {
     return (
@@ -163,23 +190,37 @@ export function VideoRoom({ roomName, onLeave, sessionId }: VideoRoomProps) {
       >
         <ConnectionStatus isVideoEnabled={isVideoEnabled} isAudioEnabled={isAudioEnabled} />
         
-        {/* Show button to enable camera if not enabled yet */}
+        {/* Show activation button if camera not enabled yet */}
         {!isVideoEnabled && !isAudioEnabled && (
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-900" style={{ zIndex: 20 }}>
-            <div className="text-center">
+          <div className="absolute inset-0 flex items-center justify-center" style={{ zIndex: 30, background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)' }}>
+            <div className="text-center px-4">
               <VideoOff className="mx-auto mb-4 h-16 w-16 text-gray-400" />
               <p className="mb-6 text-lg text-gray-300">
                 Cámara y micrófono están apagados
               </p>
+              
+              {activationError && (
+                <div className="mb-4 rounded-lg bg-red-600/90 px-4 py-3 text-sm text-white max-w-sm">
+                  {activationError}
+                </div>
+              )}
+              
               <button
-                onClick={() => {
-                  setIsVideoEnabled(true);
-                  setIsAudioEnabled(true);
-                }}
-                className="flex items-center gap-3 rounded-full bg-purple-600 px-6 py-3 text-lg font-medium text-white shadow-lg transition-all hover:scale-105 hover:bg-purple-700"
+                onClick={activateCamera}
+                disabled={isActivating}
+                className="flex items-center justify-center gap-3 rounded-full bg-purple-600 px-6 py-3 text-lg font-medium text-white shadow-lg transition-all hover:scale-105 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Camera className="h-6 w-6" />
-                Activar Cámara y Micrófono
+                {isActivating ? (
+                  <>
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    Solicitando permisos...
+                  </>
+                ) : (
+                  <>
+                    <Camera className="h-6 w-6" />
+                    Activar Cámara y Micrófono
+                  </>
+                )}
               </button>
               <p className="mt-4 text-sm text-gray-500">
                 Se solicitarán permisos al navegador
@@ -188,7 +229,7 @@ export function VideoRoom({ roomName, onLeave, sessionId }: VideoRoomProps) {
           </div>
         )}
         
-        {/* Only show VideoConference when camera is enabled */}
+        {/* Show VideoConference only when enabled */}
         {(isVideoEnabled || isAudioEnabled) && (
           <>
             <VideoConference />
@@ -196,6 +237,22 @@ export function VideoRoom({ roomName, onLeave, sessionId }: VideoRoomProps) {
           </>
         )}
       </LiveKitRoom>
+
+      {/* Toggle button to restart camera if needed */}
+      {(isVideoEnabled || isAudioEnabled) && (
+        <button
+          onClick={() => {
+            setIsVideoEnabled(false);
+            setIsAudioEnabled(false);
+            setActivationError("");
+          }}
+          className="absolute top-4 right-4 flex items-center gap-2 rounded-full bg-gray-800/80 px-3 py-1.5 text-xs text-white hover:bg-gray-700"
+          style={{ zIndex: 40 }}
+        >
+          <RefreshCw className="h-3 w-3" />
+          Reiniciar Cámara
+        </button>
+      )}
 
       {/* Whiteboard Toggle Button */}
       <button
