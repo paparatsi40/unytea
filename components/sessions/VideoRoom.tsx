@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import {
   LiveKitRoom,
   RoomAudioRenderer,
@@ -59,23 +59,35 @@ function VideoGrid() {
 
 // Individual video tile component
 function VideoTile({ trackRef }: { trackRef: any }) {
-  const videoRef = useCallback((node: HTMLVideoElement | null) => {
-    if (node && trackRef.publication.track) {
-      trackRef.publication.track.attach(node);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  
+  useEffect(() => {
+    const video = videoRef.current;
+    const track = trackRef.publication?.track;
+    
+    if (video && track) {
+      console.log("Attaching track to video element:", trackRef.participant.identity, track.trackSid);
+      track.attach(video);
+      
+      return () => {
+        console.log("Detaching track from video element:", track.trackSid);
+        track.detach(video);
+      };
     }
   }, [trackRef]);
   
   return (
-    <div className="relative aspect-video overflow-hidden rounded-lg bg-gray-800">
+    <div className="relative aspect-video overflow-hidden rounded-lg bg-gray-800" style={{ minHeight: '200px' }}>
       <video
         ref={videoRef}
         autoPlay
         playsInline
         muted={trackRef.participant.isLocal}
         className="h-full w-full object-cover"
+        style={{ display: 'block', width: '100%', height: '100%' }}
       />
       <div className="absolute bottom-2 left-2 rounded bg-black/50 px-2 py-1 text-xs text-white">
-        {trackRef.participant.identity}
+        {trackRef.participant.identity || 'Unknown'}
       </div>
     </div>
   );
