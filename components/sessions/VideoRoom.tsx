@@ -1,29 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
-  ConnectionState,
-  createLocalTracks,
-  LocalAudioTrack,
-  LocalTrack,
-  LocalVideoTrack,
-  Participant,
-  RemoteParticipant,
-  Room,
-  RoomEvent,
-  Track,
-  VideoPresets,
-} from "livekit-client";
-import {
-  AlertCircle,
-  Loader2,
-  Mic,
-  MicOff,
-  Phone,
-  PhoneOff,
-  Video,
-  VideoOff,
-} from "lucide-react";
+  LiveKitRoom,
+  PreJoin,
+  RoomAudioRenderer,
+  VideoConference,
+  type LocalUserChoices,
+} from "@livekit/components-react";
+import "@livekit/components-styles";
+import { AlertCircle, Loader2, PhoneOff } from "lucide-react";
 
 interface VideoRoomProps {
   roomName: string;
@@ -31,440 +17,129 @@ interface VideoRoomProps {
   sessionId?: string;
 }
 
-type RemoteTrackEntry = {
-  participantSid: string;
-  participantIdentity: string;
-  trackSid: string | undefined;
-  kind: Track.Kind;
-  track: Track;
-};
-
-function RemoteVideoTile({ entry }: { entry: RemoteTrackEntry }) {
-  const mediaRef = useRef<HTMLVideoElement | HTMLAudioElement | null>(null);
-
-  useEffect(() => {
-    const el = mediaRef.current;
-    if (!el) return;
-
-    entry.track.attach(el);
-
-    return () => {
-      entry.track.detach(el);
-    };
-  }, [entry]);
-
-  if (entry.kind === Track.Kind.Audio) {
-    return <audio ref={mediaRef as React.RefObject<HTMLAudioElement>} autoPlay />;
-  }
-
-  return (
-    <div className="relative min-h-[240px] overflow-hidden rounded-xl bg-black">
-      <video
-        ref={mediaRef as React.RefObject<HTMLVideoElement>}
-        autoPlay
-        playsInline
-        className="h-full w-full object-cover"
-      />
-      <div className="absolute bottom-2 left-2 rounded bg-black/60 px-2 py-1 text-xs text-white">
-        {entry.participantIdentity}
-      </div>
-    </div>
-  );
-}
+type JoinState = "prejoin" | "connecting" | "joined";
 
 export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
-  const [_room, setRoom] = useState<Room | null>(null);
-  const [localTracks, setLocalTracks] = useState<LocalTrack[]>([]);
-  const [remoteTracks, setRemoteTracks] = useState<RemoteTrackEntry[]>([]);
-
-  const [isPreparing, setIsPreparing] = useState(false);
-  const [isConnected, setIsConnected] = useState(false);
-  const [hasJoined, setHasJoined] = useState(false);
+  const [joinState, setJoinState] = useState<JoinState>("prejoin");
+  const [token, setToken] = useState("");
+  const [serverUrl, setServerUrl] = useState("");
   const [error, setError] = useState("");
+  const [choices, setChoices] = useState<LocalUserChoices | null>(null);
 
-  const [cameraEnabled, setCameraEnabled] = useState(false);
-  const [microphoneEnabled, setMicrophoneEnabled] = useState(false);
-
-  const localVideoRef = useRef<HTMLVideoElement | null>(null);
-  const roomRef = useRef<Room | null>(null);
-  const localTracksRef = useRef<LocalTrack[]>([]);
-  const didNotifyLeaveRef = useRef(false);
-
-  const localVideoTrack = useMemo(
-    () =>
-      localTracks.find(
-        (track) => track.kind === Track.Kind.Video
-      ) as LocalVideoTrack | undefined,
-    [localTracks]
-  );
-
-  const localAudioTrack = useMemo(
-    () =>
-      localTracks.find(
-        (track) => track.kind === Track.Kind.Audio
-      ) as LocalAudioTrack | undefined,
-    [localTracks]
-  );
-
-  const addRemoteTrack = useCallback((track: Track, participant: Participant) => {
-    setRemoteTracks((prev) => {
-      const exists = prev.some((item) => item.trackSid === track.sid);
-      if (exists) return prev;
-
-      return [
-        ...prev,
-        {
-          participantSid: participant.sid,
-          participantIdentity: participant.identity,
-          trackSid: track.sid,
-          kind: track.kind,
-          track,
-        },
-      ];
-    });
-  }, []);
-
-  const removeRemoteTrack = useCallback((track: Track) => {
-    setRemoteTracks((prev) => prev.filter((item) => item.trackSid !== track.sid));
-  }, []);
-
-  const stopAndClearLocalTracks = useCallback(() => {
-    for (const track of localTracksRef.current) {
+  const handlePreJoinSubmit = useCallback(
+    async (values: LocalUserChoices) => {
       try {
-        track.stop();
-      } catch {}
-    }
-    localTracksRef.current = [];
-    setLocalTracks([]);
-  }, []);
+        setError("");
+        setJoinState("connecting");
+        setChoices(values);
 
-  const disconnectRoom = useCallback(() => {
-    const currentRoom = roomRef.current;
-    roomRef.current = null;
-    setRoom(null);
+        const response = await fetch("/api/livekit/token", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            roomName,
+            participantName: values.username?.trim() || "Participant",
+          }),
+        });
 
-    if (currentRoom) {
-      try {
-        currentRoom.disconnect();
-      } catch {}
-    }
-  }, []);
+        const payload = await response.json().catch(() => ({}));
 
-  const cleanupRoom = useCallback(
-    (notifyLeave: boolean) => {
-      setRemoteTracks([]);
-      setIsConnected(false);
-      setHasJoined(false);
-      setCameraEnabled(false);
-      setMicrophoneEnabled(false);
+        if (!response.ok) {
+          throw new Error(payload.error || "No se pudo obtener el token");
+        }
 
-      const videoEl = localVideoRef.current;
-      if (videoEl) {
-        videoEl.pause();
-        videoEl.srcObject = null;
-      }
+        const resolvedToken =
+          typeof payload.token === "string" ? payload.token.trim() : "";
+        const resolvedServerUrl =
+          typeof payload.wsUrl === "string" && payload.wsUrl.trim()
+            ? payload.wsUrl.trim()
+            : (process.env.NEXT_PUBLIC_LIVEKIT_URL ?? "").trim();
 
-      stopAndClearLocalTracks();
-      disconnectRoom();
+        if (!resolvedToken) {
+          throw new Error("El backend no devolvió token");
+        }
 
-      if (notifyLeave && !didNotifyLeaveRef.current) {
-        didNotifyLeaveRef.current = true;
-        onLeave?.();
+        if (!resolvedServerUrl) {
+          throw new Error("Falta la URL de LiveKit");
+        }
+
+        setToken(resolvedToken);
+        setServerUrl(resolvedServerUrl);
+        setJoinState("joined");
+      } catch (err) {
+        console.error("PreJoin error:", err);
+        setError(
+          err instanceof Error ? err.message : "No se pudo iniciar la videollamada"
+        );
+        setJoinState("prejoin");
       }
     },
-    [disconnectRoom, onLeave, stopAndClearLocalTracks]
+    [roomName]
   );
 
-  const joinRoom = useCallback(async () => {
-    let createdRoom: Room | null = null;
-    let createdTracks: LocalTrack[] = [];
+  const handleCancel = useCallback(() => {
+    setError("");
+    setChoices(null);
+    setJoinState("prejoin");
+    setToken("");
+    setServerUrl("");
+  }, []);
 
-    try {
-      didNotifyLeaveRef.current = false;
-      setIsPreparing(true);
-      setError("");
+  const handleDisconnected = useCallback(() => {
+    setJoinState("prejoin");
+    setToken("");
+    setServerUrl("");
+    setChoices(null);
+    onLeave?.();
+  }, [onLeave]);
 
-      const tokenRes = await fetch("/api/livekit/token", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          roomName,
-          participantName: "Participant",
-        }),
-      });
+  const roomKey = useMemo(() => {
+    return `${roomName}:${token}:${serverUrl}`;
+  }, [roomName, token, serverUrl]);
 
-      const tokenData = await tokenRes.json().catch(() => ({}));
-
-      if (!tokenRes.ok) {
-        throw new Error(tokenData.error || "No se pudo obtener el token");
-      }
-
-      const resolvedToken = tokenData.token;
-      const resolvedServerUrl =
-        tokenData.wsUrl || process.env.NEXT_PUBLIC_LIVEKIT_URL || "";
-
-      if (!resolvedToken) {
-        throw new Error("El backend no devolvió token");
-      }
-
-      if (!resolvedServerUrl) {
-        throw new Error("Falta la URL de LiveKit");
-      }
-
-      createdTracks = await createLocalTracks({
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-        },
-        video: {
-          resolution: VideoPresets.h720.resolution,
-          facingMode: "user",
-        },
-      });
-
-      localTracksRef.current = createdTracks;
-      setLocalTracks(createdTracks);
-
-      const previewTrack = createdTracks.find(
-        (t) => t.kind === Track.Kind.Video
-      ) as LocalVideoTrack | undefined;
-
-      const micTrack = createdTracks.find(
-        (t) => t.kind === Track.Kind.Audio
-      ) as LocalAudioTrack | undefined;
-
-      if (previewTrack && localVideoRef.current) {
-        const mediaStream = new MediaStream([previewTrack.mediaStreamTrack]);
-        localVideoRef.current.srcObject = mediaStream;
-        localVideoRef.current.muted = true;
-        localVideoRef.current.playsInline = true;
-
-        try {
-          await localVideoRef.current.play();
-        } catch (playError) {
-          console.warn("Local preview play() warning:", playError);
-        }
-
-        setCameraEnabled(!previewTrack.isMuted);
-      } else {
-        setCameraEnabled(false);
-      }
-
-      setMicrophoneEnabled(!!micTrack && !micTrack.isMuted);
-
-      createdRoom = new Room({
-        adaptiveStream: true,
-        dynacast: true,
-      });
-
-      roomRef.current = createdRoom;
-      setRoom(createdRoom);
-
-      createdRoom.on(RoomEvent.TrackSubscribed, (track, _pub, participant) => {
-        addRemoteTrack(track, participant);
-      });
-
-      createdRoom.on(RoomEvent.TrackUnsubscribed, (track) => {
-        removeRemoteTrack(track);
-      });
-
-      createdRoom.on(
-        RoomEvent.ParticipantDisconnected,
-        (participant: RemoteParticipant) => {
-          setRemoteTracks((prev) =>
-            prev.filter((item) => item.participantSid !== participant.sid)
-          );
-        }
-      );
-
-      createdRoom.on(RoomEvent.Disconnected, () => {
-        setIsConnected(false);
-      });
-
-      createdRoom.on(RoomEvent.ConnectionStateChanged, (state: ConnectionState) => {
-        setIsConnected(state === ConnectionState.Connected);
-      });
-
-      await createdRoom.connect(resolvedServerUrl, resolvedToken);
-
-      for (const track of createdTracks) {
-        await createdRoom.localParticipant.publishTrack(track);
-      }
-
-      setHasJoined(true);
-    } catch (err) {
-      console.error("Video setup error:", err);
-
-      for (const track of createdTracks) {
-        try {
-          track.stop();
-        } catch {}
-      }
-
-      if (createdRoom) {
-        try {
-          createdRoom.disconnect();
-        } catch {}
-      }
-
-      const videoEl = localVideoRef.current;
-      if (videoEl) {
-        videoEl.pause();
-        videoEl.srcObject = null;
-      }
-
-      let message = "No se pudo iniciar la videollamada";
-      if (err instanceof Error) {
-        if (err.name === "NotAllowedError") {
-          message = "El navegador bloqueó el permiso de cámara o micrófono";
-        } else if (err.name === "NotFoundError") {
-          message = "No se encontró cámara o micrófono disponible";
-        } else if (err.name === "NotReadableError") {
-          message = "La cámara o el micrófono están siendo usados por otra app";
-        } else {
-          message = err.message;
-        }
-      }
-
-      localTracksRef.current = [];
-      roomRef.current = null;
-
-      setError(message);
-      setLocalTracks([]);
-      setCameraEnabled(false);
-      setMicrophoneEnabled(false);
-      setRoom(null);
-      setHasJoined(false);
-      setIsConnected(false);
-    } finally {
-      setIsPreparing(false);
-    }
-  }, [roomName, addRemoteTrack, removeRemoteTrack]);
-
-  useEffect(() => {
-    return () => {
-      cleanupRoom(false);
-    };
-  }, [cleanupRoom]);
-
-  useEffect(() => {
-    const el = localVideoRef.current;
-    if (!el || !localVideoTrack) return;
-
-    const mediaStream = new MediaStream([localVideoTrack.mediaStreamTrack]);
-    el.srcObject = mediaStream;
-    el.muted = true;
-    el.playsInline = true;
-
-    el.play().catch((err) => {
-      console.warn("Local video replay warning:", err);
-    });
-
-    return () => {
-      if (el.srcObject === mediaStream) {
-        el.pause();
-        el.srcObject = null;
-      }
-    };
-  }, [localVideoTrack]);
-
-  const toggleCamera = useCallback(async () => {
-    try {
-      if (!localVideoTrack) {
-        setError("No existe track local de cámara");
-        return;
-      }
-
-      setError("");
-
-      if (cameraEnabled) {
-        await localVideoTrack.mute();
-        setCameraEnabled(false);
-
-        const el = localVideoRef.current;
-        if (el) {
-          el.pause();
-          el.srcObject = null;
-        }
-      } else {
-        await localVideoTrack.unmute();
-        setCameraEnabled(true);
-
-        const el = localVideoRef.current;
-        if (el) {
-          const mediaStream = new MediaStream([localVideoTrack.mediaStreamTrack]);
-          el.srcObject = mediaStream;
-          await el.play().catch((err) => {
-            console.warn("Local video play after unmute warning:", err);
-          });
-        }
-      }
-    } catch (err) {
-      console.error("toggleCamera error:", err);
-      setError(err instanceof Error ? err.message : "No se pudo cambiar la cámara");
-    }
-  }, [cameraEnabled, localVideoTrack]);
-
-  const toggleMicrophone = useCallback(async () => {
-    try {
-      if (!localAudioTrack) {
-        setError("No existe track local de micrófono");
-        return;
-      }
-
-      setError("");
-
-      if (microphoneEnabled) {
-        await localAudioTrack.mute();
-        setMicrophoneEnabled(false);
-      } else {
-        await localAudioTrack.unmute();
-        setMicrophoneEnabled(true);
-      }
-    } catch (err) {
-      console.error("toggleMicrophone error:", err);
-      setError(err instanceof Error ? err.message : "No se pudo cambiar el micrófono");
-    }
-  }, [microphoneEnabled, localAudioTrack]);
-
-  const leaveRoom = useCallback(() => {
-    cleanupRoom(true);
-  }, [cleanupRoom]);
-
-  if (!hasJoined) {
+  if (joinState !== "joined") {
     return (
-      <div className="flex h-[600px] items-center justify-center rounded-2xl bg-zinc-950 p-6">
-        <div className="w-full max-w-md rounded-2xl border border-zinc-800 bg-zinc-900 p-6 text-white shadow-xl">
-          <h3 className="mb-2 text-xl font-semibold">Videollamada</h3>
-          <p className="mb-6 text-sm text-zinc-300">
-            Pulsa el botón para iniciar cámara, micrófono y conexión a la sala.
-          </p>
+      <div className="flex h-[700px] items-center justify-center rounded-2xl bg-zinc-950 p-6">
+        <div className="w-full max-w-3xl overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 shadow-xl">
+          <div className="border-b border-zinc-800 px-6 py-4">
+            <h2 className="text-xl font-semibold text-white">Videollamada</h2>
+            <p className="mt-1 text-sm text-zinc-400">
+              Configura tu cámara y micrófono antes de entrar a la sala.
+            </p>
+          </div>
 
           {error ? (
-            <div className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
-              {error}
+            <div className="mx-6 mt-6 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                <span>{error}</span>
+              </div>
             </div>
           ) : null}
 
-          <button
-            onClick={joinRoom}
-            disabled={isPreparing}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 font-medium text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {isPreparing ? (
-              <>
-                <Loader2 className="h-5 w-5 animate-spin" />
-                Iniciando...
-              </>
+          <div className="p-6">
+            {joinState === "connecting" ? (
+              <div className="flex min-h-[420px] items-center justify-center rounded-2xl bg-black text-white">
+                <div className="text-center">
+                  <Loader2 className="mx-auto mb-4 h-8 w-8 animate-spin" />
+                  <p>Conectando a la videollamada...</p>
+                </div>
+              </div>
             ) : (
-              <>
-                <Phone className="h-5 w-5" />
-                Entrar a la videollamada
-              </>
+              <div className="[&_.lk-prejoin]:!border-0 [&_.lk-prejoin]:!bg-transparent [&_.lk-button]:!rounded-xl">
+                <PreJoin
+                  defaults={{
+                    username: "Participant",
+                    videoEnabled: true,
+                    audioEnabled: true,
+                  }}
+                  onSubmit={handlePreJoinSubmit}
+                />
+              </div>
             )}
-          </button>
+          </div>
         </div>
       </div>
     );
@@ -472,11 +147,6 @@ export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
 
   return (
     <div className="relative h-[700px] w-full overflow-hidden rounded-2xl bg-zinc-950">
-      <div className="absolute left-4 top-4 z-50 rounded-lg bg-black/70 px-3 py-2 text-sm text-white">
-        connected: {String(isConnected)} | cam: {String(cameraEnabled)} | mic:{" "}
-        {String(microphoneEnabled)}
-      </div>
-
       {error ? (
         <div className="absolute right-4 top-4 z-50 max-w-sm rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
           <div className="flex items-start gap-2">
@@ -486,71 +156,37 @@ export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
         </div>
       ) : null}
 
-      <div className="grid h-full grid-cols-1 gap-4 p-4 md:grid-cols-2">
-        <div className="relative min-h-[300px] overflow-hidden rounded-2xl bg-black">
-          <video
-            ref={localVideoRef}
-            autoPlay
-            playsInline
-            muted
-            disablePictureInPicture
-            className="h-full w-full object-cover"
-          />
-          <div className="absolute bottom-3 left-3 rounded bg-black/60 px-2 py-1 text-xs text-white">
-            Tú
-          </div>
+      <LiveKitRoom
+        key={roomKey}
+        token={token}
+        serverUrl={serverUrl}
+        connect={true}
+        audio={choices?.audioEnabled ?? true}
+        video={choices?.videoEnabled ?? true}
+        options={{
+          adaptiveStream: true,
+          dynacast: true,
+        }}
+        onDisconnected={handleDisconnected}
+        onError={(err) => {
+          console.error("LiveKitRoom error:", err);
+          setError(err?.message || "Ocurrió un error en la videollamada");
+        }}
+        className="h-full"
+      >
+        <div className="h-full [&_.lk-control-bar]:!bg-black/75 [&_.lk-control-bar]:!backdrop-blur [&_.lk-participant-tile]:!rounded-2xl">
+          <VideoConference />
+          <RoomAudioRenderer />
         </div>
 
-        <div className="grid auto-rows-fr gap-4 overflow-auto">
-          {remoteTracks.filter((t) => t.kind === Track.Kind.Video).length === 0 ? (
-            <div className="flex min-h-[300px] items-center justify-center rounded-2xl bg-zinc-900 text-zinc-400">
-              Esperando participantes...
-            </div>
-          ) : (
-            remoteTracks
-              .filter((t) => t.kind === Track.Kind.Video)
-              .map((entry) => <RemoteVideoTile key={entry.trackSid} entry={entry} />)
-          )}
-        </div>
-      </div>
-
-      {remoteTracks
-        .filter((t) => t.kind === Track.Kind.Audio)
-        .map((entry) => (
-          <RemoteVideoTile key={entry.trackSid} entry={entry} />
-        ))}
-
-      <div className="absolute bottom-0 left-0 right-0 z-50 flex flex-wrap items-center justify-center gap-3 bg-black/75 p-4">
         <button
-          onClick={toggleCamera}
-          className={`flex items-center gap-2 rounded-full px-4 py-2 text-white transition ${
-            cameraEnabled ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"
-          }`}
-        >
-          {cameraEnabled ? <Video className="h-5 w-5" /> : <VideoOff className="h-5 w-5" />}
-          {cameraEnabled ? "Cámara encendida" : "Cámara apagada"}
-        </button>
-
-        <button
-          onClick={toggleMicrophone}
-          className={`flex items-center gap-2 rounded-full px-4 py-2 text-white transition ${
-            microphoneEnabled
-              ? "bg-green-600 hover:bg-green-700"
-              : "bg-red-600 hover:bg-red-700"
-          }`}
-        >
-          {microphoneEnabled ? <Mic className="h-5 w-5" /> : <MicOff className="h-5 w-5" />}
-          {microphoneEnabled ? "Micrófono encendido" : "Micrófono apagado"}
-        </button>
-
-        <button
-          onClick={leaveRoom}
-          className="flex items-center gap-2 rounded-full bg-zinc-700 px-4 py-2 text-white transition hover:bg-zinc-600"
+          onClick={handleCancel}
+          className="absolute bottom-24 right-4 z-50 flex items-center gap-2 rounded-full bg-zinc-700 px-4 py-2 text-white transition hover:bg-zinc-600"
         >
           <PhoneOff className="h-5 w-5" />
           Salir
         </button>
-      </div>
+      </LiveKitRoom>
     </div>
   );
 }
