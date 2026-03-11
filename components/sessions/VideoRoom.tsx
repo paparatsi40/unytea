@@ -32,7 +32,7 @@ function ConnectionStatus() {
   }, []);
   
   return (
-    <div className="absolute bottom-4 left-4 z-40 flex flex-col items-start gap-2 max-w-xs">
+    <div className="absolute bottom-4 left-4 flex flex-col items-start gap-2 max-w-xs" style={{ zIndex: 10 }}>
       <div className="rounded-full bg-black/70 px-3 py-1 text-xs text-white flex items-center gap-2">
         <span>Status: {connectionState}</span>
       </div>
@@ -198,7 +198,7 @@ export function VideoRoom({ roomName, onLeave, sessionId }: VideoRoomProps) {
         <RoomAudioRenderer />
         
         {connectionError && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/80 z-50">
+          <div className="absolute inset-0 flex items-center justify-center bg-black/80" style={{ zIndex: 50 }}>
             <div className="text-center max-w-md px-4">
               <VideoOff className="mx-auto mb-4 h-12 w-12 text-white" />
               <p className="mb-2 text-lg font-semibold text-white">
@@ -219,11 +219,12 @@ export function VideoRoom({ roomName, onLeave, sessionId }: VideoRoomProps) {
       {/* Whiteboard Toggle Button */}
       <button
         onClick={() => setShowWhiteboard(!showWhiteboard)}
-        className={`absolute bottom-20 right-4 z-[100] flex items-center gap-2 rounded-full px-4 py-2 font-medium shadow-xl transition-all hover:scale-105 ${
+        className={`absolute bottom-20 right-4 flex items-center gap-2 rounded-full px-4 py-2 font-medium shadow-xl transition-all hover:scale-105 ${
           showWhiteboard
             ? "bg-purple-600 text-white hover:bg-purple-700"
             : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
         }`}
+        style={{ zIndex: 40 }}
       >
         <Presentation className="h-5 w-5" />
         {showWhiteboard ? "Close Whiteboard" : "Open Whiteboard"}
