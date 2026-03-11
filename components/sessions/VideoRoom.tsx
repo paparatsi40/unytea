@@ -10,7 +10,6 @@ import {
 import "@livekit/components-styles";
 import { Loader2, Presentation, AlertCircle, VideoOff } from "lucide-react";
 import { SessionWhiteboard } from "./SessionWhiteboard";
-import { ConnectionState } from "livekit-client";
 
 // Component to show connection status
 function ConnectionStatus() {
