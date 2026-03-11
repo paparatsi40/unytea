@@ -7,6 +7,7 @@ import {
   useConnectionState,
   useTracks,
   ControlBar,
+  useLocalParticipant,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
 import { Loader2, Presentation, AlertCircle, VideoOff, Camera, Mic, RefreshCw, Video } from "lucide-react";
@@ -15,11 +16,12 @@ import { Track } from "livekit-client";
 
 // Manual camera toggle component
 function ManualCameraToggle() {
+  const { localParticipant } = useLocalParticipant();
   const cameraTracks = useTracks([Track.Source.Camera], { onlySubscribed: false });
   const [isCameraEnabled, setIsCameraEnabled] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   
-  // Find local camera track (participant identity starts with the local participant)
+  // Find local camera track to check status
   const localCameraTrack = cameraTracks.find((t: any) => t.participant.isLocal);
   
   useEffect(() => {
@@ -30,7 +32,6 @@ function ManualCameraToggle() {
   }, [localCameraTrack]);
   
   const toggleCamera = async () => {
-    const localParticipant = localCameraTrack?.participant;
     if (!localParticipant) {
       console.error("No local participant found");
       return;
@@ -38,11 +39,13 @@ function ManualCameraToggle() {
     
     setIsLoading(true);
     try {
+      // Cast to LocalParticipant to access setCameraEnabled
+      const local = localParticipant as any;
       if (isCameraEnabled) {
-        await localParticipant.setCameraEnabled(false);
+        await local.setCameraEnabled(false);
         setIsCameraEnabled(false);
       } else {
-        await localParticipant.setCameraEnabled(true);
+        await local.setCameraEnabled(true);
         setIsCameraEnabled(true);
       }
     } catch (err) {
