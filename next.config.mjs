@@ -96,7 +96,7 @@ const nextConfig = {
               "img-src 'self' data: https:",
               "media-src 'self' blob: https:",
               "font-src 'self' data:",
-              "connect-src 'self' wss: ws: https://sea1.ingest.uploadthing.com https://uploadthing.com https://utfs.io https://*.ufs.sh wss://*.livekit.cloud https://*.livekit.io",
+              "connect-src 'self' wss: ws: https://sea1.ingest.uploadthing.com https://uploadthing.com https://utfs.io https://*.ufs.sh wss://*.livekit.cloud https://*.livekit.io https://*.livekit.cloud",
               "frame-ancestors 'self'",
               "base-uri 'self'",
               "form-action 'self'",
