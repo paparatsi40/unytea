@@ -7,7 +7,7 @@ import {
   RoomAudioRenderer,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
-import { Loader2, Presentation } from "lucide-react";
+import { Loader2, Presentation, AlertCircle } from "lucide-react";
 import { SessionWhiteboard } from "./SessionWhiteboard";
 
 interface VideoRoomProps {
@@ -38,14 +38,18 @@ export function VideoRoom({ roomName, onLeave, sessionId }: VideoRoomProps) {
         });
 
         if (!response.ok) {
-          throw new Error("Failed to get token");
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || `Failed to get token: ${response.status}`);
         }
 
         const data = await response.json();
+        if (!data.token) {
+          throw new Error("No token received from server");
+        }
         setToken(data.token);
       } catch (err) {
         console.error("Error getting token:", err);
-        setError("Failed to join video room");
+        setError(err instanceof Error ? err.message : "Failed to join video room");
       } finally {
         setIsLoading(false);
       }
@@ -68,18 +72,34 @@ export function VideoRoom({ roomName, onLeave, sessionId }: VideoRoomProps) {
   if (error) {
     return (
       <div className="flex h-[600px] items-center justify-center rounded-xl bg-card">
-        <div className="text-center">
+        <div className="text-center max-w-md px-4">
+          <AlertCircle className="mx-auto mb-4 h-12 w-12 text-destructive" />
           <p className="mb-2 text-lg font-semibold text-destructive">
-            Failed to connect
+            Video Connection Failed
           </p>
-          <p className="text-sm text-muted-foreground">{error}</p>
+          <p className="text-sm text-muted-foreground mb-4">{error}</p>
+          <div className="text-xs text-muted-foreground bg-muted p-3 rounded-lg">
+            <p className="font-medium mb-1">Possible causes:</p>
+            <ul className="text-left list-disc pl-4 space-y-1">
+              <li>LiveKit server not configured</li>
+              <li>Camera/microphone permissions denied</li>
+              <li>Network connection issue</li>
+            </ul>
+          </div>
         </div>
       </div>
     );
   }
 
   if (!token) {
-    return null;
+    return (
+      <div className="flex h-[600px] items-center justify-center rounded-xl bg-card">
+        <div className="text-center">
+          <AlertCircle className="mx-auto mb-4 h-8 w-8 text-destructive" />
+          <p className="text-destructive">No authentication token available</p>
+        </div>
+      </div>
+    );
   }
 
   const serverUrl = process.env.NEXT_PUBLIC_LIVEKIT_URL;
@@ -87,8 +107,18 @@ export function VideoRoom({ roomName, onLeave, sessionId }: VideoRoomProps) {
   if (!serverUrl) {
     return (
       <div className="flex h-[600px] items-center justify-center rounded-xl bg-card">
-        <div className="text-center">
-          <p className="text-destructive">LiveKit server URL not configured</p>
+        <div className="text-center max-w-md px-4">
+          <AlertCircle className="mx-auto mb-4 h-12 w-12 text-destructive" />
+          <p className="mb-2 text-lg font-semibold text-destructive">
+            LiveKit Not Configured
+          </p>
+          <p className="text-sm text-muted-foreground mb-4">
+            The video call service is not properly configured. Please contact support.
+          </p>
+          <div className="text-xs text-muted-foreground bg-muted p-3 rounded-lg text-left">
+            <p className="font-medium">Missing environment variable:</p>
+            <code className="block mt-1 text-destructive">NEXT_PUBLIC_LIVEKIT_URL</code>
+          </div>
         </div>
       </div>
     );
