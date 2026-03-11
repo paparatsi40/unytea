@@ -1,5 +1,4 @@
 "use client";
-import { CameraDebug } from "@/components/sessions/CameraDebug";
 import { useCallback, useMemo, useState } from "react";
 import {
   LiveKitRoom,
