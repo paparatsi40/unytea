@@ -12,26 +12,33 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { roomName, participantName } = await request.json();
+    const body = await request.json().catch(() => null);
 
-    if (!roomName || !participantName) {
-      return NextResponse.json(
-        { error: "Missing roomName or participantName" },
-        { status: 400 }
-      );
+    if (!body) {
+      return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    }
+
+    const roomName =
+      typeof body.roomName === "string" ? body.roomName.trim() : "";
+    const participantName =
+      typeof body.participantName === "string" ? body.participantName.trim() : "";
+
+    if (!roomName) {
+      return NextResponse.json({ error: "Missing roomName" }, { status: 400 });
     }
 
     const apiKey = process.env.LIVEKIT_API_KEY;
     const apiSecret = process.env.LIVEKIT_API_SECRET;
     const wsUrl =
-      process.env.LIVEKIT_URL || process.env.NEXT_PUBLIC_LIVEKIT_URL;
+      process.env.LIVEKIT_URL?.trim() ||
+      process.env.NEXT_PUBLIC_LIVEKIT_URL?.trim() ||
+      "";
 
     if (!apiKey || !apiSecret || !wsUrl) {
-      console.error("LiveKit credentials not configured", {
-        hasApiKey: !!apiKey,
-        hasApiSecret: !!apiSecret,
-        hasWsUrl: !!wsUrl,
-        wsUrl: wsUrl || "not set",
+      console.error("LiveKit config missing", {
+        hasApiKey: Boolean(apiKey),
+        hasApiSecret: Boolean(apiSecret),
+        hasWsUrl: Boolean(wsUrl),
       });
 
       return NextResponse.json(
@@ -40,13 +47,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const at = new AccessToken(apiKey, apiSecret, {
-      identity: session.user.id,
-      name: participantName,
+    const identity = session.user.id;
+    const name =
+      participantName ||
+      session.user.name ||
+      session.user.email ||
+      "Participant";
+
+    const token = new AccessToken(apiKey, apiSecret, {
+      identity,
+      name,
       ttl: "2h",
     });
 
-    at.addGrant({
+    token.addGrant({
       roomJoin: true,
       room: roomName,
       canPublish: true,
@@ -54,15 +68,18 @@ export async function POST(request: NextRequest) {
       canPublishData: true,
     });
 
-    const token = await at.toJwt();
+    const jwt = await token.toJwt();
 
     return NextResponse.json({
-      token,
+      token: jwt,
       wsUrl,
       roomName,
+      identity,
+      participantName: name,
     });
   } catch (error) {
     console.error("Error generating LiveKit token:", error);
+
     return NextResponse.json(
       { error: "Failed to generate token" },
       { status: 500 }
