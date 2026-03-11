@@ -34,7 +34,7 @@ interface VideoRoomProps {
 type RemoteTrackEntry = {
   participantSid: string;
   participantIdentity: string;
-  trackSid: string;
+  trackSid: string | undefined;
   kind: Track.Kind;
   track: Track;
 };
