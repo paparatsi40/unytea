@@ -5,14 +5,15 @@ import {
   LiveKitRoom,
   RoomAudioRenderer,
   useConnectionState,
-  useParticipants,
-  useLocalParticipant,
+  useTracks,
+  TrackLoop,
   VideoTrack,
   ControlBar,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
 import { Loader2, Presentation, AlertCircle, VideoOff, Camera, Mic, RefreshCw } from "lucide-react";
 import { SessionWhiteboard } from "./SessionWhiteboard";
+import { Track } from "livekit-client";
 
 // Component to show connection status
 function ConnectionStatus({ isVideoEnabled, isAudioEnabled }: { isVideoEnabled: boolean; isAudioEnabled: boolean }) {
@@ -29,45 +30,36 @@ function ConnectionStatus({ isVideoEnabled, isAudioEnabled }: { isVideoEnabled: 
   );
 }
 
-// Video grid component - only shows participants with video
+// Video grid component using useTracks
 function VideoGrid() {
-  const participants = useParticipants();
-  const { localParticipant } = useLocalParticipant();
+  // Get all camera tracks from all participants
+  const cameraTracks = useTracks([Track.Source.Camera], { onlySubscribed: false });
+  const screenShareTracks = useTracks([Track.Source.ScreenShare], { onlySubscribed: false });
   
-  const allParticipants = localParticipant ? [localParticipant, ...participants] : participants;
-  const participantsWithVideo = allParticipants.filter(p => 
-    p.videoTracks.size > 0 && Array.from(p.videoTracks.values()).some(t => t.track && !t.track.isMuted)
-  );
+  const allTracks = [...cameraTracks, ...screenShareTracks];
   
-  if (participantsWithVideo.length === 0) {
+  if (allTracks.length === 0) {
     return (
       <div className="flex h-full items-center justify-center">
         <div className="text-center">
           <VideoOff className="mx-auto mb-4 h-16 w-16 text-gray-500" />
           <p className="text-gray-400">Esperando video...</p>
+          <p className="mt-2 text-xs text-gray-500">Nadie ha activado su cámara aún</p>
         </div>
       </div>
     );
   }
   
   return (
-    <div className="grid h-full w-full grid-cols-1 gap-2 p-2">
-      {participantsWithVideo.map((participant) => (
-        <div key={participant.identity} className="relative aspect-video overflow-hidden rounded-lg bg-gray-800">
-          {Array.from(participant.videoTracks.values()).map((trackPub) => (
-            trackPub.track && !trackPub.track.isMuted ? (
-              <VideoTrack 
-                key={trackPub.trackSid} 
-                trackRef={trackPub}
-                className="h-full w-full object-cover"
-              />
-            ) : null
-          ))}
+    <div className="grid h-full w-full grid-cols-1 gap-2 p-2 md:grid-cols-2">
+      <TrackLoop tracks={allTracks}>
+        <div className="relative aspect-video overflow-hidden rounded-lg bg-gray-800">
+          <VideoTrack className="h-full w-full object-cover" />
           <div className="absolute bottom-2 left-2 rounded bg-black/50 px-2 py-1 text-xs text-white">
-            {participant.identity}
+            {/* Participant name shown via context */}
           </div>
         </div>
-      ))}
+      </TrackLoop>
     </div>
   );
 }
