@@ -6,16 +6,14 @@ import {
   VideoConference,
   RoomAudioRenderer,
   useConnectionState,
-  useLocalParticipant,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
-import { Loader2, Presentation, AlertCircle, VideoOff, Mic, Camera } from "lucide-react";
+import { Loader2, Presentation, AlertCircle, VideoOff } from "lucide-react";
 import { SessionWhiteboard } from "./SessionWhiteboard";
 
 // Component to show connection and permission status
 function ConnectionStatus() {
   const connectionState = useConnectionState();
-  const { localParticipant } = useLocalParticipant();
   const [permissions, setPermissions] = useState({ camera: 'unknown', microphone: 'unknown' });
   
   useEffect(() => {
@@ -33,15 +31,10 @@ function ConnectionStatus() {
     }
   }, []);
   
-  const hasVideoTrack = localParticipant?.videoTracks.size > 0;
-  const hasAudioTrack = localParticipant?.audioTracks.size > 0;
-  
   return (
     <div className="absolute bottom-4 left-4 z-40 flex flex-col items-start gap-2 max-w-xs">
       <div className="rounded-full bg-black/70 px-3 py-1 text-xs text-white flex items-center gap-2">
         <span>Status: {connectionState}</span>
-        {hasVideoTrack && <Camera className="h-3 w-3 text-green-400" />}
-        {hasAudioTrack && <Mic className="h-3 w-3 text-green-400" />}
       </div>
       <div className="rounded-full bg-black/70 px-3 py-1 text-xs text-white">
         Cam: {permissions.camera} | Mic: {permissions.microphone}
