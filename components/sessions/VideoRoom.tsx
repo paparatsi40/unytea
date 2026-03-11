@@ -7,13 +7,73 @@ import {
   useConnectionState,
   useTracks,
   ControlBar,
+  useLocalParticipant,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
-import { Loader2, Presentation, AlertCircle, VideoOff, Camera, Mic, RefreshCw } from "lucide-react";
+import { Loader2, Presentation, AlertCircle, VideoOff, Camera, Mic, RefreshCw, Video } from "lucide-react";
 import { SessionWhiteboard } from "./SessionWhiteboard";
 import { Track } from "livekit-client";
 
-// Component to show connection status
+// Manual camera toggle component
+function ManualCameraToggle() {
+  const { localParticipant } = useLocalParticipant();
+  const [isCameraEnabled, setIsCameraEnabled] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  useEffect(() => {
+    if (localParticipant) {
+      const cameraPub = Array.from(localParticipant.videoTracks.values()).find(
+        (pub: any) => pub.trackSource === Track.Source.Camera
+      );
+      setIsCameraEnabled(cameraPub?.isSubscribed && !cameraPub?.isMuted);
+    }
+  }, [localParticipant]);
+  
+  const toggleCamera = async () => {
+    if (!localParticipant) return;
+    
+    setIsLoading(true);
+    try {
+      if (isCameraEnabled) {
+        await localParticipant.setCameraEnabled(false);
+        setIsCameraEnabled(false);
+      } else {
+        await localParticipant.setCameraEnabled(true);
+        setIsCameraEnabled(true);
+      }
+    } catch (err) {
+      console.error("Error toggling camera:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  return (
+    <button
+      onClick={toggleCamera}
+      disabled={isLoading}
+      className={`flex items-center gap-2 rounded-full px-4 py-2 font-medium transition-all ${
+        isCameraEnabled 
+          ? "bg-green-600 text-white hover:bg-green-700" 
+          : "bg-red-600 text-white hover:bg-red-700"
+      } disabled:opacity-50`}
+    >
+      {isLoading ? (
+        <Loader2 className="h-4 w-4 animate-spin" />
+      ) : isCameraEnabled ? (
+        <>
+          <Video className="h-4 w-4" />
+          Cámara ON
+        </>
+      ) : (
+        <>
+          <VideoOff className="h-4 w-4" />
+          Cámara OFF - Click para activar
+        </>
+      )}
+    </button>
+  );
+}
 function ConnectionStatus({ isVideoEnabled, isAudioEnabled }: { isVideoEnabled: boolean; isAudioEnabled: boolean }) {
   const connectionState = useConnectionState();
   
@@ -38,11 +98,12 @@ function VideoGrid() {
   
   if (allTracks.length === 0) {
     return (
-      <div className="flex h-full items-center justify-center">
+      <div className="flex h-full flex-col items-center justify-center">
         <div className="text-center">
           <VideoOff className="mx-auto mb-4 h-16 w-16 text-gray-500" />
-          <p className="text-gray-400">Esperando video...</p>
-          <p className="mt-2 text-xs text-gray-500">Activa tu cámara para comenzar</p>
+          <p className="text-gray-400 mb-4">Esperando video...</p>
+          <ManualCameraToggle />
+          <p className="mt-4 text-xs text-gray-500">Activa tu cámara para comenzar</p>
         </div>
       </div>
     );
