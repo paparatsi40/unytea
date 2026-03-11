@@ -4,7 +4,6 @@ import { useState } from "react";
 import { X, Image as ImageIcon, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
-import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/dist/excalidraw";
 
 // Dynamic import to avoid SSR issues
 const Excalidraw = dynamic(
@@ -29,7 +28,8 @@ interface SessionWhiteboardProps {
 }
 
 export function SessionWhiteboard({ isOpen, onClose, sessionId }: SessionWhiteboardProps) {
-  const [excalidrawAPI, setExcalidrawAPI] = useState<ExcalidrawImperativeAPI | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [excalidrawAPI, setExcalidrawAPI] = useState<any>(null);
 
   const handleExportPNG = async () => {
     if (!excalidrawAPI) return;
