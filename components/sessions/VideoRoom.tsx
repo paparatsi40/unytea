@@ -8,52 +8,20 @@ import {
   useConnectionState,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
-import { Loader2, Presentation, AlertCircle, VideoOff } from "lucide-react";
+import { Loader2, Presentation, AlertCircle, VideoOff, Camera, Mic } from "lucide-react";
 import { SessionWhiteboard } from "./SessionWhiteboard";
 
 // Component to show connection and permission status
-function ConnectionStatus() {
+function ConnectionStatus({ isVideoEnabled, isAudioEnabled }: { isVideoEnabled: boolean; isAudioEnabled: boolean }) {
   const connectionState = useConnectionState();
-  const [permissions, setPermissions] = useState({ camera: 'unknown', microphone: 'unknown' });
-  
-  useEffect(() => {
-    // Check browser permissions
-    if (typeof navigator !== 'undefined' && navigator.permissions) {
-      Promise.all([
-        navigator.permissions.query({ name: 'camera' as PermissionName }).catch(() => null),
-        navigator.permissions.query({ name: 'microphone' as PermissionName }).catch(() => null),
-      ]).then(([cameraPerm, micPerm]) => {
-        setPermissions({
-          camera: cameraPerm?.state || 'unknown',
-          microphone: micPerm?.state || 'unknown',
-        });
-      });
-    }
-  }, []);
   
   return (
     <div className="absolute bottom-4 left-4 flex flex-col items-start gap-2 max-w-xs" style={{ zIndex: 10 }}>
       <div className="rounded-full bg-black/70 px-3 py-1 text-xs text-white flex items-center gap-2">
         <span>Status: {connectionState}</span>
+        {isVideoEnabled && <Camera className="h-3 w-3 text-green-400" />}
+        {isAudioEnabled && <Mic className="h-3 w-3 text-green-400" />}
       </div>
-      <div className="rounded-full bg-black/70 px-3 py-1 text-xs text-white">
-        Cam: {permissions.camera} | Mic: {permissions.microphone}
-      </div>
-      {permissions.camera === 'denied' || permissions.microphone === 'denied' ? (
-        <div className="rounded-lg bg-red-600/90 px-3 py-2 text-xs text-white">
-          <span className="font-semibold">⚠️ Permisos bloqueados</span>
-          <p className="mt-1 text-white/90">
-            Ve a chrome://settings/content/camera y habilita el acceso.
-          </p>
-        </div>
-      ) : permissions.camera === 'prompt' || permissions.microphone === 'prompt' ? (
-        <div className="rounded-lg bg-amber-600/90 px-3 py-2 text-xs text-white">
-          <span className="font-semibold">ℹ️ Se requieren permisos</span>
-          <p className="mt-1 text-white/90">
-            Haz clic en "Permitir" cuando el navegador lo solicite.
-          </p>
-        </div>
-      ) : null}
     </div>
   );
 }
@@ -69,7 +37,8 @@ export function VideoRoom({ roomName, onLeave, sessionId }: VideoRoomProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [showWhiteboard, setShowWhiteboard] = useState(false);
-  const [connectionError, setConnectionError] = useState("");
+  const [isVideoEnabled, setIsVideoEnabled] = useState(false);
+  const [isAudioEnabled, setIsAudioEnabled] = useState(false);
 
   useEffect(() => {
     async function getToken() {
@@ -176,24 +145,15 @@ export function VideoRoom({ roomName, onLeave, sessionId }: VideoRoomProps) {
 
   return (
     <div className="relative h-[600px] w-full overflow-hidden rounded-xl bg-card">
-      <style jsx global>{`
-        .lk-control-bar {
-          z-index: 100 !important;
-        }
-        .lk-participant-media {
-          z-index: 1;
-        }
-      `}</style>
       <LiveKitRoom
-        video={true}
-        audio={true}
+        video={isVideoEnabled}
+        audio={isAudioEnabled}
         token={token}
         serverUrl={serverUrl}
         connect={true}
         onDisconnected={onLeave}
         onError={(err) => {
           console.error("LiveKit connection error:", err);
-          setConnectionError(err.message || "Failed to connect to video room");
         }}
         className="h-full"
         options={{
@@ -201,26 +161,39 @@ export function VideoRoom({ roomName, onLeave, sessionId }: VideoRoomProps) {
           dynacast: true,
         }}
       >
-        <ConnectionStatus />
-        <VideoConference />
-        <RoomAudioRenderer />
+        <ConnectionStatus isVideoEnabled={isVideoEnabled} isAudioEnabled={isAudioEnabled} />
         
-        {connectionError && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/80" style={{ zIndex: 50 }}>
-            <div className="text-center max-w-md px-4">
-              <VideoOff className="mx-auto mb-4 h-12 w-12 text-white" />
-              <p className="mb-2 text-lg font-semibold text-white">
-                Connection Error
+        {/* Show button to enable camera if not enabled yet */}
+        {!isVideoEnabled && !isAudioEnabled && (
+          <div className="absolute inset-0 flex items-center justify-center bg-gray-900" style={{ zIndex: 20 }}>
+            <div className="text-center">
+              <VideoOff className="mx-auto mb-4 h-16 w-16 text-gray-400" />
+              <p className="mb-6 text-lg text-gray-300">
+                Cámara y micrófono están apagados
               </p>
-              <p className="text-sm text-gray-300 mb-4">{connectionError}</p>
               <button
-                onClick={() => window.location.reload()}
-                className="rounded-full bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700"
+                onClick={() => {
+                  setIsVideoEnabled(true);
+                  setIsAudioEnabled(true);
+                }}
+                className="flex items-center gap-3 rounded-full bg-purple-600 px-6 py-3 text-lg font-medium text-white shadow-lg transition-all hover:scale-105 hover:bg-purple-700"
               >
-                Retry Connection
+                <Camera className="h-6 w-6" />
+                Activar Cámara y Micrófono
               </button>
+              <p className="mt-4 text-sm text-gray-500">
+                Se solicitarán permisos al navegador
+              </p>
             </div>
           </div>
+        )}
+        
+        {/* Only show VideoConference when camera is enabled */}
+        {(isVideoEnabled || isAudioEnabled) && (
+          <>
+            <VideoConference />
+            <RoomAudioRenderer />
+          </>
         )}
       </LiveKitRoom>
 
