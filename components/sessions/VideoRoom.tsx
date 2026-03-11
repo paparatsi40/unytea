@@ -60,57 +60,64 @@ function VideoGrid() {
 // Individual video tile component
 function VideoTile({ trackRef }: { trackRef: any }) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const hasAttached = useRef(false);
+  
+  // Use trackSid as stable dependency
+  const trackSid = trackRef.publication?.trackSid;
   
   useEffect(() => {
     const video = videoRef.current;
     const publication = trackRef.publication;
     const track = publication?.track;
     
-    console.log("VideoTile effect - video:", !!video, "track:", !!track, "mediaStream:", track?.mediaStream);
-    
-    // Only attach if we have a valid track with mediaStream
-    if (!video || !track) {
-      console.log("Missing video element or track");
+    // Only attach once
+    if (hasAttached.current) {
       return undefined;
     }
     
-    // Check if track has mediaStream (this is what we need for the video element)
-    if (!track.mediaStream) {
-      console.log("Track has no mediaStream yet - waiting...");
+    if (!video || !track || !track.mediaStream) {
       return undefined;
     }
     
-    console.log("✅ Attaching track to video:", trackRef.participant.identity, "trackSid:", track.trackSid);
+    console.log("✅ Attaching track to video:", trackRef.participant.identity, trackSid);
+    hasAttached.current = true;
     
     try {
-      // Use LiveKit's attach method which handles the mediaStream properly
+      // Use LiveKit's attach method
       track.attach(video);
       
-      // Also set srcObject as backup
+      // Set srcObject
       if (video.srcObject !== track.mediaStream) {
         video.srcObject = track.mediaStream;
       }
       
-      // Ensure video plays
+      // Play with better error handling
       const playPromise = video.play();
       if (playPromise) {
         playPromise.catch((err) => {
-          console.warn("Auto-play prevented:", err);
+          console.warn("Auto-play prevented (expected):", err.message);
+          // Try muted play as fallback
+          video.muted = true;
+          video.play().catch(() => {});
         });
       }
     } catch (err) {
       console.error("Error attaching track:", err);
+      hasAttached.current = false;
     }
     
     return () => {
-      console.log("Cleaning up video element for:", trackRef.participant.identity);
-      if (video) {
+      if (hasAttached.current) {
+        console.log("Cleaning up video for:", trackRef.participant.identity);
         track.detach(video);
-        video.srcObject = null;
-        video.pause();
+        if (video) {
+          video.srcObject = null;
+          video.pause();
+        }
+        hasAttached.current = false;
       }
     };
-  }, [trackRef]);
+  }, [trackSid, trackRef]);
   
   const track = trackRef.publication?.track;
   const isReady = track?.mediaStream;
