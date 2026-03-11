@@ -5,10 +5,23 @@ import {
   LiveKitRoom,
   VideoConference,
   RoomAudioRenderer,
+  useConnectionState,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
-import { Loader2, Presentation, AlertCircle } from "lucide-react";
+import { Loader2, Presentation, AlertCircle, VideoOff } from "lucide-react";
 import { SessionWhiteboard } from "./SessionWhiteboard";
+import { ConnectionState } from "livekit-client";
+
+// Component to show connection status
+function ConnectionStatus() {
+  const connectionState = useConnectionState();
+  
+  return (
+    <div className="absolute top-4 left-4 z-50 rounded-full bg-black/70 px-3 py-1 text-xs text-white">
+      Status: {connectionState}
+    </div>
+  );
+}
 
 interface VideoRoomProps {
   roomName: string;
@@ -21,6 +34,7 @@ export function VideoRoom({ roomName, onLeave, sessionId }: VideoRoomProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [showWhiteboard, setShowWhiteboard] = useState(false);
+  const [connectionError, setConnectionError] = useState("");
 
   useEffect(() => {
     async function getToken() {
@@ -133,10 +147,37 @@ export function VideoRoom({ roomName, onLeave, sessionId }: VideoRoomProps) {
         serverUrl={serverUrl}
         connect={true}
         onDisconnected={onLeave}
+        onError={(err) => {
+          console.error("LiveKit connection error:", err);
+          setConnectionError(err.message || "Failed to connect to video room");
+        }}
         className="h-full"
+        options={{
+          adaptiveStream: true,
+          dynacast: true,
+        }}
       >
+        <ConnectionStatus />
         <VideoConference />
         <RoomAudioRenderer />
+        
+        {connectionError && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/80 z-50">
+            <div className="text-center max-w-md px-4">
+              <VideoOff className="mx-auto mb-4 h-12 w-12 text-white" />
+              <p className="mb-2 text-lg font-semibold text-white">
+                Connection Error
+              </p>
+              <p className="text-sm text-gray-300 mb-4">{connectionError}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="rounded-full bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700"
+              >
+                Retry Connection
+              </button>
+            </div>
+          </div>
+        )}
       </LiveKitRoom>
 
       {/* Whiteboard Toggle Button */}
