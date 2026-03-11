@@ -6,7 +6,6 @@ import {
   RoomAudioRenderer,
   useConnectionState,
   useTracks,
-  VideoTrack,
   ControlBar,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
@@ -29,7 +28,7 @@ function ConnectionStatus({ isVideoEnabled, isAudioEnabled }: { isVideoEnabled: 
   );
 }
 
-// Video grid component using useTracks
+// Video grid component using useTracks with manual video element rendering
 function VideoGrid() {
   // Get all camera tracks from all participants
   const cameraTracks = useTracks([Track.Source.Camera], { onlySubscribed: false });
@@ -52,16 +51,32 @@ function VideoGrid() {
   return (
     <div className="grid h-full w-full grid-cols-1 gap-2 p-2 md:grid-cols-2">
       {allTracks.map((trackRef) => (
-        <div key={trackRef.publication.trackSid} className="relative aspect-video overflow-hidden rounded-lg bg-gray-800">
-          <VideoTrack 
-            trackRef={trackRef}
-            className="h-full w-full object-cover"
-          />
-          <div className="absolute bottom-2 left-2 rounded bg-black/50 px-2 py-1 text-xs text-white">
-            {trackRef.participant.identity}
-          </div>
-        </div>
+        <VideoTile key={trackRef.publication.trackSid} trackRef={trackRef} />
       ))}
+    </div>
+  );
+}
+
+// Individual video tile component
+function VideoTile({ trackRef }: { trackRef: any }) {
+  const videoRef = useCallback((node: HTMLVideoElement | null) => {
+    if (node && trackRef.publication.track) {
+      trackRef.publication.track.attach(node);
+    }
+  }, [trackRef]);
+  
+  return (
+    <div className="relative aspect-video overflow-hidden rounded-lg bg-gray-800">
+      <video
+        ref={videoRef}
+        autoPlay
+        playsInline
+        muted={trackRef.participant.isLocal}
+        className="h-full w-full object-cover"
+      />
+      <div className="absolute bottom-2 left-2 rounded bg-black/50 px-2 py-1 text-xs text-white">
+        {trackRef.participant.identity}
+      </div>
     </div>
   );
 }
