@@ -29,6 +29,7 @@ const nextConfig = {
   poweredByHeader: false,
 
   async headers() {
+    // Simplified CSP that allows WebRTC and LiveKit
     const contentSecurityPolicy = [
       "default-src 'self'",
       "base-uri 'self'",
@@ -42,20 +43,8 @@ const nextConfig = {
       "media-src 'self' blob: https:",
       "font-src 'self' data: https:",
       "frame-src 'self' https://vercel.live",
-      [
-        "connect-src 'self'",
-        "https:",
-        "ws:",
-        "wss:",
-        "https://sea1.ingest.uploadthing.com",
-        "https://uploadthing.com",
-        "https://utfs.io",
-        "https://*.ufs.sh",
-        "https://*.livekit.cloud",
-        "wss://*.livekit.cloud",
-        "https://*.livekit.io",
-        "wss://*.livekit.io",
-      ].join(" "),
+      // Allow all connections for WebRTC/LiveKit - simplified
+      "connect-src 'self' https: ws: wss:",
     ].join("; ");
 
     return [
@@ -78,12 +67,8 @@ const nextConfig = {
         ],
       },
       {
-        source: "/:path*",
+        source: "/:all*",
         headers: [
-          {
-            key: "X-DNS-Prefetch-Control",
-            value: "on",
-          },
           {
             key: "Strict-Transport-Security",
             value: "max-age=63072000; includeSubDomains; preload",
