@@ -73,7 +73,7 @@ function RemoteVideoTile({ entry }: { entry: RemoteTrackEntry }) {
 }
 
 export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
-  const [room, setRoom] = useState<Room | null>(null);
+  const [_room, setRoom] = useState<Room | null>(null);
   const [localTracks, setLocalTracks] = useState<LocalTrack[]>([]);
   const [remoteTracks, setRemoteTracks] = useState<RemoteTrackEntry[]>([]);
 
