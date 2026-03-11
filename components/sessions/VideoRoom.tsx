@@ -89,6 +89,7 @@ function RoomContent({
   const [isAudioEnabled, setIsAudioEnabled] = useState(false);
   const [isActivating, setIsActivating] = useState(false);
   const [activationError, setActivationError] = useState("");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const connectionState = useConnectionState();
 
   const activateCamera = useCallback(async () => {
