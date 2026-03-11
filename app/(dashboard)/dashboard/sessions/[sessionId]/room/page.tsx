@@ -93,6 +93,7 @@ export default function SessionRoomPage({
       {/* Video Room */}
       <VideoRoom
         roomName={videoSession.roomId}
+        sessionId={videoSession.id}
         onLeave={() => {
           router.push("/dashboard/sessions");
         }}

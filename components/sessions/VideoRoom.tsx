@@ -7,17 +7,20 @@ import {
   RoomAudioRenderer,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
-import { Loader2 } from "lucide-react";
+import { Loader2, Presentation } from "lucide-react";
+import { SessionWhiteboard } from "./SessionWhiteboard";
 
 interface VideoRoomProps {
   roomName: string;
   onLeave?: () => void;
+  sessionId?: string;
 }
 
-export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
+export function VideoRoom({ roomName, onLeave, sessionId }: VideoRoomProps) {
   const [token, setToken] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showWhiteboard, setShowWhiteboard] = useState(false);
 
   useEffect(() => {
     async function getToken() {
@@ -92,7 +95,7 @@ export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
   }
 
   return (
-    <div className="h-[600px] w-full overflow-hidden rounded-xl bg-card">
+    <div className="relative h-[600px] w-full overflow-hidden rounded-xl bg-card">
       <LiveKitRoom
         video={true}
         audio={true}
@@ -105,6 +108,28 @@ export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
         <VideoConference />
         <RoomAudioRenderer />
       </LiveKitRoom>
+
+      {/* Whiteboard Toggle Button */}
+      <button
+        onClick={() => setShowWhiteboard(!showWhiteboard)}
+        className={`absolute bottom-4 right-4 z-40 flex items-center gap-2 rounded-full px-4 py-2 font-medium shadow-lg transition-all ${
+          showWhiteboard
+            ? "bg-purple-600 text-white hover:bg-purple-700"
+            : "bg-white text-gray-700 hover:bg-gray-100"
+        }`}
+      >
+        <Presentation className="h-5 w-5" />
+        {showWhiteboard ? "Close Whiteboard" : "Open Whiteboard"}
+      </button>
+
+      {/* Whiteboard Overlay */}
+      {sessionId && (
+        <SessionWhiteboard
+          isOpen={showWhiteboard}
+          onClose={() => setShowWhiteboard(false)}
+          sessionId={sessionId}
+        />
+      )}
     </div>
   );
 }

@@ -44,6 +44,7 @@
     "@tiptap/extension-placeholder": "^2.27.1",
     "@tiptap/react": "^2.27.1",
     "@tiptap/starter-kit": "^2.27.1",
+    "@tldraw/tldraw": "^4.4.1",
     "@trpc/client": "^11.0.0-rc.628",
     "@trpc/next": "^11.0.0-rc.628",
     "@trpc/react-query": "^11.0.0-rc.628",
