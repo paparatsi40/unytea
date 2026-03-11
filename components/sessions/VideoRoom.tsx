@@ -6,29 +6,61 @@ import {
   VideoConference,
   RoomAudioRenderer,
   useConnectionState,
+  useLocalParticipant,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
-import { Loader2, Presentation, AlertCircle, VideoOff } from "lucide-react";
+import { Loader2, Presentation, AlertCircle, VideoOff, Mic, Camera } from "lucide-react";
 import { SessionWhiteboard } from "./SessionWhiteboard";
 
-// Component to show connection status
+// Component to show connection and permission status
 function ConnectionStatus() {
   const connectionState = useConnectionState();
-  const isIncognito = typeof window !== 'undefined' && window.navigator.userAgent.includes('Incognito');
+  const { localParticipant } = useLocalParticipant();
+  const [permissions, setPermissions] = useState({ camera: 'unknown', microphone: 'unknown' });
+  
+  useEffect(() => {
+    // Check browser permissions
+    if (typeof navigator !== 'undefined' && navigator.permissions) {
+      Promise.all([
+        navigator.permissions.query({ name: 'camera' as PermissionName }).catch(() => null),
+        navigator.permissions.query({ name: 'microphone' as PermissionName }).catch(() => null),
+      ]).then(([cameraPerm, micPerm]) => {
+        setPermissions({
+          camera: cameraPerm?.state || 'unknown',
+          microphone: micPerm?.state || 'unknown',
+        });
+      });
+    }
+  }, []);
+  
+  const hasVideoTrack = localParticipant?.videoTracks.size > 0;
+  const hasAudioTrack = localParticipant?.audioTracks.size > 0;
   
   return (
-    <div className="absolute top-4 right-4 z-40 flex flex-col items-end gap-2">
-      <div className="rounded-full bg-black/70 px-3 py-1 text-xs text-white">
-        Status: {connectionState}
+    <div className="absolute bottom-4 left-4 z-40 flex flex-col items-start gap-2 max-w-xs">
+      <div className="rounded-full bg-black/70 px-3 py-1 text-xs text-white flex items-center gap-2">
+        <span>Status: {connectionState}</span>
+        {hasVideoTrack && <Camera className="h-3 w-3 text-green-400" />}
+        {hasAudioTrack && <Mic className="h-3 w-3 text-green-400" />}
       </div>
-      {isIncognito && (
-        <div className="max-w-xs rounded-lg bg-amber-600/90 px-3 py-2 text-xs text-white">
-          <span className="font-semibold">⚠️ Modo incógnito detectado</span>
+      <div className="rounded-full bg-black/70 px-3 py-1 text-xs text-white">
+        Cam: {permissions.camera} | Mic: {permissions.microphone}
+      </div>
+      {permissions.camera === 'denied' || permissions.microphone === 'denied' ? (
+        <div className="rounded-lg bg-red-600/90 px-3 py-2 text-xs text-white">
+          <span className="font-semibold">⚠️ Permisos bloqueados</span>
           <p className="mt-1 text-white/90">
-            Chrome bloquea cámara/micrófono en modo privado. Usa una ventana normal.
+            Ve a chrome://settings/content/camera y habilita el acceso.
           </p>
         </div>
-      )}
+      ) : permissions.camera === 'prompt' || permissions.microphone === 'prompt' ? (
+        <div className="rounded-lg bg-amber-600/90 px-3 py-2 text-xs text-white">
+          <span className="font-semibold">ℹ️ Se requieren permisos</span>
+          <p className="mt-1 text-white/90">
+            Haz clic en "Permitir" cuando el navegador lo solicite.
+          </p>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -70,6 +102,7 @@ export function VideoRoom({ roomName, onLeave, sessionId }: VideoRoomProps) {
         if (!data.token) {
           throw new Error("No token received from server");
         }
+        console.log("Got LiveKit token, wsUrl:", data.wsUrl);
         setToken(data.token);
       } catch (err) {
         console.error("Error getting token:", err);
