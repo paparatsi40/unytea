@@ -61,6 +61,8 @@ function VideoGrid() {
 function VideoTile({ trackRef }: { trackRef: any }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hasAttached = useRef(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [needsManualPlay, setNeedsManualPlay] = useState(false);
   
   // Use trackSid as stable dependency
   const trackSid = trackRef.publication?.trackSid;
@@ -82,6 +84,9 @@ function VideoTile({ trackRef }: { trackRef: any }) {
     console.log("✅ Attaching track to video:", trackRef.participant.identity, trackSid);
     hasAttached.current = true;
     
+    // Always mute initially for autoplay to work
+    video.muted = true;
+    
     try {
       // Use LiveKit's attach method
       track.attach(video);
@@ -91,16 +96,24 @@ function VideoTile({ trackRef }: { trackRef: any }) {
         video.srcObject = track.mediaStream;
       }
       
-      // Play with better error handling
+      // Play
       const playPromise = video.play();
       if (playPromise) {
-        playPromise.catch((err) => {
-          console.warn("Auto-play prevented (expected):", err.message);
-          // Try muted play as fallback
-          video.muted = true;
-          video.play().catch(() => {});
-        });
+        playPromise
+          .then(() => {
+            console.log("▶️ Video playing for:", trackRef.participant.identity);
+            setIsPlaying(true);
+            setNeedsManualPlay(false);
+          })
+          .catch((err) => {
+            console.warn("Auto-play blocked:", err.message);
+            setNeedsManualPlay(true);
+          });
       }
+      
+      // Listen for play/pause events
+      video.addEventListener('playing', () => setIsPlaying(true));
+      video.addEventListener('pause', () => setIsPlaying(false));
     } catch (err) {
       console.error("Error attaching track:", err);
       hasAttached.current = false;
@@ -122,21 +135,58 @@ function VideoTile({ trackRef }: { trackRef: any }) {
   const track = trackRef.publication?.track;
   const isReady = track?.mediaStream;
   
+  const handleManualPlay = () => {
+    const video = videoRef.current;
+    if (video) {
+      video.muted = true;
+      video.play().then(() => {
+        setIsPlaying(true);
+        setNeedsManualPlay(false);
+      });
+    }
+  };
+  
   return (
-    <div className="relative aspect-video overflow-hidden rounded-lg bg-gray-800" style={{ minHeight: '200px' }}>
+    <div 
+      className="relative overflow-hidden rounded-lg bg-gray-900 flex items-center justify-center" 
+      style={{ minHeight: '300px', minWidth: '400px', border: '2px solid green' }}
+    >
       <video
         ref={videoRef}
         autoPlay
         playsInline
-        muted={trackRef.participant.isLocal}
-        className="h-full w-full object-cover"
-        style={{ display: 'block', width: '100%', height: '100%' }}
+        muted
+        className="w-full h-full object-cover"
+        style={{ 
+          display: 'block', 
+          width: '100%', 
+          height: '100%',
+          minHeight: '300px',
+          backgroundColor: '#111'
+        }}
       />
-      <div className="absolute bottom-2 left-2 rounded bg-black/50 px-2 py-1 text-xs text-white">
-        {trackRef.participant.identity || 'Unknown'}
-        {!isReady && (
-          <span className="ml-2 text-yellow-400">(connecting...)</span>
-        )}
+      
+      {/* Manual play button if autoplay blocked */}
+      {needsManualPlay && (
+        <button
+          onClick={handleManualPlay}
+          className="absolute inset-0 flex items-center justify-center bg-black/50 hover:bg-black/30 transition-colors"
+        >
+          <div className="bg-white/20 backdrop-blur rounded-full p-6">
+            <Camera className="h-12 w-12 text-white" />
+          </div>
+          <span className="absolute bottom-20 text-white font-medium">Click to start video</span>
+        </button>
+      )}
+      
+      {/* Status indicator */}
+      <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between">
+        <div className="rounded bg-black/70 px-2 py-1 text-xs text-white flex items-center gap-2">
+          {trackRef.participant.identity || 'Unknown'}
+          {!isReady && <span className="text-yellow-400">(connecting...)</span>}
+          {isReady && !isPlaying && <span className="text-red-400">(paused)</span>}
+          {isReady && isPlaying && <span className="text-green-400">● LIVE</span>}
+        </div>
       </div>
     </div>
   );
