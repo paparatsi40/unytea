@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, memo } from "react";
 import {
   LiveKitRoom,
   RoomAudioRenderer,
@@ -57,31 +57,28 @@ function VideoGrid() {
   );
 }
 
-// Individual video tile component
-function VideoTile({ trackRef }: { trackRef: any }) {
+// Individual video tile component - memoized to prevent re-renders
+const VideoTile = memo(function VideoTile({ trackRef }: { trackRef: any }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hasAttached = useRef(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [needsManualPlay, setNeedsManualPlay] = useState(false);
   
-  // Use trackSid as stable dependency
+  // Get stable values that won't change on re-renders
   const trackSid = trackRef.publication?.trackSid;
+  const participantIdentity = trackRef.participant?.identity || 'Unknown';
   
   useEffect(() => {
     const video = videoRef.current;
     const publication = trackRef.publication;
     const track = publication?.track;
     
-    // Only attach once
-    if (hasAttached.current) {
+    // Only attach once per trackSid
+    if (hasAttached.current || !video || !track || !track.mediaStream) {
       return undefined;
     }
     
-    if (!video || !track || !track.mediaStream) {
-      return undefined;
-    }
-    
-    console.log("✅ Attaching track to video:", trackRef.participant.identity, trackSid);
+    console.log("✅ Attaching track:", participantIdentity, trackSid);
     hasAttached.current = true;
     
     // Always mute initially for autoplay to work
@@ -96,41 +93,49 @@ function VideoTile({ trackRef }: { trackRef: any }) {
         video.srcObject = track.mediaStream;
       }
       
-      // Play
-      const playPromise = video.play();
-      if (playPromise) {
-        playPromise
-          .then(() => {
-            console.log("▶️ Video playing for:", trackRef.participant.identity);
-            setIsPlaying(true);
-            setNeedsManualPlay(false);
-          })
-          .catch((err) => {
-            console.warn("Auto-play blocked:", err.message);
-            setNeedsManualPlay(true);
-          });
-      }
+      // Play with better error handling
+      const playVideo = async () => {
+        try {
+          await video.play();
+          console.log("▶️ Video playing:", participantIdentity);
+          setIsPlaying(true);
+          setNeedsManualPlay(false);
+        } catch (err: any) {
+          console.warn("Auto-play blocked for:", participantIdentity, err?.message);
+          setNeedsManualPlay(true);
+        }
+      };
+      
+      // Small delay to ensure stream is ready
+      const timeoutId = setTimeout(playVideo, 100);
       
       // Listen for play/pause events
-      video.addEventListener('playing', () => setIsPlaying(true));
-      video.addEventListener('pause', () => setIsPlaying(false));
-    } catch (err) {
-      console.error("Error attaching track:", err);
-      hasAttached.current = false;
-    }
-    
-    return () => {
-      if (hasAttached.current) {
-        console.log("Cleaning up video for:", trackRef.participant.identity);
-        track.detach(video);
-        if (video) {
-          video.srcObject = null;
-          video.pause();
+      const handlePlaying = () => setIsPlaying(true);
+      const handlePause = () => setIsPlaying(false);
+      video.addEventListener('playing', handlePlaying);
+      video.addEventListener('pause', handlePause);
+      
+      return () => {
+        clearTimeout(timeoutId);
+        video.removeEventListener('playing', handlePlaying);
+        video.removeEventListener('pause', handlePause);
+        
+        if (hasAttached.current) {
+          console.log("🧹 Cleaning up video:", participantIdentity);
+          track.detach(video);
+          if (video) {
+            video.srcObject = null;
+            video.pause();
+          }
+          hasAttached.current = false;
         }
-        hasAttached.current = false;
-      }
-    };
-  }, [trackSid, trackRef]);
+      };
+    } catch (err) {
+      console.error("Error attaching track:", participantIdentity, err);
+      hasAttached.current = false;
+      return undefined;
+    }
+  }, [trackSid, participantIdentity]);
   
   const track = trackRef.publication?.track;
   const isReady = track?.mediaStream;
@@ -182,7 +187,7 @@ function VideoTile({ trackRef }: { trackRef: any }) {
       {/* Status indicator */}
       <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between">
         <div className="rounded bg-black/70 px-2 py-1 text-xs text-white flex items-center gap-2">
-          {trackRef.participant.identity || 'Unknown'}
+          {participantIdentity}
           {!isReady && <span className="text-yellow-400">(connecting...)</span>}
           {isReady && !isPlaying && <span className="text-red-400">(paused)</span>}
           {isReady && isPlaying && <span className="text-green-400">● LIVE</span>}
@@ -190,7 +195,7 @@ function VideoTile({ trackRef }: { trackRef: any }) {
       </div>
     </div>
   );
-}
+});
 
 interface VideoRoomProps {
   roomName: string;
