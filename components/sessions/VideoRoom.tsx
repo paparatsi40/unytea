@@ -76,12 +76,10 @@ function VideoGrid() {
 
 // Inner room component that has access to LiveKit hooks
 function RoomContent({ 
-  _onLeave, 
   sessionId, 
   showWhiteboard, 
   setShowWhiteboard 
 }: { 
-  _onLeave?: () => void;
   sessionId?: string;
   showWhiteboard: boolean;
   setShowWhiteboard: (v: boolean) => void;
@@ -91,6 +89,7 @@ function RoomContent({
   const [isAudioEnabled, setIsAudioEnabled] = useState(false);
   const [isActivating, setIsActivating] = useState(false);
   const [activationError, setActivationError] = useState("");
+  const connectionState = useConnectionState();
 
   const activateCamera = useCallback(async () => {
     if (!localParticipant) {
@@ -358,7 +357,6 @@ export function VideoRoom({ roomName, onLeave, sessionId }: VideoRoomProps) {
         }}
       >
         <RoomContent 
-          _onLeave={onLeave}
           sessionId={sessionId}
           showWhiteboard={showWhiteboard}
           setShowWhiteboard={setShowWhiteboard}
