@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Plus, Users, TrendingUp, Crown, Lock, Loader2, Search, Grid3x3, List, Sparkles, Dumbbell, Briefcase, Code, BookOpen, Palette } from "lucide-react";
+import { Plus, Users, TrendingUp, Crown, Lock, Loader2, Search, Grid3x3, List, Sparkles, Dumbbell, Briefcase, Code, BookOpen, Palette, BarChart3, UserPlus, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 
@@ -32,6 +32,18 @@ const categories = [
   { name: "Education", icon: BookOpen, color: "from-orange-500 to-red-500", image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&q=80" },
   { name: "Creative", icon: Palette, color: "from-pink-500 to-rose-500", image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=800&q=80" },
 ];
+
+// Helper to calculate activity status based on posts and members
+function getActivityStatus(posts: number, members: number): { text: string; isActive: boolean } {
+  if (posts > 0 && members > 1) {
+    return { text: "Last activity: today", isActive: true };
+  } else if (posts > 0 || members > 1) {
+    return { text: "Last activity: recently", isActive: true };
+  } else if (members === 1) {
+    return { text: "Needs members", isActive: false };
+  }
+  return { text: "No activity yet", isActive: false };
+}
 
 export function CommunitiesClient() {
   const { user, isLoading } = useCurrentUser();
@@ -589,27 +601,70 @@ export function CommunitiesClient() {
                         </div>
                       </div>
 
-                      {/* Bottom Info */}
-                      <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
-                        <div className="flex items-center gap-2">
-                          <div className="flex -space-x-2">
-                            {[1, 2, 3].map((i) => (
-                              <div
-                                key={i}
-                                className="h-8 w-8 rounded-full border-2 border-background bg-gradient-to-br from-primary/80 to-primary"
-                              />
-                            ))}
-                          </div>
-                          <span className="text-xs text-muted-foreground">
-                            +{community._count.members - 3} more
-                          </span>
+                      {/* Activity Stats - Mejora 1 */}
+                      <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground border-t border-border pt-4">
+                        <div className="flex items-center gap-1.5">
+                          <Users className="h-4 w-4" />
+                          <span className="font-medium">{community._count.members} {community._count.members === 1 ? 'member' : 'members'}</span>
                         </div>
+                        <div className="flex items-center gap-1.5">
+                          <TrendingUp className="h-4 w-4" />
+                          <span className="font-medium">{community._count.posts} {community._count.posts === 1 ? 'post' : 'posts'}</span>
+                        </div>
+                      </div>
+
+                      {/* Bottom Info with Activity Status */}
+                      <div className="mt-3 flex items-center justify-between">
+                        {(() => {
+                          const activity = getActivityStatus(community._count.posts, community._count.members);
+                          return (
+                            <span className={`text-xs ${activity.isActive ? 'text-green-600 font-medium' : 'text-amber-600'}`}>
+                              {activity.text}
+                            </span>
+                          );
+                        })()}
                         
-                        {/* Arrow */}
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary transition-all group-hover:bg-primary group-hover:text-primary-foreground">
-                          <svg className="h-5 w-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
+                        {/* Quick Actions on Hover - Mejora 2 */}
+                        <div className="flex items-center gap-2">
+                          {/* Default Arrow (visible when not hovered) */}
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary transition-all group-hover:hidden">
+                            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                          </div>
+                          
+                          {/* Hover Actions (visible on hover) */}
+                          <div className="hidden items-center gap-2 group-hover:flex">
+                            <Link
+                              href={`/dashboard/c/${community.slug}`}
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <Button size="sm" className="bg-primary text-white hover:bg-primary/90">
+                                <ExternalLink className="mr-1 h-3 w-3" />
+                                Open
+                              </Button>
+                            </Link>
+                            <Link
+                              href={`/dashboard/c/${community.slug}/invite`}
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <Button size="sm" variant="outline" className="border-green-500 text-green-600 hover:bg-green-50">
+                                <UserPlus className="mr-1 h-3 w-3" />
+                                Invite
+                              </Button>
+                            </Link>
+                            {community.role === "OWNER" && (
+                              <Link
+                                href={`/dashboard/c/${community.slug}/analytics`}
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <Button size="sm" variant="outline" className="border-amber-500 text-amber-600 hover:bg-amber-50">
+                                  <BarChart3 className="mr-1 h-3 w-3" />
+                                  Analytics
+                                </Button>
+                              </Link>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -673,23 +728,69 @@ export function CommunitiesClient() {
                       )}
                     </div>
 
-                    {/* Stats */}
-                    <div className="flex items-center gap-6 text-sm">
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-foreground">{community._count.members.toLocaleString()}</div>
-                        <div className="text-xs text-muted-foreground">Members</div>
+                    {/* Stats with Activity Status */}
+                    <div className="flex flex-col items-end gap-2">
+                      <div className="flex items-center gap-6 text-sm">
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-foreground">{community._count.members.toLocaleString()}</div>
+                          <div className="text-xs text-muted-foreground">Members</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-foreground">{community._count.posts}</div>
+                          <div className="text-xs text-muted-foreground">Posts</div>
+                        </div>
                       </div>
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-foreground">{community._count.posts}</div>
-                        <div className="text-xs text-muted-foreground">Posts</div>
-                      </div>
+                      {(() => {
+                        const activity = getActivityStatus(community._count.posts, community._count.members);
+                        return (
+                          <span className={`text-xs ${activity.isActive ? 'text-green-600 font-medium' : 'text-amber-600'}`}>
+                            {activity.text}
+                          </span>
+                        );
+                      })()}
                     </div>
 
-                    {/* Arrow */}
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-all group-hover:bg-primary group-hover:text-primary-foreground">
-                      <svg className="h-5 w-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
+                    {/* Quick Actions on Hover */}
+                    <div className="flex items-center gap-2">
+                      {/* Default Arrow (visible when not hovered) */}
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-all group-hover:hidden">
+                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                      
+                      {/* Hover Actions (visible on hover) */}
+                      <div className="hidden items-center gap-2 group-hover:flex">
+                        <Link
+                          href={`/dashboard/c/${community.slug}`}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Button size="sm" className="bg-primary text-white hover:bg-primary/90">
+                            <ExternalLink className="mr-1 h-3 w-3" />
+                            Open
+                          </Button>
+                        </Link>
+                        <Link
+                          href={`/dashboard/c/${community.slug}/invite`}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Button size="sm" variant="outline" className="border-green-500 text-green-600 hover:bg-green-50">
+                            <UserPlus className="mr-1 h-3 w-3" />
+                            Invite
+                          </Button>
+                        </Link>
+                        {community.role === "OWNER" && (
+                          <Link
+                            href={`/dashboard/c/${community.slug}/analytics`}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Button size="sm" variant="outline" className="border-amber-500 text-amber-600 hover:bg-amber-50">
+                              <BarChart3 className="mr-1 h-3 w-3" />
+                              Analytics
+                            </Button>
+                          </Link>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </Link>
