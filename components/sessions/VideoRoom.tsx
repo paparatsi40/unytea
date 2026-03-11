@@ -3,9 +3,13 @@
 import { useEffect, useState, useCallback } from "react";
 import {
   LiveKitRoom,
-  VideoConference,
   RoomAudioRenderer,
   useConnectionState,
+  useParticipants,
+  useLocalParticipant,
+  VideoTrack,
+  AudioTrack,
+  ControlBar,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
 import { Loader2, Presentation, AlertCircle, VideoOff, Camera, Mic, RefreshCw } from "lucide-react";
@@ -22,6 +26,49 @@ function ConnectionStatus({ isVideoEnabled, isAudioEnabled }: { isVideoEnabled: 
         {isVideoEnabled && <Camera className="h-3 w-3 text-green-400" />}
         {isAudioEnabled && <Mic className="h-3 w-3 text-green-400" />}
       </div>
+    </div>
+  );
+}
+
+// Video grid component - only shows participants with video
+function VideoGrid() {
+  const participants = useParticipants();
+  const { localParticipant } = useLocalParticipant();
+  
+  const allParticipants = localParticipant ? [localParticipant, ...participants] : participants;
+  const participantsWithVideo = allParticipants.filter(p => 
+    Array.from(p.videoTracks.values()).some(t => !t.isMuted && t.track)
+  );
+  
+  if (participantsWithVideo.length === 0) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <div className="text-center">
+          <VideoOff className="mx-auto mb-4 h-16 w-16 text-gray-500" />
+          <p className="text-gray-400">Esperando video...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  return (
+    <div className="grid h-full w-full grid-cols-1 gap-2 p-2">
+      {participantsWithVideo.map((participant) => (
+        <div key={participant.identity} className="relative aspect-video overflow-hidden rounded-lg bg-gray-800">
+          {Array.from(participant.videoTracks.values()).map((trackRef) => (
+            trackRef.track && !trackRef.isMuted ? (
+              <VideoTrack 
+                key={trackRef.trackSid} 
+                trackRef={trackRef}
+                className="h-full w-full object-cover"
+              />
+            ) : null
+          ))}
+          <div className="absolute bottom-2 left-2 rounded bg-black/50 px-2 py-1 text-xs text-white">
+            {participant.identity}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -189,6 +236,7 @@ export function VideoRoom({ roomName, onLeave, sessionId }: VideoRoomProps) {
         }}
       >
         <ConnectionStatus isVideoEnabled={isVideoEnabled} isAudioEnabled={isAudioEnabled} />
+        <RoomAudioRenderer />
         
         {/* Show activation button if camera not enabled yet */}
         {!isVideoEnabled && !isAudioEnabled && (
@@ -229,12 +277,16 @@ export function VideoRoom({ roomName, onLeave, sessionId }: VideoRoomProps) {
           </div>
         )}
         
-        {/* Show VideoConference only when enabled */}
+        {/* Custom video grid - shows actual video or placeholder */}
         {(isVideoEnabled || isAudioEnabled) && (
-          <>
-            <VideoConference />
-            <RoomAudioRenderer />
-          </>
+          <div className="flex h-full flex-col">
+            <div className="flex-1 overflow-hidden">
+              <VideoGrid />
+            </div>
+            <div className="shrink-0">
+              <ControlBar />
+            </div>
+          </div>
         )}
       </LiveKitRoom>
 
