@@ -1,4 +1,5 @@
 "use client";
+
 import { useCallback, useMemo, useState } from "react";
 import {
   LiveKitRoom,
@@ -8,28 +9,28 @@ import {
   type LocalUserChoices,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
-import { AlertCircle, Loader2, PhoneOff } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
 
 interface VideoRoomProps {
   roomName: string;
-  onLeave?: () => void;
   sessionId?: string;
+  onLeave?: () => void;
 }
 
-type JoinState = "prejoin" | "connecting" | "joined";
+type JoinStep = "prejoin" | "loading" | "room";
 
 export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
-  const [joinState, setJoinState] = useState<JoinState>("prejoin");
   const [token, setToken] = useState("");
-  const [serverUrl, setServerUrl] = useState("");
-  const [error, setError] = useState("");
+  const [wsUrl, setWsUrl] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [step, setStep] = useState<JoinStep>("prejoin");
   const [choices, setChoices] = useState<LocalUserChoices | null>(null);
 
-  const handlePreJoinSubmit = useCallback(
+  const handleSubmit = useCallback(
     async (values: LocalUserChoices) => {
       try {
-        setError("");
-        setJoinState("connecting");
+        setError(null);
+        setStep("loading");
         setChoices(values);
 
         const response = await fetch("/api/livekit/token", {
@@ -43,69 +44,59 @@ export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
           }),
         });
 
-        const payload = await response.json().catch(() => ({}));
+        const data = await response.json().catch(() => ({}));
 
         if (!response.ok) {
-          throw new Error(payload.error || "No se pudo obtener el token");
+          throw new Error(data.error || "Failed to get access token");
         }
 
         const resolvedToken =
-          typeof payload.token === "string" ? payload.token.trim() : "";
-        const resolvedServerUrl =
-          typeof payload.wsUrl === "string" && payload.wsUrl.trim()
-            ? payload.wsUrl.trim()
-            : (process.env.NEXT_PUBLIC_LIVEKIT_URL ?? "").trim();
+          typeof data.token === "string" ? data.token.trim() : "";
+        const resolvedWsUrl =
+          typeof data.wsUrl === "string" ? data.wsUrl.trim() : "";
 
         if (!resolvedToken) {
-          throw new Error("El backend no devolvió token");
+          throw new Error("Token not received");
         }
 
-        if (!resolvedServerUrl) {
-          throw new Error("Falta la URL de LiveKit");
+        if (!resolvedWsUrl) {
+          throw new Error("LiveKit wsUrl not received");
         }
 
         setToken(resolvedToken);
-        setServerUrl(resolvedServerUrl);
-        setJoinState("joined");
+        setWsUrl(resolvedWsUrl);
+        setStep("room");
       } catch (err) {
-        console.error("PreJoin error:", err);
+        console.error("Error fetching token:", err);
         setError(
-          err instanceof Error ? err.message : "No se pudo iniciar la videollamada"
+          err instanceof Error ? err.message : "Failed to connect to video call"
         );
-        setJoinState("prejoin");
+        setStep("prejoin");
       }
     },
     [roomName]
   );
 
-  const handleCancel = useCallback(() => {
-    setError("");
-    setChoices(null);
-    setJoinState("prejoin");
-    setToken("");
-    setServerUrl("");
-  }, []);
-
   const handleDisconnected = useCallback(() => {
-    setJoinState("prejoin");
     setToken("");
-    setServerUrl("");
+    setWsUrl("");
     setChoices(null);
+    setStep("prejoin");
     onLeave?.();
   }, [onLeave]);
 
   const roomKey = useMemo(() => {
-    return `${roomName}:${token}:${serverUrl}`;
-  }, [roomName, token, serverUrl]);
+    return `${roomName}:${token}:${wsUrl}`;
+  }, [roomName, token, wsUrl]);
 
-  if (joinState !== "joined") {
+  if (step === "prejoin") {
     return (
       <div className="flex h-[700px] items-center justify-center rounded-2xl bg-zinc-950 p-6">
-        <div className="w-full max-w-3xl overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 shadow-xl">
+        <div className="w-full max-w-4xl overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 shadow-xl">
           <div className="border-b border-zinc-800 px-6 py-4">
             <h2 className="text-xl font-semibold text-white">Videollamada</h2>
             <p className="mt-1 text-sm text-zinc-400">
-              Configura tu cámara y micrófono antes de entrar a la sala.
+              Configura tu cámara y micrófono antes de entrar.
             </p>
           </div>
 
@@ -119,73 +110,71 @@ export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
           ) : null}
 
           <div className="p-6">
-            {joinState === "connecting" ? (
-              <div className="flex min-h-[420px] items-center justify-center rounded-2xl bg-black text-white">
-                <div className="text-center">
-                  <Loader2 className="mx-auto mb-4 h-8 w-8 animate-spin" />
-                  <p>Conectando a la videollamada...</p>
-                </div>
-              </div>
-            ) : (
-              <div className="[&_.lk-prejoin]:!border-0 [&_.lk-prejoin]:!bg-transparent [&_.lk-button]:!rounded-xl">
-                <PreJoin
-                  defaults={{
-                    username: "Participant",
-                    videoEnabled: true,
-                    audioEnabled: true,
-                    videoDeviceId: "default"
-                  }}
-                  onSubmit={handlePreJoinSubmit}
-                />
-              </div>
-            )}
+            <div className="[&_.lk-prejoin]:!border-0 [&_.lk-prejoin]:!bg-transparent [&_.lk-button]:!rounded-xl">
+              <PreJoin
+                persistUserChoices={false}
+                defaults={{
+                  username: "Participant",
+                  videoEnabled: true,
+                  audioEnabled: true,
+                  videoDeviceId:
+                    "96cba597f5473c0fcb37c8a0a4836440914ac0c21e30537dd7440e6d58b8c527",
+                }}
+                onSubmit={handleSubmit}
+              />
+            </div>
           </div>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="relative h-[700px] w-full overflow-hidden rounded-2xl bg-zinc-950">
-      {error ? (
-        <div className="absolute right-4 top-4 z-50 max-w-sm rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
-          <div className="flex items-start gap-2">
-            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-            <span>{error}</span>
-          </div>
+  if (step === "loading") {
+    return (
+      <div className="flex h-[700px] items-center justify-center rounded-2xl bg-zinc-950">
+        <div className="text-center text-white">
+          <Loader2 className="mx-auto mb-4 h-8 w-8 animate-spin" />
+          <p>Connecting to video call...</p>
         </div>
-      ) : null}
+      </div>
+    );
+  }
 
+  if (!token || !wsUrl) {
+    return (
+      <div className="flex h-[700px] items-center justify-center rounded-2xl bg-zinc-950 p-6">
+        <div className="max-w-md text-center text-white">
+          <AlertCircle className="mx-auto mb-4 h-10 w-10 text-red-500" />
+          <p>No authentication token or LiveKit URL available.</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-[700px] overflow-hidden rounded-2xl bg-zinc-950">
       <LiveKitRoom
         key={roomKey}
         token={token}
-        serverUrl={serverUrl}
+        serverUrl={wsUrl}
         connect={true}
-        audio={choices?.audioEnabled ?? true}
         video={choices?.videoEnabled ?? true}
+        audio={choices?.audioEnabled ?? true}
+        onDisconnected={handleDisconnected}
+        onError={(err) => {
+          console.error("LiveKitRoom error:", err);
+          setError(err?.message || "Video room error");
+        }}
+        className="h-full rounded-2xl"
         options={{
           adaptiveStream: true,
           dynacast: true,
         }}
-        onDisconnected={handleDisconnected}
-        onError={(err) => {
-          console.error("LiveKitRoom error:", err);
-          setError(err?.message || "Ocurrió un error en la videollamada");
-        }}
-        className="h-full"
       >
         <div className="h-full [&_.lk-control-bar]:!bg-black/75 [&_.lk-control-bar]:!backdrop-blur [&_.lk-participant-tile]:!rounded-2xl">
           <VideoConference />
           <RoomAudioRenderer />
         </div>
-
-        <button
-          onClick={handleCancel}
-          className="absolute bottom-24 right-4 z-50 flex items-center gap-2 rounded-full bg-zinc-700 px-4 py-2 text-white transition hover:bg-zinc-600"
-        >
-          <PhoneOff className="h-5 w-5" />
-          Salir
-        </button>
       </LiveKitRoom>
     </div>
   );
