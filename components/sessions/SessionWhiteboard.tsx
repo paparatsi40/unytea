@@ -1,10 +1,26 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { Tldraw, exportAs, exportToBlob } from "@tldraw/tldraw";
-import "@tldraw/tldraw/tldraw.css";
-import { X, Download, Image as ImageIcon, FileJson } from "lucide-react";
+import { useState, useEffect } from "react";
+import { X, Download, Image as ImageIcon, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import dynamic from "next/dynamic";
+import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types/types";
+
+// Dynamic import to avoid SSR issues
+const Excalidraw = dynamic(
+  async () => (await import("@excalidraw/excalidraw")).Excalidraw,
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex h-full items-center justify-center">
+        <div className="text-center">
+          <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-purple-600 border-t-transparent" />
+          <p className="text-sm text-gray-600">Loading whiteboard...</p>
+        </div>
+      </div>
+    ),
+  }
+);
 
 interface SessionWhiteboardProps {
   isOpen: boolean;
@@ -13,21 +29,18 @@ interface SessionWhiteboardProps {
 }
 
 export function SessionWhiteboard({ isOpen, onClose, sessionId }: SessionWhiteboardProps) {
-  const [editor, setEditor] = useState<any>(null);
-
-  const handleMount = useCallback((editorInstance: any) => {
-    setEditor(editorInstance);
-  }, []);
+  const [excalidrawAPI, setExcalidrawAPI] = useState<ExcalidrawImperativeAPI | null>(null);
 
   const handleExportPNG = async () => {
-    if (!editor) return;
+    if (!excalidrawAPI) return;
     
     try {
+      const { exportToBlob } = await import("@excalidraw/excalidraw");
       const blob = await exportToBlob({
-        editor,
-        ids: editor.getCurrentPageShapeIds(),
-        format: "png",
-        opts: { background: true },
+        elements: excalidrawAPI.getSceneElements(),
+        appState: excalidrawAPI.getAppState(),
+        files: excalidrawAPI.getFiles(),
+        mimeType: "image/png",
       });
       
       const url = URL.createObjectURL(blob);
@@ -41,22 +54,9 @@ export function SessionWhiteboard({ isOpen, onClose, sessionId }: SessionWhitebo
     }
   };
 
-  const handleExportJSON = () => {
-    if (!editor) return;
-    
-    try {
-      const snapshot = editor.store.getSnapshot();
-      const json = JSON.stringify(snapshot, null, 2);
-      const blob = new Blob([json], { type: "application/json" });
-      
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `whiteboard-${sessionId}-${Date.now()}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error("Error exporting JSON:", error);
+  const handleClear = () => {
+    if (excalidrawAPI) {
+      excalidrawAPI.updateScene({ elements: [] });
     }
   };
 
@@ -82,26 +82,27 @@ export function SessionWhiteboard({ isOpen, onClose, sessionId }: SessionWhitebo
             </div>
             
             <div className="flex items-center gap-2">
-              {/* Export Buttons */}
+              {/* Export PNG */}
               <button
                 onClick={handleExportPNG}
                 className="flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-sm text-white transition-colors hover:bg-white/20"
                 title="Export as PNG"
               >
                 <ImageIcon className="h-4 w-4" />
-                PNG
+                Export PNG
               </button>
               
+              {/* Clear */}
               <button
-                onClick={handleExportJSON}
+                onClick={handleClear}
                 className="flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-sm text-white transition-colors hover:bg-white/20"
-                title="Export as JSON"
+                title="Clear canvas"
               >
-                <FileJson className="h-4 w-4" />
-                JSON
+                <Trash2 className="h-4 w-4" />
+                Clear
               </button>
 
-              {/* Close Button */}
+              {/* Close */}
               <button
                 onClick={onClose}
                 className="ml-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
@@ -112,19 +113,23 @@ export function SessionWhiteboard({ isOpen, onClose, sessionId }: SessionWhitebo
             </div>
           </div>
 
-          {/* Whiteboard Canvas */}
+          {/* Excalidraw Canvas */}
           <div className="flex-1 overflow-hidden">
-            <Tldraw
-              onMount={handleMount}
-              className="h-full w-full"
+            <Excalidraw
+              excalidrawAPI={(api) => setExcalidrawAPI(api)}
+              theme="light"
+              UIOptions={{
+                canvasActions: {
+                  changeViewBackgroundColor: true,
+                  clearCanvas: false,
+                  export: false,
+                  loadScene: false,
+                  saveToActiveFile: false,
+                  saveAsImage: false,
+                  toggleTheme: false,
+                },
+              }}
             />
-          </div>
-
-          {/* Footer Tips */}
-          <div className="border-t border-gray-200 bg-gray-50 px-4 py-2">
-            <p className="text-xs text-gray-500">
-              <strong>Tips:</strong> Double-click to add text • Drag to select • Right-click for menu • Use toolbar for shapes
-            </p>
           </div>
         </motion.div>
       )}
