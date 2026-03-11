@@ -36,7 +36,7 @@ function VideoGrid() {
   
   const allParticipants = localParticipant ? [localParticipant, ...participants] : participants;
   const participantsWithVideo = allParticipants.filter(p => 
-    Array.from(p.videoTracks.values()).some(t => !t.isMuted && t.track)
+    p.videoTracks.size > 0 && Array.from(p.videoTracks.values()).some(t => t.track && !t.track.isMuted)
   );
   
   if (participantsWithVideo.length === 0) {
@@ -54,11 +54,11 @@ function VideoGrid() {
     <div className="grid h-full w-full grid-cols-1 gap-2 p-2">
       {participantsWithVideo.map((participant) => (
         <div key={participant.identity} className="relative aspect-video overflow-hidden rounded-lg bg-gray-800">
-          {Array.from(participant.videoTracks.values()).map((trackRef) => (
-            trackRef.track && !trackRef.isMuted ? (
+          {Array.from(participant.videoTracks.values()).map((trackPub) => (
+            trackPub.track && !trackPub.track.isMuted ? (
               <VideoTrack 
-                key={trackRef.trackSid} 
-                trackRef={trackRef}
+                key={trackPub.trackSid} 
+                trackRef={trackPub}
                 className="h-full w-full object-cover"
               />
             ) : null
