@@ -112,10 +112,10 @@ export function VideoRoom({ roomName, onLeave, sessionId }: VideoRoomProps) {
       {/* Whiteboard Toggle Button */}
       <button
         onClick={() => setShowWhiteboard(!showWhiteboard)}
-        className={`absolute bottom-4 right-4 z-40 flex items-center gap-2 rounded-full px-4 py-2 font-medium shadow-lg transition-all ${
+        className={`absolute bottom-20 right-4 z-[100] flex items-center gap-2 rounded-full px-4 py-2 font-medium shadow-xl transition-all hover:scale-105 ${
           showWhiteboard
             ? "bg-purple-600 text-white hover:bg-purple-700"
-            : "bg-white text-gray-700 hover:bg-gray-100"
+            : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
         }`}
       >
         <Presentation className="h-5 w-5" />
