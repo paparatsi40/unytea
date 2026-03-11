@@ -1,225 +1,15 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import {
   LiveKitRoom,
+  VideoConference,
   RoomAudioRenderer,
-  useConnectionState,
-  useTracks,
   ControlBar,
-  useLocalParticipant,
-  VideoTrack,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
-import { Loader2, Presentation, AlertCircle, VideoOff, Camera, Mic, RefreshCw } from "lucide-react";
+import { Loader2, Presentation, AlertCircle } from "lucide-react";
 import { SessionWhiteboard } from "./SessionWhiteboard";
-import { Track } from "livekit-client";
-
-// Connection status component
-function ConnectionStatus({ isVideoEnabled, isAudioEnabled }: { isVideoEnabled: boolean; isAudioEnabled: boolean }) {
-  const connectionState = useConnectionState();
-  
-  return (
-    <div className="absolute bottom-4 left-4 flex flex-col items-start gap-2 max-w-xs" style={{ zIndex: 10 }}>
-      <div className="rounded-full bg-black/70 px-3 py-1 text-xs text-white flex items-center gap-2">
-        <span>Status: {connectionState}</span>
-        {isVideoEnabled && <Camera className="h-3 w-3 text-green-400" />}
-        {isAudioEnabled && <Mic className="h-3 w-3 text-green-400" />}
-      </div>
-    </div>
-  );
-}
-
-// Video grid component using LiveKit's native VideoTrack component
-function VideoGrid() {
-  // Get all camera tracks from all participants (including pending tracks)
-  const cameraTracks = useTracks([Track.Source.Camera]);
-  const screenShareTracks = useTracks([Track.Source.ScreenShare]);
-  
-  const allTracks = [...cameraTracks, ...screenShareTracks];
-  
-  if (allTracks.length === 0) {
-    return (
-      <div className="flex h-full flex-col items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="mx-auto mb-4 h-16 w-16 animate-spin text-purple-400" />
-          <p className="text-gray-300 mb-4 text-lg">Iniciando cámara...</p>
-          <p className="text-gray-500 text-sm">Por favor espera un momento</p>
-        </div>
-      </div>
-    );
-  }
-  
-  return (
-    <div className="grid h-full w-full grid-cols-1 gap-2 p-2 md:grid-cols-2">
-      {allTracks.map((trackRef) => (
-        <div 
-          key={trackRef.publication.trackSid} 
-          className="relative overflow-hidden rounded-lg bg-gray-900"
-          style={{ minHeight: '300px' }}
-        >
-          <VideoTrack 
-            trackRef={trackRef}
-            className="w-full h-full object-cover"
-            style={{ width: '100%', height: '100%', minHeight: '300px' }}
-          />
-          <div className="absolute bottom-2 left-2 rounded bg-black/70 px-2 py-1 text-xs text-white">
-            {trackRef.participant.identity || 'Unknown'}
-            {trackRef.participant.isLocal && <span className="ml-1 text-green-400">● Tú</span>}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// Inner room component that has access to LiveKit hooks
-function RoomContent({ 
-  sessionId, 
-  showWhiteboard, 
-  setShowWhiteboard 
-}: { 
-  sessionId?: string;
-  showWhiteboard: boolean;
-  setShowWhiteboard: (v: boolean) => void;
-}) {
-  const { localParticipant } = useLocalParticipant();
-  const [isVideoEnabled, setIsVideoEnabled] = useState(false);
-  const [isAudioEnabled, setIsAudioEnabled] = useState(false);
-  const [isActivating, setIsActivating] = useState(false);
-  const [activationError, setActivationError] = useState("");
-
-  const activateCamera = useCallback(async () => {
-    if (!localParticipant) {
-      setActivationError("No hay conexión con la sala");
-      return;
-    }
-    
-    setIsActivating(true);
-    setActivationError("");
-    
-    try {
-      console.log("Activating camera via LiveKit...");
-      // Enable camera and microphone through LiveKit
-      await localParticipant.setCameraEnabled(true);
-      await localParticipant.setMicrophoneEnabled(true);
-      
-      setIsVideoEnabled(true);
-      setIsAudioEnabled(true);
-      console.log("Camera and microphone activated successfully");
-    } catch (err: any) {
-      console.error("Error accessing camera:", err);
-      setActivationError(`Error: ${err.message || "No se pudo acceder a la cámara"}`);
-    } finally {
-      setIsActivating(false);
-    }
-  }, [localParticipant]);
-
-  return (
-    <>
-      <ConnectionStatus isVideoEnabled={isVideoEnabled} isAudioEnabled={isAudioEnabled} />
-      <RoomAudioRenderer />
-      
-      {/* Show activation button if camera not enabled yet */}
-      {!isVideoEnabled && !isAudioEnabled && (
-        <div className="absolute inset-0 flex items-center justify-center" style={{ zIndex: 30, background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)' }}>
-          <div className="text-center px-4">
-            <VideoOff className="mx-auto mb-4 h-16 w-16 text-gray-400" />
-            <p className="mb-6 text-lg text-gray-300">
-              Cámara y micrófono están apagados
-            </p>
-            
-            {activationError && (
-              <div className="mb-4 rounded-lg bg-red-600/90 px-4 py-3 text-sm text-white max-w-sm">
-                {activationError}
-              </div>
-            )}
-            
-            <button
-              onClick={activateCamera}
-              disabled={isActivating || !localParticipant}
-              className="flex items-center justify-center gap-3 rounded-full bg-purple-600 px-6 py-3 text-lg font-medium text-white shadow-lg transition-all hover:scale-105 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isActivating ? (
-                <>
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                  Solicitando permisos...
-                </>
-              ) : (
-                <>
-                  <Camera className="h-6 w-6" />
-                  Activar Cámara y Micrófono
-                </>
-              )}
-            </button>
-            <p className="mt-4 text-sm text-gray-500">
-              {localParticipant ? "Se solicitarán permisos al navegador" : "Conectando a la sala..."}
-            </p>
-          </div>
-        </div>
-      )}
-      
-      {/* Custom video grid - shows actual video or placeholder */}
-      {(isVideoEnabled || isAudioEnabled) && (
-        <div className="flex h-full flex-col">
-          <div className="flex-1 overflow-hidden">
-            <VideoGrid />
-          </div>
-          <div className="shrink-0">
-            <ControlBar />
-          </div>
-        </div>
-      )}
-
-      {/* Toggle button to restart camera if needed */}
-      {(isVideoEnabled || isAudioEnabled) && (
-        <button
-          onClick={async () => {
-            if (localParticipant) {
-              try {
-                await localParticipant.setCameraEnabled(false);
-                await localParticipant.setMicrophoneEnabled(false);
-              } catch (err) {
-                console.error("Error disabling camera:", err);
-              }
-            }
-            setIsVideoEnabled(false);
-            setIsAudioEnabled(false);
-            setActivationError("");
-          }}
-          className="absolute top-4 right-4 flex items-center gap-2 rounded-full bg-gray-800/80 px-3 py-1.5 text-xs text-white hover:bg-gray-700"
-          style={{ zIndex: 40 }}
-        >
-          <RefreshCw className="h-3 w-3" />
-          Reiniciar Cámara
-        </button>
-      )}
-
-      {/* Whiteboard Toggle Button */}
-      <button
-        onClick={() => setShowWhiteboard(!showWhiteboard)}
-        className={`absolute bottom-20 right-4 flex items-center gap-2 rounded-full px-4 py-2 font-medium shadow-xl transition-all hover:scale-105 ${
-          showWhiteboard
-            ? "bg-purple-600 text-white hover:bg-purple-700"
-            : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
-        }`}
-        style={{ zIndex: 40 }}
-      >
-        <Presentation className="h-5 w-5" />
-        {showWhiteboard ? "Close Whiteboard" : "Open Whiteboard"}
-      </button>
-
-      {/* Whiteboard Overlay */}
-      {sessionId && (
-        <SessionWhiteboard
-          isOpen={showWhiteboard}
-          onClose={() => setShowWhiteboard(false)}
-          sessionId={sessionId}
-        />
-      )}
-    </>
-  );
-}
 
 interface VideoRoomProps {
   roomName: string;
@@ -257,7 +47,7 @@ export function VideoRoom({ roomName, onLeave, sessionId }: VideoRoomProps) {
         if (!data.token) {
           throw new Error("No token received from server");
         }
-        console.log("Got LiveKit token, wsUrl:", data.wsUrl);
+        console.log("Got LiveKit token");
         setToken(data.token);
       } catch (err) {
         console.error("Error getting token:", err);
@@ -290,14 +80,6 @@ export function VideoRoom({ roomName, onLeave, sessionId }: VideoRoomProps) {
             Video Connection Failed
           </p>
           <p className="text-sm text-muted-foreground mb-4">{error}</p>
-          <div className="text-xs text-muted-foreground bg-muted p-3 rounded-lg">
-            <p className="font-medium mb-1">Possible causes:</p>
-            <ul className="text-left list-disc pl-4 space-y-1">
-              <li>LiveKit server not configured</li>
-              <li>Camera/microphone permissions denied</li>
-              <li>Network connection issue</li>
-            </ul>
-          </div>
         </div>
       </div>
     );
@@ -325,12 +107,8 @@ export function VideoRoom({ roomName, onLeave, sessionId }: VideoRoomProps) {
             LiveKit Not Configured
           </p>
           <p className="text-sm text-muted-foreground mb-4">
-            The video call service is not properly configured. Please contact support.
+            Missing environment variable: NEXT_PUBLIC_LIVEKIT_URL
           </p>
-          <div className="text-xs text-muted-foreground bg-muted p-3 rounded-lg text-left">
-            <p className="font-medium">Missing environment variable:</p>
-            <code className="block mt-1 text-destructive">NEXT_PUBLIC_LIVEKIT_URL</code>
-          </div>
         </div>
       </div>
     );
@@ -339,8 +117,8 @@ export function VideoRoom({ roomName, onLeave, sessionId }: VideoRoomProps) {
   return (
     <div className="relative h-[600px] w-full overflow-hidden rounded-xl bg-card">
       <LiveKitRoom
-        video={false}
-        audio={false}
+        video={true}
+        audio={true}
         token={token}
         serverUrl={serverUrl}
         connect={true}
@@ -354,11 +132,35 @@ export function VideoRoom({ roomName, onLeave, sessionId }: VideoRoomProps) {
           dynacast: true,
         }}
       >
-        <RoomContent 
-          sessionId={sessionId}
-          showWhiteboard={showWhiteboard}
-          setShowWhiteboard={setShowWhiteboard}
-        />
+        {/* Native LiveKit Video Conference */}
+        <div className="flex h-full flex-col">
+          <div className="flex-1 relative">
+            <VideoConference />
+          </div>
+          <RoomAudioRenderer />
+        </div>
+
+        {/* Whiteboard Toggle Button */}
+        <button
+          onClick={() => setShowWhiteboard(!showWhiteboard)}
+          className={`absolute bottom-20 right-4 flex items-center gap-2 rounded-full px-4 py-2 font-medium shadow-xl transition-all hover:scale-105 z-50 ${
+            showWhiteboard
+              ? "bg-purple-600 text-white hover:bg-purple-700"
+              : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
+          }`}
+        >
+          <Presentation className="h-5 w-5" />
+          {showWhiteboard ? "Close Whiteboard" : "Open Whiteboard"}
+        </button>
+
+        {/* Whiteboard Overlay */}
+        {sessionId && (
+          <SessionWhiteboard
+            isOpen={showWhiteboard}
+            onClose={() => setShowWhiteboard(false)}
+            sessionId={sessionId}
+          />
+        )}
       </LiveKitRoom>
     </div>
   );
