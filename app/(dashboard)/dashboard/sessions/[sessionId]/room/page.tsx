@@ -1,5 +1,5 @@
 "use client";
-
+import { CameraDebug } from "@/components/sessions/CameraDebug";
 import { getSession } from "@/app/actions/sessions";
 import { VideoRoom } from "@/components/sessions/VideoRoom";
 import { useCurrentUser } from "@/hooks/use-current-user";
@@ -92,12 +92,7 @@ export default function SessionRoomPage({
 
       {/* Video Room */}
       <VideoRoom
-        roomName={videoSession.roomId}
-        sessionId={videoSession.id}
-        onLeave={() => {
-          router.push("/dashboard/sessions");
-        }}
-      />
+        <CameraDebug />
     </div>
   );
 }
