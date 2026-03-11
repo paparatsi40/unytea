@@ -6,8 +6,8 @@ import {
   RoomAudioRenderer,
   useConnectionState,
   useTracks,
-  TrackLoop,
   VideoTrack,
+  ParticipantTile,
   ControlBar,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
@@ -44,7 +44,7 @@ function VideoGrid() {
         <div className="text-center">
           <VideoOff className="mx-auto mb-4 h-16 w-16 text-gray-500" />
           <p className="text-gray-400">Esperando video...</p>
-          <p className="mt-2 text-xs text-gray-500">Nadie ha activado su cámara aún</p>
+          <p className="mt-2 text-xs text-gray-500">Activa tu cámara para comenzar</p>
         </div>
       </div>
     );
@@ -52,14 +52,17 @@ function VideoGrid() {
   
   return (
     <div className="grid h-full w-full grid-cols-1 gap-2 p-2 md:grid-cols-2">
-      <TrackLoop tracks={allTracks}>
-        <div className="relative aspect-video overflow-hidden rounded-lg bg-gray-800">
-          <VideoTrack className="h-full w-full object-cover" />
+      {allTracks.map((trackRef) => (
+        <div key={trackRef.publication.trackSid} className="relative aspect-video overflow-hidden rounded-lg bg-gray-800">
+          <VideoTrack 
+            trackRef={trackRef}
+            className="h-full w-full object-cover"
+          />
           <div className="absolute bottom-2 left-2 rounded bg-black/50 px-2 py-1 text-xs text-white">
-            {/* Participant name shown via context */}
+            {trackRef.participant.identity}
           </div>
         </div>
-      </TrackLoop>
+      ))}
     </div>
   );
 }
