@@ -34,7 +34,7 @@ interface VideoRoomProps {
 type RemoteTrackEntry = {
   participantSid: string;
   participantIdentity: string;
-  trackSid: string | undefined;
+  trackSid: string;
   kind: Track.Kind;
   track: Track;
 };
@@ -73,7 +73,7 @@ function RemoteVideoTile({ entry }: { entry: RemoteTrackEntry }) {
 }
 
 export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
-  const [_room, setRoom] = useState<Room | null>(null);
+  const [room, setRoom] = useState<Room | null>(null);
   const [localTracks, setLocalTracks] = useState<LocalTrack[]>([]);
   const [remoteTracks, setRemoteTracks] = useState<RemoteTrackEntry[]>([]);
 
@@ -84,6 +84,11 @@ export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
 
   const [cameraEnabled, setCameraEnabled] = useState(false);
   const [microphoneEnabled, setMicrophoneEnabled] = useState(false);
+
+  const localVideoRef = useRef<HTMLVideoElement | null>(null);
+  const roomRef = useRef<Room | null>(null);
+  const localTracksRef = useRef<LocalTrack[]>([]);
+  const didNotifyLeaveRef = useRef(false);
 
   const localVideoTrack = useMemo(
     () =>
@@ -123,39 +128,59 @@ export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
     setRemoteTracks((prev) => prev.filter((item) => item.trackSid !== track.sid));
   }, []);
 
-  const cleanupRoom = useCallback(() => {
-    setRemoteTracks([]);
-    setIsConnected(false);
-    setHasJoined(false);
-
-    setLocalTracks((prev) => {
-      for (const track of prev) {
-        try {
-          track.stop();
-        } catch {}
-      }
-      return [];
-    });
-
-    setRoom((prevRoom) => {
-      if (prevRoom) {
-        try {
-          prevRoom.disconnect();
-        } catch {}
-      }
-      return null;
-    });
-
-    setCameraEnabled(false);
-    setMicrophoneEnabled(false);
-    setError("");
+  const stopAndClearLocalTracks = useCallback(() => {
+    for (const track of localTracksRef.current) {
+      try {
+        track.stop();
+      } catch {}
+    }
+    localTracksRef.current = [];
+    setLocalTracks([]);
   }, []);
+
+  const disconnectRoom = useCallback(() => {
+    const currentRoom = roomRef.current;
+    roomRef.current = null;
+    setRoom(null);
+
+    if (currentRoom) {
+      try {
+        currentRoom.disconnect();
+      } catch {}
+    }
+  }, []);
+
+  const cleanupRoom = useCallback(
+    (notifyLeave: boolean) => {
+      setRemoteTracks([]);
+      setIsConnected(false);
+      setHasJoined(false);
+      setCameraEnabled(false);
+      setMicrophoneEnabled(false);
+
+      const videoEl = localVideoRef.current;
+      if (videoEl) {
+        videoEl.pause();
+        videoEl.srcObject = null;
+      }
+
+      stopAndClearLocalTracks();
+      disconnectRoom();
+
+      if (notifyLeave && !didNotifyLeaveRef.current) {
+        didNotifyLeaveRef.current = true;
+        onLeave?.();
+      }
+    },
+    [disconnectRoom, onLeave, stopAndClearLocalTracks]
+  );
 
   const joinRoom = useCallback(async () => {
     let createdRoom: Room | null = null;
     let createdTracks: LocalTrack[] = [];
 
     try {
+      didNotifyLeaveRef.current = false;
       setIsPreparing(true);
       setError("");
 
@@ -199,6 +224,9 @@ export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
         },
       });
 
+      localTracksRef.current = createdTracks;
+      setLocalTracks(createdTracks);
+
       const previewTrack = createdTracks.find(
         (t) => t.kind === Track.Kind.Video
       ) as LocalVideoTrack | undefined;
@@ -207,18 +235,32 @@ export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
         (t) => t.kind === Track.Kind.Audio
       ) as LocalAudioTrack | undefined;
 
-      setLocalTracks(createdTracks);
+      if (previewTrack && localVideoRef.current) {
+        const mediaStream = new MediaStream([previewTrack.mediaStreamTrack]);
+        localVideoRef.current.srcObject = mediaStream;
+        localVideoRef.current.muted = true;
+        localVideoRef.current.playsInline = true;
 
-      if (previewTrack) {
-        setCameraEnabled(true);
+        try {
+          await localVideoRef.current.play();
+        } catch (playError) {
+          console.warn("Local preview play() warning:", playError);
+        }
+
+        setCameraEnabled(!previewTrack.isMuted);
+      } else {
+        setCameraEnabled(false);
       }
 
-      setMicrophoneEnabled(!!micTrack);
+      setMicrophoneEnabled(!!micTrack && !micTrack.isMuted);
 
       createdRoom = new Room({
         adaptiveStream: true,
         dynacast: true,
       });
+
+      roomRef.current = createdRoom;
+      setRoom(createdRoom);
 
       createdRoom.on(RoomEvent.TrackSubscribed, (track, _pub, participant) => {
         addRemoteTrack(track, participant);
@@ -239,7 +281,6 @@ export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
 
       createdRoom.on(RoomEvent.Disconnected, () => {
         setIsConnected(false);
-        onLeave?.();
       });
 
       createdRoom.on(RoomEvent.ConnectionStateChanged, (state: ConnectionState) => {
@@ -252,7 +293,6 @@ export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
         await createdRoom.localParticipant.publishTrack(track);
       }
 
-      setRoom(createdRoom);
       setHasJoined(true);
     } catch (err) {
       console.error("Video setup error:", err);
@@ -269,6 +309,12 @@ export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
         } catch {}
       }
 
+      const videoEl = localVideoRef.current;
+      if (videoEl) {
+        videoEl.pause();
+        videoEl.srcObject = null;
+      }
+
       let message = "No se pudo iniciar la videollamada";
       if (err instanceof Error) {
         if (err.name === "NotAllowedError") {
@@ -282,22 +328,47 @@ export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
         }
       }
 
+      localTracksRef.current = [];
+      roomRef.current = null;
+
       setError(message);
       setLocalTracks([]);
       setCameraEnabled(false);
       setMicrophoneEnabled(false);
       setRoom(null);
       setHasJoined(false);
+      setIsConnected(false);
     } finally {
       setIsPreparing(false);
     }
-  }, [roomName, addRemoteTrack, removeRemoteTrack, onLeave]);
+  }, [roomName, addRemoteTrack, removeRemoteTrack]);
 
   useEffect(() => {
     return () => {
-      cleanupRoom();
+      cleanupRoom(false);
     };
   }, [cleanupRoom]);
+
+  useEffect(() => {
+    const el = localVideoRef.current;
+    if (!el || !localVideoTrack) return;
+
+    const mediaStream = new MediaStream([localVideoTrack.mediaStreamTrack]);
+    el.srcObject = mediaStream;
+    el.muted = true;
+    el.playsInline = true;
+
+    el.play().catch((err) => {
+      console.warn("Local video replay warning:", err);
+    });
+
+    return () => {
+      if (el.srcObject === mediaStream) {
+        el.pause();
+        el.srcObject = null;
+      }
+    };
+  }, [localVideoTrack]);
 
   const toggleCamera = useCallback(async () => {
     try {
@@ -311,9 +382,24 @@ export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
       if (cameraEnabled) {
         await localVideoTrack.mute();
         setCameraEnabled(false);
+
+        const el = localVideoRef.current;
+        if (el) {
+          el.pause();
+          el.srcObject = null;
+        }
       } else {
         await localVideoTrack.unmute();
         setCameraEnabled(true);
+
+        const el = localVideoRef.current;
+        if (el) {
+          const mediaStream = new MediaStream([localVideoTrack.mediaStreamTrack]);
+          el.srcObject = mediaStream;
+          await el.play().catch((err) => {
+            console.warn("Local video play after unmute warning:", err);
+          });
+        }
       }
     } catch (err) {
       console.error("toggleCamera error:", err);
@@ -344,9 +430,8 @@ export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
   }, [microphoneEnabled, localAudioTrack]);
 
   const leaveRoom = useCallback(() => {
-    cleanupRoom();
-    onLeave?.();
-  }, [cleanupRoom, onLeave]);
+    cleanupRoom(true);
+  }, [cleanupRoom]);
 
   if (!hasJoined) {
     return (
@@ -404,13 +489,11 @@ export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
       <div className="grid h-full grid-cols-1 gap-4 p-4 md:grid-cols-2">
         <div className="relative min-h-[300px] overflow-hidden rounded-2xl bg-black">
           <video
-            ref={(el) => {
-              if (!el || !localVideoTrack) return;
-              localVideoTrack.attach(el);
-            }}
+            ref={localVideoRef}
             autoPlay
             playsInline
             muted
+            disablePictureInPicture
             className="h-full w-full object-cover"
           />
           <div className="absolute bottom-3 left-3 rounded bg-black/60 px-2 py-1 text-xs text-white">
