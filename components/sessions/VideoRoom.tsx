@@ -1,13 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   LiveKitRoom,
   VideoConference,
   RoomAudioRenderer,
+  useConnectionState,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
-import { Loader2 } from "lucide-react";
+import { Loader2, AlertCircle } from "lucide-react";
+
+// Connection status component to debug
+function ConnectionStatus() {
+  const connectionState = useConnectionState();
+  
+  useEffect(() => {
+    console.log("LiveKit Connection State:", connectionState);
+  }, [connectionState]);
+  
+  return (
+    <div className="absolute top-4 left-4 z-50 rounded bg-black/70 px-3 py-1 text-xs text-white">
+      Status: {connectionState}
+    </div>
+  );
+}
 
 interface VideoRoomProps {
   roomName: string;
@@ -20,6 +36,8 @@ export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
   const [wsUrl, setWsUrl] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [connectionError, setConnectionError] = useState<string | null>(null);
+  const hasConnected = useRef(false);
 
   useEffect(() => {
     async function fetchToken() {
@@ -60,6 +78,25 @@ export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
     fetchToken();
   }, [roomName]);
 
+  const handleDisconnected = () => {
+    console.log("Disconnected, hasConnected:", hasConnected.current);
+    // Only redirect if we were previously connected
+    if (hasConnected.current && onLeave) {
+      onLeave();
+    }
+  };
+
+  const handleError = (err: Error) => {
+    console.error("LiveKit Room Error:", err);
+    setConnectionError(err.message);
+  };
+
+  const handleConnected = () => {
+    console.log("Connected to LiveKit room");
+    hasConnected.current = true;
+    setConnectionError(null);
+  };
+
   if (loading) {
     return (
       <div className="flex h-[600px] items-center justify-center">
@@ -71,6 +108,7 @@ export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
   if (error) {
     return (
       <div className="flex h-[600px] items-center justify-center text-red-500">
+        <AlertCircle className="mr-2 h-5 w-5" />
         {error}
       </div>
     );
@@ -79,18 +117,29 @@ export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
   if (!token || !wsUrl) return null;
 
   return (
-    <LiveKitRoom
-      token={token}
-      serverUrl={wsUrl}
-      connect={true}
-      video={false}
-      audio={false}
-      onDisconnected={onLeave}
-      className="h-[700px]"
-    >
-      <VideoConference />
-
-      <RoomAudioRenderer />
-    </LiveKitRoom>
+    <div className="relative">
+      {connectionError && (
+        <div className="mb-4 rounded bg-red-100 p-3 text-red-700">
+          <AlertCircle className="mr-2 inline h-4 w-4" />
+          Connection Error: {connectionError}
+        </div>
+      )}
+      
+      <LiveKitRoom
+        token={token}
+        serverUrl={wsUrl}
+        connect={true}
+        video={false}
+        audio={false}
+        onDisconnected={handleDisconnected}
+        onError={handleError}
+        onConnected={handleConnected}
+        className="h-[700px]"
+      >
+        <ConnectionStatus />
+        <VideoConference />
+        <RoomAudioRenderer />
+      </LiveKitRoom>
+    </div>
   );
 }
