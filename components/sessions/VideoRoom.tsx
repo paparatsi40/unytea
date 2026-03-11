@@ -76,12 +76,12 @@ function VideoGrid() {
 
 // Inner room component that has access to LiveKit hooks
 function RoomContent({ 
-  onLeave, 
+  _onLeave, 
   sessionId, 
   showWhiteboard, 
   setShowWhiteboard 
 }: { 
-  onLeave?: () => void;
+  _onLeave?: () => void;
   sessionId?: string;
   showWhiteboard: boolean;
   setShowWhiteboard: (v: boolean) => void;
@@ -358,7 +358,7 @@ export function VideoRoom({ roomName, onLeave, sessionId }: VideoRoomProps) {
         }}
       >
         <RoomContent 
-          onLeave={onLeave}
+          _onLeave={onLeave}
           sessionId={sessionId}
           showWhiteboard={showWhiteboard}
           setShowWhiteboard={setShowWhiteboard}
