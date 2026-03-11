@@ -5,7 +5,6 @@ import {
   LiveKitRoom,
   VideoConference,
   RoomAudioRenderer,
-  ControlBar,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
 import { Loader2, Presentation, AlertCircle } from "lucide-react";
