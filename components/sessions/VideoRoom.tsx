@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef, memo } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   LiveKitRoom,
   RoomAudioRenderer,
@@ -8,6 +8,7 @@ import {
   useTracks,
   ControlBar,
   useLocalParticipant,
+  VideoTrack,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
 import { Loader2, Presentation, AlertCircle, VideoOff, Camera, Mic, RefreshCw, Video } from "lucide-react";
@@ -95,7 +96,7 @@ function ConnectionStatus({ isVideoEnabled, isAudioEnabled }: { isVideoEnabled: 
   );
 }
 
-// Video grid component using useTracks with manual video element rendering
+// Video grid component using LiveKit's native VideoTrack component
 function VideoGrid() {
   // Get all camera tracks from all participants
   const cameraTracks = useTracks([Track.Source.Camera], { onlySubscribed: false });
@@ -119,151 +120,28 @@ function VideoGrid() {
   return (
     <div className="grid h-full w-full grid-cols-1 gap-2 p-2 md:grid-cols-2">
       {allTracks.map((trackRef) => (
-        <VideoTile key={trackRef.publication.trackSid} trackRef={trackRef} />
+        <div 
+          key={trackRef.publication.trackSid} 
+          className="relative overflow-hidden rounded-lg bg-gray-900"
+          style={{ minHeight: '300px' }}
+        >
+          <VideoTrack 
+            trackRef={trackRef}
+            className="w-full h-full object-cover"
+            style={{ width: '100%', height: '100%', minHeight: '300px' }}
+          />
+          <div className="absolute bottom-2 left-2 rounded bg-black/70 px-2 py-1 text-xs text-white">
+            {trackRef.participant.identity || 'Unknown'}
+            {trackRef.participant.isLocal && <span className="ml-1 text-green-400">● Tú</span>}
+          </div>
+        </div>
       ))}
     </div>
   );
 }
 
 // Individual video tile component - memoized to prevent re-renders
-const VideoTile = memo(function VideoTile({ trackRef }: { trackRef: any }) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const hasAttached = useRef(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [needsManualPlay, setNeedsManualPlay] = useState(false);
-  
-  // Get stable values that won't change on re-renders
-  const trackSid = trackRef.publication?.trackSid;
-  const participantIdentity = trackRef.participant?.identity || 'Unknown';
-  
-  useEffect(() => {
-    const video = videoRef.current;
-    const publication = trackRef.publication;
-    const track = publication?.track;
-    
-    // Only attach once per trackSid
-    if (hasAttached.current || !video || !track || !track.mediaStream) {
-      return undefined;
-    }
-    
-    console.log("✅ Attaching track:", participantIdentity, trackSid);
-    hasAttached.current = true;
-    
-    // Always mute initially for autoplay to work
-    video.muted = true;
-    
-    try {
-      // Use LiveKit's attach method
-      track.attach(video);
-      
-      // Set srcObject
-      if (video.srcObject !== track.mediaStream) {
-        video.srcObject = track.mediaStream;
-      }
-      
-      // Play with better error handling
-      const playVideo = async () => {
-        try {
-          await video.play();
-          console.log("▶️ Video playing:", participantIdentity);
-          setIsPlaying(true);
-          setNeedsManualPlay(false);
-        } catch (err: any) {
-          console.warn("Auto-play blocked for:", participantIdentity, err?.message);
-          setNeedsManualPlay(true);
-        }
-      };
-      
-      // Small delay to ensure stream is ready
-      const timeoutId = setTimeout(playVideo, 100);
-      
-      // Listen for play/pause events
-      const handlePlaying = () => setIsPlaying(true);
-      const handlePause = () => setIsPlaying(false);
-      video.addEventListener('playing', handlePlaying);
-      video.addEventListener('pause', handlePause);
-      
-      return () => {
-        clearTimeout(timeoutId);
-        video.removeEventListener('playing', handlePlaying);
-        video.removeEventListener('pause', handlePause);
-        
-        if (hasAttached.current) {
-          console.log("🧹 Cleaning up video:", participantIdentity);
-          track.detach(video);
-          if (video) {
-            video.srcObject = null;
-            video.pause();
-          }
-          hasAttached.current = false;
-        }
-      };
-    } catch (err) {
-      console.error("Error attaching track:", participantIdentity, err);
-      hasAttached.current = false;
-      return undefined;
-    }
-  }, [trackSid, participantIdentity]);
-  
-  const track = trackRef.publication?.track;
-  const isReady = track?.mediaStream;
-  
-  const handleManualPlay = () => {
-    const video = videoRef.current;
-    if (video) {
-      video.muted = true;
-      video.play().then(() => {
-        setIsPlaying(true);
-        setNeedsManualPlay(false);
-      });
-    }
-  };
-  
-  return (
-    <div 
-      className="relative overflow-hidden rounded-lg bg-gray-900 flex items-center justify-center" 
-      style={{ minHeight: '300px', minWidth: '400px', border: '2px solid green' }}
-    >
-      <video
-        ref={videoRef}
-        autoPlay
-        playsInline
-        muted
-        className="w-full h-full object-cover"
-        style={{ 
-          display: 'block', 
-          width: '100%', 
-          height: '100%',
-          minHeight: '300px',
-          backgroundColor: '#111'
-        }}
-      />
-      
-      {/* Manual play button if autoplay blocked */}
-      {needsManualPlay && (
-        <button
-          onClick={handleManualPlay}
-          className="absolute inset-0 flex items-center justify-center bg-black/50 hover:bg-black/30 transition-colors"
-        >
-          <div className="bg-white/20 backdrop-blur rounded-full p-6">
-            <Camera className="h-12 w-12 text-white" />
-          </div>
-          <span className="absolute bottom-20 text-white font-medium">Click to start video</span>
-        </button>
-      )}
-      
-      {/* Status indicator */}
-      <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between">
-        <div className="rounded bg-black/70 px-2 py-1 text-xs text-white flex items-center gap-2">
-          {participantIdentity}
-          {!isReady && <span className="text-yellow-400">(connecting...)</span>}
-          {isReady && !isPlaying && <span className="text-red-400">(paused)</span>}
-          {isReady && isPlaying && <span className="text-green-400">● LIVE</span>}
-        </div>
-      </div>
-    </div>
-  );
-});
+// REMOVED: Using LiveKit's native VideoTrack component instead
 
 interface VideoRoomProps {
   roomName: string;
