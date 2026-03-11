@@ -5,10 +5,124 @@ import {
   LiveKitRoom,
   VideoConference,
   RoomAudioRenderer,
+  useLocalParticipant,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
-import { Loader2, Presentation, AlertCircle } from "lucide-react";
+import { Loader2, Presentation, AlertCircle, Video, VideoOff, Mic, MicOff } from "lucide-react";
 import { SessionWhiteboard } from "./SessionWhiteboard";
+
+// Inner component that has access to LiveKit hooks
+function VideoRoomContent({ 
+  sessionId, 
+  showWhiteboard, 
+  setShowWhiteboard 
+}: { 
+  sessionId?: string;
+  showWhiteboard: boolean;
+  setShowWhiteboard: (v: boolean) => void;
+}) {
+  const { localParticipant } = useLocalParticipant();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const cameraEnabled = localParticipant?.isCameraEnabled ?? false;
+  const microphoneEnabled = localParticipant?.isMicrophoneEnabled ?? false;
+
+  const toggleCamera = async () => {
+    if (!localParticipant) return;
+    setIsLoading(true);
+    setError("");
+    try {
+      await localParticipant.setCameraEnabled(!cameraEnabled);
+    } catch (err: any) {
+      console.error("Camera error:", err);
+      setError(err.message || "Error accessing camera");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const toggleMicrophone = async () => {
+    if (!localParticipant) return;
+    setIsLoading(true);
+    setError("");
+    try {
+      await localParticipant.setMicrophoneEnabled(!microphoneEnabled);
+    } catch (err: any) {
+      console.error("Microphone error:", err);
+      setError(err.message || "Error accessing microphone");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <>
+      {/* Controls Bar */}
+      <div className="absolute bottom-0 left-0 right-0 z-50 flex items-center justify-center gap-4 bg-black/80 p-4">
+        <button
+          onClick={toggleCamera}
+          disabled={isLoading || !localParticipant}
+          className={`flex items-center gap-2 rounded-full px-4 py-2 font-medium transition-all ${
+            cameraEnabled
+              ? "bg-green-600 text-white hover:bg-green-700"
+              : "bg-red-600 text-white hover:bg-red-700"
+          } disabled:opacity-50`}
+        >
+          {cameraEnabled ? <Video className="h-5 w-5" /> : <VideoOff className="h-5 w-5" />}
+          {cameraEnabled ? "Camera On" : "Camera Off"}
+        </button>
+
+        <button
+          onClick={toggleMicrophone}
+          disabled={isLoading || !localParticipant}
+          className={`flex items-center gap-2 rounded-full px-4 py-2 font-medium transition-all ${
+            microphoneEnabled
+              ? "bg-green-600 text-white hover:bg-green-700"
+              : "bg-red-600 text-white hover:bg-red-700"
+          } disabled:opacity-50`}
+        >
+          {microphoneEnabled ? <Mic className="h-5 w-5" /> : <MicOff className="h-5 w-5" />}
+          {microphoneEnabled ? "Mic On" : "Mic Off"}
+        </button>
+
+        {error && (
+          <span className="text-sm text-red-400">{error}</span>
+        )}
+      </div>
+
+      {/* Video Conference */}
+      <div className="flex h-full flex-col pb-16">
+        <div className="flex-1 relative">
+          <VideoConference />
+        </div>
+        <RoomAudioRenderer />
+      </div>
+
+      {/* Whiteboard Toggle Button */}
+      <button
+        onClick={() => setShowWhiteboard(!showWhiteboard)}
+        className={`absolute bottom-24 right-4 flex items-center gap-2 rounded-full px-4 py-2 font-medium shadow-xl transition-all hover:scale-105 z-50 ${
+          showWhiteboard
+            ? "bg-purple-600 text-white hover:bg-purple-700"
+            : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
+        }`}
+      >
+        <Presentation className="h-5 w-5" />
+        {showWhiteboard ? "Close Whiteboard" : "Open Whiteboard"}
+      </button>
+
+      {/* Whiteboard Overlay */}
+      {sessionId && (
+        <SessionWhiteboard
+          isOpen={showWhiteboard}
+          onClose={() => setShowWhiteboard(false)}
+          sessionId={sessionId}
+        />
+      )}
+    </>
+  );
+}
 
 interface VideoRoomProps {
   roomName: string;
@@ -116,8 +230,8 @@ export function VideoRoom({ roomName, onLeave, sessionId }: VideoRoomProps) {
   return (
     <div className="relative h-[600px] w-full overflow-hidden rounded-xl bg-card">
       <LiveKitRoom
-        video={true}
-        audio={true}
+        video={false}
+        audio={false}
         token={token}
         serverUrl={serverUrl}
         connect={true}
@@ -131,35 +245,11 @@ export function VideoRoom({ roomName, onLeave, sessionId }: VideoRoomProps) {
           dynacast: true,
         }}
       >
-        {/* Native LiveKit Video Conference */}
-        <div className="flex h-full flex-col">
-          <div className="flex-1 relative">
-            <VideoConference />
-          </div>
-          <RoomAudioRenderer />
-        </div>
-
-        {/* Whiteboard Toggle Button */}
-        <button
-          onClick={() => setShowWhiteboard(!showWhiteboard)}
-          className={`absolute bottom-20 right-4 flex items-center gap-2 rounded-full px-4 py-2 font-medium shadow-xl transition-all hover:scale-105 z-50 ${
-            showWhiteboard
-              ? "bg-purple-600 text-white hover:bg-purple-700"
-              : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
-          }`}
-        >
-          <Presentation className="h-5 w-5" />
-          {showWhiteboard ? "Close Whiteboard" : "Open Whiteboard"}
-        </button>
-
-        {/* Whiteboard Overlay */}
-        {sessionId && (
-          <SessionWhiteboard
-            isOpen={showWhiteboard}
-            onClose={() => setShowWhiteboard(false)}
-            sessionId={sessionId}
-          />
-        )}
+        <VideoRoomContent 
+          sessionId={sessionId}
+          showWhiteboard={showWhiteboard}
+          setShowWhiteboard={setShowWhiteboard}
+        />
       </LiveKitRoom>
     </div>
   );
