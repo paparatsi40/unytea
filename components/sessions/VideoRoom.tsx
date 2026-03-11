@@ -74,6 +74,7 @@ function VideoTile({ trackRef }: { trackRef: any }) {
         track.detach(video);
       };
     }
+    return undefined;
   }, [trackRef]);
   
   return (
