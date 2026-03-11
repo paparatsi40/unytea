@@ -7,7 +7,6 @@ import {
   useConnectionState,
   useTracks,
   VideoTrack,
-  ParticipantTile,
   ControlBar,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
