@@ -8,7 +8,6 @@ import {
   useParticipants,
   useLocalParticipant,
   VideoTrack,
-  AudioTrack,
   ControlBar,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
