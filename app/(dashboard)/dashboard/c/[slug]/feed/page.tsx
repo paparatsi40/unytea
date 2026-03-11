@@ -138,7 +138,7 @@ const mockLiveSessions: LiveSession[] = [
 ];
 
 export default function CommunityFeedPage() {
-  const _params = useParams();
+  // const params = useParams();
   // const _slug = params?.slug as string; // Available for future API calls
   // TODO: Use slug for API calls when backend is ready
   const { user } = useCurrentUser();
