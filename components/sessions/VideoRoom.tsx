@@ -63,18 +63,44 @@ function VideoTile({ trackRef }: { trackRef: any }) {
   
   useEffect(() => {
     const video = videoRef.current;
-    const track = trackRef.publication?.track;
+    const publication = trackRef.publication;
+    const track = publication?.track;
     
-    if (video && track) {
-      console.log("Attaching track to video element:", trackRef.participant.identity, track.trackSid);
-      track.attach(video);
-      
-      return () => {
-        console.log("Detaching track from video element:", track.trackSid);
-        track.detach(video);
-      };
+    // Only attach if we have a valid, subscribed track
+    if (!video || !track || !track.mediaStream) {
+      console.log("Video or track not ready yet, skipping attach");
+      return undefined;
     }
-    return undefined;
+    
+    // Check if track is subscribed
+    if (publication.isSubscribed === false) {
+      console.log("Track not subscribed yet");
+      return undefined;
+    }
+    
+    console.log("Attaching track to video:", trackRef.participant.identity, track.trackSid);
+    
+    try {
+      // Attach the media stream to the video element
+      if (video.srcObject !== track.mediaStream) {
+        video.srcObject = track.mediaStream;
+      }
+      
+      // Ensure video plays
+      video.play().catch((err) => {
+        console.warn("Auto-play prevented:", err);
+      });
+    } catch (err) {
+      console.error("Error attaching track:", err);
+    }
+    
+    return () => {
+      console.log("Cleaning up video element");
+      if (video) {
+        video.srcObject = null;
+        video.pause();
+      }
+    };
   }, [trackRef]);
   
   return (
@@ -89,6 +115,9 @@ function VideoTile({ trackRef }: { trackRef: any }) {
       />
       <div className="absolute bottom-2 left-2 rounded bg-black/50 px-2 py-1 text-xs text-white">
         {trackRef.participant.identity || 'Unknown'}
+        {!trackRef.publication?.track?.mediaStream && (
+          <span className="ml-2 text-yellow-400">(connecting...)</span>
+        )}
       </div>
     </div>
   );
