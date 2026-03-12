@@ -19,7 +19,7 @@ function ConnectionStatus() {
   }, [state]);
 
   return (
-    <div className="absolute top-4 left-4 z-50 rounded bg-black/70 px-3 py-1 text-xs text-white">
+    <div className="absolute top-4 right-4 z-50 rounded bg-black/70 px-3 py-1 text-xs text-white">
       {state}
     </div>
   );
