@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import {
   LiveKitRoom,
-  VideoConference,
   RoomAudioRenderer,
   useConnectionState,
 } from "@livekit/components-react";
@@ -43,34 +42,29 @@ export function VideoRoom({ roomName, sessionId, onLeave: _onLeave }: VideoRoomP
     async function getToken() {
       try {
         setLoading(true);
-        setError(null);
-
-        const res = await fetch("/api/livekit/token", {
+        const response = await fetch("/api/livekit/token", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ roomName }),
+          body: JSON.stringify({ room: roomName }),
         });
 
-        const data = await res.json();
-
-        if (!res.ok) {
-          throw new Error(data.error || "Token request failed");
+        if (!response.ok) {
+          throw new Error("Failed to get token");
         }
+
+        const data = await response.json();
 
         if (!mounted) return;
 
         setToken(data.token);
         setWsUrl(data.wsUrl);
       } catch (err) {
-        console.error("Token fetch error:", err);
-
         if (!mounted) return;
-
-        setError(
-          err instanceof Error ? err.message : "Could not connect to room"
-        );
+        setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
-        if (mounted) setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     }
 
@@ -99,7 +93,7 @@ export function VideoRoom({ roomName, sessionId, onLeave: _onLeave }: VideoRoomP
   }
 
   return (
-    <div className="relative h-[700px]">
+    <div className="h-[calc(100vh-200px)] min-h-[600px]">
       <LiveKitRoom
         token={token}
         serverUrl={wsUrl}
@@ -115,14 +109,10 @@ export function VideoRoom({ roomName, sessionId, onLeave: _onLeave }: VideoRoomP
         onError={(err) => {
           console.error("LiveKit error:", err);
         }}
-        className="h-[700px]"
+        className="h-full"
       >
         <ConnectionStatus />
-
-        <VideoConference />
-
         <RoomAudioRenderer />
-
         <VideoRoomContent sessionId={sessionId} />
       </LiveKitRoom>
     </div>
