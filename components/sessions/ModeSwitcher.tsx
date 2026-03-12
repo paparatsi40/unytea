@@ -1,6 +1,6 @@
 "use client";
 
-import { Video, Monitor, Pencil, LayoutGrid } from "lucide-react";
+import { Video, Monitor, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
