@@ -85,8 +85,11 @@ export function VideoRoomUI({ sessionId, onLeave }: VideoRoomUIProps) {
 
   const room = useRoomContext();
   const participants = useParticipants();
-  const { localParticipant, isCameraEnabled, isMicrophoneEnabled, isScreenShareEnabled } =
-    useLocalParticipant();
+  const localParticipantData = useLocalParticipant();
+  const localParticipant = localParticipantData.localParticipant;
+  const isCameraEnabled = localParticipantData.isCameraEnabled;
+  const isMicrophoneEnabled = localParticipantData.isMicrophoneEnabled;
+  const isScreenShareEnabled = localParticipantData.isScreenShareEnabled;
 
   const toggleCamera = async () => {
     setIsLoadingCamera(true);
