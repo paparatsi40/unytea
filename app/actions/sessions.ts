@@ -87,6 +87,7 @@ export async function getUserSessions() {
         scheduledAt: true,
         duration: true,
         status: true,
+        recordingUrl: true,
         mentorId: true,
         menteeId: true,
         mentor: {
