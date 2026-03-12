@@ -1,46 +1,30 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   LiveKitRoom,
-  VideoConference,
   RoomAudioRenderer,
-  useConnectionState,
+  VideoConference,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
-import { Loader2, AlertCircle } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
 import { VideoRoomContent } from "./VideoRoomContent";
-
-function ConnectionStatus() {
-  const connectionState = useConnectionState();
-
-  useEffect(() => {
-    console.log("LiveKit Connection State:", connectionState);
-  }, [connectionState]);
-
-  return (
-    <div className="absolute left-4 top-4 z-50 rounded bg-black/70 px-3 py-1 text-xs text-white">
-      Status: {connectionState}
-    </div>
-  );
-}
 
 interface VideoRoomProps {
   roomName: string;
   sessionId?: string;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onLeave?: () => void;
 }
 
-export function VideoRoom({ roomName, sessionId, onLeave: _onLeave }: VideoRoomProps) {
+export function VideoRoom({ roomName, sessionId, onLeave }: VideoRoomProps) {
   const [token, setToken] = useState("");
   const [wsUrl, setWsUrl] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [connectionError, setConnectionError] = useState<string | null>(null);
-  const hasConnected = useRef(false);
 
   useEffect(() => {
+    let active = true;
+
     async function fetchToken() {
       try {
         setLoading(true);
@@ -56,92 +40,125 @@ export function VideoRoom({ roomName, sessionId, onLeave: _onLeave }: VideoRoomP
           }),
         });
 
-        const data = await res.json();
+        const data = await res.json().catch(() => ({}));
 
         if (!res.ok) {
           throw new Error(data.error || "Failed to fetch token");
         }
 
-        setToken(data.token);
-        setWsUrl(data.wsUrl);
+        const nextToken =
+          typeof data.token === "string" ? data.token.trim() : "";
+        const nextWsUrl =
+          typeof data.wsUrl === "string" && data.wsUrl.trim()
+            ? data.wsUrl.trim()
+            : (process.env.NEXT_PUBLIC_LIVEKIT_URL ?? "").trim();
+
+        if (!nextToken) {
+          throw new Error("No token received from server");
+        }
+
+        if (!nextWsUrl) {
+          throw new Error("LiveKit server URL is missing");
+        }
+
+        if (!active) return;
+
+        setToken(nextToken);
+        setWsUrl(nextWsUrl);
       } catch (err) {
-        console.error("Token error:", err);
+        console.error("Error fetching LiveKit token:", err);
+        if (!active) return;
         setError(
           err instanceof Error ? err.message : "Could not connect to video room"
         );
       } finally {
-        setLoading(false);
+        if (active) {
+          setLoading(false);
+        }
       }
     }
 
     fetchToken();
+
+    return () => {
+      active = false;
+    };
   }, [roomName]);
 
-  const handleDisconnected = () => {
-    console.log("Disconnected, hasConnected:", hasConnected.current);
-    setConnectionError("Disconnected from LiveKit room");
-
-    // Temporalmente NO navegues automáticamente.
-    // Solo deja el log hasta estabilizar la conexión.
-    // if (hasConnected.current && onLeave) {
-    //   onLeave();
-    // }
-  };
-
-  const handleError = (err: Error) => {
-    console.error("LiveKit Room Error:", err);
-    setConnectionError(err.message);
-  };
-
-  const handleConnected = () => {
-    console.log("Connected to LiveKit room");
-    hasConnected.current = true;
-    setConnectionError(null);
-  };
+  const roomKey = useMemo(() => {
+    return `${roomName}:${token}:${wsUrl}`;
+  }, [roomName, token, wsUrl]);
 
   if (loading) {
     return (
-      <div className="flex h-[600px] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin" />
+      <div className="flex h-[700px] items-center justify-center rounded-xl bg-card">
+        <div className="text-center">
+          <Loader2 className="mx-auto mb-4 h-8 w-8 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground">
+            Connecting to video room...
+          </p>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex h-[600px] items-center justify-center text-red-500">
-        <AlertCircle className="mr-2 h-5 w-5" />
-        {error}
+      <div className="flex h-[700px] items-center justify-center rounded-xl bg-card px-4">
+        <div className="max-w-md text-center">
+          <AlertCircle className="mx-auto mb-4 h-10 w-10 text-destructive" />
+          <p className="mb-2 text-lg font-semibold text-destructive">
+            Failed to connect
+          </p>
+          <p className="text-sm text-muted-foreground">{error}</p>
+        </div>
       </div>
     );
   }
 
-  if (!token || !wsUrl) return null;
+  if (!token || !wsUrl) {
+    return (
+      <div className="flex h-[700px] items-center justify-center rounded-xl bg-card px-4">
+        <div className="max-w-md text-center">
+          <AlertCircle className="mx-auto mb-4 h-10 w-10 text-destructive" />
+          <p className="mb-2 text-lg font-semibold text-destructive">
+            LiveKit not configured
+          </p>
+          <p className="text-sm text-muted-foreground">
+            Missing token or wsUrl.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="relative">
-      {connectionError && (
-        <div className="mb-4 rounded bg-red-100 p-3 text-red-700">
-          <AlertCircle className="mr-2 inline h-4 w-4" />
-          Connection Error: {connectionError}
-        </div>
-      )}
-
+    <div className="relative h-[700px] w-full overflow-hidden rounded-xl bg-card">
       <LiveKitRoom
+        key={roomKey}
         token={token}
         serverUrl={wsUrl}
         connect={true}
         video={false}
         audio={false}
-        onDisconnected={handleDisconnected}
-        onError={handleError}
-        onConnected={handleConnected}
-        className="h-[700px]"
+        onConnected={() => {
+          console.log("Connected to LiveKit room");
+        }}
+        onDisconnected={(reason) => {
+          console.log("Disconnected from LiveKit room", reason);
+        }}
+        onError={(err) => {
+          console.error("LiveKit room error:", err);
+        }}
+        options={{
+          adaptiveStream: true,
+          dynacast: true,
+        }}
+        className="h-full"
       >
-        <ConnectionStatus />
-        <VideoRoomContent sessionId={sessionId} />
         <VideoConference />
         <RoomAudioRenderer />
+        <VideoRoomContent sessionId={sessionId} onLeave={onLeave} />
       </LiveKitRoom>
     </div>
   );
