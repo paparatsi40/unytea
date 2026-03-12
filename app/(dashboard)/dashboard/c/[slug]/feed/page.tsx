@@ -303,6 +303,60 @@ export default function CommunityFeedPage() {
               </Tabs>
             </div>
 
+            {/* NEXT LIVE SESSION BANNER - Destacado */}
+            {liveSessions.length > 0 && (
+              <Card className="border-0 shadow-lg overflow-hidden">
+                <div className="relative bg-gradient-to-r from-zinc-900 to-zinc-800 p-5">
+                  {/* Badge flotante */}
+                  <div className="absolute top-3 right-3">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-red-500/20 px-3 py-1 text-xs font-medium text-red-400">
+                      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500" />
+                      {liveSessions[0].isLive ? "Live now" : "Upcoming"}
+                    </span>
+                  </div>
+                  
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500/20">
+                      <Play className="h-6 w-6 text-purple-400" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-xs font-medium text-purple-400 uppercase tracking-wide">
+                        Next live session
+                      </p>
+                      <h3 className="mt-1 text-lg font-semibold text-white">
+                        {liveSessions[0].title}
+                      </h3>
+                      <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-zinc-400">
+                        <span className="flex items-center gap-1.5">
+                          <Calendar className="h-4 w-4" />
+                          {formatDistanceToNow(new Date(liveSessions[0].scheduledAt), { addSuffix: true })}
+                        </span>
+                        <span className="flex items-center gap-1.5">
+                          <Users className="h-4 w-4" />
+                          {liveSessions[0].attendees} attending
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-4 flex gap-3">
+                    <Button 
+                      className="flex-1 gap-2 bg-purple-600 text-white hover:bg-purple-700"
+                    >
+                      <Play className="h-4 w-4" />
+                      Join
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="border-zinc-700 bg-zinc-800/50 text-zinc-300 hover:bg-zinc-800"
+                    >
+                      Remind me
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            )}
+
             {/* CREATE POST - Main Composer */}
             <Card className="border-0 shadow-sm">
               <CardContent className="p-4">

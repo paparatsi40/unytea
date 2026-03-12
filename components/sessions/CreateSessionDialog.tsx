@@ -8,9 +8,10 @@ import { useRouter } from "next/navigation";
 
 interface CreateSessionDialogProps {
   triggerText?: string;
+  className?: string;
 }
 
-export function CreateSessionDialog({ triggerText = "Create Session" }: CreateSessionDialogProps) {
+export function CreateSessionDialog({ triggerText = "Create Session", className }: CreateSessionDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -47,9 +48,9 @@ export function CreateSessionDialog({ triggerText = "Create Session" }: CreateSe
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+        className={className || "flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"}
       >
-        <Plus className="h-4 w-4" />
+        {!className?.includes("Schedule your first") && <Plus className="h-4 w-4" />}
         {triggerText}
       </button>
 
