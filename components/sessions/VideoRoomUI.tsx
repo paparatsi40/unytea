@@ -19,16 +19,19 @@ interface VideoRoomUIProps {
 function ConnectionBadge() {
   const state = useConnectionState();
   
-  const colors = {
-    disconnected: "bg-red-500",
-    connecting: "bg-yellow-500",
-    connected: "bg-green-500",
-    reconnecting: "bg-orange-500",
+  const getColor = (s: typeof state) => {
+    switch (s) {
+      case "disconnected": return "bg-red-500";
+      case "connecting": return "bg-yellow-500";
+      case "connected": return "bg-green-500";
+      case "reconnecting": return "bg-orange-500";
+      default: return "bg-gray-500";
+    }
   };
 
   return (
     <div className="flex items-center gap-2 rounded-full bg-zinc-100 px-3 py-1.5 text-xs font-medium">
-      <span className={cn("h-2 w-2 rounded-full", colors[state] || "bg-gray-500")} />
+      <span className={cn("h-2 w-2 rounded-full", getColor(state))} />
       <span className="capitalize text-zinc-700">{state}</span>
     </div>
   );
