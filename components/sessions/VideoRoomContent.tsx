@@ -14,10 +14,9 @@ import { Button } from "@/components/ui/button";
 
 type Props = {
   sessionId?: string;
-  onLeave?: () => void;
 };
 
-export function VideoRoomContent({ onLeave }: Props) {
+export function VideoRoomContent({}: Props) {
   const room = useRoomContext();
 
   const publications = Array.from(room.localParticipant.trackPublications.values());
@@ -55,8 +54,6 @@ export function VideoRoomContent({ onLeave }: Props) {
       await room.disconnect();
     } catch (e) {
       console.error("Failed to disconnect room:", e);
-    } finally {
-      onLeave?.();
     }
   };
 
@@ -67,7 +64,6 @@ export function VideoRoomContent({ onLeave }: Props) {
           onClick={toggleCamera}
           variant={isCameraOn ? "default" : "outline"}
           size="sm"
-          className="shadow-lg"
         >
           {isCameraOn ? (
             <>
@@ -86,7 +82,6 @@ export function VideoRoomContent({ onLeave }: Props) {
           onClick={toggleMic}
           variant={isMicOn ? "default" : "outline"}
           size="sm"
-          className="shadow-lg"
         >
           {isMicOn ? (
             <>
@@ -101,12 +96,7 @@ export function VideoRoomContent({ onLeave }: Props) {
           )}
         </Button>
 
-        <Button
-          onClick={handleLeave}
-          variant="destructive"
-          size="sm"
-          className="shadow-lg"
-        >
+        <Button onClick={handleLeave} variant="destructive" size="sm">
           <PhoneOff className="mr-2 h-4 w-4" />
           Leave
         </Button>

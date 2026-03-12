@@ -138,7 +138,7 @@ export function VideoRoom({ roomName, sessionId, onLeave }: VideoRoomProps) {
         className="h-[700px]"
       >
         <ConnectionStatus />
-        <VideoRoomContent sessionId={sessionId} onLeave={onLeave} />
+        <VideoRoomContent sessionId={sessionId} />
         <VideoConference />
         <RoomAudioRenderer />
       </LiveKitRoom>
