@@ -9,7 +9,9 @@ interface LocalVideoProps {
 
 export function LocalVideo({ className }: LocalVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const { cameraTrack, isCameraEnabled } = useLocalParticipant();
+  const localParticipantData = useLocalParticipant();
+  const cameraTrack = localParticipantData.cameraTrack;
+  const isCameraEnabled = localParticipantData.isCameraEnabled;
 
   useEffect(() => {
     const videoEl = videoRef.current;
