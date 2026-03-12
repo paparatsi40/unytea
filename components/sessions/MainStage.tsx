@@ -113,14 +113,18 @@ export function MainStage({
             />
           )
         ) : isCameraEnabled ? (
-          <div className="h-full w-full bg-black">
+          <div className="h-full w-full bg-black relative">
             <LocalVideo className="h-full w-full object-cover" />
+            {/* Debug info - camera status */}
+            <div className="absolute bottom-4 left-4 rounded bg-black/70 px-3 py-2 text-xs text-white">
+              Camera: {isCameraEnabled ? 'ON' : 'OFF'} | Track: {cameraTrack ? 'YES' : 'NO'}
+            </div>
           </div>
         ) : (
           <EmptyStage
             icon={Video}
             title="Camera is off"
-            description="Turn on your camera to start the live session."
+            description="Click the purple camera button below to start your video."
           />
         )}
 
