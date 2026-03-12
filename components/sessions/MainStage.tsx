@@ -137,14 +137,6 @@ export function MainStage({
                 ? "Live video"
                 : "Video mode"}
         </div>
-
-        {/* DEBUG INFO */}
-        <div className="absolute right-4 top-4 rounded bg-green-500/90 px-3 py-2 text-xs font-mono text-black">
-          <div>isCameraEnabled: {String(isCameraEnabled)}</div>
-          <div>cameraTrack: {cameraTrack ? "✅" : "❌"}</div>
-          <div>localParticipant: {localParticipant ? "✅" : "❌"}</div>
-          <div>cameraTracks: {cameraTracks.length}</div>
-        </div>
       </div>
 
       {/* SPEAKER STRIP */}

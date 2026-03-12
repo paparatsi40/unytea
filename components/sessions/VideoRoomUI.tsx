@@ -178,38 +178,8 @@ export function VideoRoomUI({ sessionId, onLeave }: VideoRoomUIProps) {
 
       {/* MAIN CONTENT */}
       <div className="flex flex-1 overflow-hidden">
-        {/* LEFT */}
+        {/* LEFT - Video Area */}
         <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-          <div className="flex items-center justify-between border-b border-zinc-800 bg-zinc-950/80 px-4 py-3">
-            <div>
-              <h2 className="text-lg font-semibold text-white">Live Session</h2>
-              <p className="text-xs text-zinc-500">
-                {mode === "video"
-                  ? "Camera-first mode"
-                  : mode === "screen"
-                    ? "Presentation mode"
-                    : "Collaborative whiteboard mode"}
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handleRaiseHand}
-                className={cn(
-                  "flex h-10 items-center gap-2 rounded-full px-4 text-sm font-medium transition-all",
-                  raisedHand
-                    ? "bg-yellow-500 text-white hover:bg-yellow-600"
-                    : "border border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800",
-                )}
-              >
-                <Hand className="h-4 w-4" />
-                {raisedHand ? "Lower hand" : "Raise hand"}
-              </button>
-
-              <ReactionsBar />
-            </div>
-          </div>
-
           <div className="min-h-0 flex-1 overflow-hidden p-4">
             <MainStage mode={mode} sessionId={sessionId} className="h-full" />
           </div>
@@ -264,6 +234,24 @@ export function VideoRoomUI({ sessionId, onLeave }: VideoRoomUIProps) {
             >
               <Monitor className="h-6 w-6" />
             </button>
+
+            <div className="mx-1 h-8 w-px bg-zinc-700" />
+
+            {/* Raise Hand */}
+            <button
+              onClick={handleRaiseHand}
+              className={cn(
+                "flex h-12 w-12 items-center justify-center rounded-full transition-all shadow-lg",
+                raisedHand
+                  ? "bg-yellow-500 text-white hover:bg-yellow-600"
+                  : "border-2 border-zinc-600 bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white",
+              )}
+              title={raisedHand ? "Lower Hand" : "Raise Hand"}
+            >
+              <Hand className="h-6 w-6" />
+            </button>
+
+            <ReactionsBar />
 
             <div className="mx-1 h-8 w-px bg-zinc-700" />
 
