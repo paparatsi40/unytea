@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import { getUserSessions } from "@/app/actions/sessions";
 import { Video, Calendar, Clock, Play, Radio } from "lucide-react";
 import { CreateSessionDialog } from "@/components/sessions/CreateSessionDialog";
-import { SessionCard } from "@/components/sessions/SessionCard";
 import { format, isToday, isTomorrow, formatDistanceToNow } from "date-fns";
 
 export const metadata = {
