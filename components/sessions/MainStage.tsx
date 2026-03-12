@@ -84,7 +84,7 @@ export function MainStage({
       <div className="relative flex-1 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950">
         {mode === "whiteboard" ? (
           sessionId ? (
-            <SessionWhiteboard embedded sessionId={sessionId} />
+            <SessionWhiteboard embedded sessionId={sessionId} onClose={() => setMode("video")} />
           ) : (
             <EmptyStage
               icon={Pencil}
