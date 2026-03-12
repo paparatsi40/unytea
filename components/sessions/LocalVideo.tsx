@@ -14,6 +14,13 @@ export function LocalVideo({ className }: LocalVideoProps) {
   const isCameraEnabled = localParticipantData.isCameraEnabled;
   const [debugInfo, setDebugInfo] = useState<string>("Initializing...");
 
+  // Debug: log render values
+  console.log('LocalVideo RENDER:', { 
+    isCameraEnabled, 
+    hasCameraTrack: !!cameraTrack,
+    trackSid: cameraTrack?.trackSid 
+  });
+
   useEffect(() => {
     const videoEl = videoRef.current;
     const track = cameraTrack?.track;

@@ -54,8 +54,16 @@ export function MainStage({
   const localParticipantData = useLocalParticipant();
   const localParticipant = localParticipantData.localParticipant;
   const isCameraEnabled = localParticipantData.isCameraEnabled;
-  const isScreenShareEnabled = localParticipantData.isScreenShareEnabled;
   const cameraTrack = localParticipantData.cameraTrack;
+  const isScreenShareEnabled = localParticipantData.isScreenShareEnabled;
+
+  // Debug: log state
+  console.log('MainStage RENDER:', {
+    mode,
+    isCameraEnabled,
+    hasCameraTrack: !!cameraTrack,
+    trackSid: cameraTrack?.trackSid
+  });
 
   const cameraTracks = useTracks([Track.Source.Camera]);
   const screenTracks = useTracks([Track.Source.ScreenShare]);
@@ -117,8 +125,10 @@ export function MainStage({
           <div className="h-full w-full bg-black relative">
             <LocalVideo className="h-full w-full object-cover" />
             {/* Debug info - camera status */}
-            <div className="absolute bottom-4 left-4 rounded bg-black/70 px-3 py-2 text-xs text-white">
-              Camera: {isCameraEnabled ? 'ON' : 'OFF'} | Track: {cameraTrack ? 'YES' : 'NO'}
+            <div className="absolute bottom-4 left-4 rounded bg-black/70 px-3 py-2 text-xs text-white z-50">
+              <div>Camera: {isCameraEnabled ? 'ON' : 'OFF'}</div>
+              <div>Track: {cameraTrack ? 'YES' : 'NO'}</div>
+              <div>TrackID: {cameraTrack?.trackSid || 'none'}</div>
             </div>
           </div>
         ) : (

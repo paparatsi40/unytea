@@ -185,12 +185,12 @@ export function VideoRoomUI({ sessionId, onLeave }: VideoRoomUIProps) {
           </div>
 
           {/* BOTTOM CONTROLS */}
-          <div className="flex shrink-0 items-center justify-center gap-4 border-t border-zinc-800 bg-zinc-900 px-4 py-4">
+          <div className="flex shrink-0 items-center justify-center gap-3 border-t border-zinc-800 bg-zinc-900 px-4 py-3">
             <button
               onClick={toggleMicrophone}
               disabled={isLoadingMic}
               className={cn(
-                "flex h-14 w-14 items-center justify-center rounded-full transition-all shadow-lg disabled:opacity-50",
+                "flex h-12 w-12 items-center justify-center rounded-full transition-all shadow-lg disabled:opacity-50",
                 isMicrophoneEnabled
                   ? "bg-zinc-700 text-white hover:bg-zinc-600"
                   : "border-2 border-red-500/50 bg-red-500/20 text-red-400 hover:bg-red-500/30",
@@ -198,28 +198,27 @@ export function VideoRoomUI({ sessionId, onLeave }: VideoRoomUIProps) {
               title={isMicrophoneEnabled ? "Mute" : "Unmute"}
             >
               {isMicrophoneEnabled ? (
-                <Mic className="h-7 w-7" />
+                <Mic className="h-6 w-6" />
               ) : (
-                <MicOff className="h-7 w-7" />
+                <MicOff className="h-6 w-6" />
               )}
             </button>
 
-            {/* CAMERA - EXTRA LARGE WHEN OFF */}
             <button
               onClick={toggleCamera}
               disabled={isLoadingCamera}
               className={cn(
-                "flex items-center justify-center rounded-full transition-all shadow-xl disabled:opacity-50",
+                "flex items-center justify-center rounded-full transition-all shadow-lg disabled:opacity-50",
                 isCameraEnabled
-                  ? "h-14 w-14 bg-zinc-700 text-white hover:bg-zinc-600"
-                  : "h-16 w-16 animate-pulse border-4 border-purple-400 bg-purple-600 text-white hover:bg-purple-700",
+                  ? "h-12 w-12 bg-zinc-700 text-white hover:bg-zinc-600"
+                  : "h-14 w-14 animate-pulse border-4 border-purple-400 bg-purple-600 text-white hover:bg-purple-700",
               )}
               title={isCameraEnabled ? "Stop Camera" : "Start Camera"}
             >
               {isCameraEnabled ? (
-                <Video className="h-7 w-7" />
+                <Video className="h-6 w-6" />
               ) : (
-                <VideoOff className="h-8 w-8" />
+                <VideoOff className="h-7 w-7" />
               )}
             </button>
 
