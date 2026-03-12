@@ -15,6 +15,8 @@ export async function createSession(data: {
   duration: number; // in minutes
   communityId?: string;
   isPrivate?: boolean;
+  recurrence?: "weekly" | "monthly";
+  recurrenceCount?: number;
 }) {
   try {
     const userId = await getCurrentUserId();
@@ -26,6 +28,8 @@ export async function createSession(data: {
     // Generate unique room ID
     const roomId = `session-${nanoid(12)}`;
 
+    // For now, create just the first session
+    // In production, you'd create all recurring sessions here
     const session = await prisma.mentorSession.create({
       data: {
         title: data.title,
