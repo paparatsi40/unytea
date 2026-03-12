@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useRoomContext, useConnectionState } from "@livekit/components-react";
 import { Track, ConnectionState } from "livekit-client";
 import { Button } from "@/components/ui/button";
@@ -10,10 +10,16 @@ import {
   Mic,
   MicOff,
 } from "lucide-react";
+import { SessionWhiteboard } from "./SessionWhiteboard";
 
-export function VideoRoomContent() {
+interface VideoRoomContentProps {
+  sessionId?: string;
+}
+
+export function VideoRoomContent({ sessionId }: VideoRoomContentProps) {
   const room = useRoomContext();
   const connectionState = useConnectionState();
+  const [showWhiteboard, setShowWhiteboard] = useState(false);
 
   const isCameraOn = useMemo(() => {
     const pubs = Array.from(room.localParticipant.trackPublications.values());
@@ -56,34 +62,53 @@ export function VideoRoomContent() {
   };
 
   return (
-    <div className="absolute bottom-6 left-1/2 flex -translate-x-1/2 gap-4">
-      <Button onClick={toggleCamera}>
-        {isCameraOn ? (
-          <>
-            <VideoOff className="mr-2 h-4 w-4" />
-            Stop Camera
-          </>
-        ) : (
-          <>
-            <Video className="mr-2 h-4 w-4" />
-            Start Camera
-          </>
-        )}
-      </Button>
+    <>
+      <div className="absolute bottom-6 left-1/2 flex -translate-x-1/2 gap-4 z-50">
+        <Button onClick={toggleCamera}>
+          {isCameraOn ? (
+            <>
+              <VideoOff className="mr-2 h-4 w-4" />
+              Stop Camera
+            </>
+          ) : (
+            <>
+              <Video className="mr-2 h-4 w-4" />
+              Start Camera
+            </>
+          )}
+        </Button>
 
-      <Button onClick={toggleMic}>
-        {isMicOn ? (
-          <>
-            <MicOff className="mr-2 h-4 w-4" />
-            Mute
-          </>
-        ) : (
-          <>
-            <Mic className="mr-2 h-4 w-4" />
-            Unmute
-          </>
+        <Button onClick={toggleMic}>
+          {isMicOn ? (
+            <>
+              <MicOff className="mr-2 h-4 w-4" />
+              Mute
+            </>
+          ) : (
+            <>
+              <Mic className="mr-2 h-4 w-4" />
+              Unmute
+            </>
+          )}
+        </Button>
+
+        {sessionId && (
+          <Button 
+            onClick={() => setShowWhiteboard(!showWhiteboard)}
+            variant={showWhiteboard ? "default" : "outline"}
+          >
+            {showWhiteboard ? "Hide Whiteboard" : "Show Whiteboard"}
+          </Button>
         )}
-      </Button>
-    </div>
+      </div>
+
+      {sessionId && showWhiteboard && (
+        <SessionWhiteboard
+          isOpen={true}
+          onClose={() => setShowWhiteboard(false)}
+          sessionId={sessionId}
+        />
+      )}
+    </>
   );
 }

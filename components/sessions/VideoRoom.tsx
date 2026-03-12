@@ -9,6 +9,7 @@ import {
 } from "@livekit/components-react";
 import "@livekit/components-styles";
 import { Loader2, AlertCircle } from "lucide-react";
+import { VideoRoomContent } from "./VideoRoomContent";
 
 function ConnectionStatus() {
   const state = useConnectionState();
@@ -121,6 +122,8 @@ export function VideoRoom({ roomName, onLeave: _onLeave }: VideoRoomProps) {
         <VideoConference />
 
         <RoomAudioRenderer />
+
+        <VideoRoomContent sessionId={sessionId} />
       </LiveKitRoom>
     </div>
   );
