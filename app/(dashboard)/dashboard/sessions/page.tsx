@@ -46,8 +46,7 @@ export default async function SessionsPage() {
   }
 
   const { upcoming, past } = result.sessions;
-  const totalSessions = upcoming.length + past.length;
-  
+
   // Calculate sessions this week
   const sessionsThisWeek = upcoming.filter(s => 
     isThisWeek(new Date(s.scheduledAt), { weekStartsOn: 1 })
