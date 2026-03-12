@@ -1,14 +1,14 @@
 ﻿"use client";
 
 import { useState } from "react";
-import { VideoConference, useConnectionState, useParticipants } from "@livekit/components-react";
+import { VideoConference, useConnectionState, useParticipants, useLocalParticipant } from "@livekit/components-react";
 import { ModeSwitcher, SessionMode } from "./ModeSwitcher";
 import { ParticipantsPanel } from "./ParticipantsPanel";
 import { SessionChat } from "./SessionChat";
 import { SessionWhiteboard } from "./SessionWhiteboard";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { LogOut, Hand } from "lucide-react";
+import { LogOut, Hand, Video, VideoOff, Mic, MicOff } from "lucide-react";
 import { ReactionsBar } from "./ReactionsBar";
 import { useRoomContext } from "@livekit/components-react";
 
@@ -50,19 +50,75 @@ function ConnectionBadge({ mode }: { mode: SessionMode }) {
   );
 }
 
-function RoomControls({ raisedHand, onToggleHand }: { raisedHand: boolean; onToggleHand: () => void }) {
+function MediaControls() {
+  const localParticipant = useLocalParticipant();
+  const [isLoadingCamera, setIsLoadingCamera] = useState(false);
+  const [isLoadingMic, setIsLoadingMic] = useState(false);
+
+  const isCameraEnabled = localParticipant.isCameraEnabled;
+  const isMicrophoneEnabled = localParticipant.isMicrophoneEnabled;
+
+  const toggleCamera = async () => {
+    setIsLoadingCamera(true);
+    try {
+      await localParticipant.setCameraEnabled(!isCameraEnabled);
+    } catch (error) {
+      console.error("Failed to toggle camera:", error);
+    } finally {
+      setIsLoadingCamera(false);
+    }
+  };
+
+  const toggleMicrophone = async () => {
+    setIsLoadingMic(true);
+    try {
+      await localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled);
+    } catch (error) {
+      console.error("Failed to toggle microphone:", error);
+    } finally {
+      setIsLoadingMic(false);
+    }
+  };
+
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-2">
       <Button
-        onClick={onToggleHand}
-        variant={raisedHand ? "default" : "outline"}
+        onClick={toggleCamera}
+        variant={isCameraEnabled ? "default" : "outline"}
         size="sm"
-        className={raisedHand ? "bg-yellow-500 hover:bg-yellow-600" : ""}
+        disabled={isLoadingCamera}
+        className={cn(
+          isCameraEnabled 
+            ? "bg-purple-600 hover:bg-purple-700 text-white" 
+            : "border-zinc-300 text-zinc-600 hover:bg-zinc-50"
+        )}
       >
-        <Hand className="mr-2 h-4 w-4" />
-        {raisedHand ? "Lower Hand" : "Raise Hand"}
+        {isCameraEnabled ? (
+          <Video className="mr-2 h-4 w-4" />
+        ) : (
+          <VideoOff className="mr-2 h-4 w-4" />
+        )}
+        {isCameraEnabled ? "Stop Camera" : "Start Camera"}
       </Button>
-      <ReactionsBar />
+
+      <Button
+        onClick={toggleMicrophone}
+        variant={isMicrophoneEnabled ? "default" : "outline"}
+        size="sm"
+        disabled={isLoadingMic}
+        className={cn(
+          isMicrophoneEnabled 
+            ? "bg-purple-600 hover:bg-purple-700 text-white" 
+            : "border-zinc-300 text-zinc-600 hover:bg-zinc-50"
+        )}
+      >
+        {isMicrophoneEnabled ? (
+          <Mic className="mr-2 h-4 w-4" />
+        ) : (
+          <MicOff className="mr-2 h-4 w-4" />
+        )}
+        {isMicrophoneEnabled ? "Mute" : "Unmute"}
+      </Button>
     </div>
   );
 }
@@ -108,7 +164,19 @@ export function VideoRoomUI({ sessionId, onLeave }: VideoRoomUIProps) {
           />
         </div>
         <div className="flex items-center gap-3">
-          <RoomControls raisedHand={raisedHand} onToggleHand={handleRaiseHand} />
+          <MediaControls />
+          <div className="h-6 w-px bg-zinc-200 mx-1" />
+          <Button
+            onClick={handleRaiseHand}
+            variant={raisedHand ? "default" : "outline"}
+            size="sm"
+            className={raisedHand ? "bg-yellow-500 hover:bg-yellow-600" : ""}
+          >
+            <Hand className="mr-2 h-4 w-4" />
+            {raisedHand ? "Lower Hand" : "Raise Hand"}
+          </Button>
+          <ReactionsBar />
+          <div className="h-6 w-px bg-zinc-200 mx-1" />
           <Button
             onClick={onLeave}
             variant="outline"
