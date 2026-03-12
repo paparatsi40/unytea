@@ -8,7 +8,7 @@ import { SessionChat } from "./SessionChat";
 import { SessionWhiteboard } from "./SessionWhiteboard";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { LogOut, Hand, Video, VideoOff, Mic, MicOff, X } from "lucide-react";
+import { LogOut, Hand, Video, VideoOff, Mic, MicOff } from "lucide-react";
 import { ReactionsBar } from "./ReactionsBar";
 import { useRoomContext, useSpeakingParticipants } from "@livekit/components-react";
 interface VideoRoomUIProps {
