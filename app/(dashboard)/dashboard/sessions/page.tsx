@@ -272,28 +272,27 @@ export default async function SessionsPage() {
 
                 {/* Actions */}
                 <div className="mt-4 flex items-center gap-2">
-                  {s.status === "COMPLETED" ? (
-                    <>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        className="flex-1 rounded-full border-zinc-700 bg-transparent text-xs text-zinc-300 hover:bg-zinc-800"
-                      >
-                        <Play className="mr-1 h-3 w-3" />
-                        Watch
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        className="text-xs text-purple-400 hover:text-purple-300 hover:bg-purple-500/10"
-                      >
-                        Add to course
-                      </Button>
-                    </>
-                  ) : (
-                    <span className="text-xs text-zinc-500">
-                      Recording processing...
-                    </span>
+                  {/* Always show Enter Room button for past sessions */}
+                  <Link href={`/dashboard/sessions/${s.id}/room`} className="flex-1">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="w-full rounded-full border-zinc-700 bg-transparent text-xs text-zinc-300 hover:bg-zinc-800"
+                    >
+                      Enter Room
+                    </Button>
+                  </Link>
+                  
+                  {/* Show recording buttons if available */}
+                  {s.recordingUrl && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      className="text-xs text-green-400 hover:text-green-300 hover:bg-green-500/10"
+                    >
+                      <Play className="mr-1 h-3 w-3" />
+                      Watch
+                    </Button>
                   )}
                 </div>
               </div>
