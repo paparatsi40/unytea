@@ -7,7 +7,7 @@ import {
   useLocalParticipant,
   useTracks,
 } from "@livekit/components-react";
-import { Track } from "livekit-client";
+import { Track, LocalTrack } from "livekit-client";
 import { Monitor, Video, Pencil } from "lucide-react";
 import { SessionMode } from "./ModeSwitcher";
 import { SessionWhiteboard } from "./SessionWhiteboard";
@@ -123,7 +123,11 @@ export function MainStage({
           )
         ) : isCameraEnabled ? (
           <div className="h-full w-full bg-black relative" key={cameraTrack?.trackSid || 'no-camera'}>
-            <LocalVideo className="h-full w-full object-cover" />
+            <LocalVideo 
+              className="h-full w-full object-cover" 
+              cameraTrack={cameraTrack}
+              isCameraEnabled={isCameraEnabled}
+            />
             {/* Debug info - camera status */}
             <div className="absolute bottom-4 left-4 rounded bg-black/70 px-3 py-2 text-xs text-white z-50">
               <div>Camera: {isCameraEnabled ? 'ON' : 'OFF'}</div>

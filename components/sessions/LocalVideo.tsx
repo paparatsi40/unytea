@@ -1,18 +1,18 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useLocalParticipant } from "@livekit/components-react";
+import { LocalTrack } from "livekit-client";
 
 interface LocalVideoProps {
   className?: string;
+  cameraTrack?: LocalTrack | null;
+  isCameraEnabled: boolean;
 }
 
-export function LocalVideo({ className }: LocalVideoProps) {
+export function LocalVideo({ className, cameraTrack, isCameraEnabled }: LocalVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const localParticipantData = useLocalParticipant();
-  const cameraTrack = localParticipantData.cameraTrack;
-  const isCameraEnabled = localParticipantData.isCameraEnabled;
   const [debugInfo, setDebugInfo] = useState<string>("Initializing...");
+  const [hasVideo, setHasVideo] = useState(false);
 
   // Debug: log render values
   console.log('LocalVideo RENDER:', { 
@@ -23,13 +23,14 @@ export function LocalVideo({ className }: LocalVideoProps) {
 
   useEffect(() => {
     const videoEl = videoRef.current;
-    const track = cameraTrack?.track;
+    const track = cameraTrack;
 
     console.log("LocalVideo effect:", { videoEl: !!videoEl, track: !!track, isCameraEnabled });
     setDebugInfo(`VideoEl: ${!!videoEl}, Track: ${!!track}, Enabled: ${isCameraEnabled}`);
 
     if (!videoEl || !track) {
       setDebugInfo(`Missing: ${!videoEl ? 'videoEl ' : ''}${!track ? 'track' : ''}`);
+      setHasVideo(false);
       return;
     }
 
@@ -37,9 +38,11 @@ export function LocalVideo({ className }: LocalVideoProps) {
       // Attach the track to the video element
       track.attach(videoEl);
       setDebugInfo("Track attached successfully");
+      setHasVideo(true);
       console.log("Track attached to video element");
     } catch (err) {
       setDebugInfo(`Error: ${err}`);
+      setHasVideo(false);
       console.error("Error attaching track:", err);
     }
 
@@ -94,6 +97,15 @@ export function LocalVideo({ className }: LocalVideoProps) {
       <div className="absolute top-2 right-2 rounded bg-green-600/80 px-2 py-1 text-[10px] text-white font-bold">
         VIDEO READY
       </div>
+      {/* Show warning if video not showing */}
+      {!hasVideo && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+          <div className="text-center text-white">
+            <p className="text-lg font-bold">Waiting for video...</p>
+            <p className="text-sm">{debugInfo}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
