@@ -1,7 +1,6 @@
 "use client";
 
 import { useRoomContext } from "@livekit/components-react";
-import { Button } from "@/components/ui/button";
 
 const REACTIONS = [
   { emoji: "👍", label: "thumbsup" },
