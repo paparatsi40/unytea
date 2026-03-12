@@ -9,47 +9,46 @@ export function ParticipantsPanel() {
   const speakingParticipants = useSpeakingParticipants();
 
   const isSpeaking = (identity: string) => {
-    return speakingParticipants.some(p => p.identity === identity);
+    return speakingParticipants.some((p) => p.identity === identity);
   };
 
   return (
-    <div className="flex h-full flex-col bg-white">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-zinc-200 px-4 py-3">
-        <span className="text-sm font-semibold text-zinc-900">Participants</span>
-      </div>
-
+    <div className="flex h-full flex-col bg-zinc-900">
       {/* List */}
-      <div className="flex-1 overflow-y-auto p-2">
+      <div className="flex-1 overflow-y-auto p-3">
         {participants.map((participant) => {
           const speaking = isSpeaking(participant.identity);
-          
+
           return (
             <div
               key={participant.sid}
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 transition-colors",
-                speaking ? "bg-green-50 ring-1 ring-green-200" : "hover:bg-zinc-50"
+                "flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-200",
+                speaking
+                  ? "bg-zinc-800/80 ring-1 ring-green-500/30"
+                  : "hover:bg-zinc-800/50"
               )}
             >
               {/* Avatar with speaking indicator */}
-              <div className={cn(
-                "flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium text-white transition-all",
-                speaking 
-                  ? "bg-gradient-to-br from-green-500 to-green-600 ring-2 ring-green-300 ring-offset-1" 
-                  : "bg-gradient-to-br from-purple-500 to-pink-500"
-              )}>
+              <div
+                className={cn(
+                  "flex h-9 w-9 items-center justify-center rounded-full text-sm font-medium text-white transition-all duration-200",
+                  speaking
+                    ? "bg-gradient-to-br from-green-500 to-green-600 ring-2 ring-green-400/50"
+                    : "bg-gradient-to-br from-purple-500 to-pink-500"
+                )}
+              >
                 {(participant.name || participant.identity).charAt(0).toUpperCase()}
               </div>
 
               {/* Info */}
-              <div className="flex-1 min-w-0">
+              <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <p className="truncate text-sm font-medium text-zinc-900">
+                  <p className="truncate text-sm font-medium text-zinc-100">
                     {participant.name || participant.identity}
                   </p>
                   {speaking && (
-                    <span className="flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+                    <span className="flex items-center gap-1 rounded-full bg-green-500/20 px-2 py-0.5 text-xs font-medium text-green-400">
                       <Volume2 className="h-3 w-3" />
                       speaking
                     </span>
@@ -62,13 +61,13 @@ export function ParticipantsPanel() {
                 {participant.isCameraEnabled ? (
                   <Video className="h-4 w-4 text-green-500" />
                 ) : (
-                  <VideoOff className="h-4 w-4 text-zinc-400" />
+                  <VideoOff className="h-4 w-4 text-zinc-600" />
                 )}
-                
+
                 {participant.isMicrophoneEnabled ? (
                   <Mic className="h-4 w-4 text-green-500" />
                 ) : (
-                  <MicOff className="h-4 w-4 text-zinc-400" />
+                  <MicOff className="h-4 w-4 text-zinc-600" />
                 )}
               </div>
             </div>

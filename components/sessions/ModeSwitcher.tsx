@@ -1,7 +1,6 @@
 "use client";
 
 import { Video, Monitor, Pencil } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export type SessionMode = "video" | "screen" | "whiteboard";
@@ -13,45 +12,47 @@ interface ModeSwitcherProps {
   hasScreenShare?: boolean;
 }
 
-const modes: { id: SessionMode; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
-  { id: "video", label: "Video", icon: Video },
-  { id: "screen", label: "Screen", icon: Monitor },
-  { id: "whiteboard", label: "Whiteboard", icon: Pencil },
+const MODES = [
+  { id: "video" as SessionMode, label: "Video", icon: Video },
+  { id: "screen" as SessionMode, label: "Screen", icon: Monitor },
+  { id: "whiteboard" as SessionMode, label: "Whiteboard", icon: Pencil },
 ];
 
 export function ModeSwitcher({
   currentMode,
   onModeChange,
-  hasWhiteboard = true,
+  hasWhiteboard = false,
   hasScreenShare = true,
 }: ModeSwitcherProps) {
-  return (
-    <div className="flex items-center gap-1 rounded-lg border border-zinc-200 bg-white p-1 shadow-sm">
-      {modes.map((mode) => {
-        // Skip screen mode if not available
-        if (mode.id === "screen" && !hasScreenShare) return null;
-        // Skip whiteboard mode if not available
-        if (mode.id === "whiteboard" && !hasWhiteboard) return null;
+  const availableModes = MODES.filter((mode) => {
+    if (mode.id === "whiteboard" && !hasWhiteboard) return false;
+    return true;
+  });
 
+  return (
+    <div className="flex items-center">
+      {availableModes.map((mode, index) => {
         const Icon = mode.icon;
         const isActive = currentMode === mode.id;
+        const isFirst = index === 0;
+        const isLast = index === availableModes.length - 1;
 
         return (
-          <Button
+          <button
             key={mode.id}
             onClick={() => onModeChange(mode.id)}
-            variant={isActive ? "default" : "ghost"}
-            size="sm"
             className={cn(
-              "flex items-center gap-2 px-3",
+              "flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-all duration-200",
+              isFirst && "rounded-l-full",
+              isLast && "rounded-r-full",
               isActive
-                ? "bg-purple-600 text-white hover:bg-purple-700"
-                : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
+                ? "bg-purple-600 text-white shadow-md"
+                : "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
             )}
           >
             <Icon className="h-4 w-4" />
-            <span className="hidden sm:inline">{mode.label}</span>
-          </Button>
+            <span>{mode.label}</span>
+          </button>
         );
       })}
     </div>

@@ -57,14 +57,6 @@ export function MainStage({
   const cameraTrack = localParticipantData.cameraTrack;
   const isScreenShareEnabled = localParticipantData.isScreenShareEnabled;
 
-  // Debug: log state
-  console.log('MainStage RENDER:', {
-    mode,
-    isCameraEnabled,
-    hasCameraTrack: !!cameraTrack,
-    trackSid: cameraTrack?.trackSid
-  });
-
   const cameraTracks = useTracks([Track.Source.Camera]);
   const screenTracks = useTracks([Track.Source.ScreenShare]);
 
@@ -128,12 +120,6 @@ export function MainStage({
               cameraTrack={cameraTrack}
               isCameraEnabled={isCameraEnabled}
             />
-            {/* Debug info - camera status */}
-            <div className="absolute bottom-4 left-4 rounded bg-black/70 px-3 py-2 text-xs text-white z-50">
-              <div>Camera: {isCameraEnabled ? 'ON' : 'OFF'}</div>
-              <div>Track: {cameraTrack ? 'YES' : 'NO'}</div>
-              <div>TrackID: {cameraTrack?.trackSid || 'none'}</div>
-            </div>
           </div>
         ) : (
           <EmptyStage
@@ -142,19 +128,6 @@ export function MainStage({
             description="Click the purple camera button below to start your video."
           />
         )}
-
-        {/* top-left badge */}
-        <div className="absolute left-4 top-4 rounded-full bg-black/60 px-3 py-1 text-xs font-medium text-zinc-200">
-          {mode === "screen"
-            ? isScreenShareEnabled
-              ? "Sharing screen"
-              : "Screen mode"
-            : mode === "whiteboard"
-              ? "Whiteboard mode"
-              : isCameraEnabled
-                ? "Live video"
-                : "Video mode"}
-        </div>
       </div>
 
       {/* SPEAKER STRIP */}
