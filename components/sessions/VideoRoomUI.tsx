@@ -7,7 +7,7 @@ import { ParticipantsPanel } from "./ParticipantsPanel";
 import { SessionChat } from "./SessionChat";
 import { SessionWhiteboard } from "./SessionWhiteboard";
 import { cn } from "@/lib/utils";
-import { LogOut, Hand, Video, VideoOff, Mic, MicOff } from "lucide-react";
+import { LogOut, Hand, Video, VideoOff, Mic, MicOff, Monitor } from "lucide-react";
 import { ReactionsBar } from "./ReactionsBar";
 import { useRoomContext } from "@livekit/components-react";
 
@@ -31,7 +31,7 @@ function ConnectionBadge() {
   };
 
   return (
-    <div className="flex items-center gap-1.5 text-xs font-medium text-zinc-600">
+    <div className="flex items-center gap-1.5 text-xs font-medium text-zinc-400">
       <span className={cn("h-1.5 w-1.5 rounded-full", getColor())} />
       <span className="capitalize">{state}</span>
     </div>
@@ -128,14 +128,94 @@ function MediaControls() {
   );
 }
 
+// Prompt to enable camera when off
+function CameraPrompt({ onEnable }: { onEnable: () => void }) {
+  return (
+    <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-900/95 z-10">
+      <div className="text-center">
+        <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-zinc-800">
+          <Video className="h-10 w-10 text-zinc-400" />
+        </div>
+        <h3 className="mb-2 text-lg font-medium text-white">Your camera is off</h3>
+        <p className="mb-6 text-sm text-zinc-400">Enable your camera to be seen by others</p>
+        <button
+          onClick={onEnable}
+          className="flex items-center gap-2 rounded-full bg-purple-600 px-6 py-3 text-sm font-medium text-white transition-all hover:bg-purple-700"
+        >
+          <Video className="h-5 w-5" />
+          Start Camera
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// Prompt to start screen share
+function ScreenSharePrompt({ onEnable, onCancel }: { onEnable: () => void; onCancel: () => void }) {
+  return (
+    <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-900/95 z-10">
+      <div className="text-center">
+        <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-zinc-800">
+          <Monitor className="h-10 w-10 text-zinc-400" />
+        </div>
+        <h3 className="mb-2 text-lg font-medium text-white">Share your screen</h3>
+        <p className="mb-6 text-sm text-zinc-400">Choose what you want to share with others</p>
+        <div className="flex items-center justify-center gap-3">
+          <button
+            onClick={onEnable}
+            className="flex items-center gap-2 rounded-full bg-purple-600 px-6 py-3 text-sm font-medium text-white transition-all hover:bg-purple-700"
+          >
+            <Monitor className="h-5 w-5" />
+            Start Sharing
+          </button>
+          <button
+            onClick={onCancel}
+            className="flex items-center gap-2 rounded-full border border-zinc-600 bg-transparent px-6 py-3 text-sm font-medium text-zinc-300 transition-all hover:bg-zinc-800"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function VideoRoomUI({ sessionId, onLeave }: VideoRoomUIProps) {
   const [mode, setMode] = useState<SessionMode>("video");
   const [activeTab, setActiveTab] = useState<"participants" | "chat">("participants");
   const [raisedHand, setRaisedHand] = useState(false);
+  const [isLoadingCamera, setIsLoadingCamera] = useState(false);
+  const [isLoadingScreen, setIsLoadingScreen] = useState(false);
   const room = useRoomContext();
   const participants = useParticipants();
+  const localParticipant = useLocalParticipant();
 
   const isWhiteboardMode = mode === "whiteboard" && sessionId;
+  const isScreenMode = mode === "screen";
+  const isCameraEnabled = localParticipant.isCameraEnabled;
+  const isScreenSharing = localParticipant.isScreenShareEnabled;
+
+  const toggleCamera = async () => {
+    setIsLoadingCamera(true);
+    try {
+      await localParticipant.localParticipant.setCameraEnabled(!isCameraEnabled);
+    } catch (error) {
+      console.error("Failed to toggle camera:", error);
+    } finally {
+      setIsLoadingCamera(false);
+    }
+  };
+
+  const toggleScreenShare = async () => {
+    setIsLoadingScreen(true);
+    try {
+      await localParticipant.localParticipant.setScreenShareEnabled(!isScreenSharing);
+    } catch (error) {
+      console.error("Failed to toggle screen share:", error);
+    } finally {
+      setIsLoadingScreen(false);
+    }
+  };
 
   const handleRaiseHand = async () => {
     try {
@@ -230,6 +310,17 @@ export function VideoRoomUI({ sessionId, onLeave }: VideoRoomUIProps) {
               <VideoConference 
                 className="h-full w-full"
               />
+              {/* Camera prompt in video mode */}
+              {!isCameraEnabled && !isLoadingCamera && !isScreenMode && (
+                <CameraPrompt onEnable={toggleCamera} />
+              )}
+              {/* Screen share prompt in screen mode */}
+              {isScreenMode && !isScreenSharing && !isLoadingScreen && (
+                <ScreenSharePrompt 
+                  onEnable={toggleScreenShare} 
+                  onCancel={() => setMode("video")}
+                />
+              )}
             </div>
           )}
         </div>
