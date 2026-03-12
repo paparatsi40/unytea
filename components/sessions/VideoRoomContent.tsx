@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRoomContext, useLocalParticipant } from "@livekit/components-react";
+import { useRoomContext } from "@livekit/components-react";
 import { Button } from "@/components/ui/button";
 import { Hand } from "lucide-react";
 import { SessionLayout, SessionMain, SessionSidebar } from "./SessionLayout";
@@ -19,7 +19,6 @@ export function VideoRoomContent({ sessionId }: VideoRoomContentProps) {
   const [mode, setMode] = useState<SessionMode>("video");
   const [raisedHand, setRaisedHand] = useState(false);
   const room = useRoomContext();
-  const localParticipant = useLocalParticipant();
 
   const handleRaiseHand = async () => {
     try {
