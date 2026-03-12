@@ -7,7 +7,7 @@ import {
   useLocalParticipant,
   useTracks,
 } from "@livekit/components-react";
-import { Track, LocalTrack } from "livekit-client";
+import { Track } from "livekit-client";
 import { Monitor, Video, Pencil } from "lucide-react";
 import { SessionMode } from "./ModeSwitcher";
 import { SessionWhiteboard } from "./SessionWhiteboard";
