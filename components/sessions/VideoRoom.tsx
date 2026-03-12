@@ -76,7 +76,7 @@ export function VideoRoom({ roomName, sessionId, onLeave }: VideoRoomProps) {
     fetchToken();
   }, [roomName]);
 
-  /*const handleDisconnected = () => {
+  const handleDisconnected = () => {
     console.log("Disconnected, hasConnected:", hasConnected.current);
     setConnectionError("Disconnected from LiveKit room");
 
@@ -86,7 +86,7 @@ export function VideoRoom({ roomName, sessionId, onLeave }: VideoRoomProps) {
     //   onLeave();
     // }
   };
-*/
+
   const handleError = (err: Error) => {
     console.error("LiveKit Room Error:", err);
     setConnectionError(err.message);
