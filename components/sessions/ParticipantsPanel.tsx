@@ -2,7 +2,6 @@
 
 import { useParticipants } from "@livekit/components-react";
 import { Video, Mic, MicOff, VideoOff } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 interface ParticipantInfo {
   sid: string;
