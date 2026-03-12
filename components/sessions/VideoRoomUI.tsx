@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { LogOut, Hand, Video, VideoOff, Mic, MicOff } from "lucide-react";
 import { ReactionsBar } from "./ReactionsBar";
-import { useRoomContext, useSpeakingParticipants } from "@livekit/components-react";
+import { useRoomContext } from "@livekit/components-react";
 interface VideoRoomUIProps {
   sessionId?: string;
   onLeave?: () => void;
@@ -141,19 +141,6 @@ function MediaControls() {
         inactiveLabel="Start Camera"
       />
     </div>
-  );
-}
-
-function SpeakerIndicator({ identity }: { identity: string }) {
-  const speakingParticipants = useSpeakingParticipants();
-  const isSpeaking = speakingParticipants.some(p => p.identity === identity);
-  
-  if (!isSpeaking) return null;
-  
-  return (
-    <span className="ml-2 rounded-full bg-green-500 px-2 py-0.5 text-xs font-medium text-white">
-      speaking
-    </span>
   );
 }
 
