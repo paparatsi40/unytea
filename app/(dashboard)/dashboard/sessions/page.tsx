@@ -207,12 +207,6 @@ export default async function SessionsPage() {
                       </span>
                       <span>•</span>
                       <span>{s.duration} min</span>
-                      {s.participants && (
-                        <>
-                          <span>•</span>
-                          <span>{s.participants.length} participants</span>
-                        </>
-                      )}
                     </div>
                   </div>
                 </div>
