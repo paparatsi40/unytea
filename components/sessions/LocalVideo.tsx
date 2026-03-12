@@ -78,17 +78,21 @@ export function LocalVideo({ className }: LocalVideoProps) {
   }
 
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-full h-full" key={cameraTrack?.trackSid || 'no-track'}>
       <video
         ref={videoRef}
         autoPlay
         playsInline
         muted
         className={className}
-        style={{ transform: "scaleX(-1)" }} // Mirror the video
+        style={{ transform: "scaleX(-1)", background: 'black' }}
       />
       <div className="absolute bottom-2 right-2 rounded bg-black/70 px-2 py-1 text-[10px] text-white">
         {debugInfo}
+      </div>
+      {/* Debug overlay - video ready state */}
+      <div className="absolute top-2 right-2 rounded bg-green-600/80 px-2 py-1 text-[10px] text-white font-bold">
+        VIDEO READY
       </div>
     </div>
   );
