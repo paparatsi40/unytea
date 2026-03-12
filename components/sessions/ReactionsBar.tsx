@@ -34,19 +34,17 @@ export function ReactionsBar() {
   };
 
   return (
-    <div className="flex items-center gap-1 rounded-lg border border-zinc-200 bg-white p-1 shadow-sm">
+    <div className="flex items-center gap-1">
       {REACTIONS.map((reaction) => (
-        <Button
+        <button
           key={reaction.label}
           onClick={() => sendReaction(reaction.emoji, reaction.label)}
-          variant="ghost"
-          size="sm"
-          className="h-8 w-8 p-0 text-lg hover:bg-zinc-100"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-100 text-lg transition-all hover:bg-zinc-200 hover:scale-110"
           title={reaction.label}
         >
           <span className="sr-only">{reaction.label}</span>
           {reaction.emoji}
-        </Button>
+        </button>
       ))}
     </div>
   );

@@ -8,9 +8,9 @@ import { SessionChat } from "./SessionChat";
 import { SessionWhiteboard } from "./SessionWhiteboard";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { LogOut, Hand, Video, VideoOff, Mic, MicOff } from "lucide-react";
+import { LogOut, Hand, Video, VideoOff, Mic, MicOff, Monitor, MessageSquare, X } from "lucide-react";
 import { ReactionsBar } from "./ReactionsBar";
-import { useRoomContext } from "@livekit/components-react";
+import { useRoomContext, useSpeakingParticipants } from "@livekit/components-react";
 
 interface VideoRoomUIProps {
   sessionId?: string;
@@ -32,21 +32,62 @@ function ConnectionBadge({ mode }: { mode: SessionMode }) {
 
   const getModeLabel = (m: SessionMode) => {
     switch (m) {
-      case "video": return "Video Mode";
-      case "screen": return "Screen Mode";
-      case "whiteboard": return "Whiteboard Mode";
+      case "video": return "Video";
+      case "screen": return "Screen";
+      case "whiteboard": return "Whiteboard";
     }
   };
 
   return (
-    <div className="flex items-center gap-3 text-sm">
+    <div className="flex items-center gap-2 text-sm">
       <div className="flex items-center gap-2 rounded-full bg-zinc-100 px-3 py-1.5 font-medium">
         <span className={cn("h-2 w-2 rounded-full", getColor(state))} />
         <span className="capitalize text-zinc-700">{state}</span>
       </div>
       <span className="text-zinc-400">•</span>
-      <span className="font-medium text-zinc-900">{getModeLabel(mode)}</span>
+      <span className="font-medium text-zinc-900">{getModeLabel(mode)} Mode</span>
     </div>
+  );
+}
+
+// Circular control button like Zoom
+function ControlButton({
+  onClick,
+  isActive,
+  isLoading,
+  activeIcon: ActiveIcon,
+  inactiveIcon: InactiveIcon,
+  activeLabel,
+  inactiveLabel,
+  activeClass = "bg-zinc-800 hover:bg-zinc-700 text-white",
+  inactiveClass = "bg-white hover:bg-zinc-50 text-zinc-700 border border-zinc-300",
+}: {
+  onClick: () => void;
+  isActive: boolean;
+  isLoading: boolean;
+  activeIcon: React.ComponentType<{ className?: string }>;
+  inactiveIcon: React.ComponentType<{ className?: string }>;
+  activeLabel: string;
+  inactiveLabel: string;
+  activeClass?: string;
+  inactiveClass?: string;
+}) {
+  const Icon = isActive ? ActiveIcon : InactiveIcon;
+  const label = isActive ? activeLabel : inactiveLabel;
+  
+  return (
+    <button
+      onClick={onClick}
+      disabled={isLoading}
+      className={cn(
+        "flex flex-col items-center gap-1 transition-all",
+        isActive ? activeClass : inactiveClass,
+        "rounded-full p-3 shadow-sm disabled:opacity-50"
+      )}
+      title={label}
+    >
+      <Icon className="h-5 w-5" />
+    </button>
   );
 }
 
@@ -82,44 +123,38 @@ function MediaControls() {
 
   return (
     <div className="flex items-center gap-2">
-      <Button
-        onClick={toggleCamera}
-        variant={isCameraEnabled ? "default" : "outline"}
-        size="sm"
-        disabled={isLoadingCamera}
-        className={cn(
-          isCameraEnabled 
-            ? "bg-purple-600 hover:bg-purple-700 text-white" 
-            : "border-zinc-300 text-zinc-600 hover:bg-zinc-50"
-        )}
-      >
-        {isCameraEnabled ? (
-          <Video className="mr-2 h-4 w-4" />
-        ) : (
-          <VideoOff className="mr-2 h-4 w-4" />
-        )}
-        {isCameraEnabled ? "Stop Camera" : "Start Camera"}
-      </Button>
-
-      <Button
+      <ControlButton
         onClick={toggleMicrophone}
-        variant={isMicrophoneEnabled ? "default" : "outline"}
-        size="sm"
-        disabled={isLoadingMic}
-        className={cn(
-          isMicrophoneEnabled 
-            ? "bg-purple-600 hover:bg-purple-700 text-white" 
-            : "border-zinc-300 text-zinc-600 hover:bg-zinc-50"
-        )}
-      >
-        {isMicrophoneEnabled ? (
-          <Mic className="mr-2 h-4 w-4" />
-        ) : (
-          <MicOff className="mr-2 h-4 w-4" />
-        )}
-        {isMicrophoneEnabled ? "Mute" : "Unmute"}
-      </Button>
+        isActive={isMicrophoneEnabled}
+        isLoading={isLoadingMic}
+        activeIcon={Mic}
+        inactiveIcon={MicOff}
+        activeLabel="Mute"
+        inactiveLabel="Unmute"
+      />
+      <ControlButton
+        onClick={toggleCamera}
+        isActive={isCameraEnabled}
+        isLoading={isLoadingCamera}
+        activeIcon={Video}
+        inactiveIcon={VideoOff}
+        activeLabel="Stop Camera"
+        inactiveLabel="Start Camera"
+      />
     </div>
+  );
+}
+
+function SpeakerIndicator({ identity }: { identity: string }) {
+  const speakingParticipants = useSpeakingParticipants();
+  const isSpeaking = speakingParticipants.some(p => p.identity === identity);
+  
+  if (!isSpeaking) return null;
+  
+  return (
+    <span className="ml-2 rounded-full bg-green-500 px-2 py-0.5 text-xs font-medium text-white">
+      speaking
+    </span>
   );
 }
 
@@ -152,7 +187,7 @@ export function VideoRoomUI({ sessionId, onLeave }: VideoRoomUIProps) {
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
-      {/* Compact Top Control Bar */}
+      {/* Top Control Bar - Compact */}
       <div className="flex shrink-0 items-center justify-between border-b border-zinc-200 bg-white px-4 py-2">
         <div className="flex items-center gap-4">
           <ConnectionBadge mode={mode} />
@@ -165,23 +200,26 @@ export function VideoRoomUI({ sessionId, onLeave }: VideoRoomUIProps) {
         </div>
         <div className="flex items-center gap-3">
           <MediaControls />
-          <div className="h-6 w-px bg-zinc-200 mx-1" />
+          <div className="h-8 w-px bg-zinc-200" />
           <Button
             onClick={handleRaiseHand}
             variant={raisedHand ? "default" : "outline"}
             size="sm"
-            className={raisedHand ? "bg-yellow-500 hover:bg-yellow-600" : ""}
+            className={cn(
+              "rounded-full px-4",
+              raisedHand ? "bg-yellow-500 hover:bg-yellow-600" : ""
+            )}
           >
             <Hand className="mr-2 h-4 w-4" />
-            {raisedHand ? "Lower Hand" : "Raise Hand"}
+            {raisedHand ? "Lower" : "Raise"}
           </Button>
           <ReactionsBar />
-          <div className="h-6 w-px bg-zinc-200 mx-1" />
+          <div className="h-8 w-px bg-zinc-200" />
           <Button
             onClick={onLeave}
-            variant="outline"
+            variant="destructive"
             size="sm"
-            className="border-red-500 text-red-600 hover:bg-red-50 hover:text-red-700"
+            className="rounded-full px-4"
           >
             <LogOut className="mr-2 h-4 w-4" />
             Leave
@@ -259,7 +297,7 @@ export function VideoRoomUI({ sessionId, onLeave }: VideoRoomUIProps) {
             </button>
           </div>
 
-          {/* Tab Content */}
+          {/* Tab Content with Speaker Indicator */}
           <div className="flex-1 overflow-hidden">
             {activeTab === "participants" ? (
               <ParticipantsPanel />
