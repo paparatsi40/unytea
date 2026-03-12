@@ -28,10 +28,11 @@ function ConnectionStatus() {
 interface VideoRoomProps {
   roomName: string;
   sessionId?: string;
-  _onLeave?: () => void;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onLeave?: () => void;
 }
 
-export function VideoRoom({ roomName, sessionId, _onLeave }: VideoRoomProps) {
+export function VideoRoom({ roomName, sessionId, onLeave: _onLeave }: VideoRoomProps) {
   const [token, setToken] = useState("");
   const [wsUrl, setWsUrl] = useState("");
   const [loading, setLoading] = useState(true);
