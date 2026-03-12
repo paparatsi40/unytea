@@ -1,13 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   LiveKitRoom,
+  ParticipantTile,
   RoomAudioRenderer,
-  VideoConference,
+  useTracks,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
 import { AlertCircle, Loader2 } from "lucide-react";
+import { Track } from "livekit-client";
 import { VideoRoomContent } from "./VideoRoomContent";
 
 interface VideoRoomProps {
@@ -16,14 +18,46 @@ interface VideoRoomProps {
   onLeave?: () => void;
 }
 
+function SimpleRoomGrid() {
+  const tracks = useTracks(
+    [
+      { source: Track.Source.Camera, withPlaceholder: true },
+      { source: Track.Source.ScreenShare, withPlaceholder: false },
+    ],
+    {
+      onlySubscribed: false,
+    }
+  );
+
+  return (
+    <div className="grid h-full grid-cols-1 gap-4 p-4 md:grid-cols-2 xl:grid-cols-3">
+      {tracks.length === 0 ? (
+        <div className="col-span-full flex items-center justify-center rounded-2xl bg-zinc-900 text-zinc-400">
+          Waiting for participants...
+        </div>
+      ) : (
+        tracks.map((trackRef) => (
+          <div
+            key={`${trackRef.participant.identity}-${trackRef.source}`}
+            className="overflow-hidden rounded-2xl bg-zinc-900"
+          >
+            <ParticipantTile trackRef={trackRef} />
+          </div>
+        ))
+      )}
+    </div>
+  );
+}
+
 export function VideoRoom({ roomName, sessionId, onLeave }: VideoRoomProps) {
   const [token, setToken] = useState("");
   const [wsUrl, setWsUrl] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [roomError, setRoomError] = useState<string | null>(null);
 
   useEffect(() => {
-    let active = true;
+    let cancelled = false;
 
     async function fetchToken() {
       try {
@@ -35,9 +69,7 @@ export function VideoRoom({ roomName, sessionId, onLeave }: VideoRoomProps) {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            roomName,
-          }),
+          body: JSON.stringify({ roomName }),
         });
 
         const data = await res.json().catch(() => ({}));
@@ -61,18 +93,18 @@ export function VideoRoom({ roomName, sessionId, onLeave }: VideoRoomProps) {
           throw new Error("LiveKit server URL is missing");
         }
 
-        if (!active) return;
+        if (cancelled) return;
 
         setToken(nextToken);
         setWsUrl(nextWsUrl);
       } catch (err) {
         console.error("Error fetching LiveKit token:", err);
-        if (!active) return;
+        if (cancelled) return;
         setError(
           err instanceof Error ? err.message : "Could not connect to video room"
         );
       } finally {
-        if (active) {
+        if (!cancelled) {
           setLoading(false);
         }
       }
@@ -81,13 +113,9 @@ export function VideoRoom({ roomName, sessionId, onLeave }: VideoRoomProps) {
     fetchToken();
 
     return () => {
-      active = false;
+      cancelled = true;
     };
   }, [roomName]);
-
-  const roomKey = useMemo(() => {
-    return `${roomName}:${token}:${wsUrl}`;
-  }, [roomName, token, wsUrl]);
 
   if (loading) {
     return (
@@ -134,8 +162,13 @@ export function VideoRoom({ roomName, sessionId, onLeave }: VideoRoomProps) {
 
   return (
     <div className="relative h-[700px] w-full overflow-hidden rounded-xl bg-card">
+      {roomError ? (
+        <div className="absolute left-4 right-4 top-4 z-50 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+          {roomError}
+        </div>
+      ) : null}
+
       <LiveKitRoom
-        key={roomKey}
         token={token}
         serverUrl={wsUrl}
         connect={true}
@@ -143,12 +176,14 @@ export function VideoRoom({ roomName, sessionId, onLeave }: VideoRoomProps) {
         audio={false}
         onConnected={() => {
           console.log("Connected to LiveKit room");
+          setRoomError(null);
         }}
         onDisconnected={(reason) => {
           console.log("Disconnected from LiveKit room", reason);
         }}
         onError={(err) => {
           console.error("LiveKit room error:", err);
+          setRoomError(err?.message || "LiveKit room error");
         }}
         options={{
           adaptiveStream: true,
@@ -156,7 +191,7 @@ export function VideoRoom({ roomName, sessionId, onLeave }: VideoRoomProps) {
         }}
         className="h-full"
       >
-        <VideoConference />
+        <SimpleRoomGrid />
         <RoomAudioRenderer />
         <VideoRoomContent sessionId={sessionId} onLeave={onLeave} />
       </LiveKitRoom>

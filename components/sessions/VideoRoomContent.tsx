@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useRoomContext, useConnectionState } from "@livekit/components-react";
-import { LocalParticipant, ParticipantEvent, RoomEvent, Track, ConnectionState as LKConnectionState } from "livekit-client";
+import { useCallback, useEffect, useState } from "react";
+import { useRoomContext } from "@livekit/components-react";
+import { ParticipantEvent, RoomEvent, Track } from "livekit-client";
 import {
   Mic,
   MicOff,
@@ -22,38 +22,31 @@ type Props = {
 
 export function VideoRoomContent({ sessionId, onLeave }: Props) {
   const room = useRoomContext();
-  const connectionState = useConnectionState();
 
   const [showWhiteboard, setShowWhiteboard] = useState(false);
   const [cameraEnabled, setCameraEnabled] = useState(false);
   const [microphoneEnabled, setMicrophoneEnabled] = useState(false);
   const [isBusy, setIsBusy] = useState(false);
 
-  const isConnected = connectionState === LKConnectionState.Connected;
+  const syncTrackState = useCallback(() => {
+    const publications = Array.from(
+      room.localParticipant.trackPublications.values()
+    );
 
-  const syncTrackState = useMemo(() => {
-    return () => {
-      const publications = Array.from(
-        room.localParticipant.trackPublications.values()
-      );
+    const camOn = publications.some(
+      (p) => p.source === Track.Source.Camera && !p.isMuted
+    );
 
-      const camOn = publications.some(
-        (p) => p.source === Track.Source.Camera && !p.isMuted
-      );
+    const micOn = publications.some(
+      (p) => p.source === Track.Source.Microphone && !p.isMuted
+    );
 
-      const micOn = publications.some(
-        (p) => p.source === Track.Source.Microphone && !p.isMuted
-      );
-
-      setCameraEnabled(camOn);
-      setMicrophoneEnabled(micOn);
-    };
+    setCameraEnabled(camOn);
+    setMicrophoneEnabled(micOn);
   }, [room]);
 
   useEffect(() => {
     syncTrackState();
-
-    const localParticipant = room.localParticipant as LocalParticipant;
 
     const update = () => {
       syncTrackState();
@@ -63,30 +56,24 @@ export function VideoRoomContent({ sessionId, onLeave }: Props) {
     room.on(RoomEvent.LocalTrackUnpublished, update);
     room.on(RoomEvent.TrackMuted, update);
     room.on(RoomEvent.TrackUnmuted, update);
-
-    localParticipant.on(ParticipantEvent.TrackPublished, update);
-    localParticipant.on(ParticipantEvent.TrackUnpublished, update);
-    localParticipant.on(ParticipantEvent.TrackMuted, update);
-    localParticipant.on(ParticipantEvent.TrackUnmuted, update);
+    room.localParticipant.on(ParticipantEvent.TrackPublished, update);
+    room.localParticipant.on(ParticipantEvent.TrackUnpublished, update);
+    room.localParticipant.on(ParticipantEvent.TrackMuted, update);
+    room.localParticipant.on(ParticipantEvent.TrackUnmuted, update);
 
     return () => {
       room.off(RoomEvent.LocalTrackPublished, update);
       room.off(RoomEvent.LocalTrackUnpublished, update);
       room.off(RoomEvent.TrackMuted, update);
       room.off(RoomEvent.TrackUnmuted, update);
-
-      localParticipant.off(ParticipantEvent.TrackPublished, update);
-      localParticipant.off(ParticipantEvent.TrackUnpublished, update);
-      localParticipant.off(ParticipantEvent.TrackMuted, update);
-      localParticipant.off(ParticipantEvent.TrackUnmuted, update);
+      room.localParticipant.off(ParticipantEvent.TrackPublished, update);
+      room.localParticipant.off(ParticipantEvent.TrackUnpublished, update);
+      room.localParticipant.off(ParticipantEvent.TrackMuted, update);
+      room.localParticipant.off(ParticipantEvent.TrackUnmuted, update);
     };
   }, [room, syncTrackState]);
 
   const toggleCamera = async () => {
-    if (!isConnected) {
-      console.warn("Cannot toggle camera: room not connected. State:", connectionState);
-      return;
-    }
     try {
       setIsBusy(true);
       await room.localParticipant.setCameraEnabled(!cameraEnabled);
@@ -99,10 +86,6 @@ export function VideoRoomContent({ sessionId, onLeave }: Props) {
   };
 
   const toggleMicrophone = async () => {
-    if (!isConnected) {
-      console.warn("Cannot toggle microphone: room not connected. State:", connectionState);
-      return;
-    }
     try {
       setIsBusy(true);
       await room.localParticipant.setMicrophoneEnabled(!microphoneEnabled);
@@ -127,18 +110,7 @@ export function VideoRoomContent({ sessionId, onLeave }: Props) {
   return (
     <>
       <div className="pointer-events-none absolute inset-0 z-20">
-        <div className="pointer-events-auto absolute top-4 left-4 flex flex-wrap items-center gap-2">
-          {/* Connection Status */}
-          <div className={`rounded px-2 py-1 text-xs font-medium shadow-lg ${
-            isConnected 
-              ? "bg-green-500 text-white" 
-              : connectionState === LKConnectionState.Connecting 
-                ? "bg-yellow-500 text-white" 
-                : "bg-red-500 text-white"
-          }`}>
-            {isConnected ? "Connected" : connectionState === LKConnectionState.Connecting ? "Connecting..." : "Disconnected"}
-          </div>
-          
+        <div className="pointer-events-auto absolute left-4 top-4 flex flex-wrap items-center gap-2">
           {sessionId ? (
             <Button
               onClick={() => setShowWhiteboard((prev) => !prev)}
@@ -166,9 +138,8 @@ export function VideoRoomContent({ sessionId, onLeave }: Props) {
             onClick={toggleCamera}
             variant={cameraEnabled ? "default" : "outline"}
             size="sm"
-            disabled={isBusy || !isConnected}
+            disabled={isBusy}
             className="shadow-lg"
-            title={!isConnected ? "Wait for connection" : undefined}
           >
             {cameraEnabled ? (
               <>
@@ -187,9 +158,8 @@ export function VideoRoomContent({ sessionId, onLeave }: Props) {
             onClick={toggleMicrophone}
             variant={microphoneEnabled ? "default" : "outline"}
             size="sm"
-            disabled={isBusy || !isConnected}
+            disabled={isBusy}
             className="shadow-lg"
-            title={!isConnected ? "Wait for connection" : undefined}
           >
             {microphoneEnabled ? (
               <>
@@ -218,6 +188,7 @@ export function VideoRoomContent({ sessionId, onLeave }: Props) {
 
       {sessionId && showWhiteboard ? (
         <SessionWhiteboard
+          isOpen={showWhiteboard}
           onClose={() => setShowWhiteboard(false)}
           sessionId={sessionId}
         />
