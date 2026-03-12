@@ -5,9 +5,6 @@ import { X, Image as ImageIcon, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
 
-// Import Excalidraw styles
-import "@excalidraw/excalidraw/index.css";
-
 // Dynamic import to avoid SSR issues
 const Excalidraw = dynamic(
   async () => (await import("@excalidraw/excalidraw")).Excalidraw,
