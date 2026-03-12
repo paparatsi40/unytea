@@ -64,7 +64,7 @@ export function LocalVideo({ className, cameraTrack, isCameraEnabled }: LocalVid
   }
 
   return (
-    <div className="relative h-full w-full" key={cameraTrack?.trackSid || "no-track"}>
+    <div className="relative h-full w-full" key={cameraTrack?.sid || "no-track"}>
       <video
         ref={videoRef}
         autoPlay
