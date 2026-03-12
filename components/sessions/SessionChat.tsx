@@ -9,10 +9,11 @@ import { useChat, useRoomContext } from "@livekit/components-react";
 import { ChatMessage } from "livekit-client";
 
 interface SessionChatProps {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   sessionId: string;
 }
 
-export function SessionChat({ sessionId }: SessionChatProps) {
+export function SessionChat({ sessionId: _sessionId }: SessionChatProps) {
   const { chatMessages, send } = useChat();
   const room = useRoomContext();
   const [message, setMessage] = useState("");
