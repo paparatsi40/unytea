@@ -7,7 +7,7 @@ import {
   useLocalParticipant,
   useTracks,
 } from "@livekit/components-react";
-import { Track } from "livekit-client";
+import { Track, LocalTrack } from "livekit-client";
 import { Monitor, Video, Pencil } from "lucide-react";
 import { SessionMode } from "./ModeSwitcher";
 import { SessionWhiteboard } from "./SessionWhiteboard";
@@ -51,11 +51,12 @@ export function MainStage({
   sessionId,
   className,
 }: MainStageProps) {
-  const localParticipantData = useLocalParticipant();
-  const localParticipant = localParticipantData.localParticipant;
-  const isCameraEnabled = localParticipantData.isCameraEnabled;
-  const cameraTrack = localParticipantData.cameraTrack;
-  const isScreenShareEnabled = localParticipantData.isScreenShareEnabled;
+  const { localParticipant } = useLocalParticipant();
+  
+  // Access track states from localParticipant
+  const isCameraEnabled = localParticipant.isCameraEnabled;
+  const cameraTrack = localParticipant.getTrackPublication(Track.Source.Camera)?.track as LocalTrack | undefined;
+  const isScreenShareEnabled = localParticipant.isScreenShareEnabled;
 
   const cameraTracks = useTracks([Track.Source.Camera]);
   const screenTracks = useTracks([Track.Source.ScreenShare]);
