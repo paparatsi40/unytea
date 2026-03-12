@@ -13,6 +13,7 @@ import {
   TrendingUp,
   Award,
   Bell,
+  Library,
 } from "lucide-react";
 
 const navigation = [
@@ -20,6 +21,7 @@ const navigation = [
   { name: "Communities", href: "/dashboard/communities", icon: Users },
   { name: "Messages", href: "/dashboard/messages", icon: MessageSquare },
   { name: "Sessions", href: "/dashboard/sessions", icon: Video },
+  { name: "Recordings", href: "/dashboard/recordings", icon: Library },
   { name: "Courses", href: "/dashboard/courses", icon: BookOpen },
   { name: "Analytics", href: "/dashboard/analytics", icon: TrendingUp },
   { name: "Achievements", href: "/dashboard/achievements", icon: Award },
