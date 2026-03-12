@@ -45,7 +45,7 @@ export function VideoRoom({ roomName, sessionId, onLeave: _onLeave }: VideoRoomP
         const response = await fetch("/api/livekit/token", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ room: roomName }),
+          body: JSON.stringify({ roomName }),
         });
 
         if (!response.ok) {
