@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   LiveKitRoom,
   VideoConference,
@@ -9,17 +9,17 @@ import {
 } from "@livekit/components-react";
 import "@livekit/components-styles";
 import { Loader2, AlertCircle } from "lucide-react";
+import { VideoRoomContent } from "./VideoRoomContent";
 
-// Connection status component to debug
 function ConnectionStatus() {
   const connectionState = useConnectionState();
-  
+
   useEffect(() => {
     console.log("LiveKit Connection State:", connectionState);
   }, [connectionState]);
-  
+
   return (
-    <div className="absolute top-4 left-4 z-50 rounded bg-black/70 px-3 py-1 text-xs text-white">
+    <div className="absolute left-4 top-4 z-50 rounded bg-black/70 px-3 py-1 text-xs text-white">
       Status: {connectionState}
     </div>
   );
@@ -31,7 +31,7 @@ interface VideoRoomProps {
   onLeave?: () => void;
 }
 
-export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
+export function VideoRoom({ roomName, sessionId, onLeave }: VideoRoomProps) {
   const [token, setToken] = useState("");
   const [wsUrl, setWsUrl] = useState("");
   const [loading, setLoading] = useState(true);
@@ -66,9 +66,7 @@ export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
       } catch (err) {
         console.error("Token error:", err);
         setError(
-          err instanceof Error
-            ? err.message
-            : "Could not connect to video room"
+          err instanceof Error ? err.message : "Could not connect to video room"
         );
       } finally {
         setLoading(false);
@@ -78,14 +76,17 @@ export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
     fetchToken();
   }, [roomName]);
 
-  const handleDisconnected = () => {
+  /*const handleDisconnected = () => {
     console.log("Disconnected, hasConnected:", hasConnected.current);
-    // Only redirect if we were previously connected
-    if (hasConnected.current && onLeave) {
-      onLeave();
-    }
-  };
+    setConnectionError("Disconnected from LiveKit room");
 
+    // Temporalmente NO navegues automáticamente.
+    // Solo deja el log hasta estabilizar la conexión.
+    // if (hasConnected.current && onLeave) {
+    //   onLeave();
+    // }
+  };
+*/
   const handleError = (err: Error) => {
     console.error("LiveKit Room Error:", err);
     setConnectionError(err.message);
@@ -124,7 +125,7 @@ export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
           Connection Error: {connectionError}
         </div>
       )}
-      
+
       <LiveKitRoom
         token={token}
         serverUrl={wsUrl}
@@ -137,6 +138,7 @@ export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
         className="h-[700px]"
       >
         <ConnectionStatus />
+        <VideoRoomContent sessionId={sessionId} onLeave={onLeave} />
         <VideoConference />
         <RoomAudioRenderer />
       </LiveKitRoom>
