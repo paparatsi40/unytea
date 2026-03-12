@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { X, Image as ImageIcon, Trash2 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 
 // Dynamic import to avoid SSR issues
@@ -22,12 +22,11 @@ const Excalidraw = dynamic(
 );
 
 interface SessionWhiteboardProps {
-  isOpen: boolean;
   onClose: () => void;
   sessionId: string;
 }
 
-export function SessionWhiteboard({ isOpen, onClose, sessionId }: SessionWhiteboardProps) {
+export function SessionWhiteboard({ onClose, sessionId }: SessionWhiteboardProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [excalidrawAPI, setExcalidrawAPI] = useState<any>(null);
 
@@ -60,18 +59,14 @@ export function SessionWhiteboard({ isOpen, onClose, sessionId }: SessionWhitebo
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          transition={{ duration: 0.2 }}
-          className="absolute inset-4 z-50 flex flex-col overflow-hidden rounded-xl border border-purple-200 bg-white shadow-2xl"
-        >
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.2 }}
+      className="absolute inset-4 z-50 flex flex-col overflow-hidden rounded-xl border border-purple-200 bg-white shadow-2xl"
+    >
           {/* Header */}
           <div className="flex items-center justify-between border-b border-gray-200 bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-3">
             <div className="flex items-center gap-2">
@@ -132,7 +127,5 @@ export function SessionWhiteboard({ isOpen, onClose, sessionId }: SessionWhitebo
             />
           </div>
         </motion.div>
-      )}
-    </AnimatePresence>
   );
 }

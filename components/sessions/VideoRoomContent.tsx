@@ -216,9 +216,8 @@ export function VideoRoomContent({ sessionId, onLeave }: Props) {
         </div>
       </div>
 
-      {sessionId ? (
+      {sessionId && showWhiteboard ? (
         <SessionWhiteboard
-          isOpen={showWhiteboard}
           onClose={() => setShowWhiteboard(false)}
           sessionId={sessionId}
         />
