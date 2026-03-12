@@ -101,7 +101,7 @@ function MediaControls() {
   const toggleCamera = async () => {
     setIsLoadingCamera(true);
     try {
-      await localParticipant.setCameraEnabled(!isCameraEnabled);
+      await localParticipant.localParticipant.setCameraEnabled(!isCameraEnabled);
     } catch (error) {
       console.error("Failed to toggle camera:", error);
     } finally {
@@ -112,7 +112,7 @@ function MediaControls() {
   const toggleMicrophone = async () => {
     setIsLoadingMic(true);
     try {
-      await localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled);
+      await localParticipant.localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled);
     } catch (error) {
       console.error("Failed to toggle microphone:", error);
     } finally {
