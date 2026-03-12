@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocalParticipant } from "@livekit/components-react";
 
 interface LocalVideoProps {
@@ -12,20 +12,39 @@ export function LocalVideo({ className }: LocalVideoProps) {
   const localParticipantData = useLocalParticipant();
   const cameraTrack = localParticipantData.cameraTrack;
   const isCameraEnabled = localParticipantData.isCameraEnabled;
+  const [debugInfo, setDebugInfo] = useState<string>("Initializing...");
 
   useEffect(() => {
     const videoEl = videoRef.current;
     const track = cameraTrack?.track;
 
-    if (!videoEl || !track) return;
+    console.log("LocalVideo effect:", { videoEl: !!videoEl, track: !!track, isCameraEnabled });
+    setDebugInfo(`VideoEl: ${!!videoEl}, Track: ${!!track}, Enabled: ${isCameraEnabled}`);
 
-    // Attach the track to the video element
-    track.attach(videoEl);
+    if (!videoEl || !track) {
+      setDebugInfo(`Missing: ${!videoEl ? 'videoEl ' : ''}${!track ? 'track' : ''}`);
+      return;
+    }
+
+    try {
+      // Attach the track to the video element
+      track.attach(videoEl);
+      setDebugInfo("Track attached successfully");
+      console.log("Track attached to video element");
+    } catch (err) {
+      setDebugInfo(`Error: ${err}`);
+      console.error("Error attaching track:", err);
+    }
 
     return () => {
-      track.detach(videoEl);
+      try {
+        track.detach(videoEl);
+        console.log("Track detached from video element");
+      } catch (err) {
+        console.error("Error detaching track:", err);
+      }
     };
-  }, [cameraTrack]);
+  }, [cameraTrack, isCameraEnabled]);
 
   if (!isCameraEnabled || !cameraTrack) {
     return (
@@ -45,19 +64,25 @@ export function LocalVideo({ className }: LocalVideoProps) {
             />
           </svg>
           <span className="text-sm">Camera is off</span>
+          <span className="text-xs text-zinc-600">{debugInfo}</span>
         </div>
       </div>
     );
   }
 
   return (
-    <video
-      ref={videoRef}
-      autoPlay
-      playsInline
-      muted
-      className={className}
-      style={{ transform: "scaleX(-1)" }} // Mirror the video
-    />
+    <div className="relative w-full h-full">
+      <video
+        ref={videoRef}
+        autoPlay
+        playsInline
+        muted
+        className={className}
+        style={{ transform: "scaleX(-1)" }} // Mirror the video
+      />
+      <div className="absolute bottom-2 right-2 rounded bg-black/70 px-2 py-1 text-[10px] text-white">
+        {debugInfo}
+      </div>
+    </div>
   );
 }
