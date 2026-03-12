@@ -55,6 +55,7 @@ export function MainStage({
   const localParticipant = localParticipantData.localParticipant;
   const isCameraEnabled = localParticipantData.isCameraEnabled;
   const isScreenShareEnabled = localParticipantData.isScreenShareEnabled;
+  const cameraTrack = localParticipantData.cameraTrack;
 
   const cameraTracks = useTracks([Track.Source.Camera]);
   const screenTracks = useTracks([Track.Source.ScreenShare]);
