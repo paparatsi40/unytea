@@ -30,7 +30,7 @@ interface VideoRoomProps {
   onLeave?: () => void;
 }
 
-export function VideoRoom({ roomName, onLeave }: VideoRoomProps) {
+export function VideoRoom({ roomName, onLeave: _onLeave }: VideoRoomProps) {
   const [token, setToken] = useState<string | null>(null);
   const [wsUrl, setWsUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
