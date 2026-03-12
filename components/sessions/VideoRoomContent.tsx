@@ -188,7 +188,6 @@ export function VideoRoomContent({ sessionId, onLeave }: Props) {
 
       {sessionId && showWhiteboard ? (
         <SessionWhiteboard
-          isOpen={showWhiteboard}
           onClose={() => setShowWhiteboard(false)}
           sessionId={sessionId}
         />
