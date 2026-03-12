@@ -140,9 +140,9 @@ export default async function SessionsPage() {
         </div>
 
         {upcoming.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-zinc-700 bg-zinc-900/30 p-8">
+          <div className="rounded-2xl border border-dashed border-zinc-700 bg-zinc-900 p-8">
             <div className="flex flex-col items-center text-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-purple-500/10">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-purple-600/20">
                 <Video className="h-8 w-8 text-purple-400" />
               </div>
               <h3 className="mt-4 text-lg font-semibold text-white">
@@ -168,7 +168,7 @@ export default async function SessionsPage() {
             {upcoming.map((s) => (
               <div
                 key={s.id}
-                className="group relative overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 transition-all hover:border-zinc-700 hover:bg-zinc-900"
+                className="group relative overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 p-5 transition-all hover:border-zinc-700 hover:bg-zinc-900"
               >
                 {/* Date Badge */}
                 <div className="mb-4 flex items-center justify-between">
@@ -241,7 +241,7 @@ export default async function SessionsPage() {
             {past.slice(0, 6).map((s) => (
               <div
                 key={s.id}
-                className="group relative overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/30 p-5 transition-all hover:border-zinc-700 hover:bg-zinc-900/50"
+                className="group relative overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 p-5 transition-all hover:border-zinc-700 hover:bg-zinc-900"
               >
                 {/* Recording Badge */}
                 {s.status === "COMPLETED" && (
