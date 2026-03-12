@@ -11,16 +11,18 @@ import { Button } from "@/components/ui/button";
 import { LogOut, Hand, Video, VideoOff, Mic, MicOff } from "lucide-react";
 import { ReactionsBar } from "./ReactionsBar";
 import { useRoomContext } from "@livekit/components-react";
+
 interface VideoRoomUIProps {
   sessionId?: string;
   onLeave?: () => void;
 }
 
-function ConnectionBadge({ mode }: { mode: SessionMode }) {
+// Compact connection indicator
+function ConnectionBadge() {
   const state = useConnectionState();
   
-  const getColor = (s: typeof state) => {
-    switch (s) {
+  const getColor = () => {
+    switch (state) {
       case "disconnected": return "bg-red-500";
       case "connecting": return "bg-yellow-500";
       case "connected": return "bg-green-500";
@@ -29,67 +31,52 @@ function ConnectionBadge({ mode }: { mode: SessionMode }) {
     }
   };
 
-  const getModeLabel = (m: SessionMode) => {
-    switch (m) {
-      case "video": return "Video";
-      case "screen": return "Screen";
-      case "whiteboard": return "Whiteboard";
-    }
-  };
-
   return (
-    <div className="flex items-center gap-2 text-sm">
-      <div className="flex items-center gap-2 rounded-full bg-zinc-100 px-3 py-1.5 font-medium">
-        <span className={cn("h-2 w-2 rounded-full", getColor(state))} />
-        <span className="capitalize text-zinc-700">{state}</span>
-      </div>
-      <span className="text-zinc-400">•</span>
-      <span className="font-medium text-zinc-900">{getModeLabel(mode)} Mode</span>
+    <div className="flex items-center gap-1.5 text-xs font-medium text-zinc-600">
+      <span className={cn("h-1.5 w-1.5 rounded-full", getColor())} />
+      <span className="capitalize">{state}</span>
     </div>
   );
 }
 
-// Circular control button like Zoom
+// Circular control button
 function ControlButton({
   onClick,
   isActive,
   isLoading,
   activeIcon: ActiveIcon,
   inactiveIcon: InactiveIcon,
-  activeLabel,
-  inactiveLabel,
   activeClass = "bg-zinc-800 hover:bg-zinc-700 text-white",
   inactiveClass = "bg-white hover:bg-zinc-50 text-zinc-700 border border-zinc-300",
+  title,
 }: {
   onClick: () => void;
   isActive: boolean;
   isLoading: boolean;
   activeIcon: React.ComponentType<{ className?: string }>;
   inactiveIcon: React.ComponentType<{ className?: string }>;
-  activeLabel: string;
-  inactiveLabel: string;
   activeClass?: string;
   inactiveClass?: string;
+  title: string;
 }) {
   const Icon = isActive ? ActiveIcon : InactiveIcon;
-  const label = isActive ? activeLabel : inactiveLabel;
   
   return (
     <button
       onClick={onClick}
       disabled={isLoading}
+      title={title}
       className={cn(
-        "flex flex-col items-center gap-1 transition-all",
-        isActive ? activeClass : inactiveClass,
-        "rounded-full p-3 shadow-sm disabled:opacity-50"
+        "flex h-10 w-10 items-center justify-center rounded-full transition-all shadow-sm disabled:opacity-50",
+        isActive ? activeClass : inactiveClass
       )}
-      title={label}
     >
       <Icon className="h-5 w-5" />
     </button>
   );
 }
 
+// Compact media controls
 function MediaControls() {
   const localParticipant = useLocalParticipant();
   const [isLoadingCamera, setIsLoadingCamera] = useState(false);
@@ -121,15 +108,14 @@ function MediaControls() {
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1.5">
       <ControlButton
         onClick={toggleMicrophone}
         isActive={isMicrophoneEnabled}
         isLoading={isLoadingMic}
         activeIcon={Mic}
         inactiveIcon={MicOff}
-        activeLabel="Mute"
-        inactiveLabel="Unmute"
+        title={isMicrophoneEnabled ? "Mute" : "Unmute"}
       />
       <ControlButton
         onClick={toggleCamera}
@@ -137,8 +123,7 @@ function MediaControls() {
         isLoading={isLoadingCamera}
         activeIcon={Video}
         inactiveIcon={VideoOff}
-        activeLabel="Stop Camera"
-        inactiveLabel="Start Camera"
+        title={isCameraEnabled ? "Stop Camera" : "Start Camera"}
       />
     </div>
   );
@@ -172,11 +157,12 @@ export function VideoRoomUI({ sessionId, onLeave }: VideoRoomUIProps) {
   };
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden">
-      {/* Top Control Bar - Compact */}
-      <div className="flex shrink-0 items-center justify-between border-b border-zinc-200 bg-white px-4 py-2">
-        <div className="flex items-center gap-4">
-          <ConnectionBadge mode={mode} />
+    <div className="flex h-full flex-col overflow-hidden bg-zinc-950">
+      {/* Compact Top Bar */}
+      <div className="flex shrink-0 items-center justify-between border-b border-zinc-800 bg-zinc-900 px-3 py-2">
+        <div className="flex items-center gap-3">
+          <ConnectionBadge />
+          <div className="h-4 w-px bg-zinc-700" />
           <ModeSwitcher
             currentMode={mode}
             onModeChange={setMode}
@@ -184,43 +170,41 @@ export function VideoRoomUI({ sessionId, onLeave }: VideoRoomUIProps) {
             hasScreenShare={true}
           />
         </div>
-        <div className="flex items-center gap-3">
+        
+        <div className="flex items-center gap-2">
           <MediaControls />
-          <div className="h-8 w-px bg-zinc-200" />
-          <Button
+          <div className="h-6 w-px bg-zinc-700 mx-1" />
+          <button
             onClick={handleRaiseHand}
-            variant={raisedHand ? "default" : "outline"}
-            size="sm"
             className={cn(
-              "rounded-full px-4",
-              raisedHand ? "bg-yellow-500 hover:bg-yellow-600" : ""
+              "flex h-10 w-10 items-center justify-center rounded-full transition-all",
+              raisedHand 
+                ? "bg-yellow-500 hover:bg-yellow-600 text-white" 
+                : "bg-zinc-800 hover:bg-zinc-700 text-zinc-300"
             )}
+            title={raisedHand ? "Lower Hand" : "Raise Hand"}
           >
-            <Hand className="mr-2 h-4 w-4" />
-            {raisedHand ? "Lower" : "Raise"}
-          </Button>
+            <Hand className="h-5 w-5" />
+          </button>
           <ReactionsBar />
-          <div className="h-8 w-px bg-zinc-200" />
-          <Button
+          <div className="h-6 w-px bg-zinc-700 mx-1" />
+          <button
             onClick={onLeave}
-            variant="destructive"
-            size="sm"
-            className="rounded-full px-4"
+            className="flex h-10 items-center gap-2 rounded-full border border-red-500/50 bg-transparent px-4 text-sm font-medium text-red-400 transition-all hover:bg-red-500/10"
           >
-            <LogOut className="mr-2 h-4 w-4" />
+            <LogOut className="h-4 w-4" />
             Leave
-          </Button>
+          </button>
         </div>
       </div>
 
-      {/* Main Content Area */}
+      {/* Main Content - Video Dominates */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Left/Main Area - VideoConference or Whiteboard */}
-        <div className="flex flex-1 flex-col overflow-hidden">
+        {/* Video Area - Takes full available space */}
+        <div className="relative flex flex-1 overflow-hidden">
           {isWhiteboardMode ? (
             <div className="flex flex-1 flex-col overflow-hidden">
-              {/* Whiteboard Header */}
-              <div className="flex items-center justify-between border-b border-zinc-200 bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-2">
+              <div className="flex items-center justify-between border-b border-zinc-800 bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-2">
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-white">Whiteboard</span>
                   <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs text-white">
@@ -234,7 +218,6 @@ export function VideoRoomUI({ sessionId, onLeave }: VideoRoomUIProps) {
                   Exit Whiteboard
                 </button>
               </div>
-              {/* Whiteboard Canvas */}
               <div className="flex-1 overflow-hidden">
                 <SessionWhiteboard
                   onClose={() => setMode("video")}
@@ -244,58 +227,54 @@ export function VideoRoomUI({ sessionId, onLeave }: VideoRoomUIProps) {
               </div>
             </div>
           ) : (
-            <div className="relative flex-1 overflow-hidden">
-              <VideoConference />
+            <div className="relative flex-1 bg-zinc-950">
+              <VideoConference 
+                className="h-full w-full"
+              />
             </div>
           )}
         </div>
 
-        {/* Right Sidebar - Tabs for Participants & Chat */}
-        <div
-          className={cn(
-            "flex w-80 shrink-0 flex-col border-l border-zinc-200 bg-white",
-            isWhiteboardMode && "hidden"
-          )}
-        >
-          {/* Tabs Header */}
-          <div className="flex border-b border-zinc-200">
-            <button
-              onClick={() => setActiveTab("participants")}
-              className={cn(
-                "flex-1 px-4 py-3 text-sm font-medium transition-colors",
-                activeTab === "participants"
-                  ? "border-b-2 border-purple-600 text-purple-600"
-                  : "text-zinc-500 hover:text-zinc-700"
+        {/* Right Sidebar */}
+        {!isWhiteboardMode && (
+          <div className="flex w-72 shrink-0 flex-col border-l border-zinc-800 bg-zinc-900">
+            <div className="flex border-b border-zinc-800">
+              <button
+                onClick={() => setActiveTab("participants")}
+                className={cn(
+                  "flex-1 px-4 py-2.5 text-xs font-medium transition-colors",
+                  activeTab === "participants"
+                    ? "border-b-2 border-purple-500 text-purple-400"
+                    : "text-zinc-400 hover:text-zinc-200"
+                )}
+              >
+                Participants ({participants.length})
+              </button>
+              <button
+                onClick={() => setActiveTab("chat")}
+                className={cn(
+                  "flex-1 px-4 py-2.5 text-xs font-medium transition-colors",
+                  activeTab === "chat"
+                    ? "border-b-2 border-purple-500 text-purple-400"
+                    : "text-zinc-400 hover:text-zinc-200"
+                )}
+              >
+                Chat
+              </button>
+            </div>
+            <div className="flex-1 overflow-hidden">
+              {activeTab === "participants" ? (
+                <ParticipantsPanel />
+              ) : sessionId ? (
+                <SessionChat sessionId={sessionId} />
+              ) : (
+                <div className="flex h-full items-center justify-center">
+                  <p className="text-xs text-zinc-500">Chat not available</p>
+                </div>
               )}
-            >
-              Participants ({participants.length})
-            </button>
-            <button
-              onClick={() => setActiveTab("chat")}
-              className={cn(
-                "flex-1 px-4 py-3 text-sm font-medium transition-colors",
-                activeTab === "chat"
-                  ? "border-b-2 border-purple-600 text-purple-600"
-                  : "text-zinc-500 hover:text-zinc-700"
-              )}
-            >
-              Chat
-            </button>
+            </div>
           </div>
-
-          {/* Tab Content with Speaker Indicator */}
-          <div className="flex-1 overflow-hidden">
-            {activeTab === "participants" ? (
-              <ParticipantsPanel />
-            ) : sessionId ? (
-              <SessionChat sessionId={sessionId} />
-            ) : (
-              <div className="flex h-full items-center justify-center">
-                <p className="text-sm text-zinc-500">Chat not available</p>
-              </div>
-            )}
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
