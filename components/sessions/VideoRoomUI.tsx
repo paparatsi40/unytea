@@ -1,22 +1,23 @@
 ﻿"use client";
 
 import { useState } from "react";
-import { VideoConference, useConnectionState } from "@livekit/components-react";
+import { VideoConference, useConnectionState, useParticipants } from "@livekit/components-react";
 import { ModeSwitcher, SessionMode } from "./ModeSwitcher";
 import { ParticipantsPanel } from "./ParticipantsPanel";
 import { SessionChat } from "./SessionChat";
 import { SessionWhiteboard } from "./SessionWhiteboard";
-import { RoomControls } from "./RoomControls";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
+import { LogOut, Hand } from "lucide-react";
+import { ReactionsBar } from "./ReactionsBar";
+import { useRoomContext } from "@livekit/components-react";
 
 interface VideoRoomUIProps {
   sessionId?: string;
   onLeave?: () => void;
 }
 
-function ConnectionBadge() {
+function ConnectionBadge({ mode }: { mode: SessionMode }) {
   const state = useConnectionState();
   
   const getColor = (s: typeof state) => {
@@ -29,25 +30,76 @@ function ConnectionBadge() {
     }
   };
 
+  const getModeLabel = (m: SessionMode) => {
+    switch (m) {
+      case "video": return "Video Mode";
+      case "screen": return "Screen Mode";
+      case "whiteboard": return "Whiteboard Mode";
+    }
+  };
+
   return (
-    <div className="flex items-center gap-2 rounded-full bg-zinc-100 px-3 py-1.5 text-xs font-medium">
-      <span className={cn("h-2 w-2 rounded-full", getColor(state))} />
-      <span className="capitalize text-zinc-700">{state}</span>
+    <div className="flex items-center gap-3 text-sm">
+      <div className="flex items-center gap-2 rounded-full bg-zinc-100 px-3 py-1.5 font-medium">
+        <span className={cn("h-2 w-2 rounded-full", getColor(state))} />
+        <span className="capitalize text-zinc-700">{state}</span>
+      </div>
+      <span className="text-zinc-400">•</span>
+      <span className="font-medium text-zinc-900">{getModeLabel(mode)}</span>
+    </div>
+  );
+}
+
+function RoomControls({ raisedHand, onToggleHand }: { raisedHand: boolean; onToggleHand: () => void }) {
+  return (
+    <div className="flex items-center gap-3">
+      <Button
+        onClick={onToggleHand}
+        variant={raisedHand ? "default" : "outline"}
+        size="sm"
+        className={raisedHand ? "bg-yellow-500 hover:bg-yellow-600" : ""}
+      >
+        <Hand className="mr-2 h-4 w-4" />
+        {raisedHand ? "Lower Hand" : "Raise Hand"}
+      </Button>
+      <ReactionsBar />
     </div>
   );
 }
 
 export function VideoRoomUI({ sessionId, onLeave }: VideoRoomUIProps) {
   const [mode, setMode] = useState<SessionMode>("video");
+  const [activeTab, setActiveTab] = useState<"participants" | "chat">("participants");
+  const [raisedHand, setRaisedHand] = useState(false);
+  const room = useRoomContext();
+  const participants = useParticipants();
 
   const isWhiteboardMode = mode === "whiteboard" && sessionId;
 
+  const handleRaiseHand = async () => {
+    try {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(
+        JSON.stringify({
+          type: "raise_hand",
+          raised: !raisedHand,
+          from: room.localParticipant.identity,
+          timestamp: Date.now(),
+        })
+      );
+      await room.localParticipant.publishData(data, { reliable: true });
+      setRaisedHand(!raisedHand);
+    } catch (error) {
+      console.error("Failed to raise hand:", error);
+    }
+  };
+
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
-      {/* Top Control Bar */}
-      <div className="flex shrink-0 items-center justify-between border-b border-zinc-200 bg-white px-4 py-3">
+      {/* Compact Top Control Bar */}
+      <div className="flex shrink-0 items-center justify-between border-b border-zinc-200 bg-white px-4 py-2">
         <div className="flex items-center gap-4">
-          <ConnectionBadge />
+          <ConnectionBadge mode={mode} />
           <ModeSwitcher
             currentMode={mode}
             onModeChange={setMode}
@@ -55,15 +107,16 @@ export function VideoRoomUI({ sessionId, onLeave }: VideoRoomUIProps) {
             hasScreenShare={true}
           />
         </div>
-        <div className="flex items-center gap-4">
-          <RoomControls />
+        <div className="flex items-center gap-3">
+          <RoomControls raisedHand={raisedHand} onToggleHand={handleRaiseHand} />
           <Button
             onClick={onLeave}
-            variant="destructive"
+            variant="outline"
             size="sm"
+            className="border-red-500 text-red-600 hover:bg-red-50 hover:text-red-700"
           >
             <LogOut className="mr-2 h-4 w-4" />
-            Leave Session
+            Leave
           </Button>
         </div>
       </div>
@@ -105,21 +158,44 @@ export function VideoRoomUI({ sessionId, onLeave }: VideoRoomUIProps) {
           )}
         </div>
 
-        {/* Right Sidebar - Participants & Chat */}
+        {/* Right Sidebar - Tabs for Participants & Chat */}
         <div
           className={cn(
             "flex w-80 shrink-0 flex-col border-l border-zinc-200 bg-white",
             isWhiteboardMode && "hidden"
           )}
         >
-          {/* Participants Panel */}
-          <div className="flex flex-1 flex-col overflow-hidden border-b border-zinc-200">
-            <ParticipantsPanel />
+          {/* Tabs Header */}
+          <div className="flex border-b border-zinc-200">
+            <button
+              onClick={() => setActiveTab("participants")}
+              className={cn(
+                "flex-1 px-4 py-3 text-sm font-medium transition-colors",
+                activeTab === "participants"
+                  ? "border-b-2 border-purple-600 text-purple-600"
+                  : "text-zinc-500 hover:text-zinc-700"
+              )}
+            >
+              Participants ({participants.length})
+            </button>
+            <button
+              onClick={() => setActiveTab("chat")}
+              className={cn(
+                "flex-1 px-4 py-3 text-sm font-medium transition-colors",
+                activeTab === "chat"
+                  ? "border-b-2 border-purple-600 text-purple-600"
+                  : "text-zinc-500 hover:text-zinc-700"
+              )}
+            >
+              Chat
+            </button>
           </div>
 
-          {/* Chat Panel */}
-          <div className="flex flex-1 flex-col overflow-hidden">
-            {sessionId ? (
+          {/* Tab Content */}
+          <div className="flex-1 overflow-hidden">
+            {activeTab === "participants" ? (
+              <ParticipantsPanel />
+            ) : sessionId ? (
               <SessionChat sessionId={sessionId} />
             ) : (
               <div className="flex h-full items-center justify-center">

@@ -10,12 +10,7 @@ export function ParticipantsPanel() {
     <div className="flex h-full flex-col rounded-xl border border-zinc-200 bg-white shadow-sm">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-zinc-200 px-4 py-3">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-semibold text-zinc-900">Participants</span>
-          <span className="rounded-full bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-700">
-            {participants.length}
-          </span>
-        </div>
+        <span className="text-sm font-semibold text-zinc-900">Participants</span>
       </div>
 
       {/* List */}
