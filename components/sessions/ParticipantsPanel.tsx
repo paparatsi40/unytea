@@ -3,15 +3,6 @@
 import { useParticipants } from "@livekit/components-react";
 import { Video, Mic, MicOff, VideoOff } from "lucide-react";
 
-interface ParticipantInfo {
-  sid: string;
-  name?: string;
-  identity: string;
-  isCameraEnabled: boolean;
-  isMicEnabled: boolean;
-  isScreenShareEnabled: boolean;
-}
-
 export function ParticipantsPanel() {
   const participants = useParticipants();
 
