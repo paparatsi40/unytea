@@ -56,7 +56,6 @@ export function MainStage({
   // Access track states from localParticipant
   const isCameraEnabled = localParticipant.isCameraEnabled;
   const cameraTrack = localParticipant.getTrackPublication(Track.Source.Camera)?.track as LocalTrack | undefined;
-  const isScreenShareEnabled = localParticipant.isScreenShareEnabled;
 
   const cameraTracks = useTracks([Track.Source.Camera]);
   const screenTracks = useTracks([Track.Source.ScreenShare]);
