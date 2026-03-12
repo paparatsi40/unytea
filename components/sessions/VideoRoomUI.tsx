@@ -172,8 +172,21 @@ export function VideoRoomUI({ sessionId, onLeave }: VideoRoomUIProps) {
           ) : (
             <div className="relative flex flex-1 flex-col">
               {/* Video Area */}
-              <div className="flex-1 overflow-hidden">
+              <div className="relative flex-1 overflow-hidden">
                 <VideoConference className="h-full w-full" />
+                
+                {/* Camera off indicator - prominent */}
+                {!isCameraEnabled && (
+                  <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 rounded-2xl bg-zinc-900/95 px-8 py-6 border border-purple-500/50 shadow-2xl">
+                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-purple-600">
+                      <Video className="h-8 w-8 text-white" />
+                    </div>
+                    <div className="text-center">
+                      <p className="text-lg font-semibold text-white">Camera is off</p>
+                      <p className="text-sm text-zinc-400 mt-1">Click the purple button below ↓</p>
+                    </div>
+                  </div>
+                )}
               </div>
               
               {/* BOTTOM CONTROLS BAR - Always visible */}
@@ -193,19 +206,19 @@ export function VideoRoomUI({ sessionId, onLeave }: VideoRoomUIProps) {
                   {isMicrophoneEnabled ? <Mic className="h-6 w-6" /> : <MicOff className="h-6 w-6" />}
                 </button>
 
-                {/* Camera */}
+                {/* Camera - HIGH VISIBILITY when off */}
                 <button
                   onClick={toggleCamera}
                   disabled={isLoadingCamera}
                   className={cn(
-                    "flex h-12 w-12 items-center justify-center rounded-full transition-all shadow-lg disabled:opacity-50",
+                    "flex items-center justify-center rounded-full transition-all shadow-lg disabled:opacity-50",
                     isCameraEnabled 
-                      ? "bg-zinc-700 text-white hover:bg-zinc-600" 
-                      : "bg-zinc-800 text-zinc-400 border-2 border-zinc-600 hover:bg-zinc-700 hover:text-white"
+                      ? "h-12 w-12 bg-zinc-700 text-white hover:bg-zinc-600" 
+                      : "h-14 w-14 bg-purple-600 text-white border-4 border-purple-400 hover:bg-purple-700 animate-pulse"
                   )}
                   title={isCameraEnabled ? "Stop Camera" : "Start Camera"}
                 >
-                  {isCameraEnabled ? <Video className="h-6 w-6" /> : <VideoOff className="h-6 w-6" />}
+                  {isCameraEnabled ? <Video className="h-6 w-6" /> : <VideoOff className="h-7 w-7" />}
                 </button>
 
                 {/* Screen Share - Only in Screen mode or Video mode */}
