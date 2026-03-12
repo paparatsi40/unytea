@@ -10,26 +10,6 @@ export const metadata = {
   description: "Run live coaching, classes, and workshops",
 };
 
-function EmptyState({ onCreate }: { onCreate?: () => void }) {
-  return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-12 text-center">
-      <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-purple-500/10">
-        <Video className="h-8 w-8 text-purple-500" />
-      </div>
-      <h3 className="mb-2 text-lg font-semibold text-white">
-        Start your first live session
-      </h3>
-      <p className="mb-6 text-sm text-zinc-400">
-        Live sessions help communities grow faster. Schedule one now.
-      </p>
-      <CreateSessionDialog
-        triggerText="Schedule your first session"
-        className="inline-flex"
-      />
-    </div>
-  );
-}
-
 function SessionSectionTitle({
   icon: Icon,
   title,
