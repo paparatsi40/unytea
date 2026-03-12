@@ -65,7 +65,7 @@ export function SessionWhiteboard({ onClose, sessionId }: SessionWhiteboardProps
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.2 }}
-      className="absolute inset-4 z-50 flex flex-col overflow-hidden rounded-xl border border-purple-200 bg-white shadow-2xl"
+      className="fixed inset-0 z-[100] flex flex-col overflow-hidden bg-white shadow-2xl"
     >
           {/* Header */}
           <div className="flex items-center justify-between border-b border-gray-200 bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-3">

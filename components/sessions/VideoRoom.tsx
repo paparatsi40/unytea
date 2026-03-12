@@ -99,7 +99,7 @@ export function VideoRoom({ roomName, sessionId, onLeave: _onLeave }: VideoRoomP
   }
 
   return (
-    <div className="relative">
+    <div className="relative h-[700px]">
       <LiveKitRoom
         token={token}
         serverUrl={wsUrl}
