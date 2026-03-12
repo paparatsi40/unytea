@@ -83,8 +83,8 @@ export function VideoRoom({ roomName, sessionId, onLeave }: VideoRoomProps) {
         token={token}
         serverUrl={wsUrl}
         connect={true}
-        video={false}
-        audio={false}
+        video={true}
+        audio={true}
         onConnected={() => {
           console.log("Connected to LiveKit room");
         }}
