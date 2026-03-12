@@ -5,7 +5,6 @@ import { X, Image as ImageIcon, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 
-// Dynamic import to avoid SSR issues
 const Excalidraw = dynamic(
   async () => (await import("@excalidraw/excalidraw")).Excalidraw,
   {
@@ -24,9 +23,10 @@ const Excalidraw = dynamic(
 interface SessionWhiteboardProps {
   onClose: () => void;
   sessionId: string;
+  embedded?: boolean;
 }
 
-export function SessionWhiteboard({ onClose, sessionId }: SessionWhiteboardProps) {
+export function SessionWhiteboard({ onClose, sessionId, embedded = false }: SessionWhiteboardProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [excalidrawAPI, setExcalidrawAPI] = useState<any>(null);
 
@@ -59,6 +59,52 @@ export function SessionWhiteboard({ onClose, sessionId }: SessionWhiteboardProps
     }
   };
 
+  // Embedded mode - integrated into the layout
+  if (embedded) {
+    return (
+      <div className="flex h-full w-full flex-col overflow-hidden bg-white">
+        <div className="flex items-center justify-between border-b border-zinc-200 bg-white px-4 py-2">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleExportPNG}
+              className="flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-sm text-zinc-700 transition-colors hover:bg-zinc-50"
+              title="Export as PNG"
+            >
+              <ImageIcon className="h-4 w-4" />
+              Export PNG
+            </button>
+            <button
+              onClick={handleClear}
+              className="flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-sm text-zinc-700 transition-colors hover:bg-zinc-50"
+              title="Clear canvas"
+            >
+              <Trash2 className="h-4 w-4" />
+              Clear
+            </button>
+          </div>
+        </div>
+        <div className="flex-1 overflow-hidden">
+          <Excalidraw
+            excalidrawAPI={(api) => setExcalidrawAPI(api)}
+            theme="light"
+            UIOptions={{
+              canvasActions: {
+                changeViewBackgroundColor: true,
+                clearCanvas: false,
+                export: false,
+                loadScene: false,
+                saveToActiveFile: false,
+                saveAsImage: false,
+                toggleTheme: false,
+              },
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Fullscreen modal mode
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -67,65 +113,60 @@ export function SessionWhiteboard({ onClose, sessionId }: SessionWhiteboardProps
       transition={{ duration: 0.2 }}
       className="fixed inset-0 z-[100] flex flex-col overflow-hidden bg-white shadow-2xl"
     >
-          {/* Header */}
-          <div className="flex items-center justify-between border-b border-gray-200 bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-3">
-            <div className="flex items-center gap-2">
-              <span className="text-lg font-bold text-white">Whiteboard</span>
-              <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs text-white">
-                Session {sessionId.slice(-6)}
-              </span>
-            </div>
+      <div className="flex items-center justify-between border-b border-gray-200 bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-3">
+        <div className="flex items-center gap-2">
+          <span className="text-lg font-bold text-white">Whiteboard</span>
+          <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs text-white">
+            Session {sessionId.slice(-6)}
+          </span>
+        </div>
 
-            <div className="flex items-center gap-2">
-              {/* Export PNG */}
-              <button
-                onClick={handleExportPNG}
-                className="flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-sm text-white transition-colors hover:bg-white/20"
-                title="Export as PNG"
-              >
-                <ImageIcon className="h-4 w-4" />
-                Export PNG
-              </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleExportPNG}
+            className="flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-sm text-white transition-colors hover:bg-white/20"
+            title="Export as PNG"
+          >
+            <ImageIcon className="h-4 w-4" />
+            Export PNG
+          </button>
 
-              {/* Clear */}
-              <button
-                onClick={handleClear}
-                className="flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-sm text-white transition-colors hover:bg-white/20"
-                title="Clear canvas"
-              >
-                <Trash2 className="h-4 w-4" />
-                Clear
-              </button>
+          <button
+            onClick={handleClear}
+            className="flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-sm text-white transition-colors hover:bg-white/20"
+            title="Clear canvas"
+          >
+            <Trash2 className="h-4 w-4" />
+            Clear
+          </button>
 
-              {/* Close */}
-              <button
-                onClick={onClose}
-                className="ml-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
-                title="Close Whiteboard"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-          </div>
+          <button
+            onClick={onClose}
+            className="ml-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
+            title="Close Whiteboard"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+      </div>
 
-          {/* Excalidraw Canvas */}
-          <div className="flex-1 overflow-hidden relative">
-            <Excalidraw
-              excalidrawAPI={(api) => setExcalidrawAPI(api)}
-              theme="light"
-              UIOptions={{
-                canvasActions: {
-                  changeViewBackgroundColor: true,
-                  clearCanvas: false,
-                  export: false,
-                  loadScene: false,
-                  saveToActiveFile: false,
-                  saveAsImage: false,
-                  toggleTheme: false,
-                },
-              }}
-            />
-          </div>
-        </motion.div>
+      <div className="relative flex-1 overflow-hidden">
+        <Excalidraw
+          excalidrawAPI={(api) => setExcalidrawAPI(api)}
+          theme="light"
+          UIOptions={{
+            canvasActions: {
+              changeViewBackgroundColor: true,
+              clearCanvas: false,
+              export: false,
+              loadScene: false,
+              saveToActiveFile: false,
+              saveAsImage: false,
+              toggleTheme: false,
+            },
+          }}
+        />
+      </div>
+    </motion.div>
   );
 }

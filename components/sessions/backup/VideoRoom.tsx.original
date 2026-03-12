@@ -4,11 +4,12 @@ import { useEffect, useState } from "react";
 import {
   LiveKitRoom,
   RoomAudioRenderer,
+  VideoConference,
   useConnectionState,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
 import { Loader2, AlertCircle } from "lucide-react";
-import { VideoRoomUI } from "./VideoRoomUI";
+import { VideoRoomContent } from "./VideoRoomContent";
 
 function ConnectionStatus() {
   const state = useConnectionState();
@@ -18,7 +19,7 @@ function ConnectionStatus() {
   }, [state]);
 
   return (
-    <div className="absolute top-4 left-4 z-50 rounded bg-black/70 px-3 py-1 text-xs text-white">
+    <div className="absolute top-4 right-4 z-50 rounded bg-black/70 px-3 py-1 text-xs text-white">
       {state}
     </div>
   );
@@ -93,7 +94,7 @@ export function VideoRoom({ roomName, sessionId, onLeave: _onLeave }: VideoRoomP
   }
 
   return (
-    <div className="h-[calc(100vh-200px)] min-h-[600px]">
+    <div className="relative h-[calc(100vh-200px)] min-h-[600px]">
       <LiveKitRoom
         token={token}
         serverUrl={wsUrl}
@@ -109,11 +110,12 @@ export function VideoRoom({ roomName, sessionId, onLeave: _onLeave }: VideoRoomP
         onError={(err) => {
           console.error("LiveKit error:", err);
         }}
-        className="h-full flex flex-col"
+        className="h-full"
       >
         <ConnectionStatus />
-        <VideoRoomUI sessionId={sessionId} />
+        <VideoConference />
         <RoomAudioRenderer />
+        <VideoRoomContent sessionId={sessionId} />
       </LiveKitRoom>
     </div>
   );
