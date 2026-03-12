@@ -131,7 +131,7 @@ function MediaControls() {
 // Prompt to enable camera when off
 function CameraPrompt({ onEnable }: { onEnable: () => void }) {
   return (
-    <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-900/95 z-10">
+    <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-900 z-20">
       <div className="text-center">
         <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-zinc-800">
           <Video className="h-10 w-10 text-zinc-400" />
@@ -153,7 +153,7 @@ function CameraPrompt({ onEnable }: { onEnable: () => void }) {
 // Prompt to start screen share
 function ScreenSharePrompt({ onEnable, onCancel }: { onEnable: () => void; onCancel: () => void }) {
   return (
-    <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-900/95 z-10">
+    <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-900 z-20">
       <div className="text-center">
         <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-zinc-800">
           <Monitor className="h-10 w-10 text-zinc-400" />
