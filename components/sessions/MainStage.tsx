@@ -50,8 +50,10 @@ export function MainStage({
   sessionId,
   className,
 }: MainStageProps) {
-  const { localParticipant, isCameraEnabled, isScreenShareEnabled } =
-    useLocalParticipant();
+  const localParticipantData = useLocalParticipant();
+  const localParticipant = localParticipantData.localParticipant;
+  const isCameraEnabled = localParticipantData.isCameraEnabled;
+  const isScreenShareEnabled = localParticipantData.isScreenShareEnabled;
 
   const cameraTracks = useTracks([Track.Source.Camera]);
   const screenTracks = useTracks([Track.Source.ScreenShare]);
