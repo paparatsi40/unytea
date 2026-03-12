@@ -11,6 +11,7 @@ import { Track } from "livekit-client";
 import { Monitor, Video, Pencil } from "lucide-react";
 import { SessionMode } from "./ModeSwitcher";
 import { SessionWhiteboard } from "./SessionWhiteboard";
+import { LocalVideo } from "./LocalVideo";
 import { cn } from "@/lib/utils";
 
 interface MainStageProps {
@@ -111,22 +112,15 @@ export function MainStage({
               description="Share your screen to present slides, demos, or walkthroughs."
             />
           )
-        ) : mainCameraTrack ? (
+        ) : isCameraEnabled ? (
           <div className="h-full w-full bg-black">
-            <VideoTrack
-              className="h-full w-full object-cover"
-              trackRef={mainCameraTrack}
-            />
+            <LocalVideo className="h-full w-full object-cover" />
           </div>
         ) : (
           <EmptyStage
             icon={Video}
-            title={isCameraEnabled ? "Waiting for camera preview" : "Camera is off"}
-            description={
-              isCameraEnabled
-                ? "Your camera is enabled, but the preview is not available yet."
-                : "Turn on your camera to start the live session."
-            }
+            title="Camera is off"
+            description="Turn on your camera to start the live session."
           />
         )}
 
