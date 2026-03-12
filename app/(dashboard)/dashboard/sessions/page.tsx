@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { getUserSessions } from "@/app/actions/sessions";
 import { Video, Calendar, Clock, Play, Radio, Users, ArrowRight, VideoIcon, Sparkles } from "lucide-react";
 import { CreateSessionDialog } from "@/components/sessions/CreateSessionDialog";
-import { format, isToday, isTomorrow, isThisWeek, formatDistanceToNow, addDays } from "date-fns";
+import { format, isToday, isTomorrow, isThisWeek, formatDistanceToNow } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
