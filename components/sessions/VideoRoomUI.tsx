@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { LogOut, Hand, Video, VideoOff, Mic, MicOff, Monitor, MessageSquare, X } from "lucide-react";
 import { ReactionsBar } from "./ReactionsBar";
 import { useRoomContext, useSpeakingParticipants } from "@livekit/components-react";
-
 interface VideoRoomUIProps {
   sessionId?: string;
   onLeave?: () => void;
