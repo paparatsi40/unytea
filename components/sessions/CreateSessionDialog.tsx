@@ -5,7 +5,7 @@ import { Plus, Repeat, Calendar, Clock } from "lucide-react";
 import { createSession } from "@/app/actions/sessions";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { format, addWeeks, addMonths } from "date-fns";
+import { addWeeks, addMonths } from "date-fns";
 
 type RecurrenceType = "once" | "weekly" | "monthly";
 
