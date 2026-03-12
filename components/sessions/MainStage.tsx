@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 
 interface MainStageProps {
   mode: SessionMode;
+  onModeChange?: (mode: SessionMode) => void;
   sessionId?: string;
   className?: string;
 }
@@ -45,6 +46,7 @@ function EmptyStage({
 
 export function MainStage({
   mode,
+  onModeChange,
   sessionId,
   className,
 }: MainStageProps) {
@@ -84,7 +86,7 @@ export function MainStage({
       <div className="relative flex-1 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950">
         {mode === "whiteboard" ? (
           sessionId ? (
-            <SessionWhiteboard embedded sessionId={sessionId} onClose={() => setMode("video")} />
+            <SessionWhiteboard embedded sessionId={sessionId} onClose={() => onModeChange?.("video")} />
           ) : (
             <EmptyStage
               icon={Pencil}
