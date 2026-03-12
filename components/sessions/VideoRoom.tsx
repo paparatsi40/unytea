@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
   LiveKitRoom,
   RoomAudioRenderer,
+  VideoConference,
   useConnectionState,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
@@ -93,7 +94,7 @@ export function VideoRoom({ roomName, sessionId, onLeave: _onLeave }: VideoRoomP
   }
 
   return (
-    <div className="h-[calc(100vh-200px)] min-h-[600px]">
+    <div className="relative h-[calc(100vh-200px)] min-h-[600px]">
       <LiveKitRoom
         token={token}
         serverUrl={wsUrl}
@@ -112,6 +113,7 @@ export function VideoRoom({ roomName, sessionId, onLeave: _onLeave }: VideoRoomP
         className="h-full"
       >
         <ConnectionStatus />
+        <VideoConference />
         <RoomAudioRenderer />
         <VideoRoomContent sessionId={sessionId} />
       </LiveKitRoom>
