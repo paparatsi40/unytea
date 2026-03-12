@@ -9,7 +9,6 @@ interface ModeSwitcherProps {
   currentMode: SessionMode;
   onModeChange: (mode: SessionMode) => void;
   hasWhiteboard?: boolean;
-  hasScreenShare?: boolean;
 }
 
 const MODES = [
@@ -22,7 +21,6 @@ export function ModeSwitcher({
   currentMode,
   onModeChange,
   hasWhiteboard = false,
-  hasScreenShare = true,
 }: ModeSwitcherProps) {
   const availableModes = MODES.filter((mode) => {
     if (mode.id === "whiteboard" && !hasWhiteboard) return false;

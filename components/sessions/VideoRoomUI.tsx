@@ -170,7 +170,6 @@ export function VideoRoomUI({
               currentMode={mode}
               onModeChange={setMode}
               hasWhiteboard={!!sessionId}
-              hasScreenShare={true}
             />
           </div>
         </div>
