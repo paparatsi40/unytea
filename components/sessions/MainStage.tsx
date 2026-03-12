@@ -114,7 +114,7 @@ export function MainStage({
             />
           )
         ) : isCameraEnabled ? (
-          <div className="h-full w-full bg-black relative" key={cameraTrack?.trackSid || 'no-camera'}>
+          <div className="h-full w-full bg-black relative" key={cameraTrack?.sid || 'no-camera'}>
             <LocalVideo 
               className="h-full w-full object-cover" 
               cameraTrack={cameraTrack}
