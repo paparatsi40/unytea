@@ -4,25 +4,10 @@ import { useEffect, useState } from "react";
 import {
   LiveKitRoom,
   RoomAudioRenderer,
-  useConnectionState,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
 import { Loader2, AlertCircle } from "lucide-react";
 import { VideoRoomUI } from "./VideoRoomUI";
-
-function ConnectionStatus() {
-  const state = useConnectionState();
-
-  useEffect(() => {
-    console.log("LiveKit Connection State:", state);
-  }, [state]);
-
-  return (
-    <div className="absolute top-4 left-4 z-50 rounded bg-black/70 px-3 py-1 text-xs text-white">
-      {state}
-    </div>
-  );
-}
 
 interface VideoRoomProps {
   roomName: string;
@@ -30,7 +15,7 @@ interface VideoRoomProps {
   onLeave?: () => void;
 }
 
-export function VideoRoom({ roomName, sessionId, onLeave: _onLeave }: VideoRoomProps) {
+export function VideoRoom({ roomName, sessionId, onLeave }: VideoRoomProps) {
   const [token, setToken] = useState<string | null>(null);
   const [wsUrl, setWsUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -105,14 +90,14 @@ export function VideoRoom({ roomName, sessionId, onLeave: _onLeave }: VideoRoomP
         }}
         onDisconnected={(reason) => {
           console.log("Disconnected from LiveKit room", reason);
+          onLeave?.();
         }}
         onError={(err) => {
           console.error("LiveKit error:", err);
         }}
         className="h-full flex flex-col"
       >
-        <ConnectionStatus />
-        <VideoRoomUI sessionId={sessionId} />
+        <VideoRoomUI sessionId={sessionId} onLeave={onLeave} />
         <RoomAudioRenderer />
       </LiveKitRoom>
     </div>

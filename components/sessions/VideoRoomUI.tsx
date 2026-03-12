@@ -1,19 +1,40 @@
 ﻿"use client";
 
 import { useState } from "react";
-import { VideoConference } from "@livekit/components-react";
+import { VideoConference, useConnectionState } from "@livekit/components-react";
 import { ModeSwitcher, SessionMode } from "./ModeSwitcher";
 import { ParticipantsPanel } from "./ParticipantsPanel";
 import { SessionChat } from "./SessionChat";
 import { SessionWhiteboard } from "./SessionWhiteboard";
 import { RoomControls } from "./RoomControls";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { LogOut } from "lucide-react";
 
 interface VideoRoomUIProps {
   sessionId?: string;
+  onLeave?: () => void;
 }
 
-export function VideoRoomUI({ sessionId }: VideoRoomUIProps) {
+function ConnectionBadge() {
+  const state = useConnectionState();
+  
+  const colors = {
+    disconnected: "bg-red-500",
+    connecting: "bg-yellow-500",
+    connected: "bg-green-500",
+    reconnecting: "bg-orange-500",
+  };
+
+  return (
+    <div className="flex items-center gap-2 rounded-full bg-zinc-100 px-3 py-1.5 text-xs font-medium">
+      <span className={cn("h-2 w-2 rounded-full", colors[state] || "bg-gray-500")} />
+      <span className="capitalize text-zinc-700">{state}</span>
+    </div>
+  );
+}
+
+export function VideoRoomUI({ sessionId, onLeave }: VideoRoomUIProps) {
   const [mode, setMode] = useState<SessionMode>("video");
 
   const isWhiteboardMode = mode === "whiteboard" && sessionId;
@@ -23,6 +44,7 @@ export function VideoRoomUI({ sessionId }: VideoRoomUIProps) {
       {/* Top Control Bar */}
       <div className="flex shrink-0 items-center justify-between border-b border-zinc-200 bg-white px-4 py-3">
         <div className="flex items-center gap-4">
+          <ConnectionBadge />
           <ModeSwitcher
             currentMode={mode}
             onModeChange={setMode}
@@ -30,7 +52,17 @@ export function VideoRoomUI({ sessionId }: VideoRoomUIProps) {
             hasScreenShare={true}
           />
         </div>
-        <RoomControls />
+        <div className="flex items-center gap-4">
+          <RoomControls />
+          <Button
+            onClick={onLeave}
+            variant="destructive"
+            size="sm"
+          >
+            <LogOut className="mr-2 h-4 w-4" />
+            Leave Session
+          </Button>
+        </div>
       </div>
 
       {/* Main Content Area */}
