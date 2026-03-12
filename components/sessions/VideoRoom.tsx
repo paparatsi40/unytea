@@ -28,10 +28,10 @@ function ConnectionStatus() {
 interface VideoRoomProps {
   roomName: string;
   sessionId?: string;
-  onLeave?: () => void;
+  _onLeave?: () => void;
 }
 
-export function VideoRoom({ roomName, sessionId, onLeave }: VideoRoomProps) {
+export function VideoRoom({ roomName, sessionId, _onLeave }: VideoRoomProps) {
   const [token, setToken] = useState("");
   const [wsUrl, setWsUrl] = useState("");
   const [loading, setLoading] = useState(true);
