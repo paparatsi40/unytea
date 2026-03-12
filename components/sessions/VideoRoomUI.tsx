@@ -60,7 +60,6 @@ export function VideoRoomUI({ sessionId, onLeave }: VideoRoomUIProps) {
   const localParticipant = useLocalParticipant();
 
   const isWhiteboardMode = mode === "whiteboard" && sessionId;
-  const isScreenMode = mode === "screen";
   const isCameraEnabled = localParticipant.isCameraEnabled;
   const isMicrophoneEnabled = localParticipant.isMicrophoneEnabled;
   const isScreenSharing = localParticipant.isScreenShareEnabled;
