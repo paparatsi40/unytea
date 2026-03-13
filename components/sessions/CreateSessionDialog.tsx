@@ -51,7 +51,8 @@ export function CreateSessionDialog({
   const [generateCount, setGenerateCount] = useState(8);
 
   // Get day of week from selected date
-  const selectedDayOfWeek = useMemo(() => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _selectedDayOfWeek = useMemo(() => {
     if (!scheduledAt) return null;
     return new Date(scheduledAt).getDay();
   }, [scheduledAt]);
