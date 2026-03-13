@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Edit2, AlertCircle, Repeat, Calendar, Clock } from "lucide-react";
+import { Edit2, AlertCircle, Calendar, Clock } from "lucide-react";
 import { editSession, editSeriesFromSession } from "@/app/actions/sessions";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
