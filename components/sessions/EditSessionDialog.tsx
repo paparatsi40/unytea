@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Edit2, AlertCircle, Repeat, Calendar, Clock } from "lucide-react";
 import { editSession, editSeriesFromSession } from "@/app/actions/sessions";
 import { toast } from "react-hot-toast";
