@@ -50,7 +50,17 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
     }
 
     const isOwner = community.ownerId === session.user.id;
-    const canCreateSessions = isOwner || community.members.some(m => m.role === "ADMIN" || m.role === "MODERATOR");
+    const canCreateSessions = true; // TEMP: Force true for debugging
+    const hasAdminRole = community.members.some(m => m.role === "ADMIN" || m.role === "MODERATOR");
+    
+    console.log("DEBUG:", {
+      userId: session.user.id,
+      ownerId: community.ownerId,
+      isOwner,
+      hasAdminRole,
+      memberCount: community.members.length,
+      members: community.members.map(m => ({ role: m.role })),
+    });
 
     // Get sessions for this community - safely handle case where field doesn't exist yet
     let allSessions: any[] = [];
