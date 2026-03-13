@@ -90,9 +90,10 @@ export function CreateSessionDialog({
       });
 
       if (result.success) {
+        const successResult = result as { success: true; type?: string; generatedCount?: number };
         toast.success(
-          result.type === "recurring"
-            ? `Created ${result.generatedCount} sessions in series!`
+          successResult.type === "recurring"
+            ? `Created ${successResult.generatedCount} sessions in series!`
             : "Session created successfully!"
         );
         setIsOpen(false);
