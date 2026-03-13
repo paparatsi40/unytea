@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Plus, Repeat, Calendar, Clock } from "lucide-react";
 import { createSessionOrSeries } from "@/app/actions/sessions";
 import { toast } from "react-hot-toast";
@@ -49,13 +49,6 @@ export function CreateSessionDialog({
   const [interval, setInterval] = useState(1); // every 1 week/month
   const [dayOfWeek, setDayOfWeek] = useState<number>(1); // Monday default
   const [generateCount, setGenerateCount] = useState(8);
-
-  // Get day of week from selected date
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const _selectedDayOfWeek = useMemo(() => {
-    if (!scheduledAt) return null;
-    return new Date(scheduledAt).getDay();
-  }, [scheduledAt]);
 
   // Update dayOfWeek when date changes (for weekly recurrence)
   const handleDateChange = (value: string) => {
