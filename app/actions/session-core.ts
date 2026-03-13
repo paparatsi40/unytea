@@ -212,7 +212,7 @@ export async function createSessionOrSeries(input: CreateSessionOrSeriesInput) {
         repeat: "once",
         mode: session.mode,
         startsAt: session.scheduledAt.toISOString(),
-        endsAt: session.endsAt?.toISOString(),
+        endsAt: session.endedAt?.toISOString(),
       },
     });
 
@@ -276,7 +276,7 @@ export async function createSessionOrSeries(input: CreateSessionOrSeriesInput) {
         repeat: "once",
         mode: session.mode,
         startsAt: session.scheduledAt.toISOString(),
-        endsAt: session.endsAt?.toISOString(),
+        endsAt: session.endedAt?.toISOString(),
         autoPostToFeed,
       },
     });
