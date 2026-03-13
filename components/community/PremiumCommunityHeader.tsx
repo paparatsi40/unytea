@@ -133,7 +133,7 @@ export function PremiumCommunityHeader({
             <span>Feed</span>
           </Link>
           <Link
-            href={`/dashboard/communities/${community.id}/sessions`}
+            href={`/dashboard/c/${community.slug}/sessions`}
             className={`flex items-center space-x-1.5 md:space-x-2 border-b-2 px-3 md:px-4 py-2.5 md:py-3 text-xs md:text-sm font-medium transition-colors whitespace-nowrap ${
               pathname?.startsWith(`/dashboard/communities/${community.id}/sessions`)
                 ? "border-purple-600 text-purple-600"
