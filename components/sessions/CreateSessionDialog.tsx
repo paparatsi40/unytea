@@ -147,6 +147,7 @@ export function CreateSessionDialog({
           communityId,
           postToFeed: autoPostToFeed,
           repeat: "once",
+          mode: sessionType === "audio" ? "AUDIO" : "VIDEO",
         });
 
         if (result.success) {
@@ -187,6 +188,7 @@ export function CreateSessionDialog({
           dayOfWeek: recurrence === "weekly" ? dayOfWeek : undefined,
           dayOfMonth: recurrence === "monthly" ? scheduledDate.getDate() : undefined,
           generateCount: recurrence === "once" ? undefined : generateCount,
+          mode: sessionType === "audio" ? "AUDIO" : "VIDEO",
         });
 
         if (result.success) {

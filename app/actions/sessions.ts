@@ -401,6 +401,7 @@ interface CreateSessionOrSeriesInput {
   timezone: string;
   communityId?: string;
   postToFeed?: boolean;
+  mode?: "VIDEO" | "AUDIO"; // Session mode: video or audio-only
   // Recurrence fields
   repeat?: "once" | SessionFrequency;
   interval?: number; // every 1 week, every 2 weeks, etc.
@@ -459,6 +460,7 @@ async function createSingleSession(data: CreateSessionOrSeriesInput & { mentorId
     timezone: data.timezone || "UTC",
     roomId,
     status: "SCHEDULED",
+    mode: data.mode || "VIDEO", // Default to VIDEO if not specified
     mentorId: data.mentorId,
     menteeId: data.menteeId,
     seriesId: null, // explicitly null for one-time sessions
@@ -510,6 +512,7 @@ async function createRecurringSeries(
       startTime: formatTime(data.scheduledAt),
       durationMinutes: data.duration,
       timezone: data.timezone || "UTC",
+      mode: data.mode || "VIDEO", // Default to VIDEO
       startsAt: data.scheduledAt,
       isActive: true,
       autoPostToFeed: data.postToFeed !== false,
@@ -534,6 +537,7 @@ async function createRecurringSeries(
           timezone: data.timezone || "UTC",
           roomId,
           status: "SCHEDULED",
+          mode: data.mode || "VIDEO", // Same mode as series
           mentorId: hostId,
           menteeId: hostId,
           communityId,

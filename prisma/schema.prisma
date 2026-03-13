@@ -357,6 +357,7 @@ model MentorSession {
   recordingUrl  String?
   videoRoomName String?       // LiveKit room name (e.g., "session-cm123456")
   status        SessionStatus @default(SCHEDULED)
+  mode          SessionMode   @default(VIDEO)  // VIDEO | AUDIO
   mentorNotes   String?
   menteeNotes   String?
   
@@ -410,6 +411,7 @@ model SessionSeries {
   startTime       String    // "10:00" format
   durationMinutes Int       @default(60)
   timezone        String    @default("UTC")
+  mode            SessionMode @default(VIDEO)  // VIDEO | AUDIO for all instances
   
   // Series lifecycle
   startsAt        DateTime
@@ -848,6 +850,11 @@ enum SessionStatus {
   COMPLETED
   CANCELLED
   NO_SHOW
+}
+
+enum SessionMode {
+  VIDEO
+  AUDIO
 }
 
 enum SessionFrequency {
