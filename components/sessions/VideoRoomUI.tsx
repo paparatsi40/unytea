@@ -27,12 +27,8 @@ import {
   MessageSquare,
   FileText,
   Crown,
-  Plus,
-  Minus,
   Check,
   X,
-  ChevronDown,
-  ChevronUp,
 } from "lucide-react";
 import Link from "next/link";
 
