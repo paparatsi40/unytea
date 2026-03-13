@@ -773,7 +773,7 @@ export async function editSeriesFromSession(
     });
 
     if (updatedSeries) {
-      const futureInstances = generateUpcomingSessions(updatedSeries, 8);
+      const futureInstances = await generateUpcomingSessions(updatedSeries, 8);
       
       await Promise.all(
         futureInstances.map((instance) =>
