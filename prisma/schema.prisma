@@ -369,6 +369,7 @@ model MentorSession {
   mentor        User          @relation("MentorSessions", fields: [mentorId], references: [id], onDelete: Cascade)
   participations SessionParticipation[]
   feedbacks     SessionFeedback[]
+  notes         SessionNote?
 
   @@index([mentorId])
   @@index([menteeId])
