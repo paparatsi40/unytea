@@ -14,7 +14,6 @@ interface VideoRoomProps {
   sessionId?: string;
   sessionMode?: "video" | "audio";
   sessionTitle?: string;
-  sessionDescription?: string;
   isHost?: boolean;
   onLeave?: () => void;
   onEndSession?: () => void;
@@ -25,7 +24,6 @@ export function VideoRoom({
   sessionId, 
   sessionMode = "video",
   sessionTitle,
-  sessionDescription,
   isHost = false,
   onLeave,
   onEndSession,
