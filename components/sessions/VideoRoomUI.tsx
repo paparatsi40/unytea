@@ -6,7 +6,6 @@ import {
   useLocalParticipant,
   useParticipants,
   useRoomContext,
-  useTracks,
 } from "@livekit/components-react";
 import { Track } from "livekit-client";
 import { cn } from "@/lib/utils";
@@ -91,7 +90,6 @@ export function VideoRoomUI({
 
   const room = useRoomContext();
   const participants = useParticipants();
-  const _tracks = useTracks([Track.Source.Camera, Track.Source.ScreenShare]);
   const localParticipantData = useLocalParticipant();
   const localParticipant = localParticipantData.localParticipant;
   const isCameraEnabled = localParticipantData.isCameraEnabled;
