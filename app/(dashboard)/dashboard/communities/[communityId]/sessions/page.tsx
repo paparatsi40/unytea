@@ -123,6 +123,11 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
                   communityId={communityId}
                 />
               )}
+              {!canCreateSessions && (
+                <div className="text-sm text-zinc-500">
+                  (Owner only feature)
+                </div>
+              )}
             </div>
           </div>
 
