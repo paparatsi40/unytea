@@ -94,37 +94,10 @@ export function VideoRoomUI({
   const isMicrophoneEnabled = localParticipantData.isMicrophoneEnabled;
   const isScreenShareEnabled = localParticipantData.isScreenShareEnabled;
 
-  // Handle incoming data messages (raise hand)
+  // Handle incoming data messages (raise hand) - TODO: Implement when LiveKit data channel is ready
   useEffect(() => {
-    if (!room) return;
-
-    const handleData = (payload: Uint8Array, participant: any) => {
-      try {
-        const decoder = new TextDecoder();
-        const data = JSON.parse(decoder.decode(payload));
-        
-        if (data.type === "raise_hand") {
-          if (data.raised) {
-            setRaisedHands(prev => {
-              if (prev.find(h => h.identity === data.from)) return prev;
-              return [...prev, {
-                id: `${data.from}-${Date.now()}`,
-                identity: data.from,
-                name: data.from,
-                timestamp: data.timestamp,
-              }];
-            });
-          } else {
-            setRaisedHands(prev => prev.filter(h => h.identity !== data.from));
-          }
-        }
-      } catch (e) {
-        console.error("Failed to parse data message:", e);
-      }
-    };
-
-    // Note: LiveKit data messages need to be set up differently
-    // This is a simplified version
+    // LiveKit data messages setup will go here
+    // For now, this is a placeholder
   }, [room]);
 
   // Toggle functions
