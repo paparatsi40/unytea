@@ -62,12 +62,19 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
       members: community.members.map(m => ({ role: m.role })),
     });
 
-    // Get sessions for this community - safely handle case where field doesn't exist yet
+    // Get sessions - NOTE: temporarily fetching all sessions since communityId field 
+    // doesn't exist in database yet. Will filter by community once migration is applied.
     let allSessions: any[] = [];
     try {
       allSessions = await prisma.mentorSession.findMany({
+        // TODO: Add filter by communityId once field exists in database
+        // where: { communityId },
         where: {
-          communityId,
+          // For now, show sessions where user is mentor or mentee
+          OR: [
+            { mentorId: session.user.id },
+            { menteeId: session.user.id },
+          ],
         },
         select: {
           id: true,
@@ -93,7 +100,7 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
       });
     } catch (dbError) {
       console.error("Database error fetching sessions:", dbError);
-      // Continue with empty sessions - communityId field may not exist yet
+      // Continue with empty sessions
     }
 
     // Split into upcoming and past

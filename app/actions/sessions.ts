@@ -43,15 +43,14 @@ export async function createSession(data: {
     };
     
     // Only add communityId if provided (backward compatibility)
-    if (data.communityId) {
-      try {
-        // Attempt to include communityId - will fail if field doesn't exist in DB
-        sessionData.communityId = data.communityId;
-      } catch (e) {
-        // Silently ignore if field doesn't exist
-        console.log("Note: communityId field not yet in database");
-      }
-    }
+    // NOTE: Temporarily disabled until communityId field is added to database
+    // if (data.communityId) {
+    //   try {
+    //     sessionData.communityId = data.communityId;
+    //   } catch (e) {
+    //     console.log("Note: communityId field not yet in database");
+    //   }
+    // }
 
     // Create the session
     const session = await prisma.mentorSession.create({
