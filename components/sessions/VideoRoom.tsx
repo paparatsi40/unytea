@@ -13,10 +13,23 @@ interface VideoRoomProps {
   roomName: string;
   sessionId?: string;
   sessionMode?: "video" | "audio";
+  sessionTitle?: string;
+  sessionDescription?: string;
+  isHost?: boolean;
   onLeave?: () => void;
+  onEndSession?: () => void;
 }
 
-export function VideoRoom({ roomName, sessionId, sessionMode = "video", onLeave }: VideoRoomProps) {
+export function VideoRoom({ 
+  roomName, 
+  sessionId, 
+  sessionMode = "video",
+  sessionTitle,
+  sessionDescription,
+  isHost = false,
+  onLeave,
+  onEndSession,
+}: VideoRoomProps) {
   const [token, setToken] = useState<string | null>(null);
   const [wsUrl, setWsUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -63,15 +76,15 @@ export function VideoRoom({ roomName, sessionId, sessionMode = "video", onLeave 
 
   if (loading) {
     return (
-      <div className="flex h-[700px] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin" />
+      <div className="flex h-screen items-center justify-center bg-zinc-950">
+        <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
       </div>
     );
   }
 
   if (error || !token || !wsUrl) {
     return (
-      <div className="flex h-[700px] items-center justify-center text-red-500">
+      <div className="flex h-screen items-center justify-center bg-zinc-950 text-red-500">
         <AlertCircle className="mr-2 h-5 w-5" />
         {error || "Missing LiveKit config"}
       </div>
@@ -79,7 +92,7 @@ export function VideoRoom({ roomName, sessionId, sessionMode = "video", onLeave 
   }
 
   return (
-    <div className="h-[calc(100vh-200px)] min-h-[600px]">
+    <div className="h-screen">
       <LiveKitRoom
         token={token}
         serverUrl={wsUrl}
@@ -101,7 +114,11 @@ export function VideoRoom({ roomName, sessionId, sessionMode = "video", onLeave 
         <VideoRoomUI 
           sessionId={sessionId} 
           sessionMode={sessionMode}
-          onLeave={onLeave} 
+          sessionTitle={sessionTitle}
+          sessionDescription={sessionDescription}
+          isHost={isHost}
+          onLeave={onLeave}
+          onEndSession={onEndSession}
         />
         <RoomAudioRenderer />
       </LiveKitRoom>

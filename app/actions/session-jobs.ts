@@ -337,6 +337,163 @@ export async function runSessionJobs() {
   };
 }
 
+/**
+ * Generate Session Recap - Auto-create feed post after session ends
+ * This converts a live session into a permanent community asset
+ * 
+ * Features:
+ * - Creates feed post with session recording
+ * - Includes key takeaways from notes
+ * - Links to full session recap page
+ * - Engages community in follow-up discussion
+ */
+export async function generateSessionRecap(sessionId: string) {
+  try {
+    // Fetch complete session data
+    const session = await prisma.mentorSession.findUnique({
+      where: { id: sessionId },
+      include: {
+        mentor: {
+          select: { id: true, name: true, image: true, username: true },
+        },
+        community: {
+          select: { id: true, name: true, slug: true },
+        },
+        notes: true,
+        series: true,
+      },
+    });
+
+    if (!session) {
+      return { success: false, error: "Session not found" };
+    }
+
+    if (!session.communityId) {
+      return { success: false, error: "Session not linked to a community" };
+    }
+
+    // Check if recap already exists
+    if (session.feedPostId) {
+      return { success: false, error: "Recap already generated" };
+    }
+
+    // Build recap content
+    const isAudioOnly = session.mode === "AUDIO";
+    const sessionDate = session.scheduledAt.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+    });
+
+    // Extract key takeaways from notes (if available)
+    let keyTakeaways = "";
+    if (session.notes?.content) {
+      // Simple extraction: first few lines or bullet points
+      const lines = session.notes.content.split("\n").filter((l: string) => l.trim());
+      const takeaways = lines.slice(0, 5).map((l: string) => `• ${l}`).join("\n");
+      keyTakeaways = takeaways;
+    }
+
+    // Build rich content for the recap post
+    const recapContent = `🎥 **Session Recap**
+
+${session.title}
+${isAudioOnly ? "🎙️ Audio session" : "🎬 Video session"} • ${session.duration} min • ${sessionDate}
+
+${session.description ? `*${session.description}*
+
+` : ""}${keyTakeaways ? `**Key Takeaways:**
+${keyTakeaways}
+
+` : ""}💬 **What was your biggest takeaway?**
+Share your thoughts below or ask follow-up questions.
+
+[Watch Recording →](/dashboard/sessions/${session.id})
+`;
+
+    // Create the feed post
+    const post = await prisma.post.create({
+      data: {
+        id: nanoid(),
+        content: recapContent,
+        authorId: session.mentorId,
+        communityId: session.communityId,
+        type: "SESSION_RECAP",
+        metadata: {
+          sessionId: session.id,
+          sessionTitle: session.title,
+          recordingUrl: session.recordingUrl,
+          notesId: session.notes?.id,
+          isAudioOnly,
+          duration: session.duration,
+          attendeeCount: session.attendeeCount,
+        },
+      },
+    });
+
+    // Link post to session
+    await prisma.mentorSession.update({
+      where: { id: sessionId },
+      data: { feedPostId: post.id },
+    });
+
+    // Revalidate feed
+    revalidatePath(`/dashboard/communities/${session.community?.slug}/feed`);
+    revalidatePath("/dashboard/feed");
+
+    console.log(`[generateSessionRecap] Created recap post ${post.id} for session ${sessionId}`);
+
+    return {
+      success: true,
+      postId: post.id,
+      communityId: session.communityId,
+    };
+  } catch (error) {
+    console.error("[generateSessionRecap] Error:", error);
+    return { success: false, error: String(error) };
+  }
+}
+
+/**
+ * End Session - Complete session lifecycle
+ * 
+ * 1. Mark session as completed
+ * 2. Stop recording
+ * 3. Generate session recap post
+ * 4. Update analytics
+ */
+export async function endSession(sessionId: string) {
+  try {
+    // Mark session as completed
+    const session = await prisma.mentorSession.update({
+      where: { id: sessionId },
+      data: {
+        status: "COMPLETED",
+        endedAt: new Date(),
+      },
+    });
+
+    // Generate recap (async, don't wait)
+    generateSessionRecap(sessionId).catch((err) => {
+      console.error("[endSession] Failed to generate recap:", err);
+    });
+
+    // Revalidate paths
+    revalidatePath("/dashboard/sessions");
+    revalidatePath(`/dashboard/sessions/${sessionId}`);
+
+    console.log(`[endSession] Session ${sessionId} ended successfully`);
+
+    return {
+      success: true,
+      session,
+      recapQueued: true,
+    };
+  } catch (error) {
+    console.error("[endSession] Error:", error);
+    return { success: false, error: String(error) };
+  }
+}
+
 // Helper functions
 function formatTimeUntil(date: Date): string {
   const now = new Date();

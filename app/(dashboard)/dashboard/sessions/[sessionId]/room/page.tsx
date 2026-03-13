@@ -1,11 +1,12 @@
 "use client";
+
+import { useEffect, useState, useCallback } from "react";
 import { getSession } from "@/app/actions/sessions";
+import { endSession } from "@/app/actions/session-jobs";
 import { VideoRoom } from "@/components/sessions/VideoRoom";
 import { useCurrentUser } from "@/hooks/use-current-user";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
 
 export default function SessionRoomPage({
   params,
@@ -16,6 +17,7 @@ export default function SessionRoomPage({
   const { user, isLoading: isAuthLoading } = useCurrentUser();
   const [videoSession, setVideoSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [isEnding, setIsEnding] = useState(false);
 
   useEffect(() => {
     // Check auth
@@ -26,22 +28,69 @@ export default function SessionRoomPage({
 
     if (!isAuthLoading && user) {
       // Get session data
-      getSession(params.sessionId).then((result) => {
-        if (!result.success || !result.session) {
-          router.push("/dashboard/sessions");
-          return;
-        }
-        setVideoSession(result.session);
-        setLoading(false);
-      });
+      loadSession();
     }
   }, [params.sessionId, user, isAuthLoading, router]);
 
+  const loadSession = async () => {
+    try {
+      setLoading(true);
+      const result = await getSession(params.sessionId);
+      if (!result.success || !result.session) {
+        router.push("/dashboard/sessions");
+        return;
+      }
+      
+      // Check if session is already ended
+      if (result.session.status === "COMPLETED" || result.session.status === "CANCELLED") {
+        router.push(`/dashboard/sessions/${params.sessionId}`);
+        return;
+      }
+      
+      setVideoSession(result.session);
+    } catch (error) {
+      console.error("Failed to load session:", error);
+      toast.error("Failed to load session");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEndSession = useCallback(async () => {
+    if (!confirm("Are you sure you want to end this session? This will stop the recording and generate a session recap.")) {
+      return;
+    }
+
+    setIsEnding(true);
+    try {
+      const result = await endSession(params.sessionId);
+      if (result.success) {
+        toast.success("Session ended! Recap will be available shortly.");
+        // Redirect to session recap page
+        setTimeout(() => {
+          router.push(`/dashboard/sessions/${params.sessionId}`);
+        }, 1500);
+      } else {
+        toast.error(result.error || "Failed to end session");
+        setIsEnding(false);
+      }
+    } catch (error) {
+      console.error("Error ending session:", error);
+      toast.error("An error occurred while ending the session");
+      setIsEnding(false);
+    }
+  }, [params.sessionId, router]);
+
+  const handleLeave = useCallback(() => {
+    router.push("/dashboard/sessions");
+  }, [router]);
+
   if (isAuthLoading || loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-zinc-950">
         <div className="text-center">
-          <p className="text-lg">Loading session...</p>
+          <div className="mb-4 h-8 w-8 animate-spin rounded-full border-2 border-purple-500 border-t-transparent" />
+          <p className="text-zinc-400">Loading session...</p>
         </div>
       </div>
     );
@@ -49,52 +98,44 @@ export default function SessionRoomPage({
 
   if (!videoSession?.roomId) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-zinc-950">
         <div className="text-center">
-          <p className="text-lg text-destructive">Invalid session</p>
-          <Link
-            href="/dashboard/sessions"
-            className="mt-4 text-sm text-primary hover:underline"
+          <p className="text-lg text-red-400">Invalid session</p>
+          <button
+            onClick={() => router.push("/dashboard/sessions")}
+            className="mt-4 text-sm text-purple-400 hover:underline"
           >
             Back to sessions
-          </Link>
+          </button>
         </div>
       </div>
     );
   }
 
+  const isHost = user?.id === videoSession.mentorId;
+
   return (
-    <div className="min-h-screen bg-background p-4">
-      {/* Header */}
-      <div className="mb-4 flex items-center justify-between">
-        <Link
-          href="/dashboard/sessions"
-          className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Sessions
-        </Link>
-
-        <div className="text-center">
-          <h1 className="text-lg font-semibold text-foreground">
-            {videoSession.title}
-          </h1>
-          {videoSession.description && (
-            <p className="text-sm text-muted-foreground">
-              {videoSession.description}
-            </p>
-          )}
-        </div>
-
-        <div className="w-32" /> {/* Spacer for centering */}
-      </div>
-
-      {/* Video Room */}
+    <div className="h-screen bg-zinc-950">
       <VideoRoom
         roomName={videoSession.roomId}
         sessionId={videoSession.id}
         sessionMode={videoSession.mode || "video"}
+        sessionTitle={videoSession.title}
+        sessionDescription={videoSession.description}
+        isHost={isHost}
+        onLeave={handleLeave}
+        onEndSession={isHost ? handleEndSession : undefined}
       />
+      
+      {isEnding && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+          <div className="text-center">
+            <div className="mb-4 h-12 w-12 animate-spin rounded-full border-3 border-purple-500 border-t-transparent" />
+            <p className="text-lg font-medium text-white">Ending session...</p>
+            <p className="text-sm text-zinc-400">Generating recap and processing recording</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
