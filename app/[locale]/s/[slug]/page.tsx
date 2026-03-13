@@ -86,7 +86,7 @@ export default async function Page({ params }: Props) {
   return (
     <>
       <SessionJsonLd session={session} />
-      <PublicSessionPage session={session} locale={params.locale} />
+      <PublicSessionPage session={session} />
     </>
   );
 }
