@@ -148,21 +148,33 @@ export async function getPublicSessionBySlug(
 export async function getPublicSessionsForSEO(
   limit: number = 100
 ): Promise<{ slug: string; title: string; scheduledAt: Date }[]> {
-  const sessions = await prisma.mentorSession.findMany({
-    where: {
-      visibility: SessionVisibility.public,
-      status: { not: SessionStatus.CANCELLED },
-    },
-    select: {
-      slug: true,
-      title: true,
-      scheduledAt: true,
-    },
-    orderBy: {
-      scheduledAt: "desc",
-    },
-    take: limit,
-  });
+  try {
+    // Temporarily query without slug until migration is run
+    const sessions = await prisma.mentorSession.findMany({
+      where: {
+        visibility: SessionVisibility.public,
+        status: { not: SessionStatus.CANCELLED },
+      },
+      select: {
+        id: true,
+        title: true,
+        scheduledAt: true,
+      },
+      orderBy: {
+        scheduledAt: "desc",
+      },
+      take: limit,
+    });
 
-  return sessions.filter((s) => s.slug) as { slug: string; title: string; scheduledAt: Date }[];
+    // Generate slugs from title + id (fallback until DB migration)
+    return sessions.map((session) => ({
+      slug: `${session.title.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-")}-${session.id.slice(-6)}`,
+      title: session.title,
+      scheduledAt: session.scheduledAt,
+    }));
+  } catch (error) {
+    // If DB error (e.g., slug column doesn't exist), return empty array
+    console.error("Error fetching public sessions for SEO:", error);
+    return [];
+  }
 }
