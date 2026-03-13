@@ -32,7 +32,7 @@ export function PublicSessionPage({ session }: Props) {
   const isLive = session.status === "IN_PROGRESS";
   const isUpcoming = session.status === "SCHEDULED";
   const isPast = session.status === "COMPLETED";
-  const hasRecording = session.recording?.status === "READY" && session.recording?.url;
+  const hasRecording = !!(session.recording?.status === "READY" && session.recording?.url);
 
   const formatDate = (date: Date) => {
     return format(date, "EEEE, MMMM do 'at' h:mm a");
