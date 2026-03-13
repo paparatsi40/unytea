@@ -17,7 +17,6 @@ import {
   Mic,
   MicOff,
   Monitor,
-  MoreVertical,
   Pencil,
   Radio,
   Settings,
