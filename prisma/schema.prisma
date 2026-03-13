@@ -172,6 +172,7 @@ model Community {
   subscriptionPlans SubscriptionPlan[]
   buddyPartnerships BuddyPartnership[]
   sections          CommunitySection[] // Drag & drop sections
+  sessions          MentorSession[]    // Community live sessions
   
   // Resource Library Relations
   resources         Resource[]
@@ -362,6 +363,8 @@ model MentorSession {
   endedAt       DateTime?
   mentorId      String
   menteeId      String
+  communityId   String?       // Optional for now, for backward compatibility
+  community     Community?    @relation(fields: [communityId], references: [id], onDelete: SetNull)
   mentee        User          @relation("MenteeSessions", fields: [menteeId], references: [id], onDelete: Cascade)
   mentor        User          @relation("MentorSessions", fields: [mentorId], references: [id], onDelete: Cascade)
   participations SessionParticipation[]
@@ -369,6 +372,7 @@ model MentorSession {
 
   @@index([mentorId])
   @@index([menteeId])
+  @@index([communityId])
   @@index([scheduledAt])
   @@index([status])
   @@map("mentor_sessions")

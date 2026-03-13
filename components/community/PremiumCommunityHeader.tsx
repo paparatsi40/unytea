@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CommunityActions } from "@/components/community/CommunityActions";
-import { MessageCircle, Trophy, Users, Heart, TrendingUp, Crown, BookOpen, Radio, Flame } from "lucide-react";
+import { MessageCircle, Trophy, Users, Crown, BookOpen, Radio, Flame, Video } from "lucide-react";
 
 type Community = {
   id: string;
@@ -133,16 +133,15 @@ export function PremiumCommunityHeader({
             <span>Feed</span>
           </Link>
           <Link
-            href={`/dashboard/c/${community.slug}/live`}
+            href={`/dashboard/communities/${community.id}/sessions`}
             className={`flex items-center space-x-1.5 md:space-x-2 border-b-2 px-3 md:px-4 py-2.5 md:py-3 text-xs md:text-sm font-medium transition-colors whitespace-nowrap ${
-              pathname?.startsWith(`/dashboard/c/${community.slug}/live`)
-                ? "border-red-500 text-red-600"
+              pathname?.startsWith(`/dashboard/communities/${community.id}/sessions`)
+                ? "border-purple-600 text-purple-600"
                 : "border-transparent text-gray-600 hover:text-gray-900"
             }`}
           >
-            <Radio className="h-3.5 w-3.5 md:h-4 md:w-4" />
-            <span className="hidden sm:inline">Live</span>
-            <span className="sm:hidden">Live</span>
+            <Video className="h-3.5 w-3.5 md:h-4 md:w-4" />
+            <span>Sessions</span>
           </Link>
           <Link
             href={`/dashboard/c/${community.slug}/chat`}
