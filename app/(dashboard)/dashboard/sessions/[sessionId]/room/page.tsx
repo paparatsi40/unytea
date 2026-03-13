@@ -121,7 +121,6 @@ export default function SessionRoomPage({
         sessionId={videoSession.id}
         sessionMode={videoSession.mode || "video"}
         sessionTitle={videoSession.title}
-        sessionDescription={videoSession.description}
         isHost={isHost}
         onLeave={handleLeave}
         onEndSession={isHost ? handleEndSession : undefined}
