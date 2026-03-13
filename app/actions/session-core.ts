@@ -197,7 +197,7 @@ export async function createSessionOrSeries(input: CreateSessionOrSeriesInput) {
         status: SessionStatus.IN_PROGRESS,
         roomId,
         startedAt: startsAt,
-        endsAt,
+        endedAt: endsAt,
         feedPostId: null,
       },
     });
