@@ -234,6 +234,42 @@ export function CreateSessionDialog({
     return tz?.label || timezone;
   }, [timezone]);
 
+  // Duration field JSX - reused for both modes
+  const DurationField = (
+    <div>
+      <label className="mb-1.5 block text-sm font-medium text-zinc-300">
+        <Clock className="mr-1 inline h-4 w-4" />
+        Duration (minutes)
+      </label>
+      <div className="flex gap-2">
+        <input
+          type="number"
+          value={duration}
+          onChange={(e) => setDuration(Math.max(5, parseInt(e.target.value) || 30))}
+          min={5}
+          step={5}
+          className="w-24 rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-2.5 text-center text-white focus:border-purple-500 focus:outline-none"
+        />
+        <div className="flex flex-1 gap-1">
+          {DURATION_PRESETS.map((preset) => (
+            <button
+              key={preset}
+              type="button"
+              onClick={() => setDuration(preset)}
+              className={`flex-1 rounded-lg text-xs font-medium transition-colors ${
+                duration === preset
+                  ? "bg-purple-600 text-white"
+                  : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
+              }`}
+            >
+              {preset}m
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
   const getRecurrenceSummary = () => {
     if (recurrence === "once") return "";
     if (recurrence === "weekly") {
@@ -363,40 +399,6 @@ export function CreateSessionDialog({
                 />
               </div>
 
-              {/* Duration - Numeric Input */}
-              <div>
-                <label className="mb-1.5 block text-sm font-medium text-zinc-300">
-                  <Clock className="mr-1 inline h-4 w-4" />
-                  Duration (minutes)
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="number"
-                    value={duration}
-                    onChange={(e) => setDuration(Math.max(5, parseInt(e.target.value) || 30))}
-                    min={5}
-                    step={5}
-                    className="w-24 rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-2.5 text-center text-white focus:border-purple-500 focus:outline-none"
-                  />
-                  <div className="flex flex-1 gap-1">
-                    {DURATION_PRESETS.map((preset) => (
-                      <button
-                        key={preset}
-                        type="button"
-                        onClick={() => setDuration(preset)}
-                        className={`flex-1 rounded-lg text-xs font-medium transition-colors ${
-                          duration === preset
-                            ? "bg-purple-600 text-white"
-                            : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
-                        }`}
-                      >
-                        {preset}m
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
               {/* Date & Time - Only for scheduled */}
               {mode === "scheduled" && (
                 <>
@@ -442,10 +444,13 @@ export function CreateSessionDialog({
                     )}
                   </div>
 
-                  {/* Growth tip for weekly */}
+                  {/* Duration field */}
+                  {DurationField}
+
+                  {/* Growth tip for weekly - shorter text */}
                   <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-3 py-2">
                     <p className="text-xs text-amber-300">
-                      Weekly sessions increase community engagement by 3x
+                      ⭐ Weekly sessions increase engagement by 3x
                     </p>
                   </div>
 
@@ -576,6 +581,9 @@ export function CreateSessionDialog({
                   )}
                 </>
               )}
+
+              {/* Duration for Start Now mode */}
+              {mode === "now" && DurationField}
 
               {/* Auto Post Toggle */}
               {communityId && (
