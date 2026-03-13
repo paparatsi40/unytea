@@ -42,12 +42,10 @@ export async function createSession(data: {
       menteeId: userId,
     };
     
-    // Only add communityId if provided (backward compatibility)
-    // NOTE: Temporarily disabled until communityId field is added to database
-    // if (data.communityId) {
-    //   try {
-    //     sessionData.communityId = data.communityId;
-    //   } catch (e) {
+    // Only add communityId if provided
+    if (data.communityId) {
+      sessionData.communityId = data.communityId;
+    }
     //     console.log("Note: communityId field not yet in database");
     //   }
     // }

@@ -62,19 +62,12 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
       members: community.members.map(m => ({ role: m.role })),
     });
 
-    // Get sessions - NOTE: temporarily fetching all sessions since communityId field 
-    // doesn't exist in database yet. Will filter by community once migration is applied.
+    // Get sessions for this community - now filtering by communityId
     let allSessions: any[] = [];
     try {
       allSessions = await prisma.mentorSession.findMany({
-        // TODO: Add filter by communityId once field exists in database
-        // where: { communityId },
         where: {
-          // For now, show sessions where user is mentor or mentee
-          OR: [
-            { mentorId: session.user.id },
-            { menteeId: session.user.id },
-          ],
+          communityId: community.id,
         },
         select: {
           id: true,
