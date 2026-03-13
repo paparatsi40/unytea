@@ -632,6 +632,81 @@ export async function markRecordingFailed(sessionId: string, reason?: string) {
 }
 
 /**
+ * Upsert session notes - create or update notes for a session
+ */
+export async function upsertSessionNotes(params: {
+  sessionId: string;
+  userId: string;
+  content: string;
+}) {
+  const { sessionId, userId, content } = params;
+
+  const session = await prisma.mentorSession.findUnique({
+    where: { id: sessionId },
+  });
+
+  if (!session) {
+    return { success: false, error: "Session not found" };
+  }
+
+  const now = new Date();
+
+  // Check if notes already exist
+  const existing = await prisma.sessionNote.findUnique({
+    where: { sessionId },
+  });
+
+  let note;
+  const isUpdate = !!existing;
+
+  if (existing) {
+    // Update existing notes
+    note = await prisma.sessionNote.update({
+      where: { sessionId },
+      data: {
+        content,
+        updatedAt: now,
+        lastEditedBy: userId,
+      },
+    });
+  } else {
+    // Create new notes
+    note = await prisma.sessionNote.create({
+      data: {
+        id: nanoid(),
+        sessionId,
+        content,
+        createdById: userId,
+        createdAt: now,
+        updatedAt: now,
+      },
+    });
+  }
+
+  // Log the event
+  await logSessionEvent({
+    sessionId: session.id,
+    communityId: session.communityId || undefined,
+    type: SessionEventType.SESSION_NOTES_UPDATED,
+    payload: {
+      noteId: note.id,
+      userId,
+      isUpdate,
+      contentLength: content.length,
+      updatedAt: now.toISOString(),
+    },
+  });
+
+  revalidatePath(`/dashboard/sessions/${sessionId}`);
+
+  return {
+    success: true,
+    note,
+    isUpdate,
+  };
+}
+
+/**
  * Get session events for debugging/auditing
  */
 export async function getSessionEvents(sessionId: string) {
