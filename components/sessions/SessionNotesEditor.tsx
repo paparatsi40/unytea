@@ -26,11 +26,11 @@ interface SessionNotesEditorProps {
 interface NoteData {
   id: string;
   content: string;
-  summary?: string;
+  summary?: string | null;
   keyInsights: string[];
   resources: string[];
   updatedAt: Date;
-  lastEditedBy?: string;
+  lastEditedBy?: string | null;
 }
 
 export function SessionNotesEditor({ sessionId, isHost }: SessionNotesEditorProps) {
