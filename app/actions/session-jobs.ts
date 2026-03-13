@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { nanoid } from "nanoid";
 import { revalidatePath } from "next/cache";
+import { PostContentType } from "@prisma/client";
 import { generateUpcomingSessions } from "../actions/sessions";
 
 /**
@@ -417,12 +418,11 @@ Share your thoughts below or ask follow-up questions.
         content: recapContent,
         authorId: session.mentorId,
         communityId: session.communityId,
-        type: "SESSION_RECAP",
-        metadata: {
+        contentType: PostContentType.SESSION_ANNOUNCEMENT,
+        attachments: {
           sessionId: session.id,
           sessionTitle: session.title,
           recordingUrl: session.recordingUrl,
-          notesId: session.notes?.id,
           isAudioOnly,
           duration: session.duration,
           attendeeCount: session.attendeeCount,
