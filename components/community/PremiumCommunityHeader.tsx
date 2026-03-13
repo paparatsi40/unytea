@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CommunityActions } from "@/components/community/CommunityActions";
-import { MessageCircle, Trophy, Users, Crown, BookOpen, Flame, Video } from "lucide-react";
+import { MessageCircle, Trophy, Users, Crown, BookOpen, Flame, Video, TrendingUp } from "lucide-react";
 
 type Community = {
   id: string;
