@@ -29,6 +29,7 @@ import { MainStage } from "./MainStage";
 import { ParticipantsPanel } from "./ParticipantsPanel";
 import { SessionChat } from "./SessionChat";
 import { ReactionsBar } from "./ReactionsBar";
+import { SessionNotesEditor } from "./SessionNotesEditor";
 
 interface VideoRoomUIProps {
   sessionId?: string;
@@ -66,7 +67,7 @@ export function VideoRoomUI({
   onLeave,
 }: VideoRoomUIProps) {
   const [mode, setMode] = useState<SessionMode>("video");
-  const [activeTab, setActiveTab] = useState<"participants" | "chat">("participants");
+  const [activeTab, setActiveTab] = useState<"participants" | "chat" | "notes">("participants");
   const [raisedHand, setRaisedHand] = useState(false);
   const [isLoadingCamera, setIsLoadingCamera] = useState(false);
   const [isLoadingMic, setIsLoadingMic] = useState(false);
@@ -359,19 +360,40 @@ export function VideoRoomUI({
             >
               Chat
             </button>
+            <button
+              onClick={() => setActiveTab("notes")}
+              className={cn(
+                "flex-1 px-4 py-3 text-sm font-medium transition-colors duration-200",
+                activeTab === "notes"
+                  ? "border-b-2 border-yellow-500 text-yellow-400"
+                  : "text-zinc-500 hover:text-zinc-300"
+              )}
+            >
+              Notes
+            </button>
           </div>
 
           {/* Content */}
           <div className="flex-1 overflow-hidden">
             {activeTab === "participants" ? (
               <ParticipantsPanel />
-            ) : sessionId ? (
-              <SessionChat sessionId={sessionId} />
-            ) : (
-              <div className="flex h-full items-center justify-center">
-                <p className="text-sm text-zinc-500">Chat not available</p>
-              </div>
-            )}
+            ) : activeTab === "chat" ? (
+              sessionId ? (
+                <SessionChat sessionId={sessionId} />
+              ) : (
+                <div className="flex h-full items-center justify-center">
+                  <p className="text-sm text-zinc-500">Chat not available</p>
+                </div>
+              )
+            ) : activeTab === "notes" ? (
+              sessionId ? (
+                <SessionNotesEditor sessionId={sessionId} isHost={true} />
+              ) : (
+                <div className="flex h-full items-center justify-center">
+                  <p className="text-sm text-zinc-500">Notes not available</p>
+                </div>
+              )
+            ) : null}
           </div>
         </div>
       </div>
