@@ -693,7 +693,7 @@ export async function upsertSessionNotes(params: {
         id: nanoid(),
         sessionId,
         content,
-        createdById: userId,
+        lastEditedBy: userId,
         createdAt: now,
         updatedAt: now,
       },
