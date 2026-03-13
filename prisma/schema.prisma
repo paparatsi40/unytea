@@ -175,6 +175,7 @@ model Community {
   sections          CommunitySection[] // Drag & drop sections
   sessions          MentorSession[]    // Community live sessions
   sessionSeries     SessionSeries[]    // Recurring session series
+  sessionEvents     SessionEvent[]     // Audit events
   
   // Resource Library Relations
   resources         Resource[]
@@ -382,6 +383,8 @@ model MentorSession {
   participations SessionParticipation[]
   feedbacks     SessionFeedback[]
   notes         SessionNote?
+  recording     Recording?
+  events        SessionEvent[]
 
   @@index([mentorId])
   @@index([menteeId])
@@ -451,6 +454,50 @@ model SessionNote {
   
   @@index([sessionId])
   @@map("session_notes")
+}
+
+// ============================================
+// RECORDING - Session recordings
+// ============================================
+
+model Recording {
+  id              String          @id @default(cuid())
+  sessionId       String          @unique
+  
+  status          RecordingStatus @default(PROCESSING)
+  url             String?
+  durationSeconds Int?
+  
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  
+  session         MentorSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  
+  @@index([status])
+  @@map("recordings")
+}
+
+// ============================================
+// SESSION EVENTS - Audit trail for debugging
+// ============================================
+
+model SessionEvent {
+  id            String           @id @default(cuid())
+  sessionId     String
+  communityId   String?
+  
+  type          SessionEventType
+  payload       Json?            // Flexible JSON for event details
+  
+  createdAt     DateTime         @default(now())
+  
+  session       MentorSession    @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  community     Community?       @relation(fields: [communityId], references: [id], onDelete: SetNull)
+  
+  @@index([sessionId, createdAt])
+  @@index([communityId, createdAt])
+  @@index([type, createdAt])
+  @@map("session_events")
 }
 
 model Availability {
@@ -860,6 +907,26 @@ enum SessionMode {
 enum SessionFrequency {
   WEEKLY
   MONTHLY
+}
+
+enum RecordingStatus {
+  PROCESSING
+  READY
+  FAILED
+}
+
+enum SessionEventType {
+  SESSION_CREATED
+  SESSION_SERIES_CREATED
+  SESSION_UPDATED
+  SESSION_CANCELLED
+  SESSION_STARTED
+  SESSION_ENDED
+  RECORDING_PROCESSING
+  RECORDING_READY
+  SESSION_NOTES_UPDATED
+  SESSION_SHARED_TO_FEED
+  SESSION_ADDED_TO_COURSE
 }
 
 enum LessonContentType {
