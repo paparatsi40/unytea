@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { Plus, Repeat, Calendar, Clock } from "lucide-react";
-import { createSession } from "@/app/actions/sessions";
+import { useState, useMemo } from "react";
+import { Plus, Repeat, Calendar, Clock, ChevronDown } from "lucide-react";
+import { createSessionOrSeries } from "@/app/actions/sessions";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
@@ -11,73 +11,140 @@ type RecurrenceType = "once" | "weekly" | "monthly";
 interface CreateSessionDialogProps {
   triggerText?: string;
   className?: string;
-  communityId?: string; // Optional: if provided, session will be linked to this community
+  communityId?: string;
   onSuccess?: () => void;
 }
 
-export function CreateSessionDialog({ 
-  triggerText = "Create Session", 
-  className, 
+const WEEKDAYS = [
+  { value: 0, label: "Sunday" },
+  { value: 1, label: "Monday" },
+  { value: 2, label: "Tuesday" },
+  { value: 3, label: "Wednesday" },
+  { value: 4, label: "Thursday" },
+  { value: 5, label: "Friday" },
+  { value: 6, label: "Saturday" },
+];
+
+export function CreateSessionDialog({
+  triggerText = "Create Session",
+  className,
   communityId,
-  onSuccess 
+  onSuccess,
 }: CreateSessionDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [recurrence, setRecurrence] = useState<RecurrenceType>("once");
-  const [recurrenceCount, setRecurrenceCount] = useState(4);
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  // Form state
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [scheduledAt, setScheduledAt] = useState("");
+  const [duration, setDuration] = useState(60);
+  const [timezone, setTimezone] = useState(
+    Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"
+  );
+
+  // Recurrence state
+  const [recurrence, setRecurrence] = useState<RecurrenceType>("once");
+  const [interval, setInterval] = useState(1); // every 1 week/month
+  const [dayOfWeek, setDayOfWeek] = useState<number>(1); // Monday default
+  const [generateCount, setGenerateCount] = useState(8);
+
+  // Get day of week from selected date
+  const selectedDayOfWeek = useMemo(() => {
+    if (!scheduledAt) return null;
+    return new Date(scheduledAt).getDay();
+  }, [scheduledAt]);
+
+  // Update dayOfWeek when date changes (for weekly recurrence)
+  const handleDateChange = (value: string) => {
+    setScheduledAt(value);
+    if (value) {
+      const day = new Date(value).getDay();
+      setDayOfWeek(day);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    const formData = new FormData(e.currentTarget);
-    const title = formData.get("title") as string;
-    const description = formData.get("description") as string;
-    const scheduledAt = new Date(formData.get("scheduledAt") as string);
-    const duration = parseInt(formData.get("duration") as string);
+    try {
+      const scheduledDate = new Date(scheduledAt);
 
-    // Create session with communityId if provided
-    const result = await createSession({
-      title,
-      description,
-      scheduledAt,
-      duration,
-      communityId,
-      recurrence: recurrence === "once" ? undefined : recurrence,
-      recurrenceCount: recurrence === "once" ? undefined : recurrenceCount,
-    });
+      const result = await createSessionOrSeries({
+        title,
+        description,
+        scheduledAt: scheduledDate,
+        duration,
+        timezone,
+        communityId,
+        postToFeed: true,
+        // Recurrence fields
+        repeat: recurrence,
+        interval: recurrence === "once" ? undefined : interval,
+        dayOfWeek: recurrence === "weekly" ? dayOfWeek : undefined,
+        dayOfMonth: recurrence === "monthly" ? scheduledDate.getDate() : undefined,
+        generateCount: recurrence === "once" ? undefined : generateCount,
+      });
 
-    if (result.success) {
-      toast.success("Session created successfully!");
-      setIsOpen(false);
-      onSuccess?.();
-      router.refresh();
-    } else {
-      toast.error(result.error || "Failed to create session");
+      if (result.success) {
+        toast.success(
+          result.type === "recurring"
+            ? `Created ${result.generatedCount} sessions in series!`
+            : "Session created successfully!"
+        );
+        setIsOpen(false);
+        resetForm();
+        onSuccess?.();
+        router.refresh();
+      } else {
+        toast.error(result.error || "Failed to create session");
+      }
+    } catch (error) {
+      console.error("Error creating session:", error);
+      toast.error("An unexpected error occurred");
     }
 
     setIsLoading(false);
   };
 
-  const getRecurrenceLabel = () => {
-    switch (recurrence) {
-      case "weekly":
-        return `${recurrenceCount} weekly sessions`;
-      case "monthly":
-        return `${recurrenceCount} monthly sessions`;
-      default:
-        return "One-time session";
-    }
+  const resetForm = () => {
+    setTitle("");
+    setDescription("");
+    setScheduledAt("");
+    setDuration(60);
+    setRecurrence("once");
+    setInterval(1);
+    setDayOfWeek(1);
+    setGenerateCount(8);
+  };
+
+  const getRecurrenceSummary = () => {
+    if (recurrence === "once") return "One-time session";
+
+    const intervalText = interval === 1 ? "" : `every ${interval} `;
+    const frequencyText = recurrence === "weekly" ? "weeks" : "months";
+    const weekdayText =
+      recurrence === "weekly"
+        ? `on ${WEEKDAYS.find((d) => d.value === dayOfWeek)?.label}s`
+        : "";
+
+    return `${generateCount} sessions, ${intervalText}${frequencyText} ${weekdayText}`.trim();
   };
 
   return (
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className={className || "flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"}
+        className={
+          className ||
+          "flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+        }
       >
-        {!className?.includes("Schedule your first") && <Plus className="h-4 w-4" />}
+        {!className?.includes("Schedule your first") && (
+          <Plus className="h-4 w-4" />
+        )}
         {triggerText}
       </button>
 
@@ -87,15 +154,17 @@ export function CreateSessionDialog({
           onClick={() => !isLoading && setIsOpen(false)}
         >
           <div
-            className="w-full max-w-lg rounded-2xl border border-zinc-800 bg-zinc-950 p-6 shadow-2xl"
+            className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl border border-zinc-800 bg-zinc-950 p-6 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-6">
               <h2 className="text-xl font-bold text-white">
-                Schedule Session
+                {recurrence === "once" ? "Schedule Session" : "Create Recurring Series"}
               </h2>
               <p className="text-sm text-zinc-400">
-                Create a live session for your community
+                {recurrence === "once"
+                  ? "Create a live session for your community"
+                  : "Set up a recurring session series"}
               </p>
             </div>
 
@@ -107,7 +176,8 @@ export function CreateSessionDialog({
                 </label>
                 <input
                   type="text"
-                  name="title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
                   required
                   className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-2.5 text-white placeholder:text-zinc-500 focus:border-purple-500 focus:outline-none"
                   placeholder="e.g., Weekly Coaching Call"
@@ -120,7 +190,8 @@ export function CreateSessionDialog({
                   Description <span className="text-zinc-500">(optional)</span>
                 </label>
                 <textarea
-                  name="description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
                   rows={2}
                   className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-2.5 text-white placeholder:text-zinc-500 focus:border-purple-500 focus:outline-none"
                   placeholder="What will this session cover?"
@@ -136,7 +207,8 @@ export function CreateSessionDialog({
                   </label>
                   <input
                     type="datetime-local"
-                    name="scheduledAt"
+                    value={scheduledAt}
+                    onChange={(e) => handleDateChange(e.target.value)}
                     required
                     className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-2.5 text-white focus:border-purple-500 focus:outline-none"
                   />
@@ -148,27 +220,44 @@ export function CreateSessionDialog({
                     Duration
                   </label>
                   <select
-                    name="duration"
+                    value={duration}
+                    onChange={(e) => setDuration(parseInt(e.target.value))}
                     required
-                    defaultValue="60"
                     className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-2.5 text-white focus:border-purple-500 focus:outline-none"
                   >
-                    <option value="30">30 minutes</option>
-                    <option value="45">45 minutes</option>
-                    <option value="60">1 hour</option>
-                    <option value="90">1.5 hours</option>
-                    <option value="120">2 hours</option>
+                    <option value={30}>30 minutes</option>
+                    <option value={45}>45 minutes</option>
+                    <option value={60}>1 hour</option>
+                    <option value={90}>1.5 hours</option>
+                    <option value={120}>2 hours</option>
                   </select>
                 </div>
               </div>
 
-              {/* Recurrence */}
+              {/* Timezone */}
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-zinc-300">
+                  Timezone
+                </label>
+                <input
+                  type="text"
+                  value={timezone}
+                  onChange={(e) => setTimezone(e.target.value)}
+                  className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-2.5 text-white focus:border-purple-500 focus:outline-none"
+                  placeholder="e.g., America/New_York"
+                />
+                <p className="mt-1 text-xs text-zinc-500">
+                  Defaults to your local timezone
+                </p>
+              </div>
+
+              {/* Recurrence Toggle */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-zinc-300">
                   <Repeat className="mr-1 inline h-4 w-4" />
-                  Repeat Session
+                  Repeat
                 </label>
-                
+
                 <div className="flex gap-2">
                   {[
                     { id: "once", label: "Once" },
@@ -189,43 +278,95 @@ export function CreateSessionDialog({
                     </button>
                   ))}
                 </div>
+              </div>
 
-                {/* Recurrence count selector */}
-                {recurrence !== "once" && (
-                  <div className="mt-3 flex items-center gap-4 rounded-xl border border-zinc-800 bg-zinc-900/50 p-3">
+              {/* Recurrence Options */}
+              {recurrence !== "once" && (
+                <div className="space-y-4 rounded-xl border border-zinc-800 bg-zinc-900/50 p-4">
+                  {/* Interval */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-zinc-400">Repeat every</span>
+                    <div className="flex items-center gap-2">
+                      <select
+                        value={interval}
+                        onChange={(e) => setInterval(parseInt(e.target.value))}
+                        className="rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-sm text-white focus:border-purple-500 focus:outline-none"
+                      >
+                        {[1, 2, 3, 4].map((n) => (
+                          <option key={n} value={n}>
+                            {n}
+                          </option>
+                        ))}
+                      </select>
+                      <span className="text-sm text-zinc-400">
+                        {interval === 1
+                          ? recurrence === "weekly"
+                            ? "week"
+                            : "month"
+                          : recurrence === "weekly"
+                            ? "weeks"
+                            : "months"}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Day of Week (for weekly) */}
+                  {recurrence === "weekly" && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-zinc-400">On</span>
+                      <select
+                        value={dayOfWeek}
+                        onChange={(e) => setDayOfWeek(parseInt(e.target.value))}
+                        className="rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-sm text-white focus:border-purple-500 focus:outline-none"
+                      >
+                        {WEEKDAYS.map((day) => (
+                          <option key={day.value} value={day.value}>
+                            {day.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  {/* Generate Count */}
+                  <div className="flex items-center justify-between">
                     <span className="text-sm text-zinc-400">Create</span>
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
-                        onClick={() => setRecurrenceCount(Math.max(2, recurrenceCount - 1))}
+                        onClick={() =>
+                          setGenerateCount(Math.max(2, generateCount - 1))
+                        }
                         className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
                       >
                         −
                       </button>
                       <span className="w-8 text-center font-medium text-white">
-                        {recurrenceCount}
+                        {generateCount}
                       </span>
                       <button
                         type="button"
-                        onClick={() => setRecurrenceCount(Math.min(12, recurrenceCount + 1))}
+                        onClick={() =>
+                          setGenerateCount(Math.min(12, generateCount + 1))
+                        }
                         className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
                       >
                         +
                       </button>
                     </div>
-                    <span className="text-sm text-zinc-400">
-                      {recurrence === "weekly" ? "weekly sessions" : "monthly sessions"}
-                    </span>
+                    <span className="text-sm text-zinc-400">sessions</span>
                   </div>
-                )}
 
-                {/* Preview */}
-                {recurrence !== "once" && (
-                  <p className="mt-2 text-xs text-zinc-500">
-                    Creating {getRecurrenceLabel()}. First session on the selected date.
+                  {/* Summary */}
+                  <p className="text-xs text-zinc-500">
+                    Creating {getRecurrenceSummary()}. First session on{" "}
+                    {scheduledAt
+                      ? new Date(scheduledAt).toLocaleDateString()
+                      : "selected date"}
+                    .
                   </p>
-                )}
-              </div>
+                </div>
+              )}
 
               {/* Actions */}
               <div className="flex gap-3 pt-2">
@@ -239,15 +380,14 @@ export function CreateSessionDialog({
                 </button>
                 <button
                   type="submit"
-                  disabled={isLoading}
+                  disabled={isLoading || !scheduledAt || !title}
                   className="flex-1 rounded-xl bg-purple-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-purple-700 disabled:opacity-50"
                 >
-                  {isLoading 
-                    ? "Creating..." 
-                    : recurrence === "once" 
-                      ? "Create Session" 
-                      : `Create ${recurrenceCount} Sessions`
-                  }
+                  {isLoading
+                    ? "Creating..."
+                    : recurrence === "once"
+                      ? "Create Session"
+                      : `Create ${generateCount} Sessions`}
                 </button>
               </div>
             </form>
