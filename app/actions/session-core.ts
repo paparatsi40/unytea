@@ -399,7 +399,7 @@ export async function createSessionOrSeries(input: CreateSessionOrSeriesInput) {
   }
 
   // Auto-post only the first/upcoming session
-  if (autoPostToFeed && firstSession.communityId) {
+  if (autoPostToFeed && input.communityId) {
     // TODO: Create feed post for first scheduled session
   }
 
