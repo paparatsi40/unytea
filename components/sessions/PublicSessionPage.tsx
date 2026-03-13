@@ -23,10 +23,9 @@ import { JoinSessionCTA } from "./JoinSessionCTA";
 
 interface Props {
   session: PublicSessionData;
-  locale: string;
 }
 
-export function PublicSessionPage({ session, locale }: Props) {
+export function PublicSessionPage({ session }: Props) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"overview" | "transcript" | "resources">("overview");
 
