@@ -69,27 +69,12 @@ export async function GET(
       where: {
         communityId: community.id,
       },
-      include: {
-        author: {
-          select: {
-            id: true,
-            name: true, // Using 'name' field based on the schema
-            image: true,
-          },
-        },
-        _count: {
-          select: {
-            comments: true,
-            reactions: true,
-          },
-        },
-      },
       select: {
         id: true,
         title: true,
         content: true,
-        contentType: true, // Include content type for session announcements
-        attachments: true, // Include attachments for session data
+        contentType: true,
+        attachments: true,
         createdAt: true,
         author: {
           select: {
