@@ -44,6 +44,12 @@ export interface PublicSessionData {
     interval: number;
   } | null;
 }
+  series: {
+    id: string;
+    frequency: string;
+    interval: number;
+  } | null;
+}
 
 export async function getPublicSessionBySlug(
   slug: string
@@ -99,6 +105,32 @@ export async function getPublicSessionBySlug(
     return null;
   }
 
+  // Parse JSON fields from SessionNote
+  let parsedNotes: PublicSessionData["notes"] = null;
+  if (session.notes) {
+    try {
+      const keyInsights = session.notes.keyInsights 
+        ? JSON.parse(session.notes.keyInsights) 
+        : [];
+      const resources = session.notes.resources 
+        ? JSON.parse(session.notes.resources) 
+        : [];
+      
+      parsedNotes = {
+        summary: session.notes.summary,
+        keyInsights: Array.isArray(keyInsights) ? keyInsights : [],
+        resources: Array.isArray(resources) ? resources : [],
+      };
+    } catch {
+      // If JSON parsing fails, return empty arrays
+      parsedNotes = {
+        summary: session.notes.summary,
+        keyInsights: [],
+        resources: [],
+      };
+    }
+  }
+
   return {
     id: session.id,
     slug: session.slug!,
@@ -113,7 +145,7 @@ export async function getPublicSessionBySlug(
     attendeeCount: session.attendeeCount,
     mentor: session.mentor,
     community: session.community,
-    notes: session.notes,
+    notes: parsedNotes,
     recording: session.recording,
     series: session.series,
   };
