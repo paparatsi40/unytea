@@ -44,7 +44,6 @@ interface VideoRoomUIProps {
   sessionId?: string;
   sessionMode?: "video" | "audio";
   sessionTitle?: string;
-  sessionDescription?: string;
   isHost?: boolean;
   onLeave?: () => void;
   onEndSession?: () => void;
@@ -61,7 +60,6 @@ export function VideoRoomUI({
   sessionId,
   sessionMode = "video",
   sessionTitle = "Weekly Coaching Session",
-  sessionDescription = "Live now",
   isHost = true,
   onLeave,
   onEndSession,
