@@ -91,7 +91,7 @@ export function VideoRoomUI({
 
   const room = useRoomContext();
   const participants = useParticipants();
-  const tracks = useTracks([Track.Source.Camera, Track.Source.ScreenShare]);
+  const _tracks = useTracks([Track.Source.Camera, Track.Source.ScreenShare]);
   const localParticipantData = useLocalParticipant();
   const localParticipant = localParticipantData.localParticipant;
   const isCameraEnabled = localParticipantData.isCameraEnabled;
