@@ -586,7 +586,7 @@ export async function generateUpcomingSessions(
     startsAt: Date;
   },
   count: number
-): Array<{ scheduledAt: Date; endsAt: Date }> {
+): Promise<Array<{ scheduledAt: Date; endsAt: Date }>> {
   const instances: Array<{ scheduledAt: Date; endsAt: Date }> = [];
   
   let currentDate = new Date(series.startsAt);
