@@ -94,6 +94,7 @@ model User {
   reactions          Reaction[]
   menteeSessions     MentorSession[]   @relation("MenteeSessions")
   mentorSessions     MentorSession[]   @relation("MentorSessions")
+  sessionSeries      SessionSeries[]   // Host of recurring session series
   achievements       UserAchievement[]
   channelMessages    ChannelMessage[]
   channelMembers     ChannelMember[]
@@ -357,6 +358,14 @@ model MentorSession {
   status        SessionStatus @default(SCHEDULED)
   mentorNotes   String?
   menteeNotes   String?
+  
+  // Recurring session fields
+  seriesId      String?       // null = one-time session
+  isException   Boolean       @default(false)
+  exceptionData Json?         // store what changed for this exception
+  feedPostId    String?       // linked feed post for this session
+  attendeeCount Int           @default(0)
+  
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
   startedAt     DateTime?
@@ -367,6 +376,7 @@ model MentorSession {
   community     Community?    @relation(fields: [communityId], references: [id], onDelete: SetNull)
   mentee        User          @relation("MenteeSessions", fields: [menteeId], references: [id], onDelete: Cascade)
   mentor        User          @relation("MentorSessions", fields: [mentorId], references: [id], onDelete: Cascade)
+  series        SessionSeries? @relation(fields: [seriesId], references: [id], onDelete: SetNull)
   participations SessionParticipation[]
   feedbacks     SessionFeedback[]
   notes         SessionNote?
@@ -376,7 +386,52 @@ model MentorSession {
   @@index([communityId])
   @@index([scheduledAt])
   @@index([status])
+  @@index([seriesId])
   @@map("mentor_sessions")
+}
+
+// ============================================
+// RECURRING SESSIONS - SESSION SERIES
+// ============================================
+
+model SessionSeries {
+  id              String    @id @default(cuid())
+  communityId     String?
+  hostId          String
+  title           String
+  description     String?
+  
+  // Recurrence rules
+  frequency       SessionFrequency @default(WEEKLY)  // weekly | monthly
+  interval        Int       @default(1)            // every 1 week, every 2 weeks, etc.
+  dayOfWeek       Int?      // 0-6 (Sunday-Saturday) for weekly
+  dayOfMonth      Int?      // 1-31 for monthly
+  startTime       String    // "10:00" format
+  durationMinutes Int       @default(60)
+  timezone        String    @default("UTC")
+  
+  // Series lifecycle
+  startsAt        DateTime
+  endsAt          DateTime? // optional end date
+  isActive        Boolean   @default(true)
+  
+  // Automation settings
+  autoPostToFeed  Boolean   @default(true)
+  
+  // Relations
+  community       Community? @relation(fields: [communityId], references: [id], onDelete: SetNull)
+  host            User       @relation(fields: [hostId], references: [id], onDelete: Cascade)
+  instances       MentorSession[]
+  
+  // Timestamps
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([communityId])
+  @@index([hostId])
+  @@index([isActive])
+  @@index([startsAt])
+  @@map("session_series")
 }
 
 model SessionNote {
@@ -792,6 +847,11 @@ enum SessionStatus {
   COMPLETED
   CANCELLED
   NO_SHOW
+}
+
+enum SessionFrequency {
+  WEEKLY
+  MONTHLY
 }
 
 enum LessonContentType {
