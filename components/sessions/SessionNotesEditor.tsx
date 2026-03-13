@@ -44,62 +44,64 @@ export function SessionNotesEditor({ sessionId, isHost }: SessionNotesEditorProp
   const [resources, setResources] = useState<string[]>([]);
   const [newInsight, setNewInsight] = useState("");
   const [newResource, setNewResource] = useState("");
-  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const autoSaveRef = useRef<NodeJS.Timeout | null>(null);
 
   // Load notes on mount
   useEffect(() => {
+    async function loadNotes() {
+      try {
+        const result = await getOrCreateSessionNotes(sessionId);
+        if (result.success) {
+          setNote(result.note);
+          setContent(result.note.content);
+          setInsights(result.note.keyInsights || []);
+          setResources(result.note.resources || []);
+          setLastSaved(new Date(result.note.updatedAt));
+        }
+      } catch (error) {
+        console.error("Failed to load notes:", error);
+        toast.error("Failed to load session notes");
+      } finally {
+        setIsLoading(false);
+      }
+    }
     loadNotes();
   }, [sessionId]);
 
-  // Auto-save on content change
+  // Auto-save every 3 seconds when content changes
   useEffect(() => {
-    if (!note || content === note.content) return;
+    if (!note || isLoading) return;
 
-    if (saveTimeoutRef.current) {
-      clearTimeout(saveTimeoutRef.current);
+    if (autoSaveRef.current) {
+      clearTimeout(autoSaveRef.current);
     }
 
-    saveTimeoutRef.current = setTimeout(() => {
-      handleAutoSave();
+    autoSaveRef.current = setTimeout(async () => {
+      await handleAutoSave();
     }, 3000);
 
     return () => {
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current);
+      if (autoSaveRef.current) {
+        clearTimeout(autoSaveRef.current);
       }
     };
-  }, [content, note]);
-
-  const loadNotes = async () => {
-    try {
-      setIsLoading(true);
-      const result = await getOrCreateSessionNotes(sessionId);
-      if (result.success) {
-        setNote(result.note);
-        setContent(result.note.content);
-        setInsights(result.note.keyInsights || []);
-        setResources(result.note.resources || []);
-        setLastSaved(new Date(result.note.updatedAt));
-      }
-    } catch (error) {
-      console.error("Failed to load notes:", error);
-      toast.error("Failed to load notes");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  }, [content, insights, resources, note, isLoading]);
 
   const handleAutoSave = async () => {
     if (!note) return;
-    
+
     try {
-      await updateSessionNotes({
+      const result = await updateSessionNotes({
         noteId: note.id,
         content,
+        summary: note.summary || "",
         keyInsights: insights,
         resources,
       });
-      setLastSaved(new Date());
+
+      if (result.success) {
+        setLastSaved(new Date());
+      }
     } catch (error) {
       console.error("Auto-save failed:", error);
     }
@@ -107,17 +109,23 @@ export function SessionNotesEditor({ sessionId, isHost }: SessionNotesEditorProp
 
   const handleManualSave = async () => {
     if (!note) return;
-    
+
     setIsSaving(true);
     try {
-      await updateSessionNotes({
+      const result = await updateSessionNotes({
         noteId: note.id,
         content,
+        summary: note.summary || "",
         keyInsights: insights,
         resources,
       });
-      setLastSaved(new Date());
-      toast.success("Notes saved");
+
+      if (result.success) {
+        setLastSaved(new Date());
+        toast.success("Notes saved");
+      } else {
+        toast.error("Failed to save notes");
+      }
     } catch (error) {
       console.error("Save failed:", error);
       toast.error("Failed to save notes");
@@ -148,8 +156,11 @@ export function SessionNotesEditor({ sessionId, isHost }: SessionNotesEditorProp
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-zinc-400">Loading notes...</div>
+      <div className="h-full flex items-center justify-center bg-zinc-900 rounded-xl border border-zinc-800">
+        <div className="flex items-center gap-2 text-zinc-500">
+          <Clock className="h-5 w-5 animate-spin" />
+          <span>Loading notes...</span>
+        </div>
       </div>
     );
   }
@@ -248,7 +259,7 @@ Action items:
 
 Questions to follow up:
 • `}
-                className="min-h-[300px] bg-zinc-950 border-zinc-700 text-white placeholder:text-zinc-600 resize-none"
+                className="w-full min-h-[300px] bg-zinc-950 border border-zinc-700 rounded-lg p-3 text-white placeholder:text-zinc-600 resize-none focus:outline-none focus:ring-2 focus:ring-purple-500/50"
               />
             </div>
           )}
@@ -267,7 +278,7 @@ Questions to follow up:
                   value={newInsight}
                   onChange={(e) => setNewInsight(e.target.value)}
                   placeholder="Add a key insight..."
-                  className="flex-1 px-3 py-2 bg-zinc-950 border border-zinc-700 rounded-md text-white placeholder:text-zinc-600 text-sm"
+                  className="flex-1 px-3 py-2 bg-zinc-950 border border-zinc-700 rounded-md text-white placeholder:text-zinc-600 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500/50"
                   onKeyDown={(e) => e.key === "Enter" && addInsight()}
                 />
                 <Button onClick={addInsight} size="sm" className="bg-yellow-600 hover:bg-yellow-700">
@@ -287,11 +298,11 @@ Questions to follow up:
                       key={index}
                       className="flex items-start gap-2 p-3 bg-zinc-950 rounded-lg border border-zinc-800 group"
                     >
-                      <CheckCircle2 className="h-4 w-4 text-yellow-500 mt-0.5 flex-shrink-0" />
-                      <span className="text-sm text-zinc-200 flex-1">{insight}</span>
+                      <Lightbulb className="h-4 w-4 text-yellow-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-zinc-300 flex-1">{insight}</span>
                       <button
                         onClick={() => removeInsight(index)}
-                        className="opacity-0 group-hover:opacity-100 text-zinc-500 hover:text-red-400 transition-opacity"
+                        className="text-zinc-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
                       >
                         ×
                       </button>
@@ -316,7 +327,7 @@ Questions to follow up:
                   value={newResource}
                   onChange={(e) => setNewResource(e.target.value)}
                   placeholder="https://example.com or resource name"
-                  className="flex-1 px-3 py-2 bg-zinc-950 border border-zinc-700 rounded-md text-white placeholder:text-zinc-600 text-sm"
+                  className="flex-1 px-3 py-2 bg-zinc-950 border border-zinc-700 rounded-md text-white placeholder:text-zinc-600 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/50"
                   onKeyDown={(e) => e.key === "Enter" && addResource()}
                 />
                 <Button onClick={addResource} size="sm" className="bg-green-600 hover:bg-green-700">
@@ -347,7 +358,7 @@ Questions to follow up:
                       </a>
                       <button
                         onClick={() => removeResource(index)}
-                        className="opacity-0 group-hover:opacity-100 text-zinc-500 hover:text-red-400 transition-opacity"
+                        className="text-zinc-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
                       >
                         ×
                       </button>
