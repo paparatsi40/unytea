@@ -115,7 +115,6 @@ export function VideoRoom({
           sessionId={sessionId} 
           sessionMode={sessionMode}
           sessionTitle={sessionTitle}
-          sessionDescription={sessionDescription}
           isHost={isHost}
           onLeave={onLeave}
           onEndSession={onEndSession}
