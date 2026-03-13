@@ -67,7 +67,7 @@ export function VideoRoomUI({
   const isAudioOnly = sessionMode === "audio";
   
   // Session state
-  const [sessionState, setSessionState] = useState<SessionState>("live");
+  const [sessionState, _setSessionState] = useState<SessionState>("live");
   
   // Stage mode: video, screen, whiteboard, audio
   const [stageMode, setStageMode] = useState<"video" | "screen" | "whiteboard" | "audio">(
