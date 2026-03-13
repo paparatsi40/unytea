@@ -115,7 +115,12 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
           <div className="mb-8">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-semibold text-white">Live Sessions</h1>
+                <div className="flex items-center gap-2 mb-1">
+                  <h1 className="text-2xl font-semibold text-white">Live Sessions</h1>
+                  <Badge variant="secondary" className="bg-zinc-800 text-zinc-400 text-xs">
+                    {allSessions.length} sessions
+                  </Badge>
+                </div>
                 <p className="text-zinc-400">{community.name} • Run live coaching, classes, and workshops</p>
                 {upcoming.length > 0 && (
                   <div className="mt-2 flex items-center gap-2 text-sm">
@@ -158,7 +163,7 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
                     <Video className="h-8 w-8 text-zinc-400" />
                   </div>
                   <h3 className="mb-2 text-lg font-medium text-white">
-                    Host your first live session
+                    Host your first live session for this community
                   </h3>
                   <p className="mb-6 text-zinc-400 max-w-sm mx-auto">
                     Run coaching calls, workshops, or Q&A sessions. Members love live interactions!
