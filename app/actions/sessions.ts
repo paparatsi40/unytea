@@ -17,6 +17,7 @@ export async function createSession(data: {
   isPrivate?: boolean;
   recurrence?: "weekly" | "monthly";
   recurrenceCount?: number;
+  postToFeed?: boolean; // Whether to auto-post to community feed (default: true)
 }) {
   try {
     const userId = await getCurrentUserId();
@@ -28,8 +29,7 @@ export async function createSession(data: {
     // Generate unique room ID
     const roomId = `session-${nanoid(12)}`;
 
-    // For now, create just the first session
-    // In production, you'd create all recurring sessions here
+    // Create the session
     const session = await prisma.mentorSession.create({
       data: {
         title: data.title,
@@ -40,7 +40,8 @@ export async function createSession(data: {
         roomId,
         status: "SCHEDULED",
         mentorId: userId,
-        menteeId: userId, // For now, creator is both mentor and mentee
+        menteeId: userId,
+        communityId: data.communityId, // Link to community
       },
       include: {
         mentor: {
@@ -51,10 +52,52 @@ export async function createSession(data: {
             username: true,
           },
         },
+        community: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+          },
+        },
       },
     });
 
+    // Auto-post to community feed if communityId exists and postToFeed is not false
+    if (data.communityId && data.postToFeed !== false) {
+      try {
+        // Create a special post announcing the session
+        await prisma.post.create({
+          data: {
+            title: `📅 New live session: ${data.title}`,
+            content: `A new live session has been scheduled in this community.`,
+            contentType: "SESSION_ANNOUNCEMENT",
+            authorId: userId,
+            communityId: data.communityId,
+            // Store session data in attachments for the special card rendering
+            attachments: {
+              sessionId: session.id,
+              sessionTitle: data.title,
+              sessionDescription: data.description,
+              scheduledAt: data.scheduledAt.toISOString(),
+              duration: data.duration,
+              mentorId: userId,
+              mentorName: session.mentor.name,
+              mentorImage: session.mentor.image,
+            },
+          },
+        });
+
+        // Also revalidate the community feed
+        revalidatePath(`/dashboard/c/${session.community?.slug}/feed`);
+        revalidatePath(`/dashboard/communities/${data.communityId}/sessions`);
+      } catch (postError) {
+        console.error("Error creating session announcement post:", postError);
+        // Don't fail the session creation if the post fails
+      }
+    }
+
     revalidatePath("/dashboard/sessions");
+    revalidatePath("/dashboard/agenda");
     return { success: true, session };
   } catch (error) {
     console.error("Error creating session:", error);

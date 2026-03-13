@@ -766,6 +766,7 @@ enum PostContentType {
   QUESTION
   ANNOUNCEMENT
   RESOURCE
+  SESSION_ANNOUNCEMENT  // Auto-posted when session is created
 }
 
 enum SessionStatus {
