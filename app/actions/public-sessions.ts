@@ -44,12 +44,6 @@ export interface PublicSessionData {
     interval: number;
   } | null;
 }
-  series: {
-    id: string;
-    frequency: string;
-    interval: number;
-  } | null;
-}
 
 export async function getPublicSessionBySlug(
   slug: string
