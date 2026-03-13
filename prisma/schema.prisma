@@ -364,6 +364,9 @@ model MentorSession {
   mentorNotes   String?
   menteeNotes   String?
   
+  // Public URL fields
+  slug          String?       @unique  // For public session pages /s/[slug]
+  
   // Recurring session fields
   seriesId      String?       // null = one-time session
   isException   Boolean       @default(false)
@@ -395,6 +398,7 @@ model MentorSession {
   @@index([scheduledAt])
   @@index([status])
   @@index([seriesId])
+  @@index([slug])
   @@map("mentor_sessions")
 }
 

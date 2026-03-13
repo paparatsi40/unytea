@@ -6,6 +6,22 @@ import { revalidatePath } from "next/cache";
 import { nanoid } from "nanoid";
 
 // ============================================
+// SLUG GENERATOR
+// ============================================
+
+function generateSessionSlug(title: string): string {
+  const base = title
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "") // Remove special chars
+    .replace(/\s+/g, "-") // Replace spaces with hyphens
+    .substring(0, 60); // Max 60 chars
+  
+  const uniqueId = nanoid(6);
+  return `${base}-${uniqueId}`;
+}
+
+// ============================================
 // TYPES
 // ============================================
 
@@ -163,6 +179,7 @@ export async function createSessionOrSeries(input: CreateSessionOrSeriesInput) {
   if (input.timing === "now") {
     const endsAt = addMinutes(startsAt, input.durationMinutes);
     const roomId = `session-${nanoid(10)}`;
+    const slug = generateSessionSlug(input.title);
 
     const session = await prisma.mentorSession.create({
       data: {
@@ -170,6 +187,7 @@ export async function createSessionOrSeries(input: CreateSessionOrSeriesInput) {
         communityId: input.communityId,
         mentorId: input.hostId,
         menteeId: input.hostId, // For community sessions, both are host initially
+        slug,
         title: input.title.trim(),
         description: input.description ?? null,
         mode,
@@ -228,6 +246,7 @@ export async function createSessionOrSeries(input: CreateSessionOrSeriesInput) {
   if (input.repeat === "once") {
     const endsAt = addMinutes(startsAt, input.durationMinutes);
     const roomId = `session-${nanoid(10)}`;
+    const slug = generateSessionSlug(input.title);
 
     const session = await prisma.mentorSession.create({
       data: {
@@ -235,6 +254,7 @@ export async function createSessionOrSeries(input: CreateSessionOrSeriesInput) {
         communityId: input.communityId,
         mentorId: input.hostId,
         menteeId: input.hostId,
+        slug,
         title: input.title.trim(),
         description: input.description ?? null,
         mode,
@@ -313,45 +333,42 @@ export async function createSessionOrSeries(input: CreateSessionOrSeriesInput) {
     count: generateCount,
   });
 
-  // Create all sessions
-  const sessionsData = dates.map((date) => ({
-    id: nanoid(),
-    communityId: input.communityId,
-    mentorId: input.hostId,
-    menteeId: input.hostId,
-    seriesId: series.id,
-    title: input.title.trim(),
-    description: input.description ?? null,
-    mode,
-    scheduledAt: date,
-    duration: input.durationMinutes,
-    timezone: input.timezone,
-    status: SessionStatus.SCHEDULED,
-    roomId: `session-${nanoid(10)}`,
-    endsAt: addMinutes(date, input.durationMinutes),
-  }));
+  // Create all sessions with unique slugs
+  const createdSessions: { id: string; scheduledAt: Date; slug: string }[] = [];
+  
+  for (const date of dates) {
+    const slug = generateSessionSlug(`${input.title}-${date.toISOString().slice(0, 10)}`);
+    const session = await prisma.mentorSession.create({
+      data: {
+        id: nanoid(),
+        communityId: input.communityId,
+        mentorId: input.hostId,
+        menteeId: input.hostId,
+        seriesId: series.id,
+        slug,
+        title: input.title.trim(),
+        description: input.description ?? null,
+        mode,
+        scheduledAt: date,
+        duration: input.durationMinutes,
+        timezone: input.timezone,
+        status: SessionStatus.SCHEDULED,
+        roomId: `session-${nanoid(10)}`,
+        endsAt: addMinutes(date, input.durationMinutes),
+      },
+    });
+    createdSessions.push({ id: session.id, scheduledAt: session.scheduledAt, slug: session.slug! });
+  }
 
-  await prisma.mentorSession.createMany({
-    data: sessionsData,
-  });
-
-  const createdSessions = await prisma.mentorSession.findMany({
-    where: {
-      seriesId: series.id,
-    },
-    orderBy: {
-      scheduledAt: "asc",
-    },
-  });
-
-  const firstSession = createdSessions[0];
-  if (!firstSession) {
+  if (createdSessions.length === 0) {
     throw new Error("Failed to generate recurring sessions");
   }
 
+  const firstSessionId = createdSessions[0].id;
+
   // Log series creation event
   await logSessionEvent({
-    sessionId: firstSession.id,
+    sessionId: firstSessionId,
     communityId: input.communityId,
     type: SessionEventType.SESSION_SERIES_CREATED,
     payload: {
@@ -368,15 +385,15 @@ export async function createSessionOrSeries(input: CreateSessionOrSeriesInput) {
   for (const session of createdSessions) {
     await logSessionEvent({
       sessionId: session.id,
-      communityId: session.communityId || undefined,
+      communityId: input.communityId,
       type: SessionEventType.SESSION_CREATED,
       payload: {
         timing: "scheduled",
         repeat: input.repeat,
         seriesId: series.id,
         startsAt: session.scheduledAt.toISOString(),
-        endsAt: session.endsAt?.toISOString(),
-        mode: session.mode,
+        mode,
+        slug: session.slug,
       },
     });
   }
@@ -391,7 +408,7 @@ export async function createSessionOrSeries(input: CreateSessionOrSeriesInput) {
   return {
     type: "recurring_series" as const,
     series,
-    firstSession,
+    firstSessionId,
     sessions: createdSessions,
     createdSessionsCount: createdSessions.length,
   };
