@@ -8,7 +8,7 @@ import {
   useTracks,
 } from "@livekit/components-react";
 import { Track, LocalTrack } from "livekit-client";
-import { Monitor, Video, Pencil, Headphones, Mic } from "lucide-react";
+import { Monitor, Video, Pencil, Headphones } from "lucide-react";
 import { SessionMode } from "./ModeSwitcher";
 import { SessionWhiteboard } from "./SessionWhiteboard";
 import { LocalVideo } from "./LocalVideo";
