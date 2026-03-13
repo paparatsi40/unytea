@@ -401,6 +401,9 @@ export function CreateSessionDialog({
                 />
               </div>
 
+              {/* Duration - Always visible */}
+              {DurationField}
+
               {/* Date & Time - Only for scheduled */}
               {mode === "scheduled" && (
                 <>
@@ -446,13 +449,10 @@ export function CreateSessionDialog({
                     )}
                   </div>
 
-                  {/* Duration field */}
-                  {DurationField}
-
                   {/* Growth tip for weekly - shorter text */}
                   <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-3 py-2">
                     <p className="text-xs text-amber-300">
-                      ⭐ Weekly sessions increase engagement by 3x
+                      ⭐ Weekly sessions boost engagement 3x
                     </p>
                   </div>
 
@@ -583,9 +583,6 @@ export function CreateSessionDialog({
                   )}
                 </>
               )}
-
-              {/* Duration for Start Now mode */}
-              {mode === "now" && DurationField}
 
               {/* Auto Post Toggle */}
               {communityId && (
