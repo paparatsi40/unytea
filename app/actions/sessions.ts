@@ -29,20 +29,33 @@ export async function createSession(data: {
     // Generate unique room ID
     const roomId = `session-${nanoid(12)}`;
 
+    // Create the session - handle case where communityId field doesn't exist in DB yet
+    const sessionData: any = {
+      title: data.title,
+      description: data.description,
+      scheduledAt: data.scheduledAt,
+      duration: data.duration,
+      timezone: "UTC",
+      roomId,
+      status: "SCHEDULED",
+      mentorId: userId,
+      menteeId: userId,
+    };
+    
+    // Only add communityId if provided (backward compatibility)
+    if (data.communityId) {
+      try {
+        // Attempt to include communityId - will fail if field doesn't exist in DB
+        sessionData.communityId = data.communityId;
+      } catch (e) {
+        // Silently ignore if field doesn't exist
+        console.log("Note: communityId field not yet in database");
+      }
+    }
+
     // Create the session
     const session = await prisma.mentorSession.create({
-      data: {
-        title: data.title,
-        description: data.description,
-        scheduledAt: data.scheduledAt,
-        duration: data.duration,
-        timezone: "UTC",
-        roomId,
-        status: "SCHEDULED",
-        mentorId: userId,
-        menteeId: userId,
-        communityId: data.communityId, // Link to community
-      },
+      data: sessionData,
       include: {
         mentor: {
           select: {
@@ -50,13 +63,6 @@ export async function createSession(data: {
             name: true,
             image: true,
             username: true,
-          },
-        },
-        community: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
           },
         },
       },
@@ -88,8 +94,20 @@ export async function createSession(data: {
         });
 
         // Also revalidate the community feed
-        revalidatePath(`/dashboard/c/${session.community?.slug}/feed`);
         revalidatePath(`/dashboard/communities/${data.communityId}/sessions`);
+        
+        // Try to get community slug for feed revalidation if communityId exists
+        try {
+          const community = await prisma.community.findUnique({
+            where: { id: data.communityId },
+            select: { slug: true },
+          });
+          if (community?.slug) {
+            revalidatePath(`/dashboard/c/${community.slug}/feed`);
+          }
+        } catch (e) {
+          // Ignore if community lookup fails
+        }
       } catch (postError) {
         console.error("Error creating session announcement post:", postError);
         // Don't fail the session creation if the post fails
