@@ -73,8 +73,28 @@ export async function GET(
         author: {
           select: {
             id: true,
-            firstName: true,
-            lastName: true,
+            name: true, // Using 'name' field based on the schema
+            image: true,
+          },
+        },
+        _count: {
+          select: {
+            comments: true,
+            reactions: true,
+          },
+        },
+      },
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        contentType: true, // Include content type for session announcements
+        attachments: true, // Include attachments for session data
+        createdAt: true,
+        author: {
+          select: {
+            id: true,
+            name: true,
             image: true,
           },
         },

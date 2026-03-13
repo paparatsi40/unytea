@@ -12,9 +12,16 @@ type RecurrenceType = "once" | "weekly" | "monthly";
 interface CreateSessionDialogProps {
   triggerText?: string;
   className?: string;
+  communityId?: string; // Optional: if provided, session will be linked to this community
+  onSuccess?: () => void;
 }
 
-export function CreateSessionDialog({ triggerText = "Create Session", className }: CreateSessionDialogProps) {
+export function CreateSessionDialog({ 
+  triggerText = "Create Session", 
+  className, 
+  communityId,
+  onSuccess 
+}: CreateSessionDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [recurrence, setRecurrence] = useState<RecurrenceType>("once");
@@ -31,53 +38,21 @@ export function CreateSessionDialog({ triggerText = "Create Session", className 
     const scheduledAt = new Date(formData.get("scheduledAt") as string);
     const duration = parseInt(formData.get("duration") as string);
 
-    // Create sessions based on recurrence
-    const sessionsToCreate: { title: string; description: string; scheduledAt: Date; duration: number; parentSessionId?: string }[] = [];
-
-    if (recurrence === "once") {
-      sessionsToCreate.push({ title, description, scheduledAt, duration });
-    } else {
-      // Create parent session first
-      sessionsToCreate.push({ title, description, scheduledAt, duration });
-      
-      // Generate recurring sessions
-      for (let i = 1; i < recurrenceCount; i++) {
-        let nextDate: Date;
-        if (recurrence === "weekly") {
-          nextDate = addWeeks(scheduledAt, i);
-        } else {
-          nextDate = addMonths(scheduledAt, i);
-        }
-        
-        sessionsToCreate.push({
-          title: `${title} (${i + 1})`,
-          description,
-          scheduledAt: nextDate,
-          duration,
-          parentSessionId: "parent", // Will be replaced with actual parent ID after first session is created
-        });
-      }
-    }
-
-    // For now, just create the first session
-    // In production, you'd create all sessions or use a batch API
+    // Create session with communityId if provided
     const result = await createSession({
       title,
       description,
       scheduledAt,
       duration,
+      communityId,
       recurrence: recurrence === "once" ? undefined : recurrence,
-      recurrenceCount: recurrence !== "once" ? recurrenceCount : undefined,
+      recurrenceCount: recurrence === "once" ? undefined : recurrenceCount,
     });
 
     if (result.success) {
-      toast.success(recurrence === "once" 
-        ? "Session created successfully!" 
-        : `${recurrenceCount} ${recurrence} sessions created!`
-      );
+      toast.success("Session created successfully!");
       setIsOpen(false);
-      setRecurrence("once");
-      setRecurrenceCount(4);
+      onSuccess?.();
       router.refresh();
     } else {
       toast.error(result.error || "Failed to create session");

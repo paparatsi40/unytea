@@ -10,12 +10,23 @@ type Post = {
   id: string;
   title: string | null;
   content: string;
+  contentType?: string;
   createdAt: Date;
   author: {
     id: string;
     name: string | null;
     image: string | null;
   };
+  attachments?: {
+    sessionId?: string;
+    sessionTitle?: string;
+    sessionDescription?: string;
+    scheduledAt?: string;
+    duration?: number;
+    mentorId?: string;
+    mentorName?: string;
+    mentorImage?: string | null;
+  } | null;
   _count?: {
     comments: number;
     reactions: number;

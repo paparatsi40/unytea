@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { PostReactions } from "@/components/community/PostReactions";
 import { CommentSection } from "@/components/community/CommentSection";
+import { SessionAnnouncementCard } from "@/components/community/SessionAnnouncementCard";
 import { deletePost, updatePost } from "@/app/actions/posts";
 import { MessageCircle, Share2, MoreHorizontal, Clock, Edit2, Trash2, X, Check } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
@@ -12,12 +13,23 @@ type Post = {
   id: string;
   title: string | null;
   content: string;
+  contentType?: string;
   createdAt: Date;
   author: {
     id: string;
     name: string | null;
     image: string | null;
   };
+  attachments?: {
+    sessionId?: string;
+    sessionTitle?: string;
+    sessionDescription?: string;
+    scheduledAt?: string;
+    duration?: number;
+    mentorId?: string;
+    mentorName?: string;
+    mentorImage?: string | null;
+  } | null;
   _count?: {
     comments: number;
     reactions: number;
@@ -26,6 +38,12 @@ type Post = {
 
 export function PremiumPostCard({ post }: { post: Post }) {
   const { user } = useCurrentUser();
+  
+  // If this is a session announcement, render the special card
+  if (post.contentType === "SESSION_ANNOUNCEMENT") {
+    return <SessionAnnouncementCard post={post} />;
+  }
+  
   const [showMenu, setShowMenu] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [isEditing, setIsEditing] = useState(false);

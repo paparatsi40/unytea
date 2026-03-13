@@ -111,6 +111,7 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
         {canCreateSessions && (
           <CreateSessionDialog
             triggerText="Schedule Session"
+            communityId={communityId}
             className="inline-flex items-center gap-2 rounded-full bg-purple-600 px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-purple-700"
           />
         )}
@@ -186,6 +187,7 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
                   <div className="mt-6">
                     <CreateSessionDialog
                       triggerText="Schedule Session"
+                      communityId={communityId}
                       className="inline-flex items-center gap-2 rounded-full bg-purple-600 px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-purple-700"
                     />
                   </div>
