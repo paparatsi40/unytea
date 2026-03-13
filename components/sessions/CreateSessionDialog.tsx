@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Plus, Repeat, Calendar, Clock, ChevronDown } from "lucide-react";
+import { Plus, Repeat, Calendar, Clock } from "lucide-react";
 import { createSessionOrSeries } from "@/app/actions/sessions";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
