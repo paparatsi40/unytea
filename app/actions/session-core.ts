@@ -263,7 +263,7 @@ export async function createSessionOrSeries(input: CreateSessionOrSeriesInput) {
         timezone: input.timezone,
         status: SessionStatus.SCHEDULED,
         roomId,
-        endsAt,
+        endedAt: endsAt,
       },
     });
 
@@ -354,7 +354,7 @@ export async function createSessionOrSeries(input: CreateSessionOrSeriesInput) {
         timezone: input.timezone,
         status: SessionStatus.SCHEDULED,
         roomId: `session-${nanoid(10)}`,
-        endsAt: addMinutes(date, input.durationMinutes),
+        endedAt: addMinutes(date, input.durationMinutes),
       },
     });
     createdSessions.push({ id: session.id, scheduledAt: session.scheduledAt, slug: session.slug! });
