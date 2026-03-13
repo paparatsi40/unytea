@@ -13,9 +13,7 @@ import {
   CheckCircle2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { getOrCreateSessionNotes, updateSessionNotes } from "@/app/actions/sessionNotes";
 import { toast } from "react-hot-toast";
 import { formatDistanceToNow } from "date-fns";
@@ -162,7 +160,6 @@ export function SessionNotesEditor({ sessionId, isHost }: SessionNotesEditorProp
       animate={{ opacity: 1 }}
       className="h-full flex flex-col bg-zinc-900 rounded-xl border border-zinc-800 overflow-hidden"
     >
-      {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800 bg-zinc-950">
         <div className="flex items-center gap-2">
           <FileText className="h-4 w-4 text-purple-500" />
@@ -230,7 +227,7 @@ export function SessionNotesEditor({ sessionId, isHost }: SessionNotesEditorProp
       </div>
 
       {/* Content */}
-      <ScrollArea className="flex-1">
+      <div className="flex-1 overflow-y-auto">
         <div className="p-4">
           {activeSection === "notes" && (
             <div className="space-y-3">
@@ -238,7 +235,7 @@ export function SessionNotesEditor({ sessionId, isHost }: SessionNotesEditorProp
                 <Sparkles className="h-4 w-4 inline mr-1" />
                 Capture key points, decisions, and action items
               </div>
-              <Textarea
+              <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder={`Session Notes
@@ -361,7 +358,7 @@ Questions to follow up:
             </div>
           )}
         </div>
-      </ScrollArea>
+      </div>
     </motion.div>
   );
 }
