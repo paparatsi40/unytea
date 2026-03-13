@@ -101,7 +101,8 @@ export function CreateSessionDialog({
         onSuccess?.();
         router.refresh();
       } else {
-        toast.error(result.error || "Failed to create session");
+        const errorResult = result as { success: false; error?: string };
+        toast.error(errorResult.error || "Failed to create session");
       }
     } catch (error) {
       console.error("Error creating session:", error);
