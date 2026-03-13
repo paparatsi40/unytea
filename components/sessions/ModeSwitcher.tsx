@@ -1,6 +1,6 @@
 "use client";
 
-import { Video, Monitor, Pencil } from "lucide-react";
+import { Video, Monitor, Pencil, Headphones } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type SessionMode = "video" | "screen" | "whiteboard";
@@ -9,6 +9,7 @@ interface ModeSwitcherProps {
   currentMode: SessionMode;
   onModeChange: (mode: SessionMode) => void;
   hasWhiteboard?: boolean;
+  sessionMode?: "video" | "audio";
 }
 
 const MODES = [
@@ -17,15 +18,27 @@ const MODES = [
   { id: "whiteboard" as SessionMode, label: "Whiteboard", icon: Pencil },
 ];
 
+const AUDIO_MODES = [
+  { id: "screen" as SessionMode, label: "Screen", icon: Monitor },
+  { id: "whiteboard" as SessionMode, label: "Whiteboard", icon: Pencil },
+];
+
 export function ModeSwitcher({
   currentMode,
   onModeChange,
   hasWhiteboard = false,
+  sessionMode = "video",
 }: ModeSwitcherProps) {
-  const availableModes = MODES.filter((mode) => {
-    if (mode.id === "whiteboard" && !hasWhiteboard) return false;
-    return true;
-  });
+  const isAudioOnly = sessionMode === "audio";
+  const availableModes = isAudioOnly 
+    ? AUDIO_MODES.filter((mode) => {
+        if (mode.id === "whiteboard" && !hasWhiteboard) return false;
+        return true;
+      })
+    : MODES.filter((mode) => {
+        if (mode.id === "whiteboard" && !hasWhiteboard) return false;
+        return true;
+      });
 
   return (
     <div className="flex items-center">

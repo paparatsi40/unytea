@@ -21,6 +21,7 @@ import {
   Settings,
   Video,
   VideoOff,
+  Headphones,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -33,6 +34,7 @@ import { SessionNotesEditor } from "./SessionNotesEditor";
 
 interface VideoRoomUIProps {
   sessionId?: string;
+  sessionMode?: "video" | "audio";
   sessionTitle?: string;
   sessionDescription?: string;
   onLeave?: () => void;
@@ -62,11 +64,15 @@ function ConnectionBadge() {
 
 export function VideoRoomUI({
   sessionId,
+  sessionMode = "video",
   sessionTitle = "Weekly Coaching Session",
   sessionDescription = "Live now",
   onLeave,
 }: VideoRoomUIProps) {
-  const [mode, setMode] = useState<SessionMode>("video");
+  const isAudioOnly = sessionMode === "audio";
+  
+  // For audio sessions, default to "screen" mode since video isn't available
+  const [mode, setMode] = useState<SessionMode>(isAudioOnly ? "screen" : "video");
   const [activeTab, setActiveTab] = useState<"participants" | "chat" | "notes">("participants");
   const [raisedHand, setRaisedHand] = useState(false);
   const [isLoadingCamera, setIsLoadingCamera] = useState(false);
@@ -81,6 +87,7 @@ export function VideoRoomUI({
   const isScreenShareEnabled = localParticipantData.isScreenShareEnabled;
 
   const toggleCamera = async () => {
+    if (isAudioOnly) return; // Disable camera toggle for audio-only sessions
     setIsLoadingCamera(true);
     try {
       await localParticipant.setCameraEnabled(!isCameraEnabled);
@@ -108,7 +115,7 @@ export function VideoRoomUI({
       if (!isScreenShareEnabled) {
         setMode("screen");
       } else if (mode === "screen") {
-        setMode("video");
+        setMode(isAudioOnly ? "screen" : "video");
       }
     } catch (error) {
       console.error("Failed to toggle screen share:", error);
@@ -150,7 +157,7 @@ export function VideoRoomUI({
         <div className="flex flex-col items-center">
           <h1 className="text-sm font-semibold text-white">{sessionTitle}</h1>
           <p className="text-xs text-zinc-400">
-            {sessionDescription} • {participants.length} participants
+            {isAudioOnly ? "Live audio" : sessionDescription} • {participants.length} participants
           </p>
         </div>
 
@@ -175,8 +182,17 @@ export function VideoRoomUI({
               currentMode={mode}
               onModeChange={setMode}
               hasWhiteboard={!!sessionId}
+              sessionMode={sessionMode}
             />
           </div>
+          
+          {/* Audio-only indicator */}
+          {isAudioOnly && (
+            <div className="flex items-center gap-1.5 rounded-full bg-blue-500/10 px-3 py-1 text-xs font-medium text-blue-400">
+              <Headphones className="h-3.5 w-3.5" />
+              <span>Audio only</span>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center gap-2">
@@ -211,9 +227,10 @@ export function VideoRoomUI({
                 <div className="flex items-center gap-1.5 rounded-full bg-black/60 px-3 py-1 text-xs font-medium text-zinc-200 backdrop-blur-sm">
                   <Radio className="h-3.5 w-3.5 text-red-500" />
                   <span>
-                    {mode === "video" && "Live video"}
-                    {mode === "screen" && "Screen sharing"}
-                    {mode === "whiteboard" && "Whiteboard mode"}
+                    {isAudioOnly && "Live audio"}
+                    {!isAudioOnly && mode === "video" && "Live video"}
+                    {!isAudioOnly && mode === "screen" && "Screen sharing"}
+                    {!isAudioOnly && mode === "whiteboard" && "Whiteboard mode"}
                   </span>
                 </div>
               </div>
@@ -221,14 +238,15 @@ export function VideoRoomUI({
               {/* Main Stage */}
               <MainStage
                 mode={mode}
+                sessionMode={sessionMode}
                 sessionId={sessionId}
                 className="h-full"
               />
             </div>
           </div>
 
-          {/* SPEAKER STRIP - cuando hay múltiples participantes con video */}
-          {participants.filter((p) => p.isCameraEnabled).length > 1 && (
+          {/* SPEAKER STRIP - solo para video mode */}
+          {!isAudioOnly && participants.filter((p) => p.isCameraEnabled).length > 1 && (
             <div className="flex shrink-0 gap-3 px-4 pb-2">
               {participants
                 .filter((p) => p.isCameraEnabled)
@@ -248,7 +266,7 @@ export function VideoRoomUI({
 
           {/* BOTTOM CONTROLS */}
           <div className="flex shrink-0 items-center justify-center gap-2 border-t border-zinc-800 bg-zinc-900 px-4 py-3">
-            {/* Microphone */}
+            {/* Microphone - siempre visible */}
             <button
               onClick={toggleMicrophone}
               disabled={isLoadingMic}
@@ -267,26 +285,28 @@ export function VideoRoomUI({
               )}
             </button>
 
-            {/* Camera */}
-            <button
-              onClick={toggleCamera}
-              disabled={isLoadingCamera}
-              className={cn(
-                "flex items-center justify-center rounded-full transition-all duration-200 shadow-lg disabled:opacity-50",
-                isCameraEnabled
-                  ? "h-12 w-12 bg-zinc-700 text-white hover:bg-zinc-600"
-                  : "h-14 w-14 border-4 border-purple-400 bg-purple-600 text-white hover:bg-purple-700"
-              )}
-              title={isCameraEnabled ? "Stop Camera" : "Start Camera"}
-            >
-              {isCameraEnabled ? (
-                <Video className="h-5 w-5" />
-              ) : (
-                <VideoOff className="h-6 w-6" />
-              )}
-            </button>
+            {/* Camera - solo para video sessions */}
+            {!isAudioOnly && (
+              <button
+                onClick={toggleCamera}
+                disabled={isLoadingCamera}
+                className={cn(
+                  "flex items-center justify-center rounded-full transition-all duration-200 shadow-lg disabled:opacity-50",
+                  isCameraEnabled
+                    ? "h-12 w-12 bg-zinc-700 text-white hover:bg-zinc-600"
+                    : "h-14 w-14 border-4 border-purple-400 bg-purple-600 text-white hover:bg-purple-700"
+                )}
+                title={isCameraEnabled ? "Stop Camera" : "Start Camera"}
+              >
+                {isCameraEnabled ? (
+                  <Video className="h-5 w-5" />
+                ) : (
+                  <VideoOff className="h-6 w-6" />
+                )}
+              </button>
+            )}
 
-            {/* Screen Share */}
+            {/* Screen Share - visible para ambos modos */}
             <button
               onClick={toggleScreenShare}
               className={cn(
@@ -306,7 +326,7 @@ export function VideoRoomUI({
             {/* Whiteboard Toggle (when in whiteboard mode) */}
             {mode === "whiteboard" && (
               <button
-                onClick={() => setMode("video")}
+                onClick={() => setMode(isAudioOnly ? "screen" : "video")}
                 className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-zinc-700 bg-zinc-800 text-zinc-400 transition-all hover:bg-zinc-700 hover:text-white"
                 title="Exit Whiteboard"
               >

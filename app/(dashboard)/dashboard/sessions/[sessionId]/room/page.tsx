@@ -93,6 +93,7 @@ export default function SessionRoomPage({
       <VideoRoom
         roomName={videoSession.roomId}
         sessionId={videoSession.id}
+        sessionMode={videoSession.mode || "video"}
       />
     </div>
   );

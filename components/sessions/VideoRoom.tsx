@@ -12,10 +12,11 @@ import { VideoRoomUI } from "./VideoRoomUI";
 interface VideoRoomProps {
   roomName: string;
   sessionId?: string;
+  sessionMode?: "video" | "audio";
   onLeave?: () => void;
 }
 
-export function VideoRoom({ roomName, sessionId, onLeave }: VideoRoomProps) {
+export function VideoRoom({ roomName, sessionId, sessionMode = "video", onLeave }: VideoRoomProps) {
   const [token, setToken] = useState<string | null>(null);
   const [wsUrl, setWsUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -83,7 +84,7 @@ export function VideoRoom({ roomName, sessionId, onLeave }: VideoRoomProps) {
         token={token}
         serverUrl={wsUrl}
         connect={true}
-        video={true}
+        video={sessionMode === "video"}
         audio={true}
         onConnected={() => {
           console.log("Connected to LiveKit room");
@@ -97,7 +98,11 @@ export function VideoRoom({ roomName, sessionId, onLeave }: VideoRoomProps) {
         }}
         className="h-full flex flex-col"
       >
-        <VideoRoomUI sessionId={sessionId} onLeave={onLeave} />
+        <VideoRoomUI 
+          sessionId={sessionId} 
+          sessionMode={sessionMode}
+          onLeave={onLeave} 
+        />
         <RoomAudioRenderer />
       </LiveKitRoom>
     </div>
