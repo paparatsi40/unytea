@@ -7,7 +7,6 @@ import {
   useParticipants,
   useRoomContext,
 } from "@livekit/components-react";
-import { Track } from "livekit-client";
 import { cn } from "@/lib/utils";
 import {
   ArrowLeft,
