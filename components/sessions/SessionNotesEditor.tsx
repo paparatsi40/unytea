@@ -9,8 +9,7 @@ import {
   Sparkles, 
   BookOpen, 
   Link as LinkIcon,
-  Lightbulb,
-  CheckCircle2
+  Lightbulb
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
