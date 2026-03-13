@@ -102,6 +102,7 @@ model User {
   buddyPartnerships2 BuddyPartnership[] @relation("BuddyUser2")
   buddyCheckIns      BuddyCheckIn[]
   sessionParticipations SessionParticipation[]
+  sessionResources     SessionResource[]  // Resources created by user
   sessionFeedbacks   SessionFeedback[]
   
   // Resource Library Relations
@@ -357,8 +358,9 @@ model MentorSession {
   roomId        String?
   recordingUrl  String?
   videoRoomName String?       // LiveKit room name (e.g., "session-cm123456")
-  status        SessionStatus @default(SCHEDULED)
-  mode          SessionMode   @default(VIDEO)  // VIDEO | AUDIO
+  status        SessionStatus     @default(SCHEDULED)
+  mode          SessionMode       @default(VIDEO)  // VIDEO | AUDIO
+  visibility    SessionVisibility @default(community) // community | public | unlisted
   mentorNotes   String?
   menteeNotes   String?
   
@@ -385,6 +387,7 @@ model MentorSession {
   notes         SessionNote?
   recording     Recording?
   events        SessionEvent[]
+  resources     SessionResource[]
 
   @@index([mentorId])
   @@index([menteeId])
@@ -454,6 +457,31 @@ model SessionNote {
   
   @@index([sessionId])
   @@map("session_notes")
+}
+
+// ============================================
+// SESSION RESOURCES - Files and links for sessions
+// ============================================
+
+model SessionResource {
+  id          String            @id @default(cuid())
+  sessionId   String
+  type        SessionResourceType
+  title       String
+  url         String
+  description String?
+  
+  createdById String
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  
+  session     MentorSession     @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  createdBy   User              @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  
+  @@index([sessionId])
+  @@index([type])
+  @@index([createdById])
+  @@map("session_resources")
 }
 
 // ============================================
@@ -829,15 +857,17 @@ model CommunitySection {
 }
 
 model SessionParticipation {
-  id            String   @id @default(cuid())
-  sessionId     String
-  userId        String
-  joinedAt      DateTime @default(now())
-  leftAt        DateTime?
-  pointsEarned  Int      @default(0)
-  eventsData    Json?    // Track specific events: questions_asked, answers_given, etc.
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id              String            @id @default(cuid())
+  sessionId       String
+  userId          String
+  role            ParticipationRole @default(listener)
+  joinedAt        DateTime          @default(now())
+  leftAt          DateTime?
+  durationSeconds Int?              // Calculated when session ends
+  pointsEarned    Int               @default(0)
+  eventsData      Json?              // Track specific events: questions_asked, answers_given, etc.
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
 
   session MentorSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   user    User          @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -846,6 +876,7 @@ model SessionParticipation {
   @@index([sessionId])
   @@index([userId])
   @@index([joinedAt])
+  @@index([role])
   @@map("session_participations")
 }
 
@@ -927,6 +958,28 @@ enum SessionEventType {
   SESSION_NOTES_UPDATED
   SESSION_SHARED_TO_FEED
   SESSION_ADDED_TO_COURSE
+}
+
+enum SessionVisibility {
+  community
+  public
+  unlisted
+}
+
+enum ParticipationRole {
+  host
+  speaker
+  listener
+}
+
+enum SessionResourceType {
+  link
+  pdf
+  slide
+  doc
+  image
+  video
+  other
 }
 
 enum LessonContentType {
