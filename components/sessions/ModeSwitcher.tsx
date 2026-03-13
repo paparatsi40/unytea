@@ -1,6 +1,6 @@
 "use client";
 
-import { Video, Monitor, Pencil, Headphones } from "lucide-react";
+import { Video, Monitor, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type SessionMode = "video" | "screen" | "whiteboard";
