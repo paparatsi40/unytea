@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import {
-  useConnectionState,
   useLocalParticipant,
   useParticipants,
   useRoomContext,
@@ -94,7 +93,6 @@ export function VideoRoomUI({
   const isCameraEnabled = localParticipantData.isCameraEnabled;
   const isMicrophoneEnabled = localParticipantData.isMicrophoneEnabled;
   const isScreenShareEnabled = localParticipantData.isScreenShareEnabled;
-  const connectionState = useConnectionState();
 
   // Handle incoming data messages (raise hand)
   useEffect(() => {
