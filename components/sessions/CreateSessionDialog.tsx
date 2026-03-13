@@ -66,6 +66,13 @@ export function CreateSessionDialog({
     try {
       const scheduledDate = new Date(scheduledAt);
 
+      // Convert recurrence to API format (WEEKLY/MONTHLY in uppercase)
+      const apiRepeat = recurrence === "once" 
+        ? "once" 
+        : recurrence === "weekly" 
+          ? "WEEKLY" 
+          : "MONTHLY";
+
       const result = await createSessionOrSeries({
         title,
         description,
@@ -75,7 +82,7 @@ export function CreateSessionDialog({
         communityId,
         postToFeed: true,
         // Recurrence fields
-        repeat: recurrence,
+        repeat: apiRepeat as "once" | "WEEKLY" | "MONTHLY",
         interval: recurrence === "once" ? undefined : interval,
         dayOfWeek: recurrence === "weekly" ? dayOfWeek : undefined,
         dayOfMonth: recurrence === "monthly" ? scheduledDate.getDate() : undefined,
