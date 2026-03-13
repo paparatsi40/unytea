@@ -176,7 +176,7 @@ export async function ensureFutureSessions() {
         }
 
         // Generate new instances
-        const newInstances = generateUpcomingSessions(
+        const newInstances = await generateUpcomingSessions(
           {
             frequency: series.frequency,
             interval: series.interval,

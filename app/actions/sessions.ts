@@ -574,7 +574,7 @@ async function createRecurringSeries(
  * Generate upcoming session dates for a series
  * Pure function - no DB operations
  */
-export function generateUpcomingSessions(
+export async function generateUpcomingSessions(
   series: {
     frequency: SessionFrequency;
     interval: number;
