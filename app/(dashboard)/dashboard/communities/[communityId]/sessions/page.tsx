@@ -48,7 +48,6 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
     notFound();
   }
 
-  const isMember = community.members.length > 0;
   const isOwner = community.ownerId === session.user.id;
   const canCreateSessions = isOwner || community.members.some(m => m.role === "ADMIN" || m.role === "MODERATOR");
 
