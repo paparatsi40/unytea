@@ -378,6 +378,22 @@ model MentorSession {
   @@map("mentor_sessions")
 }
 
+model SessionNote {
+  id          String   @id @default(cuid())
+  content     String   @db.Text  // Rich text content (JSON/HTML)
+  summary     String?  @db.Text  // Auto-generated summary
+  keyInsights String?  @db.Text  // Array of key insights (JSON)
+  resources   String?  @db.Text  // Array of links/resources (JSON)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  sessionId   String   @unique  // One note per session
+  session     MentorSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  lastEditedBy String?        // User ID who last edited
+  
+  @@index([sessionId])
+  @@map("session_notes")
+}
+
 model Availability {
   id        String   @id @default(cuid())
   dayOfWeek Int
