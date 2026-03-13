@@ -157,6 +157,40 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
             </TabsList>
 
             <TabsContent value="upcoming" className="space-y-4">
+              {/* Show next session prominently if exists */}
+              {upcoming.length > 0 && (
+                <div className="rounded-xl border border-purple-500/30 bg-gradient-to-r from-purple-900/20 to-pink-900/20 p-6">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Badge className="bg-purple-600 text-white text-xs">
+                      Next Live Session
+                    </Badge>
+                    <span className="text-xs text-zinc-400">
+                      {formatDistanceToNow(new Date(upcoming[0].scheduledAt), { addSuffix: true })}
+                    </span>
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-1">
+                    {upcoming[0].title}
+                  </h3>
+                  <div className="flex items-center gap-4 text-sm text-zinc-400 mb-4">
+                    <span className="flex items-center gap-1">
+                      <Calendar className="h-4 w-4" />
+                      {formatSessionDate(new Date(upcoming[0].scheduledAt))}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Clock className="h-4 w-4" />
+                      {formatSessionTime(new Date(upcoming[0].scheduledAt))}
+                    </span>
+                    <span>{upcoming[0].duration} min</span>
+                  </div>
+                  <Link href={`/dashboard/sessions/${upcoming[0].id}/room`}>
+                    <Button className="bg-purple-600 hover:bg-purple-700 text-white">
+                      Join Session
+                      <ArrowRight className="h-4 w-4 ml-1" />
+                    </Button>
+                  </Link>
+                </div>
+              )}
+
               {upcoming.length === 0 ? (
                 <div className="rounded-2xl border border-dashed border-zinc-800 bg-zinc-900 p-12 text-center">
                   <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800">
@@ -170,7 +204,7 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
                   </p>
                   {canCreateSessions && (
                     <CreateSessionDialog
-                      triggerText="Start your first live session"
+                      triggerText="Schedule your first session"
                       className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2.5 rounded-lg font-medium inline-flex items-center gap-2"
                       communityId={communityId}
                     />
