@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { SessionStatus, SessionMode, SessionFrequency, SessionEventType, RecordingStatus } from "@prisma/client";
+import { Prisma, SessionStatus, SessionMode, SessionFrequency, SessionEventType, RecordingStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { nanoid } from "nanoid";
 
@@ -58,7 +58,7 @@ export async function logSessionEvent(params: {
   sessionId: string;
   communityId?: string;
   type: SessionEventType;
-  payload?: Record<string, unknown>;
+  payload?: Record<string, unknown> | null;
 }) {
   return prisma.sessionEvent.create({
     data: {
@@ -66,7 +66,7 @@ export async function logSessionEvent(params: {
       sessionId: params.sessionId,
       communityId: params.communityId,
       type: params.type,
-      payload: params.payload ?? {},
+      payload: params.payload as Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput | undefined,
     },
   });
 }
