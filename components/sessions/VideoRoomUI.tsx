@@ -452,7 +452,7 @@ export function VideoRoomUI({
               </div>
               <div className="flex-1 overflow-hidden">
                 {sessionId ? (
-                  <SessionNotesEditor sessionId={sessionId} isHost={isHost} compact />
+                  <SessionNotesEditor sessionId={sessionId} isHost={isHost} />
                 ) : (
                   <div className="flex h-full items-center justify-center">
                     <p className="text-xs text-zinc-500">Notes not available</p>
