@@ -90,7 +90,7 @@ export default function KnowledgeLibraryPage() {
         getConvertibleSessions(),
       ]);
 
-      if (impactResult.success) {
+      if (impactResult.success && impactResult.stats) {
         setStats(impactResult.stats);
       }
 
