@@ -17,9 +17,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { 
   Sparkles, 
-  Loader2, 
-  CheckCircle, 
-  Video,
+    Loader2,
+  CheckCircle,
   Clock,
   Users,
   Check,
