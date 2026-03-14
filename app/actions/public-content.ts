@@ -4,8 +4,8 @@ import { getCurrentUserId } from "@/lib/auth-utils";
 import { prisma } from "@/lib/prisma";
 
 /**
- * Analyze session for "golden moments" - high-engagement segments
- * Returns timestamps for clip generation
+ * Analyze session for "golden moments" - high-value segments
+ * Based on session structure, participation, and notes
  */
 export async function detectSessionMoments(sessionId: string) {
   try {
@@ -14,7 +14,7 @@ export async function detectSessionMoments(sessionId: string) {
       return { success: false, error: "Unauthorized" };
     }
 
-    // Fetch session with all engagement data
+    // Fetch session with relevant data
     const session = await prisma.mentorSession.findUnique({
       where: { id: sessionId },
       include: {
@@ -27,14 +27,6 @@ export async function detectSessionMoments(sessionId: string) {
         },
         notes: true,
         recording: true,
-        events: {
-          where: {
-            type: {
-              in: ["QUESTION_ASKED", "REACTION", "HAND_RAISED"],
-            },
-          },
-          orderBy: { createdAt: "asc" },
-        },
       },
     });
 
@@ -73,13 +65,13 @@ export async function detectSessionMoments(sessionId: string) {
 }
 
 /**
- * Analyze engagement patterns to find "golden moments"
+ * Analyze session structure for "golden moments"
  */
 function analyzeMoments(session: any) {
   const moments: {
     startTime: number;
     endTime: number;
-    type: "engagement" | "question" | "insight" | "reaction";
+    type: "engagement" | "insight";
     score: number;
     label: string;
     context: string;
@@ -88,115 +80,80 @@ function analyzeMoments(session: any) {
   const recording = session.recording;
   if (!recording) return moments;
 
-  const totalDuration = recording.duration || 3600; // default 1 hour
+  const totalDuration = recording.duration || 3600;
+  const attendeeCount = session.participations?.length || 0;
 
-  // 1. Find high-engagement periods (many reactions in short time)
-  const reactionEvents = session.events.filter(
-    (e: any) => e.type === "REACTION"
-  );
-
-  if (reactionEvents.length > 0) {
-    const engagementWindows = findDenseWindows(reactionEvents, totalDuration, 30);
-    engagementWindows.forEach((window) => {
-      moments.push({
-        startTime: Math.max(0, window.start - 10),
-        endTime: Math.min(totalDuration, window.end + 10),
-        type: "engagement",
-        score: window.density * 10,
-        label: "🔥 Peak Engagement",
-        context: `${window.count} reactions in ${Math.round(window.end - window.start)}s`,
-      });
-    });
-  }
-
-  // 2. Find key questions answered
-  const questionEvents = session.events.filter(
-    (e: any) => e.type === "QUESTION_ASKED"
-  );
-
-  questionEvents.forEach((q: any, index: number) => {
-    // Look for note created shortly after (indicates answer)
-    const questionTime = new Date(q.createdAt).getTime();
-    const answerNote = session.notes.find((n: any) => {
-      const noteTime = new Date(n.createdAt).getTime();
-      return noteTime > questionTime && noteTime < questionTime + 120000; // within 2 min
-    });
-
-    if (answerNote) {
-      const startSeconds = Math.floor((questionTime - new Date(session.startedAt!).getTime()) / 1000);
-      moments.push({
-        startTime: Math.max(0, startSeconds - 5),
-        endTime: Math.min(totalDuration, startSeconds + 60),
-        type: "question",
-        score: 70 + index * 5,
-        label: "❓ Key Question Answered",
-        context: answerNote.content.substring(0, 100) + "...",
-      });
-    }
+  // 1. Opening Hook (first 2-3 minutes)
+  moments.push({
+    startTime: 0,
+    endTime: Math.min(180, totalDuration),
+    type: "engagement",
+    score: 75,
+    label: "🔥 Opening Hook",
+    context: `Session starts - ${attendeeCount} people joined`,
   });
 
-  // 3. Find valuable insights (notes with high engagement)
-  const note = session.notes;
-  if (note && (note.content.length > 200)) {
-    const noteTime = new Date(note.createdAt).getTime();
-    const startSeconds = Math.floor((noteTime - new Date(session.startedAt!).getTime()) / 1000);
+  // 2. Middle content (if session > 10 min)
+  if (totalDuration > 600) {
+    const midStart = Math.floor(totalDuration * 0.3);
+    const midEnd = Math.floor(totalDuration * 0.7);
     
     moments.push({
-      startTime: Math.max(0, startSeconds - 15),
-      endTime: Math.min(totalDuration, startSeconds + 45),
+      startTime: midStart,
+      endTime: midEnd,
       type: "insight",
-      score: 60,
-      label: "💡 Valuable Insight",
-      context: note.content.substring(0, 150) + "...",
+      score: 70,
+      label: "💡 Core Content",
+      context: `Main teaching (${Math.round((midEnd - midStart) / 60)} min)`,
     });
   }
 
-  // Sort by score descending
-  moments.sort((a, b) => b.score - a.score);
+  // 3. Closing segment (last 3-5 min)
+  const closingStart = Math.max(0, totalDuration - 300);
+  moments.push({
+    startTime: closingStart,
+    endTime: totalDuration,
+    type: "engagement",
+    score: 65,
+    label: "🔚 Powerful Close",
+    context: "Final takeaways",
+  });
 
-  // Return top 5 moments, ensuring no overlaps
-  return dedupeMoments(moments.slice(0, 5));
-}
-
-/**
- * Find windows with dense event clusters
- */
-function findDenseWindows(
-  events: any[],
-  totalDuration: number,
-  windowSizeSeconds: number
-) {
-  if (events.length === 0) return [];
-
-  const windows: { start: number; end: number; count: number; density: number }[] = [];
-
-  // Group events into time windows
-  const eventTimes = events.map((e) =>
-    Math.floor((new Date(e.createdAt).getTime() - new Date(events[0].createdAt).getTime()) / 1000)
-  );
-
-  for (let i = 0; i < eventTimes.length; i++) {
-    const windowStart = eventTimes[i];
-    const windowEnd = windowStart + windowSizeSeconds;
+  // 4. Notes insight (if notes exist)
+  const note = session.notes;
+  if (note && note.content && note.content.length > 100) {
+    const estimatedTime = Math.floor(totalDuration * 0.4);
     
-    const eventsInWindow = eventTimes.filter((t) => t >= windowStart && t <= windowEnd);
-    
-    if (eventsInWindow.length >= 3) {
-      windows.push({
-        start: windowStart,
-        end: windowEnd,
-        count: eventsInWindow.length,
-        density: eventsInWindow.length / windowSizeSeconds,
-      });
-    }
+    moments.push({
+      startTime: Math.max(0, estimatedTime - 30),
+      endTime: Math.min(totalDuration, estimatedTime + 60),
+      type: "insight",
+      score: 80,
+      label: "💡 Key Insight",
+      context: note.content.substring(0, 100) + "...",
+    });
   }
 
-  // Return top 3 densest windows
-  return windows.sort((a, b) => b.density - a.density).slice(0, 3);
+  // 5. High participation bonus
+  if (attendeeCount >= 10) {
+    const bonusStart = Math.floor(totalDuration * 0.5);
+    moments.push({
+      startTime: bonusStart,
+      endTime: Math.min(totalDuration, bonusStart + 120),
+      type: "engagement",
+      score: 85,
+      label: "🔥 Peak Attendance",
+      context: `${attendeeCount} people learning`,
+    });
+  }
+
+  // Sort and dedupe
+  moments.sort((a, b) => b.score - a.score);
+  return dedupeMoments(moments.slice(0, 4));
 }
 
 /**
- * Remove overlapping moments, keeping highest scored
+ * Remove overlapping moments
  */
 function dedupeMoments(moments: any[]) {
   const result: typeof moments = [];
@@ -219,7 +176,6 @@ function dedupeMoments(moments: any[]) {
 
 /**
  * Generate shareable clip metadata
- * (Actual video processing would happen via external service like Mux, Cloudinary, or AWS)
  */
 export async function generateClipMetadata(
   sessionId: string,
@@ -248,12 +204,10 @@ export async function generateClipMetadata(
     const clipDuration = endTime - startTime;
     const clipId = `clip_${sessionId}_${startTime}_${endTime}`;
 
-    // Generate share URLs
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://unytea.com";
     const clipUrl = `${baseUrl}/clip/${clipId}`;
     const sessionUrl = `${baseUrl}/s/${session.community?.slug || "c"}/${session.slug}`;
 
-    // Generate preview text
     const previewText = generateClipPreviewText(session, clipDuration);
 
     return {
@@ -286,10 +240,9 @@ function generateClipPreviewText(session: any, duration: number) {
     `The #1 thing most people get wrong about ${session.title.toLowerCase()}...`,
     `This changed how I think about ${session.title.toLowerCase()}`,
     `The secret nobody tells you about ${session.title.toLowerCase()}`,
-    `In just ${Math.round(duration / 60)} minutes, everything you need to know`,
+    `In just ${Math.round(duration / 60)} minutes, everything you need`,
     `This insight from ${session.host?.name} is 🔥`,
   ];
-
   return hooks[Math.floor(Math.random() * hooks.length)];
 }
 
@@ -298,7 +251,7 @@ function generateShareText(session: any, previewText: string, clipUrl: string) {
 
 From: "${session.title}" with ${session.host?.name}
 
-Watch the full session on Unytea 👇
+Watch on Unytea 👇
 ${clipUrl}`;
 }
 
@@ -307,12 +260,10 @@ ${clipUrl}`;
  */
 export async function trackClipShare(
   clipId: string,
-  platform: "twitter" | "linkedin" | "tiktok" | "copy"
+  platform: "twitter" | "linkedin" | "copy"
 ) {
   try {
-    // In production, save to analytics database
     console.log(`Clip ${clipId} shared to ${platform}`);
-    
     return { success: true };
   } catch (error) {
     console.error("Error tracking share:", error);
