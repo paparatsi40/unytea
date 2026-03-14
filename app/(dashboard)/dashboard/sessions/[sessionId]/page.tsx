@@ -18,7 +18,8 @@ import {
   CheckCircle,
   Loader2,
   Radio,
-  Headphones
+  Headphones,
+  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getSession } from "@/app/actions/sessions";
@@ -26,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { AddToCourseDialog } from "@/components/sessions/AddToCourseDialog";
+import { CreateSocialClipDialog } from "@/components/public-content/CreateSocialClipDialog";
 import { toast } from "sonner";
 import { shareSessionRecap } from "@/app/actions/session-jobs";
 
@@ -40,6 +42,7 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("recording");
   const [showAddToCourse, setShowAddToCourse] = useState(false);
+  const [showCreateClip, setShowCreateClip] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
 
   useEffect(() => {
@@ -204,14 +207,25 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
           )}
           
           {session?.mentorId === user?.id && (
-            <Button 
-              variant="outline" 
-              className="gap-2 border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800"
-              onClick={() => setShowAddToCourse(true)}
-            >
-              <BookOpen className="h-4 w-4" />
-              Add to Course
-            </Button>
+            <>
+              <Button
+                variant="outline"
+                className="gap-2 border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800"
+                onClick={() => setShowAddToCourse(true)}
+              >
+                <BookOpen className="h-4 w-4" />
+                Add to Course
+              </Button>
+
+              <Button
+                variant="outline"
+                className="gap-2 border-amber-500/30 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20"
+                onClick={() => setShowCreateClip(true)}
+              >
+                <Sparkles className="h-4 w-4" />
+                Create Clip
+              </Button>
+            </>
           )}
           
           <Button 
@@ -469,13 +483,23 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
               </h3>
               <div className="space-y-2">
                 {session?.mentorId === user?.id && (
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="w-full justify-start gap-2 border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
                     onClick={() => setShowAddToCourse(true)}
                   >
                     <BookOpen className="h-4 w-4" />
                     Add to Course
+                  </Button>
+                )}
+                {session?.mentorId === user?.id && (
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start gap-2 border-amber-500/30 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20"
+                    onClick={() => setShowCreateClip(true)}
+                  >
+                    <Sparkles className="h-4 w-4" />
+                    Create Clip
                   </Button>
                 )}
                 <Button 
@@ -511,6 +535,12 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
           onSuccess={() => {
             loadSession();
           }}
+        />
+
+        <CreateSocialClipDialog
+          sessionId={session.id}
+          open={showCreateClip}
+          onOpenChange={setShowCreateClip}
         />
       )}
     </div>
