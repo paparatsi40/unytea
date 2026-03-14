@@ -29,7 +29,7 @@ export async function detectSessionMoments(sessionId: string) {
         recording: true,
         events: {
           where: {
-            eventType: {
+            type: {
               in: ["QUESTION_ASKED", "REACTION", "HAND_RAISED"],
             },
           },
@@ -92,7 +92,7 @@ function analyzeMoments(session: any) {
 
   // 1. Find high-engagement periods (many reactions in short time)
   const reactionEvents = session.events.filter(
-    (e: any) => e.eventType === "REACTION"
+    (e: any) => e.type === "REACTION"
   );
 
   if (reactionEvents.length > 0) {
@@ -111,7 +111,7 @@ function analyzeMoments(session: any) {
 
   // 2. Find key questions answered
   const questionEvents = session.events.filter(
-    (e: any) => e.eventType === "QUESTION_ASKED"
+    (e: any) => e.type === "QUESTION_ASKED"
   );
 
   questionEvents.forEach((q: any, index: number) => {
