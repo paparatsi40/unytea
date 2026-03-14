@@ -219,13 +219,6 @@ export default function NewCommunityPage() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
-      {/* VERSION MARKER - REMOVE AFTER CONFIRMING */}
-      <div className="bg-green-100 border-2 border-green-500 p-4 rounded-lg">
-        <p className="text-green-900 font-bold text-center">
-          ✅ NEW VERSION WITH UPLOAD - v2.0 - {new Date().toLocaleTimeString()}
-        </p>
-      </div>
-
       {/* Back Button */}
       <Button
         variant="ghost"
@@ -233,7 +226,7 @@ export default function NewCommunityPage() {
         className="flex items-center space-x-2"
       >
         <ArrowLeft className="h-4 w-4" />
-        <span>Back to Communities</span>
+        <span>{t("communities.backToCommunities")}</span>
       </Button>
 
       {/* Progress */}

@@ -1,4 +1,16 @@
 {
+  "common": {
+    "search": "Buscar",
+    "continue": "Continuar",
+    "previous": "Anterior",
+    "back": "Volver",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "create": "Crear",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "close": "Cerrar"
+  },
   "auth": {
     "welcomeBack": "Bienvenido de Vuelta",
     "signInSubtitle": "Inicia sesión en tu cuenta de Unytea",

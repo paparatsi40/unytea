@@ -1,4 +1,16 @@
 {
+  "common": {
+    "search": "Search",
+    "continue": "Continue",
+    "previous": "Previous",
+    "back": "Back",
+    "cancel": "Cancel",
+    "save": "Save",
+    "create": "Create",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close"
+  },
   "auth": {
     "welcomeBack": "Welcome Back",
     "signInSubtitle": "Sign in to your Unytea account",
