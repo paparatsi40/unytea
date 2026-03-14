@@ -217,7 +217,7 @@ export async function generateClipMetadata(
         sessionId: session.id,
         sessionTitle: session.title,
         hostName: session.mentor?.name,
-        communityName: session.community?.name,
+        communityName: session.community?.name ?? null,
         startTime,
         endTime,
         duration: clipDuration,
