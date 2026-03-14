@@ -506,3 +506,13 @@ function formatTimeUntil(date: Date): string {
   }
   return `in ${minutes} minute${minutes > 1 ? "s" : ""}`;
 }
+
+/**
+ * Share session recap to community feed
+ * Wrapper around generateSessionRecap for easy calling
+ */
+export async function shareSessionRecap(sessionId: string) {
+  // generateSessionRecap already creates a feed post
+  const result = await generateSessionRecap(sessionId);
+  return result;
+}

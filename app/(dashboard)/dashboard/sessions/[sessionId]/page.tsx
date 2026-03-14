@@ -18,13 +18,17 @@ import {
   CheckCircle,
   Loader2,
   Radio,
-  Headphones
+  Headphones,
+  ExternalLink
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getSession } from "@/app/actions/sessions";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { AddToCourseDialog } from "@/components/sessions/AddToCourseDialog";
+import { toast } from "sonner";
+import { shareSessionRecap } from "@/app/actions/session-jobs";
 
 interface SessionPageProps {
   params: { sessionId: string };
@@ -36,6 +40,8 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
   const [session, setSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("recording");
+  const [showAddToCourse, setShowAddToCourse] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
 
   useEffect(() => {
     if (!isAuthLoading && !user) {
@@ -61,6 +67,33 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
       console.error("Failed to load session:", error);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleShareRecap() {
+    if (!session) return;
+    
+    setIsSharing(true);
+    try {
+      // If recap post already exists, show message
+      if (session.feedPostId) {
+        toast.info("This session has already been shared to the community feed");
+        return;
+      }
+
+      // Generate recap post
+      const result = await shareSessionRecap(session.id);
+      if (result.success) {
+        toast.success("Session recap shared to community feed!");
+        // Reload session to get updated feedPostId
+        await loadSession();
+      } else {
+        toast.error(result.error || "Failed to share recap");
+      }
+    } catch (error) {
+      toast.error("Error sharing recap");
+    } finally {
+      setIsSharing(false);
     }
   }
 
@@ -171,20 +204,25 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
             </Button>
           )}
           
-          <Button 
-            variant="outline" 
-            className="gap-2 border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800"
-          >
-            <BookOpen className="h-4 w-4" />
-            Add to Course
-          </Button>
+          {session?.mentorId === user?.id && (
+            <Button 
+              variant="outline" 
+              className="gap-2 border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800"
+              onClick={() => setShowAddToCourse(true)}
+            >
+              <BookOpen className="h-4 w-4" />
+              Add to Course
+            </Button>
+          )}
           
           <Button 
             variant="outline" 
             className="gap-2 border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800"
+            onClick={handleShareRecap}
+            disabled={isSharing || session?.feedPostId}
           >
             <Share2 className="h-4 w-4" />
-            Share to Community
+            {isSharing ? "Sharing..." : session?.feedPostId ? "Already Shared" : "Share Recap"}
           </Button>
 
           {session.recordingUrl && (
@@ -431,23 +469,29 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
                 Quick Actions
               </h3>
               <div className="space-y-2">
+                {session?.mentorId === user?.id && (
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start gap-2 border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
+                    onClick={() => setShowAddToCourse(true)}
+                  >
+                    <BookOpen className="h-4 w-4" />
+                    Add to Course
+                  </Button>
+                )}
                 <Button 
                   variant="outline" 
                   className="w-full justify-start gap-2 border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
-                >
-                  <BookOpen className="h-4 w-4" />
-                  Add to Course
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-start gap-2 border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
+                  onClick={handleShareRecap}
+                  disabled={isSharing || session?.feedPostId}
                 >
                   <Share2 className="h-4 w-4" />
-                  Share Recap
+                  {session?.feedPostId ? "Shared to Feed" : "Share Recap"}
                 </Button>
                 <Button 
                   variant="outline" 
                   className="w-full justify-start gap-2 border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
+                  onClick={() => router.push(`/dashboard/sessions/create?template=${session.id}`)}
                 >
                   <Calendar className="h-4 w-4" />
                   Schedule Follow-up
@@ -457,6 +501,19 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
           </div>
         </div>
       </main>
+
+      {/* Add to Course Dialog */}
+      {session && (
+        <AddToCourseDialog
+          sessionId={session.id}
+          sessionTitle={session.title}
+          open={showAddToCourse}
+          onOpenChange={setShowAddToCourse}
+          onSuccess={() => {
+            loadSession();
+          }}
+        />
+      )}
     </div>
   );
 }
