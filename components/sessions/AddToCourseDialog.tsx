@@ -11,7 +11,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
   SelectContent,
@@ -328,20 +327,24 @@ export function AddToCourseDialog({
 
             <div className="space-y-2">
               <Label className="text-zinc-300">Pricing</Label>
-              <RadioGroup
-                value={newCourseIsPaid ? "paid" : "free"}
-                onValueChange={(value) => setNewCourseIsPaid(value === "paid")}
-                className="flex gap-4"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="free" id="free" className="border-zinc-500" />
-                  <Label htmlFor="free" className="text-zinc-300">Free</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="paid" id="paid" className="border-zinc-500" />
-                  <Label htmlFor="paid" className="text-zinc-300">Paid</Label>
-                </div>
-              </RadioGroup>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant={newCourseIsPaid ? "outline" : "default"}
+                  onClick={() => setNewCourseIsPaid(false)}
+                  className={!newCourseIsPaid ? "bg-purple-600 hover:bg-purple-700" : "border-zinc-700 bg-zinc-800 text-zinc-300"}
+                >
+                  Free
+                </Button>
+                <Button
+                  type="button"
+                  variant={newCourseIsPaid ? "default" : "outline"}
+                  onClick={() => setNewCourseIsPaid(true)}
+                  className={newCourseIsPaid ? "bg-purple-600 hover:bg-purple-700" : "border-zinc-700 bg-zinc-800 text-zinc-300"}
+                >
+                  Paid
+                </Button>
+              </div>
             </div>
 
             {newCourseIsPaid && (
