@@ -224,7 +224,7 @@ export async function generateClipMetadata(
         clipUrl,
         sessionUrl,
         thumbnailUrl: null, // No thumbnail in Recording model
-        videoUrl: session.recording?.url,
+        videoUrl: session.recording?.url ?? null,
         previewText,
         shareText: generateShareText(session, previewText, clipUrl),
       },
