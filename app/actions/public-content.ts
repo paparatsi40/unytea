@@ -51,9 +51,9 @@ export async function detectSessionMoments(sessionId: string) {
         id: session.id,
         title: session.title,
         description: session.description,
-        recordingUrl: session.recording?.videoUrl,
-        thumbnailUrl: session.recording?.thumbnailUrl,
-        duration: session.recording?.duration || 0,
+        recordingUrl: session.recording?.url,
+        thumbnailUrl: null, // No thumbnail in Recording model
+        duration: session.recording?.durationSeconds || 0,
         mentor: session.mentor,
         community: session.community,
       },
@@ -223,8 +223,8 @@ export async function generateClipMetadata(
         duration: clipDuration,
         clipUrl,
         sessionUrl,
-        thumbnailUrl: session.recording?.thumbnailUrl,
-        videoUrl: session.recording?.videoUrl,
+        thumbnailUrl: null, // No thumbnail in Recording model
+        videoUrl: session.recording?.url,
         previewText,
         shareText: generateShareText(session, previewText, clipUrl),
       },
