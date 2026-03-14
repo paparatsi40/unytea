@@ -527,21 +527,23 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
 
       {/* Add to Course Dialog */}
       {session && (
-        <AddToCourseDialog
-          sessionId={session.id}
-          sessionTitle={session.title}
-          open={showAddToCourse}
-          onOpenChange={setShowAddToCourse}
-          onSuccess={() => {
-            loadSession();
-          }}
-        />
+        <>
+          <AddToCourseDialog
+            sessionId={session.id}
+            sessionTitle={session.title}
+            open={showAddToCourse}
+            onOpenChange={setShowAddToCourse}
+            onSuccess={() => {
+              loadSession();
+            }}
+          />
 
-        <CreateSocialClipDialog
-          sessionId={session.id}
-          open={showCreateClip}
-          onOpenChange={setShowCreateClip}
-        />
+          <CreateSocialClipDialog
+            sessionId={session.id}
+            open={showCreateClip}
+            onOpenChange={setShowCreateClip}
+          />
+        </>
       )}
     </div>
   );
