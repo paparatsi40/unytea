@@ -11,7 +11,7 @@ import {
   ArrowRight,
   Loader2,
   Sparkles,
-  CheckCircle2,
+  CheckCircle,
   PlayCircle,
   TrendingUp,
   Plus,
