@@ -26,9 +26,6 @@ export async function detectSessionMoments(sessionId: string) {
           },
         },
         notes: {
-          include: {
-            createdBy: { select: { id: true, name: true } },
-          },
           orderBy: { createdAt: "asc" },
         },
         recording: true,
