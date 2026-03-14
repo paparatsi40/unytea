@@ -25,9 +25,7 @@ export async function detectSessionMoments(sessionId: string) {
             user: { select: { id: true, name: true } },
           },
         },
-        notes: {
-          orderBy: { createdAt: "asc" },
-        },
+        notes: true,
         recording: true,
         events: {
           where: {
@@ -138,11 +136,8 @@ function analyzeMoments(session: any) {
   });
 
   // 3. Find valuable insights (notes with high engagement)
-  const highValueNotes = session.notes.filter((n: any) => {
-    return n.content.length > 200 || n.isPinned;
-  });
-
-  highValueNotes.forEach((note: any, index: number) => {
+  const note = session.notes;
+  if (note && (note.content.length > 200)) {
     const noteTime = new Date(note.createdAt).getTime();
     const startSeconds = Math.floor((noteTime - new Date(session.startedAt!).getTime()) / 1000);
     
@@ -150,11 +145,11 @@ function analyzeMoments(session: any) {
       startTime: Math.max(0, startSeconds - 15),
       endTime: Math.min(totalDuration, startSeconds + 45),
       type: "insight",
-      score: 60 + index * 3,
+      score: 60,
       label: "💡 Valuable Insight",
       context: note.content.substring(0, 150) + "...",
     });
-  });
+  }
 
   // Sort by score descending
   moments.sort((a, b) => b.score - a.score);
