@@ -201,7 +201,7 @@ function groupSessionsByTopic(sessions: any[]) {
     }
   });
   
-  for (const [seriesId, seriesSessions] of Object.entries(remainingBySeries)) {
+  for (const [_seriesId, seriesSessions] of Object.entries(remainingBySeries)) {
     if (seriesSessions.length >= 2) {
       const seriesTitle = seriesSessions[0].series?.title || "Series";
       groups.push({
