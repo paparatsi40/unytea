@@ -23,7 +23,6 @@ export async function detectSessionMoments(sessionId: string) {
         participations: {
           include: {
             user: { select: { id: true, name: true } },
-            reactions: true,
           },
         },
         notes: {
