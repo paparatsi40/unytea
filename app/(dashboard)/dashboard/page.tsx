@@ -1,77 +1,127 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import {
   Users,
-  BookOpen,
   Video,
   Calendar,
   Plus,
   MessageSquare,
   Play,
-  CheckCircle2,
-  Sparkles,
-  Building2,
-  DollarSign,
-  BarChart3,
   ArrowRight,
-  Target,
-  Rocket,
+  Building2,
+  TrendingUp,
+  Activity,
   Crown,
   Zap,
-  TrendingUp,
-  Award,
-  Share2,
+  BarChart3,
+  UserPlus,
+  BookOpen,
+  ChevronRight,
+  Clock,
+  Radio,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ShareableMetrics } from "@/components/dashboard/ShareableMetrics";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import Link from "next/link";
+import {
+  getDashboardMetrics,
+  getNextLiveSession,
+  getUpcomingSessions,
+  getCommunityActivity,
+  getRecentMembers,
+  getPerformanceSnapshot,
+} from "@/app/actions/dashboard";
+import { toast } from "sonner";
 
 // Types
-interface BusinessMetrics {
+interface DashboardMetrics {
   communities: number;
   members: number;
-  revenue: number;
-  engagement: number;
+  newMembersThisWeek: number;
+  sessionsThisWeek: number;
+  avgAttendanceRate: number;
 }
 
-interface RecentActivity {
-  id: string;
-  type: "member_joined" | "course_completed" | "post_created" | "session_scheduled" | "revenue";
-  description: string;
-  time: string;
-  value?: string;
-}
-
-interface UpcomingEvent {
+interface LiveSession {
   id: string;
   title: string;
-  type: "session" | "live" | "deadline";
-  time: string;
-  community: string;
-  attendees?: number;
+  slug: string | null;
+  description: string | null;
+  scheduledAt: Date;
+  duration: number;
+  status: string;
+  mode: string;
+  mentor: { id: string; name: string | null; image: string | null } | null;
+  community: { id: string; name: string; slug: string } | null;
+  series: { id: string; title: string } | null;
+  attendeeCount: number;
+  roomId: string | null;
 }
 
-interface OnboardingStep {
-  number: number;
+interface UpcomingSession {
+  id: string;
   title: string;
-  description: string;
-  action: string;
-  link: string;
-  icon: any;
-  completed: boolean;
-  active: boolean;
+  scheduledAt: Date;
+  duration: number;
+  status: string;
+  mentorName: string | null;
+  communityName: string | null;
+  attendeeCount: number;
+}
+
+interface Activity {
+  id: string;
+  type: "member_joined" | "post_created" | "recording_ready";
+  userName: string;
+  communityName: string;
+  message: string;
+  time: Date;
+}
+
+interface RecentMember {
+  id: string;
+  name: string;
+  image: string | null;
+  communityName: string;
+  joinedAt: Date;
+}
+
+interface PerformanceSnapshot {
+  sessionsHosted: number;
+  postsThisWeek: number;
+  newMembersThisWeek: number;
+  growthRate: number;
 }
 
 export default function DashboardPage() {
+  const router = useRouter();
   const { user } = useCurrentUser();
   const t = useTranslations("dashboard");
-  const [metrics, setMetrics] = useState<BusinessMetrics | null>(null);
-  const [activities, setActivities] = useState<RecentActivity[]>([]);
-  const [events, setEvents] = useState<UpcomingEvent[]>([]);
+
+  const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
+  const [nextSession, setNextSession] = useState<LiveSession | null>(null);
+  const [upcomingSessions, setUpcomingSessions] = useState<UpcomingSession[]>(
+    []
+  );
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [recentMembers, setRecentMembers] = useState<RecentMember[]>([]);
+  const [performance, setPerformance] = useState<PerformanceSnapshot | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(true);
 
   // Load dashboard data
@@ -82,647 +132,685 @@ export default function DashboardPage() {
   const loadDashboardData = async () => {
     try {
       setIsLoading(true);
-      
-      // Load business metrics
-      const metricsRes = await fetch("/api/dashboard/metrics");
-      if (metricsRes.ok) {
-        const metricsData = await metricsRes.json();
-        setMetrics(metricsData);
-      }
 
-      // Load recent activity
-      const activityRes = await fetch("/api/dashboard/activity");
-      if (activityRes.ok) {
-        const activityData = await activityRes.json();
-        setActivities(activityData.activities || []);
-      }
+      const [
+        metricsRes,
+        nextSessionRes,
+        upcomingRes,
+        activityRes,
+        membersRes,
+        performanceRes,
+      ] = await Promise.all([
+        getDashboardMetrics(),
+        getNextLiveSession(),
+        getUpcomingSessions(5),
+        getCommunityActivity(6),
+        getRecentMembers(4),
+        getPerformanceSnapshot(),
+      ]);
 
-      // Load upcoming events
-      const eventsRes = await fetch("/api/dashboard/events");
-      if (eventsRes.ok) {
-        const eventsData = await eventsRes.json();
-        setEvents(eventsData.events || []);
-      }
+      if (metricsRes.success) setMetrics(metricsRes.metrics || null);
+      if (nextSessionRes.success) setNextSession(nextSessionRes.session);
+      if (upcomingRes.success) setUpcomingSessions(upcomingRes.sessions || []);
+      if (activityRes.success) setActivities(activityRes.activities || []);
+      if (membersRes.success) setRecentMembers(membersRes.members || []);
+      if (performanceRes.success) setPerformance(performanceRes.snapshot || null);
     } catch (error) {
       console.error("Error loading dashboard:", error);
+      toast.error("Failed to load dashboard data");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Generate onboarding steps based on user progress
-  const getOnboardingSteps = (): OnboardingStep[] => {
-    if (!metrics) return [];
-
-    const steps: OnboardingStep[] = [
-      {
-        number: 1,
-        title: "Create your community",
-        description: "Set up your community name, description, and branding",
-        action: "Create Community",
-        link: "/dashboard/communities",
-        icon: Building2,
-        completed: metrics.communities > 0,
-        active: metrics.communities === 0,
-      },
-      {
-        number: 2,
-        title: "Invite your first members",
-        description: "Share your community link or invite people directly",
-        action: "Invite Members",
-        link: "/dashboard/communities",
-        icon: Users,
-        completed: metrics.members > 0,
-        active: metrics.communities > 0 && metrics.members === 0,
-      },
-      {
-        number: 3,
-        title: "Publish your first content",
-        description: "Create a post, course, or schedule a live session",
-        action: "Create Content",
-        link: "/dashboard/communities",
-        icon: Zap,
-        completed: metrics.members > 0 && activities.length > 0,
-        active: metrics.members > 0,
-      },
-    ];
-
-    return steps;
+  const formatTime = (date: Date) => {
+    return new Date(date).toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+    });
   };
 
-  // Get celebration message based on progress
-  const getCelebrationMessage = () => {
-    if (!metrics) return null;
+  const formatDate = (date: Date) => {
+    const d = new Date(date);
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
 
-    if (metrics.communities === 0) return null;
-    
-    if (metrics.members === 0) {
-      return {
-        title: "Your community is live! 🎉",
-        subtitle: "Now invite your first members",
-        icon: Rocket,
-        color: "from-green-500 to-emerald-600",
-      };
-    }
-    
-    if (metrics.revenue === 0) {
-      return {
-        title: "Your community is growing! 📈",
-        subtitle: "Time to monetize with paid plans",
-        icon: TrendingUp,
-        color: "from-blue-500 to-indigo-600",
-      };
-    }
+    if (d.toDateString() === today.toDateString()) return "Today";
+    if (d.toDateString() === tomorrow.toDateString()) return "Tomorrow";
 
-    return {
-      title: "Your community business is thriving! 🚀",
-      subtitle: "Keep the momentum with live sessions",
-      icon: Crown,
-      color: "from-purple-500 to-pink-600",
-    };
+    return d.toLocaleDateString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+    });
   };
 
-  const steps = getOnboardingSteps();
-  const celebration = getCelebrationMessage();
-  const activeStep = steps.find(s => s.active);
-  const completedSteps = steps.filter(s => s.completed).length;
+  const getTimeAgo = (date: Date) => {
+    const now = new Date();
+    const past = new Date(date);
+    const diffMs = now.getTime() - past.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays === 1) return "Yesterday";
+    return `${diffDays} days ago`;
+  };
+
+  const hasCommunity = metrics && metrics.communities > 0;
+  const hasSessions = upcomingSessions.length > 0;
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="min-h-screen bg-zinc-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-purple-200 border-t-purple-600" />
+          <p className="text-zinc-500">Loading your dashboard...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto">
-      {/* Welcome Section */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground">
-          {t("welcome")}{user?.name ? `, ${user.name.split(' ')[0]}` : ''}! 👋
-        </h1>
-        <p className="mt-2 text-muted-foreground">
-          Here's how your community business is performing today.
-        </p>
-      </div>
+    <div className="min-h-screen bg-zinc-50">
+      <div className="mx-auto max-w-7xl p-6 space-y-6">
+        {/* HEADER */}
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-zinc-900">
+              Welcome back, {user?.name?.split(" ")[0] || "there"} 👋
+            </h1>
+            <p className="text-zinc-500 mt-1">
+              Here's how your community business is performing today.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Link href="/dashboard/communities/new">
+              <Button className="bg-purple-600 hover:bg-purple-700">
+                <Plus className="h-4 w-4 mr-2" />
+                Create Community
+              </Button>
+            </Link>
+          </div>
+        </div>
 
-      {/* Business Metrics - Host Priority #1 */}
-      {metrics && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-            <CardContent className="p-4">
+        {/* MOTIVATION BAR */}
+        {metrics && metrics.sessionsThisWeek >= 3 && (
+          <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg p-4 flex items-center gap-3">
+            <Sparkles className="h-5 w-5 text-amber-500" />
+            <span className="text-amber-800 font-medium">
+              🔥 {metrics.sessionsThisWeek} sessions happening this week. Your
+              community engagement is on fire!
+            </span>
+          </div>
+        )}
+
+        {/* METRICS ROW */}
+        <div className="grid grid-cols-4 gap-4">
+          <Card>
+            <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Communities</p>
-                  <p className="text-2xl font-bold">{metrics.communities}</p>
+                  <p className="text-sm text-zinc-500">Communities</p>
+                  <p className="text-3xl font-bold text-zinc-900">
+                    {metrics?.communities || 0}
+                  </p>
                 </div>
-                <Building2 className="h-8 w-8 text-blue-600" />
+                <div className="h-10 w-10 rounded-lg bg-purple-100 flex items-center justify-center">
+                  <Building2 className="h-5 w-5 text-purple-600" />
+                </div>
               </div>
             </CardContent>
           </Card>
-          
-          <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-            <CardContent className="p-4">
+
+          <Card>
+            <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Total Members</p>
-                  <p className="text-2xl font-bold">{metrics.members}</p>
+                  <p className="text-sm text-zinc-500">Members</p>
+                  <p className="text-3xl font-bold text-zinc-900">
+                    {metrics?.members || 0}
+                  </p>
+                  {metrics && metrics.newMembersThisWeek > 0 && (
+                    <p className="text-xs text-green-600 mt-1">
+                      +{metrics.newMembersThisWeek} this week
+                    </p>
+                  )}
                 </div>
-                <Users className="h-8 w-8 text-green-600" />
+                <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                  <Users className="h-5 w-5 text-blue-600" />
+                </div>
               </div>
             </CardContent>
           </Card>
-          
-          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
-            <CardContent className="p-4">
+
+          <Card>
+            <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Revenue</p>
-                  <p className="text-2xl font-bold">${metrics.revenue.toLocaleString()}</p>
+                  <p className="text-sm text-zinc-500">Sessions This Week</p>
+                  <p className="text-3xl font-bold text-zinc-900">
+                    {metrics?.sessionsThisWeek || 0}
+                  </p>
                 </div>
-                <DollarSign className="h-8 w-8 text-purple-600" />
+                <div className="h-10 w-10 rounded-lg bg-amber-100 flex items-center justify-center">
+                  <Video className="h-5 w-5 text-amber-600" />
+                </div>
               </div>
             </CardContent>
           </Card>
-          
-          <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
-            <CardContent className="p-4">
+
+          <Card>
+            <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Engagement</p>
-                  <p className="text-2xl font-bold">{metrics.engagement}%</p>
+                  <p className="text-sm text-zinc-500">Revenue</p>
+                  <p className="text-3xl font-bold text-zinc-900">$0</p>
+                  <p className="text-xs text-zinc-400 mt-1">Coming soon</p>
                 </div>
-                <BarChart3 className="h-8 w-8 text-orange-600" />
+                <div className="h-10 w-10 rounded-lg bg-green-100 flex items-center justify-center">
+                  <TrendingUp className="h-5 w-5 text-green-600" />
+                </div>
               </div>
             </CardContent>
           </Card>
         </div>
-      )}
 
-      {/* MAIN CONTENT - Stacked layout for better activation */}
-      <div className="space-y-6">
-        
-        {/* ROW 1: Launch Your Community - Full Width Dominant */}
-        {metrics?.communities === 0 ? (
-          // NO COMMUNITY - Full width dominant CTA
-          <Card className="border-2 border-primary/30 shadow-xl shadow-primary/10 overflow-hidden relative">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary/20 to-purple-500/20 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-amber-400/20 to-orange-500/20 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl"></div>
-            
-            <CardContent className="p-10 md:p-12 relative">
-              <div className="max-w-2xl mx-auto text-center">
-                {/* Large Icon */}
-                <div className="w-24 h-24 mx-auto mb-8 rounded-2xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-xl shadow-primary/30">
-                  <Rocket className="h-12 w-12 text-white" />
+        {/* HERO SECTION - ONBOARDING OR GROWTH */}
+        {!hasCommunity ? (
+          <Card className="bg-gradient-to-br from-purple-600 to-purple-700 text-white border-none">
+            <CardContent className="p-8">
+              <div className="max-w-2xl">
+                <div className="flex items-center gap-2 mb-4">
+                  <Crown className="h-6 w-6" />
+                  <span className="font-semibold">
+                    Launch your community business 🚀
+                  </span>
                 </div>
-                
-                {/* Main Headline */}
-                <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                  Launch your community business
-                </h2>
-                <p className="text-xl text-muted-foreground mb-3">
+                <h2 className="text-3xl font-bold mb-4">
                   Create your first community in under 2 minutes
+                </h2>
+                <p className="text-purple-100 mb-6">
+                  Start with sessions. Build with content. Grow with community.
                 </p>
-                <p className="text-base text-muted-foreground mb-10 max-w-lg mx-auto">
-                  Join creators building thriving communities with live sessions, courses, and engaged members.
-                </p>
-                
-                {/* Progress Steps */}
-                <div className="bg-muted/30 rounded-2xl p-6 mb-8">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-sm font-medium text-muted-foreground">Launch progress</span>
-                    <span className="text-sm font-bold text-primary">0 / 3 steps completed</span>
+
+                {/* Progress Bar */}
+                <div className="space-y-4 mb-8">
+                  <div className="flex items-center gap-4">
+                    <div className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center text-sm font-bold">
+                      1
+                    </div>
+                    <span className="text-purple-100">Create Community</span>
                   </div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden mb-4">
-                    <div className="h-full bg-gradient-to-r from-primary to-purple-500 rounded-full transition-all duration-500" style={{ width: '0%' }} />
+                  <div className="flex items-center gap-4">
+                    <div className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center text-sm font-bold">
+                      2
+                    </div>
+                    <span className="text-purple-100">Invite Members</span>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-6">
-                    Complete these steps to launch your community.
-                  </p>
-                  
-                  {/* Steps */}
-                  <div className="grid md:grid-cols-3 gap-4 text-left">
-                    <div className="flex items-start gap-3 p-3 rounded-xl bg-primary/10 border border-primary/20">
-                      <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold flex-shrink-0">
-                        1
-                      </div>
-                      <div>
-                        <p className="font-semibold text-sm">Create community</p>
-                        <p className="text-xs text-muted-foreground">Next step →</p>
-                      </div>
+                  <div className="flex items-center gap-4">
+                    <div className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center text-sm font-bold">
+                      3
                     </div>
-                    <div className="flex items-start gap-3 p-3 rounded-xl bg-muted/50 opacity-60">
-                      <div className="w-8 h-8 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-sm font-bold flex-shrink-0">
-                        2
-                      </div>
-                      <div>
-                        <p className="font-semibold text-sm">Invite members</p>
-                        <p className="text-xs text-muted-foreground">Pending</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3 p-3 rounded-xl bg-muted/50 opacity-60">
-                      <div className="w-8 h-8 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-sm font-bold flex-shrink-0">
-                        3
-                      </div>
-                      <div>
-                        <p className="font-semibold text-sm">Host live session</p>
-                        <p className="text-xs text-muted-foreground">Pending</p>
-                      </div>
-                    </div>
+                    <span className="text-purple-100">Host First Session</span>
                   </div>
                 </div>
-                
-                {/* CTA Button */}
-                <Link href="/dashboard/communities" className="inline-block">
-                  <Button size="lg" className="gap-2 px-10 py-7 text-lg shadow-xl shadow-primary/25 hover:shadow-2xl hover:shadow-primary/30 transition-all">
-                    <Plus className="h-5 w-5" />
+
+                <Link href="/dashboard/communities/new">
+                  <Button
+                    size="lg"
+                    className="bg-white text-purple-600 hover:bg-purple-50"
+                  >
                     Create Your First Community
-                    <ArrowRight className="h-5 w-5" />
+                    <ArrowRight className="h-4 w-4 ml-2" />
                   </Button>
                 </Link>
-                
-                {/* Trust indicators */}
-                <div className="flex items-center justify-center gap-8 mt-8 text-sm text-muted-foreground">
-                  <span className="flex items-center gap-1">
-                    <CheckCircle2 className="h-4 w-4 text-green-500" />
-                    Free to start
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <CheckCircle2 className="h-4 w-4 text-green-500" />
-                    No credit card
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <CheckCircle2 className="h-4 w-4 text-green-500" />
-                    Cancel anytime
-                  </span>
+
+                <div className="flex items-center gap-4 mt-4 text-sm text-purple-200">
+                  <span>✓ Free to start</span>
+                  <span>✓ No credit card</span>
+                  <span>✓ Cancel anytime</span>
                 </div>
               </div>
             </CardContent>
           </Card>
-        ) : (
-          // HAS COMMUNITY - Show progress with completion status
-          <Card className="border-primary/20">
-            <CardHeader className="pb-4">
-              <div className="flex items-center justify-between">
+        ) : performance && performance.growthRate > 0 ? (
+          <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
+            <CardContent className="p-6 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
+                  <TrendingUp className="h-6 w-6 text-green-600" />
+                </div>
                 <div>
-                  <CardTitle className="flex items-center gap-2 text-xl">
-                    <Target className="h-5 w-5 text-primary" />
-                    {completedSteps === steps.length ? "🎉 All Steps Complete!" : `Launch Progress: ${Math.round((completedSteps / steps.length) * 100)}%`}
-                  </CardTitle>
-                  <CardDescription>
-                    {completedSteps === steps.length 
-                      ? "You've successfully launched your community business!" 
-                      : completedSteps === 1 
-                        ? "Step 1 complete ✅ Next step: Invite your first members"
-                        : completedSteps === 2
-                          ? "Step 2 complete ✅ Final step: Host your first live session"
-                          : `Step ${activeStep?.number || completedSteps + 1} of ${steps.length}: ${activeStep?.title || steps[completedSteps]?.title}`}
-                  </CardDescription>
-                </div>
-                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
-                  <span className="text-lg font-bold text-primary">{completedSteps}/{steps.length}</span>
+                  <p className="font-semibold text-green-900">
+                    Your community grew {performance.growthRate}% this week!
+                  </p>
+                  <p className="text-green-600 text-sm">
+                    Keep scheduling sessions to maintain momentum.
+                  </p>
                 </div>
               </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Progress Bar */}
-              <div className="mb-6">
-                <div className="h-3 bg-muted rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-gradient-to-r from-primary via-purple-500 to-pink-500 rounded-full transition-all duration-500"
-                    style={{ width: `${(completedSteps / steps.length) * 100}%` }}
-                  />
-                </div>
-              </div>
-
-              {/* Steps Grid */}
-              <div className="grid md:grid-cols-3 gap-4">
-                {steps.map((step) => (
-                  <div 
-                    key={step.number}
-                    className={`flex items-start gap-3 p-4 rounded-xl transition-all ${
-                      step.completed 
-                        ? "bg-green-50 border border-green-200" 
-                        : step.active
-                          ? "bg-gradient-to-r from-primary/10 to-purple-50 border-2 border-primary/30 shadow-md"
-                          : "bg-muted/30 opacity-70"
-                    }`}
-                  >
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-                      step.completed 
-                        ? "bg-green-500 text-white" 
-                        : step.active
-                          ? "bg-primary text-white shadow-lg shadow-primary/25"
-                          : "bg-muted text-muted-foreground"
-                    }`}>
-                      {step.completed ? (
-                        <CheckCircle2 className="h-5 w-5" />
-                      ) : (
-                        <span className="font-bold">{step.number}</span>
-                      )}
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                      <h4 className={`font-semibold ${
-                        step.completed ? "text-green-700" : 
-                        step.active ? "text-primary" : "text-muted-foreground"
-                      }`}>
-                        {step.title}
-                      </h4>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {step.description}
-                      </p>
-                      {(step.active || (!step.completed && !steps.some(s => s.active))) && (
-                        <Link href={step.link} className="mt-2 inline-block">
-                          <Button size="sm" variant={step.active ? "default" : "outline"}>
-                            {step.action}
-                            <ArrowRight className="h-3 w-3 ml-1" />
-                          </Button>
-                        </Link>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <Link href="/dashboard/sessions/create">
+                <Button className="bg-green-600 hover:bg-green-700">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Schedule Session
+                </Button>
+              </Link>
             </CardContent>
           </Card>
-        )}
+        ) : null}
 
-          {/* Celebration Card - Shows when milestones reached */}
-          {celebration && (
-            <Card className={`bg-gradient-to-r ${celebration.color} text-white border-0 shadow-lg`}>
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-                    <celebration.icon className="h-7 w-7 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-lg">{celebration.title}</h3>
-                    <p className="text-white/90">{celebration.subtitle}</p>
-                    {activeStep && (
-                      <Link href={activeStep.link} className="mt-3 inline-block">
-                        <Button 
-                          variant="secondary" 
-                          size="sm"
-                          className="bg-white text-gray-900 hover:bg-white/90"
-                        >
-                          {activeStep.action}
-                          <ArrowRight className="h-4 w-4 ml-1" />
-                        </Button>
-                      </Link>
-                    )}
-                  </div>
-                </div>
+        {/* ROW 1: QUICK ACTIONS + NEXT LIVE SESSION */}
+        <div className="grid grid-cols-12 gap-6">
+          {/* QUICK ACTIONS */}
+          <div className="col-span-4">
+            <Card className="h-full">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg">Quick Actions</CardTitle>
+                <CardDescription>Drive your community growth</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Link href="/dashboard/sessions/create">
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start gap-3 border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100"
+                  >
+                    <Radio className="h-4 w-4" />
+                    <span className="font-medium">Start Live Session</span>
+                  </Button>
+                </Link>
+
+                <Link href="/dashboard/sessions/create">
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start gap-3"
+                  >
+                    <Calendar className="h-4 w-4" />
+                    Schedule Session
+                  </Button>
+                </Link>
+
+                <Link href="/dashboard/communities">
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start gap-3"
+                  >
+                    <UserPlus className="h-4 w-4" />
+                    Invite Members
+                  </Button>
+                </Link>
+
+                <Link href="/dashboard/courses/new">
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start gap-3"
+                  >
+                    <BookOpen className="h-4 w-4" />
+                    Create Course
+                  </Button>
+                </Link>
+
+                <Link href="/dashboard/analytics">
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start gap-3"
+                  >
+                    <BarChart3 className="h-4 w-4" />
+                    View Analytics
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
-          )}
+          </div>
 
-          {/* Share Your Success - Growth Loop */}
-          {metrics && metrics.communities > 0 && (
-            <Card className="border-amber-200 bg-gradient-to-br from-amber-50/50 to-white">
+          {/* NEXT LIVE SESSION */}
+          <div className="col-span-8">
+            <Card className="h-full">
               <CardHeader className="pb-3">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
-                    <Share2 className="h-4 w-4 text-amber-600" />
-                  </div>
+                <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="font-semibold text-foreground">Share Your Success</h3>
-                    <p className="text-xs text-muted-foreground">Grow your community organically</p>
+                    <CardTitle className="text-lg">Next Live Session</CardTitle>
+                    <CardDescription>
+                      {nextSession
+                        ? "Join your upcoming session"
+                        : "Schedule your next session"}
+                    </CardDescription>
                   </div>
+                  {nextSession && (
+                    <Badge
+                      variant="secondary"
+                      className="bg-amber-100 text-amber-700"
+                    >
+                      <Radio className="h-3 w-3 mr-1 animate-pulse" />
+                      {nextSession.status === "LIVE" ? "LIVE NOW" : "UPCOMING"}
+                    </Badge>
+                  )}
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Your community metrics are worth sharing. Post your progress to attract new members and inspire other creators.
-                </p>
-                <ShareableMetrics
-                  communities={metrics.communities}
-                  members={metrics.members}
-                  revenue={metrics.revenue}
-                  engagement={metrics.engagement}
-                  communityName={metrics.communities > 0 ? "My Community" : "My Community"}
-                />
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Quick Actions */}
-          <Card>
-            <CardHeader className="pb-3">
-              <h3 className="font-semibold text-foreground">Quick Actions</h3>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <Link href="/dashboard/communities">
-                <Button variant="outline" className="w-full justify-start gap-2 hover:bg-primary/10 hover:border-primary/30 transition-all">
-                  <Plus className="h-4 w-4" />
-                  Create Community
-                </Button>
-              </Link>
-              <Link href="/dashboard/communities">
-                <Button variant="outline" className="w-full justify-start gap-2 hover:bg-green-50 hover:border-green-200 transition-all">
-                  <Users className="h-4 w-4" />
-                  Invite Members
-                </Button>
-              </Link>
-              <Link href="/dashboard/courses/create">
-                <Button variant="outline" className="w-full justify-start gap-2 hover:bg-orange-50 hover:border-orange-200 transition-all">
-                  <BookOpen className="h-4 w-4" />
-                  Create Course
-                </Button>
-              </Link>
-              <Link href="/dashboard/sessions">
-                <Button variant="outline" className="w-full justify-start gap-2 hover:bg-purple-50 hover:border-purple-200 transition-all">
-                  <Video className="h-4 w-4" />
-                  Start Live Session
-                </Button>
-              </Link>
-              <Link href="/dashboard/analytics">
-                <Button variant="outline" className="w-full justify-start gap-2 hover:bg-blue-50 hover:border-blue-200 transition-all">
-                  <BarChart3 className="h-4 w-4" />
-                  View Analytics
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-
-          {/* Upcoming Live Sessions - Highlighted */}
-          <Card className="border-purple-200 bg-gradient-to-br from-purple-50/50 to-white">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center">
-                    <Play className="h-4 w-4 text-purple-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-foreground">Upcoming Live</h3>
-                    <p className="text-xs text-muted-foreground">Your next sessions</p>
-                  </div>
-                </div>
-                <Link href="/dashboard/sessions">
-                  <Button variant="ghost" size="sm" className="text-purple-600">
-                    View All
-                  </Button>
-                </Link>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {events.length > 0 ? (
-                <div className="space-y-3">
-                  {events.slice(0, 2).map((event) => (
-                    <div key={event.id} className="flex items-start gap-3 p-3 rounded-xl bg-white border border-purple-100 shadow-sm hover:shadow-md transition-all">
-                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                        event.type === "live" 
-                          ? "bg-red-100 text-red-600 animate-pulse" 
-                          : "bg-purple-100 text-purple-600"
-                      }`}>
-                        {event.type === "live" ? (
-                          <Play className="h-5 w-5 fill-current" />
-                        ) : (
-                          <Video className="h-5 w-5" />
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
+                {nextSession ? (
+                  <div className="flex items-start gap-4">
+                    <div className="h-16 w-16 rounded-xl bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center">
+                      <Video className="h-8 w-8 text-purple-600" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg">
+                        {nextSession.title}
+                      </h3>
+                      <p className="text-zinc-500 text-sm mt-1">
+                        {formatDate(nextSession.scheduledAt)} •{" "}
+                        {formatTime(nextSession.scheduledAt)} •{" "}
+                        {nextSession.duration} min
+                      </p>
+                      <div className="flex items-center gap-4 mt-3">
                         <div className="flex items-center gap-2">
-                          <p className="font-medium text-sm truncate">{event.title}</p>
-                          {event.type === "live" && (
-                            <span className="text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full font-medium">
-                              LIVE
-                            </span>
-                          )}
+                          <Avatar className="h-6 w-6">
+                            <AvatarImage src={nextSession.mentor?.image || ""} />
+                            <AvatarFallback>
+                              {nextSession.mentor?.name?.[0] || "H"}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="text-sm text-zinc-600">
+                            {nextSession.mentor?.name}
+                          </span>
                         </div>
-                        <p className="text-xs text-muted-foreground">{event.community}</p>
-                        <div className="flex items-center gap-3 mt-1.5">
-                          <span className="text-xs font-medium text-purple-600">{event.time}</span>
-                          {event.attendees && (
-                            <span className="text-xs text-muted-foreground flex items-center gap-1">
-                              <Users className="h-3 w-3" />
-                              {event.attendees} attending
-                            </span>
-                          )}
-                        </div>
+                        <span className="text-sm text-zinc-500">
+                          {nextSession.attendeeCount} members attending
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2 mt-4">
+                        <Link
+                          href={`/dashboard/sessions/${nextSession.id}/room`}
+                        >
+                          <Button className="bg-purple-600 hover:bg-purple-700">
+                            <Play className="h-4 w-4 mr-2" />
+                            {nextSession.status === "LIVE"
+                              ? "Join Room"
+                              : "Enter Room"}
+                          </Button>
+                        </Link>
+                        <Link href={`/dashboard/sessions/${nextSession.id}`}>
+                          <Button variant="outline">View Details</Button>
+                        </Link>
                       </div>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-6">
-                  <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-3">
-                    <Calendar className="h-6 w-6 text-purple-600" />
                   </div>
-                  <p className="text-sm text-muted-foreground mb-3">No upcoming sessions</p>
-                  <Link href="/dashboard/sessions">
-                    <Button size="sm" variant="outline" className="border-purple-200 text-purple-600">
-                      Schedule One
-                    </Button>
-                  </Link>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                ) : (
+                  <div className="text-center py-8">
+                    <div className="h-16 w-16 rounded-full bg-zinc-100 flex items-center justify-center mx-auto mb-4">
+                      <Calendar className="h-8 w-8 text-zinc-400" />
+                    </div>
+                    <p className="text-zinc-600 font-medium">
+                      No sessions scheduled
+                    </p>
+                    <p className="text-zinc-400 text-sm mt-1">
+                      Schedule your next session to keep your community engaged.
+                    </p>
+                    <Link href="/dashboard/sessions/create" className="mt-4">
+                      <Button className="bg-purple-600 hover:bg-purple-700">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Schedule Session
+                      </Button>
+                    </Link>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
-        {/* ROW 2: Two Column Layout - Quick Actions & Recent Activity */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Quick Actions */}
-          <div className="space-y-6">
-          {/* Recent Activity Feed */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Recent Activity</CardTitle>
-                  <CardDescription>What's happening in your communities</CardDescription>
-                </div>
-                <Button variant="outline" size="sm">View All</Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {activities.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center mx-auto mb-4">
-                    <Sparkles className="h-10 w-10 text-primary" />
-                  </div>
-                  <h3 className="font-semibold text-lg mb-2">Your community activity will appear here</h3>
-                  <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
-                    Once members start joining and engaging, you'll see their activity in real-time.
-                  </p>
-                  <Link href="/dashboard/communities">
-                    <Button size="lg" className="gap-2">
-                      <Plus className="h-5 w-5" />
-                      Create Your First Community
+        {/* ROW 2: UPCOMING SESSIONS + COMMUNITY ACTIVITY */}
+        <div className="grid grid-cols-12 gap-6">
+          {/* UPCOMING SESSIONS */}
+          <div className="col-span-6">
+            <Card className="h-full">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg">Upcoming Sessions</CardTitle>
+                  <Link href="/dashboard/sessions">
+                    <Button variant="ghost" size="sm">
+                      View all
+                      <ChevronRight className="h-4 w-4 ml-1" />
                     </Button>
                   </Link>
                 </div>
-              ) : (
-                <div className="space-y-4">
-                  {activities.slice(0, 5).map((activity) => (
-                    <div key={activity.id} className="flex items-start gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-                        activity.type === "member_joined" ? "bg-green-100" :
-                        activity.type === "revenue" ? "bg-purple-100" :
-                        activity.type === "course_completed" ? "bg-blue-100" :
-                        "bg-orange-100"
-                      }`}>
-                        {activity.type === "member_joined" ? (
-                          <Users className="h-5 w-5 text-green-600" />
-                        ) : activity.type === "revenue" ? (
-                          <DollarSign className="h-5 w-5 text-purple-600" />
-                        ) : activity.type === "course_completed" ? (
-                          <CheckCircle2 className="h-5 w-5 text-blue-600" />
-                        ) : activity.type === "session_scheduled" ? (
-                          <Video className="h-5 w-5 text-orange-600" />
-                        ) : (
-                          <MessageSquare className="h-5 w-5 text-orange-600" />
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm">{activity.description}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="text-xs text-muted-foreground">{activity.time}</span>
-                          {activity.value && (
-                            <>
-                              <span className="text-muted-foreground">•</span>
-                              <span className="text-xs font-medium text-green-600">{activity.value}</span>
-                            </>
-                          )}
+              </CardHeader>
+              <CardContent>
+                {hasSessions ? (
+                  <div className="space-y-4">
+                    {upcomingSessions.slice(0, 4).map((session) => (
+                      <div
+                        key={session.id}
+                        className="flex items-center justify-between p-3 rounded-lg bg-zinc-50 hover:bg-zinc-100 transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-lg bg-purple-100 flex items-center justify-center">
+                            <Video className="h-5 w-5 text-purple-600" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-sm">
+                              {session.title}
+                            </p>
+                            <p className="text-xs text-zinc-500">
+                              {formatDate(session.scheduledAt)} •{" "}
+                              {formatTime(session.scheduledAt)} •{" "}
+                              {session.communityName}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-zinc-500">
+                            {session.attendeeCount} attending
+                          </span>
+                          <Link
+                            href={`/dashboard/sessions/${session.id}/room`}
+                          >
+                            <Button size="sm" variant="ghost">
+                              Join
+                            </Button>
+                          </Link>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Achievement/Gamification Section - Optional */}
-          {completedSteps > 0 && (
-            <Card className="bg-gradient-to-br from-amber-50 to-yellow-50 border-amber-200">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 flex items-center justify-center shadow-lg shadow-amber-200">
-                    <Award className="h-8 w-8 text-white" />
+                    ))}
                   </div>
-                  <div>
-                    <h3 className="font-bold text-lg text-amber-900">Community Builder</h3>
-                    <p className="text-amber-700">You've completed {completedSteps} milestones!</p>
-                    <div className="flex items-center gap-2 mt-2">
-                      {steps.filter(s => s.completed).map((s) => (
-                        <div key={s.number} className="w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center text-xs font-bold">
-                          {s.number}
-                        </div>
-                      ))}
-                      {steps.filter(s => !s.completed).map((s) => (
-                        <div key={s.number} className="w-8 h-8 rounded-full bg-amber-200 text-amber-600 flex items-center justify-center text-xs font-bold">
-                          {s.number}
-                        </div>
-                      ))}
-                    </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-zinc-500">
+                      No upcoming sessions scheduled.
+                    </p>
+                    <Link href="/dashboard/sessions/create">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="mt-3"
+                      >
+                        Schedule your first session
+                      </Button>
+                    </Link>
                   </div>
-                </div>
+                )}
               </CardContent>
             </Card>
-          )}
+          </div>
+
+          {/* COMMUNITY ACTIVITY */}
+          <div className="col-span-6">
+            <Card className="h-full">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg">Community Activity</CardTitle>
+                  <Activity className="h-4 w-4 text-zinc-400" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                {activities.length > 0 ? (
+                  <div className="space-y-3">
+                    {activities.map((activity) => (
+                      <div
+                        key={activity.id}
+                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-zinc-50"
+                      >
+                        <div
+                          className={`h-8 w-8 rounded-full flex items-center justify-center ${
+                            activity.type === "member_joined"
+                              ? "bg-blue-100"
+                              : activity.type === "post_created"
+                              ? "bg-green-100"
+                              : "bg-purple-100"
+                          }`}
+                        >
+                          {activity.type === "member_joined" ? (
+                            <UserPlus className="h-4 w-4 text-blue-600" />
+                          ) : activity.type === "post_created" ? (
+                            <MessageSquare className="h-4 w-4 text-green-600" />
+                          ) : (
+                            <Play className="h-4 w-4 text-purple-600" />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm truncate">{activity.message}</p>
+                          <p className="text-xs text-zinc-400">
+                            {getTimeAgo(activity.time)}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-zinc-400">
+                    <Activity className="h-8 w-8 mx-auto mb-2" />
+                    <p>No recent activity</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* ROW 3: RECENT MEMBERS + PERFORMANCE SNAPSHOT */}
+        <div className="grid grid-cols-12 gap-6">
+          {/* RECENT MEMBERS */}
+          <div className="col-span-6">
+            <Card className="h-full">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg">Recent Members</CardTitle>
+                  <Link href="/dashboard/communities">
+                    <Button variant="ghost" size="sm">
+                      Invite more
+                      <UserPlus className="h-4 w-4 ml-1" />
+                    </Button>
+                  </Link>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {recentMembers.length > 0 ? (
+                  <div className="space-y-3">
+                    {recentMembers.map((member) => (
+                      <div
+                        key={member.id}
+                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-zinc-50"
+                      >
+                        <Avatar className="h-10 w-10">
+                          <AvatarImage src={member.image || ""} />
+                          <AvatarFallback className="bg-purple-100 text-purple-600">
+                            {member.name[0]}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1">
+                          <p className="font-medium text-sm">{member.name}</p>
+                          <p className="text-xs text-zinc-500">
+                            Joined {member.communityName} •{" "}
+                            {getTimeAgo(member.joinedAt)}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-zinc-400">
+                    <Users className="h-8 w-8 mx-auto mb-2" />
+                    <p>No new members yet</p>
+                    <p className="text-sm">
+                      Invite people to your community to get started.
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* PERFORMANCE SNAPSHOT */}
+          <div className="col-span-6">
+            <Card className="h-full">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg">Community Performance</CardTitle>
+                  <Zap className="h-4 w-4 text-amber-500" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                {performance ? (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="p-4 rounded-lg bg-zinc-50">
+                        <p className="text-2xl font-bold text-zinc-900">
+                          {performance.sessionsHosted}
+                        </p>
+                        <p className="text-sm text-zinc-500">
+                          Sessions hosted this week
+                        </p>
+                      </div>
+                      <div className="p-4 rounded-lg bg-zinc-50">
+                        <p className="text-2xl font-bold text-zinc-900">
+                          {performance.newMembersThisWeek}
+                        </p>
+                        <p className="text-sm text-zinc-500">
+                          New members this week
+                        </p>
+                      </div>
+                    </div>
+                    <div className="p-4 rounded-lg bg-zinc-50">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm text-zinc-600">
+                          Growth rate
+                        </span>
+                        <span
+                          className={`font-semibold ${
+                            performance.growthRate >= 0
+                              ? "text-green-600"
+                              : "text-red-600"
+                          }`}
+                        >
+                          {performance.growthRate >= 0 ? "+" : ""}
+                          {performance.growthRate}%
+                        </span>
+                      </div>
+                      <Progress
+                        value={Math.max(0, Math.min(100, performance.growthRate))}
+                        className="h-2"
+                      />
+                    </div>
+                    <Link href="/dashboard/analytics">
+                      <Button variant="outline" className="w-full">
+                        <BarChart3 className="h-4 w-4 mr-2" />
+                        View full analytics
+                      </Button>
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-zinc-400">
+                    <BarChart3 className="h-8 w-8 mx-auto mb-2" />
+                    <p>Performance data loading...</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </div>
