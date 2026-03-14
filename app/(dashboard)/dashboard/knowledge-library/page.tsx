@@ -239,14 +239,14 @@ export default function KnowledgeLibraryPage() {
                       <p className="text-sm text-zinc-400">Courses created</p>
                     </div>
                   </div>
-                  {stats.totalCourses > 0 && (
+                  {stats?.totalCourses > 0 && (
                     <div className="mt-3">
                       <Progress 
-                        value={stats.conversionRate} 
+                        value={stats?.conversionRate} 
                         className="h-1.5 bg-zinc-800"
                       />
                       <p className="text-xs text-zinc-500 mt-1">
-                        {stats.conversionRate}% conversion rate
+                        {stats?.conversionRate}% conversion rate
                       </p>
                     </div>
                   )}
