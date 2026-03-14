@@ -1,9 +1,7 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { getCurrentUserId } from "@/app/actions/session-core";
+import { getCurrentUserId } from "@/lib/auth-utils";
 import { prisma } from "@/lib/prisma";
-import { z } from "zod";
 
 /**
  * Analyze session for "golden moments" - high-engagement segments
