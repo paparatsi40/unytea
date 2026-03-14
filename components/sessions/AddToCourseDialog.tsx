@@ -41,7 +41,7 @@ interface Course {
   title: string;
   description: string | null;
   isPaid: boolean;
-  price?: number;
+  price: number | null;
   modules: { id: string; title: string }[];
   _count: { enrollments: number };
 }
