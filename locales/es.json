@@ -211,6 +211,22 @@
       "close": "Cerrar"
     }
   },
+  "communities": {
+    "stepBasicInfo": "Información Básica",
+    "stepBasicInfoDesc": "Comienza con lo esencial",
+    "stepAppearance": "Apariencia",
+    "stepAppearanceDesc": "Personaliza el look de tu comunidad",
+    "stepLayout": "Diseño",
+    "stepLayoutDesc": "Elige la estructura de tu comunidad",
+    "stepSettings": "Configuración",
+    "stepSettingsDesc": "Configura acceso y privacidad",
+    "stepPreview": "Vista Previa",
+    "stepPreviewDesc": "Revisa antes de publicar",
+    "descriptionPlaceholder": "Describe tu comunidad, qué aprenderán los miembros y por qué deberían unirse...",
+    "backToCommunities": "Volver a Comunidades",
+    "communityName": "Nombre de la Comunidad",
+    "continue": "Continuar"
+  },
   "dashboard": {
     "title": "Panel",
     "welcome": "Bienvenido de vuelta",
