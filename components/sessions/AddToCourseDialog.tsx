@@ -39,7 +39,7 @@ interface AddToCourseDialogProps {
 interface Course {
   id: string;
   title: string;
-  description?: string;
+  description: string | null;
   isPaid: boolean;
   price?: number;
   modules: { id: string; title: string }[];
