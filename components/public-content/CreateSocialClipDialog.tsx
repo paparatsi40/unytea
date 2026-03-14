@@ -47,7 +47,7 @@ interface SessionInfo {
   thumbnailUrl: string | null;
   duration: number;
   mentor: { id: string; name: string | null; image: string | null } | null;
-  community: { id: string; name: string; slug: string } | null;
+  community: { id: string; name: string | null; slug: string | null } | null;
 }
 
 interface ClipData {
@@ -55,7 +55,7 @@ interface ClipData {
   sessionId: string;
   sessionTitle: string;
   hostName: string | null;
-  communityName: string;
+  communityName: string | null;
   startTime: number;
   endTime: number;
   duration: number;
