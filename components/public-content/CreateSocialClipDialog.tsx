@@ -47,7 +47,7 @@ interface SessionInfo {
   recordingUrl: string | null;
   thumbnailUrl: string | null;
   duration: number;
-  host: { id: string; name: string | null; image: string | null } | null;
+  mentor: { id: string; name: string | null; image: string | null } | null;
   community: { id: string; name: string; slug: string } | null;
 }
 
@@ -212,7 +212,7 @@ export function CreateSocialClipDialog({
               <div className="bg-zinc-800/50 rounded-lg p-4">
                 <h3 className="font-semibold text-white">{session.title}</h3>
                 <p className="text-sm text-zinc-400 mt-1">
-                  {session.host?.name} • {session.community?.name}
+                  {session.mentor?.name} • {session.community?.name}
                 </p>
               </div>
             )}

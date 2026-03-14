@@ -18,7 +18,7 @@ export async function detectSessionMoments(sessionId: string) {
     const session = await prisma.mentorSession.findUnique({
       where: { id: sessionId },
       include: {
-        host: { select: { id: true, name: true, image: true } },
+        mentor: { select: { id: true, name: true, image: true } },
         community: { select: { id: true, name: true, slug: true } },
         participations: {
           include: {
@@ -34,8 +34,8 @@ export async function detectSessionMoments(sessionId: string) {
       return { success: false, error: "Session not found" };
     }
 
-    if (session.hostId !== userId) {
-      return { success: false, error: "Only host can create clips" };
+    if (session.mentorId !== userId) {
+      return { success: false, error: "Only mentor can create clips" };
     }
 
     if (!session.recording || session.recording.status !== "READY") {
@@ -54,7 +54,7 @@ export async function detectSessionMoments(sessionId: string) {
         recordingUrl: session.recording?.videoUrl,
         thumbnailUrl: session.recording?.thumbnailUrl,
         duration: session.recording?.duration || 0,
-        host: session.host,
+        mentor: session.mentor,
         community: session.community,
       },
     };
@@ -191,13 +191,13 @@ export async function generateClipMetadata(
     const session = await prisma.mentorSession.findUnique({
       where: { id: sessionId },
       include: {
-        host: { select: { id: true, name: true, image: true } },
+        mentor: { select: { id: true, name: true, image: true } },
         community: { select: { id: true, name: true, slug: true } },
         recording: true,
       },
     });
 
-    if (!session || session.hostId !== userId) {
+    if (!session || session.mentorId !== userId) {
       return { success: false, error: "Unauthorized" };
     }
 
@@ -216,7 +216,7 @@ export async function generateClipMetadata(
         id: clipId,
         sessionId: session.id,
         sessionTitle: session.title,
-        hostName: session.host?.name,
+        hostName: session.mentor?.name,
         communityName: session.community?.name,
         startTime,
         endTime,
@@ -241,7 +241,7 @@ function generateClipPreviewText(session: any, duration: number) {
     `This changed how I think about ${session.title.toLowerCase()}`,
     `The secret nobody tells you about ${session.title.toLowerCase()}`,
     `In just ${Math.round(duration / 60)} minutes, everything you need`,
-    `This insight from ${session.host?.name} is 🔥`,
+    `This insight from ${session.mentor?.name} is 🔥`,
   ];
   return hooks[Math.floor(Math.random() * hooks.length)];
 }
@@ -249,7 +249,7 @@ function generateClipPreviewText(session: any, duration: number) {
 function generateShareText(session: any, previewText: string, clipUrl: string) {
   return `${previewText}
 
-From: "${session.title}" with ${session.host?.name}
+From: "${session.title}" with ${session.mentor?.name}
 
 Watch on Unytea 👇
 ${clipUrl}`;
