@@ -18,8 +18,7 @@ import {
   CheckCircle,
   Loader2,
   Radio,
-  Headphones,
-  ExternalLink
+  Headphones
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getSession } from "@/app/actions/sessions";
