@@ -95,6 +95,10 @@ export async function getPublicSession(
       return { success: false, error: "Session not available" };
     }
 
+    if (!session.community) {
+      return { success: false, error: "Session community not found" };
+    }
+
     const data: PublicSessionData = {
       id: session.id,
       slug: session.slug!,
