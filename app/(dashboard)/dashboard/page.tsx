@@ -84,7 +84,7 @@ interface Activity {
   id: string;
   type: "member_joined" | "post_created" | "recording_ready";
   userName: string;
-  communityName: string;
+  communityName: string | null;
   message: string;
   time: Date;
 }
