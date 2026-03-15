@@ -17,7 +17,6 @@ import {
   Radio,
   Video,
   VideoOff,
-  Headphones,
   Users,
   MessageSquare,
   FileText,
