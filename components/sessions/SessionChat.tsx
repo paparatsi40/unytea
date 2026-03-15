@@ -24,7 +24,7 @@ interface ChatMessage {
 
 const REACTIONS = ["👍", "❤️", "🔥", "👏", "💡", "🎉"];
 
-export function SessionChat({ sessionId, onPinQuestion }: SessionChatProps) {
+export function SessionChat({ sessionId: _sessionId, onPinQuestion }: SessionChatProps) {
   const { chatMessages, send } = useChat();
   const room = useRoomContext();
   const [message, setMessage] = useState("");
