@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 import {
   useLocalParticipant,
   useParticipants,
-  useRoomContext,
 } from "@livekit/components-react";
 import { cn } from "@/lib/utils";
 import {
@@ -83,7 +82,6 @@ export function VideoRoomUI({
   const isAudioOnly = sessionMode === "audio";
   
   // Room context
-  const room = useRoomContext();
   const participants = useParticipants();
   const localParticipantData = useLocalParticipant();
   const localParticipant = localParticipantData.localParticipant;
