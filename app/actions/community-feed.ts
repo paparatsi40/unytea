@@ -151,7 +151,7 @@ export async function getCommunityPinnedRecap(communityId: string) {
         recordingUrl: session.recording?.url,
         attendeeCount: session._count.participations,
         endedAt: session.endedAt,
-        keyTakeaways: session.notes?.content?.substring(0, 200) || null,
+        keyTakeaways: null,
       },
     };
   } catch (error) {
