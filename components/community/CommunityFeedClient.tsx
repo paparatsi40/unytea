@@ -124,7 +124,7 @@ export function CommunityFeedClient({
           }
 
           if (sessionRes.success) {
-            setUpcomingSession(sessionRes.session);
+            setUpcomingSession(sessionRes.session ?? null);
           }
 
           if (topicsRes.success) {
