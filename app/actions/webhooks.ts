@@ -5,16 +5,17 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { autoStartRecording } from "./recording";
 
-// Webhook secret from LiveKit Cloud dashboard
-const WEBHOOK_SECRET = process.env.LIVEKIT_WEBHOOK_SECRET || "";
+// LiveKit configuration
+const LIVEKIT_API_KEY = process.env.LIVEKIT_API_KEY || "";
+const LIVEKIT_API_SECRET = process.env.LIVEKIT_API_SECRET || "";
 
-if (!WEBHOOK_SECRET) {
-  console.warn("LiveKit webhook secret not configured. Webhook verification will fail.");
+if (!LIVEKIT_API_KEY || !LIVEKIT_API_SECRET) {
+  console.warn("LiveKit API credentials not configured. Webhook verification will fail.");
 }
 
 const receiver = new WebhookReceiver(
-  process.env.LIVEKIT_API_KEY || "",
-  WEBHOOK_SECRET
+  LIVEKIT_API_KEY,
+  LIVEKIT_API_SECRET
 );
 
 export type LiveKitWebhookEvent =
