@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useTranslations } from "next-intl";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import {
   Users,
@@ -107,7 +106,6 @@ interface PerformanceSnapshot {
 
 export default function DashboardPage() {
   const { user } = useCurrentUser();
-  const t = useTranslations("dashboard");
 
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
   const [nextSession, setNextSession] = useState<LiveSession | null>(null);
