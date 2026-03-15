@@ -84,7 +84,7 @@ export function JoinSessionCTA({ session }: Props) {
             <div className="bg-gray-50 rounded-lg p-4">
               <h4 className="font-semibold text-gray-900">{session.title}</h4>
               <p className="text-sm text-gray-500 mt-1">
-                with {session.mentor.name || "our expert"}
+                with {session.host.name || "our expert"}
               </p>
               {session.community && (
                 <p className="text-sm text-violet-600 mt-1">
