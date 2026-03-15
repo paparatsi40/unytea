@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { formatDistanceToNow, format } from "date-fns";
+import { format } from "date-fns";
 
 interface PublicSessionPageProps {
   session: {
