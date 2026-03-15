@@ -21,7 +21,6 @@ import {
   UserPlus,
   BookOpen,
   ChevronRight,
-  Clock,
   Radio,
   Sparkles,
 } from "lucide-react";
