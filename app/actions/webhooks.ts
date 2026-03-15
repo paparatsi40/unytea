@@ -153,7 +153,7 @@ async function handleRoomFinished(event: any) {
       where: { id: participation.id },
       data: {
         leftAt: now,
-        durationSeconds: participation.durationSeconds + durationSeconds,
+        durationSeconds: (participation.durationSeconds || 0) + durationSeconds,
       },
     });
   }
@@ -253,7 +253,7 @@ async function handleParticipantLeft(event: any) {
       where: { id: participation.id },
       data: {
         leftAt,
-        durationSeconds: participation.durationSeconds + durationSeconds,
+        durationSeconds: (participation.durationSeconds || 0) + durationSeconds,
       },
     });
   }
