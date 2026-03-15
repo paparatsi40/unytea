@@ -36,7 +36,7 @@ interface PublicSessionPageProps {
     };
     recording: {
       id: string;
-      url: string;
+      url: string | null;
       status: string;
       durationSeconds: number | null;
     } | null;
