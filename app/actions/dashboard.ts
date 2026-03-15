@@ -374,7 +374,7 @@ export async function getRecentMembers(limit: number = 4) {
         name: m.user.name || "Anonymous",
         image: m.user.image,
         communityName: m.community.name,
-        joinedAt: m.createdAt,
+        joinedAt: m.joinedAt,
       })),
     };
   } catch (error) {
