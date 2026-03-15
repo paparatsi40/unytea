@@ -102,7 +102,7 @@ export function VideoRoomUI({
   const [pinnedQuestion, setPinnedQuestion] = useState<PinnedQuestion | null>(null);
 
   // Recording
-  const [isRecording, setIsRecording] = useState(true);
+  const isRecording = true;
 
   // Reactions
   const [showReactions, setShowReactions] = useState(false);
