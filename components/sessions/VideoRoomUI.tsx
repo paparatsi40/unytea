@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   useLocalParticipant,
   useParticipants,
@@ -14,9 +14,7 @@ import {
   Mic,
   MicOff,
   Monitor,
-  Pencil,
   Radio,
-  Settings,
   Video,
   VideoOff,
   Headphones,
@@ -24,68 +22,74 @@ import {
   MessageSquare,
   FileText,
   Crown,
-  Check,
+  MoreVertical,
+  Pin,
+  Flame,
+  Smile,
+  ThumbsUp,
+  Heart,
+  Zap,
+  Clock,
   X,
+  ChevronDown,
+  ChevronUp,
+  UserPlus,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 import Link from "next/link";
 
 import { MainStage } from "./MainStage";
 import { SessionChat } from "./SessionChat";
 import { SessionNotesEditor } from "./SessionNotesEditor";
-import { SessionWhiteboard } from "./SessionWhiteboard";
+import { ReactionsBar } from "./ReactionsBar";
 
-// Session states
-type SessionState = "waiting" | "live" | "ending" | "ended";
-
-interface VideoRoomUIProps {
-  sessionId?: string;
-  sessionMode?: "video" | "audio";
-  sessionTitle?: string;
-  isHost?: boolean;
-  onLeave?: () => void;
-  onEndSession?: () => void;
-}
+// Types
+type PanelTab = "notes" | "chat" | "participants";
 
 interface RaiseHandRequest {
   id: string;
   identity: string;
   name: string;
+  avatar?: string;
   timestamp: number;
+}
+
+interface PinnedQuestion {
+  id: string;
+  author: string;
+  content: string;
+  timestamp: number;
+}
+
+interface VideoRoomUIProps {
+  sessionId?: string;
+  sessionMode?: "video" | "audio";
+  sessionTitle?: string;
+  hostName?: string;
+  hostAvatar?: string;
+  isHost?: boolean;
+  attendeeCount?: number;
+  sessionStartTime?: Date;
+  onLeave?: () => void;
+  onEndSession?: () => void;
 }
 
 export function VideoRoomUI({
   sessionId,
   sessionMode = "video",
-  sessionTitle = "Weekly Coaching Session",
-  isHost = true,
+  sessionTitle = "Weekly Community Q&A",
+  hostName = "Host",
+  hostAvatar,
+  isHost = false,
+  attendeeCount = 47,
+  sessionStartTime = new Date(),
   onLeave,
   onEndSession,
 }: VideoRoomUIProps) {
   const isAudioOnly = sessionMode === "audio";
   
-  // Session state
-  const [sessionState, _setSessionState] = useState<SessionState>("live");
-  
-  // Stage mode: video, screen, whiteboard, audio
-  const [stageMode, setStageMode] = useState<"video" | "screen" | "whiteboard" | "audio">(
-    isAudioOnly ? "audio" : "video"
-  );
-  
-  // Right panel tabs
-  const [rightPanelTab, setRightPanelTab] = useState<"chat" | "notes">("chat");
-  
-  // Raise hand system
-  const [raisedHands, setRaisedHands] = useState<RaiseHandRequest[]>([]);
-  const [hasRaisedHand, setHasRaisedHand] = useState(false);
-  const [showHandQueue, setShowHandQueue] = useState(false);
-  
-  // Recording
-  const [isRecording, setIsRecording] = useState(false);
-  
-  // Media loading states
-  const [isLoadingCamera, setIsLoadingCamera] = useState(false);
-  const [isLoadingMic, setIsLoadingMic] = useState(false);
-
+  // Room context
   const room = useRoomContext();
   const participants = useParticipants();
   const localParticipantData = useLocalParticipant();
@@ -94,301 +98,428 @@ export function VideoRoomUI({
   const isMicrophoneEnabled = localParticipantData.isMicrophoneEnabled;
   const isScreenShareEnabled = localParticipantData.isScreenShareEnabled;
 
-  // Handle incoming data messages (raise hand) - TODO: Implement when LiveKit data channel is ready
+  // Active panel (for mobile/responsive)
+  const [activePanel, setActivePanel] = useState<PanelTab>("chat");
+  const [showAllPanels, setShowAllPanels] = useState(true);
+
+  // Raise hand system
+  const [raisedHands, setRaisedHands] = useState<RaiseHandRequest[]>([]);
+  const [hasRaisedHand, setHasRaisedHand] = useState(false);
+  const [showHandQueue, setShowHandQueue] = useState(false);
+
+  // Pinned question
+  const [pinnedQuestion, setPinnedQuestion] = useState<PinnedQuestion | null>(null);
+
+  // Recording
+  const [isRecording, setIsRecording] = useState(true);
+
+  // Reactions
+  const [showReactions, setShowReactions] = useState(false);
+
+  // Session duration
+  const [elapsedTime, setElapsedTime] = useState("0:00");
+
+  // Calculate elapsed time
   useEffect(() => {
-    // LiveKit data messages setup will go here
-    // For now, this is a placeholder
-  }, [room]);
+    const interval = setInterval(() => {
+      const now = new Date();
+      const diff = Math.floor((now.getTime() - sessionStartTime.getTime()) / 1000);
+      const minutes = Math.floor(diff / 60);
+      const seconds = diff % 60;
+      setElapsedTime(`${minutes}:${seconds.toString().padStart(2, "0")}`);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [sessionStartTime]);
 
-  // Toggle functions
-  const toggleCamera = async () => {
-    if (isAudioOnly) return;
-    setIsLoadingCamera(true);
-    try {
-      await localParticipant.setCameraEnabled(!isCameraEnabled);
-      if (!isCameraEnabled) {
-        setStageMode("video");
-      }
-    } catch (error) {
-      console.error("Failed to toggle camera:", error);
-    } finally {
-      setIsLoadingCamera(false);
-    }
-  };
-
-  const toggleMicrophone = async () => {
-    setIsLoadingMic(true);
+  // Toggle microphone
+  const toggleMicrophone = useCallback(async () => {
     try {
       await localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled);
-    } catch (error) {
-      console.error("Failed to toggle microphone:", error);
-    } finally {
-      setIsLoadingMic(false);
+    } catch (e) {
+      console.error("Failed to toggle microphone:", e);
     }
-  };
+  }, [localParticipant, isMicrophoneEnabled]);
 
-  const toggleScreenShare = async () => {
+  // Toggle camera
+  const toggleCamera = useCallback(async () => {
+    try {
+      await localParticipant.setCameraEnabled(!isCameraEnabled);
+    } catch (e) {
+      console.error("Failed to toggle camera:", e);
+    }
+  }, [localParticipant, isCameraEnabled]);
+
+  // Toggle screen share
+  const toggleScreenShare = useCallback(async () => {
     try {
       await localParticipant.setScreenShareEnabled(!isScreenShareEnabled);
-      if (!isScreenShareEnabled) {
-        setStageMode("screen");
-      } else {
-        setStageMode(isAudioOnly ? "audio" : "video");
-      }
-    } catch (error) {
-      console.error("Failed to toggle screen share:", error);
+    } catch (e) {
+      console.error("Failed to toggle screen share:", e);
     }
-  };
+  }, [localParticipant, isScreenShareEnabled]);
 
-  const handleRaiseHand = async () => {
-    const newState = !hasRaisedHand;
-    setHasRaisedHand(newState);
-    
-    try {
-      const encoder = new TextEncoder();
-      const data = encoder.encode(
-        JSON.stringify({
-          type: "raise_hand",
-          raised: newState,
-          from: localParticipant.identity,
-          timestamp: Date.now(),
-        })
-      );
-      await room.localParticipant.publishData(data, { reliable: true });
-    } catch (error) {
-      console.error("Failed to raise hand:", error);
+  // Raise hand
+  const toggleRaiseHand = useCallback(() => {
+    if (hasRaisedHand) {
+      // Lower hand
+      setRaisedHands(prev => prev.filter(h => h.identity !== localParticipant.identity));
+      setHasRaisedHand(false);
+    } else {
+      // Raise hand
+      const newRequest: RaiseHandRequest = {
+        id: Math.random().toString(36).substring(7),
+        identity: localParticipant.identity,
+        name: localParticipant.name || "Anonymous",
+        timestamp: Date.now(),
+      };
+      setRaisedHands(prev => [...prev, newRequest]);
+      setHasRaisedHand(true);
     }
+  }, [hasRaisedHand, localParticipant]);
+
+  // Invite speaker (host only)
+  const inviteSpeaker = useCallback((request: RaiseHandRequest) => {
+    // TODO: Implement actual speaker invite via LiveKit
+    console.log("Inviting speaker:", request);
+    setRaisedHands(prev => prev.filter(h => h.id !== request.id));
+  }, []);
+
+  // Mute all (host only)
+  const muteAll = useCallback(() => {
+    // TODO: Implement mute all
+    console.log("Mute all participants");
+  }, []);
+
+  // Pin question
+  const pinQuestion = useCallback((author: string, content: string) => {
+    setPinnedQuestion({
+      id: Math.random().toString(36).substring(7),
+      author,
+      content,
+      timestamp: Date.now(),
+    });
+  }, []);
+
+  // Unpin question
+  const unpinQuestion = useCallback(() => {
+    setPinnedQuestion(null);
+  }, []);
+
+  // Handle reaction
+  const handleReaction = useCallback((emoji: string) => {
+    // TODO: Send reaction via LiveKit data channel
+    console.log("Reaction:", emoji);
+    setShowReactions(false);
+  }, []);
+
+  // Format time ago
+  const formatTimeAgo = (timestamp: number) => {
+    const seconds = Math.floor((Date.now() - timestamp) / 1000);
+    if (seconds < 60) return "just now";
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    return `${hours}h ago`;
   };
 
-  const inviteToSpeak = (hand: RaiseHandRequest) => {
-    // In a real implementation, this would trigger a host action
-    // to spotlight this participant or give them special permissions
-    setRaisedHands(prev => prev.filter(h => h.id !== hand.id));
-  };
-
-  const toggleRecording = () => {
-    setIsRecording(!isRecording);
-    // In real implementation, this would start/stop recording
-  };
-
-  // Mode switcher options
-  const modeOptions = isAudioOnly 
-    ? [
-        { id: "audio", label: "Audio", icon: Headphones },
-        { id: "screen", label: "Screen", icon: Monitor },
-        { id: "whiteboard", label: "Whiteboard", icon: Pencil },
-      ]
-    : [
-        { id: "video", label: "Video", icon: Video },
-        { id: "screen", label: "Screen", icon: Monitor },
-        { id: "whiteboard", label: "Whiteboard", icon: Pencil },
-      ];
-
-  // Render different states
-  if (sessionState === "waiting") {
-    return (
-      <div className="flex h-full flex-col items-center justify-center bg-zinc-950 p-8">
-        <div className="text-center">
-          <div className="mb-6 flex justify-center">
-            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-zinc-800">
-              <Radio className="h-12 w-12 text-zinc-500" />
-            </div>
-          </div>
-          <h2 className="mb-2 text-2xl font-bold text-white">Session starts soon</h2>
-          <p className="mb-6 text-zinc-400">
-            {sessionTitle} will begin shortly. Get ready!
-          </p>
-          <div className="flex items-center justify-center gap-2 text-sm text-zinc-500">
-            <Users className="h-4 w-4" />
-            <span>{participants.length} participants waiting</span>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (sessionState === "ending") {
-    return (
-      <div className="flex h-full flex-col items-center justify-center bg-zinc-950 p-8">
-        <div className="text-center">
-          <div className="mb-6 flex justify-center">
-            <div className="flex h-24 w-24 animate-pulse items-center justify-center rounded-full bg-yellow-500/20">
-              <Radio className="h-12 w-12 text-yellow-500" />
-            </div>
-          </div>
-          <h2 className="mb-2 text-2xl font-bold text-white">Session is ending</h2>
-          <p className="mb-6 text-zinc-400">
-            Recording is being processed. You&apos;ll be redirected shortly.
-          </p>
-          <div className="flex items-center justify-center gap-2 text-sm text-zinc-500">
-            <span>Processing recording...</span>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (sessionState === "ended") {
-    return (
-      <div className="flex h-full flex-col items-center justify-center bg-zinc-950 p-8">
-        <div className="text-center">
-          <div className="mb-6 flex justify-center">
-            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-green-500/20">
-              <Check className="h-12 w-12 text-green-500" />
-            </div>
-          </div>
-          <h2 className="mb-2 text-2xl font-bold text-white">Session ended</h2>
-          <p className="mb-6 text-zinc-400">
-            Thank you for joining! The recording and notes are now available.
-          </p>
-          <div className="flex gap-3">
-            <Link
-              href={`/dashboard/sessions/${sessionId}`}
-              className="rounded-xl bg-purple-600 px-6 py-3 font-medium text-white transition-colors hover:bg-purple-700"
-            >
-              View Recap
-            </Link>
-            <button
-              onClick={onLeave}
-              className="rounded-xl border border-zinc-700 bg-zinc-800 px-6 py-3 font-medium text-zinc-300 transition-colors hover:bg-zinc-700"
-            >
-              Back to Sessions
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // LIVE STATE - Main 4-panel layout
   return (
-    <div className="flex h-full flex-col overflow-hidden bg-zinc-950">
-      {/* HEADER */}
-      <header className="flex h-14 shrink-0 items-center justify-between border-b border-zinc-800 bg-zinc-900 px-4">
-        {/* Left: Back + Title */}
+    <div className="flex h-screen flex-col bg-zinc-950">
+      {/* ==================== HEADER ==================== */}
+      <header className="flex items-center justify-between border-b border-zinc-800 bg-zinc-900/95 px-4 py-3 backdrop-blur">
+        {/* Left: Back + Session Info */}
         <div className="flex items-center gap-4">
           <Link
             href="/dashboard/sessions"
-            className="flex items-center gap-2 text-sm text-zinc-400 transition-colors hover:text-white"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-zinc-800 text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-white"
           >
-            <ArrowLeft className="h-4 w-4" />
-          <span className="hidden sm:inline">Back</span>
+            <ArrowLeft className="h-5 w-5" />
           </Link>
-          <div className="h-6 w-px bg-zinc-700" />
+
           <div>
-            <h1 className="text-sm font-semibold text-white">{sessionTitle}</h1>
-            <p className="text-xs text-zinc-500">
-              {isAudioOnly ? "Live audio" : "Live session"} • {participants.length} participants
-            </p>
+            <h1 className="text-lg font-semibold text-white">{sessionTitle}</h1>
+            <div className="flex items-center gap-2 text-sm text-zinc-400">
+              <span className="flex items-center gap-1">
+                <Crown className="h-3.5 w-3.5 text-amber-400" />
+                Host: {hostName}
+              </span>
+              <span>•</span>
+              <span className="flex items-center gap-1">
+                <Users className="h-3.5 w-3.5" />
+                {attendeeCount} attending
+              </span>
+              <span>•</span>
+              <span className="flex items-center gap-1">
+                <Clock className="h-3.5 w-3.5" />
+                {elapsedTime}
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Center: Mode switcher */}
-        <div className="hidden md:flex items-center gap-2">
-          <div className="flex items-center rounded-full border border-zinc-800 bg-zinc-950 p-1">
-            {modeOptions.map((option, index) => {
-              const Icon = option.icon;
-              const isActive = stageMode === option.id;
-              const isFirst = index === 0;
-              const isLast = index === modeOptions.length - 1;
-              
-              return (
+        {/* Center: Recording Indicator */}
+        {isRecording && (
+          <div className="flex items-center gap-2 rounded-full bg-red-500/10 px-3 py-1.5">
+            <Radio className="h-4 w-4 animate-pulse text-red-500" />
+            <span className="text-sm font-medium text-red-400">Recording</span>
+          </div>
+        )}
+
+        {/* Right: Host Actions / Member Actions */}
+        <div className="flex items-center gap-2">
+          {isHost ? (
+            <>
+              {/* Raise Hand Queue Toggle */}
+              {raisedHands.length > 0 && (
                 <button
-                  key={option.id}
-                  onClick={() => setStageMode(option.id as any)}
+                  onClick={() => setShowHandQueue(!showHandQueue)}
                   className={cn(
-                    "flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-all",
-                    isFirst && "rounded-l-full",
-                    isLast && "rounded-r-full",
-                    isActive
-                      ? "bg-purple-600 text-white"
-                      : "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
+                    "relative flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
+                    showHandQueue
+                      ? "bg-amber-500/20 text-amber-400"
+                      : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
                   )}
                 >
-                  <Icon className="h-3.5 w-3.5" />
-                  <span className="hidden lg:inline">{option.label}</span>
+                  <Hand className="h-4 w-4" />
+                  <span>{raisedHands.length}</span>
                 </button>
-              );
-            })}
-          </div>
-          
-          {/* Audio-only badge */}
-          {isAudioOnly && (
-            <div className="flex items-center gap-1.5 rounded-full bg-blue-500/10 px-2.5 py-1 text-xs font-medium text-blue-400">
-              <Headphones className="h-3 w-3" />
-              <span>Audio</span>
-            </div>
-          )}
-        </div>
+              )}
 
-        {/* Right: Recording + Hand queue + Leave */}
-        <div className="flex items-center gap-2">
-          {/* Recording indicator */}
-          {isRecording && (
-            <div className="flex items-center gap-1.5 rounded-full bg-red-500/10 px-2.5 py-1 text-xs font-medium text-red-400">
-              <div className="h-2 w-2 animate-pulse rounded-full bg-red-500" />
-              <span className="hidden sm:inline">REC</span>
-            </div>
-          )}
-          
-          {/* Raise hand queue (host only) */}
-          {isHost && raisedHands.length > 0 && (
-            <button
-              onClick={() => setShowHandQueue(!showHandQueue)}
-              className="relative flex items-center gap-1.5 rounded-full bg-yellow-500/10 px-2.5 py-1 text-xs font-medium text-yellow-400"
-            >
-              <Hand className="h-3.5 w-3.5" />
-              <span>{raisedHands.length}</span>
-            </button>
-          )}
+              {/* Mute All */}
+              <button
+                onClick={muteAll}
+                className="flex items-center gap-2 rounded-full bg-zinc-800 px-3 py-1.5 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-700"
+              >
+                <VolumeX className="h-4 w-4" />
+                <span className="hidden sm:inline">Mute All</span>
+              </button>
 
-          {/* End/Leave button */}
-          {isHost ? (
-            <button
-              onClick={onEndSession}
-              className="flex h-8 items-center gap-1.5 rounded-full border border-red-500/50 px-3 text-xs font-medium text-red-400 transition-all hover:bg-red-500/10"
-            >
-              <Radio className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">End</span>
-            </button>
+              {/* End Session */}
+              <button
+                onClick={onEndSession}
+                className="flex items-center gap-2 rounded-full bg-red-500/10 px-3 py-1.5 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/20"
+              >
+                <Radio className="h-4 w-4" />
+                <span>End Session</span>
+              </button>
+            </>
           ) : (
-            <button
-              onClick={onLeave}
-              className="flex h-8 items-center gap-1.5 rounded-full border border-zinc-700 bg-zinc-800 px-3 text-xs font-medium text-zinc-400 transition-all hover:bg-zinc-700"
-            >
-              <LogOut className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Leave</span>
-            </button>
+            <>
+              {/* Raise Hand */}
+              <button
+                onClick={toggleRaiseHand}
+                className={cn(
+                  "flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
+                  hasRaisedHand
+                    ? "bg-amber-500/20 text-amber-400"
+                    : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
+                )}
+              >
+                <Hand className={cn("h-4 w-4", hasRaisedHand && "animate-bounce")} />
+                <span>{hasRaisedHand ? "Hand Raised" : "Raise Hand"}</span>
+              </button>
+
+              {/* Leave */}
+              <button
+                onClick={onLeave}
+                className="flex items-center gap-2 rounded-full bg-red-500/10 px-3 py-1.5 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/20"
+              >
+                <LogOut className="h-4 w-4" />
+                <span>Leave</span>
+              </button>
+            </>
           )}
         </div>
       </header>
 
-      {/* HAND QUEUE PANEL (Host only, expandable) */}
-      {isHost && showHandQueue && raisedHands.length > 0 && (
-        <div className="shrink-0 border-b border-zinc-800 bg-yellow-500/5 px-4 py-2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-yellow-400">
-              Raised hands ({raisedHands.length})
+      {/* ==================== MAIN CONTENT ==================== */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* LEFT: Notes Panel */}
+        <div
+          className={cn(
+            "flex w-80 flex-col border-r border-zinc-800 bg-zinc-900/50 transition-all",
+            !showAllPanels && activePanel !== "notes" && "hidden"
+          )}
+        >
+          <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-3">
+            <div className="flex items-center gap-2 text-sm font-medium text-zinc-300">
+              <FileText className="h-4 w-4 text-emerald-400" />
+              Session Notes
+            </div>
+            <span className="text-xs text-zinc-500">Auto-saved</span>
+          </div>
+          <div className="flex-1 overflow-hidden">
+            <SessionNotesEditor
+              sessionId={sessionId || ""}
+              minimal
+            />
+          </div>
+        </div>
+
+        {/* CENTER: Stage + Chat */}
+        <div className="flex flex-1 flex-col min-w-0">
+          {/* Pinned Question Banner */}
+          {pinnedQuestion && (
+            <div className="flex items-start gap-3 border-b border-zinc-800 bg-amber-500/5 px-4 py-3">
+              <Pin className="h-4 w-4 shrink-0 text-amber-400" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm text-amber-200">
+                  <span className="font-medium">{pinnedQuestion.author}:</span>{" "}
+                  {pinnedQuestion.content}
+                </p>
+              </div>
+              {isHost && (
+                <button
+                  onClick={unpinQuestion}
+                  className="shrink-0 text-zinc-500 hover:text-zinc-300"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Stage */}
+          <div className="flex-1 min-h-0 p-4">
+            <MainStage
+              mode={isAudioOnly ? "audio" : isScreenShareEnabled ? "screen" : "video"}
+              sessionMode={sessionMode}
+              sessionId={sessionId}
+            />
+          </div>
+
+          {/* Chat Panel (below stage on desktop, or replace stage on mobile) */}
+          <div
+            className={cn(
+              "h-64 border-t border-zinc-800 bg-zinc-900/30",
+              !showAllPanels && activePanel !== "chat" && "hidden"
+            )}
+          >
+            <SessionChat
+              sessionId={sessionId || ""}
+              onPinQuestion={isHost ? pinQuestion : undefined}
+            />
+          </div>
+        </div>
+
+        {/* RIGHT: Participants Panel */}
+        <div
+          className={cn(
+            "flex w-72 flex-col border-l border-zinc-800 bg-zinc-900/50 transition-all",
+            !showAllPanels && activePanel !== "participants" && "hidden"
+          )}
+        >
+          {/* Participants Header */}
+          <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-3">
+            <div className="flex items-center gap-2 text-sm font-medium text-zinc-300">
+              <Users className="h-4 w-4 text-blue-400" />
+              Participants
+            </div>
+            <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-400">
+              {participants.length + 1}
             </span>
+          </div>
+
+          {/* Participants List */}
+          <div className="flex-1 overflow-y-auto p-2">
+            {/* Host Section */}
+            <div className="mb-4">
+              <p className="mb-2 px-2 text-xs font-medium uppercase text-zinc-500">Host</p>
+              <div className="flex items-center gap-3 rounded-lg bg-zinc-800/50 px-3 py-2">
+                <div className="relative">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-sm font-medium text-white">
+                    {hostName.charAt(0)}
+                  </div>
+                  <Crown className="absolute -right-1 -top-1 h-3 w-3 text-amber-400" />
+                </div>
+                <span className="text-sm font-medium text-white">{hostName}</span>
+              </div>
+            </div>
+
+            {/* Speakers Section */}
+            <div className="mb-4">
+              <p className="mb-2 px-2 text-xs font-medium uppercase text-zinc-500">Speakers</p>
+              {participants
+                .filter(p => !p.isRemote) // Local participants who are speakers
+                .map(p => (
+                  <div
+                    key={p.identity}
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-zinc-800/50"
+                  >
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 text-sm font-medium text-white">
+                      {p.name?.charAt(0) || "?"}
+                    </div>
+                    <span className="text-sm text-zinc-300">{p.name || "Unknown"}</span>
+                    {p.isMicrophoneEnabled && (
+                      <div className="ml-auto flex items-center gap-1">
+                        <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-400" />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              {participants.filter(p => !p.isRemote).length === 0 && (
+                <p className="px-2 text-sm text-zinc-500">No speakers yet</p>
+              )}
+            </div>
+
+            {/* Audience Section */}
+            <div>
+              <p className="mb-2 px-2 text-xs font-medium uppercase text-zinc-500">Audience</p>
+              {participants
+                .filter(p => p.isRemote)
+                .slice(0, 10)
+                .map(p => (
+                  <div
+                    key={p.identity}
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-zinc-800/50"
+                  >
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-700 text-sm font-medium text-zinc-300">
+                      {p.name?.charAt(0) || "?"}
+                    </div>
+                    <span className="text-sm text-zinc-400">{p.name || "Unknown"}</span>
+                  </div>
+                ))}
+              {participants.filter(p => p.isRemote).length > 10 && (
+                <p className="px-2 text-sm text-zinc-500">
+                  +{participants.filter(p => p.isRemote).length - 10} more
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ==================== RAISE HAND QUEUE (Host Overlay) ==================== */}
+      {isHost && showHandQueue && raisedHands.length > 0 && (
+        <div className="absolute right-80 top-16 z-50 w-72 rounded-xl border border-zinc-700 bg-zinc-900/95 p-4 shadow-2xl backdrop-blur">
+          <div className="mb-3 flex items-center justify-between">
+            <h3 className="font-medium text-white">Hand Raised Queue</h3>
             <button
               onClick={() => setShowHandQueue(false)}
-              className="text-xs text-zinc-500 hover:text-white"
+              className="text-zinc-500 hover:text-zinc-300"
             >
               <X className="h-4 w-4" />
             </button>
           </div>
-          <div className="mt-2 flex gap-2">
-            {raisedHands.map((hand) => (
+          <div className="space-y-2">
+            {raisedHands.map((request) => (
               <div
-                key={hand.id}
-                className="flex items-center gap-2 rounded-lg bg-zinc-800 px-3 py-1.5"
+                key={request.id}
+                className="flex items-center justify-between rounded-lg bg-zinc-800/50 px-3 py-2"
               >
-                <span className="text-xs text-white">{hand.name}</span>
+                <div className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-700 text-sm font-medium text-zinc-300">
+                    {request.name.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-white">{request.name}</p>
+                    <p className="text-xs text-zinc-500">{formatTimeAgo(request.timestamp)}</p>
+                  </div>
+                </div>
                 <button
-                  onClick={() => inviteToSpeak(hand)}
-                  className="rounded bg-purple-600 px-2 py-0.5 text-xs text-white hover:bg-purple-700"
+                  onClick={() => inviteSpeaker(request)}
+                  className="rounded-lg bg-blue-500/20 px-2 py-1 text-xs font-medium text-blue-400 transition-colors hover:bg-blue-500/30"
                 >
-                  Invite
+                  <UserPlus className="h-4 w-4" />
                 </button>
               </div>
             ))}
@@ -396,320 +527,132 @@ export function VideoRoomUI({
         </div>
       )}
 
-      {/* MAIN 4-PANEL GRID */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* LEFT COLUMN: Stage (arriba) + Notes (abajo) */}
-        <div className="flex flex-1 flex-col min-w-0">
-          {/* STAGE - Top half */}
-          <div className="flex-1 min-h-0 p-3">
-            <div className="relative h-full overflow-hidden rounded-2xl border border-zinc-800 bg-black shadow-2xl">
-              {/* Live badge */}
-              <div className="absolute left-3 top-3 z-20 flex items-center gap-2">
-                <div className="flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-1 text-xs font-medium text-zinc-200 backdrop-blur-sm">
-                  <Radio className="h-3 w-3 text-red-500" />
-                  <span>LIVE</span>
-                </div>
-                {isRecording && (
-                  <div className="flex items-center gap-1.5 rounded-full bg-red-500/20 px-2.5 py-1 text-xs font-medium text-red-400">
-                    <div className="h-2 w-2 animate-pulse rounded-full bg-red-500" />
-                    <span>REC</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Main content based on stage mode */}
-              {stageMode === "whiteboard" && sessionId ? (
-                <SessionWhiteboard 
-                  embedded 
-                  sessionId={sessionId} 
-                  onClose={() => setStageMode(isAudioOnly ? "audio" : "video")} 
-                />
-              ) : (
-                <MainStage
-                  mode={stageMode as any}
-                  sessionMode={sessionMode}
-                  sessionId={sessionId}
-                  className="h-full"
-                />
-              )}
-            </div>
-          </div>
-
-          {/* NOTES - Bottom half */}
-          <div className="h-64 shrink-0 border-t border-zinc-800 bg-zinc-900">
-            <div className="flex h-full flex-col">
-              <div className="flex items-center justify-between border-b border-zinc-800 px-3 py-2">
-                <div className="flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-yellow-500" />
-                  <span className="text-xs font-medium text-zinc-300">Session Notes</span>
-                </div>
-                {isHost && (
-                  <span className="flex items-center gap-1 text-xs text-zinc-500">
-                    <Crown className="h-3 w-3" />
-                    Host
-                  </span>
-                )}
-              </div>
-              <div className="flex-1 overflow-hidden">
-                {sessionId ? (
-                  <SessionNotesEditor sessionId={sessionId} isHost={isHost} />
-                ) : (
-                  <div className="flex h-full items-center justify-center">
-                    <p className="text-xs text-zinc-500">Notes not available</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* RIGHT COLUMN: Chat (full height) */}
-        <div className="flex w-80 shrink-0 flex-col border-l border-zinc-800 bg-zinc-900">
-          {/* Tabs */}
-          <div className="flex border-b border-zinc-800">
-            <button
-              onClick={() => setRightPanelTab("chat")}
-              className={cn(
-                "flex flex-1 items-center justify-center gap-2 px-4 py-3 text-xs font-medium transition-colors",
-                rightPanelTab === "chat"
-                  ? "border-b-2 border-purple-500 text-purple-400"
-                  : "text-zinc-500 hover:text-zinc-300"
-              )}
-            >
-              <MessageSquare className="h-4 w-4" />
-              Chat
-            </button>
-            <button
-              onClick={() => setRightPanelTab("notes")}
-              className={cn(
-                "flex flex-1 items-center justify-center gap-2 px-4 py-3 text-xs font-medium transition-colors",
-                rightPanelTab === "notes"
-                  ? "border-b-2 border-yellow-500 text-yellow-400"
-                  : "text-zinc-500 hover:text-zinc-300"
-              )}
-            >
-              <FileText className="h-4 w-4" />
-              Notes
-            </button>
-          </div>
-
-          {/* Content */}
-          <div className="flex-1 overflow-hidden">
-            {rightPanelTab === "chat" ? (
-              sessionId ? (
-                <SessionChat sessionId={sessionId} />
-              ) : (
-                <div className="flex h-full items-center justify-center">
-                  <p className="text-xs text-zinc-500">Chat not available</p>
-                </div>
-              )
+      {/* ==================== CONTROLS BAR ==================== */}
+      <div className="flex items-center justify-between border-t border-zinc-800 bg-zinc-900 px-4 py-3">
+        {/* Left: Media Controls */}
+        <div className="flex items-center gap-2">
+          {/* Mic */}
+          <button
+            onClick={toggleMicrophone}
+            className={cn(
+              "flex h-12 w-12 items-center justify-center rounded-full transition-all",
+              isMicrophoneEnabled
+                ? "bg-zinc-800 text-white hover:bg-zinc-700"
+                : "bg-red-500/20 text-red-400 hover:bg-red-500/30"
+            )}
+          >
+            {isMicrophoneEnabled ? (
+              <Mic className="h-5 w-5" />
             ) : (
-              <div className="flex h-full items-center justify-center">
-                <p className="text-xs text-zinc-500">
-                  Notes are shown in the left panel during the session.
-                </p>
-              </div>
+              <MicOff className="h-5 w-5" />
             )}
-          </div>
-        </div>
-      </div>
+          </button>
 
-      {/* PARTICIPANTS BAR */}
-      <div className="shrink-0 border-t border-zinc-800 bg-zinc-900 px-4 py-2">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 text-xs text-zinc-500">
-            <Users className="h-4 w-4" />
-            <span>{participants.length} participants</span>
-          </div>
-          <div className="h-4 w-px bg-zinc-700" />
-          <div className="flex gap-1.5 overflow-x-auto">
-            {/* Local participant */}
-            <div className="flex items-center gap-1.5 rounded-full bg-zinc-800 px-2.5 py-1">
-              <div className={cn(
-                "h-2 w-2 rounded-full",
-                isMicrophoneEnabled ? "bg-green-500" : "bg-red-500"
-              )} />
-              <span className="text-xs text-zinc-300">You</span>
-              {isHost && <Crown className="h-3 w-3 text-yellow-500" />}
-            </div>
-            
-            {/* Other participants */}
-            {participants
-              .filter(p => p.identity !== localParticipant.identity)
-              .slice(0, 8)
-              .map((participant) => (
-                <div 
-                  key={participant.identity}
-                  className="flex items-center gap-1.5 rounded-full bg-zinc-800 px-2.5 py-1"
-                >
-                  <div className={cn(
-                    "h-2 w-2 rounded-full",
-                    participant.isSpeaking ? "bg-green-500" : "bg-zinc-600"
-                  )} />
-                  <span className="text-xs text-zinc-300 truncate max-w-[80px]">
-                    {participant.identity}
-                  </span>
-                </div>
-              ))}
-            
-            {participants.length > 9 && (
-              <div className="flex items-center rounded-full bg-zinc-800 px-2.5 py-1">
-                <span className="text-xs text-zinc-500">
-                  +{participants.length - 9}
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* BOTTOM CONTROLS */}
-      <div className="flex shrink-0 items-center justify-center gap-1 border-t border-zinc-800 bg-zinc-900 px-4 py-3 sm:gap-2">
-        {/* Microphone */}
-        <button
-          onClick={toggleMicrophone}
-          disabled={isLoadingMic}
-          className={cn(
-            "flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full transition-all shadow-lg disabled:opacity-50",
-            isMicrophoneEnabled
-              ? "bg-zinc-700 text-white hover:bg-zinc-600"
-              : "border-2 border-red-500/50 bg-red-500/20 text-red-400 hover:bg-red-500/30"
+          {/* Camera (video mode only) */}
+          {!isAudioOnly && (
+            <button
+              onClick={toggleCamera}
+              className={cn(
+                "flex h-12 w-12 items-center justify-center rounded-full transition-all",
+                isCameraEnabled
+                  ? "bg-zinc-800 text-white hover:bg-zinc-700"
+                  : "bg-red-500/20 text-red-400 hover:bg-red-500/30"
+              )}
+            >
+              {isCameraEnabled ? (
+                <Video className="h-5 w-5" />
+              ) : (
+                <VideoOff className="h-5 w-5" />
+              )}
+            </button>
           )}
-          title={isMicrophoneEnabled ? "Mute" : "Unmute"}
-        >
-          {isMicrophoneEnabled ? (
-            <Mic className="h-4 w-4 sm:h-5 sm:w-5" />
+
+          {/* Screen Share */}
+          <button
+            onClick={toggleScreenShare}
+            className={cn(
+              "flex h-12 w-12 items-center justify-center rounded-full transition-all",
+              isScreenShareEnabled
+                ? "bg-green-500/20 text-green-400 hover:bg-green-500/30"
+                : "bg-zinc-800 text-white hover:bg-zinc-700"
+            )}
+          >
+            <Monitor className="h-5 w-5" />
+          </button>
+
+          {/* Reactions */}
+          <div className="relative">
+            <button
+              onClick={() => setShowReactions(!showReactions)}
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-800 text-white transition-all hover:bg-zinc-700"
+            >
+              <Smile className="h-5 w-5" />
+            </button>
+            {showReactions && (
+              <div className="absolute bottom-full left-1/2 mb-2 -translate-x-1/2">
+                <ReactionsBar onReaction={handleReaction} />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Center: Session Info (mobile only) */}
+        <div className="hidden md:block text-center">
+          <p className="text-sm text-zinc-400">{elapsedTime}</p>
+        </div>
+
+        {/* Right: Panel Toggle + Leave */}
+        <div className="flex items-center gap-2">
+          {/* Panel Toggle (mobile) */}
+          <div className="flex rounded-lg bg-zinc-800 p-1 md:hidden">
+            {(["notes", "chat", "participants"] as PanelTab[]).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => {
+                  setActivePanel(tab);
+                  setShowAllPanels(false);
+                }}
+                className={cn(
+                  "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
+                  activePanel === tab
+                    ? "bg-zinc-700 text-white"
+                    : "text-zinc-400 hover:text-zinc-200"
+                )}
+              >
+                {tab === "notes" && <FileText className="h-4 w-4" />}
+                {tab === "chat" && <MessageSquare className="h-4 w-4" />}
+                {tab === "participants" && <Users className="h-4 w-4" />}
+              </button>
+            ))}
+          </div>
+
+          {/* Toggle All Panels (desktop) */}
+          <button
+            onClick={() => setShowAllPanels(!showAllPanels)}
+            className="hidden h-12 w-12 items-center justify-center rounded-full bg-zinc-800 text-white transition-all hover:bg-zinc-700 md:flex"
+          >
+            {showAllPanels ? <ChevronDown className="h-5 w-5" /> : <ChevronUp className="h-5 w-5" />}
+          </button>
+
+          {/* Leave / End */}
+          {isHost ? (
+            <button
+              onClick={onEndSession}
+              className="flex h-12 items-center gap-2 rounded-full bg-red-500 px-4 font-medium text-white transition-colors hover:bg-red-600"
+            >
+              <Radio className="h-5 w-5" />
+              <span className="hidden sm:inline">End</span>
+            </button>
           ) : (
-            <MicOff className="h-4 w-4 sm:h-5 sm:w-5" />
-          )}
-        </button>
-
-        {/* Camera (video only) */}
-        {!isAudioOnly && (
-          <button
-            onClick={toggleCamera}
-            disabled={isLoadingCamera}
-            className={cn(
-              "flex items-center justify-center rounded-full transition-all shadow-lg disabled:opacity-50",
-              isCameraEnabled
-                ? "h-10 w-10 sm:h-12 sm:w-12 bg-zinc-700 text-white hover:bg-zinc-600"
-                : "h-11 w-11 sm:h-14 sm:w-14 border-2 sm:border-4 border-purple-400 bg-purple-600 text-white hover:bg-purple-700"
-            )}
-            title={isCameraEnabled ? "Stop Camera" : "Start Camera"}
-          >
-            {isCameraEnabled ? (
-              <Video className="h-4 w-4 sm:h-5 sm:w-5" />
-            ) : (
-              <VideoOff className="h-5 w-5 sm:h-6 sm:w-6" />
-            )}
-          </button>
-        )}
-
-        {/* Screen Share */}
-        <button
-          onClick={toggleScreenShare}
-          className={cn(
-            "flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full border-2 transition-all shadow-lg",
-            isScreenShareEnabled
-              ? "border-green-500 bg-green-600 text-white hover:bg-green-700"
-              : "border-zinc-700 bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white"
-          )}
-          title={isScreenShareEnabled ? "Stop Sharing" : "Share Screen"}
-        >
-          <Monitor className="h-4 w-4 sm:h-5 sm:w-5" />
-        </button>
-
-        {/* Whiteboard */}
-        {sessionId && (
-          <button
-            onClick={() => setStageMode("whiteboard")}
-            className={cn(
-              "flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full border-2 transition-all",
-              stageMode === "whiteboard"
-                ? "border-purple-500 bg-purple-600 text-white"
-                : "border-zinc-700 bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white"
-            )}
-            title="Whiteboard"
-          >
-            <Pencil className="h-4 w-4 sm:h-5 sm:w-5" />
-          </button>
-        )}
-
-        {/* Divider */}
-        <div className="mx-1 sm:mx-2 h-6 sm:h-8 w-px bg-zinc-700" />
-
-        {/* Raise Hand */}
-        <button
-          onClick={handleRaiseHand}
-          className={cn(
-            "flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full transition-all",
-            hasRaisedHand
-              ? "bg-yellow-500 text-white shadow-lg hover:bg-yellow-600"
-              : "border border-zinc-700 bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white"
-          )}
-          title={hasRaisedHand ? "Lower Hand" : "Raise Hand"}
-        >
-          <Hand className="h-4 w-4 sm:h-5 sm:w-5" />
-        </button>
-
-        {/* Reactions */}
-        <div className="hidden sm:flex items-center gap-1">
-          {["👍", "❤️", "🔥", "👏", "🎉"].map((emoji) => (
             <button
-              key={emoji}
-              onClick={() => {
-                // Send reaction via LiveKit data message
-              }}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-800 text-sm transition-all hover:bg-zinc-700 hover:scale-110"
+              onClick={onLeave}
+              className="flex h-12 items-center gap-2 rounded-full bg-red-500 px-4 font-medium text-white transition-colors hover:bg-red-600"
             >
-              {emoji}
+              <LogOut className="h-5 w-5" />
+              <span className="hidden sm:inline">Leave</span>
             </button>
-          ))}
+          )}
         </div>
-
-        {/* Recording (host only) */}
-        {isHost && (
-          <button
-            onClick={toggleRecording}
-            className={cn(
-              "flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full border-2 transition-all",
-              isRecording
-                ? "border-red-500 bg-red-600 text-white"
-                : "border-zinc-700 bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
-            )}
-            title={isRecording ? "Stop Recording" : "Start Recording"}
-          >
-            <Radio className="h-4 w-4 sm:h-5 sm:w-5" />
-          </button>
-        )}
-
-        {/* Settings */}
-        <button
-          className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full border border-zinc-700 bg-zinc-800 text-zinc-400 transition-all hover:bg-zinc-700 hover:text-white"
-          title="Settings"
-        >
-          <Settings className="h-4 w-4 sm:h-5 sm:w-5" />
-        </button>
-
-        {/* End/Leave */}
-        {isHost ? (
-          <button
-            onClick={onEndSession}
-            className="ml-1 sm:ml-2 flex h-10 sm:h-12 items-center justify-center rounded-full border border-red-500/50 px-3 sm:px-5 text-xs sm:text-sm font-medium text-red-400 transition-all hover:bg-red-500/10"
-          >
-            <Radio className="mr-1.5 h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            <span className="hidden sm:inline">End</span>
-            <span className="sm:hidden">Stop</span>
-          </button>
-        ) : (
-          <button
-            onClick={onLeave}
-            className="ml-1 sm:ml-2 flex h-10 sm:h-12 items-center justify-center rounded-full border border-zinc-700 bg-zinc-800 px-3 sm:px-5 text-xs sm:text-sm font-medium text-zinc-400 transition-all hover:bg-zinc-700"
-          >
-            <LogOut className="mr-1.5 h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            <span>Leave</span>
-          </button>
-        )}
       </div>
     </div>
   );
