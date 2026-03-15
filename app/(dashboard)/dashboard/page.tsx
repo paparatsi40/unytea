@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import {
@@ -107,7 +106,6 @@ interface PerformanceSnapshot {
 }
 
 export default function DashboardPage() {
-  const router = useRouter();
   const { user } = useCurrentUser();
   const t = useTranslations("dashboard");
 
