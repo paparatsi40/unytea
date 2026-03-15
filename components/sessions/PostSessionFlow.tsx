@@ -227,7 +227,7 @@ export function PostSessionFlow({
             )}
             onClick={() => {
               setActiveAction("course");
-              setShowAddToCourse(true);
+              onAddToCourse();
             }}
           >
             <CardContent className="flex items-start gap-4 p-5">
@@ -252,7 +252,7 @@ export function PostSessionFlow({
             )}
             onClick={() => {
               setActiveAction("clips");
-              setShowCreateClip(true);
+              onCreateClip();
             }}
           >
             <CardContent className="flex items-start gap-4 p-5">
