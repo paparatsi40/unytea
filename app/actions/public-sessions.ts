@@ -175,3 +175,50 @@ export async function getRelatedSessions(
     return { success: false, error: "Failed to load related sessions" };
   }
 }
+
+// Alias for compatibility with existing code
+export async function getPublicSessionBySlug(
+  slug: string
+): Promise<any | null> {
+  const result = await getPublicSession(slug);
+  if (!result.success || !result.session) return null;
+  
+  // Transform to legacy format expected by other components
+  const session = result.session;
+  return {
+    ...session,
+    mentor: session.host,
+    community: {
+      ...session.community,
+      imageUrl: session.community.image,
+    },
+  };
+}
+
+// For sitemap generation
+export async function getPublicSessionsForSEO(
+  limit: number = 100
+): Promise<{ slug: string; updatedAt: Date }[]> {
+  try {
+    const sessions = await prisma.mentorSession.findMany({
+      where: {
+        status: "COMPLETED",
+        recording: { status: "READY" },
+        slug: { not: null },
+      },
+      select: {
+        slug: true,
+        updatedAt: true,
+      },
+      orderBy: { updatedAt: "desc" },
+      take: limit,
+    });
+    
+    return sessions
+      .filter((s): s is { slug: string; updatedAt: Date } => s.slug !== null)
+      .map((s) => ({ slug: s.slug, updatedAt: s.updatedAt }));
+  } catch (error) {
+    console.error("Error fetching sessions for SEO:", error);
+    return [];
+  }
+}
