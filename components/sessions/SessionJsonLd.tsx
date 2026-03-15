@@ -18,7 +18,7 @@ export function SessionJsonLd({ session }: Props) {
     image: session.community?.imageUrl || session.host.image || "https://www.unytea.com/og-image.png",
     startDate: session.scheduledAt.toISOString(),
     endDate: new Date(
-      session.scheduledAt.getTime() + session.duration * 60000
+      session.scheduledAt.getTime() + (session.duration || 60) * 60000
     ).toISOString(),
     eventStatus: isLive
       ? "https://schema.org/EventInProgress"
