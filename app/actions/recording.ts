@@ -75,17 +75,13 @@ export async function startCompositeRecording(
     }
 
     // Configure S3 output
-    const s3Output: S3Upload = {
+    const s3Output = {
       bucket: S3_BUCKET,
       region: S3_REGION,
       accessKey: S3_ACCESS_KEY,
       secret: S3_SECRET_KEY,
-    };
-
-    // Add custom endpoint for R2 or other S3-compatible storage
-    if (S3_ENDPOINT) {
-      (s3Output as any).endpoint = S3_ENDPOINT;
-    }
+      ...(S3_ENDPOINT && { endpoint: S3_ENDPOINT }),
+    } as S3Upload;
 
     // Start room composite egress
     const egressInfo = await client.startRoomCompositeEgress(
