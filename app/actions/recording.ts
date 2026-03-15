@@ -3,8 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/auth-utils";
 
-// LiveKit configuration
-const LIVEKIT_URL = process.env.LIVEKIT_URL || "wss://unytea-livekit.livekit.cloud";
+// Check LiveKit credentials
 const LIVEKIT_API_KEY = process.env.LIVEKIT_API_KEY || "";
 const LIVEKIT_API_SECRET = process.env.LIVEKIT_API_SECRET || "";
 
