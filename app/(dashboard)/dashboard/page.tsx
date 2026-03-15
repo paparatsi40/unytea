@@ -145,7 +145,7 @@ export default function DashboardPage() {
       ]);
 
       if (metricsRes.success) setMetrics(metricsRes.metrics || null);
-      if (nextSessionRes.success) setNextSession(nextSessionRes.session);
+      if (nextSessionRes.success) setNextSession(nextSessionRes.session ?? null);
       if (upcomingRes.success) setUpcomingSessions(upcomingRes.sessions || []);
       if (activityRes.success) setActivities(activityRes.activities || []);
       if (membersRes.success) setRecentMembers(membersRes.members || []);
