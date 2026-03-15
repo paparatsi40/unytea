@@ -419,9 +419,17 @@ export function VideoRoomUI({
               <p className="mb-2 px-2 text-xs font-medium uppercase text-zinc-500">Host</p>
               <div className="flex items-center gap-3 rounded-lg bg-zinc-800/50 px-3 py-2">
                 <div className="relative">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-sm font-medium text-white">
-                    {hostName.charAt(0)}
-                  </div>
+                  {hostAvatar ? (
+                    <img
+                      src={hostAvatar}
+                      alt={hostName}
+                      className="h-8 w-8 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-sm font-medium text-white">
+                      {hostName.charAt(0)}
+                    </div>
+                  )}
                   <Crown className="absolute -right-1 -top-1 h-3 w-3 text-amber-400" />
                 </div>
                 <span className="text-sm font-medium text-white">{hostName}</span>
