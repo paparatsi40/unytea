@@ -237,7 +237,7 @@ export async function getUpcomingSessions(limit: number = 5) {
         duration: s.duration,
         status: s.status,
         mentorName: s.mentor?.name,
-        communityName: s.community?.name,
+        communityName: s.community?.name ?? null,
         attendeeCount: s.participations.length,
       })),
     };
