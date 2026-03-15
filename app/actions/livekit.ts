@@ -276,7 +276,7 @@ export async function leaveSession(
       where: { id: participation.id },
       data: {
         leftAt,
-        durationSeconds: participation.durationSeconds + durationSeconds,
+        durationSeconds: (participation.durationSeconds || 0) + durationSeconds,
       },
     });
 
