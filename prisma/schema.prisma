@@ -495,17 +495,30 @@ model SessionResource {
 model Recording {
   id              String          @id @default(cuid())
   sessionId       String          @unique
-  
+
   status          RecordingStatus @default(PROCESSING)
   url             String?
   durationSeconds Int?
+
+  // LiveKit Egress fields
+  egressId        String?         @unique  // LiveKit Egress ID
+  fileSize        Int?                     // File size in bytes
+  storageProvider String?         @default("s3")  // s3, r2, gcs
+  storageBucket   String?                  // Bucket name
+  storageKey      String?                  // Object key/path
   
+  // Processing metadata
+  processingStartedAt DateTime?
+  processingEndedAt   DateTime?
+  errorMessage    String?
+
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
-  
+
   session         MentorSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  
+
   @@index([status])
+  @@index([egressId])
   @@map("recordings")
 }
 
@@ -870,6 +883,14 @@ model SessionParticipation {
   durationSeconds Int?              // Calculated when session ends
   pointsEarned    Int               @default(0)
   eventsData      Json?              // Track specific events: questions_asked, answers_given, etc.
+  
+  // LiveKit integration fields
+  livekitIdentity String?  @unique  // Maps to LiveKit participant identity
+  messagesCount   Int      @default(0)  // Chat messages sent
+  reactionsCount  Int      @default(0)  // Reactions sent
+  handRaisedCount Int      @default(0)  // Times raised hand
+  wasInvited      Boolean  @default(false)  // Was invited to speak
+  
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
 
@@ -881,6 +902,7 @@ model SessionParticipation {
   @@index([userId])
   @@index([joinedAt])
   @@index([role])
+  @@index([livekitIdentity])
   @@map("session_participations")
 }
 
