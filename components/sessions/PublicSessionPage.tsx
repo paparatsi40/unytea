@@ -31,7 +31,7 @@ interface PublicSessionPageProps {
       name: string;
       slug: string;
       description: string | null;
-      image: string | null;
+      imageUrl: string | null;
       memberCount: number;
     };
     recording: {
