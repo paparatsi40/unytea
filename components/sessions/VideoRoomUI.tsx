@@ -371,10 +371,10 @@ export function VideoRoomUI({
           {/* Stage */}
           <div className="flex-1 min-h-0 p-4">
             <MainStage
-              mode={isAudioOnly ? "audio" : isScreenShareEnabled ? "screen" : "video"}
-              sessionMode={sessionMode}
-              sessionId={sessionId}
-            />
+            mode={isScreenShareEnabled ? "screen" : "video"}
+            sessionMode={sessionMode}
+            sessionId={sessionId}
+          />
           </div>
 
           {/* Chat Panel (below stage on desktop, or replace stage on mobile) */}
