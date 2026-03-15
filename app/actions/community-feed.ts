@@ -124,7 +124,6 @@ export async function getCommunityPinnedRecap(communityId: string) {
         status: "COMPLETED",
         recording: {
           isNot: null,
-          url: { not: null },
         },
       },
       include: {
