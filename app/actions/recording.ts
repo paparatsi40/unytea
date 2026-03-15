@@ -8,10 +8,8 @@ const LIVEKIT_URL = process.env.LIVEKIT_URL || "wss://unytea-livekit.livekit.clo
 const LIVEKIT_API_KEY = process.env.LIVEKIT_API_KEY || "";
 const LIVEKIT_API_SECRET = process.env.LIVEKIT_API_SECRET || "";
 
-// Initialize egress client
-  if (!LIVEKIT_API_KEY || !LIVEKIT_API_SECRET) {
-    return null;
-  }
+if (!LIVEKIT_API_KEY || !LIVEKIT_API_SECRET) {
+  console.warn("LiveKit credentials not configured. Recording integration will be limited.");
 }
 
 export interface RecordingConfig {
@@ -140,14 +138,6 @@ export async function stopRecording(
 
     // For V1: Recording stops automatically via LiveKit when room ends
     // We just update our DB record. The webhook will update final status.
-    await prisma.recording.update({
-      where: { id: recording.id },
-      data: {
-        // Keep as PROCESSING until webhook confirms completion
-        // This is just a marker that we requested stop
-      },
-    });
-
     console.log(`[Recording] Stop requested for session ${sessionId}`);
     console.log(`[Recording] Actual stop will be handled by LiveKit when room ends`);
 
@@ -170,7 +160,6 @@ export async function getRecordingStatus(
     status: string;
     url: string | null;
     durationSeconds: number | null;
-    fileSize: number | null;
     processingProgress?: number;
   };
   error?: string;
@@ -191,7 +180,6 @@ export async function getRecordingStatus(
         status: recording.status,
         url: recording.url,
         durationSeconds: recording.durationSeconds,
-        fileSize: recording.fileSize,
       },
     };
   } catch (error) {
@@ -338,19 +326,13 @@ export async function autoStartRecording(sessionId: string): Promise<void> {
       return;
     }
 
-    // Start recording
-    const result = await startCompositeRecording({
+    // Create recording record
+    await startCompositeRecording({
       sessionId,
       roomName: session.videoRoomName,
       layout: "grid",
       audioOnly: session.mode === "AUDIO",
     });
-
-    if (result.success) {
-      console.log(`[Recording] Auto-started for session ${sessionId}`);
-    } else {
-      console.error(`[Recording] Auto-start failed:`, result.error);
-    }
   } catch (error) {
     console.error("[Recording] Auto-start error:", error);
   }
