@@ -18,7 +18,7 @@ interface PublicSessionPageProps {
     description: string | null;
     status: string;
     scheduledAt: Date;
-    durationMinutes: number | null;
+    duration: number | null;
     attendeeCount: number;
     host: {
       id: string;
@@ -69,8 +69,8 @@ export function PublicSessionPage({ session, relatedSessions }: PublicSessionPag
   const formattedDate = format(new Date(session.scheduledAt), "MMMM d, yyyy");
   const formattedDuration = session.recording?.durationSeconds
     ? `${Math.round(session.recording.durationSeconds / 60)} min`
-    : session.durationMinutes
-    ? `${session.durationMinutes} min`
+    : session.duration
+    ? `${session.duration} min`
     : null;
 
   const handleShare = async () => {

@@ -9,7 +9,7 @@ export interface PublicSessionData {
   description: string | null;
   status: string;
   scheduledAt: Date;
-  durationMinutes: number | null;
+  duration: number | null;
   attendeeCount: number;
   host: {
     id: string;
@@ -102,7 +102,7 @@ export async function getPublicSession(
       description: session.description,
       status: session.status,
       scheduledAt: session.scheduledAt,
-      durationMinutes: session.durationMinutes,
+      duration: session.duration,
       attendeeCount: session._count.participations,
       host: {
         id: session.mentor.id,
