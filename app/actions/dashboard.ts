@@ -143,7 +143,7 @@ export async function getNextLiveSession() {
         scheduledAt: {
           gte: now,
         },
-        status: { in: ["SCHEDULED", "LIVE"] },
+        status: { in: ["SCHEDULED", "IN_PROGRESS"] },
       },
       include: {
         mentor: { select: { id: true, name: true, image: true } },
@@ -214,7 +214,7 @@ export async function getUpcomingSessions(limit: number = 5) {
         scheduledAt: {
           gte: now,
         },
-        status: { in: ["SCHEDULED", "LIVE"] },
+        status: { in: ["SCHEDULED", "IN_PROGRESS"] },
       },
       include: {
         mentor: { select: { id: true, name: true } },
