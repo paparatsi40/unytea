@@ -23,7 +23,7 @@ export async function getDashboardMetrics() {
         members: {
           some: {
             userId: userId,
-            role: { in: ["admin", "owner", "moderator"] },
+            role: { in: ["ADMIN", "OWNER", "MODERATOR"] },
           },
         },
       },
@@ -134,7 +134,7 @@ export async function getNextLiveSession() {
               members: {
                 some: {
                   userId: userId,
-                  role: { in: ["admin", "owner", "moderator"] },
+                  role: { in: ["ADMIN", "OWNER", "MODERATOR"] },
                 },
               },
             },
@@ -205,7 +205,7 @@ export async function getUpcomingSessions(limit: number = 5) {
               members: {
                 some: {
                   userId: userId,
-                  role: { in: ["admin", "owner", "moderator"] },
+                  role: { in: ["ADMIN", "OWNER", "MODERATOR"] },
                 },
               },
             },
