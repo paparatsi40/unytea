@@ -1,21 +1,18 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { SessionVisibility, SessionStatus } from "@prisma/client";
+import { notFound } from "next/navigation";
 
 export interface PublicSessionData {
   id: string;
   slug: string;
   title: string;
   description: string | null;
+  status: string;
   scheduledAt: Date;
-  duration: number;
-  timezone: string;
-  status: SessionStatus;
-  mode: "VIDEO" | "AUDIO";
-  visibility: SessionVisibility;
+  durationMinutes: number | null;
   attendeeCount: number;
-  mentor: {
+  host: {
     id: string;
     name: string | null;
     image: string | null;
@@ -25,156 +22,156 @@ export interface PublicSessionData {
     id: string;
     name: string;
     slug: string;
-    imageUrl: string | null;
     description: string | null;
-  } | null;
-  notes: {
-    summary: string | null;
-    keyInsights: string[];
-    resources: { title: string; url: string; type: string }[];
-  } | null;
+    image: string | null;
+    memberCount: number;
+  };
   recording: {
-    status: "PROCESSING" | "READY" | "FAILED";
-    url: string | null;
+    id: string;
+    url: string;
+    status: string;
     durationSeconds: number | null;
   } | null;
-  series: {
+  notes: {
     id: string;
-    frequency: string;
-    interval: number;
+    content: string;
+    createdAt: Date;
   } | null;
 }
 
-export async function getPublicSessionBySlug(
+export async function getPublicSession(
   slug: string
-): Promise<PublicSessionData | null> {
-  const session = await prisma.mentorSession.findUnique({
-    where: { slug },
-    include: {
-      mentor: {
-        select: {
-          id: true,
-          name: true,
-          image: true,
-          bio: true,
+): Promise<{ success: boolean; session?: PublicSessionData; error?: string }> {
+  try {
+    const session = await prisma.mentorSession.findUnique({
+      where: { slug },
+      include: {
+        mentor: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          },
         },
+        community: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            description: true,
+            image: true,
+            _count: {
+              select: { members: true },
+            },
+          },
+        },
+        recording: {
+          where: { status: "READY" },
+          select: {
+            id: true,
+            url: true,
+            status: true,
+            durationSeconds: true,
+          },
+        },
+        notes: {
+          select: {
+            id: true,
+            content: true,
+            createdAt: true,
+          },
+        },
+        _count: {
+          select: { participations: true },
+        },
+      },
+    });
+
+    if (!session) {
+      return { success: false, error: "Session not found" };
+    }
+
+    // Only show completed sessions with recordings
+    if (session.status !== "COMPLETED" || !session.recording) {
+      return { success: false, error: "Session not available" };
+    }
+
+    const data: PublicSessionData = {
+      id: session.id,
+      slug: session.slug!,
+      title: session.title,
+      description: session.description,
+      status: session.status,
+      scheduledAt: session.scheduledAt,
+      durationMinutes: session.durationMinutes,
+      attendeeCount: session._count.participations,
+      host: {
+        id: session.mentor.id,
+        name: session.mentor.name,
+        image: session.mentor.image,
+        bio: null, // Could be added to User model
       },
       community: {
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          imageUrl: true,
-          description: true,
-        },
+        id: session.community.id,
+        name: session.community.name,
+        slug: session.community.slug,
+        description: session.community.description,
+        image: session.community.image,
+        memberCount: session.community._count.members,
       },
-      notes: {
-        select: {
-          summary: true,
-          keyInsights: true,
-          resources: true,
-        },
-      },
-      recording: {
-        select: {
-          status: true,
-          url: true,
-          durationSeconds: true,
-        },
-      },
-      series: {
-        select: {
-          id: true,
-          frequency: true,
-          interval: true,
-        },
-      },
-    },
-  });
+      recording: session.recording,
+      notes: session.notes,
+    };
 
-  if (!session) return null;
-
-  // Only show public sessions
-  if (session.visibility !== SessionVisibility.public) {
-    return null;
+    return { success: true, session: data };
+  } catch (error) {
+    console.error("Error fetching public session:", error);
+    return { success: false, error: "Failed to load session" };
   }
-
-  // Parse JSON fields from SessionNote
-  let parsedNotes: PublicSessionData["notes"] = null;
-  if (session.notes) {
-    try {
-      const keyInsights = session.notes.keyInsights 
-        ? JSON.parse(session.notes.keyInsights) 
-        : [];
-      const resources = session.notes.resources 
-        ? JSON.parse(session.notes.resources) 
-        : [];
-      
-      parsedNotes = {
-        summary: session.notes.summary,
-        keyInsights: Array.isArray(keyInsights) ? keyInsights : [],
-        resources: Array.isArray(resources) ? resources : [],
-      };
-    } catch {
-      // If JSON parsing fails, return empty arrays
-      parsedNotes = {
-        summary: session.notes.summary,
-        keyInsights: [],
-        resources: [],
-      };
-    }
-  }
-
-  return {
-    id: session.id,
-    slug: session.slug!,
-    title: session.title,
-    description: session.description,
-    scheduledAt: session.scheduledAt,
-    duration: session.duration,
-    timezone: session.timezone,
-    status: session.status,
-    mode: session.mode,
-    visibility: session.visibility,
-    attendeeCount: session.attendeeCount,
-    mentor: session.mentor,
-    community: session.community,
-    notes: parsedNotes,
-    recording: session.recording,
-    series: session.series,
-  };
 }
 
-export async function getPublicSessionsForSEO(
-  limit: number = 100
-): Promise<{ slug: string; title: string; scheduledAt: Date }[]> {
+export async function getRelatedSessions(
+  communityId: string,
+  currentSessionId: string,
+  limit: number = 3
+): Promise<{ success: boolean; sessions?: any[]; error?: string }> {
   try {
-    // Temporarily query without slug until migration is run
     const sessions = await prisma.mentorSession.findMany({
       where: {
-        visibility: SessionVisibility.public,
-        status: { not: SessionStatus.CANCELLED },
+        communityId,
+        id: { not: currentSessionId },
+        status: "COMPLETED",
+        recording: { status: "READY" },
       },
-      select: {
-        id: true,
-        title: true,
-        scheduledAt: true,
+      include: {
+        mentor: {
+          select: { id: true, name: true, image: true },
+        },
+        recording: {
+          select: { durationSeconds: true },
+        },
+        _count: {
+          select: { participations: true },
+        },
       },
-      orderBy: {
-        scheduledAt: "desc",
-      },
+      orderBy: { scheduledAt: "desc" },
       take: limit,
     });
 
-    // Generate slugs from title + id (fallback until DB migration)
-    return sessions.map((session) => ({
-      slug: `${session.title.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-")}-${session.id.slice(-6)}`,
-      title: session.title,
-      scheduledAt: session.scheduledAt,
+    const formatted = sessions.map((s) => ({
+      id: s.id,
+      slug: s.slug,
+      title: s.title,
+      description: s.description,
+      scheduledAt: s.scheduledAt,
+      host: s.mentor,
+      attendeeCount: s._count.participations,
+      duration: s.recording?.durationSeconds,
     }));
+
+    return { success: true, sessions: formatted };
   } catch (error) {
-    // If DB error (e.g., slug column doesn't exist), return empty array
-    console.error("Error fetching public sessions for SEO:", error);
-    return [];
+    console.error("Error fetching related sessions:", error);
+    return { success: false, error: "Failed to load related sessions" };
   }
 }
