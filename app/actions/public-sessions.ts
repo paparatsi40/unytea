@@ -1,7 +1,6 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { notFound } from "next/navigation";
 
 export interface PublicSessionData {
   id: string;
