@@ -1,6 +1,6 @@
 "use server";
 
-import { EgressClient, EncodedFileType, S3Upload } from "livekit-server-sdk";
+import { EgressClient, EncodedFileType } from "livekit-server-sdk";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/auth-utils";
 
