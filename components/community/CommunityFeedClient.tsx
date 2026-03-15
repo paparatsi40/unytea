@@ -8,7 +8,6 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 import {
   getCommunityUpcomingSession,
   getCommunityHotDiscussions,
-  getCommunityPinnedRecap,
 } from "@/app/actions/community-feed";
 
 type Post = {
