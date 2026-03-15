@@ -74,22 +74,13 @@ export async function startCompositeRecording(
       return { success: false, error: "Recording service not configured" };
     }
 
-    // Configure S3 output
-    const s3Output = {
-      bucket: S3_BUCKET,
-      region: S3_REGION,
-      accessKey: S3_ACCESS_KEY,
-      secret: S3_SECRET_KEY,
-      ...(S3_ENDPOINT && { endpoint: S3_ENDPOINT }),
-    } as S3Upload;
-
     // Start room composite egress
+    // Note: S3 configuration is handled at the LiveKit Cloud dashboard level
     const egressInfo = await client.startRoomCompositeEgress(
       config.roomName,
       {
         fileType: EncodedFileType.MP4,
         filepath: `recordings/${config.sessionId}/${Date.now()}_recording.mp4`,
-        s3: s3Output,
       },
       {
         layout: config.layout || "grid",
@@ -110,8 +101,6 @@ export async function startCompositeRecording(
         egressId: egressInfo.egressId,
         processingStartedAt: new Date(),
         storageProvider: S3_ENDPOINT ? "r2" : "s3",
-        storageBucket: S3_BUCKET,
-        storageKey: `recordings/${config.sessionId}/${Date.now()}_recording.mp4`,
       },
     });
 
