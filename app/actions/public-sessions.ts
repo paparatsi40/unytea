@@ -201,7 +201,7 @@ export async function getPublicSessionBySlug(
 // For sitemap generation
 export async function getPublicSessionsForSEO(
   limit: number = 100
-): Promise<{ slug: string; updatedAt: Date }[]> {
+): Promise<{ slug: string; updatedAt: Date; scheduledAt: Date }[]> {
   try {
     const sessions = await prisma.mentorSession.findMany({
       where: {
@@ -212,14 +212,15 @@ export async function getPublicSessionsForSEO(
       select: {
         slug: true,
         updatedAt: true,
+        scheduledAt: true,
       },
       orderBy: { updatedAt: "desc" },
       take: limit,
     });
     
     return sessions
-      .filter((s): s is { slug: string; updatedAt: Date } => s.slug !== null)
-      .map((s) => ({ slug: s.slug, updatedAt: s.updatedAt }));
+      .filter((s): s is { slug: string; updatedAt: Date; scheduledAt: Date } => s.slug !== null)
+      .map((s) => ({ slug: s.slug, updatedAt: s.updatedAt, scheduledAt: s.scheduledAt }));
   } catch (error) {
     console.error("Error fetching sessions for SEO:", error);
     return [];
