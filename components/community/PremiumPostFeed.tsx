@@ -17,13 +17,9 @@ import {
   BookOpen,
   MessagesSquare,
   Flame,
-  Calendar,
   Play,
-  ChevronRight,
   Radio,
-  TrendingUp,
   HelpCircle,
-  Target,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
