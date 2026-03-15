@@ -22,7 +22,7 @@ export interface PublicSessionData {
     name: string;
     slug: string;
     description: string | null;
-    image: string | null;
+    imageUrl: string | null;
     memberCount: number;
   };
   recording: {
@@ -58,7 +58,7 @@ export async function getPublicSession(
             name: true,
             slug: true,
             description: true,
-            image: true,
+            imageUrl: true,
             _count: {
               select: { members: true },
             },
@@ -115,7 +115,7 @@ export async function getPublicSession(
         name: session.community.name,
         slug: session.community.slug,
         description: session.community.description,
-        image: session.community.image,
+        imageUrl: session.community.imageUrl,
         memberCount: session.community._count.members,
       },
       recording: session.recording,
@@ -182,16 +182,16 @@ export async function getPublicSessionBySlug(
   const result = await getPublicSession(slug);
   if (!result.success || !result.session) return null;
   
-  // Transform to legacy format expected by other components
-  const session = result.session;
-  return {
-    ...session,
-    mentor: session.host,
-    community: {
-      ...session.community,
-      imageUrl: session.community.image,
-    },
-  };
+      // Transform to legacy format expected by other components
+    const session = result.session;
+    return {
+      ...session,
+      mentor: session.host,
+      community: {
+        ...session.community,
+        imageUrl: session.community.imageUrl,
+      },
+    };
 }
 
 // For sitemap generation
