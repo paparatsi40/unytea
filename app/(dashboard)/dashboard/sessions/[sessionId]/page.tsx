@@ -28,6 +28,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { AddToCourseDialog } from "@/components/sessions/AddToCourseDialog";
 import { CreateSocialClipDialog } from "@/components/public-content/CreateSocialClipDialog";
+import { PostSessionFlow } from "@/components/sessions/PostSessionFlow";
 import { toast } from "sonner";
 import { shareSessionRecap } from "@/app/actions/session-jobs";
 
@@ -139,6 +140,35 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
     hour: "numeric",
     minute: "2-digit",
   });
+
+  // Show Post-Session Flow for completed sessions
+  if (session.status === "COMPLETED") {
+    return (
+      <div className="min-h-screen bg-zinc-950">
+        <PostSessionFlow
+          session={session}
+          isHost={session.mentorId === user?.id}
+          onShareRecap={handleShareRecap}
+          onAddToCourse={() => setShowAddToCourse(true)}
+          onCreateClip={() => setShowCreateClip(true)}
+        />
+        
+        {/* Dialogs */}
+        <AddToCourseDialog
+          sessionId={session.id}
+          sessionTitle={session.title}
+          open={showAddToCourse}
+          onOpenChange={setShowAddToCourse}
+        />
+        
+        <CreateSocialClipDialog
+          sessionId={session.id}
+          open={showCreateClip}
+          onOpenChange={setShowCreateClip}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-zinc-950">
