@@ -39,8 +39,8 @@ export function SessionJsonLd({ session }: Props) {
       : undefined,
     performer: {
       "@type": "Person",
-      name: session.mentor.name || "Host",
-      image: session.mentor.image || undefined,
+      name: session.host.name || "Host",
+      image: session.host.image || undefined,
     },
     offers: {
       "@type": "Offer",
@@ -60,7 +60,7 @@ export function SessionJsonLd({ session }: Props) {
         "@type": "VideoObject",
         name: `Recording: ${session.title}`,
         description: session.description || session.title,
-        thumbnailUrl: session.community?.imageUrl || session.mentor.image,
+        thumbnailUrl: session.community?.imageUrl || session.host.image,
         uploadDate: session.scheduledAt.toISOString(),
         duration: session.recording.durationSeconds
           ? `PT${Math.floor(session.recording.durationSeconds / 60)}M${session.recording.durationSeconds % 60}S`
