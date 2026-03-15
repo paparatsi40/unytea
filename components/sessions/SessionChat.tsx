@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Send, MessageSquare, Pin, Smile, MoreVertical } from "lucide-react";
+import { Send, MessageSquare, Pin, Smile } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
