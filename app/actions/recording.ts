@@ -87,7 +87,7 @@ export async function startCompositeRecording(
     return {
       success: true,
       recording: {
-        egressId: recording.egressId,
+        egressId: recording.egressId || "",
         status: "PENDING_WEBHOOK",
         startedAt: new Date(),
       },
