@@ -63,7 +63,7 @@ export async function getDashboardMetrics() {
     const newMembersThisWeek = await prisma.member.count({
       where: {
         communityId: { in: communityIds },
-        createdAt: {
+        joinedAt: {
           gte: weekStart,
         },
       },
@@ -271,7 +271,7 @@ export async function getCommunityActivity(limit: number = 6) {
         user: { select: { id: true, name: true, image: true } },
         community: { select: { id: true, name: true } },
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: { joinedAt: "desc" },
       take: 3,
     });
 
@@ -308,7 +308,7 @@ export async function getCommunityActivity(limit: number = 6) {
         type: "member_joined" as const,
         userName: m.user.name || "Someone",
         communityName: m.community.name ?? null,
-        time: m.createdAt,
+        time: m.joinedAt,
         message: `${m.user.name || "Someone"} joined ${m.community.name || "a community"}`,
       })),
       ...recentPosts.map((p) => ({
@@ -363,7 +363,7 @@ export async function getRecentMembers(limit: number = 4) {
         user: { select: { id: true, name: true, image: true } },
         community: { select: { name: true } },
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: { joinedAt: "desc" },
       take: limit,
     });
 
@@ -430,7 +430,7 @@ export async function getPerformanceSnapshot() {
     const newMembersThisWeek = await prisma.member.count({
       where: {
         communityId: { in: communityIds },
-        createdAt: {
+        joinedAt: {
           gte: weekStart,
         },
       },
@@ -443,7 +443,7 @@ export async function getPerformanceSnapshot() {
     const previousMembers = await prisma.member.count({
       where: {
         communityId: { in: communityIds },
-        createdAt: {
+        joinedAt: {
           gte: previousWeekStart,
           lt: weekStart,
         },
