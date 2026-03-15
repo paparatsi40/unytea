@@ -39,7 +39,7 @@ export async function handleLiveKitWebhook(
 ): Promise<{ success: boolean; message: string }> {
   try {
     // Verify webhook signature
-    if (!WEBHOOK_SECRET) {
+    if (!LIVEKIT_API_KEY || !LIVEKIT_API_SECRET) {
       return { success: false, message: "Webhook secret not configured" };
     }
 
