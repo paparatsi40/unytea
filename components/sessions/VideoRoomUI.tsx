@@ -437,7 +437,7 @@ export function VideoRoomUI({
             <div className="mb-4">
               <p className="mb-2 px-2 text-xs font-medium uppercase text-zinc-500">Speakers</p>
               {participants
-                .filter(p => !p.isRemote) // Local participants who are speakers
+                .filter(p => p.identity !== localParticipant.identity) // Local participants who are speakers
                 .map(p => (
                   <div
                     key={p.identity}
@@ -454,7 +454,7 @@ export function VideoRoomUI({
                     )}
                   </div>
                 ))}
-              {participants.filter(p => !p.isRemote).length === 0 && (
+              {participants.filter(p => p.identity !== localParticipant.identity).length === 0 && (
                 <p className="px-2 text-sm text-zinc-500">No speakers yet</p>
               )}
             </div>
@@ -463,7 +463,7 @@ export function VideoRoomUI({
             <div>
               <p className="mb-2 px-2 text-xs font-medium uppercase text-zinc-500">Audience</p>
               {participants
-                .filter(p => p.isRemote)
+                .filter(p => p.identity === localParticipant.identity)
                 .slice(0, 10)
                 .map(p => (
                   <div
@@ -476,9 +476,9 @@ export function VideoRoomUI({
                     <span className="text-sm text-zinc-400">{p.name || "Unknown"}</span>
                   </div>
                 ))}
-              {participants.filter(p => p.isRemote).length > 10 && (
+              {participants.filter(p => p.identity === localParticipant.identity).length > 10 && (
                 <p className="px-2 text-sm text-zinc-500">
-                  +{participants.filter(p => p.isRemote).length - 10} more
+                  +{participants.filter(p => p.identity === localParticipant.identity).length - 10} more
                 </p>
               )}
             </div>
