@@ -9,13 +9,6 @@ const LIVEKIT_URL = process.env.LIVEKIT_URL || "wss://unytea-livekit.livekit.clo
 const LIVEKIT_API_KEY = process.env.LIVEKIT_API_KEY || "";
 const LIVEKIT_API_SECRET = process.env.LIVEKIT_API_SECRET || "";
 
-// S3/R2 configuration for egress output
-const S3_BUCKET = process.env.RECORDING_BUCKET || "unytea-recordings";
-const S3_REGION = process.env.RECORDING_REGION || "us-west-2";
-const S3_ACCESS_KEY = process.env.RECORDING_ACCESS_KEY || "";
-const S3_SECRET_KEY = process.env.RECORDING_SECRET_KEY || "";
-const S3_ENDPOINT = process.env.RECORDING_ENDPOINT; // Optional (for R2)
-
 // Initialize egress client
 function getEgressClient(): EgressClient | null {
   if (!LIVEKIT_API_KEY || !LIVEKIT_API_SECRET) {
@@ -100,7 +93,7 @@ export async function startCompositeRecording(
         status: "PROCESSING",
         egressId: egressInfo.egressId,
         processingStartedAt: new Date(),
-        storageProvider: S3_ENDPOINT ? "r2" : "s3",
+        storageProvider: "s3", // Default to s3, actual provider set in LiveKit Cloud
       },
     });
 
