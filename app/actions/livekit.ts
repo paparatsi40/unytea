@@ -438,7 +438,7 @@ export async function getSessionParticipants(
         image: p.user.image,
         role: p.role,
         joinedAt: p.joinedAt,
-        durationSeconds: p.durationSeconds,
+        durationSeconds: p.durationSeconds || 0,
         messagesCount: p.messagesCount,
         reactionsCount: p.reactionsCount,
         handRaisedCount: p.handRaisedCount,
