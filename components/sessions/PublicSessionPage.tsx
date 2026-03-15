@@ -46,7 +46,7 @@ interface PublicSessionPageProps {
       createdAt: Date;
     } | null;
   };
-  relatedSessions: {
+  relatedSessions?: {
     id: string;
     slug: string | null;
     title: string;
@@ -261,7 +261,7 @@ export function PublicSessionPage({ session, relatedSessions }: PublicSessionPag
             </Tabs>
 
             {/* Related Sessions */}
-            {relatedSessions.length > 0 && (
+            {relatedSessions && relatedSessions.length > 0 && (
               <div className="mt-8">
                 <h3 className="mb-4 text-xl font-semibold text-white">
                   More from {session.community.name}
