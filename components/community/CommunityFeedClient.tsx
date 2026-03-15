@@ -5,6 +5,11 @@ import { useRouter } from "next/navigation";
 import { PremiumPostFeed } from "@/components/community/PremiumPostFeed";
 import { Users, Loader2 } from "lucide-react";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import {
+  getCommunityUpcomingSession,
+  getCommunityHotDiscussions,
+  getCommunityPinnedRecap,
+} from "@/app/actions/community-feed";
 
 type Post = {
   id: string;
@@ -33,6 +38,25 @@ type Post = {
   };
 };
 
+type UpcomingSession = {
+  id: string;
+  title: string;
+  slug: string | null;
+  scheduledAt: Date;
+  duration: number;
+  mode: string;
+  mentorName: string | null;
+  mentorImage: string | null;
+  attendeeCount: number;
+};
+
+type HotTopic = {
+  id: string;
+  title: string;
+  commentCount: number;
+  authorName: string | null;
+};
+
 export function CommunityFeedClient({
   slug,
 }: {
@@ -47,6 +71,8 @@ export function CommunityFeedClient({
     isPending: boolean;
     isPrivate: boolean;
   } | null>(null);
+  const [upcomingSession, setUpcomingSession] = useState<UpcomingSession | null>(null);
+  const [hotTopics, setHotTopics] = useState<HotTopic[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -77,7 +103,7 @@ export function CommunityFeedClient({
         const { community, membership: membershipData } = communityData;
 
         console.log("✅ Community loaded:", community.id, community.name);
-        setCommunityId(community.id); // ← FIX: Set the communityId
+        setCommunityId(community.id);
 
         const isMember = membershipData?.status === "ACTIVE";
         const isPending = membershipData?.status === "PENDING";
@@ -87,13 +113,23 @@ export function CommunityFeedClient({
 
         // Fetch posts if member or public community
         if (isMember || !isPrivate) {
-          const postsResponse = await fetch(
-            `/api/communities/${slug}/posts?userId=${user.id}`
-          );
+          const [postsResponse, sessionRes, topicsRes] = await Promise.all([
+            fetch(`/api/communities/${slug}/posts?userId=${user.id}`),
+            getCommunityUpcomingSession(community.id),
+            getCommunityHotDiscussions(community.id, 5),
+          ]);
 
           if (postsResponse.ok) {
             const postsData = await postsResponse.json();
             setPosts(postsData);
+          }
+
+          if (sessionRes.success) {
+            setUpcomingSession(sessionRes.session);
+          }
+
+          if (topicsRes.success) {
+            setHotTopics(topicsRes.topics || []);
           }
         }
       } catch (err) {
@@ -134,7 +170,12 @@ export function CommunityFeedClient({
   return (
     <div className="container mx-auto px-6 py-12">
       {isMember || !isPrivate ? (
-        <PremiumPostFeed posts={posts} communityId={communityId} />
+        <PremiumPostFeed 
+          posts={posts} 
+          communityId={communityId}
+          upcomingSession={upcomingSession}
+          hotTopics={hotTopics}
+        />
       ) : isPending ? (
         /* Pending Approval State */
         <div className="mx-auto max-w-2xl rounded-2xl border-2 border-dashed border-amber-500/20 bg-gradient-to-br from-amber-500/5 to-amber-500/10 p-12 text-center">
