@@ -14,8 +14,8 @@ export function SessionJsonLd({ session }: Props) {
     "@context": "https://schema.org",
     "@type": "Event",
     name: session.title,
-    description: session.description || `Join ${session.mentor.name} for an interactive session`,
-    image: session.community?.imageUrl || session.mentor.image || "https://www.unytea.com/og-image.png",
+    description: session.description || `Join ${session.host.name} for an interactive session`,
+    image: session.community?.imageUrl || session.host.image || "https://www.unytea.com/og-image.png",
     startDate: session.scheduledAt.toISOString(),
     endDate: new Date(
       session.scheduledAt.getTime() + session.duration * 60000
