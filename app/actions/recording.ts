@@ -342,8 +342,7 @@ export async function autoStartRecording(sessionId: string): Promise<void> {
  * Optional: if you want to keep recordings private
  */
 export async function getSignedRecordingUrl(
-  recordingId: string,
-  expiresInSeconds: number = 3600
+  recordingId: string
 ): Promise<{ success: boolean; url?: string; error?: string }> {
   try {
     const userId = await getCurrentUserId();
