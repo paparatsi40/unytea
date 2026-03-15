@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: PublicSessionRouteProps): Pro
       url: `https://unytea.com/sessions/${session.slug}`,
       images: [
         {
-          url: session.community.image || "/og-default.jpg",
+          url: session.community.imageUrl || "/og-default.jpg",
           width: 1200,
           height: 630,
           alt: session.title,
@@ -56,7 +56,7 @@ export async function generateMetadata({ params }: PublicSessionRouteProps): Pro
       card: "summary_large_image",
       title,
       description,
-      images: [session.community.image || "/og-default.jpg"],
+      images: [session.community.imageUrl || "/og-default.jpg"],
     },
     alternates: {
       canonical: `https://unytea.com/sessions/${session.slug}`,

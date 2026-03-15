@@ -238,7 +238,7 @@ export function PublicSessionPage({ session, relatedSessions }: PublicSessionPag
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4">
                       <Avatar className="h-16 w-16">
-                        <AvatarImage src={session.community.image || undefined} />
+                        <AvatarImage src={session.community.imageUrl || undefined} />
                         <AvatarFallback className="bg-zinc-700 text-white">
                           {session.community.name.charAt(0).toUpperCase()}
                         </AvatarFallback>
@@ -300,7 +300,7 @@ export function PublicSessionPage({ session, relatedSessions }: PublicSessionPag
               <CardContent className="p-6">
                 <div className="mb-4 flex items-center gap-3">
                   <Avatar className="h-12 w-12">
-                    <AvatarImage src={session.community.image || undefined} />
+                    <AvatarImage src={session.community.imageUrl || undefined} />
                     <AvatarFallback className="bg-zinc-700">
                       {session.community.name.charAt(0).toUpperCase()}
                     </AvatarFallback>
