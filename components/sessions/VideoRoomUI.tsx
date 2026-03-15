@@ -196,13 +196,6 @@ export function VideoRoomUI({
     setPinnedQuestion(null);
   }, []);
 
-  // Handle reaction
-  const handleReaction = useCallback((emoji: string) => {
-    // TODO: Send reaction via LiveKit data channel
-    console.log("Reaction:", emoji);
-    setShowReactions(false);
-  }, []);
-
   // Format time ago
   const formatTimeAgo = (timestamp: number) => {
     const seconds = Math.floor((Date.now() - timestamp) / 1000);
@@ -578,20 +571,20 @@ export function VideoRoomUI({
             <Monitor className="h-5 w-5" />
           </button>
 
-          {/* Reactions */}
-          <div className="relative">
-            <button
-              onClick={() => setShowReactions(!showReactions)}
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-800 text-white transition-all hover:bg-zinc-700"
-            >
-              <Smile className="h-5 w-5" />
-            </button>
-            {showReactions && (
-              <div className="absolute bottom-full left-1/2 mb-2 -translate-x-1/2">
-                <ReactionsBar onReaction={handleReaction} />
-              </div>
-            )}
-          </div>
+                      {/* Reactions */}
+            <div className="relative">
+              <button
+                onClick={() => setShowReactions(!showReactions)}
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-800 text-white transition-all hover:bg-zinc-700"
+              >
+                <Smile className="h-5 w-5" />
+              </button>
+              {showReactions && (
+                <div className="absolute bottom-full left-1/2 mb-2 -translate-x-1/2">
+                  <ReactionsBar />
+                </div>
+              )}
+            </div>
         </div>
 
         {/* Center: Session Info (mobile only) */}
