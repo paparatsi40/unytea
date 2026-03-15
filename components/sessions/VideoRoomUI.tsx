@@ -341,7 +341,6 @@ export function VideoRoomUI({
           <div className="flex-1 overflow-hidden">
             <SessionNotesEditor
               sessionId={sessionId || ""}
-              minimal
             />
           </div>
         </div>
