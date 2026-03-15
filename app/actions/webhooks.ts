@@ -3,6 +3,7 @@
 import { WebhookReceiver } from "livekit-server-sdk";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { autoStartRecording } from "./recording";
 
 // Webhook secret from LiveKit Cloud dashboard
 const WEBHOOK_SECRET = process.env.LIVEKIT_WEBHOOK_SECRET || "";
@@ -103,6 +104,9 @@ async function handleRoomStarted(event: any) {
       startedAt: new Date(),
     },
   });
+
+  // Auto-start recording
+  await autoStartRecording(sessionId);
 
   // Log event
   await logSessionEvent(sessionId, "ROOM_STARTED", {
