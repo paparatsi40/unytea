@@ -3,7 +3,19 @@ import { redirect, notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Video, Calendar, Clock, ArrowRight, Sparkles } from "lucide-react";
 import { CreateSessionDialog } from "@/components/sessions/CreateSessionDialog";
-import { format, isToday, isTomorrow, formatDistanceToNow } from "date-fns";
+import {
+  format,
+  isToday,
+  isTomorrow,
+  formatDistanceToNow,
+  startOfMonth,
+  endOfMonth,
+  startOfWeek,
+  endOfWeek,
+  eachDayOfInterval,
+  isSameMonth,
+  isSameDay,
+} from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
@@ -50,17 +62,7 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
     }
 
     const isOwner = community.ownerId === session.user.id;
-    const canCreateSessions = true; // TEMP: Force true for debugging
-    const hasAdminRole = community.members.some(m => m.role === "ADMIN" || m.role === "MODERATOR");
-    
-    console.log("DEBUG:", {
-      userId: session.user.id,
-      ownerId: community.ownerId,
-      isOwner,
-      hasAdminRole,
-      memberCount: community.members.length,
-      members: community.members.map(m => ({ role: m.role })),
-    });
+    const canCreateSessions = isOwner;
 
     // Get sessions for this community - now filtering by communityId
     let allSessions: any[] = [];
@@ -108,6 +110,21 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
       return sessionDate <= weekFromNow;
     });
 
+    // Calendar data (current month)
+    const monthStart = startOfMonth(now);
+    const monthEnd = endOfMonth(now);
+    const calendarStart = startOfWeek(monthStart, { weekStartsOn: 1 });
+    const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
+    const calendarDays = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
+
+    const sessionsThisMonth = allSessions.filter((s) => {
+      const d = new Date(s.scheduledAt);
+      return d >= monthStart && d <= monthEnd;
+    });
+
+    const getSessionsForDay = (day: Date) =>
+      allSessions.filter((s) => isSameDay(new Date(s.scheduledAt), day));
+
     return (
       <div className="min-h-screen bg-zinc-950">
         <div className="container mx-auto max-w-6xl px-4 py-6">
@@ -153,6 +170,9 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
               </TabsTrigger>
               <TabsTrigger value="past" className="data-[state=active]:bg-zinc-800 text-zinc-300">
                 Past ({past.length})
+              </TabsTrigger>
+              <TabsTrigger value="calendar" className="data-[state=active]:bg-zinc-800 text-zinc-300">
+                Calendar
               </TabsTrigger>
             </TabsList>
 
@@ -319,6 +339,98 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
                   ))}
                 </div>
               )}
+            </TabsContent>
+
+            <TabsContent value="calendar" className="space-y-6">
+              <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+                <div className="mb-4 flex items-center justify-between">
+                  <h3 className="text-lg font-semibold text-white">
+                    {format(monthStart, "MMMM yyyy")}
+                  </h3>
+                  <p className="text-sm text-zinc-400">
+                    {sessionsThisMonth.length} {sessionsThisMonth.length === 1 ? "session" : "sessions"} this month
+                  </p>
+                </div>
+
+                <div className="mb-2 grid grid-cols-7 gap-2 text-center text-xs text-zinc-500">
+                  {[
+                    "Mon",
+                    "Tue",
+                    "Wed",
+                    "Thu",
+                    "Fri",
+                    "Sat",
+                    "Sun",
+                  ].map((d) => (
+                    <div key={d} className="py-1 font-medium">
+                      {d}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="grid grid-cols-7 gap-2">
+                  {calendarDays.map((day) => {
+                    const daySessions = getSessionsForDay(day);
+                    const isCurrentMonth = isSameMonth(day, monthStart);
+                    const isTodayDate = isToday(day);
+
+                    return (
+                      <div
+                        key={day.toISOString()}
+                        className={`min-h-[92px] rounded-lg border p-2 ${
+                          isCurrentMonth
+                            ? "border-zinc-800 bg-zinc-950"
+                            : "border-zinc-900 bg-zinc-950/40"
+                        } ${isTodayDate ? "ring-1 ring-purple-500/70" : ""}`}
+                      >
+                        <div className={`text-xs font-medium ${isCurrentMonth ? "text-zinc-300" : "text-zinc-600"}`}>
+                          {format(day, "d")}
+                        </div>
+
+                        <div className="mt-1 space-y-1">
+                          {daySessions.slice(0, 2).map((s) => (
+                            <Link key={s.id} href={`/dashboard/sessions/${s.id}`}>
+                              <div className="truncate rounded bg-purple-600/20 px-1.5 py-0.5 text-[10px] text-purple-300 hover:bg-purple-600/30">
+                                {formatSessionTime(new Date(s.scheduledAt))} • {s.title}
+                              </div>
+                            </Link>
+                          ))}
+                          {daySessions.length > 2 && (
+                            <div className="text-[10px] text-zinc-500">+{daySessions.length - 2} more</div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+                <h3 className="mb-4 text-sm font-semibold text-white">Upcoming in this month</h3>
+                {sessionsThisMonth.filter((s) => new Date(s.scheduledAt) >= now).length === 0 ? (
+                  <p className="text-sm text-zinc-500">No upcoming sessions this month.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {sessionsThisMonth
+                      .filter((s) => new Date(s.scheduledAt) >= now)
+                      .sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime())
+                      .slice(0, 8)
+                      .map((s) => (
+                        <Link key={s.id} href={`/dashboard/sessions/${s.id}`}>
+                          <div className="flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 hover:border-zinc-700">
+                            <div>
+                              <p className="text-sm font-medium text-white">{s.title}</p>
+                              <p className="text-xs text-zinc-500">
+                                {format(new Date(s.scheduledAt), "EEE, MMM d • h:mm a")}
+                              </p>
+                            </div>
+                            <Badge className="bg-zinc-800 text-zinc-300">{s.duration || 60} min</Badge>
+                          </div>
+                        </Link>
+                      ))}
+                  </div>
+                )}
+              </div>
             </TabsContent>
           </Tabs>
         </div>
