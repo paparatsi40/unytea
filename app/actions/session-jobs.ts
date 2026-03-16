@@ -300,6 +300,11 @@ export async function sendSessionReminders() {
 
             if (alreadySent) continue;
 
+            const reminderLink =
+              session.visibility === "public" && session.slug
+                ? `/sessions/${session.slug}`
+                : `/dashboard/sessions/${session.id}`;
+
             await prisma.notification.create({
               data: {
                 type: "SESSION_REMINDER",
@@ -311,6 +316,7 @@ export async function sendSessionReminders() {
                   title: session.title,
                   scheduledAt: session.scheduledAt.toISOString(),
                   reminderType: window.key,
+                  link: reminderLink,
                 },
                 userId,
               },
