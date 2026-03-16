@@ -29,11 +29,16 @@ export async function generateMetadata({ params }: PublicSessionRouteProps): Pro
   const description = session.description || 
     `Watch this session from ${communityName} hosted by ${hostName}. Join the community to access more live sessions and recordings.`;
 
+  const isIndexable = session.visibility === "public";
+
   return {
     title,
     description,
     keywords: [session.title, hostName, communityName, "live session", "recording", "community learning"],
     authors: [{ name: hostName }],
+    robots: isIndexable
+      ? { index: true, follow: true }
+      : { index: false, follow: false, nocache: true },
     openGraph: {
       title,
       description,
