@@ -231,11 +231,16 @@ export default async function ExploreCommunitiesPage({
   return (
     <div className="min-h-screen bg-background">
       <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground">Explore Communities</h1>
-          <p className="mt-2 text-muted-foreground">
-            Discover communities, preview what is next, and join your people.
-          </p>
+        <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Explore Communities</h1>
+            <p className="mt-2 text-muted-foreground">
+              Discover communities, preview what is next, and join your people.
+            </p>
+          </div>
+          <Button asChild variant="outline">
+            <Link href={`/${locale}/library?src=explore`}>Open Library</Link>
+          </Button>
         </div>
 
         <form className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-6" method="GET">
