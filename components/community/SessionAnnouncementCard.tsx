@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { format, isToday, isTomorrow, formatDistanceToNow } from "date-fns";
-import { Video, Calendar, Clock, Users, ArrowRight, Sparkles } from "lucide-react";
+import { Video, Calendar, Clock, Users, ArrowRight, Sparkles, Radio } from "lucide-react";
 import { getSessionRSVPStatus, toggleSessionRSVP } from "@/app/actions/sessions";
 import { askQuestionForNextSession } from "@/app/actions/public-sessions";
 import { getSessionFeedState } from "@/app/actions/community-feed";
@@ -176,9 +176,18 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <Badge className="bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0 text-xs">
-              <Sparkles className="mr-1 h-3 w-3" />
-              {isLive ? "Live now" : hasRecording ? "Recording ready" : "Live Session"}
+            <Badge className={`border-0 text-xs ${isLive ? "bg-red-600 text-white" : "bg-gradient-to-r from-purple-600 to-pink-600 text-white"}`}>
+              {isLive ? (
+                <>
+                  <Radio className="mr-1 h-3 w-3 animate-pulse" />
+                  Live now
+                </>
+              ) : (
+                <>
+                  <Sparkles className="mr-1 h-3 w-3" />
+                  {hasRecording ? "Recording ready" : "Live Session"}
+                </>
+              )}
             </Badge>
             <span className="text-xs text-zinc-500">
               {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
@@ -293,7 +302,19 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
             </Button>
           )}
 
-          {hasRecording && sessionState?.recordingUrl ? (
+          {isLive ? (
+            <Link href={`/dashboard/sessions/${sessionData.sessionId}/room`}>
+              <Button
+                className={`w-full rounded-full bg-red-600 text-white font-semibold shadow-md transition-all hover:bg-red-700 ${
+                  isHovered ? "shadow-lg scale-[1.02]" : ""
+                }`}
+              >
+                <Radio className="mr-2 h-4 w-4 animate-pulse" />
+                Join Live Now
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+          ) : hasRecording && sessionState?.recordingUrl ? (
             <Link href={sessionState.recordingUrl} target="_blank">
               <Button
                 className={`w-full rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold shadow-md transition-all ${
@@ -313,7 +334,7 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
                 }`}
               >
                 <Video className="mr-2 h-4 w-4" />
-                {isLive ? "Join Live Now" : isUpcoming ? "Join Session" : "Enter Room"}
+                {isUpcoming ? "Join Session" : "Enter Room"}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
