@@ -106,6 +106,7 @@ export function AddToCourseDialog({
         moduleId: selectedModuleId || undefined,
         lessonTitle: lessonTitle || undefined,
         isFree,
+        source: "add_to_course_dialog_existing",
       });
 
       if (result.success) {
@@ -137,6 +138,7 @@ export function AddToCourseDialog({
           description: newCourseDescription || undefined,
           isPaid: newCourseIsPaid,
           price: newCourseIsPaid ? parseFloat(newCoursePrice) || 0 : 0,
+          source: "add_to_course_dialog_new",
         }
       );
 

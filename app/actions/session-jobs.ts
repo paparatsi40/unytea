@@ -439,7 +439,8 @@ ${isAudioOnly ? "🎙️ Audio session" : "🎬 Video session"} • ${session.du
 ${session.description ? `*${session.description}*\n\n` : ""}${noteSummary ? `**Summary:**\n${noteSummary}\n\n` : ""}${keyTakeaways ? `**Key Takeaways:**\n${keyTakeaways}\n\n` : ""}${chaptersBlock}💬 **What was your biggest takeaway?**
 Share your thoughts below or ask follow-up questions.
 
-[Watch Recording →](/dashboard/sessions/${session.id})
+[Watch Recording →](/dashboard/sessions/${session.id}?src=recap_post)
+[Reuse in Course/Library →](/dashboard/sessions/${session.id}?src=recap_reuse_cta)
 `;
 
     // Create the feed post

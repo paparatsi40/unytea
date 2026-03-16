@@ -32,6 +32,7 @@ import { CreateSocialClipDialog } from "@/components/public-content/CreateSocial
 import { PostSessionFlow } from "@/components/sessions/PostSessionFlow";
 import { toast } from "sonner";
 import { shareSessionRecap } from "@/app/actions/session-jobs";
+import { createResourceFromSession } from "@/app/actions/session-course";
 
 interface SessionPageProps {
   params: { sessionId: string };
@@ -113,6 +114,29 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
       toast.error("Error sharing recap");
     } finally {
       setIsSharing(false);
+    }
+  }
+
+  async function handlePublishToLibrary() {
+    if (!session || session.status !== "COMPLETED") return;
+
+    try {
+      const result = await createResourceFromSession(session.id, {
+        source: "session_detail_post_session_flow",
+      });
+
+      if (!result.success) {
+        toast.error(result.error || "Failed to publish to library");
+        return;
+      }
+
+      toast.success("Session published to library");
+      if (session.community?.slug) {
+        router.push(`/dashboard/c/${session.community.slug}/library?src=session_reuse`);
+      }
+      await loadSession();
+    } catch {
+      toast.error("Failed to publish to library");
     }
   }
 
@@ -244,6 +268,7 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
           onShareRecap={handleShareRecap}
           onAddToCourse={() => setShowAddToCourse(true)}
           onCreateClip={() => setShowCreateClip(true)}
+          onPublishToLibrary={handlePublishToLibrary}
         />
         
         {/* Dialogs */}

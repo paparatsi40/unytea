@@ -19,6 +19,7 @@ import {
   Scissors,
   ChevronLeft,
   Radio,
+  Folder,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -63,6 +64,7 @@ interface PostSessionFlowProps {
   onShareRecap: () => Promise<void>;
   onAddToCourse: () => void;
   onCreateClip: () => void;
+  onPublishToLibrary: () => void;
 }
 
 export function PostSessionFlow({
@@ -71,6 +73,7 @@ export function PostSessionFlow({
   onShareRecap,
   onAddToCourse,
   onCreateClip,
+  onPublishToLibrary,
 }: PostSessionFlowProps) {
   const router = useRouter();
   const [activeAction, setActiveAction] = useState<string | null>(null);
@@ -263,6 +266,31 @@ export function PostSessionFlow({
                 <h3 className="font-semibold text-white">Create Clips</h3>
                 <p className="text-sm text-zinc-400">
                   Generate short clips for social media
+                </p>
+              </div>
+              <ArrowRight className="h-5 w-5 text-zinc-500" />
+            </CardContent>
+          </Card>
+
+          {/* Publish to Library */}
+          <Card
+            className={cn(
+              "cursor-pointer border-zinc-800 bg-zinc-900/50 transition-all hover:border-cyan-500/50 hover:bg-zinc-800/50",
+              activeAction === "library" && "border-cyan-500 bg-zinc-800"
+            )}
+            onClick={() => {
+              setActiveAction("library");
+              onPublishToLibrary();
+            }}
+          >
+            <CardContent className="flex items-start gap-4 p-5">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-cyan-500/20">
+                <Folder className="h-6 w-6 text-cyan-400" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-white">Publish to Library</h3>
+                <p className="text-sm text-zinc-400">
+                  Turn this recap into a reusable library resource
                 </p>
               </div>
               <ArrowRight className="h-5 w-5 text-zinc-500" />

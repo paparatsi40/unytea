@@ -4,6 +4,27 @@ import { revalidatePath } from "next/cache";
 import { getCurrentUserId } from "@/lib/auth-utils";
 import { prisma } from "@/lib/prisma";
 
+function normalizeSource(source?: string) {
+  return (source || "unknown")
+    .toLowerCase()
+    .replace(/[^a-z0-9_:-]/g, "_")
+    .slice(0, 80);
+}
+
+function trackReuseConversion(params: {
+  eventName: "session_to_course" | "session_to_new_course" | "session_to_resource";
+  sessionId: string;
+  userId: string;
+  source?: string;
+  extra?: Record<string, unknown>;
+}) {
+  console.info("[ReuseConversionEvent]", {
+    at: new Date().toISOString(),
+    ...params,
+    source: normalizeSource(params.source),
+  });
+}
+
 /**
  * Add a session to a course as a lesson
  * This converts a live session into permanent course content
@@ -15,6 +36,7 @@ export async function addSessionToCourse(
     moduleId?: string; // Optional: specific module, otherwise creates "Live Sessions" module
     lessonTitle?: string; // Optional: custom title, otherwise uses session title
     isFree?: boolean; // Optional: make lesson free (default: false)
+    source?: string;
   }
 ) {
   try {
@@ -139,15 +161,25 @@ export async function addSessionToCourse(
     });
 
     // Create a session resource to track this usage
+    const source = normalizeSource(options?.source);
+
     await prisma.sessionResource.create({
       data: {
         sessionId: sessionId,
         type: "video",
         title: `Added to course: ${course.title}`,
         url: `/dashboard/courses/${courseId}?lesson=${lesson.id}`,
-        description: `This session has been converted into a course lesson`,
+        description: `This session has been converted into a course lesson (source: ${source})`,
         createdById: userId,
       },
+    });
+
+    trackReuseConversion({
+      eventName: "session_to_course",
+      sessionId,
+      userId,
+      source,
+      extra: { courseId, lessonId: lesson.id, moduleId },
     });
 
     // Revalidate paths
@@ -227,6 +259,7 @@ export async function createCourseFromSession(
     description?: string;
     isPaid?: boolean;
     price?: number;
+    source?: string;
   }
 ) {
   try {
@@ -304,6 +337,8 @@ export async function createCourseFromSession(
       },
     });
 
+    const source = normalizeSource(options?.source);
+
     // Track this usage
     await prisma.sessionResource.create({
       data: {
@@ -311,9 +346,17 @@ export async function createCourseFromSession(
         type: "video",
         title: `Converted to course: ${courseTitle}`,
         url: `/dashboard/courses/${course.id}`,
-        description: `This session was converted into a standalone course`,
+        description: `This session was converted into a standalone course (source: ${source})`,
         createdById: userId,
       },
+    });
+
+    trackReuseConversion({
+      eventName: "session_to_new_course",
+      sessionId,
+      userId,
+      source,
+      extra: { courseId: course.id, lessonId: lesson.id },
     });
 
     revalidatePath(`/dashboard/courses/${course.id}`);
@@ -329,5 +372,124 @@ export async function createCourseFromSession(
   } catch (error) {
     console.error("Error creating course from session:", error);
     return { success: false, error: "Failed to create course" };
+  }
+}
+
+/**
+ * Create a library resource from a completed session recap
+ */
+export async function createResourceFromSession(
+  sessionId: string,
+  options?: {
+    source?: string;
+    title?: string;
+    description?: string;
+    isPublic?: boolean;
+  }
+) {
+  try {
+    const userId = await getCurrentUserId();
+
+    if (!userId) {
+      return { success: false, error: "Not authenticated" };
+    }
+
+    const session = await prisma.mentorSession.findUnique({
+      where: { id: sessionId },
+      include: {
+        community: { select: { id: true, slug: true } },
+        recording: { select: { url: true, durationSeconds: true } },
+        notes: { select: { summary: true, content: true } },
+      },
+    });
+
+    if (!session || session.mentorId !== userId) {
+      return { success: false, error: "Session not found or unauthorized" };
+    }
+
+    if (!session.community) {
+      return { success: false, error: "Session must belong to a community" };
+    }
+
+    const videoUrl = session.recordingUrl || session.recording?.url;
+    if (!videoUrl) {
+      return { success: false, error: "Recording not available yet" };
+    }
+
+    const baseTitle = options?.title?.trim() || `${session.title} - Replay`;
+    const baseSlug =
+      baseTitle
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "")
+        .slice(0, 70) || `session-${session.id.slice(0, 8)}`;
+
+    const source = normalizeSource(options?.source);
+
+    let slug = baseSlug;
+    let index = 2;
+    while (
+      await prisma.resource.findUnique({
+        where: { communityId_slug: { communityId: session.community.id, slug } },
+        select: { id: true },
+      })
+    ) {
+      slug = `${baseSlug}-${index}`;
+      index += 1;
+    }
+
+    const resource = await prisma.resource.create({
+      data: {
+        title: baseTitle,
+        slug,
+        description:
+          options?.description?.trim() ||
+          session.notes?.summary ||
+          session.notes?.content?.slice(0, 300) ||
+          `Replay from session: ${session.title}`,
+        type: "VIDEO",
+        status: "PUBLISHED",
+        externalUrl: videoUrl,
+        duration: session.recording?.durationSeconds || (session.duration || 0) * 60,
+        tags: ["session", "replay", "ai-summary"],
+        isPublic: options?.isPublic ?? true,
+        communityId: session.community.id,
+        authorId: userId,
+        publishedAt: new Date(),
+      },
+      select: { id: true, slug: true, communityId: true },
+    });
+
+    await prisma.sessionResource.create({
+      data: {
+        sessionId,
+        type: "doc",
+        title: `Published to library: ${resource.slug}`,
+        url: `/dashboard/c/${session.community.slug}/library/${resource.id}`,
+        description: `Resource published from session recap (source: ${source})`,
+        createdById: userId,
+      },
+    });
+
+    trackReuseConversion({
+      eventName: "session_to_resource",
+      sessionId,
+      userId,
+      source,
+      extra: { resourceId: resource.id, communityId: resource.communityId },
+    });
+
+    revalidatePath(`/dashboard/c/${session.community.slug}/library`);
+    revalidatePath(`/dashboard/sessions/${sessionId}`);
+
+    return {
+      success: true,
+      resourceId: resource.id,
+      resourceSlug: resource.slug,
+      message: "Session published to library",
+    };
+  } catch (error) {
+    console.error("Error creating resource from session:", error);
+    return { success: false, error: "Failed to publish session to library" };
   }
 }
