@@ -370,8 +370,11 @@ const sessionDate = new Date(s.scheduledAt);
                 <span className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-zinc-300">
                   Visibility: {primarySession.visibility}
                 </span>
+                <span className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-zinc-400">
+                  Last updated: {new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
+                </span>
               </div>
-              <div className="flex flex-wrap gap-2">
+<div className="flex flex-wrap gap-2">
                 <Link href={`/dashboard/sessions/${primarySession.id}/room?src=sessions_hub_qa`}>
                   <Button size="sm" className="bg-emerald-600 text-white hover:bg-emerald-700">
                     Join room
