@@ -374,7 +374,11 @@ async function handleEgressEnded(event: any) {
 
     const sessionWithParticipants = await prisma.mentorSession.findUnique({
       where: { id: sessionId },
-      include: {
+      select: {
+        title: true,
+        slug: true,
+        mentorId: true,
+        menteeId: true,
         participations: { select: { userId: true } },
       },
     });
@@ -387,17 +391,38 @@ async function handleEgressEnded(event: any) {
       ];
 
       const uniqueTargetUserIds = [...new Set(targetUserIds.filter(Boolean))];
+      const replayLink = sessionWithParticipants.slug
+        ? `/sessions/${sessionWithParticipants.slug}`
+        : `/dashboard/recordings`;
 
       for (const userId of uniqueTargetUserIds) {
+        const notificationKey = `recording_ready:${sessionId}:${recording.id}:${userId}`;
+
+        const alreadySent = await prisma.notification.findFirst({
+          where: {
+            userId,
+            type: "SYSTEM",
+            data: {
+              path: ["notificationKey"],
+              equals: notificationKey,
+            },
+          },
+          select: { id: true },
+        });
+
+        if (alreadySent) continue;
+
         await createNotification({
           userId,
           type: "SYSTEM",
           title: "Recording is ready",
           message: `The recording for \"${sessionWithParticipants.title}\" is now available.`,
           data: {
+            notificationKey,
             sessionId,
             recordingId: recording.id,
             recordingUrl: fileResult.filename,
+            link: replayLink,
             type: "recording_ready",
           },
         });
