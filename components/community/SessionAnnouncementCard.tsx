@@ -303,8 +303,8 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
           )}
 
           {isLive ? (
-            <Link href={`/dashboard/sessions/${sessionData.sessionId}/room`}>
-              <Button
+            <Link href={`/dashboard/sessions/${sessionData.sessionId}/room?src=feed_session_card_live`}>
+<Button
                 className={`w-full rounded-full bg-red-600 text-white font-semibold shadow-md transition-all hover:bg-red-700 ${
                   isHovered ? "shadow-lg scale-[1.02]" : ""
                 }`}
@@ -327,8 +327,7 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
               </Button>
             </Link>
           ) : (
-            <Link href={`/dashboard/sessions/${sessionData.sessionId}/room`}>
-              <Button
+            <Link href={`/dashboard/sessions/${sessionData.sessionId}/room?src=feed_session_card`}><Button
                 className={`w-full rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold shadow-md transition-all ${
                   isHovered ? "shadow-lg scale-[1.02]" : ""
                 }`}
