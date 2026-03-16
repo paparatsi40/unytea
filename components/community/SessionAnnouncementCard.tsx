@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { format, isToday, isTomorrow, formatDistanceToNow } from "date-fns";
 import { Video, Calendar, Clock, Users, ArrowRight, Sparkles } from "lucide-react";
 import { getSessionRSVPStatus, toggleSessionRSVP } from "@/app/actions/sessions";
+import { askQuestionForNextSession } from "@/app/actions/public-sessions";
 import { toast } from "sonner";
 
 interface SessionAnnouncementCardProps {
@@ -15,6 +16,7 @@ interface SessionAnnouncementCardProps {
     title: string | null;
     content: string;
     createdAt: Date;
+    communityId?: string;
     author: {
       id: string;
       name: string | null;
@@ -39,6 +41,8 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
   const [isAttending, setIsAttending] = useState(false);
   const [attendingCount, setAttendingCount] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [question, setQuestion] = useState("");
+  const [isQuestionSubmitting, setIsQuestionSubmitting] = useState(false);
 
   if (!sessionData?.sessionId) {
     // Fallback to regular rendering if no session data
@@ -101,8 +105,41 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
     }
   };
 
+  const handleAskQuestion = async () => {
+    if (!post.communityId) {
+      toast.error("Community context missing");
+      return;
+    }
+
+    const trimmed = question.trim();
+    if (trimmed.length < 5) {
+      toast.error("Write at least 5 characters");
+      return;
+    }
+
+    setIsQuestionSubmitting(true);
+    try {
+      const result = await askQuestionForNextSession({
+        communityId: post.communityId,
+        question: trimmed,
+      });
+
+      if (!result.success) {
+        toast.error(result.error || "Could not post question");
+        return;
+      }
+
+      setQuestion("");
+      toast.success("Question added to discussion");
+    } catch {
+      toast.error("Could not post question");
+    } finally {
+      setIsQuestionSubmitting(false);
+    }
+  };
+
   return (
-<div
+    <div
       className="group relative overflow-hidden rounded-2xl border border-purple-200/50 bg-gradient-to-br from-purple-50 via-white to-pink-50 shadow-lg transition-all duration-300 hover:shadow-xl hover:border-purple-300"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -190,6 +227,31 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
           </div>
         )}
 
+        {/* Pre-live discussion */}
+        {isUpcoming && (
+          <div className="mt-5 rounded-xl border border-purple-200/70 bg-white/80 p-3">
+            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-purple-700">
+              Pre-session discussion
+            </p>
+            <div className="flex gap-2">
+              <input
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                placeholder="Drop your question for the host..."
+                className="flex-1 rounded-md border border-purple-200 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-purple-400"
+              />
+              <Button
+                type="button"
+                onClick={handleAskQuestion}
+                disabled={isQuestionSubmitting}
+                className="bg-purple-600 text-white hover:bg-purple-700"
+              >
+                {isQuestionSubmitting ? "Posting..." : "Ask"}
+              </Button>
+            </div>
+          </div>
+        )}
+
         {/* CTA Buttons */}
         <div className="mt-5 space-y-2">
           {isUpcoming && (
@@ -226,9 +288,9 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
             </Button>
           </Link>
         </div>
-</div>
+      </div>
 
-      {/* Bottom decoration */}
+      {/* Bottom decoration */
       <div className="relative h-1 w-full bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500" />
     </div>
   );

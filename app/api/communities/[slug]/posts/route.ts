@@ -76,6 +76,7 @@ export async function GET(
         contentType: true,
         attachments: true,
         createdAt: true,
+        communityId: true,
         author: {
           select: {
             id: true,
