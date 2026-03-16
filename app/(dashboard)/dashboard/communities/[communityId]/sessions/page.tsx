@@ -400,8 +400,8 @@ const sessionDate = new Date(s.scheduledAt);
                     <span>{primarySession._count?.participations || 0} attending</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Link href={`/dashboard/sessions/${primarySession.id}/room`}>
-                      <Button className={`${primarySession.status === "IN_PROGRESS" ? "bg-red-600 hover:bg-red-700" : "bg-purple-600 hover:bg-purple-700"} text-white`}>
+                    <Link href={`/dashboard/sessions/${primarySession.id}/room?src=sessions_hub_next_live`}>
+<Button className={`${primarySession.status === "IN_PROGRESS" ? "bg-red-600 hover:bg-red-700" : "bg-purple-600 hover:bg-purple-700"} text-white`}>
                         {primarySession.status === "IN_PROGRESS" ? "Join Live Now" : "Join Session"}
                         <ArrowRight className="ml-1 h-4 w-4" />
                       </Button>
