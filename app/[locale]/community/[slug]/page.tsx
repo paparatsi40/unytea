@@ -6,6 +6,7 @@ import { joinCommunity } from "@/app/actions/communities";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Users, Calendar } from "lucide-react";
+import { headers } from "next/headers";
 
 function formatHostName(owner: {
   name: string | null;
@@ -27,12 +28,30 @@ function formatSchedule(date: Date | null) {
   });
 }
 
+function trackPublicCommunityEvent(params: {
+  eventName: "community_preview_view" | "join_cta_click" | "join_success";
+  communityId: string;
+  communitySlug: string;
+  source: string;
+  locale: string;
+  userId?: string | null;
+  extra?: Record<string, unknown>;
+}) {
+  console.info("[PublicDiscoveryEvent]", {
+    at: new Date().toISOString(),
+    ...params,
+  });
+}
+
 export default async function CommunityPublicPreviewPage({
   params,
+  searchParams,
 }: {
   params: { locale: string; slug: string };
+  searchParams?: { src?: string; rank?: string; sort?: string };
 }) {
   const { slug, locale } = params;
+  const source = searchParams?.src || "direct";
 
   const community = await prisma.community.findUnique({
     where: { slug },
@@ -94,6 +113,23 @@ export default async function CommunityPublicPreviewPage({
   const userId = session?.user?.id;
   let membershipStatus: "ACTIVE" | "PENDING" | null = null;
 
+  const headerBag = headers();
+  const userAgent = headerBag.get("user-agent") || "unknown";
+
+  trackPublicCommunityEvent({
+    eventName: "community_preview_view",
+    communityId: currentCommunity.id,
+    communitySlug: currentCommunity.slug,
+    source,
+    locale,
+    userId,
+    extra: {
+      rank: searchParams?.rank || null,
+      sort: searchParams?.sort || null,
+      userAgent,
+    },
+  });
+
   if (userId) {
     const membership = await prisma.member.findUnique({
       where: {
@@ -115,12 +151,34 @@ export default async function CommunityPublicPreviewPage({
     "use server";
 
     const joiner = await auth();
+
+    trackPublicCommunityEvent({
+      eventName: "join_cta_click",
+      communityId: currentCommunity.id,
+      communitySlug: currentCommunity.slug,
+      source,
+      locale,
+      userId: joiner?.user?.id,
+      extra: {
+        rank: searchParams?.rank || null,
+        sort: searchParams?.sort || null,
+      },
+    });
+
     if (!joiner?.user?.id) {
       redirect(`/auth/signin?callbackUrl=/${locale}/community/${slug}`);
     }
 
     const result = await joinCommunity(currentCommunity.id);
     if (result.success) {
+      trackPublicCommunityEvent({
+        eventName: "join_success",
+        communityId: currentCommunity.id,
+        communitySlug: currentCommunity.slug,
+        source,
+        locale,
+        userId: joiner.user.id,
+      });
       redirect(`/dashboard/c/${currentCommunity.slug}`);
     }
 
@@ -201,14 +259,10 @@ export default async function CommunityPublicPreviewPage({
               </Link>
             ) : membershipStatus === "PENDING" ? (
               <Button disabled>Request pending approval</Button>
-            ) : userId ? (
-              <form action={handleJoin}>
-                <Button type="submit">Join now</Button>
-              </form>
             ) : (
-              <Link href={`/auth/signin?callbackUrl=/${locale}/community/${currentCommunity.slug}`}>
-                <Button>Sign in to join</Button>
-              </Link>
+              <form action={handleJoin}>
+                <Button type="submit">{userId ? "Join now" : "Sign in to join"}</Button>
+              </form>
             )}
             <Link href={`/${locale}/explore`}>
               <Button variant="outline">Back to explore</Button>
