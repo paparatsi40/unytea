@@ -413,6 +413,7 @@ export async function generateSessionRecap(sessionId: string) {
     // Extract AI summary package (if available)
     const noteSummary = session.notes?.summary?.trim() || "";
     const parsedInsights = safeParseStringArray(session.notes?.keyInsights || null);
+    const parsedChapters = safeParseChapters(session.notes?.resources || null);
 
     let keyTakeaways = "";
     if (parsedInsights.length > 0) {
@@ -422,13 +423,20 @@ export async function generateSessionRecap(sessionId: string) {
       keyTakeaways = lines.slice(0, 5).map((l: string) => `• ${l}`).join("\n");
     }
 
+    const chaptersBlock = parsedChapters.length
+      ? `**Chapters:**\n${parsedChapters
+          .slice(0, 5)
+          .map((c) => `• ${c.timestamp ? `${c.timestamp} — ` : ""}${c.title}`)
+          .join("\n")}\n\n`
+      : "";
+
     // Build rich content for the recap post
     const recapContent = `🎥 **Session Recap**
 
 ${session.title}
 ${isAudioOnly ? "🎙️ Audio session" : "🎬 Video session"} • ${session.duration} min • ${sessionDate}
 
-${session.description ? `*${session.description}*\n\n` : ""}${noteSummary ? `**Summary:**\n${noteSummary}\n\n` : ""}${keyTakeaways ? `**Key Takeaways:**\n${keyTakeaways}\n\n` : ""}💬 **What was your biggest takeaway?**
+${session.description ? `*${session.description}*\n\n` : ""}${noteSummary ? `**Summary:**\n${noteSummary}\n\n` : ""}${keyTakeaways ? `**Key Takeaways:**\n${keyTakeaways}\n\n` : ""}${chaptersBlock}💬 **What was your biggest takeaway?**
 Share your thoughts below or ask follow-up questions.
 
 [Watch Recording →](/dashboard/sessions/${session.id})
@@ -523,6 +531,23 @@ function safeParseStringArray(value: string | null): string[] {
   try {
     const parsed = JSON.parse(value);
     return Array.isArray(parsed) ? parsed.filter((item) => typeof item === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
+function safeParseChapters(value: string | null): { title: string; timestamp?: string }[] {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    if (!Array.isArray(parsed)) return [];
+
+    return parsed
+      .filter((item) => item?.type === "chapter" && typeof item?.title === "string")
+      .map((item) => ({
+        title: item.title as string,
+        timestamp: typeof item.timestamp === "string" ? item.timestamp : undefined,
+      }));
   } catch {
     return [];
   }
