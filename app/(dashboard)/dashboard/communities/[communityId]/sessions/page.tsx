@@ -137,8 +137,13 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
     const getSessionsForDay = (day: Date) =>
       allSessions.filter((s) => isSameDay(new Date(s.scheduledAt), day));
 
+    async function handleRSVP(sessionId: string, _formData: FormData) {
+      "use server";
+      await toggleSessionRSVP(sessionId, `/dashboard/communities/${communityId}/sessions`);
+    }
+
     return (
-      <div className="min-h-screen bg-zinc-950">
+<div className="min-h-screen bg-zinc-950">
         <div className="container mx-auto max-w-6xl px-4 py-6">
           {/* Header */}
           <div className="mb-8">
@@ -223,8 +228,8 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
                         <ArrowRight className="h-4 w-4 ml-1" />
                       </Button>
                     </Link>
-                    <form action={toggleSessionRSVP.bind(null, upcoming[0].id, `/dashboard/communities/${communityId}/sessions`)}>
-                      <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
+                    <form action={handleRSVP.bind(null, upcoming[0].id)}>
+<Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
                         {upcoming[0].participations?.length ? "Attending" : "RSVP"}
                       </Button>
                     </form>
@@ -301,8 +306,8 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
                             Join
                           </Button>
                         </Link>
-                        <form action={toggleSessionRSVP.bind(null, s.id, `/dashboard/communities/${communityId}/sessions`)}>
-                          <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
+                        <form action={handleRSVP.bind(null, s.id)}>
+<Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
                             {s.participations?.length ? "Attending" : "RSVP"}
                           </Button>
                         </form>
