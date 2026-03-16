@@ -60,8 +60,16 @@ function getAttendanceRecommendation(attendance: any) {
     };
   }
 
-  if ((attendance.trend?.avgAttendanceDelta || 0) > 0 || (attendance.trend?.rsvpToJoinRateDelta || 0) > 0) {
+  if (attendance.replayRate < 60 && attendance.completedSessions >= 2) {
     return {
+      title: "Replay capture opportunity",
+      description: "More sessions need replay distribution. Push recording-ready notifications and share public links.",
+      tone: "warning" as const,
+    };
+  }
+
+  if ((attendance.trend?.avgAttendanceDelta || 0) > 0 || (attendance.trend?.rsvpToJoinRateDelta || 0) > 0) {
+return {
       title: "Momentum is improving",
       description: "Keep cadence stable this week and push one extra live session announcement.",
       tone: "positive" as const,
