@@ -453,14 +453,22 @@ const sessionDate = new Date(s.scheduledAt);
                     <Video className="h-8 w-8 text-zinc-400" />
                   </div>
                   <h3 className="mb-2 text-lg font-medium text-white">
-                    Host your first live session for this community
+                    {filter === "live"
+                      ? "No sessions live right now"
+                      : filter === "today"
+                      ? "No sessions scheduled for today"
+                      : filter === "week"
+                      ? "No sessions scheduled this week"
+                      : "Host your first live session for this community"}
                   </h3>
                   <p className="mb-6 text-zinc-400 max-w-sm mx-auto">
-                    Run coaching calls, workshops, or Q&A sessions. Members love live interactions!
+                    {filter === "all"
+                      ? "Run coaching calls, workshops, or Q&A sessions. Members love live interactions!"
+                      : "Try another filter or schedule a new session to keep your weekly cadence."}
                   </p>
                   {canCreateSessions && (
                     <CreateSessionDialog
-                      triggerText="Schedule your first session"
+                      triggerText={filter === "all" ? "Schedule your first session" : "Schedule a session"}
                       className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2.5 rounded-lg font-medium inline-flex items-center gap-2"
                       communityId={communityId}
                     />
@@ -658,8 +666,8 @@ const sessionDate = new Date(s.scheduledAt);
                                 )}
 </>
                             ) : (
-                              <Link href={`/dashboard/sessions/${s.id}/room`}>
-                                <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
+                              <Link href={`/dashboard/sessions/${s.id}/room?src=sessions_hub_past_enter_room`}>
+<Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
                                   Enter Room
                                 </Button>
                               </Link>
@@ -721,8 +729,8 @@ const sessionDate = new Date(s.scheduledAt);
 
                         <div className="mt-1 space-y-1">
                           {daySessions.slice(0, 2).map((s) => (
-                            <Link key={s.id} href={`/dashboard/sessions/${s.id}`}>
-                              <div className="truncate rounded bg-purple-600/20 px-1.5 py-0.5 text-[10px] text-purple-300 hover:bg-purple-600/30">
+                            <Link key={s.id} href={`/dashboard/sessions/${s.id}?src=sessions_hub_calendar_day`}>
+<div className="truncate rounded bg-purple-600/20 px-1.5 py-0.5 text-[10px] text-purple-300 hover:bg-purple-600/30">
                                 {formatSessionTime(new Date(s.scheduledAt))} • {s.title}
                               </div>
                             </Link>
@@ -748,8 +756,8 @@ const sessionDate = new Date(s.scheduledAt);
                       .sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime())
                       .slice(0, 8)
                       .map((s) => (
-                        <Link key={s.id} href={`/dashboard/sessions/${s.id}`}>
-                          <div className="flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 hover:border-zinc-700">
+                        <Link key={s.id} href={`/dashboard/sessions/${s.id}?src=sessions_hub_calendar_list`}>
+<div className="flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 hover:border-zinc-700">
                             <div>
                               <p className="text-sm font-medium text-white">{s.title}</p>
                               <p className="text-xs text-zinc-500">
