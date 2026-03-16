@@ -390,6 +390,11 @@ const sessionDate = new Date(s.scheduledAt);
                     Notifications
                   </Button>
                 </Link>
+                <Link href={`/dashboard/c/${community.slug}?src=sessions_hub_qa`}>
+                  <Button size="sm" variant="outline" className="border-zinc-700 text-zinc-200">
+                    Community feed
+                  </Button>
+                </Link>
 {primarySession.visibility === "public" && primarySession.slug && (
                   <>
                     <Link href={`/sessions/${primarySession.slug}?ref=sessions_hub&src=qa_flow`} target="_blank">
