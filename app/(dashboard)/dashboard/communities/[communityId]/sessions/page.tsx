@@ -374,7 +374,7 @@ const sessionDate = new Date(s.scheduledAt);
                   Last updated: {new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
                 </span>
               </div>
-<div className="flex flex-wrap gap-2">
+              <div className="mb-3 flex flex-wrap gap-2">
                 <Link href={`/dashboard/sessions/${primarySession.id}/room?src=sessions_hub_qa`}>
                   <Button size="sm" className="bg-emerald-600 text-white hover:bg-emerald-700">
                     Join room
@@ -397,6 +397,12 @@ const sessionDate = new Date(s.scheduledAt);
                     </code>
                   </>
                 )}
+              </div>
+              <div className="grid gap-2 text-xs text-zinc-300 sm:grid-cols-2">
+                <div className="rounded border border-zinc-800 bg-zinc-900 px-3 py-2">✅ RSVP in session detail</div>
+                <div className="rounded border border-zinc-800 bg-zinc-900 px-3 py-2">✅ Join room and verify live</div>
+                <div className="rounded border border-zinc-800 bg-zinc-900 px-3 py-2">✅ End session and open replay</div>
+                <div className="rounded border border-zinc-800 bg-zinc-900 px-3 py-2">✅ Open public page and test join CTA</div>
               </div>
             </div>
           )}
