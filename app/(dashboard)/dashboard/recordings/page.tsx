@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Video, Play, Plus, Library, Clock, Users, Calendar } from "lucide-react";
+import { RecordingDistributionActions } from "@/components/sessions/RecordingDistributionActions";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 
@@ -26,11 +27,17 @@ async function getRecordedSessions(userId: string) {
     select: {
       id: true,
       title: true,
+      slug: true,
       description: true,
       scheduledAt: true,
       duration: true,
       recordingUrl: true,
       endedAt: true,
+      recording: {
+        select: {
+          url: true,
+        },
+      },
       mentor: {
         select: {
           id: true,
@@ -236,7 +243,7 @@ export default async function RecordingsLibraryPage() {
                 {/* Actions */}
                 <div className="mt-4 flex gap-2">
                   <a
-                    href={recording.recordingUrl || "#"}
+                    href={recording.recording?.url || recording.recordingUrl || "#"}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-purple-600 px-3 py-2 text-sm font-medium text-white transition-all hover:bg-purple-700"
@@ -251,10 +258,13 @@ export default async function RecordingsLibraryPage() {
                   </button>
                 </div>
 
-                {/* Share option */}
-                <button className="mt-2 w-full rounded-lg border border-dashed border-zinc-700 py-2 text-sm font-medium text-zinc-500 transition-all hover:border-zinc-600 hover:text-zinc-400">
-                  Share with community
-                </button>
+                <div className="mt-2">
+                  <RecordingDistributionActions
+                    recordingUrl={recording.recording?.url || recording.recordingUrl || null}
+                    publicUrl={recording.slug ? `https://www.unytea.com/sessions/${recording.slug}` : null}
+                    title={recording.title}
+                  />
+                </div>
               </div>
             </div>
           ))}
