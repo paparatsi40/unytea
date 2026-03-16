@@ -501,7 +501,12 @@ export async function getHostAnalyticsV1() {
           where: completedSessionWhere,
           select: {
             attendeeCount: true,
-            participations: { select: { id: true } },
+            participations: {
+              select: {
+                id: true,
+                eventsData: true,
+              },
+            },
           },
           take: 50,
           orderBy: { endedAt: "desc" },
@@ -542,11 +547,27 @@ export async function getHostAnalyticsV1() {
         )
       : 0;
 
+    const totalRsvps = completedSessions.reduce((sum, session) => {
+      const count = session.participations.filter((p: any) => {
+        const data = (p.eventsData || {}) as Record<string, unknown>;
+        return data.rsvp === true || data.rsvpStatus === "attending";
+      }).length;
+      return sum + count;
+    }, 0);
+
+    const totalAttended = completedSessions.reduce(
+      (sum, s) => sum + (s.attendeeCount || s.participations.length || 0),
+      0
+    );
+
+    const rsvpToAttendanceRate = totalRsvps > 0 ? Math.round((totalAttended / totalRsvps) * 100) : 0;
+
     return {
       success: true,
       analytics: {
         sessionsHosted,
         avgAttendance,
+        rsvpToAttendanceRate,
         recordingViews: recordingViews._sum.viewCount || 0,
         activeMembers: activeMembers.length,
         recordingsReady: recordingReadyCount,

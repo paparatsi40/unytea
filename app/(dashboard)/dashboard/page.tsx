@@ -112,6 +112,7 @@ interface PerformanceSnapshot {
 interface HostAnalyticsV1 {
   sessionsHosted: number;
   avgAttendance: number;
+  rsvpToAttendanceRate: number;
   recordingViews: number;
   activeMembers: number;
   recordingsReady: number;
@@ -925,26 +926,33 @@ export default function DashboardPage() {
                         <p className="text-sm text-zinc-500">Active members (30d)</p>
                       </div>
                     </div>
-                    <div className="p-4 rounded-lg bg-zinc-50">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm text-zinc-600">
-                          Growth rate
-                        </span>
-                        <span
-                          className={`font-semibold ${
-                            performance.growthRate >= 0
-                              ? "text-green-600"
-                              : "text-red-600"
-                          }`}
-                        >
-                          {performance.growthRate >= 0 ? "+" : ""}
-                          {performance.growthRate}%
+                    <div className="p-4 rounded-lg bg-zinc-50 space-y-3">
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm text-zinc-600">Growth rate</span>
+                          <span
+                            className={`font-semibold ${
+                              performance.growthRate >= 0
+                                ? "text-green-600"
+                                : "text-red-600"
+                            }`}
+                          >
+                            {performance.growthRate >= 0 ? "+" : ""}
+                            {performance.growthRate}%
+                          </span>
+                        </div>
+                        <Progress
+                          value={Math.max(0, Math.min(100, performance.growthRate))}
+                          className="h-2"
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-zinc-600">RSVP → Attendance</span>
+                        <span className="font-semibold text-zinc-900">
+                          {hostAnalytics?.rsvpToAttendanceRate ?? 0}%
                         </span>
                       </div>
-                      <Progress
-                        value={Math.max(0, Math.min(100, performance.growthRate))}
-                        className="h-2"
-                      />
                     </div>
                     <Link href="/dashboard/analytics">
                       <Button variant="outline" className="w-full">
