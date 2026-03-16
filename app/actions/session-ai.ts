@@ -13,8 +13,44 @@ interface Quote {
   reason: string;
 }
 
+function parseSummaryPayload(raw: string): {
+  summary?: string;
+  takeaways?: string[];
+  chapters?: Chapter[];
+  quotes?: Quote[];
+} {
+  const direct = raw.trim();
+  const fencedClean = direct.replace(/```json|```/g, "").trim();
+
+  const candidates = [direct, fencedClean];
+
+  for (const candidate of candidates) {
+    try {
+      return JSON.parse(candidate);
+    } catch {
+      // continue
+    }
+  }
+
+  const jsonMatch = fencedClean.match(/\{[\s\S]*\}/);
+  if (jsonMatch) {
+    try {
+      return JSON.parse(jsonMatch[0]);
+    } catch {
+      // continue
+    }
+  }
+
+  return {
+    summary: fencedClean.slice(0, 500),
+    takeaways: [],
+    chapters: [],
+    quotes: [],
+  };
+}
+
 export async function generateAISessionSummary(sessionId: string) {
-  try {
+try {
     const session = await prisma.mentorSession.findUnique({
       where: { id: sessionId },
       include: {
@@ -54,13 +90,7 @@ Session context:\n${sourceText}`;
       maxTokens: 900,
     });
 
-    const cleaned = raw.replace(/```json|```/g, "").trim();
-    const parsed = JSON.parse(cleaned) as {
-      summary?: string;
-      takeaways?: string[];
-      chapters?: Chapter[];
-      quotes?: Quote[];
-    };
+    const parsed = parseSummaryPayload(raw);
 
     const takeaways = Array.isArray(parsed.takeaways) ? parsed.takeaways : [];
     const chapters = Array.isArray(parsed.chapters) ? parsed.chapters : [];

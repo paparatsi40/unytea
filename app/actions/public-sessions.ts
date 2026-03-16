@@ -4,6 +4,38 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/auth-utils";
 import { PostContentType, Prisma } from "@prisma/client";
 
+function safeParseStringArray(value: string | null): string[] {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed.filter((v) => typeof v === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
+function safeParseResources(value: string | null): any[] {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function safeParseChapters(value: string | null): { title: string; timestamp?: string }[] {
+  return safeParseResources(value)
+    .filter((r) => r?.type === "chapter" && typeof r?.title === "string")
+    .map((r) => ({ title: r.title as string, timestamp: typeof r.timestamp === "string" ? r.timestamp : undefined }));
+}
+
+function safeParseQuotes(value: string | null): { text: string; reason?: string }[] {
+  return safeParseResources(value)
+    .filter((r) => r?.type === "quote" && typeof r?.text === "string")
+    .map((r) => ({ text: r.text as string, reason: typeof r.reason === "string" ? r.reason : undefined }));
+}
+
 export interface PublicSessionData {
   id: string;
   slug: string;
@@ -39,6 +71,10 @@ export interface PublicSessionData {
   notes: {
     id: string;
     content: string;
+    summary: string | null;
+    keyInsights: string[];
+    chapters: { title: string; timestamp?: string }[];
+    quotes: { text: string; reason?: string }[];
     createdAt: Date;
   } | null;
 }
@@ -82,6 +118,9 @@ export async function getPublicSession(
           select: {
             id: true,
             content: true,
+            summary: true,
+            keyInsights: true,
+            resources: true,
             createdAt: true,
           },
         },
@@ -154,7 +193,17 @@ export async function getPublicSession(
             url: canWatchRecording ? session.recording.url : null,
           }
         : null,
-      notes: session.notes,
+      notes: session.notes
+        ? {
+            id: session.notes.id,
+            content: session.notes.content,
+            summary: session.notes.summary,
+            keyInsights: safeParseStringArray(session.notes.keyInsights),
+            chapters: safeParseChapters(session.notes.resources),
+            quotes: safeParseQuotes(session.notes.resources),
+            createdAt: session.notes.createdAt,
+          }
+        : null,
     };
 
     return { success: true, session: data };

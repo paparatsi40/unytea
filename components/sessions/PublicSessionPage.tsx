@@ -47,9 +47,13 @@ interface PublicSessionPageProps {
     notes: {
       id: string;
       content: string;
+      summary: string | null;
+      keyInsights: string[];
+      chapters: { title: string; timestamp?: string }[];
+      quotes: { text: string; reason?: string }[];
       createdAt: Date;
     } | null;
-  };
+};
   relatedSessions?: {
     id: string;
     slug: string | null;
@@ -246,20 +250,34 @@ export function PublicSessionPage({ session, relatedSessions, nextSession }: Pub
                   </CardContent>
                 </Card>
 
-                {/* Key Takeaways */}
+                {session.notes?.summary && (
+                  <Card className="border-zinc-800 bg-zinc-900/50">
+                    <CardContent className="p-6">
+                      <h3 className="mb-2 font-semibold text-white">AI Summary</h3>
+                      <p className="text-zinc-300">{session.notes.summary}</p>
+                      {session.notes.keyInsights.length > 0 && (
+                        <ul className="mt-4 list-disc space-y-1 pl-5 text-sm text-zinc-300">
+                          {session.notes.keyInsights.slice(0, 5).map((item, idx) => (
+                            <li key={idx}>{item}</li>
+                          ))}
+                        </ul>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Session Notes */}
                 {session.notes?.content && (
                   <Card className="border-zinc-800 bg-zinc-900/50">
                     <CardContent className="p-6">
-                      <h3 className="mb-4 font-semibold text-white">
-                        Key Takeaways
-                      </h3>
+                      <h3 className="mb-4 font-semibold text-white">Session Notes</h3>
                       <div className="prose prose-invert max-w-none text-zinc-300">
                         {session.notes.content}
                       </div>
                     </CardContent>
                   </Card>
                 )}
-              </TabsContent>
+</TabsContent>
 
               <TabsContent value="notes">
                 {session.notes?.content ? (
