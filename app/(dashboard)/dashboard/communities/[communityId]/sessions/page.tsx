@@ -514,9 +514,9 @@ const sessionDate = new Date(s.scheduledAt);
 
                       {/* Actions */}
                       <div className="flex flex-wrap items-center gap-2">
-                        <Link href={`/dashboard/sessions/${s.id}/room`}>
+                        <Link href={`/dashboard/sessions/${s.id}/room?src=sessions_hub_upcoming_card`}>
                           <Button className={`${s.status === "IN_PROGRESS" ? "bg-red-600 hover:bg-red-700" : "bg-purple-600 hover:bg-purple-700"} text-white`}>
-                            {s.status === "IN_PROGRESS" ? "Join Live" : "Join"}
+{s.status === "IN_PROGRESS" ? "Join Live" : "Join"}
                           </Button>
                         </Link>
                         {s.visibility === "public" && s.slug && (
