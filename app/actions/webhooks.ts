@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { autoStartRecording } from "./recording";
 import { createNotification } from "./notifications";
 import { generateAISessionSummary } from "./session-ai";
+import { generateSessionRecap } from "./session-jobs";
 
 // LiveKit configuration
 const LIVEKIT_API_KEY = process.env.LIVEKIT_API_KEY || "";
@@ -491,21 +492,29 @@ async function logSessionEvent(
  * Trigger post-processing jobs after recording is ready
  */
 async function triggerPostProcessing(sessionId: string, recordingId: string) {
-  // TODO: Queue jobs for:
-  // 1. Generate transcript
-  // 2. Generate summary/notes stub
-  // 3. Create recap post
-  // 4. Suggest add to course
-
   console.log(`[Post-Processing] Triggered for session ${sessionId}`);
 
-  // For now, execute summary generation directly (can move to queue later)
+  // 1) Ensure transcript placeholder exists
+  await prisma.sessionNote.upsert({
+    where: { sessionId },
+    create: {
+      sessionId,
+      content: "Transcript processing in progress...",
+    },
+    update: {},
+  });
+
+  // 2) Generate AI summary package
   const summaryResult = await generateAISessionSummary(sessionId);
+
+  // 3) Generate recap feed post (recording ready post)
+  const recapResult = await generateSessionRecap(sessionId);
 
   await logSessionEvent(sessionId, "POST_PROCESSING_TRIGGERED", {
     recordingId,
     jobs: ["transcript", "summary", "recap", "course_suggestion"],
     summaryGenerated: summaryResult.success,
+    recapGenerated: recapResult.success,
   });
 }
 

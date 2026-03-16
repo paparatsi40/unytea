@@ -91,8 +91,8 @@ const [isPlaying, setIsPlaying] = useState(false);
 
   const formattedDate = format(new Date(session.scheduledAt), "MMMM d, yyyy");
   const canViewPremiumContent = session.canWatchRecording || session.isMember;
-  const ref = searchParams.get("ref");
-  const src = searchParams.get("src");
+  const ref = searchParams?.get("ref") || null;
+  const src = searchParams?.get("src") || null;
   const joinParams = new URLSearchParams();
   if (ref) joinParams.set("ref", ref);
   joinParams.set("src", "public_session_join_cta");

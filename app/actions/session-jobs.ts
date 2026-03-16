@@ -410,13 +410,16 @@ export async function generateSessionRecap(sessionId: string) {
       day: "numeric",
     });
 
-    // Extract key takeaways from notes (if available)
+    // Extract AI summary package (if available)
+    const noteSummary = session.notes?.summary?.trim() || "";
+    const parsedInsights = safeParseStringArray(session.notes?.keyInsights || null);
+
     let keyTakeaways = "";
-    if (session.notes?.content) {
-      // Simple extraction: first few lines or bullet points
+    if (parsedInsights.length > 0) {
+      keyTakeaways = parsedInsights.slice(0, 5).map((item) => `• ${item}`).join("\n");
+    } else if (session.notes?.content) {
       const lines = session.notes.content.split("\n").filter((l: string) => l.trim());
-      const takeaways = lines.slice(0, 5).map((l: string) => `• ${l}`).join("\n");
-      keyTakeaways = takeaways;
+      keyTakeaways = lines.slice(0, 5).map((l: string) => `• ${l}`).join("\n");
     }
 
     // Build rich content for the recap post
@@ -425,12 +428,7 @@ export async function generateSessionRecap(sessionId: string) {
 ${session.title}
 ${isAudioOnly ? "🎙️ Audio session" : "🎬 Video session"} • ${session.duration} min • ${sessionDate}
 
-${session.description ? `*${session.description}*
-
-` : ""}${keyTakeaways ? `**Key Takeaways:**
-${keyTakeaways}
-
-` : ""}💬 **What was your biggest takeaway?**
+${session.description ? `*${session.description}*\n\n` : ""}${noteSummary ? `**Summary:**\n${noteSummary}\n\n` : ""}${keyTakeaways ? `**Key Takeaways:**\n${keyTakeaways}\n\n` : ""}💬 **What was your biggest takeaway?**
 Share your thoughts below or ask follow-up questions.
 
 [Watch Recording →](/dashboard/sessions/${session.id})
@@ -520,6 +518,16 @@ export async function endSession(sessionId: string) {
 }
 
 // Helper functions
+function safeParseStringArray(value: string | null): string[] {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed.filter((item) => typeof item === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
 function formatTimeUntil(date: Date): string {
   const now = new Date();
   const diff = date.getTime() - now.getTime();
