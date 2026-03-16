@@ -354,6 +354,93 @@ export async function cancelSession(sessionId: string) {
 /**
  * Delete a session
  */
+export async function getCommunityAttendanceMetrics(communityId: string, days: number = 30) {
+  try {
+    const userId = await getCurrentUserId();
+    if (!userId) return { success: false, error: "Not authenticated" };
+
+    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+
+    const sessions = await prisma.mentorSession.findMany({
+      where: {
+        communityId,
+        scheduledAt: { gte: since },
+      },
+      select: {
+        id: true,
+        status: true,
+        scheduledAt: true,
+        _count: { select: { participations: true } },
+      },
+    });
+
+    const completedSessions = sessions.filter((s) => s.status === "COMPLETED");
+    const scheduledSessions = sessions.filter((s) => s.status === "SCHEDULED");
+
+    const completedIds = completedSessions.map((s) => s.id);
+
+    const attendance = completedIds.length
+      ? await prisma.sessionParticipation.groupBy({
+          by: ["sessionId"],
+          where: {
+            sessionId: { in: completedIds },
+          },
+          _count: { _all: true },
+        })
+      : [];
+
+    const attendanceMap = new Map(attendance.map((a) => [a.sessionId, a._count._all]));
+
+    const totalAttendance = completedSessions.reduce(
+      (sum, s) => sum + (attendanceMap.get(s.id) || 0),
+      0
+    );
+
+    const avgAttendance = completedSessions.length
+      ? totalAttendance / completedSessions.length
+      : 0;
+
+    const reminderNotifications = await prisma.notification.findMany({
+      where: {
+        type: "SESSION_REMINDER",
+        createdAt: { gte: since },
+      },
+      select: { data: true },
+    });
+
+    const sessionIdSet = new Set(sessions.map((s) => s.id));
+    const remindersSent = reminderNotifications.filter((n) => {
+      const payload = n.data as any;
+      return payload?.sessionId && sessionIdSet.has(payload.sessionId);
+    }).length;
+
+    const uniqueRsvps = await prisma.sessionParticipation.count({
+      where: {
+        sessionId: { in: sessions.map((s) => s.id) },
+      },
+    });
+
+    const rsvpToJoinRate = uniqueRsvps > 0 ? (totalAttendance / uniqueRsvps) * 100 : 0;
+
+    return {
+      success: true,
+      metrics: {
+        periodDays: days,
+        totalSessions: sessions.length,
+        scheduledSessions: scheduledSessions.length,
+        completedSessions: completedSessions.length,
+        totalAttendance,
+        avgAttendance: Number(avgAttendance.toFixed(1)),
+        remindersSent,
+        rsvpToJoinRate: Number(Math.min(100, rsvpToJoinRate).toFixed(1)),
+      },
+    };
+  } catch (error) {
+    console.error("Error getting community attendance metrics:", error);
+    return { success: false, error: "Failed to load attendance metrics" };
+  }
+}
+
 export async function deleteSession(sessionId: string) {
   try {
     const userId = await getCurrentUserId();

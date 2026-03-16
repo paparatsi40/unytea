@@ -3,7 +3,7 @@ import { redirect, notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Video, Calendar, Clock, ArrowRight, Sparkles } from "lucide-react";
 import { CreateSessionDialog } from "@/components/sessions/CreateSessionDialog";
-import { toggleSessionRSVP } from "@/app/actions/sessions";
+import { getCommunityAttendanceMetrics, toggleSessionRSVP } from "@/app/actions/sessions";
 import {
   format,
   isToday,
@@ -110,6 +110,9 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
       // Continue with empty sessions
     }
 
+    const attendanceResult = await getCommunityAttendanceMetrics(communityId, 30);
+    const attendance = attendanceResult.success ? attendanceResult.metrics : null;
+
     // Split into upcoming and past
     const now = new Date();
     const upcoming = allSessions.filter(s => new Date(s.scheduledAt) >= now);
@@ -179,6 +182,31 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
               )}
             </div>
           </div>
+
+          {attendance && (
+            <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4">
+                <p className="text-xs uppercase tracking-wide text-zinc-500">Avg attendance</p>
+                <p className="mt-1 text-2xl font-semibold text-white">{attendance.avgAttendance}</p>
+                <p className="text-xs text-zinc-500">last {attendance.periodDays} days</p>
+              </div>
+              <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4">
+                <p className="text-xs uppercase tracking-wide text-zinc-500">RSVP → join</p>
+                <p className="mt-1 text-2xl font-semibold text-white">{attendance.rsvpToJoinRate}%</p>
+                <p className="text-xs text-zinc-500">conversion quality</p>
+              </div>
+              <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4">
+                <p className="text-xs uppercase tracking-wide text-zinc-500">Reminders sent</p>
+                <p className="mt-1 text-2xl font-semibold text-white">{attendance.remindersSent}</p>
+                <p className="text-xs text-zinc-500">delivery volume</p>
+              </div>
+              <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4">
+                <p className="text-xs uppercase tracking-wide text-zinc-500">Completed sessions</p>
+                <p className="mt-1 text-2xl font-semibold text-white">{attendance.completedSessions}</p>
+                <p className="text-xs text-zinc-500">last {attendance.periodDays} days</p>
+              </div>
+            </div>
+          )}
 
           <Tabs defaultValue="upcoming" className="w-full">
             <TabsList className="bg-zinc-900 border-zinc-800 mb-6">
