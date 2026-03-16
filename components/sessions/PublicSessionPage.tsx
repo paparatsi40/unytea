@@ -97,8 +97,9 @@ const [isPlaying, setIsPlaying] = useState(false);
   if (ref) joinParams.set("ref", ref);
   if (src) joinParams.set("src", src);
   const joinCommunityHref = `/c/${session.community.slug}${joinParams.toString() ? `?${joinParams.toString()}` : ""}`;
+  const nextSessionRoomHref = `/dashboard/sessions/${nextSession?.id}/room?src=public_next_live_card`;
 const formattedDuration = session.recording?.durationSeconds
-    ? `${Math.round(session.recording.durationSeconds / 60)} min`
+? `${Math.round(session.recording.durationSeconds / 60)} min`
     : session.duration
     ? `${session.duration} min`
     : null;
@@ -442,9 +443,15 @@ const formattedDuration = session.recording?.durationSeconds
                     <Card
                       key={related.id}
                       className="cursor-pointer border-zinc-800 bg-zinc-900/50 transition-colors hover:bg-zinc-800"
-                      onClick={() => router.push(`/sessions/${related.slug}`)}
+                      onClick={() => {
+                        const qs = new URLSearchParams();
+                        if (ref) qs.set("ref", ref);
+                        qs.set("src", "public_related_card");
+                        const suffix = qs.toString() ? `?${qs.toString()}` : "";
+                        router.push(`/sessions/${related.slug}${suffix}`);
+                      }}
                     >
-                      <CardContent className="p-4">
+<CardContent className="p-4">
                         <h4 className="mb-2 font-medium text-white line-clamp-2">
                           {related.title}
                         </h4>
@@ -513,9 +520,16 @@ const formattedDuration = session.recording?.durationSeconds
                           {isRSVPLoading ? "Updating..." : isAttendingNext ? "Attending" : "RSVP for live"}
                         </Button>
                         {rsvpMessage && (
-                          <p className="mt-2 text-xs text-zinc-300">{rsvpMessage}</p>
-                        )}
-                      </>
+                        <p className="mt-2 text-xs text-zinc-300">{rsvpMessage}</p>
+                      )}
+                      <Button
+                        onClick={() => router.push(nextSessionRoomHref)}
+                        variant="outline"
+                        className="mt-2 w-full border-zinc-700 text-zinc-200 hover:bg-zinc-800"
+                      >
+                        View session room
+                      </Button>
+</>
                     ) : (
                       <p className="mt-2 text-xs text-zinc-300">Join community to RSVP and participate live.</p>
                     )}
