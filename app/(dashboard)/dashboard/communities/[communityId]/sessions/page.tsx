@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CopyInviteLinkButton } from "@/components/sessions/CopyInviteLinkButton";
 
 interface CommunitySessionsPageProps {
   params: Promise<{
@@ -50,9 +51,9 @@ function getAttendanceRecommendation(attendance: any) {
   if (attendance.rsvpToJoinRate < 50) {
     return {
       title: "Low RSVP → Join conversion",
-      description: "Prioritize reminders + pre-session question prompts to convert intent into attendance.",
+      description: "Tip: Ask members to drop questions in the feed before the session. This increases attendance.",
       tone: "warning" as const,
-    };
+};
   }
 
   if (attendance.avgAttendance < 5 && attendance.completedSessions >= 3) {
@@ -246,6 +247,11 @@ const sessionDate = new Date(s.scheduledAt);
     });
 
     const primarySession = liveSessions[0] || upcoming[0] || null;
+    const invitePath = primarySession
+      ? primarySession.visibility === "public" && primarySession.slug
+        ? `/sessions/${primarySession.slug}?ref=community_invite&src=host_invite`
+        : `/dashboard/sessions/${primarySession.id}?src=host_invite`
+      : null;
 
     async function handleRSVP(sessionId: string, _formData: FormData) {
 "use server";
@@ -298,8 +304,50 @@ const sessionDate = new Date(s.scheduledAt);
             </div>
           </div>
 
+          {showQuickStart && canCreateSessions && (
+            <div className="mb-6 rounded-xl border border-purple-500/30 bg-purple-500/10 p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-sm font-semibold text-white">Schedule your first live session</p>
+                  <p className="mt-1 text-xs text-zinc-300">Communities with weekly sessions grow 3x faster.</p>
+                  <p className="mt-1 text-xs text-zinc-500">Most communities host their first session within 24 hours.</p>
+                </div>
+                <Badge className="border-purple-400/40 bg-purple-500/20 text-purple-200">Recommended first session: Community Q&A · 30 min</Badge>
+              </div>
+              <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                <div className="rounded-lg border border-purple-500/30 bg-zinc-900/60 p-3">
+                  <CreateSessionDialog
+                    triggerText="30 min Q&A"
+                    className="w-full bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-md text-sm"
+                    communityId={communityId}
+                    defaultDuration={30}
+                  />
+                  <p className="mt-2 text-[11px] text-zinc-400">Best for your first session</p>
+                </div>
+                <div className="rounded-lg border border-zinc-700 bg-zinc-900/60 p-3">
+                  <CreateSessionDialog
+                    triggerText="45 min Workshop"
+                    className="w-full bg-zinc-800 hover:bg-zinc-700 text-white px-3 py-2 rounded-md text-sm"
+                    communityId={communityId}
+                    defaultDuration={45}
+                  />
+                  <p className="mt-2 text-[11px] text-zinc-400">Teach a specific topic</p>
+                </div>
+                <div className="rounded-lg border border-zinc-700 bg-zinc-900/60 p-3">
+                  <CreateSessionDialog
+                    triggerText="60 min Masterclass"
+                    className="w-full bg-zinc-800 hover:bg-zinc-700 text-white px-3 py-2 rounded-md text-sm"
+                    communityId={communityId}
+                    defaultDuration={60}
+                  />
+                  <p className="mt-2 text-[11px] text-zinc-400">Deep dive session</p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {attendance && (
-            <>
+<>
             <div className="mb-2 flex flex-wrap items-center gap-2 text-[11px] text-zinc-400">
               <span className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1">Upcoming: {filter}</span>
               <span className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1">Past: {pastFilter}</span>
@@ -408,41 +456,39 @@ const sessionDate = new Date(s.scheduledAt);
               }`}>
                 <p className="text-sm font-semibold text-white">{recommendation.title}</p>
                 <p className="mt-1 text-sm text-zinc-300">{recommendation.description}</p>
+                {recommendation.title === "Low RSVP → Join conversion" && (
+                  <div className="mt-3">
+                    <Link href={`/dashboard/c/${community.slug}?src=attendance_tip_question_post`}>
+                      <Button variant="outline" className="border-zinc-700 text-zinc-200 hover:bg-zinc-800">
+                        Create question post
+                      </Button>
+                    </Link>
+                  </div>
+                )}
               </div>
             )}
-            </>
+</>
           )}
 
-          {showQuickStart && canCreateSessions && (
-            <div className="mb-6 rounded-xl border border-purple-500/30 bg-purple-500/10 p-4">
-              <p className="text-sm font-semibold text-white">Schedule your first live session</p>
-              <p className="mt-1 text-xs text-zinc-300">Quick presets to reduce setup friction and launch now.</p>
+
+          {primarySession && invitePath && (
+            <div className="mb-4 rounded-lg border border-blue-500/30 bg-blue-500/10 p-4">
+              <p className="text-sm font-semibold text-white">Invite members to this session</p>
+              <p className="mt-1 text-xs text-zinc-300">Host creates session, attendance starts with invites.</p>
               <div className="mt-3 flex flex-wrap gap-2">
-                <CreateSessionDialog
-                  triggerText="30 min Q&A"
-                  className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-md text-sm"
-                  communityId={communityId}
-                  defaultDuration={30}
-                />
-                <CreateSessionDialog
-                  triggerText="45 min Workshop"
-                  className="bg-zinc-800 hover:bg-zinc-700 text-white px-3 py-2 rounded-md text-sm"
-                  communityId={communityId}
-                  defaultDuration={45}
-                />
-                <CreateSessionDialog
-                  triggerText="60 min Masterclass"
-                  className="bg-zinc-800 hover:bg-zinc-700 text-white px-3 py-2 rounded-md text-sm"
-                  communityId={communityId}
-                  defaultDuration={60}
-                />
+                <CopyInviteLinkButton invitePath={invitePath} />
+                <Link href={invitePath} target="_blank">
+                  <Button variant="outline" className="border-zinc-700 text-zinc-200 hover:bg-zinc-800">
+                    Open invite page
+                  </Button>
+                </Link>
               </div>
             </div>
           )}
 
           {primarySession && (
             <div className="mb-6 rounded-lg border border-zinc-800 bg-zinc-900/60 p-4">
-              <div className="mb-2 flex items-center justify-between">
+<div className="mb-2 flex items-center justify-between">
                 <p className="text-sm font-medium text-zinc-200">QA Quick Flow</p>
                 <span className="text-xs text-zinc-500">Validate loop in ~1 min</span>
               </div>
@@ -623,11 +669,11 @@ const sessionDate = new Date(s.scheduledAt);
                   </p>
                   {canCreateSessions && (
                     <CreateSessionDialog
-                      triggerText={filter === "all" ? "Schedule your first session" : "Schedule a session"}
+                      triggerText={filter === "all" ? "Schedule your first live session" : "Schedule a live session"}
                       className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2.5 rounded-lg font-medium inline-flex items-center gap-2"
                       communityId={communityId}
                     />
-                  )}
+)}
                   <div className="mt-4 flex items-center justify-center gap-2">
                     {filter !== "all" && (
                       <Link href={`/dashboard/communities/${communityId}/sessions?filter=all&window=${metricWindow}`}>
@@ -637,10 +683,19 @@ const sessionDate = new Date(s.scheduledAt);
                       </Link>
                     )}
                   </div>
+                  {filter === "all" && (
+                    <div className="mx-auto mt-4 max-w-xs rounded-lg border border-zinc-800 bg-zinc-950 p-3 text-left">
+                      <p className="text-xs uppercase tracking-wide text-zinc-500">Next live session</p>
+                      <p className="mt-1 text-sm font-semibold text-zinc-100">Community Q&A</p>
+                      <p className="text-xs text-zinc-400">Friday · 6:00 PM</p>
+                      <p className="mt-1 text-xs text-zinc-500">0 attending</p>
+                    </div>
+                  )}
                   <div className="mt-2 flex items-center justify-center gap-2 text-sm text-zinc-500">
                     <Sparkles className="h-4 w-4" />
                     <span>Communities with weekly sessions grow 3x faster</span>
                   </div>
+                  <p className="mt-1 text-xs text-zinc-600">Most communities host their first session within 24 hours.</p>
 </div>
               ) : (
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
