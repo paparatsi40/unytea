@@ -184,6 +184,9 @@ mentor: {
       return true;
     });
     const featuredReplays = filteredPast.filter((s) => Boolean(s.recordingUrl)).slice(0, 3);
+    const pastAllCount = pastSorted.length;
+    const pastReplayCount = pastSorted.filter((s) => Boolean(s.recordingUrl)).length;
+    const pastPublicReplayCount = pastSorted.filter((s) => Boolean(s.recordingUrl) && s.visibility === "public" && Boolean(s.slug)).length;
 
     // Calculate sessions this week
     const thisWeek = [...liveSessions, ...upcoming].filter(s => {
@@ -530,20 +533,20 @@ const sessionDate = new Date(s.scheduledAt);
                   <div className="flex flex-wrap gap-2">
                     <Link href={`/dashboard/communities/${communityId}/sessions?filter=${filter}&pastFilter=all`}>
                       <Button variant="outline" className={`h-8 border-zinc-700 text-xs ${pastFilter === "all" ? "bg-zinc-800 text-white" : "text-zinc-300 hover:bg-zinc-800"}`}>
-                        All
+                        All ({pastAllCount})
                       </Button>
                     </Link>
                     <Link href={`/dashboard/communities/${communityId}/sessions?filter=${filter}&pastFilter=replay`}>
                       <Button variant="outline" className={`h-8 border-zinc-700 text-xs ${pastFilter === "replay" ? "bg-zinc-800 text-white" : "text-zinc-300 hover:bg-zinc-800"}`}>
-                        With Replay
+                        With Replay ({pastReplayCount})
                       </Button>
                     </Link>
                     <Link href={`/dashboard/communities/${communityId}/sessions?filter=${filter}&pastFilter=public`}>
                       <Button variant="outline" className={`h-8 border-zinc-700 text-xs ${pastFilter === "public" ? "bg-emerald-600 text-white border-emerald-500" : "text-zinc-300 hover:bg-zinc-800"}`}>
-                        Public Replays
+                        Public Replays ({pastPublicReplayCount})
                       </Button>
                     </Link>
-                  </div>
+</div>
 {featuredReplays.length > 0 && (
                     <div>
                       <h3 className="mb-3 text-sm font-semibold text-zinc-300">Featured Replays</h3>
