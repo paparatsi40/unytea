@@ -570,13 +570,18 @@ const sessionDate = new Date(s.scheduledAt);
                     <div>
                       <h3 className="mb-3 text-sm font-semibold text-zinc-300">Featured Replays</h3>
                       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                        {featuredReplays.map((s) => (
+                        {featuredReplays.map((s, index) => (
                           <div key={s.id} className="rounded-xl border border-emerald-500/30 bg-gradient-to-br from-zinc-900 to-zinc-950 p-5">
-                            <div className="mb-3 flex items-center justify-between">
-                              <Badge className="border-emerald-500/30 bg-emerald-500/20 text-emerald-300">Replay</Badge>
+                            <div className="mb-3 flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-2">
+                                <Badge className="border-emerald-500/30 bg-emerald-500/20 text-emerald-300">Replay</Badge>
+                                {index === 0 && (
+                                  <Badge className="border-amber-500/40 bg-amber-500/20 text-amber-300">Top attended</Badge>
+                                )}
+                              </div>
                               <span className="text-xs text-zinc-500">{formatDistanceToNow(new Date(s.scheduledAt), { addSuffix: true })}</span>
                             </div>
-                            <h4 className="mb-2 line-clamp-2 text-base font-semibold text-white">{s.title}</h4>
+<h4 className="mb-2 line-clamp-2 text-base font-semibold text-white">{s.title}</h4>
                             <p className="mb-4 text-xs text-zinc-400">{s.duration || 60} min • {s._count?.participations || 0} attended</p>
                             <div className="grid grid-cols-2 gap-2">
                               <Link href={s.recordingUrl!} target="_blank">
