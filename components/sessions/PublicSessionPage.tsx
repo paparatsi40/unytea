@@ -97,7 +97,10 @@ const [isPlaying, setIsPlaying] = useState(false);
   if (ref) joinParams.set("ref", ref);
   if (src) joinParams.set("src", src);
   const joinCommunityHref = `/c/${session.community.slug}${joinParams.toString() ? `?${joinParams.toString()}` : ""}`;
-  const nextSessionRoomHref = `/dashboard/sessions/${nextSession?.id}/room?src=public_next_live_card`;
+  const roomParams = new URLSearchParams();
+  roomParams.set("src", "public_next_live_card");
+  if (ref) roomParams.set("ref", ref);
+  const nextSessionRoomHref = `/dashboard/sessions/${nextSession?.id}/room?${roomParams.toString()}`;
 const formattedDuration = session.recording?.durationSeconds
 ? `${Math.round(session.recording.durationSeconds / 60)} min`
     : session.duration
