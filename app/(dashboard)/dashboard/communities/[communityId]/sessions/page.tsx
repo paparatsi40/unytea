@@ -324,6 +324,13 @@ const sessionDate = new Date(s.scheduledAt);
               >
                 Reset filters
               </Link>
+              <Link
+                href={`/dashboard/communities/${communityId}/sessions?filter=${filter}&pastFilter=${pastFilter}&window=${metricWindow}`}
+                target="_blank"
+                className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-[11px] text-zinc-400 transition hover:bg-zinc-800"
+              >
+                Open current view ↗
+              </Link>
               <code className="rounded border border-zinc-700 bg-zinc-950 px-2 py-1 text-[11px] text-zinc-500">
                 /dashboard/communities/{communityId}/sessions?filter={filter}&pastFilter={pastFilter}&window={metricWindow}
               </code>
