@@ -3,6 +3,7 @@ import { redirect, notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Video, Calendar, Clock, ArrowRight, Sparkles } from "lucide-react";
 import { CreateSessionDialog } from "@/components/sessions/CreateSessionDialog";
+import { toggleSessionRSVP } from "@/app/actions/sessions";
 import {
   format,
   isToday,
@@ -86,6 +87,17 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
               name: true,
               image: true,
               username: true,
+            },
+          },
+          participations: {
+            where: {
+              userId: session.user.id,
+            },
+            select: { id: true },
+          },
+          _count: {
+            select: {
+              participations: true,
             },
           },
         },
@@ -201,13 +213,22 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
                       {formatSessionTime(new Date(upcoming[0].scheduledAt))}
                     </span>
                     <span>{upcoming[0].duration} min</span>
+                    <span>•</span>
+                    <span>{upcoming[0]._count?.participations || 0} attending</span>
                   </div>
-                  <Link href={`/dashboard/sessions/${upcoming[0].id}/room`}>
-                    <Button className="bg-purple-600 hover:bg-purple-700 text-white">
-                      Join Session
-                      <ArrowRight className="h-4 w-4 ml-1" />
-                    </Button>
-                  </Link>
+                  <div className="flex items-center gap-2">
+                    <Link href={`/dashboard/sessions/${upcoming[0].id}/room`}>
+                      <Button className="bg-purple-600 hover:bg-purple-700 text-white">
+                        Join Session
+                        <ArrowRight className="h-4 w-4 ml-1" />
+                      </Button>
+                    </Link>
+                    <form action={toggleSessionRSVP.bind(null, upcoming[0].id, `/dashboard/communities/${communityId}/sessions`)}>
+                      <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
+                        {upcoming[0].participations?.length ? "Attending" : "RSVP"}
+                      </Button>
+                    </form>
+                  </div>
                 </div>
               )}
 
@@ -269,6 +290,10 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
                         <span>{s.duration || 60} min</span>
                       </div>
 
+                      <p className="mb-3 text-xs text-zinc-500">
+                        {s._count?.participations || 0} attending
+                      </p>
+
                       {/* Actions */}
                       <div className="flex items-center gap-2">
                         <Link href={`/dashboard/sessions/${s.id}/room`}>
@@ -276,6 +301,11 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
                             Join
                           </Button>
                         </Link>
+                        <form action={toggleSessionRSVP.bind(null, s.id, `/dashboard/communities/${communityId}/sessions`)}>
+                          <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
+                            {s.participations?.length ? "Attending" : "RSVP"}
+                          </Button>
+                        </form>
                         {canCreateSessions && (
                           <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
                             Edit

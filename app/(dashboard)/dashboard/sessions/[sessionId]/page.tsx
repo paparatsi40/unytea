@@ -22,7 +22,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getSession } from "@/app/actions/sessions";
+import { getSession, getSessionRSVPStatus, toggleSessionRSVP } from "@/app/actions/sessions";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCurrentUser } from "@/hooks/use-current-user";
@@ -45,6 +45,9 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
   const [showAddToCourse, setShowAddToCourse] = useState(false);
   const [showCreateClip, setShowCreateClip] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
+  const [isAttending, setIsAttending] = useState(false);
+  const [attendingCount, setAttendingCount] = useState(0);
+  const [isRSVPLoading, setIsRSVPLoading] = useState(false);
 
   useEffect(() => {
     if (!isAuthLoading && !user) {
@@ -63,6 +66,14 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
       const result = await getSession(params.sessionId);
       if (result.success && result.session) {
         setSession(result.session);
+
+        if (result.session.status === "SCHEDULED") {
+          const rsvp = await getSessionRSVPStatus(result.session.id);
+          if (rsvp.success) {
+            setIsAttending(rsvp.isAttending);
+            setAttendingCount(rsvp.attendingCount);
+          }
+        }
       } else {
         router.push("/dashboard/sessions");
       }
@@ -75,7 +86,7 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
 
   async function handleShareRecap() {
     if (!session) return;
-    
+
     setIsSharing(true);
     try {
       // If recap post already exists, show message
@@ -97,6 +108,28 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
       toast.error("Error sharing recap");
     } finally {
       setIsSharing(false);
+    }
+  }
+
+  async function handleToggleRSVP() {
+    if (!session || session.status !== "SCHEDULED") return;
+
+    setIsRSVPLoading(true);
+    try {
+      const result = await toggleSessionRSVP(session.id, window.location.pathname);
+      if (!result.success) {
+        toast.error(result.error || "Failed to update RSVP");
+        return;
+      }
+
+      const nextAttending = result.action === "rsvped";
+      setIsAttending(nextAttending);
+      setAttendingCount((prev) => Math.max(0, prev + (nextAttending ? 1 : -1)));
+      toast.success(nextAttending ? "You are attending this session" : "RSVP removed");
+    } catch {
+      toast.error("Failed to update RSVP");
+    } finally {
+      setIsRSVPLoading(false);
     }
   }
 
@@ -204,6 +237,15 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
                   <Clock className="h-3 w-3" />
                   {session.duration} min
                 </span>
+                {session.status === "SCHEDULED" && (
+                  <>
+                    <span>•</span>
+                    <span className="flex items-center gap-1 text-zinc-300">
+                      <Users className="h-3 w-3" />
+                      {attendingCount} attending
+                    </span>
+                  </>
+                )}
                 {isAudioOnly && (
                   <>
                     <span>•</span>
@@ -226,6 +268,23 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
       <main className="mx-auto max-w-7xl p-6">
         {/* ACTION BAR */}
         <div className="mb-6 flex items-center gap-3">
+          {session.status === "SCHEDULED" && (
+            <Button
+              variant={isAttending ? "outline" : "default"}
+              className={cn(
+                "gap-2",
+                isAttending
+                  ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
+                  : "bg-emerald-600 hover:bg-emerald-700"
+              )}
+              disabled={isRSVPLoading}
+              onClick={handleToggleRSVP}
+            >
+              <Users className="h-4 w-4" />
+              {isRSVPLoading ? "Updating..." : isAttending ? "Attending" : "RSVP"}
+            </Button>
+          )}
+
           {hasRecording && !isProcessing && (
             <Button 
               className="gap-2 bg-purple-600 hover:bg-purple-700"
@@ -235,7 +294,7 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
               Watch Recording
             </Button>
           )}
-          
+
           {session?.mentorId === user?.id && (
             <>
               <Button

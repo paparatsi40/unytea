@@ -906,6 +906,126 @@ export async function getSessionSeries(seriesId: string) {
   }
 }
 
+/**
+ * RSVP / Un-RSVP a scheduled session
+ */
+export async function toggleSessionRSVP(sessionId: string, revalidateTargetPath?: string) {
+  try {
+    const userId = await getCurrentUserId();
+
+    if (!userId) {
+      return { success: false, error: "Not authenticated" };
+    }
+
+    const session = await prisma.mentorSession.findUnique({
+      where: { id: sessionId },
+      select: {
+        id: true,
+        title: true,
+        status: true,
+        communityId: true,
+      },
+    });
+
+    if (!session) {
+      return { success: false, error: "Session not found" };
+    }
+
+    if (session.status !== "SCHEDULED") {
+      return { success: false, error: "RSVP is only available for upcoming sessions" };
+    }
+
+    if (session.communityId) {
+      const membership = await prisma.member.findUnique({
+        where: {
+          userId_communityId: {
+            userId,
+            communityId: session.communityId,
+          },
+        },
+        select: { status: true },
+      });
+
+      if (!membership || membership.status !== "ACTIVE") {
+        return { success: false, error: "Join the community to RSVP" };
+      }
+    }
+
+    const existing = await prisma.sessionParticipation.findUnique({
+      where: {
+        sessionId_userId: {
+          sessionId,
+          userId,
+        },
+      },
+      select: { id: true },
+    });
+
+    let action: "rsvped" | "unrsvped" = "rsvped";
+
+    if (existing) {
+      await prisma.sessionParticipation.delete({ where: { id: existing.id } });
+      action = "unrsvped";
+    } else {
+      await prisma.sessionParticipation.create({
+        data: {
+          sessionId,
+          userId,
+          role: "listener",
+          eventsData: { rsvp: true },
+        },
+      });
+      action = "rsvped";
+    }
+
+    revalidatePath("/dashboard/sessions");
+    if (session.communityId) {
+      revalidatePath(`/dashboard/communities/${session.communityId}/sessions`);
+    }
+    if (revalidateTargetPath) {
+      revalidatePath(revalidateTargetPath);
+    }
+
+    return { success: true, action };
+  } catch (error) {
+    console.error("Error toggling RSVP:", error);
+    return { success: false, error: "Failed to update RSVP" };
+  }
+}
+
+/**
+ * Get RSVP status for current user + attending count
+ */
+export async function getSessionRSVPStatus(sessionId: string) {
+  try {
+    const userId = await getCurrentUserId();
+
+    const [attendingCount, existing] = await Promise.all([
+      prisma.sessionParticipation.count({ where: { sessionId } }),
+      userId
+        ? prisma.sessionParticipation.findUnique({
+            where: { sessionId_userId: { sessionId, userId } },
+            select: { id: true },
+          })
+        : Promise.resolve(null),
+    ]);
+
+    return {
+      success: true,
+      attendingCount,
+      isAttending: !!existing,
+    };
+  } catch (error) {
+    console.error("Error getting RSVP status:", error);
+    return {
+      success: false,
+      attendingCount: 0,
+      isAttending: false,
+      error: "Failed to get RSVP status",
+    };
+  }
+}
+
 // ============================================
 // HELPERS
 // ============================================
