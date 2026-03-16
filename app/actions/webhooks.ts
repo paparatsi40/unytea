@@ -7,6 +7,7 @@ import { autoStartRecording } from "./recording";
 import { createNotification } from "./notifications";
 import { generateAISessionSummary } from "./session-ai";
 import { generateSessionRecap } from "./session-jobs";
+import { PostContentType, Prisma } from "@prisma/client";
 
 // LiveKit configuration
 const LIVEKIT_API_KEY = process.env.LIVEKIT_API_KEY || "";
@@ -112,6 +113,17 @@ async function handleRoomStarted(event: any) {
   // Auto-start recording
   await autoStartRecording(sessionId);
 
+  // Feed lifecycle posts
+  await ensureSessionLifecyclePost(sessionId, "pre_session", {
+    titlePrefix: "🧵 Pre-session thread",
+    body: "Drop your questions below before we go live.",
+  });
+
+  await ensureSessionLifecyclePost(sessionId, "live_started", {
+    titlePrefix: "🔴 Live now",
+    body: "We are live now. Join and share your questions in real time.",
+  });
+
   // Log event
   await logSessionEvent(sessionId, "ROOM_STARTED", {
     roomSid: event.room?.sid,
@@ -161,6 +173,12 @@ async function handleRoomFinished(event: any) {
       },
     });
   }
+
+  // Feed lifecycle post: discussion thread after live
+  await ensureSessionLifecyclePost(sessionId, "discussion_thread", {
+    titlePrefix: "💬 Discussion thread",
+    body: "Session ended. Share your biggest takeaway and follow-up questions below.",
+  });
 
   // Log event
   await logSessionEvent(sessionId, "ROOM_FINISHED", {
@@ -488,6 +506,86 @@ async function logSessionEvent(
   });
 }
 
+type LifecycleStage = "pre_session" | "live_started" | "recording_ready" | "discussion_thread";
+
+async function ensureSessionLifecyclePost(
+  sessionId: string,
+  stage: LifecycleStage,
+  data: { titlePrefix: string; body: string }
+) {
+  const session = await prisma.mentorSession.findUnique({
+    where: { id: sessionId },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      scheduledAt: true,
+      duration: true,
+      attendeeCount: true,
+      recordingUrl: true,
+      mentorId: true,
+      communityId: true,
+      community: {
+        select: {
+          id: true,
+          slug: true,
+        },
+      },
+    },
+  });
+
+  if (!session?.communityId) return;
+
+  const existing = await prisma.post.findMany({
+    where: {
+      communityId: session.communityId,
+      contentType: PostContentType.SESSION_ANNOUNCEMENT,
+      attachments: {
+        path: ["sessionId"],
+        equals: sessionId,
+      },
+    },
+    select: {
+      id: true,
+      attachments: true,
+    },
+    orderBy: { createdAt: "desc" },
+    take: 20,
+  });
+
+  const alreadyExists = existing.some((post) => {
+    const attachments = post.attachments as Record<string, unknown> | null;
+    return attachments?.lifecycleStage === stage;
+  });
+
+  if (alreadyExists) return;
+
+  await prisma.post.create({
+    data: {
+      title: `${data.titlePrefix}: ${session.title}`,
+      content: data.body,
+      contentType: PostContentType.SESSION_ANNOUNCEMENT,
+      authorId: session.mentorId,
+      communityId: session.communityId,
+      attachments: {
+        sessionId: session.id,
+        sessionTitle: session.title,
+        sessionDescription: session.description,
+        scheduledAt: session.scheduledAt.toISOString(),
+        duration: session.duration,
+        recordingUrl: session.recordingUrl,
+        attendeeCount: session.attendeeCount,
+        lifecycleStage: stage,
+      } as Prisma.InputJsonValue,
+    },
+  });
+
+  revalidatePath(`/dashboard/communities/${session.communityId}/sessions`);
+  if (session.community?.slug) {
+    revalidatePath(`/dashboard/c/${session.community.slug}/feed`);
+  }
+}
+
 /**
  * Trigger post-processing jobs after recording is ready
  */
@@ -507,12 +605,18 @@ async function triggerPostProcessing(sessionId: string, recordingId: string) {
   // 2) Generate AI summary package
   const summaryResult = await generateAISessionSummary(sessionId);
 
-  // 3) Generate recap feed post (recording ready post)
+  // 3) Recording ready post
+  await ensureSessionLifecyclePost(sessionId, "recording_ready", {
+    titlePrefix: "🎬 Recording ready",
+    body: "Recording is now available. Watch the replay and continue the conversation.",
+  });
+
+  // 4) Recap post with AI summary package
   const recapResult = await generateSessionRecap(sessionId);
 
   await logSessionEvent(sessionId, "POST_PROCESSING_TRIGGERED", {
     recordingId,
-    jobs: ["transcript", "summary", "recap", "course_suggestion"],
+    jobs: ["transcript", "summary", "recording_ready", "recap", "course_suggestion"],
     summaryGenerated: summaryResult.success,
     recapGenerated: recapResult.success,
   });
