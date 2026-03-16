@@ -360,9 +360,17 @@ const sessionDate = new Date(s.scheduledAt);
                 <p className="text-sm font-medium text-zinc-200">QA Quick Flow</p>
                 <span className="text-xs text-zinc-500">Validate loop in ~1 min</span>
               </div>
-              <p className="mb-3 text-xs text-zinc-400">
+              <p className="mb-2 text-xs text-zinc-400">
                 Test create → join → recap/replay → public/share on the current primary session.
               </p>
+              <div className="mb-3 flex flex-wrap items-center gap-2 text-xs">
+                <span className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-zinc-300">
+                  Status: {primarySession.status}
+                </span>
+                <span className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-zinc-300">
+                  Visibility: {primarySession.visibility}
+                </span>
+              </div>
               <div className="flex flex-wrap gap-2">
                 <Link href={`/dashboard/sessions/${primarySession.id}/room?src=sessions_hub_qa`}>
                   <Button size="sm" className="bg-emerald-600 text-white hover:bg-emerald-700">
