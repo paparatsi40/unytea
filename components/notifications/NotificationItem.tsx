@@ -82,6 +82,14 @@ export function NotificationItem({ notification, onUpdate }: NotificationItemPro
   };
 
   const icon = NOTIFICATION_ICONS[notification.type] || NOTIFICATION_ICONS.SYSTEM;
+  const destination = notification.data?.link || notification.link || null;
+
+  const handleOpen = async () => {
+    if (!notification.isRead) {
+      await markNotificationAsRead(notification.id);
+      onUpdate?.();
+    }
+  };
 
   const content = (
     <div
@@ -146,8 +154,12 @@ export function NotificationItem({ notification, onUpdate }: NotificationItemPro
     </div>
   );
 
-  if (notification.data?.link) {
-    return <Link href={notification.data.link}>{content}</Link>;
+  if (destination) {
+    return (
+      <Link href={destination} onClick={handleOpen}>
+        {content}
+      </Link>
+    );
   }
 
   return content;
