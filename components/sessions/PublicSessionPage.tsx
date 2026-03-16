@@ -297,12 +297,46 @@ export function PublicSessionPage({ session, relatedSessions, nextSession }: Pub
                     <CardContent className="p-6">
                       <h3 className="mb-2 font-semibold text-white">AI Summary</h3>
                       <p className="text-zinc-300">{session.notes.summary}</p>
+
                       {session.notes.keyInsights.length > 0 && (
-                        <ul className="mt-4 list-disc space-y-1 pl-5 text-sm text-zinc-300">
-                          {session.notes.keyInsights.slice(0, 5).map((item, idx) => (
-                            <li key={idx}>{item}</li>
-                          ))}
-                        </ul>
+                        <div className="mt-4">
+                          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">Key takeaways</p>
+                          <ul className="list-disc space-y-1 pl-5 text-sm text-zinc-300">
+                            {session.notes.keyInsights.slice(0, 5).map((item, idx) => (
+                              <li key={idx}>{item}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {session.notes.chapters.length > 0 && (
+                        <div className="mt-5">
+                          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">Chapters</p>
+                          <div className="space-y-2">
+                            {session.notes.chapters.slice(0, 6).map((chapter, idx) => (
+                              <div key={idx} className="flex items-center justify-between rounded-md border border-zinc-800 bg-zinc-900/60 px-3 py-2 text-sm">
+                                <span className="text-zinc-200">{chapter.title}</span>
+                                {chapter.timestamp && <span className="text-zinc-500">{chapter.timestamp}</span>}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {session.notes.quotes.length > 0 && (
+                        <div className="mt-5">
+                          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">Key quotes</p>
+                          <div className="space-y-3">
+                            {session.notes.quotes.slice(0, 3).map((quote, idx) => (
+                              <blockquote key={idx} className="rounded-md border-l-2 border-emerald-500/50 bg-zinc-900/60 px-3 py-2 text-sm text-zinc-300">
+                                “{quote.text}”
+                                {quote.reason && (
+                                  <div className="mt-1 text-xs text-zinc-500">{quote.reason}</div>
+                                )}
+                              </blockquote>
+                            ))}
+                          </div>
+                        </div>
                       )}
                     </CardContent>
                   </Card>
