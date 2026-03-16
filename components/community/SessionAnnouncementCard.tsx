@@ -192,7 +192,11 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
             <span className="text-xs text-zinc-500">
               {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
             </span>
-          </div>
+            <span className="text-xs text-zinc-500">•</span>
+            <span className="text-xs font-medium text-zinc-600">
+              {isLive ? "Live" : hasRecording ? "Replay" : isUpcoming ? "Upcoming" : "Session"}
+            </span>
+</div>
         </div>
       </div>
 
@@ -315,8 +319,8 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
               </Button>
             </Link>
           ) : hasRecording && sessionState?.recordingUrl ? (
-            <Link href={sessionState.recordingUrl} target="_blank">
-              <Button
+            <Link href={`${sessionState.recordingUrl}${sessionState.recordingUrl.includes("?") ? "&" : "?"}src=feed_session_recording`} target="_blank">
+<Button
                 className={`w-full rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold shadow-md transition-all ${
                   isHovered ? "shadow-lg scale-[1.02]" : ""
                 }`}
