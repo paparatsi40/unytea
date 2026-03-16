@@ -148,14 +148,19 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
     const attendance = attendanceResult.success ? attendanceResult.metrics : null;
     const recommendation = attendance ? getAttendanceRecommendation(attendance) : null;
 
-    // Split into upcoming and past
+    // Split into live, upcoming and past
     const now = new Date();
-    const upcoming = allSessions.filter(s => new Date(s.scheduledAt) >= now);
-    const past = allSessions.filter(s => new Date(s.scheduledAt) < now);
+    const liveSessions = allSessions.filter((s) => s.status === "IN_PROGRESS");
+    const upcoming = allSessions.filter(
+      (s) => s.status === "SCHEDULED" && new Date(s.scheduledAt) >= now
+    );
+    const past = allSessions.filter(
+      (s) => s.status === "COMPLETED" || (s.status === "SCHEDULED" && new Date(s.scheduledAt) < now)
+    );
 
     // Calculate sessions this week
-    const thisWeek = upcoming.filter(s => {
-      const sessionDate = new Date(s.scheduledAt);
+    const thisWeek = [...liveSessions, ...upcoming].filter(s => {
+const sessionDate = new Date(s.scheduledAt);
       const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
       return sessionDate <= weekFromNow;
     });
@@ -175,8 +180,10 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
     const getSessionsForDay = (day: Date) =>
       allSessions.filter((s) => isSameDay(new Date(s.scheduledAt), day));
 
+    const primarySession = liveSessions[0] || upcoming[0] || null;
+
     async function handleRSVP(sessionId: string, _formData: FormData) {
-      "use server";
+"use server";
       await toggleSessionRSVP(sessionId, `/dashboard/communities/${communityId}/sessions`);
     }
 
@@ -194,6 +201,14 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
                   </Badge>
                 </div>
                 <p className="text-zinc-400">{community.name} • Run live coaching, classes, and workshops</p>
+                {liveSessions.length > 0 && (
+                  <div className="mt-2 flex items-center gap-2 text-sm">
+                    <Sparkles className="h-4 w-4 text-red-500" />
+                    <span className="text-zinc-300">
+                      {liveSessions.length} {liveSessions.length === 1 ? "session is" : "sessions are"} live now
+                    </span>
+                  </div>
+                )}
                 {upcoming.length > 0 && (
                   <div className="mt-2 flex items-center gap-2 text-sm">
                     <Sparkles className="h-4 w-4 text-yellow-500" />
@@ -202,7 +217,7 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
                     </span>
                   </div>
                 )}
-              </div>
+</div>
               {canCreateSessions && (
                 <CreateSessionDialog
                   triggerText="Schedule Session"
@@ -272,9 +287,9 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
           <Tabs defaultValue="upcoming" className="w-full">
 <TabsList className="bg-zinc-900 border-zinc-800 mb-6">
               <TabsTrigger value="upcoming" className="data-[state=active]:bg-zinc-800 text-zinc-300">
-                Upcoming ({upcoming.length})
+                Upcoming ({liveSessions.length + upcoming.length})
               </TabsTrigger>
-              <TabsTrigger value="past" className="data-[state=active]:bg-zinc-800 text-zinc-300">
+<TabsTrigger value="past" className="data-[state=active]:bg-zinc-800 text-zinc-300">
                 Past ({past.length})
               </TabsTrigger>
               <TabsTrigger value="calendar" className="data-[state=active]:bg-zinc-800 text-zinc-300">
@@ -283,51 +298,57 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
             </TabsList>
 
             <TabsContent value="upcoming" className="space-y-4">
-              {/* Show next session prominently if exists */}
-              {upcoming.length > 0 && (
-                <div className="rounded-xl border border-purple-500/30 bg-gradient-to-r from-purple-900/20 to-pink-900/20 p-6">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Badge className="bg-purple-600 text-white text-xs">
-                      Next Live Session
+              {/* Show primary session prominently (LIVE first, then next upcoming) */}
+              {primarySession && (
+                <div className={`rounded-xl p-6 ${
+                  primarySession.status === "IN_PROGRESS"
+                    ? "border border-red-500/30 bg-gradient-to-r from-red-900/20 to-rose-900/20"
+                    : "border border-purple-500/30 bg-gradient-to-r from-purple-900/20 to-pink-900/20"
+                }`}>
+                  <div className="mb-2 flex items-center gap-2">
+                    <Badge className={`${primarySession.status === "IN_PROGRESS" ? "bg-red-600" : "bg-purple-600"} text-xs text-white`}>
+                      {primarySession.status === "IN_PROGRESS" ? "Live Now" : "Next Live Session"}
                     </Badge>
-                    <span className="text-xs text-zinc-400">
-                      {formatDistanceToNow(new Date(upcoming[0].scheduledAt), { addSuffix: true })}
-                    </span>
+                    {primarySession.status !== "IN_PROGRESS" && (
+                      <span className="text-xs text-zinc-400">
+                        {formatDistanceToNow(new Date(primarySession.scheduledAt), { addSuffix: true })}
+                      </span>
+                    )}
                   </div>
-                  <h3 className="text-xl font-semibold text-white mb-1">
-                    {upcoming[0].title}
-                  </h3>
-                  <div className="flex items-center gap-4 text-sm text-zinc-400 mb-4">
+                  <h3 className="mb-1 text-xl font-semibold text-white">{primarySession.title}</h3>
+                  <div className="mb-4 flex items-center gap-4 text-sm text-zinc-400">
                     <span className="flex items-center gap-1">
                       <Calendar className="h-4 w-4" />
-                      {formatSessionDate(new Date(upcoming[0].scheduledAt))}
+                      {formatSessionDate(new Date(primarySession.scheduledAt))}
                     </span>
                     <span className="flex items-center gap-1">
                       <Clock className="h-4 w-4" />
-                      {formatSessionTime(new Date(upcoming[0].scheduledAt))}
+                      {formatSessionTime(new Date(primarySession.scheduledAt))}
                     </span>
-                    <span>{upcoming[0].duration} min</span>
+                    <span>{primarySession.duration} min</span>
                     <span>•</span>
-                    <span>{upcoming[0]._count?.participations || 0} attending</span>
+                    <span>{primarySession._count?.participations || 0} attending</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Link href={`/dashboard/sessions/${upcoming[0].id}/room`}>
-                      <Button className="bg-purple-600 hover:bg-purple-700 text-white">
-                        Join Session
-                        <ArrowRight className="h-4 w-4 ml-1" />
+                    <Link href={`/dashboard/sessions/${primarySession.id}/room`}>
+                      <Button className={`${primarySession.status === "IN_PROGRESS" ? "bg-red-600 hover:bg-red-700" : "bg-purple-600 hover:bg-purple-700"} text-white`}>
+                        {primarySession.status === "IN_PROGRESS" ? "Join Live Now" : "Join Session"}
+                        <ArrowRight className="ml-1 h-4 w-4" />
                       </Button>
                     </Link>
-                    <form action={handleRSVP.bind(null, upcoming[0].id)}>
-<Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
-                        {upcoming[0].participations?.length ? "Attending" : "RSVP"}
-                      </Button>
-                    </form>
+                    {primarySession.status !== "IN_PROGRESS" && (
+                      <form action={handleRSVP.bind(null, primarySession.id)}>
+                        <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
+                          {primarySession.participations?.length ? "Attending" : "RSVP"}
+                        </Button>
+                      </form>
+                    )}
                   </div>
                 </div>
               )}
 
-              {upcoming.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-zinc-800 bg-zinc-900 p-12 text-center">
+              {liveSessions.length + upcoming.length === 0 ? (
+<div className="rounded-2xl border border-dashed border-zinc-800 bg-zinc-900 p-12 text-center">
                   <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800">
                     <Video className="h-8 w-8 text-zinc-400" />
                   </div>
@@ -351,8 +372,8 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
                 </div>
               ) : (
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {upcoming.map((s) => (
-                    <div
+                  {[...liveSessions, ...upcoming].map((s) => (
+<div
                       key={s.id}
                       className="group rounded-xl border border-zinc-800 bg-zinc-950 p-5 transition-all hover:border-zinc-700"
                     >
@@ -362,6 +383,9 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
                         <span className="text-zinc-300">
                           {formatSessionDate(new Date(s.scheduledAt))}
                         </span>
+                        {s.status === "IN_PROGRESS" && (
+                          <Badge className="bg-red-600 text-white text-[10px]">LIVE</Badge>
+                        )}
                       </div>
 
                       {/* Title */}
@@ -391,16 +415,18 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
                       {/* Actions */}
                       <div className="flex items-center gap-2">
                         <Link href={`/dashboard/sessions/${s.id}/room`}>
-                          <Button className="bg-purple-600 hover:bg-purple-700 text-white">
-                            Join
+                          <Button className={`${s.status === "IN_PROGRESS" ? "bg-red-600 hover:bg-red-700" : "bg-purple-600 hover:bg-purple-700"} text-white`}>
+                            {s.status === "IN_PROGRESS" ? "Join Live" : "Join"}
                           </Button>
                         </Link>
-                        <form action={handleRSVP.bind(null, s.id)}>
-<Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
-                            {s.participations?.length ? "Attending" : "RSVP"}
-                          </Button>
-                        </form>
-                        {canCreateSessions && (
+                        {s.status !== "IN_PROGRESS" && (
+                          <form action={handleRSVP.bind(null, s.id)}>
+                            <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
+                              {s.participations?.length ? "Attending" : "RSVP"}
+                            </Button>
+                          </form>
+                        )}
+{canCreateSessions && (
                           <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
                             Edit
                           </Button>
