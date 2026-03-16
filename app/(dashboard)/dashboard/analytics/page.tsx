@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { getOverviewAnalytics } from "@/app/actions/analytics";
+import { getOverviewAnalytics, getRetentionCohorts } from "@/app/actions/analytics";
 import { BarChart3, TrendingUp, Users, MessageSquare, FileText } from "lucide-react";
 import { StatsCard } from "@/components/analytics/StatsCard";
 import { CommunitySelector } from "@/components/analytics/CommunitySelector";
@@ -16,7 +16,10 @@ export default async function AnalyticsPage() {
     redirect("/auth/signin");
   }
 
-  const result = await getOverviewAnalytics();
+  const [result, retentionResult] = await Promise.all([
+    getOverviewAnalytics(),
+    getRetentionCohorts(),
+  ]);
 
   if (!result.success || !result.data) {
     return (
@@ -35,6 +38,7 @@ export default async function AnalyticsPage() {
   }
 
   const data = result.data;
+  const cohorts = retentionResult.success ? retentionResult.cohorts || [] : [];
 
   return (
     <div className="space-y-8 p-8">
@@ -173,6 +177,49 @@ export default async function AnalyticsPage() {
               Create Community
             </a>
           </div>
+        )}
+      </div>
+
+      {/* Retention Cohorts */}
+      <div className="rounded-xl border border-border/50 bg-card/50 p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-bold text-foreground">Retention Cohorts</h2>
+            <p className="text-sm text-muted-foreground">
+              Weekly cohorts by join date and % active in following weeks
+            </p>
+          </div>
+        </div>
+
+        {cohorts.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead>
+                <tr className="border-b border-border/40 text-left text-muted-foreground">
+                  <th className="py-2 pr-4 font-medium">Cohort (week)</th>
+                  <th className="py-2 pr-4 font-medium">Size</th>
+                  <th className="py-2 pr-4 font-medium">W0</th>
+                  <th className="py-2 pr-4 font-medium">W1</th>
+                  <th className="py-2 pr-4 font-medium">W2</th>
+                  <th className="py-2 pr-4 font-medium">W3</th>
+                </tr>
+              </thead>
+              <tbody>
+                {cohorts.map((cohort) => (
+                  <tr key={cohort.cohort} className="border-b border-border/20 text-foreground">
+                    <td className="py-2 pr-4">{cohort.cohort}</td>
+                    <td className="py-2 pr-4">{cohort.size}</td>
+                    <td className="py-2 pr-4">{cohort.week0}%</td>
+                    <td className="py-2 pr-4">{cohort.week1}%</td>
+                    <td className="py-2 pr-4">{cohort.week2}%</td>
+                    <td className="py-2 pr-4">{cohort.week3}%</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="text-sm text-muted-foreground">Not enough cohort data yet.</p>
         )}
       </div>
 

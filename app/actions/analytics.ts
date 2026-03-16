@@ -2,7 +2,7 @@
 
 import { getCurrentUserId } from "@/lib/auth-utils";
 import { prisma } from "@/lib/prisma";
-import { startOfDay, subDays } from "date-fns";
+import { addWeeks, endOfWeek, startOfDay, startOfWeek, subDays } from "date-fns";
 
 /**
  * Get overview analytics for dashboard
@@ -449,5 +449,130 @@ export async function getMemberAnalytics(communityId: string) {
   } catch (error) {
     console.error("Error fetching member analytics:", error);
     return { success: false, error: "Failed to fetch member analytics" };
+  }
+}
+
+export async function getRetentionCohorts() {
+  try {
+    const userId = await getCurrentUserId();
+    if (!userId) {
+      return { success: false, error: "Not authenticated" };
+    }
+
+    const ownedCommunities = await prisma.community.findMany({
+      where: { ownerId: userId },
+      select: { id: true },
+    });
+
+    const communityIds = ownedCommunities.map((c) => c.id);
+    if (communityIds.length === 0) {
+      return { success: true, cohorts: [] };
+    }
+
+    const oldestCohortStart = startOfWeek(subDays(new Date(), 7 * 8), { weekStartsOn: 1 });
+
+    const members = await prisma.member.findMany({
+      where: {
+        communityId: { in: communityIds },
+        joinedAt: { gte: oldestCohortStart },
+      },
+      select: {
+        userId: true,
+        joinedAt: true,
+      },
+    });
+
+    const cohortBuckets = new Map<string, Set<string>>();
+    for (const member of members) {
+      const cohortKey = startOfWeek(member.joinedAt, { weekStartsOn: 1 })
+        .toISOString()
+        .slice(0, 10);
+
+      if (!cohortBuckets.has(cohortKey)) {
+        cohortBuckets.set(cohortKey, new Set());
+      }
+      cohortBuckets.get(cohortKey)!.add(member.userId);
+    }
+
+    const cohortEntries = Array.from(cohortBuckets.entries())
+      .sort((a, b) => b[0].localeCompare(a[0]))
+      .slice(0, 8);
+
+    const cohorts = [] as Array<{
+      cohort: string;
+      size: number;
+      week0: number;
+      week1: number;
+      week2: number;
+      week3: number;
+    }>;
+
+    for (const [cohort, users] of cohortEntries) {
+      const cohortStart = startOfWeek(new Date(cohort), { weekStartsOn: 1 });
+      const userIds = Array.from(users);
+      const size = userIds.length;
+
+      const retention = [] as number[];
+      for (let weekOffset = 0; weekOffset <= 3; weekOffset++) {
+        const windowStart = addWeeks(cohortStart, weekOffset);
+        const windowEnd = endOfWeek(windowStart, { weekStartsOn: 1 });
+
+        const [postUsers, commentUsers, participationUsers] = await Promise.all([
+          prisma.post.findMany({
+            where: {
+              communityId: { in: communityIds },
+              authorId: { in: userIds },
+              createdAt: { gte: windowStart, lte: windowEnd },
+            },
+            select: { authorId: true },
+            distinct: ["authorId"],
+          }),
+          prisma.comment.findMany({
+            where: {
+              authorId: { in: userIds },
+              createdAt: { gte: windowStart, lte: windowEnd },
+              post: {
+                communityId: { in: communityIds },
+              },
+            },
+            select: { authorId: true },
+            distinct: ["authorId"],
+          }),
+          prisma.sessionParticipation.findMany({
+            where: {
+              userId: { in: userIds },
+              createdAt: { gte: windowStart, lte: windowEnd },
+              session: {
+                communityId: { in: communityIds },
+              },
+            },
+            select: { userId: true },
+            distinct: ["userId"],
+          }),
+        ]);
+
+        const activeSet = new Set<string>([
+          ...postUsers.map((u) => u.authorId),
+          ...commentUsers.map((u) => u.authorId),
+          ...participationUsers.map((u) => u.userId),
+        ]);
+
+        retention.push(size > 0 ? Math.round((activeSet.size / size) * 100) : 0);
+      }
+
+      cohorts.push({
+        cohort,
+        size,
+        week0: retention[0] || 0,
+        week1: retention[1] || 0,
+        week2: retention[2] || 0,
+        week3: retention[3] || 0,
+      });
+    }
+
+    return { success: true, cohorts };
+  } catch (error) {
+    console.error("Error fetching retention cohorts:", error);
+    return { success: false, error: "Failed to fetch retention cohorts" };
   }
 }
