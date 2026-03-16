@@ -325,6 +325,18 @@ const sessionDate = new Date(s.scheduledAt);
                 Reset filters
               </Link>
               <Link
+                href={`/dashboard/communities/${communityId}/sessions?filter=live&pastFilter=all&window=7`}
+                className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-zinc-400 transition hover:bg-zinc-800"
+              >
+                Live now preset
+              </Link>
+              <Link
+                href={`/dashboard/communities/${communityId}/sessions?filter=all&pastFilter=public&window=30`}
+                className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-zinc-400 transition hover:bg-zinc-800"
+              >
+                Replay focus preset
+              </Link>
+              <Link
                 href={`/dashboard/communities/${communityId}/sessions?filter=${filter}&pastFilter=${pastFilter}&window=${metricWindow}`}
                 target="_blank"
                 className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-[11px] text-zinc-400 transition hover:bg-zinc-800"
