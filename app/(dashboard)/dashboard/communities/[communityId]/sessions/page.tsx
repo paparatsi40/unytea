@@ -512,22 +512,22 @@ const sessionDate = new Date(s.scheduledAt);
                 {upcomingLiveCount > 0 && (
                   <Badge className="bg-red-600 text-white text-xs">{upcomingLiveCount} live now</Badge>
                 )}
-<Link href={`/dashboard/communities/${communityId}/sessions?filter=all`}>
+<Link href={`/dashboard/communities/${communityId}/sessions?filter=all&window=${metricWindow}`}>
                   <Button variant="outline" className={`h-8 border-zinc-700 text-xs ${filter === "all" ? "bg-zinc-800 text-white" : "text-zinc-300 hover:bg-zinc-800"}`}>
                     All ({upcomingAllCount})
 </Button>
                 </Link>
-                <Link href={`/dashboard/communities/${communityId}/sessions?filter=live`}>
+                <Link href={`/dashboard/communities/${communityId}/sessions?filter=live&window=${metricWindow}`}>
                   <Button variant="outline" className={`h-8 border-zinc-700 text-xs ${filter === "live" ? "bg-red-600 text-white border-red-500" : "text-zinc-300 hover:bg-zinc-800"}`}>
                     Live ({upcomingLiveCount})
 </Button>
                 </Link>
-                <Link href={`/dashboard/communities/${communityId}/sessions?filter=today`}>
+                <Link href={`/dashboard/communities/${communityId}/sessions?filter=today&window=${metricWindow}`}>
                   <Button variant="outline" className={`h-8 border-zinc-700 text-xs ${filter === "today" ? "bg-zinc-800 text-white" : "text-zinc-300 hover:bg-zinc-800"}`}>
                     Today ({upcomingTodayCount})
 </Button>
                 </Link>
-                <Link href={`/dashboard/communities/${communityId}/sessions?filter=week`}>
+                <Link href={`/dashboard/communities/${communityId}/sessions?filter=week&window=${metricWindow}`}>
                   <Button variant="outline" className={`h-8 border-zinc-700 text-xs ${filter === "week" ? "bg-zinc-800 text-white" : "text-zinc-300 hover:bg-zinc-800"}`}>
                     This week ({upcomingWeekCount})
 </Button>
@@ -562,7 +562,7 @@ const sessionDate = new Date(s.scheduledAt);
                   )}
                   <div className="mt-4 flex items-center justify-center gap-2">
                     {filter !== "all" && (
-                      <Link href={`/dashboard/communities/${communityId}/sessions?filter=all`}>
+                      <Link href={`/dashboard/communities/${communityId}/sessions?filter=all&window=${metricWindow}`}>
                         <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
                           Clear filter
                         </Button>
@@ -661,17 +661,17 @@ const sessionDate = new Date(s.scheduledAt);
               ) : (
                 <div className="space-y-6">
                   <div className="flex flex-wrap gap-2">
-                    <Link href={`/dashboard/communities/${communityId}/sessions?filter=${filter}&pastFilter=all`}>
+                    <Link href={`/dashboard/communities/${communityId}/sessions?filter=${filter}&pastFilter=all&window=${metricWindow}`}>
                       <Button variant="outline" className={`h-8 border-zinc-700 text-xs ${pastFilter === "all" ? "bg-zinc-800 text-white" : "text-zinc-300 hover:bg-zinc-800"}`}>
                         All ({pastAllCount})
                       </Button>
                     </Link>
-                    <Link href={`/dashboard/communities/${communityId}/sessions?filter=${filter}&pastFilter=replay`}>
+                    <Link href={`/dashboard/communities/${communityId}/sessions?filter=${filter}&pastFilter=replay&window=${metricWindow}`}>
                       <Button variant="outline" className={`h-8 border-zinc-700 text-xs ${pastFilter === "replay" ? "bg-zinc-800 text-white" : "text-zinc-300 hover:bg-zinc-800"}`}>
                         With Replay ({pastReplayCount})
                       </Button>
                     </Link>
-                    <Link href={`/dashboard/communities/${communityId}/sessions?filter=${filter}&pastFilter=public`}>
+                    <Link href={`/dashboard/communities/${communityId}/sessions?filter=${filter}&pastFilter=public&window=${metricWindow}`}>
                       <Button variant="outline" className={`h-8 border-zinc-700 text-xs ${pastFilter === "public" ? "bg-emerald-600 text-white border-emerald-500" : "text-zinc-300 hover:bg-zinc-800"}`}>
                         Public Replays ({pastPublicReplayCount})
                       </Button>
