@@ -214,7 +214,19 @@ const sessionDate = new Date(s.scheduledAt);
     const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
     const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
 
-    const filteredUpcoming = [...liveSessions, ...upcoming].filter((s) => {
+    const allUpcomingPool = [...liveSessions, ...upcoming];
+    const upcomingAllCount = allUpcomingPool.length;
+    const upcomingLiveCount = allUpcomingPool.filter((s) => s.status === "IN_PROGRESS").length;
+    const upcomingTodayCount = allUpcomingPool.filter((s) => {
+      const date = new Date(s.scheduledAt);
+      return date >= startOfToday && date <= endOfToday;
+    }).length;
+    const upcomingWeekCount = allUpcomingPool.filter((s) => {
+      const date = new Date(s.scheduledAt);
+      return date >= now && date <= weekFromNow;
+    }).length;
+
+    const filteredUpcoming = allUpcomingPool.filter((s) => {
       const date = new Date(s.scheduledAt);
       if (filter === "live") return s.status === "IN_PROGRESS";
       if (filter === "today") return date >= startOfToday && date <= endOfToday;
@@ -408,23 +420,23 @@ const sessionDate = new Date(s.scheduledAt);
               <div className="mb-4 flex flex-wrap gap-2">
                 <Link href={`/dashboard/communities/${communityId}/sessions?filter=all`}>
                   <Button variant="outline" className={`h-8 border-zinc-700 text-xs ${filter === "all" ? "bg-zinc-800 text-white" : "text-zinc-300 hover:bg-zinc-800"}`}>
-                    All
-                  </Button>
+                    All ({upcomingAllCount})
+</Button>
                 </Link>
                 <Link href={`/dashboard/communities/${communityId}/sessions?filter=live`}>
                   <Button variant="outline" className={`h-8 border-zinc-700 text-xs ${filter === "live" ? "bg-red-600 text-white border-red-500" : "text-zinc-300 hover:bg-zinc-800"}`}>
-                    Live
-                  </Button>
+                    Live ({upcomingLiveCount})
+</Button>
                 </Link>
                 <Link href={`/dashboard/communities/${communityId}/sessions?filter=today`}>
                   <Button variant="outline" className={`h-8 border-zinc-700 text-xs ${filter === "today" ? "bg-zinc-800 text-white" : "text-zinc-300 hover:bg-zinc-800"}`}>
-                    Today
-                  </Button>
+                    Today ({upcomingTodayCount})
+</Button>
                 </Link>
                 <Link href={`/dashboard/communities/${communityId}/sessions?filter=week`}>
                   <Button variant="outline" className={`h-8 border-zinc-700 text-xs ${filter === "week" ? "bg-zinc-800 text-white" : "text-zinc-300 hover:bg-zinc-800"}`}>
-                    This week
-                  </Button>
+                    This week ({upcomingWeekCount})
+</Button>
                 </Link>
               </div>
 
