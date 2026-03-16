@@ -224,6 +224,7 @@ export async function getRelatedSessions(
         communityId,
         id: { not: currentSessionId },
         status: "COMPLETED",
+        visibility: "public",
         recording: { status: "READY" },
       },
       include: {
@@ -286,6 +287,7 @@ export async function getPublicSessionsForSEO(
     const sessions = await prisma.mentorSession.findMany({
       where: {
         status: "COMPLETED",
+        visibility: "public",
         recording: { status: "READY" },
         slug: { not: null },
       },
