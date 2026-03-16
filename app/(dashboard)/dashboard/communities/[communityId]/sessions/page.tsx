@@ -588,10 +588,10 @@ const sessionDate = new Date(s.scheduledAt);
                                 <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">Watch Replay</Button>
                               </Link>
                               {s.visibility === "public" && s.slug ? (
-                                <Link href={`/sessions/${s.slug}?ref=sessions_hub`} target="_blank">
+                                <Link href={`/sessions/${s.slug}?ref=sessions_hub&src=featured_replay`} target="_blank">
                                   <Button variant="outline" className="w-full border-zinc-700 text-zinc-300 hover:bg-zinc-800">Public Link</Button>
                                 </Link>
-                              ) : (
+) : (
                                 <Button variant="outline" disabled className="w-full border-zinc-800 text-zinc-600">Members-only</Button>
                               )}
                             </div>
@@ -643,13 +643,13 @@ const sessionDate = new Date(s.scheduledAt);
                                   </Button>
                                 </Link>
                                 {s.visibility === "public" && s.slug && (
-                                  <Link href={`/sessions/${s.slug}?ref=sessions_hub`} target="_blank">
+                                  <Link href={`/sessions/${s.slug}?ref=sessions_hub&src=past_card`} target="_blank">
                                     <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
                                       Public Link
                                     </Button>
                                   </Link>
                                 )}
-                              </>
+</>
                             ) : (
                               <Link href={`/dashboard/sessions/${s.id}/room`}>
                                 <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
