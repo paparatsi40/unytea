@@ -29,6 +29,7 @@ interface CommunitySessionsPageProps {
   searchParams: Promise<{
     filter?: string;
     pastFilter?: string;
+    window?: string;
   }>;
 }
 
@@ -92,7 +93,8 @@ try {
     }
 
     const { communityId } = await params;
-    const { filter = "all", pastFilter = "all" } = await searchParams;
+    const { filter = "all", pastFilter = "all", window = "30" } = await searchParams;
+    const metricWindow = ["7", "30", "90"].includes(window) ? Number(window) : 30;
 
     // Verify community exists and user is a member
     const community = await prisma.community.findUnique({
@@ -159,7 +161,7 @@ mentor: {
       // Continue with empty sessions
     }
 
-    const attendanceResult = await getCommunityAttendanceMetrics(communityId, 30);
+    const attendanceResult = await getCommunityAttendanceMetrics(communityId, metricWindow);
     const attendance = attendanceResult.success ? attendanceResult.metrics : null;
     const recommendation = attendance ? getAttendanceRecommendation(attendance) : null;
     const rsvpJoinTarget = 70;
@@ -296,6 +298,22 @@ const sessionDate = new Date(s.scheduledAt);
 
           {attendance && (
             <>
+            <div className="mb-3 flex flex-wrap items-center gap-2 text-xs">
+              <span className="text-zinc-500">Window:</span>
+              {([7, 30, 90] as const).map((days) => (
+                <Link
+                  key={days}
+                  href={`/dashboard/communities/${communityId}/sessions?filter=${filter}&pastFilter=${pastFilter}&window=${days}`}
+                  className={`rounded border px-2 py-1 transition ${
+                    metricWindow === days
+                      ? "border-zinc-500 bg-zinc-800 text-zinc-100"
+                      : "border-zinc-700 bg-zinc-900 text-zinc-400 hover:bg-zinc-800"
+                  }`}
+                >
+                  {days}d
+                </Link>
+              ))}
+            </div>
             <div className="mb-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
 <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4">
                 <p className="text-xs uppercase tracking-wide text-zinc-500">Avg attendance</p>
