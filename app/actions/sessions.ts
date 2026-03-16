@@ -373,6 +373,7 @@ export async function getCommunityAttendanceMetrics(communityId: string, days: n
           id: true,
           status: true,
           scheduledAt: true,
+          recordingUrl: true,
           _count: { select: { participations: true } },
         },
       }),
@@ -385,6 +386,7 @@ export async function getCommunityAttendanceMetrics(communityId: string, days: n
           id: true,
           status: true,
           scheduledAt: true,
+          recordingUrl: true,
           _count: { select: { participations: true } },
         },
       }),
@@ -394,6 +396,7 @@ export async function getCommunityAttendanceMetrics(communityId: string, days: n
       const completedSessions = sessions.filter((s) => s.status === "COMPLETED");
       const scheduledSessions = sessions.filter((s) => s.status === "SCHEDULED");
       const completedIds = completedSessions.map((s) => s.id);
+      const completedWithReplay = completedSessions.filter((s) => Boolean(s.recordingUrl)).length;
 
       const attendance = completedIds.length
         ? await prisma.sessionParticipation.groupBy({
@@ -433,17 +436,19 @@ export async function getCommunityAttendanceMetrics(communityId: string, days: n
       });
 
       const rsvpToJoinRate = uniqueRsvps > 0 ? (totalAttendance / uniqueRsvps) * 100 : 0;
+      const replayRate = completedSessions.length > 0 ? (completedWithReplay / completedSessions.length) * 100 : 0;
 
       return {
-        totalSessions: sessions.length,
+totalSessions: sessions.length,
         scheduledSessions: scheduledSessions.length,
         completedSessions: completedSessions.length,
         totalAttendance,
         avgAttendance: Number(avgAttendance.toFixed(1)),
         remindersSent,
         rsvpToJoinRate: Number(Math.min(100, rsvpToJoinRate).toFixed(1)),
+        replayRate: Number(Math.min(100, replayRate).toFixed(1)),
       };
-    };
+};
 
     const [currentMetrics, previousMetrics] = await Promise.all([
       computeMetrics(sessionsCurrent, since),
@@ -455,6 +460,7 @@ export async function getCommunityAttendanceMetrics(communityId: string, days: n
       rsvpToJoinRateDelta: Number((currentMetrics.rsvpToJoinRate - previousMetrics.rsvpToJoinRate).toFixed(1)),
       remindersSentDelta: currentMetrics.remindersSent - previousMetrics.remindersSent,
       completedSessionsDelta: currentMetrics.completedSessions - previousMetrics.completedSessions,
+      replayRateDelta: Number((currentMetrics.replayRate - previousMetrics.replayRate).toFixed(1)),
     };
 
     return {

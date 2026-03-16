@@ -297,12 +297,12 @@ const sessionDate = new Date(s.scheduledAt);
               <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4">
                 <p className="text-xs uppercase tracking-wide text-zinc-500">Completed sessions</p>
                 <p className="mt-1 text-2xl font-semibold text-white">{attendance.completedSessions}</p>
-                <p className="text-xs text-zinc-500">last {attendance.periodDays} days</p>
-                <p className={`mt-1 text-xs ${attendance.trend?.completedSessionsDelta >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
-                  {attendance.trend?.completedSessionsDelta >= 0 ? "+" : ""}{attendance.trend?.completedSessionsDelta || 0} vs prev period
+                <p className="text-xs text-zinc-500">Replay rate: {attendance.replayRate}%</p>
+                <p className={`mt-1 text-xs ${attendance.trend?.replayRateDelta >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                  {attendance.trend?.replayRateDelta >= 0 ? "+" : ""}{attendance.trend?.replayRateDelta || 0}pp replay vs prev period
                 </p>
               </div>
-            </div>
+</div>
             {recommendation && (
               <div className={`mb-6 rounded-lg border p-4 ${
                 recommendation.tone === "positive"
