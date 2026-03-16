@@ -354,6 +354,37 @@ const sessionDate = new Date(s.scheduledAt);
             </>
           )}
 
+          {primarySession && (
+            <div className="mb-6 rounded-lg border border-zinc-800 bg-zinc-900/60 p-4">
+              <div className="mb-2 flex items-center justify-between">
+                <p className="text-sm font-medium text-zinc-200">QA Quick Flow</p>
+                <span className="text-xs text-zinc-500">Validate loop in ~1 min</span>
+              </div>
+              <p className="mb-3 text-xs text-zinc-400">
+                Test create → join → recap/replay → public/share on the current primary session.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <Link href={`/dashboard/sessions/${primarySession.id}/room?src=sessions_hub_qa`}>
+                  <Button size="sm" className="bg-emerald-600 text-white hover:bg-emerald-700">
+                    Join room
+                  </Button>
+                </Link>
+                <Link href={`/dashboard/sessions/${primarySession.id}?src=sessions_hub_qa`}>
+                  <Button size="sm" variant="outline" className="border-zinc-700 text-zinc-200">
+                    Session detail
+                  </Button>
+                </Link>
+                {primarySession.visibility === "public" && primarySession.slug && (
+                  <Link href={`/sessions/${primarySession.slug}?ref=sessions_hub&src=qa_flow`} target="_blank">
+                    <Button size="sm" variant="outline" className="border-zinc-700 text-zinc-200">
+                      Public page
+                    </Button>
+                  </Link>
+                )}
+              </div>
+            </div>
+          )}
+
           <Tabs defaultValue="upcoming" className="w-full">
 <TabsList className="bg-zinc-900 border-zinc-800 mb-6">
               <TabsTrigger value="upcoming" className="data-[state=active]:bg-zinc-800 text-zinc-300">
