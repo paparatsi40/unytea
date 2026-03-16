@@ -639,17 +639,17 @@ defaultDuration={30}
 </Button>
                 </Link>
                 <Link href={`/dashboard/communities/${communityId}/sessions?filter=live&window=${metricWindow}`}>
-                  <Button variant="outline" className={`h-8 border-zinc-700 text-xs ${filter === "live" ? "bg-red-600 text-white border-red-500" : "text-zinc-300 hover:bg-zinc-800"}`}>
+                  <Button variant="outline" className={`h-8 border-zinc-700 text-xs ${filter === "live" ? "bg-red-600 text-white border-red-500" : "bg-zinc-900 text-zinc-100 hover:bg-zinc-800"}`}>
                     Live ({upcomingLiveCount})
 </Button>
                 </Link>
                 <Link href={`/dashboard/communities/${communityId}/sessions?filter=today&window=${metricWindow}`}>
-                  <Button variant="outline" className={`h-8 border-zinc-700 text-xs ${filter === "today" ? "bg-zinc-800 text-white" : "text-zinc-300 hover:bg-zinc-800"}`}>
+                  <Button variant="outline" className={`h-8 border-zinc-700 text-xs ${filter === "today" ? "bg-zinc-800 text-white" : "bg-zinc-900 text-zinc-100 hover:bg-zinc-800"}`}>
                     Today ({upcomingTodayCount})
 </Button>
                 </Link>
                 <Link href={`/dashboard/communities/${communityId}/sessions?filter=week&window=${metricWindow}`}>
-                  <Button variant="outline" className={`h-8 border-zinc-700 text-xs ${filter === "week" ? "bg-zinc-800 text-white" : "text-zinc-300 hover:bg-zinc-800"}`}>
+                  <Button variant="outline" className={`h-8 border-zinc-700 text-xs ${filter === "week" ? "bg-zinc-800 text-white" : "bg-zinc-900 text-zinc-100 hover:bg-zinc-800"}`}>
                     This week ({upcomingWeekCount})
 </Button>
                 </Link>
