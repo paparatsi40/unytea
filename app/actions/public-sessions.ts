@@ -336,6 +336,7 @@ export async function getNextCommunitySession(communityId: string) {
 export async function askQuestionForNextSession(params: {
   communityId: string;
   question: string;
+  source?: string;
 }) {
   try {
     const userId = await getCurrentUserId();
@@ -389,8 +390,8 @@ export async function askQuestionForNextSession(params: {
         attachments: {
           targetSessionId: nextSession.id,
           targetSessionTitle: nextSession.title,
-          source: "public_session_page",
-        } as Prisma.InputJsonValue,
+          source: params.source || "public_session_page",
+} as Prisma.InputJsonValue,
       },
     });
 

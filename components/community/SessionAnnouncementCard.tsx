@@ -143,6 +143,7 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
       const result = await askQuestionForNextSession({
         communityId: post.communityId,
         question: trimmed,
+        source: `feed_session_ask_${isLive ? "live" : hasRecording ? "replay" : "upcoming"}`,
       });
 
       if (!result.success) {
@@ -288,7 +289,10 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
                 {isQuestionSubmitting ? "Posting..." : "Ask"}
               </Button>
             </div>
-          </div>
+            <p className="mt-2 text-[11px] text-purple-700/80">
+              {isLive ? "Host can address this in real time." : hasRecording ? "This helps shape the next live session." : "Questions will be queued for the host before going live."}
+            </p>
+</div>
         )}
 
         {/* CTA Buttons */}
