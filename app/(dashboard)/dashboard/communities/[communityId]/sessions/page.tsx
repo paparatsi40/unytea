@@ -525,10 +525,19 @@ const sessionDate = new Date(s.scheduledAt);
                             </div>
                             <h4 className="mb-2 line-clamp-2 text-base font-semibold text-white">{s.title}</h4>
                             <p className="mb-4 text-xs text-zinc-400">{s.duration || 60} min • {s._count?.participations || 0} attended</p>
-                            <Link href={s.recordingUrl!} target="_blank">
-                              <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">Watch Replay</Button>
-                            </Link>
-                          </div>
+                            <div className="grid grid-cols-2 gap-2">
+                              <Link href={s.recordingUrl!} target="_blank">
+                                <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">Watch Replay</Button>
+                              </Link>
+                              {s.visibility === "public" && s.slug ? (
+                                <Link href={`/sessions/${s.slug}`} target="_blank">
+                                  <Button variant="outline" className="w-full border-zinc-700 text-zinc-300 hover:bg-zinc-800">Public Link</Button>
+                                </Link>
+                              ) : (
+                                <Button variant="outline" disabled className="w-full border-zinc-800 text-zinc-600">Members-only</Button>
+                              )}
+                            </div>
+</div>
                         ))}
                       </div>
                     </div>
