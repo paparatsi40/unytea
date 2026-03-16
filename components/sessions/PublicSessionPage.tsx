@@ -105,14 +105,17 @@ const formattedDuration = session.recording?.durationSeconds
     : null;
 
   const handleShare = async () => {
+    const shareUrl = new URL(window.location.href);
+    shareUrl.searchParams.set("src", "public_share");
+
     if (navigator.share) {
       await navigator.share({
         title: session.title,
         text: `Watch "${session.title}" by ${session.host.name} on Unytea`,
-        url: window.location.href,
+        url: shareUrl.toString(),
       });
     } else {
-      await navigator.clipboard.writeText(window.location.href);
+      await navigator.clipboard.writeText(shareUrl.toString());
     }
   };
 
@@ -439,11 +442,14 @@ const formattedDuration = session.recording?.durationSeconds
                   More from {session.community.name}
                 </h3>
                 <div className="grid gap-4 sm:grid-cols-2">
-                  {relatedSessions.map((related) => (
+                  {relatedSessions.map((related) => {
+                    const hasPublicPage = Boolean(related.slug);
+                    return (
                     <Card
                       key={related.id}
-                      className="cursor-pointer border-zinc-800 bg-zinc-900/50 transition-colors hover:bg-zinc-800"
+                      className={`border-zinc-800 bg-zinc-900/50 transition-colors ${hasPublicPage ? "cursor-pointer hover:bg-zinc-800" : "opacity-70"}`}
                       onClick={() => {
+                        if (!hasPublicPage) return;
                         const qs = new URLSearchParams();
                         if (ref) qs.set("ref", ref);
                         qs.set("src", "public_related_card");
@@ -451,7 +457,7 @@ const formattedDuration = session.recording?.durationSeconds
                         router.push(`/sessions/${related.slug}${suffix}`);
                       }}
                     >
-<CardContent className="p-4">
+                      <CardContent className="p-4">
                         <h4 className="mb-2 font-medium text-white line-clamp-2">
                           {related.title}
                         </h4>
@@ -464,10 +470,14 @@ const formattedDuration = session.recording?.durationSeconds
                           </Avatar>
                           <span>{related.host.name}</span>
                         </div>
+                        {!hasPublicPage && (
+                          <p className="mt-2 text-xs text-zinc-500">No public page for this session</p>
+                        )}
                       </CardContent>
                     </Card>
-                  ))}
-                </div>
+                    );
+                  })}
+</div>
               </div>
             )}
           </div>
