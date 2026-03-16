@@ -467,21 +467,27 @@ export function PublicSessionPage({ session, relatedSessions, nextSession }: Pub
                     <p className="mt-1 text-xs text-zinc-300">
                       {nextAttendingCount ?? 0} attending
                     </p>
-                    <Button
-                      onClick={handleRSVPNextSession}
-                      disabled={isRSVPLoading}
-                      variant={isAttendingNext ? "secondary" : "default"}
-                      className={`mt-3 w-full ${isAttendingNext ? "bg-zinc-800 text-zinc-200 hover:bg-zinc-700" : "bg-emerald-500 text-white hover:bg-emerald-600"}`}
-                    >
-                      {isRSVPLoading ? "Updating..." : isAttendingNext ? "Attending" : "RSVP for live"}
-                    </Button>
-                    {rsvpMessage && (
-                      <p className="mt-2 text-xs text-zinc-300">{rsvpMessage}</p>
+                    {session.isMember ? (
+                      <>
+                        <Button
+                          onClick={handleRSVPNextSession}
+                          disabled={isRSVPLoading}
+                          variant={isAttendingNext ? "secondary" : "default"}
+                          className={`mt-3 w-full ${isAttendingNext ? "bg-zinc-800 text-zinc-200 hover:bg-zinc-700" : "bg-emerald-500 text-white hover:bg-emerald-600"}`}
+                        >
+                          {isRSVPLoading ? "Updating..." : isAttendingNext ? "Attending" : "RSVP for live"}
+                        </Button>
+                        {rsvpMessage && (
+                          <p className="mt-2 text-xs text-zinc-300">{rsvpMessage}</p>
+                        )}
+                      </>
+                    ) : (
+                      <p className="mt-2 text-xs text-zinc-300">Join community to RSVP and participate live.</p>
                     )}
                   </div>
                 )}
 
-                {nextSession && (
+                {nextSession && session.isMember && (
                   <div className="mb-4 space-y-2">
                     <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
                       Ask a question for next session
@@ -509,7 +515,7 @@ export function PublicSessionPage({ session, relatedSessions, nextSession }: Pub
                   className="mb-3 w-full bg-emerald-500 hover:bg-emerald-600 text-white"
                   onClick={() => router.push(`/c/${session.community.slug}`)}
                 >
-                  Join Community
+                  {session.isMember ? "Go to Community" : "Join Community"}
                 </Button>
 
                 <Button
@@ -520,9 +526,11 @@ export function PublicSessionPage({ session, relatedSessions, nextSession }: Pub
                   Explore Communities
                 </Button>
 
-                <p className="mt-4 text-center text-xs text-zinc-500">
-                  Free to join. No credit card required.
-                </p>
+                {!session.isMember && (
+                  <p className="mt-4 text-center text-xs text-zinc-500">
+                    Free to join. No credit card required.
+                  </p>
+                )}
               </CardContent>
             </Card>
           </div>
