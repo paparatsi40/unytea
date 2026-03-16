@@ -724,3 +724,72 @@ export async function getHostAlerts() {
     return { success: false, error: "Failed to load host alerts" };
   }
 }
+
+export async function getMemberLeaderboard(limit: number = 5) {
+  try {
+    const userId = await getCurrentUserId();
+    if (!userId) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const hostCommunities = await prisma.member.findMany({
+      where: {
+        userId,
+        role: { in: ["OWNER", "ADMIN", "MODERATOR"] },
+      },
+      select: { communityId: true },
+    });
+
+    const communityIds = hostCommunities.map((m) => m.communityId);
+    if (communityIds.length === 0) {
+      return { success: true, contributors: [], attendees: [] };
+    }
+
+    const [contributorsRaw, attendeesRaw] = await Promise.all([
+      prisma.member.findMany({
+        where: { communityId: { in: communityIds }, status: "ACTIVE" },
+        select: {
+          userId: true,
+          points: true,
+          user: { select: { name: true, image: true } },
+        },
+        orderBy: { points: "desc" },
+        take: limit,
+      }),
+      prisma.sessionParticipation.groupBy({
+        by: ["userId"],
+        where: {
+          session: { communityId: { in: communityIds } },
+        },
+        _count: { userId: true },
+        orderBy: { _count: { userId: "desc" } },
+        take: limit,
+      }),
+    ]);
+
+    const attendeeUsers = await prisma.user.findMany({
+      where: { id: { in: attendeesRaw.map((a) => a.userId) } },
+      select: { id: true, name: true, image: true },
+    });
+    const attendeeMap = new Map(attendeeUsers.map((u) => [u.id, u]));
+
+    return {
+      success: true,
+      contributors: contributorsRaw.map((m) => ({
+        userId: m.userId,
+        name: m.user.name || "Member",
+        image: m.user.image,
+        score: m.points,
+      })),
+      attendees: attendeesRaw.map((a) => ({
+        userId: a.userId,
+        name: attendeeMap.get(a.userId)?.name || "Member",
+        image: attendeeMap.get(a.userId)?.image || null,
+        score: a._count.userId,
+      })),
+    };
+  } catch (error) {
+    console.error("Error getting member leaderboard:", error);
+    return { success: false, error: "Failed to load leaderboard" };
+  }
+}

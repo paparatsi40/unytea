@@ -45,6 +45,7 @@ import {
   getHostAnalyticsV1,
   getNextRecommendedAction,
   getHostAlerts,
+  getMemberLeaderboard,
 } from "@/app/actions/dashboard";
 import { toast } from "sonner";
 
@@ -132,6 +133,13 @@ interface HostAlert {
   cta: string;
 }
 
+interface LeaderboardMember {
+  userId: string;
+  name: string;
+  image: string | null;
+  score: number;
+}
+
 export default function DashboardPage() {
   const { user } = useCurrentUser();
 
@@ -148,6 +156,8 @@ export default function DashboardPage() {
   const [hostAnalytics, setHostAnalytics] = useState<HostAnalyticsV1 | null>(null);
   const [nextAction, setNextAction] = useState<NextRecommendedAction | null>(null);
   const [hostAlerts, setHostAlerts] = useState<HostAlert[]>([]);
+  const [topContributors, setTopContributors] = useState<LeaderboardMember[]>([]);
+  const [topAttendees, setTopAttendees] = useState<LeaderboardMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Load dashboard data
@@ -169,6 +179,7 @@ export default function DashboardPage() {
         hostAnalyticsRes,
         nextActionRes,
         hostAlertsRes,
+        leaderboardRes,
       ] = await Promise.all([
         getDashboardMetrics(),
         getNextLiveSession(),
@@ -179,6 +190,7 @@ export default function DashboardPage() {
         getHostAnalyticsV1(),
         getNextRecommendedAction(),
         getHostAlerts(),
+        getMemberLeaderboard(5),
       ]);
 
       if (metricsRes.success) setMetrics(metricsRes.metrics || null);
@@ -190,6 +202,10 @@ export default function DashboardPage() {
       if (hostAnalyticsRes.success) setHostAnalytics(hostAnalyticsRes.analytics || null);
       if (nextActionRes.success) setNextAction(nextActionRes.recommendation || null);
       if (hostAlertsRes.success) setHostAlerts(hostAlertsRes.alerts || []);
+      if (leaderboardRes.success) {
+        setTopContributors(leaderboardRes.contributors || []);
+        setTopAttendees(leaderboardRes.attendees || []);
+      }
     } catch (error) {
       console.error("Error loading dashboard:", error);
       toast.error("Failed to load dashboard data");
@@ -395,6 +411,54 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
             ))}
+          </div>
+        )}
+
+        {(topContributors.length > 0 || topAttendees.length > 0) && (
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg">Top Contributors</CardTitle>
+                <CardDescription>By contribution points</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {topContributors.slice(0, 5).map((member, idx) => (
+                  <div key={member.userId} className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs font-semibold text-zinc-500 w-5">#{idx + 1}</span>
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={member.image || ""} />
+                        <AvatarFallback>{member.name.slice(0, 1).toUpperCase()}</AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm font-medium text-zinc-900">{member.name}</span>
+                    </div>
+                    <span className="text-sm font-semibold text-purple-700">{member.score} pts</span>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg">Top Attendees</CardTitle>
+                <CardDescription>By session participations</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {topAttendees.slice(0, 5).map((member, idx) => (
+                  <div key={member.userId} className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs font-semibold text-zinc-500 w-5">#{idx + 1}</span>
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={member.image || ""} />
+                        <AvatarFallback>{member.name.slice(0, 1).toUpperCase()}</AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm font-medium text-zinc-900">{member.name}</span>
+                    </div>
+                    <span className="text-sm font-semibold text-blue-700">{member.score}</span>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
           </div>
         )}
 
