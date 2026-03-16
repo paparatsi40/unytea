@@ -117,9 +117,11 @@ try {
           scheduledAt: true,
           duration: true,
           status: true,
+          visibility: true,
+          slug: true,
           recordingUrl: true,
           mentorId: true,
-          mentor: {
+mentor: {
             select: {
               id: true,
               name: true,
@@ -364,6 +366,13 @@ const sessionDate = new Date(s.scheduledAt);
                         <ArrowRight className="ml-1 h-4 w-4" />
                       </Button>
                     </Link>
+                    {primarySession.visibility === "public" && primarySession.slug && (
+                      <Link href={`/sessions/${primarySession.slug}`} target="_blank">
+                        <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
+                          Public Page
+                        </Button>
+                      </Link>
+                    )}
                     {primarySession.status !== "IN_PROGRESS" && (
                       <form action={handleRSVP.bind(null, primarySession.id)}>
                         <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
@@ -371,7 +380,7 @@ const sessionDate = new Date(s.scheduledAt);
                         </Button>
                       </form>
                     )}
-                  </div>
+</div>
                 </div>
               )}
 
