@@ -513,12 +513,19 @@ const sessionDate = new Date(s.scheduledAt);
                       </p>
 
                       {/* Actions */}
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         <Link href={`/dashboard/sessions/${s.id}/room`}>
                           <Button className={`${s.status === "IN_PROGRESS" ? "bg-red-600 hover:bg-red-700" : "bg-purple-600 hover:bg-purple-700"} text-white`}>
                             {s.status === "IN_PROGRESS" ? "Join Live" : "Join"}
                           </Button>
                         </Link>
+                        {s.visibility === "public" && s.slug && (
+                          <Link href={`/sessions/${s.slug}?ref=sessions_hub&src=upcoming_card`} target="_blank">
+                            <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
+                              Public Page
+                            </Button>
+                          </Link>
+                        )}
                         {s.status !== "IN_PROGRESS" && (
                           <form action={handleRSVP.bind(null, s.id)}>
                             <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
@@ -526,13 +533,13 @@ const sessionDate = new Date(s.scheduledAt);
                             </Button>
                           </form>
                         )}
-{canCreateSessions && (
+                        {canCreateSessions && (
                           <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
                             Edit
                           </Button>
                         )}
                       </div>
-                    </div>
+</div>
                   ))}
                 </div>
               )}
