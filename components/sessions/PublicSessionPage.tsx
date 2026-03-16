@@ -89,6 +89,7 @@ export function PublicSessionPage({ session, relatedSessions, nextSession }: Pub
   const [rsvpMessage, setRsvpMessage] = useState<string | null>(null);
 
   const formattedDate = format(new Date(session.scheduledAt), "MMMM d, yyyy");
+  const canViewPremiumContent = session.canWatchRecording || session.isMember;
   const formattedDuration = session.recording?.durationSeconds
     ? `${Math.round(session.recording.durationSeconds / 60)} min`
     : session.duration
@@ -263,8 +264,8 @@ export function PublicSessionPage({ session, relatedSessions, nextSession }: Pub
             <Tabs defaultValue="about" className="w-full">
               <TabsList className="mb-6 bg-zinc-900">
                 <TabsTrigger value="about">About</TabsTrigger>
-                <TabsTrigger value="notes" disabled={!session.notes}>
-                  Notes {session.notes && "✓"}
+                <TabsTrigger value="notes" disabled={!session.notes || !canViewPremiumContent}>
+                  Notes {session.notes && canViewPremiumContent && "✓"}
                 </TabsTrigger>
                 <TabsTrigger value="community">Community</TabsTrigger>
               </TabsList>
@@ -292,7 +293,7 @@ export function PublicSessionPage({ session, relatedSessions, nextSession }: Pub
                   </CardContent>
                 </Card>
 
-                {session.notes?.summary && (
+                {session.notes?.summary && canViewPremiumContent && (
                   <Card className="border-zinc-800 bg-zinc-900/50">
                     <CardContent className="p-6">
                       <h3 className="mb-2 font-semibold text-white">AI Summary</h3>
@@ -343,7 +344,7 @@ export function PublicSessionPage({ session, relatedSessions, nextSession }: Pub
                 )}
 
                 {/* Session Notes */}
-                {session.notes?.content && (
+                {session.notes?.content && canViewPremiumContent && (
                   <Card className="border-zinc-800 bg-zinc-900/50">
                     <CardContent className="p-6">
                       <h3 className="mb-4 font-semibold text-white">Session Notes</h3>
@@ -353,15 +354,40 @@ export function PublicSessionPage({ session, relatedSessions, nextSession }: Pub
                     </CardContent>
                   </Card>
                 )}
-</TabsContent>
+
+                {session.notes && !canViewPremiumContent && (
+                  <Card className="border-amber-500/30 bg-amber-500/10">
+                    <CardContent className="p-6">
+                      <h3 className="mb-2 font-semibold text-white">Members-only insights</h3>
+                      <p className="text-sm text-zinc-300">
+                        Join the community to unlock AI summary, key takeaways, chapters, and full session notes.
+                      </p>
+                      <Button
+                        className="mt-4 bg-emerald-500 text-white hover:bg-emerald-600"
+                        onClick={() => router.push(`/c/${session.community.slug}`)}
+                      >
+                        Join to unlock insights
+                      </Button>
+                    </CardContent>
+                  </Card>
+                )}
+              </TabsContent>
 
               <TabsContent value="notes">
-                {session.notes?.content ? (
+                {session.notes?.content && canViewPremiumContent ? (
                   <Card className="border-zinc-800 bg-zinc-900/50">
                     <CardContent className="p-6">
                       <div className="prose prose-invert max-w-none text-zinc-300">
                         {session.notes.content}
                       </div>
+                    </CardContent>
+                  </Card>
+                ) : session.notes && !canViewPremiumContent ? (
+                  <Card className="border-amber-500/30 bg-amber-500/10">
+                    <CardContent className="p-6">
+                      <p className="text-sm text-zinc-300">
+                        Notes are available for community members only.
+                      </p>
                     </CardContent>
                   </Card>
                 ) : (
