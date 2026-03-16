@@ -26,6 +26,9 @@ interface CommunitySessionsPageProps {
   params: Promise<{
     communityId: string;
   }>;
+  searchParams: Promise<{
+    filter?: string;
+  }>;
 }
 
 function formatSessionDate(date: Date): string {
@@ -72,14 +75,15 @@ function getAttendanceRecommendation(attendance: any) {
   };
 }
 
-export default async function CommunitySessionsPage({ params }: CommunitySessionsPageProps) {
-  try {
+export default async function CommunitySessionsPage({ params, searchParams }: CommunitySessionsPageProps) {
+try {
     const session = await auth();
     if (!session?.user?.id) {
       redirect("/auth/signin");
     }
 
     const { communityId } = await params;
+    const { filter = "all" } = await searchParams;
 
     // Verify community exists and user is a member
     const community = await prisma.community.findUnique({
@@ -179,6 +183,18 @@ const sessionDate = new Date(s.scheduledAt);
 
     const getSessionsForDay = (day: Date) =>
       allSessions.filter((s) => isSameDay(new Date(s.scheduledAt), day));
+
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+    const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+    const filteredUpcoming = [...liveSessions, ...upcoming].filter((s) => {
+      const date = new Date(s.scheduledAt);
+      if (filter === "live") return s.status === "IN_PROGRESS";
+      if (filter === "today") return date >= startOfToday && date <= endOfToday;
+      if (filter === "week") return date >= now && date <= weekFromNow;
+      return true;
+    });
 
     const primarySession = liveSessions[0] || upcoming[0] || null;
 
@@ -347,7 +363,30 @@ const sessionDate = new Date(s.scheduledAt);
                 </div>
               )}
 
-              {liveSessions.length + upcoming.length === 0 ? (
+              <div className="mb-4 flex flex-wrap gap-2">
+                <Link href={`/dashboard/communities/${communityId}/sessions?filter=all`}>
+                  <Button variant="outline" className={`h-8 border-zinc-700 text-xs ${filter === "all" ? "bg-zinc-800 text-white" : "text-zinc-300 hover:bg-zinc-800"}`}>
+                    All
+                  </Button>
+                </Link>
+                <Link href={`/dashboard/communities/${communityId}/sessions?filter=live`}>
+                  <Button variant="outline" className={`h-8 border-zinc-700 text-xs ${filter === "live" ? "bg-red-600 text-white border-red-500" : "text-zinc-300 hover:bg-zinc-800"}`}>
+                    Live
+                  </Button>
+                </Link>
+                <Link href={`/dashboard/communities/${communityId}/sessions?filter=today`}>
+                  <Button variant="outline" className={`h-8 border-zinc-700 text-xs ${filter === "today" ? "bg-zinc-800 text-white" : "text-zinc-300 hover:bg-zinc-800"}`}>
+                    Today
+                  </Button>
+                </Link>
+                <Link href={`/dashboard/communities/${communityId}/sessions?filter=week`}>
+                  <Button variant="outline" className={`h-8 border-zinc-700 text-xs ${filter === "week" ? "bg-zinc-800 text-white" : "text-zinc-300 hover:bg-zinc-800"}`}>
+                    This week
+                  </Button>
+                </Link>
+              </div>
+
+              {filteredUpcoming.length === 0 ? (
 <div className="rounded-2xl border border-dashed border-zinc-800 bg-zinc-900 p-12 text-center">
                   <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800">
                     <Video className="h-8 w-8 text-zinc-400" />
@@ -372,7 +411,7 @@ const sessionDate = new Date(s.scheduledAt);
                 </div>
               ) : (
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {[...liveSessions, ...upcoming].map((s) => (
+                  {filteredUpcoming.map((s) => (
 <div
                       key={s.id}
                       className="group rounded-xl border border-zinc-800 bg-zinc-950 p-5 transition-all hover:border-zinc-700"
