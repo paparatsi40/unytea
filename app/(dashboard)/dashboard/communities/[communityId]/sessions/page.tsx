@@ -38,6 +38,40 @@ function formatSessionTime(date: Date): string {
   return format(date, "h:mm a");
 }
 
+function getAttendanceRecommendation(attendance: any) {
+  if (!attendance) return null;
+
+  if (attendance.rsvpToJoinRate < 50) {
+    return {
+      title: "Low RSVP → Join conversion",
+      description: "Prioritize reminders + pre-session question prompts to convert intent into attendance.",
+      tone: "warning" as const,
+    };
+  }
+
+  if (attendance.avgAttendance < 5 && attendance.completedSessions >= 3) {
+    return {
+      title: "Attendance is still low",
+      description: "Try a fixed weekly time and announce it earlier in feed to build a habit loop.",
+      tone: "warning" as const,
+    };
+  }
+
+  if ((attendance.trend?.avgAttendanceDelta || 0) > 0 || (attendance.trend?.rsvpToJoinRateDelta || 0) > 0) {
+    return {
+      title: "Momentum is improving",
+      description: "Keep cadence stable this week and push one extra live session announcement.",
+      tone: "positive" as const,
+    };
+  }
+
+  return {
+    title: "Stable baseline",
+    description: "Run one focused experiment this week (topic, time slot, or reminder copy) and track deltas.",
+    tone: "neutral" as const,
+  };
+}
+
 export default async function CommunitySessionsPage({ params }: CommunitySessionsPageProps) {
   try {
     const session = await auth();
@@ -112,6 +146,7 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
 
     const attendanceResult = await getCommunityAttendanceMetrics(communityId, 30);
     const attendance = attendanceResult.success ? attendanceResult.metrics : null;
+    const recommendation = attendance ? getAttendanceRecommendation(attendance) : null;
 
     // Split into upcoming and past
     const now = new Date();
@@ -184,8 +219,9 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
           </div>
 
           {attendance && (
-            <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4">
+            <>
+            <div className="mb-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+<div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4">
                 <p className="text-xs uppercase tracking-wide text-zinc-500">Avg attendance</p>
                 <p className="mt-1 text-2xl font-semibold text-white">{attendance.avgAttendance}</p>
                 <p className="text-xs text-zinc-500">last {attendance.periodDays} days</p>
@@ -218,10 +254,23 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
                 </p>
               </div>
             </div>
+            {recommendation && (
+              <div className={`mb-6 rounded-lg border p-4 ${
+                recommendation.tone === "positive"
+                  ? "border-emerald-500/30 bg-emerald-500/10"
+                  : recommendation.tone === "warning"
+                  ? "border-amber-500/30 bg-amber-500/10"
+                  : "border-zinc-700 bg-zinc-900"
+              }`}>
+                <p className="text-sm font-semibold text-white">{recommendation.title}</p>
+                <p className="mt-1 text-sm text-zinc-300">{recommendation.description}</p>
+              </div>
+            )}
+            </>
           )}
 
           <Tabs defaultValue="upcoming" className="w-full">
-            <TabsList className="bg-zinc-900 border-zinc-800 mb-6">
+<TabsList className="bg-zinc-900 border-zinc-800 mb-6">
               <TabsTrigger value="upcoming" className="data-[state=active]:bg-zinc-800 text-zinc-300">
                 Upcoming ({upcoming.length})
               </TabsTrigger>
