@@ -298,6 +298,11 @@ const sessionDate = new Date(s.scheduledAt);
 
           {attendance && (
             <>
+            <div className="mb-2 flex flex-wrap items-center gap-2 text-[11px] text-zinc-400">
+              <span className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1">Upcoming: {filter}</span>
+              <span className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1">Past: {pastFilter}</span>
+              <span className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1">Window: {metricWindow}d</span>
+            </div>
             <div className="mb-3 flex flex-wrap items-center gap-2 text-xs">
               <span className="text-zinc-500">Window:</span>
               {([7, 30, 90] as const).map((days) => (
