@@ -249,61 +249,73 @@ export async function sendSessionReminders() {
   try {
     const now = new Date();
 
-    // Find sessions starting in ~1 hour (within 55-65 min window)
-    const oneHourFromNow = new Date(now);
-    oneHourFromNow.setHours(oneHourFromNow.getHours() + 1);
-    const oneHourWindowStart = new Date(oneHourFromNow);
-    oneHourWindowStart.setMinutes(oneHourWindowStart.getMinutes() - 5);
-    const oneHourWindowEnd = new Date(oneHourFromNow);
-    oneHourWindowEnd.setMinutes(oneHourWindowEnd.getMinutes() + 5);
+    const windows = [
+      { minutes: 60, title: "Session starts in 1 hour", key: "1h" },
+      { minutes: 10, title: "Session starts in 10 minutes", key: "10m" },
+    ];
 
-    const sessionsStartingSoon = await prisma.mentorSession.findMany({
-      where: {
-        scheduledAt: {
-          gte: oneHourWindowStart,
-          lte: oneHourWindowEnd,
+    for (const window of windows) {
+      const target = new Date(now.getTime() + window.minutes * 60 * 1000);
+      const windowStart = new Date(target.getTime() - 5 * 60 * 1000);
+      const windowEnd = new Date(target.getTime() + 5 * 60 * 1000);
+
+      const sessionsStartingSoon = await prisma.mentorSession.findMany({
+        where: {
+          scheduledAt: {
+            gte: windowStart,
+            lte: windowEnd,
+          },
+          status: "SCHEDULED",
         },
-        status: "SCHEDULED",
-      },
-      include: {
-        mentor: { select: { id: true, name: true } },
-        mentee: { select: { id: true, name: true } },
-        participations: {
-          include: {
-            user: { select: { id: true, name: true } },
+        include: {
+          participations: {
+            include: {
+              user: { select: { id: true, name: true } },
+            },
           },
         },
-      },
-    });
+      });
 
-    for (const session of sessionsStartingSoon) {
-      try {
-        // Create notifications for participants
-        const participantIds = session.participations.map((p) => p.userId);
-        participantIds.push(session.mentorId, session.menteeId);
-        const uniqueParticipants = [...new Set(participantIds)];
+      for (const session of sessionsStartingSoon) {
+        try {
+          const participantIds = session.participations.map((p) => p.userId);
+          participantIds.push(session.mentorId, session.menteeId);
+          const uniqueParticipants = [...new Set(participantIds.filter(Boolean))];
 
-        for (const userId of uniqueParticipants) {
-          await prisma.notification.create({
-            data: {
-              type: "SESSION_REMINDER",
-              title: "Session starting in 1 hour",
-              message: `${session.title} starts at ${session.scheduledAt.toLocaleTimeString()}`,
-              data: {
-                sessionId: session.id,
-                title: session.title,
-                scheduledAt: session.scheduledAt,
+          for (const userId of uniqueParticipants) {
+            const alreadySent = await prisma.notification.findFirst({
+              where: {
+                userId,
+                type: "SESSION_REMINDER",
+                title: window.title,
+                createdAt: { gte: new Date(now.getTime() - 2 * 60 * 60 * 1000) },
               },
-              userId,
-            },
-          });
-        }
+            });
 
-        results.remindersSent += uniqueParticipants.length;
-      } catch (error) {
-        const errorMsg = `Failed to send reminders for ${session.id}: ${error}`;
-        console.error(errorMsg);
-        results.errors.push(errorMsg);
+            if (alreadySent) continue;
+
+            await prisma.notification.create({
+              data: {
+                type: "SESSION_REMINDER",
+                title: window.title,
+                message: `${session.title} starts at ${session.scheduledAt.toLocaleTimeString()}`,
+                data: {
+                  sessionId: session.id,
+                  title: session.title,
+                  scheduledAt: session.scheduledAt.toISOString(),
+                  reminderType: window.key,
+                },
+                userId,
+              },
+            });
+
+            results.remindersSent += 1;
+          }
+        } catch (error) {
+          const errorMsg = `Failed to send ${window.key} reminders for ${session.id}: ${error}`;
+          console.error(errorMsg);
+          results.errors.push(errorMsg);
+        }
       }
     }
 

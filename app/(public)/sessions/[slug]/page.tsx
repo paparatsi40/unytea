@@ -1,6 +1,10 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getPublicSession, getRelatedSessions } from "@/app/actions/public-sessions";
+import {
+  getPublicSession,
+  getRelatedSessions,
+  getNextCommunitySession,
+} from "@/app/actions/public-sessions";
 import { PublicSessionPage } from "@/components/sessions/PublicSessionPage";
 
 interface PublicSessionRouteProps {
@@ -79,10 +83,13 @@ export default async function PublicSessionRoute({ params }: PublicSessionRouteP
     3
   );
 
+  const nextSessionResult = await getNextCommunitySession(session.community.id);
+
   return (
     <PublicSessionPage
       session={session}
       relatedSessions={relatedResult.success ? relatedResult.sessions || [] : []}
+      nextSession={nextSessionResult.success ? nextSessionResult.session ?? null : null}
     />
   );
 }

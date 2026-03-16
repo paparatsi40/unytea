@@ -4,6 +4,8 @@ import { WebhookReceiver } from "livekit-server-sdk";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { autoStartRecording } from "./recording";
+import { createNotification } from "./notifications";
+import { generateAISessionSummary } from "./session-ai";
 
 // LiveKit configuration
 const LIVEKIT_API_KEY = process.env.LIVEKIT_API_KEY || "";
@@ -370,6 +372,38 @@ async function handleEgressEnded(event: any) {
       },
     });
 
+    const sessionWithParticipants = await prisma.mentorSession.findUnique({
+      where: { id: sessionId },
+      include: {
+        participations: { select: { userId: true } },
+      },
+    });
+
+    if (sessionWithParticipants) {
+      const targetUserIds = [
+        sessionWithParticipants.mentorId,
+        sessionWithParticipants.menteeId,
+        ...sessionWithParticipants.participations.map((p) => p.userId),
+      ];
+
+      const uniqueTargetUserIds = [...new Set(targetUserIds.filter(Boolean))];
+
+      for (const userId of uniqueTargetUserIds) {
+        await createNotification({
+          userId,
+          type: "SYSTEM",
+          title: "Recording is ready",
+          message: `The recording for \"${sessionWithParticipants.title}\" is now available.`,
+          data: {
+            sessionId,
+            recordingId: recording.id,
+            recordingUrl: fileResult.filename,
+            type: "recording_ready",
+          },
+        });
+      }
+    }
+
     // Trigger post-processing jobs
     await triggerPostProcessing(sessionId, recording.id);
   } else {
@@ -440,10 +474,13 @@ async function triggerPostProcessing(sessionId: string, recordingId: string) {
 
   console.log(`[Post-Processing] Triggered for session ${sessionId}`);
 
-  // For now, just log. In production, use a queue like BullMQ or SQS
+  // For now, execute summary generation directly (can move to queue later)
+  const summaryResult = await generateAISessionSummary(sessionId);
+
   await logSessionEvent(sessionId, "POST_PROCESSING_TRIGGERED", {
     recordingId,
     jobs: ["transcript", "summary", "recap", "course_suggestion"],
+    summaryGenerated: summaryResult.success,
   });
 }
 

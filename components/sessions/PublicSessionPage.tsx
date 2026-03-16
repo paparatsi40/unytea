@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { askQuestionForNextSession } from "@/app/actions/public-sessions";
 import { useRouter } from "next/navigation";
 import { Play, Calendar, Users, Clock, Share2, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -60,11 +61,20 @@ interface PublicSessionPageProps {
     attendeeCount: number;
     duration: number | null;
   }[];
+  nextSession?: {
+    id: string;
+    title: string;
+    scheduledAt: Date;
+    duration: number | null;
+  } | null;
 }
 
-export function PublicSessionPage({ session, relatedSessions }: PublicSessionPageProps) {
+export function PublicSessionPage({ session, relatedSessions, nextSession }: PublicSessionPageProps) {
   const router = useRouter();
   const [isPlaying, setIsPlaying] = useState(false);
+  const [question, setQuestion] = useState("");
+  const [isSubmittingQuestion, setIsSubmittingQuestion] = useState(false);
+  const [questionMessage, setQuestionMessage] = useState<string | null>(null);
 
   const formattedDate = format(new Date(session.scheduledAt), "MMMM d, yyyy");
   const formattedDuration = session.recording?.durationSeconds
@@ -83,6 +93,26 @@ export function PublicSessionPage({ session, relatedSessions }: PublicSessionPag
     } else {
       await navigator.clipboard.writeText(window.location.href);
     }
+  };
+
+  const handleAskQuestion = async () => {
+    if (!nextSession) return;
+    setQuestionMessage(null);
+    setIsSubmittingQuestion(true);
+
+    const result = await askQuestionForNextSession({
+      communityId: session.community.id,
+      question,
+    });
+
+    if (result.success) {
+      setQuestion("");
+      setQuestionMessage("Question submitted for the next live session.");
+    } else {
+      setQuestionMessage(result.error || "Could not submit your question.");
+    }
+
+    setIsSubmittingQuestion(false);
   };
 
   return (
@@ -318,6 +348,42 @@ export function PublicSessionPage({ session, relatedSessions }: PublicSessionPag
                 <p className="mb-6 text-sm text-zinc-400">
                   Join this community to access live sessions, recordings, and connect with like-minded people.
                 </p>
+
+                {nextSession && (
+                  <div className="mb-4 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-emerald-400">
+                      Next live session
+                    </p>
+                    <p className="mt-1 text-sm font-semibold text-white">{nextSession.title}</p>
+                    <p className="mt-1 text-xs text-zinc-300">
+                      {format(new Date(nextSession.scheduledAt), "MMM d, yyyy 'at' h:mm a")}
+                    </p>
+                  </div>
+                )}
+
+                {nextSession && (
+                  <div className="mb-4 space-y-2">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+                      Ask a question for next session
+                    </p>
+                    <textarea
+                      value={question}
+                      onChange={(e) => setQuestion(e.target.value)}
+                      placeholder="Drop your question for the host..."
+                      className="min-h-[84px] w-full rounded-md border border-zinc-700 bg-zinc-900 p-2 text-sm text-white placeholder:text-zinc-500 focus:border-emerald-500 focus:outline-none"
+                    />
+                    <Button
+                      disabled={isSubmittingQuestion || question.trim().length < 5}
+                      onClick={handleAskQuestion}
+                      className="w-full bg-zinc-800 text-zinc-200 hover:bg-zinc-700"
+                    >
+                      {isSubmittingQuestion ? "Submitting..." : "Submit Question"}
+                    </Button>
+                    {questionMessage && (
+                      <p className="text-xs text-zinc-400">{questionMessage}</p>
+                    )}
+                  </div>
+                )}
 
                 <Button
                   className="mb-3 w-full bg-emerald-500 hover:bg-emerald-600 text-white"

@@ -1,6 +1,8 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { getCurrentUserId } from "@/lib/auth-utils";
+import { PostContentType, Prisma } from "@prisma/client";
 
 export interface PublicSessionData {
   id: string;
@@ -217,12 +219,104 @@ export async function getPublicSessionsForSEO(
       orderBy: { updatedAt: "desc" },
       take: limit,
     });
-    
+
     return sessions
       .filter((s): s is { slug: string; updatedAt: Date; scheduledAt: Date } => s.slug !== null)
       .map((s) => ({ slug: s.slug, updatedAt: s.updatedAt, scheduledAt: s.scheduledAt }));
   } catch (error) {
     console.error("Error fetching sessions for SEO:", error);
     return [];
+  }
+}
+
+export async function getNextCommunitySession(communityId: string) {
+  try {
+    const nextSession = await prisma.mentorSession.findFirst({
+      where: {
+        communityId,
+        status: "SCHEDULED",
+        scheduledAt: { gt: new Date() },
+      },
+      orderBy: { scheduledAt: "asc" },
+      select: {
+        id: true,
+        title: true,
+        scheduledAt: true,
+        duration: true,
+      },
+    });
+
+    return { success: true, session: nextSession ?? null };
+  } catch (error) {
+    console.error("Error fetching next community session:", error);
+    return { success: false, error: "Failed to load next session" };
+  }
+}
+
+export async function askQuestionForNextSession(params: {
+  communityId: string;
+  question: string;
+}) {
+  try {
+    const userId = await getCurrentUserId();
+    if (!userId) {
+      return { success: false, error: "Not authenticated" };
+    }
+
+    const question = params.question.trim();
+    if (question.length < 5) {
+      return { success: false, error: "Question is too short" };
+    }
+
+    const membership = await prisma.member.findUnique({
+      where: {
+        userId_communityId: {
+          userId,
+          communityId: params.communityId,
+        },
+      },
+      select: { status: true },
+    });
+
+    if (!membership || membership.status !== "ACTIVE") {
+      return { success: false, error: "Join the community to ask questions" };
+    }
+
+    const nextSession = await prisma.mentorSession.findFirst({
+      where: {
+        communityId: params.communityId,
+        status: "SCHEDULED",
+        scheduledAt: { gt: new Date() },
+      },
+      orderBy: { scheduledAt: "asc" },
+      select: {
+        id: true,
+        title: true,
+      },
+    });
+
+    if (!nextSession) {
+      return { success: false, error: "No upcoming session available" };
+    }
+
+    const post = await prisma.post.create({
+      data: {
+        title: `❓ Question for next session: ${nextSession.title}`,
+        content: question,
+        contentType: PostContentType.QUESTION,
+        authorId: userId,
+        communityId: params.communityId,
+        attachments: {
+          targetSessionId: nextSession.id,
+          targetSessionTitle: nextSession.title,
+          source: "public_session_page",
+        } as Prisma.InputJsonValue,
+      },
+    });
+
+    return { success: true, postId: post.id, sessionId: nextSession.id };
+  } catch (error) {
+    console.error("Error creating pre-session question:", error);
+    return { success: false, error: "Failed to submit question" };
   }
 }

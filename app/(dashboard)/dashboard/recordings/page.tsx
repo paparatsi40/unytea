@@ -49,13 +49,33 @@ async function getRecordedSessions(userId: string) {
   return sessions;
 }
 
+async function getNextLiveSession(userId: string) {
+  return prisma.mentorSession.findFirst({
+    where: {
+      OR: [{ mentorId: userId }, { menteeId: userId }],
+      status: "SCHEDULED",
+      scheduledAt: { gt: new Date() },
+    },
+    orderBy: { scheduledAt: "asc" },
+    select: {
+      id: true,
+      title: true,
+      scheduledAt: true,
+      duration: true,
+    },
+  });
+}
+
 export default async function RecordingsLibraryPage() {
   const session = await auth();
   if (!session?.user?.id) {
     redirect("/auth/signin");
   }
 
-  const recordings = await getRecordedSessions(session.user.id);
+  const [recordings, nextLiveSession] = await Promise.all([
+    getRecordedSessions(session.user.id),
+    getNextLiveSession(session.user.id),
+  ]);
 
   return (
     <div className="space-y-8 p-8">
@@ -75,6 +95,28 @@ export default async function RecordingsLibraryPage() {
           New Session
         </Link>
       </div>
+
+      {nextLiveSession && (
+        <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-400">
+            Next live session
+          </p>
+          <div className="mt-1 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-lg font-semibold text-white">{nextLiveSession.title}</p>
+              <p className="text-sm text-zinc-300">
+                {new Date(nextLiveSession.scheduledAt).toLocaleString()}
+              </p>
+            </div>
+            <Link
+              href={`/dashboard/sessions/${nextLiveSession.id}`}
+              className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+            >
+              View Session
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* STATS */}
       <div className="grid gap-4 sm:grid-cols-3">
