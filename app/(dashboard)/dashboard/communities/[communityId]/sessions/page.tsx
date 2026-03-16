@@ -565,12 +565,21 @@ const sessionDate = new Date(s.scheduledAt);
 
                         <div className="flex items-center gap-2">
                           {s.recordingUrl ? (
-                            <Link href={s.recordingUrl} target="_blank">
-                              <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 flex items-center gap-2">
-                                <ArrowRight className="h-4 w-4" />
-                                Watch
-                              </Button>
-                            </Link>
+                            <>
+                              <Link href={s.recordingUrl} target="_blank">
+                                <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 flex items-center gap-2">
+                                  <ArrowRight className="h-4 w-4" />
+                                  Watch
+                                </Button>
+                              </Link>
+                              {s.visibility === "public" && s.slug && (
+                                <Link href={`/sessions/${s.slug}`} target="_blank">
+                                  <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
+                                    Public Link
+                                  </Button>
+                                </Link>
+                              )}
+                            </>
                           ) : (
                             <Link href={`/dashboard/sessions/${s.id}/room`}>
                               <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
@@ -579,7 +588,7 @@ const sessionDate = new Date(s.scheduledAt);
                             </Link>
                           )}
                         </div>
-                      </div>
+</div>
                     ))}
                   </div>
                 </div>
