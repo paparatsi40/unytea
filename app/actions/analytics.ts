@@ -452,7 +452,7 @@ export async function getMemberAnalytics(communityId: string) {
   }
 }
 
-export async function getRetentionCohorts() {
+export async function getRetentionCohorts(communityId?: string) {
   try {
     const userId = await getCurrentUserId();
     if (!userId) {
@@ -461,13 +461,18 @@ export async function getRetentionCohorts() {
 
     const ownedCommunities = await prisma.community.findMany({
       where: { ownerId: userId },
-      select: { id: true },
+      select: { id: true, name: true, slug: true },
+      orderBy: { createdAt: "desc" },
     });
 
-    const communityIds = ownedCommunities.map((c) => c.id);
-    if (communityIds.length === 0) {
-      return { success: true, cohorts: [] };
+    const allCommunityIds = ownedCommunities.map((c) => c.id);
+    if (allCommunityIds.length === 0) {
+      return { success: true, cohorts: [], communities: [], selectedCommunityId: null, trend: 0 };
     }
+
+    const selectedCommunityId =
+      communityId && allCommunityIds.includes(communityId) ? communityId : null;
+    const communityIds = selectedCommunityId ? [selectedCommunityId] : allCommunityIds;
 
     const oldestCohortStart = startOfWeek(subDays(new Date(), 7 * 8), { weekStartsOn: 1 });
 
@@ -570,7 +575,17 @@ export async function getRetentionCohorts() {
       });
     }
 
-    return { success: true, cohorts };
+    const trend = cohorts.length
+      ? Math.round(cohorts.reduce((acc, c) => acc + (c.week3 - c.week1), 0) / cohorts.length)
+      : 0;
+
+    return {
+      success: true,
+      cohorts,
+      communities: ownedCommunities,
+      selectedCommunityId,
+      trend,
+    };
   } catch (error) {
     console.error("Error fetching retention cohorts:", error);
     return { success: false, error: "Failed to fetch retention cohorts" };

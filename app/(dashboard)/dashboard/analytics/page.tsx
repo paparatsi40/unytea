@@ -10,15 +10,21 @@ export const metadata = {
   description: "Community analytics and insights",
 };
 
-export default async function AnalyticsPage() {
-  const session = await auth();
+export default async function AnalyticsPage({
+  searchParams,
+}: {
+  searchParams?: { communityId?: string };
+}) {
+const session = await auth();
   if (!session?.user?.id) {
     redirect("/auth/signin");
   }
 
+  const selectedCommunityId = searchParams?.communityId;
+
   const [result, retentionResult] = await Promise.all([
     getOverviewAnalytics(),
-    getRetentionCohorts(),
+    getRetentionCohorts(selectedCommunityId),
   ]);
 
   if (!result.success || !result.data) {
@@ -39,6 +45,9 @@ export default async function AnalyticsPage() {
 
   const data = result.data;
   const cohorts = retentionResult.success ? retentionResult.cohorts || [] : [];
+  const retentionCommunities = retentionResult.success ? retentionResult.communities || [] : [];
+  const retentionTrend = retentionResult.success ? retentionResult.trend || 0 : 0;
+  const retentionCommunityId = retentionResult.success ? retentionResult.selectedCommunityId : null;
 
   return (
     <div className="space-y-8 p-8">
@@ -182,14 +191,45 @@ export default async function AnalyticsPage() {
 
       {/* Retention Cohorts */}
       <div className="rounded-xl border border-border/50 bg-card/50 p-6">
-        <div className="mb-4 flex items-center justify-between">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="text-xl font-bold text-foreground">Retention Cohorts</h2>
             <p className="text-sm text-muted-foreground">
               Weekly cohorts by join date and % active in following weeks
             </p>
           </div>
+          <div className="rounded-md border border-border/50 bg-background px-3 py-2 text-xs">
+            W1→W3 trend: <span className={retentionTrend >= 0 ? "text-green-600" : "text-red-600"}>{retentionTrend >= 0 ? `+${retentionTrend}` : retentionTrend}%</span>
+          </div>
         </div>
+
+        {retentionCommunities.length > 0 && (
+          <div className="mb-4 flex flex-wrap gap-2">
+            <a
+              href="/dashboard/analytics"
+              className={`rounded-full border px-3 py-1 text-xs transition ${
+                !retentionCommunityId
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              All communities
+            </a>
+            {retentionCommunities.map((community) => (
+              <a
+                key={community.id}
+                href={`/dashboard/analytics?communityId=${community.id}`}
+                className={`rounded-full border px-3 py-1 text-xs transition ${
+                  retentionCommunityId === community.id
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {community.name}
+              </a>
+            ))}
+          </div>
+        )}
 
         {cohorts.length > 0 ? (
           <div className="overflow-x-auto">
