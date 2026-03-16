@@ -452,6 +452,114 @@ export async function getMemberAnalytics(communityId: string) {
   }
 }
 
+export async function getLiveCommunityHealthMetrics(communityId?: string) {
+  try {
+    const userId = await getCurrentUserId();
+    if (!userId) {
+      return { success: false, error: "Not authenticated" };
+    }
+
+    const ownedCommunities = await prisma.community.findMany({
+      where: { ownerId: userId },
+      select: { id: true, name: true, slug: true },
+      orderBy: { createdAt: "desc" },
+    });
+
+    const allCommunityIds = ownedCommunities.map((c) => c.id);
+    if (allCommunityIds.length === 0) {
+      return {
+        success: true,
+        communities: [],
+        selectedCommunityId: null,
+        metrics: {
+          returningAttendeesRate: 0,
+          feedParticipationRate: 0,
+          returningAttendeesCount: 0,
+          uniqueAttendeesCount: 0,
+          feedActiveMembersCount: 0,
+          activeMembersCount: 0,
+        },
+      };
+    }
+
+    const selectedCommunityId =
+      communityId && allCommunityIds.includes(communityId) ? communityId : null;
+    const communityIds = selectedCommunityId ? [selectedCommunityId] : allCommunityIds;
+
+    const [activeMembersCount, attendeeRows, postRows, commentRows] = await Promise.all([
+      prisma.member.count({
+        where: {
+          communityId: { in: communityIds },
+          status: "ACTIVE",
+        },
+      }),
+      prisma.sessionParticipation.groupBy({
+        by: ["userId"],
+        where: {
+          session: {
+            communityId: { in: communityIds },
+            status: "COMPLETED",
+          },
+        },
+        _count: { userId: true },
+      }),
+      prisma.post.findMany({
+        where: {
+          communityId: { in: communityIds },
+          createdAt: { gte: subDays(new Date(), 30) },
+        },
+        select: { authorId: true },
+        distinct: ["authorId"],
+      }),
+      prisma.comment.findMany({
+        where: {
+          createdAt: { gte: subDays(new Date(), 30) },
+          post: {
+            communityId: { in: communityIds },
+          },
+        },
+        select: { authorId: true },
+        distinct: ["authorId"],
+      }),
+    ]);
+
+    const uniqueAttendeesCount = attendeeRows.length;
+    const returningAttendeesCount = attendeeRows.filter((row) => (row._count?.userId || 0) > 1).length;
+    const returningAttendeesRate =
+      uniqueAttendeesCount > 0
+        ? Math.round((returningAttendeesCount / uniqueAttendeesCount) * 100)
+        : 0;
+
+    const feedActiveSet = new Set<string>([
+      ...postRows.map((row) => row.authorId),
+      ...commentRows.map((row) => row.authorId),
+    ]);
+
+    const feedActiveMembersCount = feedActiveSet.size;
+    const feedParticipationRate =
+      activeMembersCount > 0
+        ? Math.round((feedActiveMembersCount / activeMembersCount) * 100)
+        : 0;
+
+    return {
+      success: true,
+      communities: ownedCommunities,
+      selectedCommunityId,
+      metrics: {
+        returningAttendeesRate,
+        feedParticipationRate,
+        returningAttendeesCount,
+        uniqueAttendeesCount,
+        feedActiveMembersCount,
+        activeMembersCount,
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching live community health metrics:", error);
+    return { success: false, error: "Failed to fetch live community health metrics" };
+  }
+}
+
 export async function getRetentionCohorts(communityId?: string) {
   try {
     const userId = await getCurrentUserId();

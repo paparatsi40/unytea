@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { getOverviewAnalytics, getRetentionCohorts } from "@/app/actions/analytics";
+import { getLiveCommunityHealthMetrics, getOverviewAnalytics, getRetentionCohorts } from "@/app/actions/analytics";
 import { BarChart3, TrendingUp, Users, MessageSquare, FileText } from "lucide-react";
 import { StatsCard } from "@/components/analytics/StatsCard";
 import { CommunitySelector } from "@/components/analytics/CommunitySelector";
@@ -22,9 +22,10 @@ const session = await auth();
 
   const selectedCommunityId = searchParams?.communityId;
 
-  const [result, retentionResult] = await Promise.all([
+  const [result, retentionResult, healthResult] = await Promise.all([
     getOverviewAnalytics(),
     getRetentionCohorts(selectedCommunityId),
+    getLiveCommunityHealthMetrics(selectedCommunityId),
   ]);
 
   if (!result.success || !result.data) {
@@ -48,6 +49,24 @@ const session = await auth();
   const retentionCommunities = retentionResult.success ? retentionResult.communities || [] : [];
   const retentionTrend = retentionResult.success ? retentionResult.trend || 0 : 0;
   const retentionCommunityId = retentionResult.success ? retentionResult.selectedCommunityId : null;
+  const health = healthResult.success ? healthResult.metrics : null;
+
+  const getReturningBenchmark = (value: number) => {
+    if (value < 20) return { label: "Needs work", tone: "text-red-600" };
+    if (value < 40) return { label: "Acceptable", tone: "text-amber-600" };
+    if (value < 60) return { label: "Strong", tone: "text-green-600" };
+    return { label: "Exceptional", tone: "text-emerald-700" };
+  };
+
+  const getFeedBenchmark = (value: number) => {
+    if (value < 3) return { label: "Silent", tone: "text-red-600" };
+    if (value < 10) return { label: "Normal", tone: "text-amber-600" };
+    if (value < 20) return { label: "Alive", tone: "text-green-600" };
+    return { label: "Very strong", tone: "text-emerald-700" };
+  };
+
+  const returningBenchmark = getReturningBenchmark(health?.returningAttendeesRate || 0);
+  const feedBenchmark = getFeedBenchmark(health?.feedParticipationRate || 0);
 
   return (
     <div className="space-y-8 p-8">
@@ -186,6 +205,44 @@ const session = await auth();
               Create Community
             </a>
           </div>
+        )}
+      </div>
+
+      {/* Live Community Health */}
+      <div className="rounded-xl border border-border/50 bg-card/50 p-6">
+        <div className="mb-4">
+          <h2 className="text-xl font-bold text-foreground">Live Community Health</h2>
+          <p className="text-sm text-muted-foreground">
+            Core health metrics for session-driven communities
+          </p>
+        </div>
+
+        {health ? (
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="rounded-lg border border-border/30 bg-background p-4">
+              <p className="text-sm text-muted-foreground">Returning attendees</p>
+              <div className="mt-1 flex items-center gap-3">
+                <p className="text-3xl font-bold text-foreground">{health.returningAttendeesRate}%</p>
+                <span className={`text-sm font-semibold ${returningBenchmark.tone}`}>{returningBenchmark.label}</span>
+              </div>
+              <p className="mt-2 text-xs text-muted-foreground">
+                {health.returningAttendeesCount} of {health.uniqueAttendeesCount} attendees joined more than one session.
+              </p>
+            </div>
+
+            <div className="rounded-lg border border-border/30 bg-background p-4">
+              <p className="text-sm text-muted-foreground">Feed participation rate (30d)</p>
+              <div className="mt-1 flex items-center gap-3">
+                <p className="text-3xl font-bold text-foreground">{health.feedParticipationRate}%</p>
+                <span className={`text-sm font-semibold ${feedBenchmark.tone}`}>{feedBenchmark.label}</span>
+              </div>
+              <p className="mt-2 text-xs text-muted-foreground">
+                {health.feedActiveMembersCount} active members posted/commented from {health.activeMembersCount} active members.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <p className="text-sm text-muted-foreground">Could not load live health metrics right now.</p>
         )}
       </div>
 
