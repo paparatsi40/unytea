@@ -424,8 +424,11 @@ const sessionDate = new Date(s.scheduledAt);
                 </div>
               )}
 
-              <div className="mb-4 flex flex-wrap gap-2">
-                <Link href={`/dashboard/communities/${communityId}/sessions?filter=all`}>
+              <div className="mb-4 flex flex-wrap items-center gap-2">
+                {upcomingLiveCount > 0 && (
+                  <Badge className="bg-red-600 text-white text-xs">{upcomingLiveCount} live now</Badge>
+                )}
+<Link href={`/dashboard/communities/${communityId}/sessions?filter=all`}>
                   <Button variant="outline" className={`h-8 border-zinc-700 text-xs ${filter === "all" ? "bg-zinc-800 text-white" : "text-zinc-300 hover:bg-zinc-800"}`}>
                     All ({upcomingAllCount})
 </Button>
@@ -473,11 +476,20 @@ const sessionDate = new Date(s.scheduledAt);
                       communityId={communityId}
                     />
                   )}
-                  <div className="mt-6 flex items-center justify-center gap-2 text-sm text-zinc-500">
+                  <div className="mt-4 flex items-center justify-center gap-2">
+                    {filter !== "all" && (
+                      <Link href={`/dashboard/communities/${communityId}/sessions?filter=all`}>
+                        <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
+                          Clear filter
+                        </Button>
+                      </Link>
+                    )}
+                  </div>
+                  <div className="mt-2 flex items-center justify-center gap-2 text-sm text-zinc-500">
                     <Sparkles className="h-4 w-4" />
                     <span>Communities with weekly sessions grow 3x faster</span>
                   </div>
-                </div>
+</div>
               ) : (
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {filteredUpcoming.map((s) => (
