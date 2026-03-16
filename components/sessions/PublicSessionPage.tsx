@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { askQuestionForNextSession } from "@/app/actions/public-sessions";
 import { getSessionRSVPStatus, toggleSessionRSVP } from "@/app/actions/sessions";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Play, Calendar, Users, Clock, Share2, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -79,7 +79,8 @@ interface PublicSessionPageProps {
 
 export function PublicSessionPage({ session, relatedSessions, nextSession }: PublicSessionPageProps) {
   const router = useRouter();
-  const [isPlaying, setIsPlaying] = useState(false);
+  const searchParams = useSearchParams();
+const [isPlaying, setIsPlaying] = useState(false);
   const [question, setQuestion] = useState("");
   const [isSubmittingQuestion, setIsSubmittingQuestion] = useState(false);
   const [questionMessage, setQuestionMessage] = useState<string | null>(null);
@@ -90,7 +91,9 @@ export function PublicSessionPage({ session, relatedSessions, nextSession }: Pub
 
   const formattedDate = format(new Date(session.scheduledAt), "MMMM d, yyyy");
   const canViewPremiumContent = session.canWatchRecording || session.isMember;
-  const formattedDuration = session.recording?.durationSeconds
+  const ref = searchParams.get("ref");
+  const joinCommunityHref = `/c/${session.community.slug}${ref ? `?ref=${encodeURIComponent(ref)}` : ""}`;
+const formattedDuration = session.recording?.durationSeconds
     ? `${Math.round(session.recording.durationSeconds / 60)} min`
     : session.duration
     ? `${session.duration} min`
@@ -364,7 +367,7 @@ export function PublicSessionPage({ session, relatedSessions, nextSession }: Pub
                       </p>
                       <Button
                         className="mt-4 bg-emerald-500 text-white hover:bg-emerald-600"
-                        onClick={() => router.push(`/c/${session.community.slug}`)}
+                        onClick={() => router.push(joinCommunityHref)}
                       >
                         Join to unlock insights
                       </Button>
@@ -539,7 +542,7 @@ export function PublicSessionPage({ session, relatedSessions, nextSession }: Pub
 
                 <Button
                   className="mb-3 w-full bg-emerald-500 hover:bg-emerald-600 text-white"
-                  onClick={() => router.push(`/c/${session.community.slug}`)}
+                  onClick={() => router.push(joinCommunityHref)}
                 >
                   {session.isMember ? "Go to Community" : "Join Community"}
                 </Button>
