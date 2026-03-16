@@ -189,21 +189,33 @@ export default async function CommunitySessionsPage({ params }: CommunitySession
                 <p className="text-xs uppercase tracking-wide text-zinc-500">Avg attendance</p>
                 <p className="mt-1 text-2xl font-semibold text-white">{attendance.avgAttendance}</p>
                 <p className="text-xs text-zinc-500">last {attendance.periodDays} days</p>
+                <p className={`mt-1 text-xs ${attendance.trend?.avgAttendanceDelta >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                  {attendance.trend?.avgAttendanceDelta >= 0 ? "+" : ""}{attendance.trend?.avgAttendanceDelta || 0} vs prev period
+                </p>
               </div>
               <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4">
                 <p className="text-xs uppercase tracking-wide text-zinc-500">RSVP → join</p>
                 <p className="mt-1 text-2xl font-semibold text-white">{attendance.rsvpToJoinRate}%</p>
                 <p className="text-xs text-zinc-500">conversion quality</p>
+                <p className={`mt-1 text-xs ${attendance.trend?.rsvpToJoinRateDelta >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                  {attendance.trend?.rsvpToJoinRateDelta >= 0 ? "+" : ""}{attendance.trend?.rsvpToJoinRateDelta || 0}pp vs prev period
+                </p>
               </div>
               <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4">
                 <p className="text-xs uppercase tracking-wide text-zinc-500">Reminders sent</p>
                 <p className="mt-1 text-2xl font-semibold text-white">{attendance.remindersSent}</p>
                 <p className="text-xs text-zinc-500">delivery volume</p>
+                <p className={`mt-1 text-xs ${attendance.trend?.remindersSentDelta >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                  {attendance.trend?.remindersSentDelta >= 0 ? "+" : ""}{attendance.trend?.remindersSentDelta || 0} vs prev period
+                </p>
               </div>
               <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4">
                 <p className="text-xs uppercase tracking-wide text-zinc-500">Completed sessions</p>
                 <p className="mt-1 text-2xl font-semibold text-white">{attendance.completedSessions}</p>
                 <p className="text-xs text-zinc-500">last {attendance.periodDays} days</p>
+                <p className={`mt-1 text-xs ${attendance.trend?.completedSessionsDelta >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                  {attendance.trend?.completedSessionsDelta >= 0 ? "+" : ""}{attendance.trend?.completedSessionsDelta || 0} vs prev period
+                </p>
               </div>
             </div>
           )}
