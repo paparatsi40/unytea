@@ -399,10 +399,7 @@ const sessionDate = new Date(s.scheduledAt);
               >
                 Open current view ↗
               </Link>
-              <code className="rounded border border-zinc-700 bg-zinc-950 px-2 py-1 text-[11px] text-zinc-500">
-                /dashboard/communities/{communityId}/sessions?filter={filter}&pastFilter={pastFilter}&window={metricWindow}
-              </code>
-            </div>
+</div>
             <div className="mb-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
 <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4">
                 <p className="text-xs uppercase tracking-wide text-zinc-500">Avg attendance</p>
