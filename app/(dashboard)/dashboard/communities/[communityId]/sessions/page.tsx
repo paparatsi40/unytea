@@ -28,6 +28,7 @@ interface CommunitySessionsPageProps {
   }>;
   searchParams: Promise<{
     filter?: string;
+    pastFilter?: string;
   }>;
 }
 
@@ -91,7 +92,7 @@ try {
     }
 
     const { communityId } = await params;
-    const { filter = "all" } = await searchParams;
+    const { filter = "all", pastFilter = "all" } = await searchParams;
 
     // Verify community exists and user is a member
     const community = await prisma.community.findUnique({
@@ -177,7 +178,12 @@ mentor: {
     const pastSorted = [...past].sort(
       (a, b) => new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime()
     );
-    const featuredReplays = pastSorted.filter((s) => Boolean(s.recordingUrl)).slice(0, 3);
+    const filteredPast = pastSorted.filter((s) => {
+      if (pastFilter === "replay") return Boolean(s.recordingUrl);
+      if (pastFilter === "public") return Boolean(s.recordingUrl) && s.visibility === "public";
+      return true;
+    });
+    const featuredReplays = filteredPast.filter((s) => Boolean(s.recordingUrl)).slice(0, 3);
 
     // Calculate sessions this week
     const thisWeek = [...liveSessions, ...upcoming].filter(s => {
@@ -521,7 +527,24 @@ const sessionDate = new Date(s.scheduledAt);
                 </div>
               ) : (
                 <div className="space-y-6">
-                  {featuredReplays.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    <Link href={`/dashboard/communities/${communityId}/sessions?filter=${filter}&pastFilter=all`}>
+                      <Button variant="outline" className={`h-8 border-zinc-700 text-xs ${pastFilter === "all" ? "bg-zinc-800 text-white" : "text-zinc-300 hover:bg-zinc-800"}`}>
+                        All
+                      </Button>
+                    </Link>
+                    <Link href={`/dashboard/communities/${communityId}/sessions?filter=${filter}&pastFilter=replay`}>
+                      <Button variant="outline" className={`h-8 border-zinc-700 text-xs ${pastFilter === "replay" ? "bg-zinc-800 text-white" : "text-zinc-300 hover:bg-zinc-800"}`}>
+                        With Replay
+                      </Button>
+                    </Link>
+                    <Link href={`/dashboard/communities/${communityId}/sessions?filter=${filter}&pastFilter=public`}>
+                      <Button variant="outline" className={`h-8 border-zinc-700 text-xs ${pastFilter === "public" ? "bg-emerald-600 text-white border-emerald-500" : "text-zinc-300 hover:bg-zinc-800"}`}>
+                        Public Replays
+                      </Button>
+                    </Link>
+                  </div>
+{featuredReplays.length > 0 && (
                     <div>
                       <h3 className="mb-3 text-sm font-semibold text-zinc-300">Featured Replays</h3>
                       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -552,8 +575,8 @@ const sessionDate = new Date(s.scheduledAt);
                   )}
 
                   <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {pastSorted.slice(0, 9).map((s) => (
-                      <div
+                    {filteredPast.slice(0, 9).map((s) => (
+<div
                         key={s.id}
                         className="group rounded-xl border border-zinc-800 bg-zinc-950 p-5 transition-all hover:border-zinc-700"
                       >
