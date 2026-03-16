@@ -671,41 +671,23 @@ export async function getHostAlerts() {
 
     const now = new Date();
     const in14Days = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+    const last30Days = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-    const [upcomingCount, recentSessions, previousSessions] = await Promise.all([
-      prisma.mentorSession.count({
-        where: {
-          mentorId: userId,
-          status: { in: ["SCHEDULED", "IN_PROGRESS"] },
-          scheduledAt: { gte: now, lte: in14Days },
-        },
-      }),
-      prisma.mentorSession.findMany({
-        where: { mentorId: userId, status: "COMPLETED" },
-        select: { attendeeCount: true, participations: { select: { id: true } } },
-        orderBy: { endedAt: "desc" },
-        take: 5,
-      }),
-      prisma.mentorSession.findMany({
-        where: { mentorId: userId, status: "COMPLETED" },
-        select: { attendeeCount: true, participations: { select: { id: true } } },
-        orderBy: { endedAt: "desc" },
-        skip: 5,
-        take: 5,
-      }),
-    ]);
+    const communities = await prisma.community.findMany({
+      where: { ownerId: userId },
+      select: { id: true, name: true, slug: true },
+      orderBy: { createdAt: "desc" },
+    });
 
-    const alerts: Array<{ type: "warning" | "info"; title: string; description: string; href: string; cta: string }> = [];
-
-    if (upcomingCount === 0) {
-      alerts.push({
-        type: "warning",
-        title: "No upcoming sessions scheduled",
-        description: "You have no live sessions in the next 14 days. Schedule one to keep momentum.",
-        href: "/dashboard/sessions/create",
-        cta: "Schedule now",
-      });
-    }
+    const alerts: Array<{
+      type: "warning" | "info";
+      title: string;
+      description: string;
+      href: string;
+      cta: string;
+      priority: "high" | "medium" | "low";
+      communityName?: string;
+    }> = [];
 
     const avg = (rows: Array<{ attendeeCount: number; participations: { id: string }[] }>) => {
       if (!rows.length) return 0;
@@ -715,31 +697,101 @@ export async function getHostAlerts() {
       );
     };
 
-    const recentAvg = avg(recentSessions);
-    const previousAvg = avg(previousSessions);
+    for (const community of communities) {
+      const [upcomingCount, recentSessions, previousSessions, completedLast30Days] = await Promise.all([
+        prisma.mentorSession.count({
+          where: {
+            mentorId: userId,
+            communityId: community.id,
+            status: { in: ["SCHEDULED", "IN_PROGRESS"] },
+            scheduledAt: { gte: now, lte: in14Days },
+          },
+        }),
+        prisma.mentorSession.findMany({
+          where: { mentorId: userId, communityId: community.id, status: "COMPLETED" },
+          select: { attendeeCount: true, participations: { select: { id: true } } },
+          orderBy: { endedAt: "desc" },
+          take: 3,
+        }),
+        prisma.mentorSession.findMany({
+          where: { mentorId: userId, communityId: community.id, status: "COMPLETED" },
+          select: { attendeeCount: true, participations: { select: { id: true } } },
+          orderBy: { endedAt: "desc" },
+          skip: 3,
+          take: 3,
+        }),
+        prisma.mentorSession.count({
+          where: {
+            mentorId: userId,
+            communityId: community.id,
+            status: "COMPLETED",
+            endedAt: { gte: last30Days },
+          },
+        }),
+      ]);
 
-    if (previousAvg > 0 && recentAvg < previousAvg * 0.7) {
-      const dropPct = Math.round(((previousAvg - recentAvg) / previousAvg) * 100);
-      alerts.push({
-        type: "warning",
-        title: "Attendance is trending down",
-        description: `Average attendance dropped ${dropPct}% vs your previous sessions.`,
-        href: "/dashboard/analytics",
-        cta: "Review analytics",
-      });
+      if (upcomingCount === 0) {
+        alerts.push({
+          type: "warning",
+          title: "No upcoming sessions",
+          description: `No live sessions in the next 14 days for ${community.name}.`,
+          href: "/dashboard/sessions/create",
+          cta: "Schedule now",
+          priority: "high",
+          communityName: community.name,
+        });
+      }
+
+      const recentAvg = avg(recentSessions);
+      const previousAvg = avg(previousSessions);
+      if (previousAvg > 0 && recentAvg < previousAvg * 0.7) {
+        const dropPct = Math.round(((previousAvg - recentAvg) / previousAvg) * 100);
+        alerts.push({
+          type: "warning",
+          title: "Attendance trending down",
+          description: `${community.name} dropped ${dropPct}% vs previous sessions.`,
+          href: "/dashboard/analytics",
+          cta: "Review analytics",
+          priority: "medium",
+          communityName: community.name,
+        });
+      }
+
+      if (completedLast30Days === 0) {
+        alerts.push({
+          type: "info",
+          title: "No completed sessions in 30 days",
+          description: `Run a session in ${community.name} to reactivate momentum.`,
+          href: "/dashboard/sessions/create",
+          cta: "Create session",
+          priority: "low",
+          communityName: community.name,
+        });
+      }
     }
 
-    if (alerts.length === 0) {
-      alerts.push({
+    const priorityRank = { high: 3, medium: 2, low: 1 } as const;
+    const ordered = alerts
+      .sort((a, b) => {
+        const p = priorityRank[b.priority] - priorityRank[a.priority];
+        if (p !== 0) return p;
+        if (a.type !== b.type) return a.type === "warning" ? -1 : 1;
+        return a.title.localeCompare(b.title);
+      })
+      .slice(0, 4);
+
+    if (ordered.length === 0) {
+      ordered.push({
         type: "info",
         title: "No urgent alerts",
         description: "Your session cadence and attendance look healthy this week.",
         href: "/dashboard/sessions",
         cta: "View sessions",
+        priority: "low",
       });
     }
 
-    return { success: true, alerts };
+    return { success: true, alerts: ordered };
   } catch (error) {
     console.error("Error getting host alerts:", error);
     return { success: false, error: "Failed to load host alerts" };

@@ -132,6 +132,8 @@ interface HostAlert {
   description: string;
   href: string;
   cta: string;
+  priority: "high" | "medium" | "low";
+  communityName?: string;
 }
 
 interface LeaderboardMember {
@@ -402,7 +404,15 @@ export default function DashboardPage() {
                   <div className="flex items-start gap-3">
                     <AlertTriangle className={alert.type === "warning" ? "h-5 w-5 text-amber-600 mt-0.5" : "h-5 w-5 text-blue-600 mt-0.5"} />
                     <div>
-                      <p className="font-semibold text-zinc-900">{alert.title}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold text-zinc-900">{alert.title}</p>
+                        <Badge variant="outline" className="bg-white">
+                          {alert.priority}
+                        </Badge>
+                        {alert.communityName && (
+                          <Badge variant="secondary">{alert.communityName}</Badge>
+                        )}
+                      </div>
                       <p className="text-sm text-zinc-600">{alert.description}</p>
                     </div>
                   </div>
