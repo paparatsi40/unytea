@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { askQuestionForNextSession } from "@/app/actions/public-sessions";
-import { getSessionRSVPStatus, toggleSessionRSVP } from "@/app/actions/sessions";
+import { getSessionRSVPStatus, setSessionRSVPStatus } from "@/app/actions/sessions";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Play, Calendar, Users, Clock, Share2, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -85,8 +85,9 @@ const [isPlaying, setIsPlaying] = useState(false);
   const [isSubmittingQuestion, setIsSubmittingQuestion] = useState(false);
   const [questionMessage, setQuestionMessage] = useState<string | null>(null);
   const [isRSVPLoading, setIsRSVPLoading] = useState(false);
-  const [isAttendingNext, setIsAttendingNext] = useState(false);
+  const [nextRsvpStatus, setNextRsvpStatus] = useState<"attending" | "interested" | null>(null);
   const [nextAttendingCount, setNextAttendingCount] = useState<number | null>(null);
+  const [nextInterestedCount, setNextInterestedCount] = useState<number | null>(null);
   const [rsvpMessage, setRsvpMessage] = useState<string | null>(null);
 
   const formattedDate = format(new Date(session.scheduledAt), "MMMM d, yyyy");
@@ -103,11 +104,57 @@ const roomParams = new URLSearchParams();
   if (ref) roomParams.set("ref", ref);
   if (src) roomParams.set("parent_src", src);
   const nextSessionRoomHref = `/dashboard/sessions/${nextSession?.id}/room?${roomParams.toString()}`;
-const formattedDuration = session.recording?.durationSeconds
+  const formattedDuration = session.recording?.durationSeconds
 ? `${Math.round(session.recording.durationSeconds / 60)} min`
     : session.duration
     ? `${session.duration} min`
     : null;
+
+  const buildGoogleCalendarUrl = (item: { title: string; description?: string | null; scheduledAt: Date; duration?: number | null; }) => {
+    const start = new Date(item.scheduledAt);
+    const end = new Date(start.getTime() + (item.duration || 60) * 60 * 1000);
+    const formatCalDate = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+
+    const params = new URLSearchParams({
+      action: "TEMPLATE",
+      text: item.title,
+      details: item.description || "Join this live session on Unytea.",
+      dates: `${formatCalDate(start)}/${formatCalDate(end)}`,
+    });
+
+    return `https://calendar.google.com/calendar/render?${params.toString()}`;
+  };
+
+  const downloadAppleCalendarIcs = (item: { id: string; title: string; description?: string | null; scheduledAt: Date; duration?: number | null; }) => {
+    const start = new Date(item.scheduledAt);
+    const end = new Date(start.getTime() + (item.duration || 60) * 60 * 1000);
+    const formatCalDate = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+
+    const ics = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//Unytea//Session//EN",
+      "BEGIN:VEVENT",
+      `UID:${item.id}@unytea`,
+      `DTSTAMP:${formatCalDate(new Date())}`,
+      `DTSTART:${formatCalDate(start)}`,
+      `DTEND:${formatCalDate(end)}`,
+      `SUMMARY:${(item.title || "Unytea Session").replace(/,/g, "\\,")}`,
+      `DESCRIPTION:${(item.description || "Join this live session on Unytea.").replace(/\n/g, " ").replace(/,/g, "\\,")}`,
+      "END:VEVENT",
+      "END:VCALENDAR",
+    ].join("\r\n");
+
+    const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${item.title || "unytea-session"}.ics`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   const handleShare = async () => {
     const shareUrl = new URL(window.location.href);
@@ -131,8 +178,9 @@ const formattedDuration = session.recording?.durationSeconds
       if (!nextSession) return;
       const status = await getSessionRSVPStatus(nextSession.id);
       if (!active || !status.success) return;
-      setIsAttendingNext(status.isAttending);
+      setNextRsvpStatus(status.status);
       setNextAttendingCount(status.attendingCount);
+      setNextInterestedCount(status.interestedCount || 0);
     }
 
     loadNextSessionRsvp();
@@ -141,19 +189,23 @@ const formattedDuration = session.recording?.durationSeconds
     };
   }, [nextSession?.id]);
 
-  const handleRSVPNextSession = async () => {
+  const handleSetNextSessionRSVP = async (status: "attending" | "interested") => {
     if (!nextSession) return;
     setIsRSVPLoading(true);
     setRsvpMessage(null);
 
-    const result = await toggleSessionRSVP(nextSession.id);
+    const result = await setSessionRSVPStatus(nextSession.id, status);
     if (result.success) {
-      setIsAttendingNext((prev) => !prev);
-      setNextAttendingCount((prev) => {
-        const current = prev ?? 0;
-        return isAttendingNext ? Math.max(0, current - 1) : current + 1;
-      });
-      setRsvpMessage(isAttendingNext ? "RSVP removed." : "You're attending the next live session.");
+      setNextRsvpStatus(result.status ?? null);
+      setNextAttendingCount(result.attendingCount || 0);
+      setNextInterestedCount(result.interestedCount || 0);
+      if (!result.status) {
+        setRsvpMessage("RSVP removed.");
+      } else if (result.status === "attending") {
+        setRsvpMessage("You're attending the next live session.");
+      } else {
+        setRsvpMessage("Marked as interested.");
+      }
     } else {
       setRsvpMessage(result.error || "Could not update RSVP.");
     }
@@ -523,28 +575,65 @@ router.push(`/sessions/${related.slug}${suffix}`);
                       {format(new Date(nextSession.scheduledAt), "MMM d, yyyy 'at' h:mm a")}
                     </p>
                     <p className="mt-1 text-xs text-zinc-300">
-                      {nextAttendingCount ?? 0} attending
+                      {nextAttendingCount ?? 0} attending · {nextInterestedCount ?? 0} interested
                     </p>
                     {session.isMember ? (
                       <>
                         <Button
-                          onClick={handleRSVPNextSession}
+                          onClick={() => handleSetNextSessionRSVP("attending")}
                           disabled={isRSVPLoading}
-                          variant={isAttendingNext ? "secondary" : "default"}
-                          className={`mt-3 w-full ${isAttendingNext ? "bg-zinc-800 text-zinc-200 hover:bg-zinc-700" : "bg-emerald-500 text-white hover:bg-emerald-600"}`}
+                          variant={nextRsvpStatus === "attending" ? "secondary" : "default"}
+                          className={`mt-3 w-full ${nextRsvpStatus === "attending" ? "bg-zinc-800 text-zinc-200 hover:bg-zinc-700" : "bg-emerald-500 text-white hover:bg-emerald-600"}`}
                         >
-                          {isRSVPLoading ? "Updating..." : isAttendingNext ? "Attending" : "RSVP for live"}
+                          {isRSVPLoading ? "Updating..." : "Attending"}
+                        </Button>
+                        <Button
+                          onClick={() => handleSetNextSessionRSVP("interested")}
+                          disabled={isRSVPLoading}
+                          variant={nextRsvpStatus === "interested" ? "secondary" : "outline"}
+                          className={`mt-2 w-full ${nextRsvpStatus === "interested" ? "bg-zinc-800 text-zinc-200 hover:bg-zinc-700" : "border-zinc-700 text-zinc-200 hover:bg-zinc-800"}`}
+                        >
+                          {isRSVPLoading ? "Updating..." : "Interested"}
+                        </Button>
+                        <Button
+                          asChild
+                          variant="outline"
+                          className="mt-2 w-full border-zinc-700 text-zinc-200 hover:bg-zinc-800"
+                        >
+                          <a href={buildGoogleCalendarUrl({
+                            title: nextSession.title,
+                            description: session.description,
+                            scheduledAt: new Date(nextSession.scheduledAt),
+                            duration: nextSession.duration,
+                          })} target="_blank" rel="noreferrer">
+                            Add to Google Calendar
+                          </a>
+                        </Button>
+                        <Button
+                          onClick={() =>
+                            downloadAppleCalendarIcs({
+                              id: nextSession.id,
+                              title: nextSession.title,
+                              description: session.description,
+                              scheduledAt: new Date(nextSession.scheduledAt),
+                              duration: nextSession.duration,
+                            })
+                          }
+                          variant="outline"
+                          className="mt-2 w-full border-zinc-700 text-zinc-200 hover:bg-zinc-800"
+                        >
+                          Add to Apple Calendar
                         </Button>
                         {rsvpMessage && (
-                        <p className="mt-2 text-xs text-zinc-300">{rsvpMessage}</p>
-                      )}
-                      <Button
-                        onClick={() => router.push(nextSessionRoomHref)}
-                        variant="outline"
-                        className="mt-2 w-full border-zinc-700 text-zinc-200 hover:bg-zinc-800"
-                      >
-                        View session room
-                      </Button>
+                          <p className="mt-2 text-xs text-zinc-300">{rsvpMessage}</p>
+                        )}
+                        <Button
+                          onClick={() => router.push(nextSessionRoomHref)}
+                          variant="outline"
+                          className="mt-2 w-full border-zinc-700 text-zinc-200 hover:bg-zinc-800"
+                        >
+                          View session room
+                        </Button>
 </>
                     ) : (
                       <p className="mt-2 text-xs text-zinc-300">Join community to RSVP and participate live.</p>

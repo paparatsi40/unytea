@@ -22,7 +22,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getSession, getSessionRSVPStatus, toggleSessionRSVP } from "@/app/actions/sessions";
+import { getSession, getSessionRSVPStatus, setSessionRSVPStatus } from "@/app/actions/sessions";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCurrentUser } from "@/hooks/use-current-user";
@@ -45,8 +45,9 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
   const [showAddToCourse, setShowAddToCourse] = useState(false);
   const [showCreateClip, setShowCreateClip] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
-  const [isAttending, setIsAttending] = useState(false);
+  const [rsvpStatus, setRsvpStatus] = useState<"attending" | "interested" | null>(null);
   const [attendingCount, setAttendingCount] = useState(0);
+  const [interestedCount, setInterestedCount] = useState(0);
   const [isRSVPLoading, setIsRSVPLoading] = useState(false);
 
   useEffect(() => {
@@ -70,8 +71,9 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
         if (result.session.status === "SCHEDULED") {
           const rsvp = await getSessionRSVPStatus(result.session.id);
           if (rsvp.success) {
-            setIsAttending(rsvp.isAttending);
+            setRsvpStatus(rsvp.status);
             setAttendingCount(rsvp.attendingCount);
+            setInterestedCount(rsvp.interestedCount || 0);
           }
         }
       } else {
@@ -111,21 +113,28 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
     }
   }
 
-  async function handleToggleRSVP() {
+  async function handleSetRSVP(status: "attending" | "interested") {
     if (!session || session.status !== "SCHEDULED") return;
 
     setIsRSVPLoading(true);
     try {
-      const result = await toggleSessionRSVP(session.id, window.location.pathname);
+      const result = await setSessionRSVPStatus(session.id, status, window.location.pathname);
       if (!result.success) {
         toast.error(result.error || "Failed to update RSVP");
         return;
       }
 
-      const nextAttending = result.action === "rsvped";
-      setIsAttending(nextAttending);
-      setAttendingCount((prev) => Math.max(0, prev + (nextAttending ? 1 : -1)));
-      toast.success(nextAttending ? "You are attending this session" : "RSVP removed");
+      setRsvpStatus(result.status ?? null);
+      setAttendingCount(result.attendingCount || 0);
+      setInterestedCount(result.interestedCount || 0);
+
+      if (!result.status) {
+        toast.success("RSVP removed");
+      } else if (result.status === "attending") {
+        toast.success("You are attending this session");
+      } else {
+        toast.success("Marked as interested");
+      }
     } catch {
       toast.error("Failed to update RSVP");
     } finally {
@@ -173,6 +182,53 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
     hour: "numeric",
     minute: "2-digit",
   });
+
+  const buildGoogleCalendarUrl = () => {
+    const start = new Date(session.scheduledAt);
+    const end = new Date(start.getTime() + (session.duration || 60) * 60 * 1000);
+    const formatCalDate = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+
+    const params = new URLSearchParams({
+      action: "TEMPLATE",
+      text: session.title,
+      details: session.description || "Join this live session on Unytea.",
+      dates: `${formatCalDate(start)}/${formatCalDate(end)}`,
+    });
+
+    return `https://calendar.google.com/calendar/render?${params.toString()}`;
+  };
+
+  const downloadAppleCalendarIcs = () => {
+    const start = new Date(session.scheduledAt);
+    const end = new Date(start.getTime() + (session.duration || 60) * 60 * 1000);
+    const formatCalDate = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+    const uid = `${session.id}@unytea`;
+
+    const ics = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//Unytea//Session//EN",
+      "BEGIN:VEVENT",
+      `UID:${uid}`,
+      `DTSTAMP:${formatCalDate(new Date())}`,
+      `DTSTART:${formatCalDate(start)}`,
+      `DTEND:${formatCalDate(end)}`,
+      `SUMMARY:${(session.title || "Unytea Session").replace(/,/g, "\\,")}`,
+      `DESCRIPTION:${(session.description || "Join this live session on Unytea.").replace(/\n/g, " ").replace(/,/g, "\\,")}`,
+      "END:VEVENT",
+      "END:VCALENDAR",
+    ].join("\r\n");
+
+    const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${session.title || "unytea-session"}.ics`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   // Show Post-Session Flow for completed sessions
   if (session.status === "COMPLETED") {
@@ -242,7 +298,7 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
                     <span>•</span>
                     <span className="flex items-center gap-1 text-zinc-300">
                       <Users className="h-3 w-3" />
-                      {attendingCount} attending
+                      {attendingCount} attending · {interestedCount} interested
                     </span>
                   </>
                 )}
@@ -269,20 +325,59 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
         {/* ACTION BAR */}
         <div className="mb-6 flex items-center gap-3">
           {session.status === "SCHEDULED" && (
-            <Button
-              variant={isAttending ? "outline" : "default"}
-              className={cn(
-                "gap-2",
-                isAttending
-                  ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
-                  : "bg-emerald-600 hover:bg-emerald-700"
-              )}
-              disabled={isRSVPLoading}
-              onClick={handleToggleRSVP}
-            >
-              <Users className="h-4 w-4" />
-              {isRSVPLoading ? "Updating..." : isAttending ? "Attending" : "RSVP"}
-            </Button>
+            <>
+              <Button
+                variant={rsvpStatus === "attending" ? "outline" : "default"}
+                className={cn(
+                  "gap-2",
+                  rsvpStatus === "attending"
+                    ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
+                    : "bg-emerald-600 hover:bg-emerald-700"
+                )}
+                disabled={isRSVPLoading}
+                onClick={() => handleSetRSVP("attending")}
+              >
+                <Users className="h-4 w-4" />
+                {isRSVPLoading && rsvpStatus !== "attending" ? "Updating..." : rsvpStatus === "attending" ? "Attending" : "Attending"}
+              </Button>
+              <Button
+                variant={rsvpStatus === "interested" ? "outline" : "secondary"}
+                className={cn(
+                  "gap-2",
+                  rsvpStatus === "interested"
+                    ? "border-amber-500/40 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20"
+                    : "bg-zinc-800 text-zinc-200 hover:bg-zinc-700"
+                )}
+                disabled={isRSVPLoading}
+                onClick={() => handleSetRSVP("interested")}
+              >
+                <Calendar className="h-4 w-4" />
+                {isRSVPLoading && rsvpStatus !== "interested" ? "Updating..." : "Interested"}
+              </Button>
+            </>
+          )}
+
+          {session.status === "SCHEDULED" && (
+            <>
+              <Button
+                variant="outline"
+                className="gap-2 border-zinc-700 bg-zinc-900 text-zinc-200 hover:bg-zinc-800"
+                asChild
+              >
+                <a href={buildGoogleCalendarUrl()} target="_blank" rel="noreferrer">
+                  <Calendar className="h-4 w-4" />
+                  Add to Google Calendar
+                </a>
+              </Button>
+              <Button
+                variant="outline"
+                className="gap-2 border-zinc-700 bg-zinc-900 text-zinc-200 hover:bg-zinc-800"
+                onClick={downloadAppleCalendarIcs}
+              >
+                <Calendar className="h-4 w-4" />
+                Add to Apple Calendar
+              </Button>
+            </>
           )}
 
           {hasRecording && !isProcessing && (

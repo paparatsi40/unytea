@@ -1030,9 +1030,25 @@ export async function getSessionSeries(seriesId: string) {
 }
 
 /**
- * RSVP / Un-RSVP a scheduled session
+ * RSVP status helper
  */
-export async function toggleSessionRSVP(sessionId: string, revalidateTargetPath?: string) {
+function getRsvpStatusFromEventsData(eventsData: any): "attending" | "interested" | null {
+  if (!eventsData || typeof eventsData !== "object") return null;
+  if (eventsData.rsvpStatus === "attending" || eventsData.rsvpStatus === "interested") {
+    return eventsData.rsvpStatus;
+  }
+  if (eventsData.rsvp === true) return "attending";
+  return null;
+}
+
+/**
+ * Set RSVP status for a scheduled session
+ */
+export async function setSessionRSVPStatus(
+  sessionId: string,
+  status: "attending" | "interested" | "none",
+  revalidateTargetPath?: string
+) {
   try {
     const userId = await getCurrentUserId();
 
@@ -1044,7 +1060,6 @@ export async function toggleSessionRSVP(sessionId: string, revalidateTargetPath?
       where: { id: sessionId },
       select: {
         id: true,
-        title: true,
         status: true,
         communityId: true,
       },
@@ -1081,24 +1096,31 @@ export async function toggleSessionRSVP(sessionId: string, revalidateTargetPath?
           userId,
         },
       },
-      select: { id: true },
+      select: { id: true, eventsData: true },
     });
 
-    let action: "rsvped" | "unrsvped" = "rsvped";
+    const currentStatus = getRsvpStatusFromEventsData(existing?.eventsData);
 
-    if (existing) {
-      await prisma.sessionParticipation.delete({ where: { id: existing.id } });
-      action = "unrsvped";
-    } else {
+    if (status === "none" || currentStatus === status) {
+      if (existing) {
+        await prisma.sessionParticipation.delete({ where: { id: existing.id } });
+      }
+    } else if (!existing) {
       await prisma.sessionParticipation.create({
         data: {
           sessionId,
           userId,
           role: "listener",
-          eventsData: { rsvp: true },
+          eventsData: { rsvp: true, rsvpStatus: status },
         },
       });
-      action = "rsvped";
+    } else {
+      await prisma.sessionParticipation.update({
+        where: { id: existing.id },
+        data: {
+          eventsData: { rsvp: true, rsvpStatus: status },
+        },
+      });
     }
 
     revalidatePath("/dashboard/sessions");
@@ -1109,41 +1131,107 @@ export async function toggleSessionRSVP(sessionId: string, revalidateTargetPath?
       revalidatePath(revalidateTargetPath);
     }
 
-    return { success: true, action };
+    const [attendingCount, interestedCount] = await Promise.all([
+      prisma.sessionParticipation.count({
+        where: {
+          sessionId,
+          OR: [
+            { eventsData: { path: ["rsvpStatus"], equals: "attending" } },
+            { eventsData: { path: ["rsvp"], equals: true } },
+          ],
+        },
+      }),
+      prisma.sessionParticipation.count({
+        where: {
+          sessionId,
+          eventsData: { path: ["rsvpStatus"], equals: "interested" },
+        },
+      }),
+    ]);
+
+    const effectiveStatus = currentStatus === status || status === "none" ? null : status;
+
+    return {
+      success: true,
+      status: effectiveStatus,
+      attendingCount,
+      interestedCount,
+      isAttending: effectiveStatus === "attending",
+      isInterested: effectiveStatus === "interested",
+    };
   } catch (error) {
-    console.error("Error toggling RSVP:", error);
+    console.error("Error setting RSVP status:", error);
     return { success: false, error: "Failed to update RSVP" };
   }
 }
 
 /**
- * Get RSVP status for current user + attending count
+ * RSVP toggle (backward compatibility)
+ */
+export async function toggleSessionRSVP(sessionId: string, revalidateTargetPath?: string) {
+  const result = await setSessionRSVPStatus(sessionId, "attending", revalidateTargetPath);
+  if (!result.success) return result;
+
+  return {
+    success: true,
+    action: result.status === "attending" ? "rsvped" : "unrsvped",
+    attendingCount: result.attendingCount,
+    interestedCount: result.interestedCount,
+    isAttending: result.isAttending,
+    isInterested: result.isInterested,
+  };
+}
+
+/**
+ * Get RSVP status for current user + attending/interested counts
  */
 export async function getSessionRSVPStatus(sessionId: string) {
   try {
     const userId = await getCurrentUserId();
 
-    const [attendingCount, existing] = await Promise.all([
-      prisma.sessionParticipation.count({ where: { sessionId } }),
+    const [attendingCount, interestedCount, existing] = await Promise.all([
+      prisma.sessionParticipation.count({
+        where: {
+          sessionId,
+          OR: [
+            { eventsData: { path: ["rsvpStatus"], equals: "attending" } },
+            { eventsData: { path: ["rsvp"], equals: true } },
+          ],
+        },
+      }),
+      prisma.sessionParticipation.count({
+        where: {
+          sessionId,
+          eventsData: { path: ["rsvpStatus"], equals: "interested" },
+        },
+      }),
       userId
         ? prisma.sessionParticipation.findUnique({
             where: { sessionId_userId: { sessionId, userId } },
-            select: { id: true },
+            select: { eventsData: true },
           })
         : Promise.resolve(null),
     ]);
 
+    const status = getRsvpStatusFromEventsData(existing?.eventsData);
+
     return {
       success: true,
       attendingCount,
-      isAttending: !!existing,
+      interestedCount,
+      isAttending: status === "attending",
+      isInterested: status === "interested",
+      status,
     };
   } catch (error) {
     console.error("Error getting RSVP status:", error);
     return {
       success: false,
       attendingCount: 0,
+      interestedCount: 0,
       isAttending: false,
+      isInterested: false,
+      status: null,
       error: "Failed to get RSVP status",
     };
   }

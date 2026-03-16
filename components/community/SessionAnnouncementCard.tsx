@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { format, isToday, isTomorrow, formatDistanceToNow } from "date-fns";
 import { Video, Calendar, Clock, Users, ArrowRight, Sparkles, Radio } from "lucide-react";
-import { getSessionRSVPStatus, toggleSessionRSVP } from "@/app/actions/sessions";
+import { getSessionRSVPStatus, setSessionRSVPStatus } from "@/app/actions/sessions";
 import { askQuestionForNextSession } from "@/app/actions/public-sessions";
 import { getSessionFeedState } from "@/app/actions/community-feed";
 import { toast } from "sonner";
@@ -39,8 +39,9 @@ interface SessionAnnouncementCardProps {
 export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) {
   const sessionData = post.attachments;
   const [isHovered, setIsHovered] = useState(false);
-  const [isAttending, setIsAttending] = useState(false);
+  const [rsvpStatus, setRsvpStatus] = useState<"attending" | "interested" | null>(null);
   const [attendingCount, setAttendingCount] = useState(0);
+  const [interestedCount, setInterestedCount] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [question, setQuestion] = useState("");
   const [isQuestionSubmitting, setIsQuestionSubmitting] = useState(false);
@@ -70,6 +71,52 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
     return format(date, "h:mm a");
   };
 
+  const buildGoogleCalendarUrl = () => {
+    if (!scheduledAt) return "#";
+    const end = new Date(scheduledAt.getTime() + (sessionData.duration || 60) * 60 * 1000);
+    const formatCalDate = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+
+    const params = new URLSearchParams({
+      action: "TEMPLATE",
+      text: sessionData.sessionTitle || post.title || "Unytea Session",
+      details: sessionData.sessionDescription || "Join this live session on Unytea.",
+      dates: `${formatCalDate(scheduledAt)}/${formatCalDate(end)}`,
+    });
+
+    return `https://calendar.google.com/calendar/render?${params.toString()}`;
+  };
+
+  const downloadAppleCalendarIcs = () => {
+    if (!scheduledAt) return;
+    const end = new Date(scheduledAt.getTime() + (sessionData.duration || 60) * 60 * 1000);
+    const formatCalDate = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+
+    const ics = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//Unytea//Session//EN",
+      "BEGIN:VEVENT",
+      `UID:${sessionData.sessionId}@unytea`,
+      `DTSTAMP:${formatCalDate(new Date())}`,
+      `DTSTART:${formatCalDate(scheduledAt)}`,
+      `DTEND:${formatCalDate(end)}`,
+      `SUMMARY:${(sessionData.sessionTitle || post.title || "Unytea Session").replace(/,/g, "\\,")}`,
+      `DESCRIPTION:${(sessionData.sessionDescription || "Join this live session on Unytea.").replace(/\n/g, " ").replace(/,/g, "\\,")}`,
+      "END:VEVENT",
+      "END:VCALENDAR",
+    ].join("\r\n");
+
+    const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${sessionData.sessionTitle || "unytea-session"}.ics`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   const isUpcoming = scheduledAt && scheduledAt > new Date();
   const effectiveStatus = sessionState?.status || (isUpcoming ? "SCHEDULED" : "COMPLETED");
   const isLive = effectiveStatus === "IN_PROGRESS";
@@ -89,8 +136,9 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
       if (!mounted) return;
 
       if (rsvpResult && rsvpResult.success) {
-        setIsAttending(rsvpResult.isAttending);
+        setRsvpStatus(rsvpResult.status);
         setAttendingCount(rsvpResult.attendingCount);
+        setInterestedCount(rsvpResult.interestedCount || 0);
       }
 
       if (stateResult.success && stateResult.state) {
@@ -104,21 +152,28 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
     };
   }, [sessionData?.sessionId, isUpcoming]);
 
-  const handleToggleRSVP = async () => {
+  const handleSetRSVP = async (status: "attending" | "interested") => {
     if (!sessionData?.sessionId || !isUpcoming || isSubmitting) return;
 
     setIsSubmitting(true);
     try {
-      const result = await toggleSessionRSVP(sessionData.sessionId, window.location.pathname);
+      const result = await setSessionRSVPStatus(sessionData.sessionId, status, window.location.pathname);
       if (!result.success) {
         toast.error(result.error || "Could not update RSVP");
         return;
       }
 
-      const nextAttending = result.action === "rsvped";
-      setIsAttending(nextAttending);
-      setAttendingCount((prev) => Math.max(0, prev + (nextAttending ? 1 : -1)));
-      toast.success(nextAttending ? "You are attending this session" : "RSVP removed");
+      setRsvpStatus(result.status ?? null);
+      setAttendingCount(result.attendingCount || 0);
+      setInterestedCount(result.interestedCount || 0);
+
+      if (!result.status) {
+        toast.success("RSVP removed");
+      } else if (result.status === "attending") {
+        toast.success("You are attending this session");
+      } else {
+        toast.success("Marked as interested");
+      }
     } catch {
       toast.error("Could not update RSVP");
     } finally {
@@ -234,7 +289,7 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
             {isUpcoming && (
               <div className="flex items-center gap-1.5 text-gray-600">
                 <Users className="h-4 w-4 text-gray-400" />
-                {attendingCount} attending
+                {attendingCount} attending · {interestedCount} interested
               </div>
             )}
           </div>
@@ -298,16 +353,36 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
         {/* CTA Buttons */}
         <div className="mt-5 space-y-2">
           {isUpcoming && (
-            <Button
-              type="button"
-              variant={isAttending ? "outline" : "default"}
-              disabled={isSubmitting}
-              onClick={handleToggleRSVP}
-              className={isAttending ? "w-full rounded-full" : "w-full rounded-full bg-emerald-600 text-white hover:bg-emerald-700"}
-            >
-              <Users className="mr-2 h-4 w-4" />
-              {isSubmitting ? "Updating..." : isAttending ? "Attending" : "RSVP"}
-            </Button>
+            <>
+              <Button
+                type="button"
+                variant={rsvpStatus === "attending" ? "outline" : "default"}
+                disabled={isSubmitting}
+                onClick={() => handleSetRSVP("attending")}
+                className={rsvpStatus === "attending" ? "w-full rounded-full" : "w-full rounded-full bg-emerald-600 text-white hover:bg-emerald-700"}
+              >
+                <Users className="mr-2 h-4 w-4" />
+                {isSubmitting ? "Updating..." : "Attending"}
+              </Button>
+              <Button
+                type="button"
+                variant={rsvpStatus === "interested" ? "outline" : "secondary"}
+                disabled={isSubmitting}
+                onClick={() => handleSetRSVP("interested")}
+                className="w-full rounded-full"
+              >
+                <Calendar className="mr-2 h-4 w-4" />
+                {isSubmitting ? "Updating..." : "Interested"}
+              </Button>
+              <Button asChild variant="outline" className="w-full rounded-full">
+                <a href={buildGoogleCalendarUrl()} target="_blank" rel="noreferrer">
+                  Add to Google Calendar
+                </a>
+              </Button>
+              <Button type="button" variant="outline" className="w-full rounded-full" onClick={downloadAppleCalendarIcs}>
+                Add to Apple Calendar
+              </Button>
+            </>
           )}
 
           {isLive ? (
