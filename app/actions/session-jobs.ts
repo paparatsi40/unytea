@@ -237,8 +237,10 @@ export async function ensureFutureSessions() {
  * Should run every hour
  * 
  * Sends reminders at:
- * - 24 hours before
  * - 1 hour before
+ * - 10 minutes before
+ *
+ * Uses an idempotency key (notificationKey) to avoid duplicates.
  */
 export async function sendSessionReminders() {
   const results = {
@@ -283,12 +285,16 @@ export async function sendSessionReminders() {
           const uniqueParticipants = [...new Set(participantIds.filter(Boolean))];
 
           for (const userId of uniqueParticipants) {
+            const reminderKey = `${window.key}:${session.id}:${userId}`;
+
             const alreadySent = await prisma.notification.findFirst({
               where: {
                 userId,
                 type: "SESSION_REMINDER",
-                title: window.title,
-                createdAt: { gte: new Date(now.getTime() - 2 * 60 * 60 * 1000) },
+                data: {
+                  path: ["notificationKey"],
+                  equals: reminderKey,
+                },
               },
             });
 
@@ -300,6 +306,7 @@ export async function sendSessionReminders() {
                 title: window.title,
                 message: `${session.title} starts at ${session.scheduledAt.toLocaleTimeString()}`,
                 data: {
+                  notificationKey: reminderKey,
                   sessionId: session.id,
                   title: session.title,
                   scheduledAt: session.scheduledAt.toISOString(),
