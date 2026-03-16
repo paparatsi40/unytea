@@ -96,9 +96,52 @@ export async function GET(
       },
     });
 
+    // Prioritize session announcements (LIVE first, then upcoming) to increase attendance
+    const now = new Date();
+    const announcementSessionIds = posts
+      .filter((p) => p.contentType === "SESSION_ANNOUNCEMENT")
+      .map((p) => {
+        const attachments = p.attachments as any;
+        return attachments?.sessionId as string | undefined;
+      })
+      .filter((id): id is string => Boolean(id));
+
+    const sessions = announcementSessionIds.length
+      ? await prisma.mentorSession.findMany({
+          where: { id: { in: announcementSessionIds } },
+          select: { id: true, status: true, scheduledAt: true },
+        })
+      : [];
+
+    const sessionMap = new Map(sessions.map((s) => [s.id, s]));
+
+    const getPriority = (post: (typeof posts)[number]) => {
+      if (post.contentType !== "SESSION_ANNOUNCEMENT") return 3;
+
+      const attachments = post.attachments as any;
+      const sessionId = attachments?.sessionId as string | undefined;
+      if (!sessionId) return 3;
+
+      const session = sessionMap.get(sessionId);
+      if (!session) return 3;
+
+      if (session.status === "IN_PROGRESS") return 0; // LIVE now
+      if (session.status === "SCHEDULED" && session.scheduledAt > now) return 1; // Upcoming
+      if (session.status === "COMPLETED") return 2; // Recent recording/recap context
+
+      return 3;
+    };
+
+    const prioritizedPosts = [...posts].sort((a, b) => {
+      const priorityDiff = getPriority(a) - getPriority(b);
+      if (priorityDiff !== 0) return priorityDiff;
+
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+
     console.log(`✓ API: Found ${posts.length} posts`);
 
-    return NextResponse.json(posts);
+    return NextResponse.json(prioritizedPosts);
   } catch (error) {
     console.error("❌ API Error:", error);
     return NextResponse.json(
