@@ -157,9 +157,11 @@ const formattedDuration = session.recording?.durationSeconds
     setQuestionMessage(null);
     setIsSubmittingQuestion(true);
 
+    const sourceParts = ["public_session_page_ask", src, ref].filter(Boolean);
     const result = await askQuestionForNextSession({
       communityId: session.community.id,
       question,
+      source: sourceParts.join("_"),
     });
 
     if (result.success) {

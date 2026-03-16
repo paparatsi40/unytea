@@ -380,6 +380,11 @@ export async function askQuestionForNextSession(params: {
       return { success: false, error: "No upcoming session available" };
     }
 
+    const normalizedSource = (params.source || "public_session_page")
+      .toLowerCase()
+      .replace(/[^a-z0-9_:-]/g, "_")
+      .slice(0, 80);
+
     const post = await prisma.post.create({
       data: {
         title: `❓ Question for next session: ${nextSession.title}`,
@@ -390,8 +395,8 @@ export async function askQuestionForNextSession(params: {
         attachments: {
           targetSessionId: nextSession.id,
           targetSessionTitle: nextSession.title,
-          source: params.source || "public_session_page",
-} as Prisma.InputJsonValue,
+          source: normalizedSource,
+        } as Prisma.InputJsonValue,
       },
     });
 
