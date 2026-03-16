@@ -404,6 +404,9 @@ const sessionDate = new Date(s.scheduledAt);
                 <div className="rounded border border-zinc-800 bg-zinc-900 px-3 py-2">✅ End session and open replay</div>
                 <div className="rounded border border-zinc-800 bg-zinc-900 px-3 py-2">✅ Open public page and test join CTA</div>
               </div>
+              <div className="mt-3 rounded border border-zinc-800 bg-zinc-950 px-3 py-2 text-[11px] text-zinc-400">
+                Tracking keys: <code>src=sessions_hub_qa</code>, <code>src=qa_flow</code>, <code>src=public_session_join_cta</code>
+              </div>
             </div>
           )}
 
