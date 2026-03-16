@@ -574,55 +574,68 @@ const sessionDate = new Date(s.scheduledAt);
                     </div>
                   )}
 
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {filteredPast.slice(0, 9).map((s) => (
-<div
-                        key={s.id}
-                        className="group rounded-xl border border-zinc-800 bg-zinc-950 p-5 transition-all hover:border-zinc-700"
-                      >
-                        <div className="mb-3 flex items-center justify-between">
-                          <span className="text-sm text-zinc-500">
-                            {formatDistanceToNow(new Date(s.scheduledAt), { addSuffix: true })}
-                          </span>
-                          {s.recordingUrl && (
-                            <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
-                              Recording available
-                            </Badge>
-                          )}
-                        </div>
+                  {filteredPast.length === 0 ? (
+                    <div className="rounded-xl border border-dashed border-zinc-800 bg-zinc-950 p-8 text-center">
+                      <p className="text-sm font-medium text-zinc-300">No sessions match this filter</p>
+                      <p className="mt-1 text-xs text-zinc-500">
+                        {pastFilter === "public"
+                          ? "No public replays yet. Mark a replay as public to distribute it."
+                          : pastFilter === "replay"
+                          ? "No recordings available yet in this range."
+                          : "Try another filter or host a new live session."}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                      {filteredPast.slice(0, 9).map((s) => (
+                        <div
+                          key={s.id}
+                          className="group rounded-xl border border-zinc-800 bg-zinc-950 p-5 transition-all hover:border-zinc-700"
+                        >
+                          <div className="mb-3 flex items-center justify-between">
+                            <span className="text-sm text-zinc-500">
+                              {formatDistanceToNow(new Date(s.scheduledAt), { addSuffix: true })}
+                            </span>
+                            {s.recordingUrl && (
+                              <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                                Recording available
+                              </Badge>
+                            )}
+                          </div>
 
-                        <h3 className="mb-2 text-base font-medium text-white">{s.title}</h3>
-                        <p className="mb-4 text-xs text-zinc-500">{s.duration || 60} min • {s._count?.participations || 0} attended</p>
+                          <h3 className="mb-2 text-base font-medium text-white">{s.title}</h3>
+                          <p className="mb-4 text-xs text-zinc-500">{s.duration || 60} min • {s._count?.participations || 0} attended</p>
 
-                        <div className="flex items-center gap-2">
-                          {s.recordingUrl ? (
-                            <>
-                              <Link href={s.recordingUrl} target="_blank">
-                                <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 flex items-center gap-2">
-                                  <ArrowRight className="h-4 w-4" />
-                                  Watch
-                                </Button>
-                              </Link>
-                              {s.visibility === "public" && s.slug && (
-                                <Link href={`/sessions/${s.slug}?ref=sessions_hub`} target="_blank">
-                                  <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
-                                    Public Link
+                          <div className="flex items-center gap-2">
+                            {s.recordingUrl ? (
+                              <>
+                                <Link href={s.recordingUrl} target="_blank">
+                                  <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 flex items-center gap-2">
+                                    <ArrowRight className="h-4 w-4" />
+                                    Watch
                                   </Button>
                                 </Link>
-                              )}
-                            </>
-                          ) : (
-                            <Link href={`/dashboard/sessions/${s.id}/room`}>
-                              <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
-                                Enter Room
-                              </Button>
-                            </Link>
-                          )}
+                                {s.visibility === "public" && s.slug && (
+                                  <Link href={`/sessions/${s.slug}?ref=sessions_hub`} target="_blank">
+                                    <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
+                                      Public Link
+                                    </Button>
+                                  </Link>
+                                )}
+                              </>
+                            ) : (
+                              <Link href={`/dashboard/sessions/${s.id}/room`}>
+                                <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
+                                  Enter Room
+                                </Button>
+                              </Link>
+                            )}
+                          </div>
                         </div>
+                      ))}
+                    </div>
+                  )}
 </div>
-                    ))}
-                  </div>
-                </div>
               )}
 </TabsContent>
 
