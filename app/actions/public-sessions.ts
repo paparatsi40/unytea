@@ -10,6 +10,9 @@ export interface PublicSessionData {
   title: string;
   description: string | null;
   status: string;
+  visibility: string;
+  canWatchRecording: boolean;
+  isMember: boolean;
   scheduledAt: Date;
   duration: number | null;
   attendeeCount: number;
@@ -101,12 +104,33 @@ export async function getPublicSession(
       return { success: false, error: "Session community not found" };
     }
 
+    const viewerId = await getCurrentUserId();
+    let isMember = false;
+
+    if (viewerId) {
+      const membership = await prisma.member.findUnique({
+        where: {
+          userId_communityId: {
+            userId: viewerId,
+            communityId: session.community.id,
+          },
+        },
+        select: { status: true },
+      });
+      isMember = membership?.status === "ACTIVE";
+    }
+
+    const canWatchRecording = session.visibility !== "community" || isMember;
+
     const data: PublicSessionData = {
       id: session.id,
       slug: session.slug!,
       title: session.title,
       description: session.description,
       status: session.status,
+      visibility: session.visibility,
+      canWatchRecording,
+      isMember,
       scheduledAt: session.scheduledAt,
       duration: session.duration,
       attendeeCount: session._count.participations,
@@ -124,7 +148,12 @@ export async function getPublicSession(
         imageUrl: session.community.imageUrl,
         memberCount: session.community._count.members,
       },
-      recording: session.recording,
+      recording: session.recording
+        ? {
+            ...session.recording,
+            url: canWatchRecording ? session.recording.url : null,
+          }
+        : null,
       notes: session.notes,
     };
 

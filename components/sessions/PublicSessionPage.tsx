@@ -18,6 +18,9 @@ interface PublicSessionPageProps {
     title: string;
     description: string | null;
     status: string;
+    visibility: string;
+    canWatchRecording: boolean;
+    isMember: boolean;
     scheduledAt: Date;
     duration: number | null;
     attendeeCount: number;
@@ -146,8 +149,8 @@ export function PublicSessionPage({ session, relatedSessions, nextSession }: Pub
       <main className="mx-auto max-w-6xl px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <Badge className="mb-3 bg-emerald-500/20 text-emerald-400 border-emerald-500/30">
-            Recording Available
+          <Badge className={`mb-3 border ${session.canWatchRecording ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" : "bg-amber-500/20 text-amber-400 border-amber-500/30"}`}>
+            {session.canWatchRecording ? "Recording Available" : "Members-only recording"}
           </Badge>
           <h1 className="mb-4 text-3xl font-bold text-white sm:text-4xl">
             {session.title}
@@ -196,6 +199,15 @@ export function PublicSessionPage({ session, relatedSessions, nextSession }: Pub
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {session.recording && !session.recording.url && (
+          <div className="mb-8 rounded-xl border border-amber-500/30 bg-amber-500/10 p-6">
+            <h3 className="text-lg font-semibold text-white">Members-only replay</h3>
+            <p className="mt-2 text-sm text-zinc-300">
+              This recording is available to community members. Join to watch the full replay and attend the next live session.
+            </p>
           </div>
         )}
 
