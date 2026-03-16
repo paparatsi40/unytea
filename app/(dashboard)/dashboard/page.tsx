@@ -41,6 +41,8 @@ import {
   getCommunityActivity,
   getRecentMembers,
   getPerformanceSnapshot,
+  getHostAnalyticsV1,
+  getNextRecommendedAction,
 } from "@/app/actions/dashboard";
 import { toast } from "sonner";
 
@@ -104,6 +106,22 @@ interface PerformanceSnapshot {
   growthRate: number;
 }
 
+interface HostAnalyticsV1 {
+  sessionsHosted: number;
+  avgAttendance: number;
+  recordingViews: number;
+  activeMembers: number;
+  recordingsReady: number;
+}
+
+interface NextRecommendedAction {
+  title: string;
+  description: string;
+  href: string;
+  cta: string;
+  priority: string;
+}
+
 export default function DashboardPage() {
   const { user } = useCurrentUser();
 
@@ -117,6 +135,8 @@ export default function DashboardPage() {
   const [performance, setPerformance] = useState<PerformanceSnapshot | null>(
     null
   );
+  const [hostAnalytics, setHostAnalytics] = useState<HostAnalyticsV1 | null>(null);
+  const [nextAction, setNextAction] = useState<NextRecommendedAction | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Load dashboard data
@@ -135,6 +155,8 @@ export default function DashboardPage() {
         activityRes,
         membersRes,
         performanceRes,
+        hostAnalyticsRes,
+        nextActionRes,
       ] = await Promise.all([
         getDashboardMetrics(),
         getNextLiveSession(),
@@ -142,6 +164,8 @@ export default function DashboardPage() {
         getCommunityActivity(6),
         getRecentMembers(4),
         getPerformanceSnapshot(),
+        getHostAnalyticsV1(),
+        getNextRecommendedAction(),
       ]);
 
       if (metricsRes.success) setMetrics(metricsRes.metrics || null);
@@ -150,6 +174,8 @@ export default function DashboardPage() {
       if (activityRes.success) setActivities(activityRes.activities || []);
       if (membersRes.success) setRecentMembers(membersRes.members || []);
       if (performanceRes.success) setPerformance(performanceRes.snapshot || null);
+      if (hostAnalyticsRes.success) setHostAnalytics(hostAnalyticsRes.analytics || null);
+      if (nextActionRes.success) setNextAction(nextActionRes.recommendation || null);
     } catch (error) {
       console.error("Error loading dashboard:", error);
       toast.error("Failed to load dashboard data");
@@ -313,6 +339,26 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         </div>
+
+        {nextAction && (
+          <Card className="border-purple-200 bg-purple-50/70">
+            <CardContent className="p-5 flex items-center justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-purple-700">
+                  Next recommended action
+                </p>
+                <h3 className="mt-1 text-lg font-semibold text-purple-950">{nextAction.title}</h3>
+                <p className="mt-1 text-sm text-purple-800">{nextAction.description}</p>
+              </div>
+              <Link href={nextAction.href}>
+                <Button className="bg-purple-600 hover:bg-purple-700">
+                  {nextAction.cta}
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        )}
 
         {/* HERO SECTION - ONBOARDING OR GROWTH */}
         {!hasCommunity ? (
@@ -754,19 +800,27 @@ export default function DashboardPage() {
                     <div className="grid grid-cols-2 gap-4">
                       <div className="p-4 rounded-lg bg-zinc-50">
                         <p className="text-2xl font-bold text-zinc-900">
-                          {performance.sessionsHosted}
+                          {hostAnalytics?.sessionsHosted ?? performance.sessionsHosted}
                         </p>
-                        <p className="text-sm text-zinc-500">
-                          Sessions hosted this week
-                        </p>
+                        <p className="text-sm text-zinc-500">Sessions hosted</p>
                       </div>
                       <div className="p-4 rounded-lg bg-zinc-50">
                         <p className="text-2xl font-bold text-zinc-900">
-                          {performance.newMembersThisWeek}
+                          {hostAnalytics?.avgAttendance ?? 0}
                         </p>
-                        <p className="text-sm text-zinc-500">
-                          New members this week
+                        <p className="text-sm text-zinc-500">Avg attendance</p>
+                      </div>
+                      <div className="p-4 rounded-lg bg-zinc-50">
+                        <p className="text-2xl font-bold text-zinc-900">
+                          {hostAnalytics?.recordingViews ?? 0}
                         </p>
+                        <p className="text-sm text-zinc-500">Recording views</p>
+                      </div>
+                      <div className="p-4 rounded-lg bg-zinc-50">
+                        <p className="text-2xl font-bold text-zinc-900">
+                          {hostAnalytics?.activeMembers ?? performance.newMembersThisWeek}
+                        </p>
+                        <p className="text-sm text-zinc-500">Active members (30d)</p>
                       </div>
                     </div>
                     <div className="p-4 rounded-lg bg-zinc-50">

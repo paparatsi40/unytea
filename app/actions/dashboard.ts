@@ -471,3 +471,172 @@ export async function getPerformanceSnapshot() {
     return { success: false, error: "Failed to load snapshot" };
   }
 }
+
+export async function getHostAnalyticsV1() {
+  try {
+    const userId = await getCurrentUserId();
+    if (!userId) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const hostMemberships = await prisma.member.findMany({
+      where: {
+        userId,
+        role: { in: ["OWNER", "ADMIN", "MODERATOR"] },
+      },
+      select: { communityId: true },
+    });
+
+    const communityIds = hostMemberships.map((m) => m.communityId);
+
+    const completedSessionWhere = {
+      OR: [{ mentorId: userId }, { communityId: { in: communityIds } }],
+      status: "COMPLETED" as const,
+    };
+
+    const [sessionsHosted, completedSessions, recordingReadyCount, recordingViews, activeMembers] =
+      await Promise.all([
+        prisma.mentorSession.count({ where: completedSessionWhere }),
+        prisma.mentorSession.findMany({
+          where: completedSessionWhere,
+          select: {
+            attendeeCount: true,
+            participations: { select: { id: true } },
+          },
+          take: 50,
+          orderBy: { endedAt: "desc" },
+        }),
+        prisma.recording.count({
+          where: {
+            status: "READY",
+            session: {
+              OR: [{ mentorId: userId }, { communityId: { in: communityIds } }],
+            },
+          },
+        }),
+        prisma.post.aggregate({
+          where: {
+            communityId: { in: communityIds },
+            contentType: "SESSION_ANNOUNCEMENT",
+          },
+          _sum: { viewCount: true },
+        }),
+        prisma.sessionParticipation.findMany({
+          where: {
+            createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
+            session: {
+              communityId: { in: communityIds },
+            },
+          },
+          distinct: ["userId"],
+          select: { userId: true },
+        }),
+      ]);
+
+    const avgAttendance = completedSessions.length
+      ? Math.round(
+          completedSessions.reduce(
+            (sum, s) => sum + (s.attendeeCount || s.participations.length || 0),
+            0
+          ) / completedSessions.length
+        )
+      : 0;
+
+    return {
+      success: true,
+      analytics: {
+        sessionsHosted,
+        avgAttendance,
+        recordingViews: recordingViews._sum.viewCount || 0,
+        activeMembers: activeMembers.length,
+        recordingsReady: recordingReadyCount,
+      },
+    };
+  } catch (error) {
+    console.error("Error getting host analytics v1:", error);
+    return { success: false, error: "Failed to load host analytics" };
+  }
+}
+
+export async function getNextRecommendedAction() {
+  try {
+    const [metricsRes, nextSessionRes, hostAnalyticsRes] = await Promise.all([
+      getDashboardMetrics(),
+      getNextLiveSession(),
+      getHostAnalyticsV1(),
+    ]);
+
+    if (!metricsRes.success) {
+      return { success: false, error: "Failed to evaluate recommendation" };
+    }
+
+    const metrics = metricsRes.metrics!;
+    const hostAnalytics = hostAnalyticsRes.success ? hostAnalyticsRes.analytics : null;
+
+    if (metrics.communities === 0) {
+      return {
+        success: true,
+        recommendation: {
+          title: "Create your first community",
+          description: "Start your network layer by launching a focused community hub.",
+          href: "/dashboard/communities/new",
+          cta: "Create community",
+          priority: "high",
+        },
+      };
+    }
+
+    if (!nextSessionRes.success || !nextSessionRes.session) {
+      return {
+        success: true,
+        recommendation: {
+          title: "Schedule your next live session",
+          description: "Consistency drives attendance. Publish the next live now.",
+          href: "/dashboard/sessions/create",
+          cta: "Schedule session",
+          priority: "high",
+        },
+      };
+    }
+
+    if ((hostAnalytics?.recordingsReady || 0) > 0 && (hostAnalytics?.recordingViews || 0) < 25) {
+      return {
+        success: true,
+        recommendation: {
+          title: "Boost replay distribution",
+          description: "Your recordings are ready—share recap posts to increase replay views.",
+          href: "/dashboard/recordings",
+          cta: "Promote recordings",
+          priority: "medium",
+        },
+      };
+    }
+
+    if ((hostAnalytics?.activeMembers || 0) < 5) {
+      return {
+        success: true,
+        recommendation: {
+          title: "Activate more members this week",
+          description: "Invite inactive members to the next live and encourage RSVP.",
+          href: "/dashboard/communities",
+          cta: "Invite members",
+          priority: "medium",
+        },
+      };
+    }
+
+    return {
+      success: true,
+      recommendation: {
+        title: "Keep momentum with a themed session",
+        description: "You are trending well—launch a focused topic session this week.",
+        href: "/dashboard/sessions/create",
+        cta: "Create themed session",
+        priority: "low",
+      },
+    };
+  } catch (error) {
+    console.error("Error getting next recommended action:", error);
+    return { success: false, error: "Failed to load recommendation" };
+  }
+}
