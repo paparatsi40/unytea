@@ -290,7 +290,7 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
         </div>
       </div>
 
-      {/* Bottom decoration */
+      {/* Bottom decoration */}
       <div className="relative h-1 w-full bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500" />
     </div>
   );
