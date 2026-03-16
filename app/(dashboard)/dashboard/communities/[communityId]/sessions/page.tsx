@@ -313,6 +313,12 @@ const sessionDate = new Date(s.scheduledAt);
                   {days}d
                 </Link>
               ))}
+              <Link
+                href={`/dashboard/communities/${communityId}/sessions?filter=all&pastFilter=all&window=30`}
+                className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-zinc-400 transition hover:bg-zinc-800"
+              >
+                Reset filters
+              </Link>
             </div>
             <div className="mb-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
 <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4">
