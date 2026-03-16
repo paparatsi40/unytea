@@ -315,30 +315,39 @@ const sessionDate = new Date(s.scheduledAt);
                 <Badge className="border-purple-400/40 bg-purple-500/20 text-purple-200">Recommended first session: Community Q&A · 30 min</Badge>
               </div>
               <div className="mt-3 grid gap-2 sm:grid-cols-3">
-                <div className="rounded-lg border border-purple-500/30 bg-zinc-900/60 p-3">
+                <div className="rounded-lg border border-purple-500/40 bg-zinc-900/60 p-3 shadow-[0_0_0_1px_rgba(168,85,247,0.25)]">
+                  <div className="mb-2 flex items-center justify-between">
+                    <Badge className="border-purple-400/40 bg-purple-500/20 text-[10px] text-purple-200">Recommended</Badge>
+                  </div>
                   <CreateSessionDialog
-                    triggerText="30 min Q&A"
+                    triggerText="⏱ 30 min Q&A"
                     className="w-full bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-md text-sm"
                     communityId={communityId}
                     defaultDuration={30}
+                    presetTitle="Community Q&A"
+                    presetDescription="Ask anything about this community topic."
                   />
                   <p className="mt-2 text-[11px] text-zinc-400">Best for your first session</p>
                 </div>
                 <div className="rounded-lg border border-zinc-700 bg-zinc-900/60 p-3">
                   <CreateSessionDialog
-                    triggerText="45 min Workshop"
+                    triggerText="⏱ 45 min Workshop"
                     className="w-full bg-zinc-800 hover:bg-zinc-700 text-white px-3 py-2 rounded-md text-sm"
                     communityId={communityId}
                     defaultDuration={45}
+                    presetTitle="Workshop Session"
+                    presetDescription="Teach one specific topic with practical examples."
                   />
                   <p className="mt-2 text-[11px] text-zinc-400">Teach a specific topic</p>
                 </div>
                 <div className="rounded-lg border border-zinc-700 bg-zinc-900/60 p-3">
                   <CreateSessionDialog
-                    triggerText="60 min Masterclass"
+                    triggerText="⏱ 60 min Masterclass"
                     className="w-full bg-zinc-800 hover:bg-zinc-700 text-white px-3 py-2 rounded-md text-sm"
                     communityId={communityId}
                     defaultDuration={60}
+                    presetTitle="Masterclass"
+                    presetDescription="Deep dive into a focused topic with examples and Q&A."
                   />
                   <p className="mt-2 text-[11px] text-zinc-400">Deep dive session</p>
                 </div>
@@ -666,7 +675,7 @@ const sessionDate = new Date(s.scheduledAt);
                   </p>
                   {canCreateSessions && (
                     <CreateSessionDialog
-                      triggerText={filter === "all" ? "Schedule your first live session" : "Schedule a live session"}
+                      triggerText={filter === "all" ? "Start your first live session" : "Create a live session"}
                       className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2.5 rounded-lg font-medium inline-flex items-center gap-2"
                       communityId={communityId}
                     />
@@ -686,6 +695,7 @@ const sessionDate = new Date(s.scheduledAt);
                       <p className="mt-1 text-sm font-semibold text-zinc-100">Community Q&A</p>
                       <p className="text-xs text-zinc-400">Friday · 6:00 PM</p>
                       <p className="mt-1 text-xs text-zinc-500">0 attending</p>
+                      <p className="mt-1 text-[11px] text-zinc-400">Members will receive reminders automatically</p>
                     </div>
                   )}
                   <div className="mt-2 flex items-center justify-center gap-2 text-sm text-zinc-500">

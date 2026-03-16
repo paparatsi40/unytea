@@ -15,6 +15,8 @@ interface CreateSessionDialogProps {
   className?: string;
   communityId?: string;
   defaultDuration?: number;
+  presetTitle?: string;
+  presetDescription?: string;
   onSuccess?: () => void;
 }
 
@@ -55,6 +57,8 @@ export function CreateSessionDialog({
   className,
   communityId,
   defaultDuration = 60,
+  presetTitle,
+  presetDescription,
   onSuccess,
 }: CreateSessionDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -68,8 +72,8 @@ export function CreateSessionDialog({
   const [sessionType, setSessionType] = useState<SessionType>("video");
 
   // Form state
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [title, setTitle] = useState(presetTitle || "");
+  const [description, setDescription] = useState(presetDescription || "");
   const [scheduledAt, setScheduledAt] = useState("");
   const [duration, setDuration] = useState(defaultDuration);
   const [timezone, setTimezone] = useState(
@@ -221,8 +225,8 @@ export function CreateSessionDialog({
     setMode("scheduled");
     setSessionType("video");
     setDuration(defaultDuration);
-    setTitle("");
-    setDescription("");
+    setTitle(presetTitle || "");
+    setDescription(presetDescription || "");
     setScheduledAt("");
     setTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC");
     setAutoPostToFeed(true);
@@ -286,7 +290,12 @@ export function CreateSessionDialog({
   return (
     <>
       <button
-        onClick={() => setIsOpen(true)}
+        onClick={() => {
+          setTitle(presetTitle || "");
+          setDescription(presetDescription || "");
+          setDuration(defaultDuration);
+          setIsOpen(true);
+        }}
         className={
           className ||
           "flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
