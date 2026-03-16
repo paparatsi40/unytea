@@ -371,7 +371,7 @@ const sessionDate = new Date(s.scheduledAt);
                       </Button>
                     </Link>
                     {primarySession.visibility === "public" && primarySession.slug && (
-                      <Link href={`/sessions/${primarySession.slug}`} target="_blank">
+                      <Link href={`/sessions/${primarySession.slug}?ref=sessions_hub`} target="_blank">
                         <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
                           Public Page
                         </Button>
@@ -530,7 +530,7 @@ const sessionDate = new Date(s.scheduledAt);
                                 <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">Watch Replay</Button>
                               </Link>
                               {s.visibility === "public" && s.slug ? (
-                                <Link href={`/sessions/${s.slug}`} target="_blank">
+                                <Link href={`/sessions/${s.slug}?ref=sessions_hub`} target="_blank">
                                   <Button variant="outline" className="w-full border-zinc-700 text-zinc-300 hover:bg-zinc-800">Public Link</Button>
                                 </Link>
                               ) : (
@@ -573,7 +573,7 @@ const sessionDate = new Date(s.scheduledAt);
                                 </Button>
                               </Link>
                               {s.visibility === "public" && s.slug && (
-                                <Link href={`/sessions/${s.slug}`} target="_blank">
+                                <Link href={`/sessions/${s.slug}?ref=sessions_hub`} target="_blank">
                                   <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
                                     Public Link
                                   </Button>
