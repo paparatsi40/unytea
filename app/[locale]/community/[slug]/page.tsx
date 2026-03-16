@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -41,6 +42,59 @@ function trackPublicCommunityEvent(params: {
     at: new Date().toISOString(),
     ...params,
   });
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { locale: string; slug: string };
+}): Promise<Metadata> {
+  const community = await prisma.community.findUnique({
+    where: { slug: params.slug },
+    select: {
+      name: true,
+      description: true,
+      imageUrl: true,
+      owner: { select: { name: true, firstName: true, lastName: true } },
+    },
+  });
+
+  if (!community) {
+    return {
+      title: "Community Not Found | Unytea",
+      description: "This community preview is not available.",
+      robots: { index: false, follow: false },
+    };
+  }
+
+  const title = `${community.name} Community | Unytea`;
+  const host = formatHostName(community.owner);
+  const description =
+    community.description?.slice(0, 160) ||
+    `Join ${community.name} hosted by ${host} on Unytea.`;
+  const canonical = `https://www.unytea.com/${params.locale}/community/${params.slug}`;
+  const image = community.imageUrl || "https://www.unytea.com/og-image.png";
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      url: canonical,
+      images: [{ url: image, width: 1200, height: 630 }],
+      siteName: "Unytea",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
+    },
+    alternates: { canonical },
+    robots: { index: true, follow: true },
+  };
 }
 
 export default async function CommunityPublicPreviewPage({

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { Users, Calendar, Sparkles, TrendingUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -42,6 +43,38 @@ function formatNextSession(date: Date | null, title: string | null) {
     minute: "2-digit",
   });
   return title ? `${title} · ${time}` : `Next live · ${time}`;
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { locale: string };
+}): Promise<Metadata> {
+  const canonical = `https://www.unytea.com/${params.locale}/explore`;
+  const title = "Explore Communities | Unytea";
+  const description =
+    "Discover active communities, trending topics, and upcoming live sessions on Unytea.";
+
+  return {
+    title,
+    description,
+    alternates: { canonical },
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      url: canonical,
+      images: [{ url: "https://www.unytea.com/og-image.png", width: 1200, height: 630 }],
+      siteName: "Unytea",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: ["https://www.unytea.com/og-image.png"],
+    },
+    robots: { index: true, follow: true },
+  };
 }
 
 export default async function ExploreCommunitiesPage({
