@@ -151,6 +151,9 @@ try {
     const attendanceResult = await getCommunityAttendanceMetrics(communityId, 30);
     const attendance = attendanceResult.success ? attendanceResult.metrics : null;
     const recommendation = attendance ? getAttendanceRecommendation(attendance) : null;
+    const rsvpJoinTarget = 70;
+    const rsvpJoinProgress = attendance ? Math.min(100, Math.max(0, attendance.rsvpToJoinRate)) : 0;
+    const rsvpJoinGap = attendance ? Math.max(0, rsvpJoinTarget - attendance.rsvpToJoinRate) : 0;
 
     // Split into live, upcoming and past
     const now = new Date();
@@ -263,12 +266,21 @@ const sessionDate = new Date(s.scheduledAt);
               <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4">
                 <p className="text-xs uppercase tracking-wide text-zinc-500">RSVP → join</p>
                 <p className="mt-1 text-2xl font-semibold text-white">{attendance.rsvpToJoinRate}%</p>
-                <p className="text-xs text-zinc-500">conversion quality</p>
+                <p className="text-xs text-zinc-500">target: {rsvpJoinTarget}%</p>
+                <div className="mt-2 h-1.5 w-full rounded-full bg-zinc-800">
+                  <div
+                    className={`h-1.5 rounded-full ${rsvpJoinProgress >= rsvpJoinTarget ? "bg-emerald-500" : "bg-amber-500"}`}
+                    style={{ width: `${rsvpJoinProgress}%` }}
+                  />
+                </div>
+                <p className="mt-1 text-xs text-zinc-500">
+                  {rsvpJoinGap === 0 ? "On target" : `${rsvpJoinGap}pp to target`}
+                </p>
                 <p className={`mt-1 text-xs ${attendance.trend?.rsvpToJoinRateDelta >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
                   {attendance.trend?.rsvpToJoinRateDelta >= 0 ? "+" : ""}{attendance.trend?.rsvpToJoinRateDelta || 0}pp vs prev period
                 </p>
               </div>
-              <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4">
+<div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4">
                 <p className="text-xs uppercase tracking-wide text-zinc-500">Reminders sent</p>
                 <p className="mt-1 text-2xl font-semibold text-white">{attendance.remindersSent}</p>
                 <p className="text-xs text-zinc-500">delivery volume</p>
