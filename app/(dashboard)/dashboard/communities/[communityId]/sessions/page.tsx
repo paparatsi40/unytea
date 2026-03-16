@@ -51,9 +51,9 @@ function getAttendanceRecommendation(attendance: any) {
   if (attendance.rsvpToJoinRate < 50) {
     return {
       title: "Low RSVP → Join conversion",
-      description: "Tip: Ask members to drop questions in the feed before the session. This increases attendance.",
+      description: "Tip: Ask members to drop questions in the feed before the session. This typically increases attendance by ~30%.",
       tone: "warning" as const,
-};
+    };
   }
 
   if (attendance.avgAttendance < 5 && attendance.completedSessions >= 3) {
@@ -317,13 +317,13 @@ const sessionDate = new Date(s.scheduledAt);
               <div className="mt-3 grid gap-2 sm:grid-cols-3">
                 <div className="rounded-lg border border-purple-500/40 bg-zinc-900/60 p-3 shadow-[0_0_0_1px_rgba(168,85,247,0.25)]">
                   <div className="mb-2 flex items-center justify-between">
-                    <Badge className="border-purple-400/40 bg-purple-500/20 text-[10px] text-purple-200">Recommended</Badge>
+                    <Badge className="border-purple-400/40 bg-purple-500/20 text-[10px] text-purple-100">⭐ Best first session</Badge>
                   </div>
                   <CreateSessionDialog
-                    triggerText="⏱ 30 min Q&A"
+                    triggerText="⏱ 30 min Community Q&A"
                     className="w-full bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-md text-sm"
                     communityId={communityId}
-                    defaultDuration={30}
+defaultDuration={30}
                     presetTitle="Community Q&A"
                     presetDescription="Ask anything about this community topic."
                   />
@@ -352,15 +352,16 @@ const sessionDate = new Date(s.scheduledAt);
                   <p className="mt-2 text-[11px] text-zinc-400">Deep dive session</p>
                 </div>
               </div>
+              <p className="mt-3 text-xs text-zinc-300">Tip: Start with a weekly Q&A to build engagement.</p>
             </div>
           )}
 
           {attendance && (
 <>
-            <div className="mb-2 flex flex-wrap items-center gap-2 text-[11px] text-zinc-400">
-              <span className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1">Upcoming: {filter}</span>
-              <span className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1">Past: {pastFilter}</span>
-              <span className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1">Window: {metricWindow}d</span>
+            <div className="mb-2 flex flex-wrap items-center gap-2 text-[11px] text-zinc-300">
+              <span className="rounded border border-zinc-600 bg-zinc-900 px-2 py-1">Upcoming: {filter}</span>
+              <span className="rounded border border-zinc-600 bg-zinc-900 px-2 py-1">Past: {pastFilter}</span>
+              <span className="rounded border border-zinc-600 bg-zinc-900 px-2 py-1">Window: {metricWindow}d</span>
             </div>
             <div className="mb-3 flex flex-wrap items-center gap-2 text-xs">
               <span className="text-zinc-500">Window:</span>
@@ -465,7 +466,7 @@ const sessionDate = new Date(s.scheduledAt);
                 {recommendation.title === "Low RSVP → Join conversion" && (
                   <div className="mt-3">
                     <Link href={`/dashboard/c/${community.slug}?src=attendance_tip_question_post`}>
-                      <Button variant="outline" className="border-zinc-700 text-zinc-200 hover:bg-zinc-800">
+                      <Button className="bg-amber-400 text-zinc-900 hover:bg-amber-300">
                         Create question post
                       </Button>
                     </Link>
@@ -695,7 +696,8 @@ const sessionDate = new Date(s.scheduledAt);
                       <p className="mt-1 text-sm font-semibold text-zinc-100">Community Q&A</p>
                       <p className="text-xs text-zinc-400">Friday · 6:00 PM</p>
                       <p className="mt-1 text-xs text-zinc-500">0 attending</p>
-                      <p className="mt-1 text-[11px] text-zinc-400">Members will receive reminders automatically</p>
+                      <p className="mt-1 text-[11px] text-zinc-300">Members will receive reminders automatically</p>
+                      <p className="mt-1 text-[11px] text-zinc-400">Members can RSVP and join with one click</p>
                     </div>
                   )}
                   <div className="mt-2 flex items-center justify-center gap-2 text-sm text-zinc-500">
