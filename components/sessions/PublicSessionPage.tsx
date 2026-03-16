@@ -100,6 +100,7 @@ const [isPlaying, setIsPlaying] = useState(false);
   const roomParams = new URLSearchParams();
   roomParams.set("src", "public_next_live_card");
   if (ref) roomParams.set("ref", ref);
+  if (src) roomParams.set("parent_src", src);
   const nextSessionRoomHref = `/dashboard/sessions/${nextSession?.id}/room?${roomParams.toString()}`;
 const formattedDuration = session.recording?.durationSeconds
 ? `${Math.round(session.recording.durationSeconds / 60)} min`
@@ -456,8 +457,9 @@ const formattedDuration = session.recording?.durationSeconds
                         const qs = new URLSearchParams();
                         if (ref) qs.set("ref", ref);
                         qs.set("src", "public_related_card");
+                        if (src) qs.set("parent_src", src);
                         const suffix = qs.toString() ? `?${qs.toString()}` : "";
-                        router.push(`/sessions/${related.slug}${suffix}`);
+router.push(`/sessions/${related.slug}${suffix}`);
                       }}
                     >
                       <CardContent className="p-4">
