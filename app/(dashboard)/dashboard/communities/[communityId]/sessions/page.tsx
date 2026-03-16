@@ -183,8 +183,15 @@ mentor: {
       if (pastFilter === "public") return Boolean(s.recordingUrl) && s.visibility === "public";
       return true;
     });
-    const featuredReplays = filteredPast.filter((s) => Boolean(s.recordingUrl)).slice(0, 3);
-    const pastAllCount = pastSorted.length;
+    const featuredReplays = pastSorted
+      .filter((s) => Boolean(s.recordingUrl))
+      .sort((a, b) => {
+        const attendanceDelta = (b._count?.participations || 0) - (a._count?.participations || 0);
+        if (attendanceDelta !== 0) return attendanceDelta;
+        return new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime();
+      })
+      .slice(0, 3);
+const pastAllCount = pastSorted.length;
     const pastReplayCount = pastSorted.filter((s) => Boolean(s.recordingUrl)).length;
     const pastPublicReplayCount = pastSorted.filter((s) => Boolean(s.recordingUrl) && s.visibility === "public" && Boolean(s.slug)).length;
 
