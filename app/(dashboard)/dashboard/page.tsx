@@ -21,6 +21,7 @@ import {
   ChevronRight,
   Radio,
   Sparkles,
+  AlertTriangle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -43,6 +44,7 @@ import {
   getPerformanceSnapshot,
   getHostAnalyticsV1,
   getNextRecommendedAction,
+  getHostAlerts,
 } from "@/app/actions/dashboard";
 import { toast } from "sonner";
 
@@ -122,6 +124,14 @@ interface NextRecommendedAction {
   priority: string;
 }
 
+interface HostAlert {
+  type: "warning" | "info";
+  title: string;
+  description: string;
+  href: string;
+  cta: string;
+}
+
 export default function DashboardPage() {
   const { user } = useCurrentUser();
 
@@ -137,6 +147,7 @@ export default function DashboardPage() {
   );
   const [hostAnalytics, setHostAnalytics] = useState<HostAnalyticsV1 | null>(null);
   const [nextAction, setNextAction] = useState<NextRecommendedAction | null>(null);
+  const [hostAlerts, setHostAlerts] = useState<HostAlert[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Load dashboard data
@@ -157,6 +168,7 @@ export default function DashboardPage() {
         performanceRes,
         hostAnalyticsRes,
         nextActionRes,
+        hostAlertsRes,
       ] = await Promise.all([
         getDashboardMetrics(),
         getNextLiveSession(),
@@ -166,6 +178,7 @@ export default function DashboardPage() {
         getPerformanceSnapshot(),
         getHostAnalyticsV1(),
         getNextRecommendedAction(),
+        getHostAlerts(),
       ]);
 
       if (metricsRes.success) setMetrics(metricsRes.metrics || null);
@@ -176,6 +189,7 @@ export default function DashboardPage() {
       if (performanceRes.success) setPerformance(performanceRes.snapshot || null);
       if (hostAnalyticsRes.success) setHostAnalytics(hostAnalyticsRes.analytics || null);
       if (nextActionRes.success) setNextAction(nextActionRes.recommendation || null);
+      if (hostAlertsRes.success) setHostAlerts(hostAlertsRes.alerts || []);
     } catch (error) {
       console.error("Error loading dashboard:", error);
       toast.error("Failed to load dashboard data");
@@ -358,6 +372,30 @@ export default function DashboardPage() {
               </Link>
             </CardContent>
           </Card>
+        )}
+
+        {hostAlerts.length > 0 && (
+          <div className="grid gap-3">
+            {hostAlerts.map((alert, idx) => (
+              <Card
+                key={`${alert.title}-${idx}`}
+                className={alert.type === "warning" ? "border-amber-300 bg-amber-50" : "border-blue-200 bg-blue-50"}
+              >
+                <CardContent className="p-4 flex items-center justify-between gap-3">
+                  <div className="flex items-start gap-3">
+                    <AlertTriangle className={alert.type === "warning" ? "h-5 w-5 text-amber-600 mt-0.5" : "h-5 w-5 text-blue-600 mt-0.5"} />
+                    <div>
+                      <p className="font-semibold text-zinc-900">{alert.title}</p>
+                      <p className="text-sm text-zinc-600">{alert.description}</p>
+                    </div>
+                  </div>
+                  <Link href={alert.href}>
+                    <Button variant="outline">{alert.cta}</Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         )}
 
         {/* HERO SECTION - ONBOARDING OR GROWTH */}

@@ -640,3 +640,87 @@ export async function getNextRecommendedAction() {
     return { success: false, error: "Failed to load recommendation" };
   }
 }
+
+export async function getHostAlerts() {
+  try {
+    const userId = await getCurrentUserId();
+    if (!userId) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const now = new Date();
+    const in14Days = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+
+    const [upcomingCount, recentSessions, previousSessions] = await Promise.all([
+      prisma.mentorSession.count({
+        where: {
+          mentorId: userId,
+          status: { in: ["SCHEDULED", "IN_PROGRESS"] },
+          scheduledAt: { gte: now, lte: in14Days },
+        },
+      }),
+      prisma.mentorSession.findMany({
+        where: { mentorId: userId, status: "COMPLETED" },
+        select: { attendeeCount: true, participations: { select: { id: true } } },
+        orderBy: { endedAt: "desc" },
+        take: 5,
+      }),
+      prisma.mentorSession.findMany({
+        where: { mentorId: userId, status: "COMPLETED" },
+        select: { attendeeCount: true, participations: { select: { id: true } } },
+        orderBy: { endedAt: "desc" },
+        skip: 5,
+        take: 5,
+      }),
+    ]);
+
+    const alerts: Array<{ type: "warning" | "info"; title: string; description: string; href: string; cta: string }> = [];
+
+    if (upcomingCount === 0) {
+      alerts.push({
+        type: "warning",
+        title: "No upcoming sessions scheduled",
+        description: "You have no live sessions in the next 14 days. Schedule one to keep momentum.",
+        href: "/dashboard/sessions/create",
+        cta: "Schedule now",
+      });
+    }
+
+    const avg = (rows: Array<{ attendeeCount: number; participations: { id: string }[] }>) => {
+      if (!rows.length) return 0;
+      return (
+        rows.reduce((sum, s) => sum + (s.attendeeCount || s.participations.length || 0), 0) /
+        rows.length
+      );
+    };
+
+    const recentAvg = avg(recentSessions);
+    const previousAvg = avg(previousSessions);
+
+    if (previousAvg > 0 && recentAvg < previousAvg * 0.7) {
+      const dropPct = Math.round(((previousAvg - recentAvg) / previousAvg) * 100);
+      alerts.push({
+        type: "warning",
+        title: "Attendance is trending down",
+        description: `Average attendance dropped ${dropPct}% vs your previous sessions.`,
+        href: "/dashboard/analytics",
+        cta: "Review analytics",
+      });
+    }
+
+    if (alerts.length === 0) {
+      alerts.push({
+        type: "info",
+        title: "No urgent alerts",
+        description: "Your session cadence and attendance look healthy this week.",
+        href: "/dashboard/sessions",
+        cta: "View sessions",
+      });
+    }
+
+    return { success: true, alerts };
+  } catch (error) {
+    console.error("Error getting host alerts:", error);
+    return { success: false, error: "Failed to load host alerts" };
+  }
+}
