@@ -172,6 +172,22 @@ const roomParams = new URLSearchParams();
     }
   };
 
+  const shareToNetwork = (network: "twitter" | "linkedin" | "whatsapp") => {
+    const shareUrl = new URL(window.location.href);
+    shareUrl.searchParams.set("src", "public_share_network");
+    const text = encodeURIComponent(`Join this live session: ${session.title}`);
+    const url = encodeURIComponent(shareUrl.toString());
+
+    const target =
+      network === "twitter"
+        ? `https://twitter.com/intent/tweet?text=${text}&url=${url}`
+        : network === "linkedin"
+        ? `https://www.linkedin.com/sharing/share-offsite/?url=${url}`
+        : `https://wa.me/?text=${text}%20${url}`;
+
+    window.open(target, "_blank", "noopener,noreferrer");
+  };
+
   useEffect(() => {
     let active = true;
 
@@ -253,15 +269,20 @@ const roomParams = new URLSearchParams();
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Unytea
             </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleShare}
-              className="text-zinc-400 hover:text-white"
-            >
-              <Share2 className="mr-2 h-4 w-4" />
-              Share
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleShare}
+                className="text-zinc-400 hover:text-white"
+              >
+                <Share2 className="mr-2 h-4 w-4" />
+                Share
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => shareToNetwork("twitter")} className="text-zinc-400 hover:text-white">X</Button>
+              <Button variant="ghost" size="sm" onClick={() => shareToNetwork("linkedin")} className="text-zinc-400 hover:text-white">LinkedIn</Button>
+              <Button variant="ghost" size="sm" onClick={() => shareToNetwork("whatsapp")} className="text-zinc-400 hover:text-white">WhatsApp</Button>
+            </div>
           </div>
         </div>
       </nav>

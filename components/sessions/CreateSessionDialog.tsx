@@ -14,6 +14,7 @@ interface CreateSessionDialogProps {
   triggerText?: string;
   className?: string;
   communityId?: string;
+  defaultDuration?: number;
   onSuccess?: () => void;
 }
 
@@ -53,6 +54,7 @@ export function CreateSessionDialog({
   triggerText = "Create Session",
   className,
   communityId,
+  defaultDuration = 60,
   onSuccess,
 }: CreateSessionDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -69,7 +71,7 @@ export function CreateSessionDialog({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [scheduledAt, setScheduledAt] = useState("");
-  const [duration, setDuration] = useState(60);
+  const [duration, setDuration] = useState(defaultDuration);
   const [timezone, setTimezone] = useState(
     Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"
   );
@@ -218,10 +220,10 @@ export function CreateSessionDialog({
   const resetForm = () => {
     setMode("scheduled");
     setSessionType("video");
+    setDuration(defaultDuration);
     setTitle("");
     setDescription("");
     setScheduledAt("");
-    setDuration(60);
     setTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC");
     setAutoPostToFeed(true);
     setRecurrence("once");

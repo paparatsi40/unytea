@@ -125,6 +125,7 @@ export default async function CommunityPublicPreviewPage({
       _count: {
         select: {
           members: true,
+          sessions: true,
         },
       },
       sessions: {
@@ -241,6 +242,42 @@ export default async function CommunityPublicPreviewPage({
 
   const nextSession = currentCommunity.sessions[0] ?? null;
 
+  const monthStart = new Date();
+  monthStart.setDate(1);
+  monthStart.setHours(0, 0, 0, 0);
+
+  const [sessionsThisMonth, upcomingSessionsCount, completedSessions] = await Promise.all([
+    prisma.mentorSession.count({
+      where: {
+        communityId: currentCommunity.id,
+        scheduledAt: { gte: monthStart },
+      },
+    }),
+    prisma.mentorSession.count({
+      where: {
+        communityId: currentCommunity.id,
+        status: "SCHEDULED",
+        scheduledAt: { gt: new Date() },
+      },
+    }),
+    prisma.mentorSession.findMany({
+      where: {
+        communityId: currentCommunity.id,
+        status: "COMPLETED",
+      },
+      orderBy: { scheduledAt: "desc" },
+      take: 12,
+      select: { attendeeCount: true },
+    }),
+  ]);
+
+  const averageAttendance = completedSessions.length
+    ? Math.round(
+        completedSessions.reduce((sum, item) => sum + (item.attendeeCount || 0), 0) /
+          completedSessions.length
+      )
+    : 0;
+
   return (
     <div className="min-h-screen bg-background">
       <main className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
@@ -277,6 +314,25 @@ export default async function CommunityPublicPreviewPage({
         </div>
 
         <section className="mb-8 rounded-xl border border-border bg-card p-5">
+          <h2 className="text-lg font-semibold text-foreground">Session momentum</h2>
+          <p className="mt-1 text-sm text-muted-foreground">A quick view of how active this community is right now.</p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-3">
+            <div className="rounded-lg border border-border p-3">
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">Sessions this month</p>
+              <p className="mt-1 text-xl font-semibold text-foreground">{sessionsThisMonth}</p>
+            </div>
+            <div className="rounded-lg border border-border p-3">
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">Average attendance</p>
+              <p className="mt-1 text-xl font-semibold text-foreground">{averageAttendance}</p>
+            </div>
+            <div className="rounded-lg border border-border p-3">
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">Upcoming sessions</p>
+              <p className="mt-1 text-xl font-semibold text-foreground">{upcomingSessionsCount}</p>
+            </div>
+          </div>
+        </section>
+
+        <section className="mb-8 rounded-xl border border-border bg-card p-5">
           <h2 className="text-lg font-semibold text-foreground">Discussion preview</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Public teaser only. Full feed and recordings unlock after joining.
@@ -303,7 +359,7 @@ export default async function CommunityPublicPreviewPage({
         <section className="rounded-xl border border-primary/30 bg-primary/5 p-5">
           <h2 className="text-lg font-semibold text-foreground">Join this community</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Access full feed, recordings, and member-only discussions.
+            Attend live sessions, access full feed and recordings, and unlock member-only discussions.
           </p>
 
           <div className="mt-4 flex flex-wrap gap-3">
@@ -315,7 +371,7 @@ export default async function CommunityPublicPreviewPage({
               <Button disabled>Request pending approval</Button>
             ) : (
               <form action={handleJoin}>
-                <Button type="submit">{userId ? "Join now" : "Sign in to join"}</Button>
+                <Button type="submit">{userId ? "Join community" : "Sign in to join community"}</Button>
               </form>
             )}
             <Link href={`/${locale}/explore`}>

@@ -188,12 +188,11 @@ export default function NewCommunityPage() {
       console.log("📦 Server response:", result);
 
       if (result.success && result.community) {
-        const redirectUrl = `/dashboard/c/${result.community.slug}`;
-        console.log("✅ Community created! Redirecting to:", redirectUrl);
+        const redirectUrl = `/dashboard/communities/${result.community.id}/sessions?quickStart=1`;
+        console.log("✅ Community created! Redirecting to quick schedule:", redirectUrl);
         console.log("✅ Membership ID:", result.membership?.id);
         
-        // Use window.location.href to force a full page reload
-        // This ensures no stale data from cache
+        // Route host straight to first-session activation flow
         window.location.href = redirectUrl;
       } else {
         console.error("❌ Failed to create community:", result.error);

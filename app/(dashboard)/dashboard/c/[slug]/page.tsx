@@ -53,7 +53,7 @@ function JoinCommunityView({ community, stats }: { community: Community; stats?:
             </div>
             <form action={handleJoin}>
               <Button type="submit" size="lg" className="bg-white text-purple-900 hover:bg-white/90">
-                Join Community
+                Join community • Attend live sessions
               </Button>
             </form>
           </div>

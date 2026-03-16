@@ -211,6 +211,29 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
     minute: "2-digit",
   });
 
+  const publicSessionUrl = session.slug
+    ? `${window.location.origin}/sessions/${session.slug}?src=session_detail_share`
+    : `${window.location.origin}/dashboard/sessions/${session.id}?src=session_detail_share`;
+
+  const handleCopyInviteLink = async () => {
+    await navigator.clipboard.writeText(publicSessionUrl);
+    toast.success("Invite link copied");
+  };
+
+  const shareToNetwork = (network: "twitter" | "linkedin" | "whatsapp") => {
+    const text = encodeURIComponent(`Join this session: ${session.title}`);
+    const url = encodeURIComponent(publicSessionUrl);
+
+    const target =
+      network === "twitter"
+        ? `https://twitter.com/intent/tweet?text=${text}&url=${url}`
+        : network === "linkedin"
+        ? `https://www.linkedin.com/sharing/share-offsite/?url=${url}`
+        : `https://wa.me/?text=${text}%20${url}`;
+
+    window.open(target, "_blank", "noopener,noreferrer");
+  };
+
   const buildGoogleCalendarUrl = () => {
     const start = new Date(session.scheduledAt);
     const end = new Date(start.getTime() + (session.duration || 60) * 60 * 1000);
@@ -417,6 +440,35 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
               >
                 <Calendar className="h-4 w-4" />
                 Add to Apple Calendar
+              </Button>
+              <Button
+                variant="outline"
+                className="gap-2 border-zinc-700 bg-zinc-900 text-zinc-200 hover:bg-zinc-800"
+                onClick={handleCopyInviteLink}
+              >
+                <Users className="h-4 w-4" />
+                Invite members
+              </Button>
+              <Button
+                variant="outline"
+                className="gap-2 border-zinc-700 bg-zinc-900 text-zinc-200 hover:bg-zinc-800"
+                onClick={() => shareToNetwork("twitter")}
+              >
+                Share X
+              </Button>
+              <Button
+                variant="outline"
+                className="gap-2 border-zinc-700 bg-zinc-900 text-zinc-200 hover:bg-zinc-800"
+                onClick={() => shareToNetwork("linkedin")}
+              >
+                Share LinkedIn
+              </Button>
+              <Button
+                variant="outline"
+                className="gap-2 border-zinc-700 bg-zinc-900 text-zinc-200 hover:bg-zinc-800"
+                onClick={() => shareToNetwork("whatsapp")}
+              >
+                Share WhatsApp
               </Button>
             </>
           )}

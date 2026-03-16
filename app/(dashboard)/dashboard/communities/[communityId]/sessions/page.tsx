@@ -30,6 +30,7 @@ interface CommunitySessionsPageProps {
     filter?: string;
     pastFilter?: string;
     window?: string;
+    quickStart?: string;
   }>;
 }
 
@@ -93,8 +94,9 @@ try {
     }
 
     const { communityId } = await params;
-    const { filter = "all", pastFilter = "all", window = "30" } = await searchParams;
+    const { filter = "all", pastFilter = "all", window = "30", quickStart } = await searchParams;
     const metricWindow = ["7", "30", "90"].includes(window) ? Number(window) : 30;
+    const showQuickStart = quickStart === "1";
 
     // Verify community exists and user is a member
     const community = await prisma.community.findUnique({
@@ -409,6 +411,33 @@ const sessionDate = new Date(s.scheduledAt);
               </div>
             )}
             </>
+          )}
+
+          {showQuickStart && canCreateSessions && (
+            <div className="mb-6 rounded-xl border border-purple-500/30 bg-purple-500/10 p-4">
+              <p className="text-sm font-semibold text-white">Schedule your first live session</p>
+              <p className="mt-1 text-xs text-zinc-300">Quick presets to reduce setup friction and launch now.</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <CreateSessionDialog
+                  triggerText="30 min Q&A"
+                  className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-md text-sm"
+                  communityId={communityId}
+                  defaultDuration={30}
+                />
+                <CreateSessionDialog
+                  triggerText="45 min Workshop"
+                  className="bg-zinc-800 hover:bg-zinc-700 text-white px-3 py-2 rounded-md text-sm"
+                  communityId={communityId}
+                  defaultDuration={45}
+                />
+                <CreateSessionDialog
+                  triggerText="60 min Masterclass"
+                  className="bg-zinc-800 hover:bg-zinc-700 text-white px-3 py-2 rounded-md text-sm"
+                  communityId={communityId}
+                  defaultDuration={60}
+                />
+              </div>
+            </div>
           )}
 
           {primarySession && (
