@@ -55,6 +55,7 @@ export function NotificationItem({ notification, onUpdate }: NotificationItemPro
 
   const handleMarkAsRead = async (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsLoading(true);
     const result = await markNotificationAsRead(notification.id);
 
@@ -69,6 +70,7 @@ export function NotificationItem({ notification, onUpdate }: NotificationItemPro
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsLoading(true);
     const result = await deleteNotification(notification.id);
 
