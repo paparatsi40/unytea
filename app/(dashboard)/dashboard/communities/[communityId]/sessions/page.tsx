@@ -385,7 +385,12 @@ const sessionDate = new Date(s.scheduledAt);
                     Session detail
                   </Button>
                 </Link>
-                {primarySession.visibility === "public" && primarySession.slug && (
+                <Link href="/dashboard/notifications?src=sessions_hub_qa">
+                  <Button size="sm" variant="outline" className="border-zinc-700 text-zinc-200">
+                    Notifications
+                  </Button>
+                </Link>
+{primarySession.visibility === "public" && primarySession.slug && (
                   <>
                     <Link href={`/sessions/${primarySession.slug}?ref=sessions_hub&src=qa_flow`} target="_blank">
                       <Button size="sm" variant="outline" className="border-zinc-700 text-zinc-200">
