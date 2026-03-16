@@ -8,6 +8,7 @@ import { format, isToday, isTomorrow, formatDistanceToNow } from "date-fns";
 import { Video, Calendar, Clock, Users, ArrowRight, Sparkles } from "lucide-react";
 import { getSessionRSVPStatus, toggleSessionRSVP } from "@/app/actions/sessions";
 import { askQuestionForNextSession } from "@/app/actions/public-sessions";
+import { getSessionFeedState } from "@/app/actions/community-feed";
 import { toast } from "sonner";
 
 interface SessionAnnouncementCardProps {
@@ -43,6 +44,12 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [question, setQuestion] = useState("");
   const [isQuestionSubmitting, setIsQuestionSubmitting] = useState(false);
+  const [sessionState, setSessionState] = useState<{
+    status: string;
+    hasRecording: boolean;
+    recordingUrl: string | null;
+    discussionCount: number;
+  } | null>(null);
 
   if (!sessionData?.sessionId) {
     // Fallback to regular rendering if no session data
@@ -64,20 +71,34 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
   };
 
   const isUpcoming = scheduledAt && scheduledAt > new Date();
+  const effectiveStatus = sessionState?.status || (isUpcoming ? "SCHEDULED" : "COMPLETED");
+  const isLive = effectiveStatus === "IN_PROGRESS";
+  const hasRecording = !!sessionState?.hasRecording;
 
   useEffect(() => {
     let mounted = true;
 
-    async function loadRSVPStatus() {
-      if (!sessionData?.sessionId || !isUpcoming) return;
-      const result = await getSessionRSVPStatus(sessionData.sessionId);
-      if (mounted && result.success) {
-        setIsAttending(result.isAttending);
-        setAttendingCount(result.attendingCount);
+    async function loadState() {
+      if (!sessionData?.sessionId) return;
+
+      const [rsvpResult, stateResult] = await Promise.all([
+        isUpcoming ? getSessionRSVPStatus(sessionData.sessionId) : Promise.resolve(null),
+        getSessionFeedState(sessionData.sessionId),
+      ]);
+
+      if (!mounted) return;
+
+      if (rsvpResult && rsvpResult.success) {
+        setIsAttending(rsvpResult.isAttending);
+        setAttendingCount(rsvpResult.attendingCount);
+      }
+
+      if (stateResult.success && stateResult.state) {
+        setSessionState(stateResult.state);
       }
     }
 
-    loadRSVPStatus();
+    loadState();
     return () => {
       mounted = false;
     };
@@ -157,7 +178,7 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
           <div className="flex items-center gap-2">
             <Badge className="bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0 text-xs">
               <Sparkles className="mr-1 h-3 w-3" />
-              Live Session
+              {isLive ? "Live now" : hasRecording ? "Recording ready" : "Live Session"}
             </Badge>
             <span className="text-xs text-zinc-500">
               {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
@@ -227,17 +248,22 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
           </div>
         )}
 
-        {/* Pre-live discussion */}
-        {isUpcoming && (
+        {/* Session discussion block */}
+        {(isUpcoming || isLive || hasRecording) && (
           <div className="mt-5 rounded-xl border border-purple-200/70 bg-white/80 p-3">
-            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-purple-700">
-              Pre-session discussion
-            </p>
+            <div className="mb-2 flex items-center justify-between">
+              <p className="text-xs font-medium uppercase tracking-wide text-purple-700">
+                {isLive ? "Live discussion" : hasRecording ? "Post-session discussion" : "Pre-session discussion"}
+              </p>
+              <span className="text-xs text-purple-700/80">
+                {sessionState?.discussionCount || 0} questions
+              </span>
+            </div>
             <div className="flex gap-2">
               <input
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
-                placeholder="Drop your question for the host..."
+                placeholder={isLive ? "Ask a question live..." : hasRecording ? "Add a follow-up question..." : "Drop your question for the host..."}
                 className="flex-1 rounded-md border border-purple-200 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-purple-400"
               />
               <Button
@@ -267,26 +293,31 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
             </Button>
           )}
 
-          <Link href={`/dashboard/sessions/${sessionData.sessionId}/room`}>
-            <Button
-              className={`w-full rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold shadow-md transition-all ${
-                isHovered ? "shadow-lg scale-[1.02]" : ""
-              }`}
-            >
-              {isUpcoming ? (
-                <>
-                  <Video className="mr-2 h-4 w-4" />
-                  Join Session
-                </>
-              ) : (
-                <>
-                  <Video className="mr-2 h-4 w-4" />
-                  Enter Room
-                </>
-              )}
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </Link>
+          {hasRecording && sessionState?.recordingUrl ? (
+            <Link href={sessionState.recordingUrl} target="_blank">
+              <Button
+                className={`w-full rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold shadow-md transition-all ${
+                  isHovered ? "shadow-lg scale-[1.02]" : ""
+                }`}
+              >
+                <Video className="mr-2 h-4 w-4" />
+                Watch Recording
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+          ) : (
+            <Link href={`/dashboard/sessions/${sessionData.sessionId}/room`}>
+              <Button
+                className={`w-full rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold shadow-md transition-all ${
+                  isHovered ? "shadow-lg scale-[1.02]" : ""
+                }`}
+              >
+                <Video className="mr-2 h-4 w-4" />
+                {isLive ? "Join Live Now" : isUpcoming ? "Join Session" : "Enter Room"}
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
 

@@ -159,3 +159,69 @@ export async function getCommunityPinnedRecap(communityId: string) {
     return { success: false, error: "Failed to load recap" };
   }
 }
+
+/**
+ * Get dynamic state for session announcement cards (pre/live/recording/discussion)
+ */
+export async function getSessionFeedState(sessionId: string) {
+  try {
+    const userId = await getCurrentUserId();
+    if (!userId) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const session = await prisma.mentorSession.findUnique({
+      where: { id: sessionId },
+      select: {
+        id: true,
+        status: true,
+        communityId: true,
+        recording: {
+          select: {
+            id: true,
+            status: true,
+            url: true,
+          },
+        },
+      },
+    });
+
+    if (!session) {
+      return { success: false, error: "Session not found" };
+    }
+
+    let discussionCount = 0;
+    if (session.communityId) {
+      const questionPosts = await prisma.post.findMany({
+        where: {
+          communityId: session.communityId,
+          contentType: "QUESTION",
+        },
+        select: {
+          id: true,
+          attachments: true,
+        },
+      });
+
+      discussionCount = questionPosts.filter((p) => {
+        const att = p.attachments as any;
+        return att?.targetSessionId === sessionId;
+      }).length;
+    }
+
+    const hasRecording = !!session.recording?.url;
+
+    return {
+      success: true,
+      state: {
+        status: session.status,
+        hasRecording,
+        recordingUrl: session.recording?.url || null,
+        discussionCount,
+      },
+    };
+  } catch (error) {
+    console.error("Error getting session feed state:", error);
+    return { success: false, error: "Failed to load session state" };
+  }
+}
