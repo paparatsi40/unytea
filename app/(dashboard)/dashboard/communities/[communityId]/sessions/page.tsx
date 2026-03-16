@@ -375,11 +375,16 @@ const sessionDate = new Date(s.scheduledAt);
                   </Button>
                 </Link>
                 {primarySession.visibility === "public" && primarySession.slug && (
-                  <Link href={`/sessions/${primarySession.slug}?ref=sessions_hub&src=qa_flow`} target="_blank">
-                    <Button size="sm" variant="outline" className="border-zinc-700 text-zinc-200">
-                      Public page
-                    </Button>
-                  </Link>
+                  <>
+                    <Link href={`/sessions/${primarySession.slug}?ref=sessions_hub&src=qa_flow`} target="_blank">
+                      <Button size="sm" variant="outline" className="border-zinc-700 text-zinc-200">
+                        Public page
+                      </Button>
+                    </Link>
+                    <code className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs text-zinc-400">
+                      /sessions/{primarySession.slug}?ref=sessions_hub&src=qa_flow
+                    </code>
+                  </>
                 )}
               </div>
             </div>
