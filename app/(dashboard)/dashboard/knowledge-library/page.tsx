@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { toast } from "sonner";
 import {
@@ -122,6 +123,41 @@ export default function KnowledgeLibraryPage() {
 
   const hasConvertibleSessions = sessions.length > 0;
   const hasSuggestions = suggestions.length > 0;
+
+  const bestSessions = [...sessions]
+    .sort((a, b) => (b.engagementScore || 0) - (a.engagementScore || 0))
+    .slice(0, 3);
+
+  const curatedRecordings = [...sessions]
+    .sort((a, b) => (b._count?.participations || 0) - (a._count?.participations || 0))
+    .slice(0, 5);
+
+  const keyTopics = Object.entries(
+    sessions.reduce((acc, session) => {
+      const title = (session.title || "").toLowerCase();
+      const candidates = [
+        "marketing",
+        "sales",
+        "product",
+        "engineering",
+        "leadership",
+        "finance",
+        "strategy",
+        "operations",
+        "ai",
+      ];
+
+      for (const topic of candidates) {
+        if (title.includes(topic)) {
+          acc[topic] = (acc[topic] || 0) + 1;
+        }
+      }
+
+      return acc;
+    }, {} as Record<string, number>)
+  )
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8);
 
   return (
     <div className="min-h-screen bg-zinc-950">
@@ -280,6 +316,76 @@ export default function KnowledgeLibraryPage() {
                   </div>
                 </CardContent>
               </Card>
+            </div>
+          </section>
+        )}
+
+        {/* CURATED DISCOVERY */}
+        {hasConvertibleSessions && (
+          <section className="mb-8 grid gap-4 md:grid-cols-3">
+            <Card className="bg-zinc-900 border-zinc-800 md:col-span-2">
+              <CardContent className="p-5">
+                <h2 className="text-lg font-semibold text-white mb-3">Best Sessions</h2>
+                <div className="space-y-3">
+                  {bestSessions.map((session) => (
+                    <div key={session.id} className="flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-900/60 px-3 py-2">
+                      <div>
+                        <p className="font-medium text-zinc-100">{session.title}</p>
+                        <p className="text-xs text-zinc-500">
+                          {session.community?.name || "Community"} • {session._count.participations} attendees
+                        </p>
+                      </div>
+                      <Link href={`/dashboard/sessions/${session.id}`}>
+                        <Button variant="ghost" size="sm" className="text-purple-400">Open</Button>
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-zinc-900 border-zinc-800">
+              <CardContent className="p-5">
+                <h2 className="text-lg font-semibold text-white mb-3">Key Topics</h2>
+                <div className="flex flex-wrap gap-2">
+                  {keyTopics.length > 0 ? (
+                    keyTopics.map(([topic, count]) => (
+                      <Badge key={topic} variant="secondary" className="bg-zinc-800 text-zinc-200">
+                        {topic} ({count})
+                      </Badge>
+                    ))
+                  ) : (
+                    <p className="text-sm text-zinc-500">Topics will appear as sessions accumulate.</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </section>
+        )}
+
+        {hasConvertibleSessions && (
+          <section className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-white">Curated Recordings</h2>
+              <Link href="/dashboard/recordings">
+                <Button variant="outline" size="sm" className="border-zinc-700 text-zinc-300">View recordings</Button>
+              </Link>
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-2">
+              {curatedRecordings.map((session) => (
+                <Card key={session.id} className="bg-zinc-900 border-zinc-800">
+                  <CardContent className="p-4 flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-zinc-100">{session.title}</p>
+                      <p className="text-xs text-zinc-500">{session._count.participations} attendees • {session.duration} min</p>
+                    </div>
+                    <Link href={`/dashboard/sessions/${session.id}`}>
+                      <Button variant="ghost" size="sm" className="text-purple-400">Watch</Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </section>
         )}

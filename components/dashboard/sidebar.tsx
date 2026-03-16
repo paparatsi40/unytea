@@ -22,6 +22,7 @@ const navigation = [
   { name: "Messages", href: "/dashboard/messages", icon: MessageSquare },
   { name: "Sessions", href: "/dashboard/sessions", icon: Video },
   { name: "Recordings", href: "/dashboard/recordings", icon: Library },
+  { name: "Knowledge Library", href: "/dashboard/knowledge-library", icon: BookOpen },
   { name: "Courses", href: "/dashboard/courses", icon: BookOpen },
   { name: "Analytics", href: "/dashboard/analytics", icon: TrendingUp },
   { name: "Achievements", href: "/dashboard/achievements", icon: Award },
