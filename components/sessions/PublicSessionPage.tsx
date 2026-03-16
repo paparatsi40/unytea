@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { askQuestionForNextSession } from "@/app/actions/public-sessions";
+import { getSessionRSVPStatus, toggleSessionRSVP } from "@/app/actions/sessions";
 import { useRouter } from "next/navigation";
 import { Play, Calendar, Users, Clock, Share2, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -82,6 +83,10 @@ export function PublicSessionPage({ session, relatedSessions, nextSession }: Pub
   const [question, setQuestion] = useState("");
   const [isSubmittingQuestion, setIsSubmittingQuestion] = useState(false);
   const [questionMessage, setQuestionMessage] = useState<string | null>(null);
+  const [isRSVPLoading, setIsRSVPLoading] = useState(false);
+  const [isAttendingNext, setIsAttendingNext] = useState(false);
+  const [nextAttendingCount, setNextAttendingCount] = useState<number | null>(null);
+  const [rsvpMessage, setRsvpMessage] = useState<string | null>(null);
 
   const formattedDate = format(new Date(session.scheduledAt), "MMMM d, yyyy");
   const formattedDuration = session.recording?.durationSeconds
@@ -100,6 +105,43 @@ export function PublicSessionPage({ session, relatedSessions, nextSession }: Pub
     } else {
       await navigator.clipboard.writeText(window.location.href);
     }
+  };
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadNextSessionRsvp() {
+      if (!nextSession) return;
+      const status = await getSessionRSVPStatus(nextSession.id);
+      if (!active || !status.success) return;
+      setIsAttendingNext(status.isAttending);
+      setNextAttendingCount(status.attendingCount);
+    }
+
+    loadNextSessionRsvp();
+    return () => {
+      active = false;
+    };
+  }, [nextSession?.id]);
+
+  const handleRSVPNextSession = async () => {
+    if (!nextSession) return;
+    setIsRSVPLoading(true);
+    setRsvpMessage(null);
+
+    const result = await toggleSessionRSVP(nextSession.id);
+    if (result.success) {
+      setIsAttendingNext((prev) => !prev);
+      setNextAttendingCount((prev) => {
+        const current = prev ?? 0;
+        return isAttendingNext ? Math.max(0, current - 1) : current + 1;
+      });
+      setRsvpMessage(isAttendingNext ? "RSVP removed." : "You're attending the next live session.");
+    } else {
+      setRsvpMessage(result.error || "Could not update RSVP.");
+    }
+
+    setIsRSVPLoading(false);
   };
 
   const handleAskQuestion = async () => {
@@ -388,6 +430,20 @@ export function PublicSessionPage({ session, relatedSessions, nextSession }: Pub
                     <p className="mt-1 text-xs text-zinc-300">
                       {format(new Date(nextSession.scheduledAt), "MMM d, yyyy 'at' h:mm a")}
                     </p>
+                    <p className="mt-1 text-xs text-zinc-300">
+                      {nextAttendingCount ?? 0} attending
+                    </p>
+                    <Button
+                      onClick={handleRSVPNextSession}
+                      disabled={isRSVPLoading}
+                      variant={isAttendingNext ? "secondary" : "default"}
+                      className={`mt-3 w-full ${isAttendingNext ? "bg-zinc-800 text-zinc-200 hover:bg-zinc-700" : "bg-emerald-500 text-white hover:bg-emerald-600"}`}
+                    >
+                      {isRSVPLoading ? "Updating..." : isAttendingNext ? "Attending" : "RSVP for live"}
+                    </Button>
+                    {rsvpMessage && (
+                      <p className="mt-2 text-xs text-zinc-300">{rsvpMessage}</p>
+                    )}
                   </div>
                 )}
 
