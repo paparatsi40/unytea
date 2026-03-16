@@ -166,6 +166,10 @@ mentor: {
     const past = allSessions.filter(
       (s) => s.status === "COMPLETED" || (s.status === "SCHEDULED" && new Date(s.scheduledAt) < now)
     );
+    const pastSorted = [...past].sort(
+      (a, b) => new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime()
+    );
+    const featuredReplays = pastSorted.filter((s) => Boolean(s.recordingUrl)).slice(0, 3);
 
     // Calculate sessions this week
     const thisWeek = [...liveSessions, ...upcoming].filter(s => {
@@ -508,48 +512,70 @@ const sessionDate = new Date(s.scheduledAt);
                   </p>
                 </div>
               ) : (
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {past.slice(0, 6).map((s) => (
-                    <div
-                      key={s.id}
-                      className="group rounded-xl border border-zinc-800 bg-zinc-950 p-5 transition-all hover:border-zinc-700"
-                    >
-                      <div className="mb-3 flex items-center justify-between">
-                        <span className="text-sm text-zinc-500">
-                          {formatDistanceToNow(new Date(s.scheduledAt), { addSuffix: true })}
-                        </span>
-                        {s.recordingUrl && (
-                          <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
-                            Recording available
-                          </Badge>
-                        )}
-                      </div>
-
-                      <h3 className="mb-4 text-base font-medium text-white">
-                        {s.title}
-                      </h3>
-
-                      <div className="flex items-center gap-2">
-                        {s.recordingUrl ? (
-                          <Link href={s.recordingUrl} target="_blank">
-                            <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 flex items-center gap-2">
-                              <ArrowRight className="h-4 w-4" />
-                              Watch
-                            </Button>
-                          </Link>
-                        ) : (
-                          <Link href={`/dashboard/sessions/${s.id}/room`}>
-                            <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
-                              Enter Room
-                            </Button>
-                          </Link>
-                        )}
+                <div className="space-y-6">
+                  {featuredReplays.length > 0 && (
+                    <div>
+                      <h3 className="mb-3 text-sm font-semibold text-zinc-300">Featured Replays</h3>
+                      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                        {featuredReplays.map((s) => (
+                          <div key={s.id} className="rounded-xl border border-emerald-500/30 bg-gradient-to-br from-zinc-900 to-zinc-950 p-5">
+                            <div className="mb-3 flex items-center justify-between">
+                              <Badge className="border-emerald-500/30 bg-emerald-500/20 text-emerald-300">Replay</Badge>
+                              <span className="text-xs text-zinc-500">{formatDistanceToNow(new Date(s.scheduledAt), { addSuffix: true })}</span>
+                            </div>
+                            <h4 className="mb-2 line-clamp-2 text-base font-semibold text-white">{s.title}</h4>
+                            <p className="mb-4 text-xs text-zinc-400">{s.duration || 60} min • {s._count?.participations || 0} attended</p>
+                            <Link href={s.recordingUrl!} target="_blank">
+                              <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">Watch Replay</Button>
+                            </Link>
+                          </div>
+                        ))}
                       </div>
                     </div>
-                  ))}
+                  )}
+
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {pastSorted.slice(0, 9).map((s) => (
+                      <div
+                        key={s.id}
+                        className="group rounded-xl border border-zinc-800 bg-zinc-950 p-5 transition-all hover:border-zinc-700"
+                      >
+                        <div className="mb-3 flex items-center justify-between">
+                          <span className="text-sm text-zinc-500">
+                            {formatDistanceToNow(new Date(s.scheduledAt), { addSuffix: true })}
+                          </span>
+                          {s.recordingUrl && (
+                            <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                              Recording available
+                            </Badge>
+                          )}
+                        </div>
+
+                        <h3 className="mb-2 text-base font-medium text-white">{s.title}</h3>
+                        <p className="mb-4 text-xs text-zinc-500">{s.duration || 60} min • {s._count?.participations || 0} attended</p>
+
+                        <div className="flex items-center gap-2">
+                          {s.recordingUrl ? (
+                            <Link href={s.recordingUrl} target="_blank">
+                              <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 flex items-center gap-2">
+                                <ArrowRight className="h-4 w-4" />
+                                Watch
+                              </Button>
+                            </Link>
+                          ) : (
+                            <Link href={`/dashboard/sessions/${s.id}/room`}>
+                              <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
+                                Enter Room
+                              </Button>
+                            </Link>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
-            </TabsContent>
+</TabsContent>
 
             <TabsContent value="calendar" className="space-y-6">
               <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
