@@ -281,37 +281,74 @@ export default async function CommunityPublicPreviewPage({
   return (
     <div className="min-h-screen bg-background">
       <main className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
-        <div className="mb-8 space-y-3">
-          <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold text-foreground">{currentCommunity.name}</h1>
-            <Badge variant="outline">{currentCommunity.isPaid ? "Paid" : "Free"}</Badge>
-          </div>
-          <p className="text-muted-foreground">
-            {currentCommunity.description || "Community preview page"}
-          </p>
-        </div>
+        <section className="mb-8 grid gap-4 lg:grid-cols-[1.7fr_1fr]">
+          <div className="rounded-xl border border-border bg-card p-5">
+            <div className="mb-3 flex items-center gap-3">
+              <h1 className="text-3xl font-bold text-foreground">{currentCommunity.name}</h1>
+              <Badge variant="outline">{currentCommunity.isPaid ? "Paid" : "Free"}</Badge>
+            </div>
+            <p className="text-muted-foreground">
+              {currentCommunity.description || "Community preview page"}
+            </p>
 
-        <div className="mb-8 grid gap-4 sm:grid-cols-3">
-          <div className="rounded-xl border border-border bg-card p-4">
-            <p className="text-xs uppercase tracking-wide text-muted-foreground">Host</p>
-            <p className="mt-1 font-medium text-foreground">{formatHostName(currentCommunity.owner)}</p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              <div className="rounded-lg border border-border p-3">
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">Host</p>
+                <p className="mt-1 font-medium text-foreground">{formatHostName(currentCommunity.owner)}</p>
+              </div>
+              <div className="rounded-lg border border-border p-3">
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">Members</p>
+                <p className="mt-1 flex items-center gap-2 font-medium text-foreground">
+                  <Users className="h-4 w-4" />
+                  {currentCommunity._count.members}
+                </p>
+              </div>
+              <div className="rounded-lg border border-border p-3">
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">Next session</p>
+                <p className="mt-1 flex items-center gap-2 font-medium text-foreground">
+                  <Calendar className="h-4 w-4" />
+                  {formatSchedule(nextSession?.scheduledAt ?? null)}
+                </p>
+                {nextSession && <p className="mt-1 text-xs text-muted-foreground">{nextSession.title}</p>}
+              </div>
+            </div>
+
+            <div className="mt-4 rounded-lg border border-border bg-background p-3">
+              <p className="text-sm font-semibold text-foreground">What you get</p>
+              <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
+                <li>• Weekly live sessions and Q&A</li>
+                <li>• Full recordings and recap insights</li>
+                <li>• Member discussions between sessions</li>
+              </ul>
+            </div>
           </div>
-          <div className="rounded-xl border border-border bg-card p-4">
-            <p className="text-xs uppercase tracking-wide text-muted-foreground">Members</p>
-            <p className="mt-1 flex items-center gap-2 font-medium text-foreground">
-              <Users className="h-4 w-4" />
-              {currentCommunity._count.members}
+
+          <div className="rounded-xl border border-primary/30 bg-primary/5 p-5">
+            <h2 className="text-lg font-semibold text-foreground">Join this community</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Attend live sessions, access full feed and recordings, and unlock member-only discussions.
             </p>
-          </div>
-          <div className="rounded-xl border border-border bg-card p-4">
-            <p className="text-xs uppercase tracking-wide text-muted-foreground">Next session</p>
-            <p className="mt-1 flex items-center gap-2 font-medium text-foreground">
-              <Calendar className="h-4 w-4" />
-              {formatSchedule(nextSession?.scheduledAt ?? null)}
+            <p className="mt-2 text-xs text-muted-foreground">
+              Most active communities host sessions every week.
             </p>
-            {nextSession && <p className="mt-1 text-xs text-muted-foreground">{nextSession.title}</p>}
+            <div className="mt-4 flex flex-col gap-2">
+              {membershipStatus === "ACTIVE" ? (
+                <Link href={`/dashboard/c/${currentCommunity.slug}`}>
+                  <Button className="w-full">Go to community</Button>
+                </Link>
+              ) : membershipStatus === "PENDING" ? (
+                <Button className="w-full" disabled>Request pending approval</Button>
+              ) : (
+                <form action={handleJoin}>
+                  <Button className="w-full" type="submit">{userId ? "Join community" : "Sign in to join community"}</Button>
+                </form>
+              )}
+              <Link href={`/${locale}/explore`}>
+                <Button className="w-full" variant="outline">Back to explore</Button>
+              </Link>
+            </div>
           </div>
-        </div>
+        </section>
 
         <section className="mb-8 rounded-xl border border-border bg-card p-5">
           <h2 className="text-lg font-semibold text-foreground">Session momentum</h2>
@@ -356,26 +393,19 @@ export default async function CommunityPublicPreviewPage({
           </div>
         </section>
 
-        <section className="rounded-xl border border-primary/30 bg-primary/5 p-5">
-          <h2 className="text-lg font-semibold text-foreground">Join this community</h2>
+        <section className="rounded-xl border border-border bg-card p-5">
+          <h2 className="text-lg font-semibold text-foreground">First session checklist</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Attend live sessions, access full feed and recordings, and unlock member-only discussions.
+            Quick path to get value in your first week.
           </p>
-
-          <div className="mt-4 flex flex-wrap gap-3">
-            {membershipStatus === "ACTIVE" ? (
-              <Link href={`/dashboard/c/${currentCommunity.slug}`}>
-                <Button>Go to community</Button>
-              </Link>
-            ) : membershipStatus === "PENDING" ? (
-              <Button disabled>Request pending approval</Button>
-            ) : (
-              <form action={handleJoin}>
-                <Button type="submit">{userId ? "Join community" : "Sign in to join community"}</Button>
-              </form>
-            )}
+          <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+            <li>1. Join the community and introduce yourself.</li>
+            <li>2. RSVP to the next live session.</li>
+            <li>3. Drop one question in the discussion feed.</li>
+          </ul>
+          <div className="mt-4">
             <Link href={`/${locale}/explore`}>
-              <Button variant="outline">Back to explore</Button>
+              <Button variant="outline">Discover more communities</Button>
             </Link>
           </div>
         </section>
