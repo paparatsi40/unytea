@@ -1131,7 +1131,7 @@ export async function setSessionRSVPStatus(
       revalidatePath(revalidateTargetPath);
     }
 
-    const [attendingCount, interestedCount] = await Promise.all([
+    const [attendingCount, interestedCount, attendingPreview] = await Promise.all([
       prisma.sessionParticipation.count({
         where: {
           sessionId,
@@ -1147,6 +1147,25 @@ export async function setSessionRSVPStatus(
           eventsData: { path: ["rsvpStatus"], equals: "interested" },
         },
       }),
+      prisma.sessionParticipation.findMany({
+        where: {
+          sessionId,
+          OR: [
+            { eventsData: { path: ["rsvpStatus"], equals: "attending" } },
+            { eventsData: { path: ["rsvp"], equals: true } },
+          ],
+        },
+        select: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+        },
+        take: 5,
+      }),
     ]);
 
     const effectiveStatus = currentStatus === status || status === "none" ? null : status;
@@ -1156,6 +1175,11 @@ export async function setSessionRSVPStatus(
       status: effectiveStatus,
       attendingCount,
       interestedCount,
+      attendingPreview: attendingPreview.map((p) => ({
+        id: p.user.id,
+        name: p.user.name,
+        image: p.user.image,
+      })),
       isAttending: effectiveStatus === "attending",
       isInterested: effectiveStatus === "interested",
     };
@@ -1189,7 +1213,7 @@ export async function getSessionRSVPStatus(sessionId: string) {
   try {
     const userId = await getCurrentUserId();
 
-    const [attendingCount, interestedCount, existing] = await Promise.all([
+    const [attendingCount, interestedCount, existing, attendingPreview] = await Promise.all([
       prisma.sessionParticipation.count({
         where: {
           sessionId,
@@ -1211,6 +1235,25 @@ export async function getSessionRSVPStatus(sessionId: string) {
             select: { eventsData: true },
           })
         : Promise.resolve(null),
+      prisma.sessionParticipation.findMany({
+        where: {
+          sessionId,
+          OR: [
+            { eventsData: { path: ["rsvpStatus"], equals: "attending" } },
+            { eventsData: { path: ["rsvp"], equals: true } },
+          ],
+        },
+        select: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+        },
+        take: 5,
+      }),
     ]);
 
     const status = getRsvpStatusFromEventsData(existing?.eventsData);
@@ -1219,6 +1262,11 @@ export async function getSessionRSVPStatus(sessionId: string) {
       success: true,
       attendingCount,
       interestedCount,
+      attendingPreview: attendingPreview.map((p) => ({
+        id: p.user.id,
+        name: p.user.name,
+        image: p.user.image,
+      })),
       isAttending: status === "attending",
       isInterested: status === "interested",
       status,
@@ -1229,6 +1277,7 @@ export async function getSessionRSVPStatus(sessionId: string) {
       success: false,
       attendingCount: 0,
       interestedCount: 0,
+      attendingPreview: [],
       isAttending: false,
       isInterested: false,
       status: null,

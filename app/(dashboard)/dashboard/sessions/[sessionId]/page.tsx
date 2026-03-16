@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils";
 import { getSession, getSessionRSVPStatus, setSessionRSVPStatus } from "@/app/actions/sessions";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { AddToCourseDialog } from "@/components/sessions/AddToCourseDialog";
 import { CreateSocialClipDialog } from "@/components/public-content/CreateSocialClipDialog";
@@ -48,6 +49,7 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
   const [rsvpStatus, setRsvpStatus] = useState<"attending" | "interested" | null>(null);
   const [attendingCount, setAttendingCount] = useState(0);
   const [interestedCount, setInterestedCount] = useState(0);
+  const [attendingPreview, setAttendingPreview] = useState<Array<{ id: string; name: string | null; image: string | null }>>([]);
   const [isRSVPLoading, setIsRSVPLoading] = useState(false);
 
   useEffect(() => {
@@ -74,6 +76,7 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
             setRsvpStatus(rsvp.status);
             setAttendingCount(rsvp.attendingCount);
             setInterestedCount(rsvp.interestedCount || 0);
+            setAttendingPreview(rsvp.attendingPreview || []);
           }
         }
       } else {
@@ -127,6 +130,7 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
       setRsvpStatus(result.status ?? null);
       setAttendingCount(result.attendingCount || 0);
       setInterestedCount(result.interestedCount || 0);
+      setAttendingPreview(result.attendingPreview || []);
 
       if (!result.status) {
         toast.success("RSVP removed");
@@ -300,6 +304,18 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
                       <Users className="h-3 w-3" />
                       {attendingCount} attending · {interestedCount} interested
                     </span>
+                    {attendingPreview.length > 0 && (
+                      <span className="ml-1 flex -space-x-1">
+                        {attendingPreview.slice(0, 4).map((member) => (
+                          <Avatar key={member.id} className="h-5 w-5 border border-zinc-900">
+                            <AvatarImage src={member.image || ""} alt={member.name || "Member"} />
+                            <AvatarFallback className="bg-zinc-800 text-[9px] text-zinc-200">
+                              {(member.name || "M").slice(0, 1).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                        ))}
+                      </span>
+                    )}
                   </>
                 )}
                 {isAudioOnly && (

@@ -88,6 +88,7 @@ const [isPlaying, setIsPlaying] = useState(false);
   const [nextRsvpStatus, setNextRsvpStatus] = useState<"attending" | "interested" | null>(null);
   const [nextAttendingCount, setNextAttendingCount] = useState<number | null>(null);
   const [nextInterestedCount, setNextInterestedCount] = useState<number | null>(null);
+  const [nextAttendingPreview, setNextAttendingPreview] = useState<Array<{ id: string; name: string | null; image: string | null }>>([]);
   const [rsvpMessage, setRsvpMessage] = useState<string | null>(null);
 
   const formattedDate = format(new Date(session.scheduledAt), "MMMM d, yyyy");
@@ -181,6 +182,7 @@ const roomParams = new URLSearchParams();
       setNextRsvpStatus(status.status);
       setNextAttendingCount(status.attendingCount);
       setNextInterestedCount(status.interestedCount || 0);
+      setNextAttendingPreview(status.attendingPreview || []);
     }
 
     loadNextSessionRsvp();
@@ -199,6 +201,7 @@ const roomParams = new URLSearchParams();
       setNextRsvpStatus(result.status ?? null);
       setNextAttendingCount(result.attendingCount || 0);
       setNextInterestedCount(result.interestedCount || 0);
+      setNextAttendingPreview(result.attendingPreview || []);
       if (!result.status) {
         setRsvpMessage("RSVP removed.");
       } else if (result.status === "attending") {
@@ -577,6 +580,18 @@ router.push(`/sessions/${related.slug}${suffix}`);
                     <p className="mt-1 text-xs text-zinc-300">
                       {nextAttendingCount ?? 0} attending · {nextInterestedCount ?? 0} interested
                     </p>
+                    {nextAttendingPreview.length > 0 && (
+                      <div className="mt-2 flex -space-x-2">
+                        {nextAttendingPreview.slice(0, 5).map((member) => (
+                          <Avatar key={member.id} className="h-6 w-6 border border-zinc-900">
+                            <AvatarImage src={member.image || ""} alt={member.name || "Member"} />
+                            <AvatarFallback className="bg-zinc-800 text-[10px] text-zinc-200">
+                              {(member.name || "M").slice(0, 1).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                        ))}
+                      </div>
+                    )}
                     {session.isMember ? (
                       <>
                         <Button

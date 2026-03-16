@@ -10,6 +10,7 @@ import { getSessionRSVPStatus, setSessionRSVPStatus } from "@/app/actions/sessio
 import { askQuestionForNextSession } from "@/app/actions/public-sessions";
 import { getSessionFeedState } from "@/app/actions/community-feed";
 import { toast } from "sonner";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface SessionAnnouncementCardProps {
   post: {
@@ -42,6 +43,7 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
   const [rsvpStatus, setRsvpStatus] = useState<"attending" | "interested" | null>(null);
   const [attendingCount, setAttendingCount] = useState(0);
   const [interestedCount, setInterestedCount] = useState(0);
+  const [attendingPreview, setAttendingPreview] = useState<Array<{ id: string; name: string | null; image: string | null }>>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [question, setQuestion] = useState("");
   const [isQuestionSubmitting, setIsQuestionSubmitting] = useState(false);
@@ -139,6 +141,7 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
         setRsvpStatus(rsvpResult.status);
         setAttendingCount(rsvpResult.attendingCount);
         setInterestedCount(rsvpResult.interestedCount || 0);
+        setAttendingPreview(rsvpResult.attendingPreview || []);
       }
 
       if (stateResult.success && stateResult.state) {
@@ -166,6 +169,7 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
       setRsvpStatus(result.status ?? null);
       setAttendingCount(result.attendingCount || 0);
       setInterestedCount(result.interestedCount || 0);
+      setAttendingPreview(result.attendingPreview || []);
 
       if (!result.status) {
         toast.success("RSVP removed");
@@ -287,9 +291,21 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
               </div>
             )}
             {isUpcoming && (
-              <div className="flex items-center gap-1.5 text-gray-600">
+              <div className="flex items-center gap-2 text-gray-600">
                 <Users className="h-4 w-4 text-gray-400" />
-                {attendingCount} attending · {interestedCount} interested
+                <span>{attendingCount} attending · {interestedCount} interested</span>
+                {attendingPreview.length > 0 && (
+                  <div className="ml-1 flex -space-x-2">
+                    {attendingPreview.slice(0, 4).map((member) => (
+                      <Avatar key={member.id} className="h-6 w-6 border border-white">
+                        <AvatarImage src={member.image || ""} alt={member.name || "Member"} />
+                        <AvatarFallback className="text-[10px]">
+                          {(member.name || "M").slice(0, 1).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>
