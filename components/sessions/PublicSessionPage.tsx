@@ -92,7 +92,11 @@ const [isPlaying, setIsPlaying] = useState(false);
   const formattedDate = format(new Date(session.scheduledAt), "MMMM d, yyyy");
   const canViewPremiumContent = session.canWatchRecording || session.isMember;
   const ref = searchParams.get("ref");
-  const joinCommunityHref = `/c/${session.community.slug}${ref ? `?ref=${encodeURIComponent(ref)}` : ""}`;
+  const src = searchParams.get("src");
+  const joinParams = new URLSearchParams();
+  if (ref) joinParams.set("ref", ref);
+  if (src) joinParams.set("src", src);
+  const joinCommunityHref = `/c/${session.community.slug}${joinParams.toString() ? `?${joinParams.toString()}` : ""}`;
 const formattedDuration = session.recording?.durationSeconds
     ? `${Math.round(session.recording.durationSeconds / 60)} min`
     : session.duration

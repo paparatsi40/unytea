@@ -407,7 +407,7 @@ const sessionDate = new Date(s.scheduledAt);
                       </Button>
                     </Link>
                     {primarySession.visibility === "public" && primarySession.slug && (
-                      <Link href={`/sessions/${primarySession.slug}?ref=sessions_hub`} target="_blank">
+                      <Link href={`/sessions/${primarySession.slug}?ref=sessions_hub&src=primary_session`} target="_blank">
                         <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
                           Public Page
                         </Button>
