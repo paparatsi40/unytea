@@ -497,27 +497,22 @@ export function CommunitiesClient() {
         </div>
 
         <div className="space-y-3">
-          {sortedCommunities.map((community, index) => {
+          {sortedCommunities.map((community) => {
             const state = getCommunityState(community);
-            const isPrimary = index === 0;
 
             return (
               <div
                 key={community.id}
-                className="rounded-3xl border border-border/70 bg-card px-5 py-4 shadow-sm transition-colors hover:bg-muted/20"
+                className="rounded-3xl border border-border/70 bg-card px-5 py-3 shadow-sm transition-colors hover:bg-muted/20"
               >
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="truncate text-base font-semibold text-foreground">
                         {community.name}
                       </p>
 
-                      {isPrimary && (
-                        <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-primary">
-                          In focus
-                        </span>
-                      )}
+
                     </div>
 
                     <p className="mt-1 text-sm text-muted-foreground">
@@ -551,7 +546,7 @@ export function CommunitiesClient() {
         </div>
       </section>
 
-      <section className="rounded-3xl border border-border/70 bg-card p-6 shadow-sm">
+      <section className="rounded-3xl border border-border/70 bg-card p-5 shadow-sm">
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
           Quick actions
         </p>
