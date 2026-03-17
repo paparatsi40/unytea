@@ -98,6 +98,7 @@ export function AIChatWidget({ communitySlug }: AIChatWidgetProps) {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
+          aria-label="Open AI assistant"
           className="fixed bottom-6 right-6 h-14 w-14 rounded-full bg-gradient-to-r from-sky-500 to-purple-500 text-white shadow-lg hover:scale-110 transition-transform z-50 flex items-center justify-center"
         >
           <Sparkles className="h-6 w-6" />
@@ -118,6 +119,7 @@ export function AIChatWidget({ communitySlug }: AIChatWidgetProps) {
             </div>
             <button
               onClick={() => setIsOpen(false)}
+              aria-label="Close AI assistant"
               className="hover:bg-white/20 rounded-lg p-1 transition-colors"
             >
               <X className="h-5 w-5" />

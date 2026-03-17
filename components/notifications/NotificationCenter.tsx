@@ -106,6 +106,7 @@ export function NotificationCenter() {
       {/* Bell Icon Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
+        aria-label={isOpen ? "Close notifications" : "Open notifications"}
         className="relative rounded-full p-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
       >
         <Bell className="h-6 w-6" />
