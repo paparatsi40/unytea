@@ -59,6 +59,23 @@ function cleanPreviewText(text: string) {
   return raw;
 }
 
+function getUpcomingSessionWeight(nextSessionAt: Date | null, now: Date): number {
+  if (!nextSessionAt) return 0;
+
+  const hoursUntil = (nextSessionAt.getTime() - now.getTime()) / (1000 * 60 * 60);
+  if (hoursUntil <= 24) return 5;
+  if (hoursUntil <= 72) return 3;
+  if (hoursUntil <= 7 * 24) return 2;
+  return 0;
+}
+
+function getBoostScore(settings: unknown): number {
+  if (!settings || typeof settings !== "object") return 0;
+  const value = (settings as Record<string, unknown>).boostScore;
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  return 0;
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -180,14 +197,28 @@ export default async function ExploreCommunitiesPage({
 
   const communityIds = communities.map((community) => community.id);
 
+  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
   const recentPosts = communityIds.length
     ? await prisma.post.groupBy({
         by: ["communityId"],
         where: {
           communityId: { in: communityIds },
-          createdAt: { gte: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) },
+          createdAt: { gte: sevenDaysAgo },
         },
         _count: {
+          communityId: true,
+        },
+      })
+    : [];
+
+  const recentMembers = communityIds.length
+    ? await prisma.member.findMany({
+        where: {
+          communityId: { in: communityIds },
+          joinedAt: { gte: sevenDaysAgo },
+        },
+        select: {
           communityId: true,
         },
       })
@@ -214,6 +245,13 @@ export default async function ExploreCommunitiesPage({
   const postsByCommunity = new Map(
     recentPosts.map((row) => [row.communityId, row._count.communityId])
   );
+  const newMembersByCommunity = new Map<string, number>();
+  for (const row of recentMembers) {
+    newMembersByCommunity.set(
+      row.communityId,
+      (newMembersByCommunity.get(row.communityId) || 0) + 1
+    );
+  }
 
   const normalized = communities.map((community) => {
     const category = communityCategory(community.settings);
@@ -227,15 +265,26 @@ export default async function ExploreCommunitiesPage({
       : 0;
 
     const recentPostCount = postsByCommunity.get(community.id) || 0;
+    const newMembersLast7d = newMembersByCommunity.get(community.id) || 0;
 
-    const trendingScore =
-      community._count.members * 1 +
-      sessionsThisWeekList.length * 10 +
-      recentPostCount * 2 +
-      nextSessionAttending * 1.5;
+    const upcomingSessionWeight = getUpcomingSessionWeight(
+      nextSession?.scheduledAt ?? null,
+      now
+    );
 
     const isNew =
       now.getTime() - community.createdAt.getTime() <= 14 * 24 * 60 * 60 * 1000;
+
+    const boostScore = getBoostScore(community.settings);
+
+    const rankingScore =
+      upcomingSessionWeight * 5 +
+      nextSessionAttending * 3 +
+      sessionsThisWeekList.length * 2 +
+      recentPostCount * 1.5 +
+      newMembersLast7d * 2 +
+      (isNew ? 1 : 0) +
+      boostScore;
 
     const previewPost =
       community.posts[0]?.title ||
@@ -251,10 +300,13 @@ export default async function ExploreCommunitiesPage({
       nextSession,
       nextSessionAttending,
       recentPostCount,
-      trendingScore,
+      newMembersLast7d,
+      upcomingSessionWeight,
+      boostScore,
+      rankingScore,
       isNew,
       previewPost: truncate(cleanPreviewText(previewPost), 78),
-    };
+};
   });
 
   const filtered = normalized.filter((community) => {
@@ -279,7 +331,7 @@ export default async function ExploreCommunitiesPage({
     if (selectedSort === "newest") {
       return b.createdAt.getTime() - a.createdAt.getTime();
     }
-    return b.trendingScore - a.trendingScore;
+    return b.rankingScore - a.rankingScore;
   });
 
   const trendingCommunities = sorted.slice(0, 3).map((community, index) => ({
@@ -317,6 +369,10 @@ export default async function ExploreCommunitiesPage({
   );
 
   const suggestedWhenEmpty = sorted.slice(0, 3);
+  const hasHappening = liveThisWeek.length > 0;
+  const newCommunities = [...sorted]
+    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+    .slice(0, 3);
 
   const categories = Array.from(
     new Set([...DEFAULT_CATEGORIES, ...normalized.map((c) => c.category)])
@@ -354,93 +410,13 @@ export default async function ExploreCommunitiesPage({
           }}
         />
 
-        <section className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Flame className="h-5 w-5 text-amber-500" />
-            <h2 className="text-xl font-semibold">Growing communities this week</h2>
-            <p className="text-xs text-amber-600">Ranked by member growth, activity, and upcoming sessions</p>
-          </div>
-
-          {trendingCommunities.length === 0 ? (
-            <div className="rounded-xl border border-border bg-card p-5 text-sm text-muted-foreground">
-              No communities match your filters yet.
+        {hasHappening && (
+          <section className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Clock className="h-5 w-5 text-green-600" />
+              <h2 className="text-xl font-semibold">🟢 Happening this week</h2>
             </div>
-          ) : (
-            <div className="grid gap-4 md:grid-cols-3">
-              {trendingCommunities.map((community, index) => {
-                const nextSessionText = community.nextSession
-                  ? `Next: ${formatSessionSlot(community.nextSession.scheduledAt)}`
-                  : "Weekly live sessions";
 
-                const socialProof = community.nextSessionAttending > 0
-                  ? `${community.nextSessionAttending} attending`
-                  : community.sessionsThisWeek > 0
-                    ? "Weekly sessions"
-                    : community.isNew
-                      ? "Be one of the first members"
-                      : "Growing community";
-
-                const badge = community.isNew ? "🆕 New" : "🔥 Trending";
-
-                return (
-                  <Link
-                    key={community.id}
-                    href={`/${locale}/community/${community.slug}?src=explore_trending&rank=${index + 1}&sort=trending`}
-                    className="group rounded-xl border border-border bg-card p-5 transition hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-lg"
-                  >
-                    <div className="mb-3 flex items-center justify-between">
-                      <Badge>{badge}</Badge>
-                      <Badge variant="outline">{community.isPaid ? "Paid access" : "Free access"}</Badge>
-                    </div>
-
-                    <h3 className="text-lg font-semibold text-foreground">{community.name}</h3>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {community.description?.trim() || "Learn with live sessions and community."}
-                    </p>
-
-                    <p className="mt-3 text-sm text-muted-foreground">👤 {hostName(community.owner)} (Host)</p>
-                    <p className="text-sm text-muted-foreground">👥 {community._count.members} members</p>
-
-                    <p className="mt-3 text-sm font-medium text-foreground">🟢 {nextSessionText}</p>
-                    <p className="text-sm text-muted-foreground">🔥 {socialProof}</p>
-                    <p className="mt-2 text-xs text-muted-foreground">💬 “{community.previewPost}”</p>
-
-                    <div className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary">
-                      View community <ArrowRight className="h-4 w-4" />
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          )}
-        </section>
-
-        <section className="space-y-4">
-          <div className="flex items-center gap-2">
-            <Clock className="h-5 w-5 text-green-600" />
-            <h2 className="text-xl font-semibold">🟢 Happening this week</h2>
-          </div>
-
-          {liveThisWeek.length === 0 ? (
-            <div className="space-y-3 rounded-xl border border-border bg-card p-5">
-              <p className="text-sm font-semibold text-foreground">🟢 Live sessions every week</p>
-              <p className="text-sm text-muted-foreground">
-                Join a community to attend the next live session.
-              </p>
-              <div className="grid gap-3 md:grid-cols-3">
-                {suggestedWhenEmpty.map((community, index) => (
-                  <Link
-                    key={community.id}
-                    href={`/${locale}/community/${community.slug}?src=explore_happening_empty&rank=${index + 1}`}
-                    className="rounded-lg border border-border bg-background p-3 transition hover:border-primary/50"
-                  >
-                    <p className="text-sm font-semibold text-foreground">{community.name}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">{community._count.members} members</p>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          ) : (
             <div className="space-y-4">
               {todaySessions.length > 0 && (
                 <div className="space-y-2">
@@ -508,12 +484,114 @@ export default async function ExploreCommunitiesPage({
                 </div>
               )}
             </div>
+          </section>
+        )}
+
+        <section className="space-y-3">
+<div className="flex items-center gap-2">
+            <Flame className="h-5 w-5 text-amber-500" />
+            <h2 className="text-xl font-semibold">Growing communities this week</h2>
+            <p className="text-xs text-amber-600">Ranked by member growth, activity, and upcoming sessions</p>
+          </div>
+
+          {trendingCommunities.length === 0 ? (
+            <div className="rounded-xl border border-border bg-card p-5 text-sm text-muted-foreground">
+              No communities match your filters yet.
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-3">
+              {trendingCommunities.map((community, index) => {
+                const nextSessionText = community.nextSession
+                  ? `Next: ${formatSessionSlot(community.nextSession.scheduledAt)}`
+                  : "Weekly live sessions";
+
+                const socialProof = community.nextSessionAttending > 0
+                  ? `${community.nextSessionAttending} attending`
+                  : community.sessionsThisWeek > 0
+                    ? "Weekly sessions"
+                    : community.isNew
+                      ? "Be one of the first members"
+                      : "Growing community";
+
+                const badge = community.isNew ? "🆕 New" : "🔥 Trending";
+
+                return (
+                  <Link
+                    key={community.id}
+                    href={`/${locale}/community/${community.slug}?src=explore_trending&rank=${index + 1}&sort=trending`}
+                    className="group rounded-xl border border-border bg-card p-5 transition hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-lg"
+                  >
+                    <div className="mb-3 flex items-center justify-between">
+                      <Badge>{badge}</Badge>
+                      <Badge variant="outline">{community.isPaid ? "Paid access" : "Free access"}</Badge>
+                    </div>
+
+                    <h3 className="text-lg font-semibold text-foreground">{community.name}</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {community.description?.trim() || "Learn with live sessions and community."}
+                    </p>
+
+                    <p className="mt-3 text-sm text-muted-foreground">👤 {hostName(community.owner)} (Host)</p>
+                    <p className="text-sm text-muted-foreground">👥 {community._count.members} members</p>
+
+                    <p className="mt-3 text-sm font-medium text-foreground">🟢 {nextSessionText}</p>
+                    <p className="text-sm text-muted-foreground">🔥 {socialProof}</p>
+                    <p className="mt-2 text-xs text-muted-foreground">💬 “{community.previewPost}”</p>
+
+                    <div className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary">
+                      View community <ArrowRight className="h-4 w-4" />
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
           )}
         </section>
 
+        {!hasHappening && (
+          <section className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Clock className="h-5 w-5 text-green-600" />
+              <h2 className="text-xl font-semibold">🟢 Live sessions every week</h2>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Join a community to attend the next live session.
+            </p>
+            <div className="grid gap-3 md:grid-cols-3">
+              {suggestedWhenEmpty.map((community, index) => (
+                <Link
+                  key={community.id}
+                  href={`/${locale}/community/${community.slug}?src=explore_happening_empty&rank=${index + 1}`}
+                  className="rounded-lg border border-border bg-background p-3 transition hover:border-primary/50"
+                >
+                  <p className="text-sm font-semibold text-foreground">{community.name}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{community._count.members} members</p>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {!hasHappening && newCommunities.length > 0 && (
+          <section className="space-y-3">
+            <h2 className="text-xl font-semibold">New communities</h2>
+            <div className="grid gap-3 md:grid-cols-3">
+              {newCommunities.map((community, index) => (
+                <Link
+                  key={community.id}
+                  href={`/${locale}/community/${community.slug}?src=explore_new_communities&rank=${index + 1}`}
+                  className="rounded-lg border border-border bg-card p-4 transition hover:border-primary/50"
+                >
+                  <p className="text-sm font-semibold text-foreground">{community.name}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{community.description?.trim() || "New community with live sessions."}</p>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
 
         <section className="space-y-4">
-          <div className="flex items-center justify-between">
+<div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold">All communities</h2>
             <p className="text-sm text-muted-foreground">{sorted.length} communities</p>
           </div>
