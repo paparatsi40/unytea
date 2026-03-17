@@ -763,6 +763,189 @@ export async function getHostScoreSystem() {
   }
 }
 
+export async function getHostGamificationSnapshot() {
+  try {
+    const userId = await getCurrentUserId();
+    if (!userId) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const now = new Date();
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - now.getDay());
+    weekStart.setHours(0, 0, 0, 0);
+    const weekEnd = new Date(weekStart.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+    const hostMemberships = await prisma.member.findMany({
+      where: {
+        userId,
+        role: { in: ["OWNER", "ADMIN", "MODERATOR"] },
+      },
+      select: { communityId: true },
+    });
+
+    const communityIds = hostMemberships.map((m) => m.communityId);
+
+    const completedWhere = {
+      OR: [{ mentorId: userId }, { communityId: { in: communityIds } }],
+      status: "COMPLETED" as const,
+    };
+
+    const [completedSessions, weeklyCompletedSessions, weeklyAttendedSessions, weeklyDiscussionPosts, activeMembers] =
+      await Promise.all([
+        prisma.mentorSession.findMany({
+          where: completedWhere,
+          select: {
+            id: true,
+            endedAt: true,
+            attendeeCount: true,
+            participations: { select: { id: true } },
+          },
+          orderBy: { endedAt: "desc" },
+          take: 200,
+        }),
+        prisma.mentorSession.count({
+          where: {
+            ...completedWhere,
+            endedAt: { gte: weekStart, lt: weekEnd },
+          },
+        }),
+        prisma.mentorSession.findMany({
+          where: {
+            ...completedWhere,
+            endedAt: { gte: weekStart, lt: weekEnd },
+          },
+          select: {
+            attendeeCount: true,
+            participations: { select: { id: true } },
+          },
+        }),
+        prisma.post.count({
+          where: {
+            authorId: userId,
+            communityId: { in: communityIds },
+            createdAt: { gte: weekStart, lt: weekEnd },
+          },
+        }),
+        prisma.member.count({
+          where: {
+            communityId: { in: communityIds },
+            status: "ACTIVE",
+          },
+        }),
+      ]);
+
+    const getWeekKey = (date: Date) => {
+      const d = new Date(date);
+      d.setDate(d.getDate() - d.getDay());
+      d.setHours(0, 0, 0, 0);
+      return d.toISOString();
+    };
+
+    const activeWeeks = new Set(
+      completedSessions
+        .map((s) => s.endedAt)
+        .filter((d): d is Date => !!d)
+        .map((d) => getWeekKey(d))
+    );
+
+    let streakWeeks = 0;
+    const cursor = new Date(weekStart);
+    for (let i = 0; i < 52; i++) {
+      if (!activeWeeks.has(cursor.toISOString())) break;
+      streakWeeks += 1;
+      cursor.setDate(cursor.getDate() - 7);
+    }
+
+    const totalSessionsHosted = completedSessions.length;
+    const totalAttendees = completedSessions.reduce(
+      (sum, s) => sum + (s.attendeeCount || s.participations.length || 0),
+      0
+    );
+
+    const weeklyAttendees = weeklyAttendedSessions.reduce(
+      (sum, s) => sum + (s.attendeeCount || s.participations.length || 0),
+      0
+    );
+
+    const milestones = [
+      {
+        key: "first_session",
+        label: "First session hosted",
+        target: 1,
+        current: totalSessionsHosted,
+      },
+      {
+        key: "sessions_10",
+        label: "10 sessions hosted",
+        target: 10,
+        current: totalSessionsHosted,
+      },
+      {
+        key: "attendees_100",
+        label: "100 total attendees",
+        target: 100,
+        current: totalAttendees,
+      },
+      {
+        key: "active_members_50",
+        label: "50 active members",
+        target: 50,
+        current: activeMembers,
+      },
+    ].map((m) => ({
+      ...m,
+      completed: m.current >= m.target,
+      progress: Math.min(100, Math.round((m.current / m.target) * 100)),
+    }));
+
+    const nextMilestone = milestones.find((m) => !m.completed) || milestones[milestones.length - 1];
+
+    const weeklyGoals = [
+      {
+        key: "host_session",
+        label: "Host 1 session",
+        target: 1,
+        current: weeklyCompletedSessions,
+      },
+      {
+        key: "get_attendees",
+        label: "Get 10 attendees",
+        target: 10,
+        current: weeklyAttendees,
+      },
+      {
+        key: "post_discussion",
+        label: "Post 1 discussion",
+        target: 1,
+        current: weeklyDiscussionPosts,
+      },
+    ].map((g) => ({
+      ...g,
+      completed: g.current >= g.target,
+    }));
+
+    return {
+      success: true,
+      streak: {
+        weeks: streakWeeks,
+        isActiveThisWeek: weeklyCompletedSessions > 0,
+      },
+      milestones,
+      nextMilestone,
+      weeklyGoals,
+      totals: {
+        sessionsHosted: totalSessionsHosted,
+        attendees: totalAttendees,
+        activeMembers,
+      },
+    };
+  } catch (error) {
+    console.error("Error getting host gamification snapshot:", error);
+    return { success: false, error: "Failed to load gamification snapshot" };
+  }
+}
+
 export async function getNextRecommendedAction() {
   try {
     const [metricsRes, nextSessionRes, hostAnalyticsRes] = await Promise.all([

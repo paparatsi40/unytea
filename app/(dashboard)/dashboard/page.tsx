@@ -22,6 +22,7 @@ import {
   Radio,
   Sparkles,
   AlertTriangle,
+  Flame,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -48,6 +49,7 @@ import {
   getMemberLeaderboard,
   getCommunityOSSnapshot,
   getHostScoreSystem,
+  getHostGamificationSnapshot,
 } from "@/app/actions/dashboard";
 import { toast } from "sonner";
 
@@ -194,6 +196,36 @@ interface HostScoreSystem {
   }>;
 }
 
+interface HostGamificationSnapshot {
+  streak: {
+    weeks: number;
+    isActiveThisWeek: boolean;
+  };
+  milestones: Array<{
+    key: string;
+    label: string;
+    target: number;
+    current: number;
+    completed: boolean;
+    progress: number;
+  }>;
+  nextMilestone: {
+    key: string;
+    label: string;
+    target: number;
+    current: number;
+    completed: boolean;
+    progress: number;
+  };
+  weeklyGoals: Array<{
+    key: string;
+    label: string;
+    target: number;
+    current: number;
+    completed: boolean;
+  }>;
+}
+
 export default function DashboardPage() {
   const { user } = useCurrentUser();
 
@@ -214,6 +246,7 @@ export default function DashboardPage() {
   const [topAttendees, setTopAttendees] = useState<LeaderboardMember[]>([]);
   const [communityOS, setCommunityOS] = useState<CommunityOSSnapshot | null>(null);
   const [hostScoreSystem, setHostScoreSystem] = useState<HostScoreSystem | null>(null);
+  const [gamification, setGamification] = useState<HostGamificationSnapshot | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Load dashboard data
@@ -238,6 +271,7 @@ export default function DashboardPage() {
         leaderboardRes,
         communityOSRes,
         hostScoreRes,
+        gamificationRes,
       ] = await Promise.all([
         getDashboardMetrics(),
         getNextLiveSession(),
@@ -251,6 +285,7 @@ export default function DashboardPage() {
         getMemberLeaderboard(5),
         getCommunityOSSnapshot(),
         getHostScoreSystem(),
+        getHostGamificationSnapshot(),
       ]);
 
       if (metricsRes.success) setMetrics(metricsRes.metrics || null);
@@ -267,6 +302,18 @@ export default function DashboardPage() {
         setTopAttendees(leaderboardRes.attendees || []);
       }
       if (communityOSRes.success) setCommunityOS(communityOSRes.snapshot || null);
+      if (
+        gamificationRes.success &&
+        gamificationRes.streak &&
+        gamificationRes.nextMilestone
+      ) {
+        setGamification({
+          streak: gamificationRes.streak,
+          milestones: gamificationRes.milestones || [],
+          nextMilestone: gamificationRes.nextMilestone,
+          weeklyGoals: gamificationRes.weeklyGoals || [],
+        });
+      }
       if (
         hostScoreRes.success &&
         typeof hostScoreRes.hostScore === "number" &&
@@ -368,38 +415,89 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {hostScoreSystem && (
+        {(hostScoreSystem || gamification) && (
           <Card className="border-zinc-200 bg-white">
             <CardContent className="p-5 space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Host Score</p>
-                  <h3 className="text-lg font-semibold text-zinc-900">{hostScoreSystem.hostScore}/100 · {hostScoreSystem.level}</h3>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Host OS</p>
+                  {hostScoreSystem ? (
+                    <h3 className="text-lg font-semibold text-zinc-900">{hostScoreSystem.hostScore}/100 · {hostScoreSystem.level}</h3>
+                  ) : (
+                    <h3 className="text-lg font-semibold text-zinc-900">Grow your weekly consistency</h3>
+                  )}
                 </div>
-                <Badge variant="outline">Community OS Brain</Badge>
+                {gamification?.streak ? (
+                  <Badge className="bg-orange-100 text-orange-800 hover:bg-orange-100">
+                    <Flame className="h-3.5 w-3.5 mr-1" />
+                    {gamification.streak.weeks} week streak
+                  </Badge>
+                ) : (
+                  <Badge variant="outline">Community OS Brain</Badge>
+                )}
               </div>
 
-              <div className="grid gap-3 md:grid-cols-5">
-                {hostScoreSystem.components.map((component) => (
-                  <div key={component.key} className="rounded-lg bg-zinc-50 p-3">
-                    <p className="text-xs text-zinc-500">{component.label}</p>
-                    <p className="mt-1 text-xl font-bold text-zinc-900">{component.score}</p>
-                    <Progress value={component.score} className="mt-2 h-1.5" />
+              {gamification && (
+                <div className="grid gap-3 md:grid-cols-3">
+                  <div className="rounded-lg border border-orange-200 bg-orange-50 p-3">
+                    <p className="text-xs text-orange-700">Streak</p>
+                    <p className="mt-1 text-2xl font-bold text-orange-900">🔥 {gamification.streak.weeks}</p>
+                    <p className="text-xs text-orange-800">
+                      {gamification.streak.isActiveThisWeek
+                        ? "You hosted this week — streak alive"
+                        : "Host this week to keep the streak"}
+                    </p>
                   </div>
-                ))}
-              </div>
 
-              <div className="grid gap-3 md:grid-cols-2">
-                {hostScoreSystem.actions.slice(0, 2).map((action, idx) => (
-                  <div key={`${action.title}-${idx}`} className="rounded-lg border border-zinc-200 p-3">
-                    <p className="font-medium text-zinc-900">{action.title}</p>
-                    <p className="mt-1 text-sm text-zinc-600">{action.description}</p>
-                    <Link href={action.href} className="mt-2 inline-flex">
-                      <Button size="sm" variant="outline">{action.cta}</Button>
-                    </Link>
+                  <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3 md:col-span-2">
+                    <p className="text-xs font-medium text-zinc-500">This week goals</p>
+                    <div className="mt-2 space-y-1.5">
+                      {gamification.weeklyGoals.map((goal) => (
+                        <p key={goal.key} className={`text-sm ${goal.completed ? "text-green-700" : "text-zinc-700"}`}>
+                          {goal.completed ? "☑" : "☐"} {goal.label} ({Math.min(goal.current, goal.target)}/{goal.target})
+                        </p>
+                      ))}
+                    </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              )}
+
+              {gamification?.nextMilestone && (
+                <div className="rounded-lg border border-purple-200 bg-purple-50 p-3">
+                  <p className="text-xs font-medium text-purple-700">Next milestone</p>
+                  <p className="mt-1 text-sm font-semibold text-purple-900">🎯 {gamification.nextMilestone.label}</p>
+                  <p className="mt-1 text-xs text-purple-800">
+                    Progress: {Math.min(gamification.nextMilestone.current, gamification.nextMilestone.target)} / {gamification.nextMilestone.target}
+                  </p>
+                  <Progress value={gamification.nextMilestone.progress} className="mt-2 h-1.5" />
+                </div>
+              )}
+
+              {hostScoreSystem && (
+                <>
+                  <div className="grid gap-3 md:grid-cols-5">
+                    {hostScoreSystem.components.map((component) => (
+                      <div key={component.key} className="rounded-lg bg-zinc-50 p-3">
+                        <p className="text-xs text-zinc-500">{component.label}</p>
+                        <p className="mt-1 text-xl font-bold text-zinc-900">{component.score}</p>
+                        <Progress value={component.score} className="mt-2 h-1.5" />
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="grid gap-3 md:grid-cols-2">
+                    {hostScoreSystem.actions.slice(0, 2).map((action, idx) => (
+                      <div key={`${action.title}-${idx}`} className="rounded-lg border border-zinc-200 p-3">
+                        <p className="font-medium text-zinc-900">{action.title}</p>
+                        <p className="mt-1 text-sm text-zinc-600">{action.description}</p>
+                        <Link href={action.href} className="mt-2 inline-flex">
+                          <Button size="sm" variant="outline">{action.cta}</Button>
+                        </Link>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
         )}
