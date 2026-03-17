@@ -175,11 +175,48 @@ export async function GET() {
           },
         });
 
+        const postsThisWeek = await prisma.post.count({
+          where: {
+            communityId: m.community.id,
+            createdAt: { gte: startOfWeek },
+          },
+        });
+
+        const lastPost = await prisma.post.findFirst({
+          where: {
+            communityId: m.community.id,
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+          select: {
+            createdAt: true,
+          },
+        });
+
+        const lastSession = await prisma.mentorSession.findFirst({
+          where: {
+            communityId: m.community.id,
+            status: {
+              in: ["COMPLETED", "IN_PROGRESS", "CANCELLED"],
+            },
+          },
+          orderBy: {
+            scheduledAt: "desc",
+          },
+          select: {
+            scheduledAt: true,
+          },
+        });
+
         return {
           ...m.community,
           role: m.role,
           nextSession,
           weeklySessions,
+          postsThisWeek,
+          lastPostAt: lastPost?.createdAt || null,
+          lastSessionAt: lastSession?.scheduledAt || null,
           avgAttendanceThisWeek: Math.round(weeklyAttendance._avg.attendeeCount || 0),
           attendeesThisWeek: weeklyAttendance._sum.attendeeCount || 0,
         };
