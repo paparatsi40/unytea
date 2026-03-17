@@ -383,11 +383,11 @@ export function CommunitiesClient() {
       {primaryCommunity && primaryCard && (
         <>
           <div className="overflow-hidden rounded-3xl border border-border bg-card">
-            <div className="h-32 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-orange-500" />
-            <div className="-mt-8 p-6">
-              <p className="text-2xl font-bold text-white drop-shadow-sm">{primaryCommunity.name}</p>
-              <p className="text-sm text-zinc-100">{primaryCommunity.description || "Mentoring & Community"}</p>
-              <p className="mt-3 text-xs text-zinc-200">
+            <div className="h-14 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-orange-500" />
+            <div className="p-6 pt-4">
+              <p className="text-2xl font-bold text-foreground">{primaryCommunity.name}</p>
+              <p className="text-sm text-muted-foreground">{primaryCommunity.description || "Mentoring & Community"}</p>
+              <p className="mt-3 text-xs text-muted-foreground">
                 {primaryCommunity._count.members} members · {primaryCommunity._count.posts} posts
               </p>
 
@@ -408,7 +408,7 @@ export function CommunitiesClient() {
                 </Link>
               </div>
 
-              <p className="mt-3 text-xs text-zinc-200">
+              <p className="mt-3 text-xs text-muted-foreground">
                 Last activity: {primaryLastPost ? `post ${primaryLastPost}` : "no posts yet"}
               </p>
             </div>
