@@ -153,6 +153,15 @@ function getHeroContent(community: Community) {
     };
   }
 
+  if (!nextSession) {
+    return {
+      title: "⚡ Schedule your next session",
+      subtitle: "Communities grow faster with a consistent weekly rhythm",
+      primaryLabel: "Schedule next session",
+      primaryHref: "/dashboard/sessions/create",
+    };
+  }
+
   const d = daysUntil(nextSession.scheduledAt);
 
   if (nextSession.status === "IN_PROGRESS") {
