@@ -546,7 +546,7 @@ export default function DashboardPage() {
         ? {
             title: "🟢 Your session starts soon",
             description: `${nextSession?.title || "Next session"} · ${nextSession?.attendeeCount || 0} attending`,
-            cta: "Join session",
+            cta: "Join Next Session",
             href: nextSession ? `/dashboard/sessions/${nextSession.id}` : "/dashboard/sessions",
           }
         : heroState === "upcoming"
@@ -703,7 +703,7 @@ export default function DashboardPage() {
                 <>
                   <p className="font-semibold text-zinc-900">{nextSession.title}</p>
                   <p className="text-sm text-zinc-600">{formatDate(nextSession.scheduledAt)} {formatTime(nextSession.scheduledAt)} · {nextSession.attendeeCount} attending</p>
-                  <Link href={`/dashboard/sessions/${nextSession.id}`}><Button size="sm" variant="outline">View session</Button></Link>
+                  <Link href={`/dashboard/sessions/${nextSession.id}/room`}><Button size="sm">Join Next Session</Button></Link>
                 </>
               ) : (
                 <>

@@ -20,6 +20,8 @@ import {
   Radio,
   Headphones,
   Sparkles,
+  BellRing,
+  ArrowRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getSession, getSessionRSVPStatus, setSessionRSVPStatus } from "@/app/actions/sessions";
@@ -215,6 +217,9 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
     ? `${window.location.origin}/sessions/${session.slug}?src=session_detail_share`
     : `${window.location.origin}/dashboard/sessions/${session.id}?src=session_detail_share`;
 
+  const startsInMinutes = Math.floor((new Date(session.scheduledAt).getTime() - Date.now()) / (1000 * 60));
+  const isStartingSoon = session.status === "SCHEDULED" && startsInMinutes >= 0 && startsInMinutes <= 10;
+
   const handleCopyInviteLink = async () => {
     await navigator.clipboard.writeText(publicSessionUrl);
     toast.success("Invite link copied");
@@ -386,8 +391,32 @@ export default function SessionDetailPage({ params }: SessionPageProps) {
 
       {/* MAIN CONTENT */}
       <main className="mx-auto max-w-7xl p-6">
+        {isStartingSoon && (
+          <div className="mb-4 flex items-center justify-between gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3">
+            <div className="flex items-center gap-2 text-amber-200">
+              <BellRing className="h-4 w-4 animate-pulse" />
+              <span className="text-sm font-medium">Starting soon · {startsInMinutes} min</span>
+            </div>
+            <Link href={`/dashboard/sessions/${session.id}/room`}>
+              <Button size="sm" className="bg-amber-500 text-zinc-900 hover:bg-amber-400">
+                Join Next Session
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
+        )}
+
         {/* ACTION BAR */}
         <div className="mb-6 flex items-center gap-3">
+          {session.status === "SCHEDULED" && (
+            <Link href={`/dashboard/sessions/${session.id}/room`}>
+              <Button className="gap-2 bg-purple-600 hover:bg-purple-700">
+                <Play className="h-4 w-4" />
+                Join Next Session
+              </Button>
+            </Link>
+          )}
+
           {session.status === "SCHEDULED" && (
             <>
               <Button

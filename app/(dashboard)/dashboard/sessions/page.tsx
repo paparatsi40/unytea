@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { getUserSessions } from "@/app/actions/sessions";
-import { Video, Calendar, Clock, Play, Radio, Users, ArrowRight, VideoIcon, Sparkles } from "lucide-react";
+import { Video, Calendar, Clock, Play, Radio, Users, ArrowRight, VideoIcon, Sparkles, BellRing } from "lucide-react";
 import { CreateSessionDialog } from "@/components/sessions/CreateSessionDialog";
 import { format, isToday, isTomorrow, isThisWeek, formatDistanceToNow } from "date-fns";
 import { Button } from "@/components/ui/button";
@@ -62,6 +62,18 @@ export default async function SessionsPage() {
     return diffMinutes >= 0 && diffMinutes <= 60;
   });
 
+  const nextSession = upcoming[0] ?? null;
+  const nextSessionStartsInMinutes = nextSession
+    ? Math.floor((new Date(nextSession.scheduledAt).getTime() - Date.now()) / (1000 * 60))
+    : null;
+  const startingSoonSession =
+    nextSession &&
+    nextSessionStartsInMinutes !== null &&
+    nextSessionStartsInMinutes >= 0 &&
+    nextSessionStartsInMinutes <= 10
+      ? nextSession
+      : null;
+
   return (
     <div className="space-y-8 p-8">
       {/* HEADER with Stats */}
@@ -83,6 +95,32 @@ export default async function SessionsPage() {
           className="inline-flex items-center gap-2 rounded-full bg-purple-600 px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-purple-700"
         />
       </div>
+
+      {startingSoonSession && (
+        <div className="relative overflow-hidden rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-950/50 to-zinc-900 p-6">
+          <div className="absolute left-0 top-0 h-full w-1 bg-amber-500" />
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/20">
+                <BellRing className="h-6 w-6 animate-pulse text-amber-400" />
+              </div>
+              <div>
+                <Badge className="bg-amber-500 text-zinc-900">STARTING SOON</Badge>
+                <h2 className="mt-2 text-xl font-semibold text-white">{startingSoonSession.title}</h2>
+                <p className="mt-1 text-sm text-zinc-300">
+                  Starts in {nextSessionStartsInMinutes} min · {formatSessionTime(new Date(startingSoonSession.scheduledAt))}
+                </p>
+              </div>
+            </div>
+            <Link href={`/dashboard/sessions/${startingSoonSession.id}/room`}>
+              <Button className="rounded-full bg-amber-500 px-6 text-zinc-900 hover:bg-amber-400">
+                Join Next Session
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* LIVE NOW SECTION */}
       {liveSession && (
@@ -117,7 +155,7 @@ export default async function SessionsPage() {
             </div>
             <Link href={`/dashboard/sessions/${liveSession.id}/room`}>
               <Button className="rounded-full bg-red-500 px-6 hover:bg-red-600">
-                Join Session
+                Join Next Session
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
@@ -212,7 +250,7 @@ export default async function SessionsPage() {
                       size="sm"
                       className="w-full rounded-full bg-purple-600 hover:bg-purple-700"
                     >
-                      Join
+                      Join Next Session
                     </Button>
                   </Link>
                   <CreateSessionDialog
