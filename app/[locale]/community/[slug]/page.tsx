@@ -270,15 +270,22 @@ export default async function CommunityPublicPreviewPage({
       : Promise.resolve(0),
   ]);
 
+  const accessTypeLabel = currentCommunity.isPaid ? "De pago" : "Gratis";
+  const subscribeLabel = userId
+    ? currentCommunity.isPaid
+      ? "Suscribirme (pago requerido)"
+      : "Suscribirme"
+    : "Iniciar sesión para suscribirme";
+
   return (
-    <div className="min-h-screen bg-background">
+<div className="min-h-screen bg-background">
       <main className="mx-auto max-w-5xl space-y-6 px-4 py-10 sm:px-6">
         <section className="rounded-xl border border-border bg-card p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <div className="mb-2 flex items-center gap-3">
                 <h1 className="text-3xl font-bold text-foreground">{currentCommunity.name}</h1>
-                <Badge variant="outline">{currentCommunity.isPaid ? "Paid" : "Free"}</Badge>
+                <Badge variant="outline">{accessTypeLabel}</Badge>
               </div>
               <p className="text-muted-foreground">{currentCommunity.description || "Community preview page"}</p>
               <p className="mt-2 text-sm text-muted-foreground">Hosted by {formatHostName(currentCommunity.owner)}</p>
@@ -287,16 +294,16 @@ export default async function CommunityPublicPreviewPage({
             <div className="min-w-[220px]">
               {membershipStatus === "ACTIVE" ? (
                 <Link href={`/dashboard/c/${currentCommunity.slug}`}>
-                  <Button className="w-full">Go to community</Button>
+                  <Button className="w-full">Entrar a la comunidad</Button>
                 </Link>
               ) : membershipStatus === "PENDING" ? (
                 <Button className="w-full" disabled>Request pending approval</Button>
               ) : (
                 <form action={handleJoin}>
-                  <Button className="w-full" type="submit">{userId ? "Suscribirme" : "Iniciar sesión para suscribirme"}</Button>
+                  <Button className="w-full" type="submit">{subscribeLabel}</Button>
                 </form>
               )}
-              <p className="mt-2 text-xs text-muted-foreground">Join to attend live sessions and access recordings.</p>
+              <p className="mt-2 text-xs text-muted-foreground">Acceso: {accessTypeLabel}. Suscríbete para asistir en vivo y ver grabaciones.</p>
             </div>
           </div>
         </section>
@@ -311,7 +318,7 @@ export default async function CommunityPublicPreviewPage({
           <div className="mt-4">
             {membershipStatus === "ACTIVE" ? (
               <Link href={`/dashboard/c/${currentCommunity.slug}`}>
-                <Button>Go to community</Button>
+                <Button>Entrar a la comunidad</Button>
               </Link>
             ) : membershipStatus === "PENDING" ? (
               <Button disabled>Request pending approval</Button>
@@ -377,7 +384,7 @@ export default async function CommunityPublicPreviewPage({
           <div className="mt-4 flex flex-wrap gap-2">
             {membershipStatus === "ACTIVE" ? (
               <Link href={`/dashboard/c/${currentCommunity.slug}`}>
-                <Button>Go to community</Button>
+                <Button>Entrar a la comunidad</Button>
               </Link>
             ) : membershipStatus === "PENDING" ? (
               <Button disabled>Request pending approval</Button>
@@ -387,7 +394,7 @@ export default async function CommunityPublicPreviewPage({
               </form>
             )}
             <Link href={`/${locale}/explore`}>
-              <Button variant="outline">Back to explore</Button>
+              <Button variant="outline">Volver a explorar</Button>
             </Link>
           </div>
         </section>
