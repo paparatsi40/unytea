@@ -1,12 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Plus, Users, TrendingUp, Crown, Lock, Loader2, Search, Grid3x3, List, Sparkles, Dumbbell, Briefcase, Code, BookOpen, Palette, BarChart3, UserPlus, ExternalLink } from "lucide-react";
+import {
+  Plus,
+  Users,
+  Loader2,
+  Search,
+  Lock,
+  Crown,
+  Calendar,
+  ArrowRight,
+  Radio,
+  UserPlus,
+  MessageSquare,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useTranslations } from "next-intl";
 
 type Community = {
   id: string;
@@ -21,84 +32,108 @@ type Community = {
     members: number;
     posts: number;
   };
+  nextSession?: {
+    id: string;
+    title: string;
+    scheduledAt: string;
+    status: string;
+  } | null;
 };
 
-// Categories for carousel
-const categories = [
-  { name: "Spiritual", icon: Sparkles, color: "from-purple-500 to-pink-500", image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80" },
-  { name: "Fitness", icon: Dumbbell, color: "from-green-500 to-emerald-500", image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&q=80" },
-  { name: "Business", icon: Briefcase, color: "from-blue-500 to-cyan-500", image: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&q=80" },
-  { name: "Technology", icon: Code, color: "from-indigo-500 to-purple-500", image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80" },
-  { name: "Education", icon: BookOpen, color: "from-orange-500 to-red-500", image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&q=80" },
-  { name: "Creative", icon: Palette, color: "from-pink-500 to-rose-500", image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=800&q=80" },
-];
+function formatSessionDate(dateString: string) {
+  const date = new Date(dateString);
+  const today = new Date();
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
 
-// Helper to calculate activity status based on posts and members
-function getActivityStatus(posts: number, members: number): { text: string; isActive: boolean } {
-  if (posts > 0 && members > 1) {
-    return { text: "Last activity: today", isActive: true };
-  } else if (posts > 0 || members > 1) {
-    return { text: "Last activity: recently", isActive: true };
-  } else if (members === 1) {
-    return { text: "Needs members", isActive: false };
+  if (date.toDateString() === today.toDateString()) return "Today";
+  if (date.toDateString() === tomorrow.toDateString()) return "Tomorrow";
+
+  return date.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+function formatSessionTime(dateString: string) {
+  return new Date(dateString).toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
+function getSessionState(nextSession?: Community["nextSession"]) {
+  if (!nextSession) {
+    return {
+      state: "none" as const,
+      label: "No sessions scheduled",
+      cta: "Schedule session",
+      href: "/dashboard/sessions/create",
+      badgeClass: "bg-zinc-100 text-zinc-700",
+    };
   }
-  return { text: "No activity yet", isActive: false };
+
+  if (nextSession.status === "IN_PROGRESS") {
+    return {
+      state: "live" as const,
+      label: "Live now",
+      cta: "Start session",
+      href: `/dashboard/sessions/${nextSession.id}/room`,
+      badgeClass: "bg-red-100 text-red-700",
+    };
+  }
+
+  const scheduledAt = new Date(nextSession.scheduledAt);
+  const now = new Date();
+
+  if (scheduledAt.toDateString() === now.toDateString()) {
+    return {
+      state: "today" as const,
+      label: `Live ${formatSessionTime(nextSession.scheduledAt)}`,
+      cta: "Start session",
+      href: `/dashboard/sessions/${nextSession.id}`,
+      badgeClass: "bg-amber-100 text-amber-700",
+    };
+  }
+
+  return {
+    state: "upcoming" as const,
+    label: `${formatSessionDate(nextSession.scheduledAt)} · ${formatSessionTime(nextSession.scheduledAt)}`,
+    cta: "View session",
+    href: `/dashboard/sessions/${nextSession.id}`,
+    badgeClass: "bg-emerald-100 text-emerald-700",
+  };
 }
 
 export function CommunitiesClient() {
   const { user, isLoading } = useCurrentUser();
   const router = useRouter();
-  const t = useTranslations();
   const [communities, setCommunities] = useState<Community[]>([]);
-  const [exploreCommunities, setExploreCommunities] = useState<Community[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
-  // UI States
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState<"recent" | "members" | "posts" | "name">("recent");
-  const [filterPrivacy, setFilterPrivacy] = useState<"all" | "public" | "private">("all");
-  const [currentCarouselIndex, setCurrentCarouselIndex] = useState(0);
-
-  // Auto-rotate carousel
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentCarouselIndex((prev) => prev + 1);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, []);
 
   useEffect(() => {
     async function fetchCommunities() {
       if (isLoading) return;
-      
+
       if (!user) {
         router.push("/auth/signin");
         return;
       }
 
       try {
-        const response = await fetch('/api/communities');
-        
+        const response = await fetch("/api/communities");
+
         if (!response.ok) {
           throw new Error("Failed to fetch communities");
         }
-        
+
         const data = await response.json();
-        console.log("📥 API Response:", data);
-        
-        // Handle new API response format with myCommunities and exploreCommunities
-        if (data.myCommunities && data.exploreCommunities) {
-          setCommunities(data.myCommunities);
-          setExploreCommunities(data.exploreCommunities);
-        } else {
-          // Fallback for old format (just array)
-          setCommunities(Array.isArray(data) ? data : []);
-          setExploreCommunities([]);
-        }
+        const myCommunities = data?.myCommunities || [];
+        setCommunities(myCommunities);
       } catch (err) {
-        console.error("❌ Error fetching communities:", err);
         setError(err instanceof Error ? err.message : "Failed to load communities");
       } finally {
         setLoading(false);
@@ -108,37 +143,40 @@ export function CommunitiesClient() {
     fetchCommunities();
   }, [user, isLoading, router]);
 
-  // Filter and sort communities
-  const filteredCommunities = communities
-    .filter((c) => {
-      // Search filter
-      if (searchQuery && !c.name.toLowerCase().includes(searchQuery.toLowerCase())) {
-        return false;
-      }
-      // Privacy filter
-      if (filterPrivacy === "public" && c.isPrivate) return false;
-      if (filterPrivacy === "private" && !c.isPrivate) return false;
-      return true;
-    })
-    .sort((a, b) => {
-      switch (sortBy) {
-        case "members":
-          return b._count.members - a._count.members;
-        case "posts":
-          return b._count.posts - a._count.posts;
-        case "name":
-          return a.name.localeCompare(b.name);
-        default:
-          return 0;
-      }
-    });
+  const filteredCommunities = useMemo(() => {
+    return communities.filter((community) =>
+      community.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [communities, searchQuery]);
+
+  const totalMembers = communities.reduce((sum, c) => sum + c._count.members, 0);
+  const totalPosts = communities.reduce((sum, c) => sum + c._count.posts, 0);
+  const communitiesWithUpcoming = communities.filter((c) => c.nextSession).length;
+
+  const activationChecklist = [
+    {
+      label: "Invite 5 members",
+      done: totalMembers >= 5,
+      href: "/dashboard/communities",
+    },
+    {
+      label: "Schedule first session",
+      done: communitiesWithUpcoming > 0,
+      href: "/dashboard/sessions/create",
+    },
+    {
+      label: "Create first post",
+      done: totalPosts > 0,
+      href: "/dashboard/feed",
+    },
+  ];
 
   if (isLoading || loading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
         <div className="text-center">
           <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />
-          <p className="mt-4 text-muted-foreground">{t("common.loading")}</p>
+          <p className="mt-4 text-muted-foreground">Loading communities...</p>
         </div>
       </div>
     );
@@ -158,748 +196,192 @@ export function CommunitiesClient() {
     );
   }
 
-  // Calculate stats
-  const totalMembers = communities.reduce((sum, c) => sum + c._count.members, 0);
-  const ownedCommunities = communities.filter((c) => c.role === "OWNER").length;
-  const totalPosts = communities.reduce((sum, c) => sum + c._count.posts, 0);
-
   return (
-    <div className="space-y-8">
-      {/* 🎨 HERO CAROUSEL - CATEGORIES */}
-      <div className="relative h-[500px] overflow-hidden rounded-3xl bg-gradient-to-br from-gray-900 via-purple-900 to-pink-900">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)`,
-            backgroundSize: '40px 40px'
-          }}></div>
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-start justify-between gap-3 rounded-2xl border border-border bg-card p-6">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Your communities</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Manage and grow your community business.</p>
         </div>
-
-        {/* Title */}
-        <div className="absolute left-1/2 top-6 z-20 -translate-x-1/2 text-center">
-          <h2 className="mb-1 text-5xl font-bold text-white drop-shadow-2xl">
-            Your Communities
-          </h2>
-          <p className="text-lg text-white/80">
-            Manage and grow your community business
-          </p>
-        </div>
-
-        {/* 3D Carousel Container - CENTERED */}
-        <div className="absolute inset-0 flex items-center justify-center" style={{ perspective: '1000px' }}>
-          <div 
-            className="relative h-64 w-full"
-            style={{
-              transformStyle: 'preserve-3d',
-              transform: `translateY(-100px) translateZ(-350px) rotateY(${-currentCarouselIndex * 60}deg)`,
-              transition: 'transform 0.7s ease-out'
-            }}
-          >
-            {/* Category Cards in 3D Circle */}
-            {categories.map((category, index) => {
-              const Icon = category.icon;
-              const angle = (index * 360) / categories.length;
-              
-              return (
-                <div
-                  key={category.name}
-                  className="absolute left-1/2 top-1/2 h-72 w-64 -translate-x-1/2 -translate-y-1/2 cursor-pointer"
-                  style={{
-                    transform: `rotateY(${angle}deg) translateZ(350px)`,
-                    transformStyle: 'preserve-3d'
-                  }}
-                  onClick={() => setCurrentCarouselIndex(index)}
-                >
-                  <div className="group h-full w-full overflow-hidden rounded-2xl shadow-2xl transition-all hover:scale-110">
-                    {/* Card Image */}
-                    <div className="relative h-full w-full">
-                      <img
-                        src={category.image}
-                        alt={category.name}
-                        className="h-full w-full object-cover"
-                      />
-                      <div className={`absolute inset-0 bg-gradient-to-br ${category.color} opacity-70`} />
-                      
-                      {/* Card Content */}
-                      <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-white">
-                        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white/20 backdrop-blur-md">
-                          <Icon className="h-8 w-8" />
-                        </div>
-                        <h3 className="mb-2 text-2xl font-bold">
-                          {category.name}
-                        </h3>
-                        <p className="text-center text-sm text-white/80">
-                          Discover amazing communities
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Navigation Controls */}
-        <div className="absolute bottom-4 left-1/2 z-30 flex -translate-x-1/2 items-center gap-4">
-          <button
-            onClick={() => setCurrentCarouselIndex((prev) => prev - 1)}
-            className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-md transition-all hover:bg-white/20 hover:scale-110"
-          >
-            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-
-          {/* Indicators */}
-          <div className="flex gap-2">
-            {categories.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => setCurrentCarouselIndex(idx)}
-                className={`h-2 rounded-full transition-all ${
-                  idx === currentCarouselIndex % categories.length
-                    ? "w-8 bg-white"
-                    : "w-2 bg-white/40 hover:bg-white/60"
-                }`}
-              />
-            ))}
-          </div>
-
-          <button
-            onClick={() => setCurrentCarouselIndex((prev) => prev + 1)}
-            className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-md transition-all hover:bg-white/20 hover:scale-110"
-          >
-            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-        </div>
-
-        {/* Create Button */}
-        <div className="absolute right-8 top-6 z-30">
+        <div className="flex items-center gap-2">
+          <Link href="/dashboard/sessions/create">
+            <Button variant="outline">
+              <Calendar className="mr-2 h-4 w-4" />
+              Schedule session
+            </Button>
+          </Link>
           <Link href="/dashboard/communities/new">
-            <Button size="lg" className="bg-white text-gray-900 shadow-2xl hover:bg-gray-100 hover:scale-105 transition-all">
-              <Plus className="mr-2 h-5 w-5" />
-              Create Community
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Create community
             </Button>
           </Link>
         </div>
       </div>
 
-      {/* 🔍 SEARCH & FILTERS BAR */}
-      <div className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-6 shadow-sm lg:flex-row lg:items-center lg:justify-between">
-        {/* Search */}
-        <div className="relative flex-1 lg:max-w-md">
-          <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder="Search communities..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 pl-10 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-          />
-        </div>
-
-        {/* Filters & Sort */}
-        <div className="flex flex-wrap items-center gap-3">
-          {/* Privacy Filter */}
-          <select
-            value={filterPrivacy}
-            onChange={(e) => setFilterPrivacy(e.target.value as any)}
-            className="rounded-lg border border-border bg-background px-4 py-2 text-sm"
-          >
-            <option value="all">{t("communities.allCommunities")}</option>
-            <option value="public">{t("communities.public")}</option>
-            <option value="private">{t("communities.private")}</option>
-          </select>
-
-          {/* Sort */}
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as any)}
-            className="rounded-lg border border-border bg-background px-4 py-2 text-sm"
-          >
-            <option value="recent">{t("common.recent")}</option>
-            <option value="members">{t("communities.mostMembers")}</option>
-            <option value="posts">{t("communities.mostActive")}</option>
-            <option value="name">{t("common.alphabetical")}</option>
-          </select>
-
-          {/* View Toggle */}
-          <div className="flex rounded-lg border border-border bg-background">
-            <button
-              onClick={() => setViewMode("grid")}
-              className={`p-2 ${
-                viewMode === "grid"
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              } rounded-l-lg transition-colors`}
+      <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
+        <p className="text-sm font-semibold text-amber-900">🚀 Get your community started</p>
+        <div className="mt-3 grid gap-2 md:grid-cols-3">
+          {activationChecklist.map((item) => (
+            <Link
+              key={item.label}
+              href={item.href}
+              className={`rounded-lg border px-3 py-2 text-sm ${
+                item.done
+                  ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                  : "border-amber-200 bg-white text-amber-900"
+              }`}
             >
-              <Grid3x3 className="h-5 w-5" />
-            </button>
-            <button
-              onClick={() => setViewMode("list")}
-              className={`p-2 ${
-                viewMode === "list"
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              } rounded-r-lg transition-colors`}
-            >
-              <List className="h-5 w-5" />
-            </button>
-          </div>
+              {item.done ? "☑" : "☐"} {item.label}
+            </Link>
+          ))}
         </div>
       </div>
 
-      {/* 📊 STATS CARDS */}
-      {communities.length > 0 && (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="group rounded-2xl border border-border bg-gradient-to-br from-card to-card/50 p-6 shadow-sm transition-all hover:scale-105 hover:shadow-xl">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Communities</p>
-                <p className="mt-2 text-3xl font-bold text-foreground">{communities.length}</p>
-              </div>
-              <div className="rounded-xl bg-primary/10 p-3 transition-transform group-hover:rotate-12">
-                <Users className="h-6 w-6 text-primary" />
-              </div>
-            </div>
-          </div>
-
-          <div className="group rounded-2xl border border-border bg-gradient-to-br from-card to-card/50 p-6 shadow-sm transition-all hover:scale-105 hover:shadow-xl">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Members</p>
-                <p className="mt-2 text-3xl font-bold text-foreground">{totalMembers}</p>
-              </div>
-              <div className="rounded-xl bg-green-500/10 p-3 transition-transform group-hover:rotate-12">
-                <Users className="h-6 w-6 text-green-500" />
-              </div>
-            </div>
-          </div>
-
-          <div className="group rounded-2xl border border-border bg-gradient-to-br from-card to-card/50 p-6 shadow-sm transition-all hover:scale-105 hover:shadow-xl">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Owned</p>
-                <p className="mt-2 text-3xl font-bold text-foreground">{ownedCommunities}</p>
-              </div>
-              <div className="rounded-xl bg-amber-500/10 p-3 transition-transform group-hover:rotate-12">
-                <Crown className="h-6 w-6 text-amber-500" />
-              </div>
-            </div>
-          </div>
-
-          <div className="group rounded-2xl border border-border bg-gradient-to-br from-card to-card/50 p-6 shadow-sm transition-all hover:scale-105 hover:shadow-xl">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Posts</p>
-                <p className="mt-2 text-3xl font-bold text-foreground">{totalPosts}</p>
-              </div>
-              <div className="rounded-xl bg-blue-500/10 p-3 transition-transform group-hover:rotate-12">
-                <TrendingUp className="h-6 w-6 text-blue-500" />
-              </div>
-            </div>
-          </div>
+      <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="relative w-full lg:max-w-sm">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder="Search your communities..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="h-10 w-full rounded-md border border-input bg-background pl-9 pr-3 text-sm"
+          />
         </div>
-      )}
-
-      {/* 📈 GROWTH INSIGHTS WIDGET */}
-      {communities.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Quick Tips */}
-          <div className="lg:col-span-3">
-            <div className="rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50 p-6 shadow-sm">
-              <div className="flex items-start gap-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg">
-                  <TrendingUp className="h-6 w-6 text-white" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-bold text-lg text-amber-900 mb-2">
-                    Grow your community faster
-                  </h3>
-                  <div className="grid sm:grid-cols-3 gap-3">
-                    <div className="flex items-center gap-2 text-sm text-amber-800">
-                      <div className="h-6 w-6 rounded-full bg-amber-200 flex items-center justify-center text-xs font-bold">1</div>
-                      <span>Invite your first members</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-amber-800">
-                      <div className="h-6 w-6 rounded-full bg-amber-200 flex items-center justify-center text-xs font-bold">2</div>
-                      <span>Schedule your first live session</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-amber-800">
-                      <div className="h-6 w-6 rounded-full bg-amber-200 flex items-center justify-center text-xs font-bold">3</div>
-                      <span>Post your first content</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Mini Stats */}
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-            <h4 className="font-semibold text-sm text-muted-foreground mb-3">Community Growth</h4>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm">Members</span>
-                <span className="font-bold text-green-600">{totalMembers}</span>
-              </div>
-              <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                <div className="h-full bg-green-500 rounded-full" style={{ width: `${Math.min((totalMembers / 100) * 100, 100)}%` }} />
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm">Posts</span>
-                <span className="font-bold text-blue-600">{totalPosts}</span>
-              </div>
-              <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                <div className="h-full bg-blue-500 rounded-full" style={{ width: `${Math.min((totalPosts / 50) * 100, 100)}%` }} />
-              </div>
-              <div className="flex justify-between items-center text-xs text-muted-foreground pt-1">
-                <span>Engagement rate</span>
-                <span className="font-medium">{communities.length > 0 ? Math.round((totalPosts / Math.max(totalMembers, 1)) * 100) : 0}%</span>
-              </div>
-            </div>
-          </div>
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <span>{filteredCommunities.length} communities</span>
+          <span>·</span>
+          <span>{totalMembers} members</span>
         </div>
-      )}
+      </div>
 
-      {/* 🎨 COMMUNITIES GRID/LIST */}
       {filteredCommunities.length > 0 ? (
-        <div>
-          {/* Section Header with Tabs */}
-          <div className="mb-8 flex items-center justify-between">
-            <div>
-              <h2 className="text-3xl font-bold text-foreground">
-                Your Communities
-              </h2>
-              <p className="mt-1 text-muted-foreground">
-                {filteredCommunities.length} {filteredCommunities.length === 1 ? 'community' : 'communities'} • Growing daily
-              </p>
-            </div>
-            
-            {/* Featured Badges */}
-            <div className="hidden items-center gap-2 lg:flex">
-              <div className="flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-2 text-sm font-semibold text-white shadow-lg">
-                <Crown className="h-4 w-4" />
-                <span>{ownedCommunities} Owned</span>
-              </div>
-              <div className="flex items-center gap-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow-lg">
-                <Users className="h-4 w-4" />
-                <span>{totalMembers} Members</span>
-              </div>
-            </div>
-          </div>
-          
-          {viewMode === "grid" ? (
-            // 🎨 EPIC GRID VIEW - SUPERIOR TO SKOOL
-            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              {filteredCommunities.map((community, index) => (
-                <Link
-                  key={community.id}
-                  href={`/dashboard/c/${community.slug}`}
-                  className="group relative"
-                >
-                  <div className="relative overflow-hidden rounded-3xl border-2 border-border bg-card shadow-xl transition-all duration-500 hover:scale-[1.02] hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/20">
-                    {/* Ranking Badge */}
-                    {index < 3 && (
-                      <div className="absolute left-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500 font-bold text-white shadow-2xl">
-                        #{index + 1}
-                      </div>
-                    )}
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {filteredCommunities.map((community) => {
+            const sessionState = getSessionState(community.nextSession);
 
-                    {/* Cover Image with Overlay */}
-                    <div className="relative h-48 overflow-hidden">
-                      {community.coverImageUrl ? (
-                        <img
-                          src={community.coverImageUrl}
-                          alt={community.name}
-                          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        />
-                      ) : (
-                        <div className={`h-full w-full bg-gradient-to-br ${categories[index % categories.length].color}`} />
-                      )}
-                      
-                      {/* Gradient Overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-                      
-                      {/* Badges on Cover */}
-                      <div className="absolute right-4 top-4 flex flex-col gap-2">
-                        {community.isPrivate && (
-                          <div className="flex items-center gap-1 rounded-full bg-black/60 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-md">
-                            <Lock className="h-3 w-3" />
-                            Private
-                          </div>
-                        )}
-                        {community.role === "OWNER" && (
-                          <div className="flex items-center gap-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-3 py-1.5 text-xs font-bold text-white shadow-lg">
-                            <Crown className="h-3 w-3" />
-                            Owner
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Stats on Cover */}
-                      <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
-                        <div className="flex items-center gap-3 text-white">
-                          <div className="flex items-center gap-1.5 rounded-full bg-black/40 px-3 py-1.5 backdrop-blur-md">
-                            <Users className="h-4 w-4" />
-                            <span className="text-sm font-semibold">{community._count.members.toLocaleString()}</span>
-                          </div>
-                          <div className="flex items-center gap-1.5 rounded-full bg-black/40 px-3 py-1.5 backdrop-blur-md">
-                            <TrendingUp className="h-4 w-4" />
-                            <span className="text-sm font-semibold">{community._count.posts}</span>
-                          </div>
-                        </div>
-                        
-                        {/* Quick Actions */}
-                        <div className="flex items-center gap-2">
-                          {community.role === "OWNER" && (
-                            <Link
-                              href={`/dashboard/c/${community.slug}/settings`}
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <Button size="sm" variant="secondary" className="bg-white/90 text-gray-900 hover:bg-white">
-                                Manage
-                              </Button>
-                            </Link>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Content */}
-                    <div className="p-6">
-                      {/* Logo + Name */}
-                      <div className="mb-4 flex items-start gap-4">
-                        {/* Logo */}
-                        <div className="relative -mt-12 shrink-0">
-                          <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl border-4 border-background bg-gradient-to-br from-primary to-primary/70 shadow-2xl">
-                            {community.imageUrl ? (
-                              <img
-                                src={community.imageUrl}
-                                alt={community.name}
-                                className="h-full w-full object-cover"
-                              />
-                            ) : (
-                              <Users className="h-10 w-10 text-primary-foreground" />
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Name + Quick Stats */}
-                        <div className="min-w-0 flex-1 pt-2">
-                          <h3 className="mb-2 truncate text-xl font-bold text-foreground transition-colors group-hover:text-primary">
-                            {community.name}
-                          </h3>
-                          {community.description && (
-                            <p className="line-clamp-2 text-sm text-muted-foreground">
-                              {community.description}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Activity Stats - Mejora 1 */}
-                      <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground border-t border-border pt-4">
-                        <div className="flex items-center gap-1.5">
-                          <Users className="h-4 w-4" />
-                          <span className="font-medium">{community._count.members} {community._count.members === 1 ? 'member' : 'members'}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <TrendingUp className="h-4 w-4" />
-                          <span className="font-medium">{community._count.posts} {community._count.posts === 1 ? 'post' : 'posts'}</span>
-                        </div>
-                      </div>
-
-                      {/* Bottom Info with Activity Status */}
-                      <div className="mt-3 flex items-center justify-between">
-                        {(() => {
-                          const activity = getActivityStatus(community._count.posts, community._count.members);
-                          return (
-                            <span className={`text-xs ${activity.isActive ? 'text-green-600 font-medium' : 'text-amber-600'}`}>
-                              {activity.text}
-                            </span>
-                          );
-                        })()}
-                        
-                        {/* Quick Actions on Hover - Mejora 2 */}
-                        <div className="flex items-center gap-2">
-                          {/* Default Arrow (visible when not hovered) */}
-                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary transition-all group-hover:hidden">
-                            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                            </svg>
-                          </div>
-                          
-                          {/* Hover Actions (visible on hover) */}
-                          <div className="hidden items-center gap-2 group-hover:flex">
-                            <Link
-                              href={`/dashboard/c/${community.slug}`}
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <Button size="sm" className="bg-primary text-white hover:bg-primary/90">
-                                <ExternalLink className="mr-1 h-3 w-3" />
-                                Open
-                              </Button>
-                            </Link>
-                            <Link
-                              href={`/dashboard/c/${community.slug}/invite`}
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <Button size="sm" variant="outline" className="border-green-500 text-green-600 hover:bg-green-50">
-                                <UserPlus className="mr-1 h-3 w-3" />
-                                Invite
-                              </Button>
-                            </Link>
-                            {community.role === "OWNER" && (
-                              <Link
-                                href={`/dashboard/c/${community.slug}/analytics`}
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <Button size="sm" variant="outline" className="border-amber-500 text-amber-600 hover:bg-amber-50">
-                                  <BarChart3 className="mr-1 h-3 w-3" />
-                                  Analytics
-                                </Button>
-                              </Link>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+            return (
+              <div key={community.id} className="rounded-2xl border border-border bg-card p-5">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="truncate text-lg font-semibold text-foreground">{community.name}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {community._count.members} members · {community._count.posts} posts
+                    </p>
                   </div>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            // 📋 ENHANCED LIST VIEW
-            <div className="space-y-4">
-              {filteredCommunities.map((community, index) => (
-                <Link
-                  key={community.id}
-                  href={`/dashboard/c/${community.slug}`}
-                  className="group"
-                >
-                  <div className="flex items-center gap-6 overflow-hidden rounded-2xl border-2 border-border bg-card p-6 shadow-lg transition-all hover:scale-[1.01] hover:border-primary/50 hover:shadow-xl hover:shadow-primary/10">
-                    {/* Ranking */}
-                    {index < 3 && (
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-lg font-bold text-white shadow-lg">
-                        #{index + 1}
-                      </div>
+                  <div className="flex items-center gap-1">
+                    {community.role === "OWNER" && (
+                      <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
+                        <Crown className="mr-1 inline h-3 w-3" />
+                        Owner
+                      </span>
                     )}
-
-                    {/* Logo */}
-                    <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-primary to-primary/70 shadow-lg">
-                      {community.imageUrl ? (
-                        <img
-                          src={community.imageUrl}
-                          alt={community.name}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <Users className="h-8 w-8 text-primary-foreground" />
-                      )}
-                    </div>
-
-                    {/* Info */}
-                    <div className="min-w-0 flex-1">
-                      <div className="mb-2 flex items-center gap-2">
-                        <h3 className="truncate text-xl font-bold text-foreground transition-colors group-hover:text-primary">
-                          {community.name}
-                        </h3>
-                        {community.role === "OWNER" && (
-                          <span className="flex items-center gap-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-2 py-0.5 text-xs font-bold text-white">
-                            <Crown className="h-3 w-3" />
-                            Owner
-                          </span>
-                        )}
-                        {community.isPrivate && (
-                          <span className="flex items-center gap-1 rounded-full bg-gray-500 px-2 py-0.5 text-xs font-semibold text-white">
-                            <Lock className="h-3 w-3" />
-                            Private
-                          </span>
-                        )}
-                      </div>
-                      {community.description && (
-                        <p className="line-clamp-1 text-sm text-muted-foreground">
-                          {community.description}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Stats with Activity Status */}
-                    <div className="flex flex-col items-end gap-2">
-                      <div className="flex items-center gap-6 text-sm">
-                        <div className="text-center">
-                          <div className="text-2xl font-bold text-foreground">{community._count.members.toLocaleString()}</div>
-                          <div className="text-xs text-muted-foreground">Members</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-2xl font-bold text-foreground">{community._count.posts}</div>
-                          <div className="text-xs text-muted-foreground">Posts</div>
-                        </div>
-                      </div>
-                      {(() => {
-                        const activity = getActivityStatus(community._count.posts, community._count.members);
-                        return (
-                          <span className={`text-xs ${activity.isActive ? 'text-green-600 font-medium' : 'text-amber-600'}`}>
-                            {activity.text}
-                          </span>
-                        );
-                      })()}
-                    </div>
-
-                    {/* Quick Actions on Hover */}
-                    <div className="flex items-center gap-2">
-                      {/* Default Arrow (visible when not hovered) */}
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-all group-hover:hidden">
-                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </div>
-                      
-                      {/* Hover Actions (visible on hover) */}
-                      <div className="hidden items-center gap-2 group-hover:flex">
-                        <Link
-                          href={`/dashboard/c/${community.slug}`}
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <Button size="sm" className="bg-primary text-white hover:bg-primary/90">
-                            <ExternalLink className="mr-1 h-3 w-3" />
-                            Open
-                          </Button>
-                        </Link>
-                        <Link
-                          href={`/dashboard/c/${community.slug}/invite`}
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <Button size="sm" variant="outline" className="border-green-500 text-green-600 hover:bg-green-50">
-                            <UserPlus className="mr-1 h-3 w-3" />
-                            Invite
-                          </Button>
-                        </Link>
-                        {community.role === "OWNER" && (
-                          <Link
-                            href={`/dashboard/c/${community.slug}/analytics`}
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <Button size="sm" variant="outline" className="border-amber-500 text-amber-600 hover:bg-amber-50">
-                              <BarChart3 className="mr-1 h-3 w-3" />
-                              Analytics
-                            </Button>
-                          </Link>
-                        )}
-                      </div>
-                    </div>
+                    {community.isPrivate && (
+                      <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-semibold text-zinc-700">
+                        <Lock className="mr-1 inline h-3 w-3" />
+                        Private
+                      </span>
+                    )}
                   </div>
-                </Link>
-              ))}
-            </div>
-          )}
+                </div>
+
+                <div className="mt-4 rounded-lg border border-border bg-muted/30 p-3">
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">Next session</p>
+                  {community.nextSession ? (
+                    <>
+                      <p className="mt-1 line-clamp-1 text-sm font-medium text-foreground">{community.nextSession.title}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">{sessionState.label}</p>
+                    </>
+                  ) : (
+                    <p className="mt-1 text-sm text-muted-foreground">No sessions scheduled</p>
+                  )}
+                </div>
+
+                <div className="mt-4 flex items-center justify-between">
+                  <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${sessionState.badgeClass}`}>
+                    {sessionState.state === "live" ? (
+                      <>
+                        <Radio className="mr-1 inline h-3 w-3" />
+                        Live now
+                      </>
+                    ) : sessionState.state === "none" ? (
+                      "No session"
+                    ) : sessionState.state === "today" ? (
+                      "Today"
+                    ) : (
+                      "Upcoming"
+                    )}
+                  </span>
+
+                  <div className="flex items-center gap-2">
+                    <Link href={`/dashboard/c/${community.slug}`}>
+                      <Button size="sm" variant="outline">Enter community</Button>
+                    </Link>
+                    <Link href={sessionState.href}>
+                      <Button size="sm">
+                        {sessionState.state === "none" ? (
+                          <>
+                            <Calendar className="mr-1 h-3.5 w-3.5" />
+                            {sessionState.cta}
+                          </>
+                        ) : sessionState.state === "live" || sessionState.state === "today" ? (
+                          <>
+                            <Radio className="mr-1 h-3.5 w-3.5" />
+                            {sessionState.cta}
+                          </>
+                        ) : (
+                          <>
+                            {sessionState.cta}
+                            <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                          </>
+                        )}
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+
+                <div className="mt-3 flex items-center gap-3 border-t border-border pt-3 text-xs text-muted-foreground">
+                  <Link href={`/dashboard/c/${community.slug}/invite`} className="inline-flex items-center hover:text-foreground">
+                    <UserPlus className="mr-1 h-3.5 w-3.5" />
+                    Invite members
+                  </Link>
+                  <Link href="/dashboard/feed" className="inline-flex items-center hover:text-foreground">
+                    <MessageSquare className="mr-1 h-3.5 w-3.5" />
+                    Create post
+                  </Link>
+                  <span className="inline-flex items-center">
+                    <Users className="mr-1 h-3.5 w-3.5" />
+                    {community._count.members}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
         </div>
       ) : (
-        /* Empty State - Show Explore Communities if available */
-        exploreCommunities.length > 0 ? (
-          <div className="space-y-6">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-foreground">Discover Communities</h2>
-              <p className="mt-2 text-muted-foreground">Join a community to get started</p>
-            </div>
-            
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {exploreCommunities.map((community) => (
-                <Link
-                  key={community.id}
-                  href={`/dashboard/c/${community.slug}`}
-                  className="group relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl"
-                >
-                  {/* Cover Image */}
-                  <div className="absolute inset-0 h-32 overflow-hidden">
-                    {community.coverImageUrl ? (
-                      <img
-                        src={community.coverImageUrl}
-                        alt=""
-                        className="h-full w-full object-cover opacity-20 transition-transform group-hover:scale-110"
-                      />
-                    ) : (
-                      <div className="h-full w-full bg-gradient-to-br from-primary/10 to-purple-500/10" />
-                    )}
-                  </div>
-
-                  {/* Content */}
-                  <div className="relative pt-20">
-                    {/* Community Image */}
-                    <div className="absolute -top-4 left-6 h-20 w-20 overflow-hidden rounded-2xl border-4 border-card shadow-lg">
-                      {community.imageUrl ? (
-                        <img
-                          src={community.imageUrl}
-                          alt={community.name}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary to-purple-600">
-                          <Users className="h-8 w-8 text-white" />
-                        </div>
-                      )}
-                    </div>
-
-                    <h3 className="mb-1 text-xl font-bold text-foreground group-hover:text-primary">
-                      {community.name}
-                    </h3>
-                    
-                    {community.description && (
-                      <p className="mb-3 line-clamp-2 text-sm text-muted-foreground">
-                        {community.description}
-                      </p>
-                    )}
-
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <span className="flex items-center gap-1">
-                        <Users className="h-4 w-4" />
-                        {community._count?.members || 0} members
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <TrendingUp className="h-4 w-4" />
-                        {community._count?.posts || 0} posts
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-
-            <div className="text-center">
-              <p className="text-muted-foreground">or</p>
-              <Link href="/dashboard/communities/new" className="mt-2 inline-block">
-                <Button variant="outline" size="lg">
-                  <Plus className="mr-2 h-5 w-5" />
-                  Create Your Own Community
-                </Button>
-              </Link>
-            </div>
-          </div>
-        ) : (
-          <div className="flex min-h-[400px] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-gradient-to-br from-card/50 to-accent/20 p-12 text-center">
-            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-primary/5">
-              <Users className="h-10 w-10 text-primary" />
-            </div>
-            <h2 className="mb-2 text-2xl font-bold text-foreground">
-              {searchQuery ? "No communities found" : "No communities yet"}
-            </h2>
-            <p className="mb-6 max-w-md text-muted-foreground">
-              {searchQuery
-                ? "Try adjusting your search or filters"
-                : "Create your first community to start building your audience"}
-            </p>
+        <div className="flex min-h-[320px] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-card p-10 text-center">
+          <Users className="h-10 w-10 text-primary" />
+          <h2 className="mt-4 text-xl font-bold text-foreground">
+            {searchQuery ? "No communities found" : "No communities yet"}
+          </h2>
+          <p className="mt-2 max-w-md text-sm text-muted-foreground">
+            {searchQuery
+              ? "Try another search term."
+              : "Create your first community or explore existing communities to get started."}
+          </p>
+          <div className="mt-5 flex items-center gap-2">
             <Link href="/dashboard/communities/new">
-              <Button size="lg" className="bg-gradient-to-r from-primary to-primary/80 shadow-lg">
-                <Plus className="mr-2 h-5 w-5" />
-                Create Community
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                Create community
               </Button>
             </Link>
+            <Link href="/dashboard/communities/explore">
+              <Button variant="outline">Explore communities</Button>
+            </Link>
           </div>
-        )
+        </div>
       )}
     </div>
   );

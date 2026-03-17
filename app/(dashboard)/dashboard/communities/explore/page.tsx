@@ -2,8 +2,17 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/auth-utils";
-import { Search, Users, TrendingUp, Filter } from "lucide-react";
+import { Search, Users, TrendingUp, Filter, Sparkles, Dumbbell, Briefcase, Code, BookOpen, Palette } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+const discoveryCategories = [
+  { name: "Spiritual", icon: Sparkles, color: "from-purple-500/30 to-pink-500/30" },
+  { name: "Fitness", icon: Dumbbell, color: "from-green-500/30 to-emerald-500/30" },
+  { name: "Business", icon: Briefcase, color: "from-blue-500/30 to-cyan-500/30" },
+  { name: "Technology", icon: Code, color: "from-indigo-500/30 to-purple-500/30" },
+  { name: "Education", icon: BookOpen, color: "from-orange-500/30 to-red-500/30" },
+  { name: "Creative", icon: Palette, color: "from-pink-500/30 to-rose-500/30" },
+];
 
 async function getPublicCommunities(userId?: string) {
   // Get communities that are public
@@ -74,32 +83,45 @@ export default async function ExplorePage() {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
-      <div className="space-y-4">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">
-            Explore Communities
-          </h1>
-          <p className="mt-2 text-muted-foreground">
-            Discover and join amazing communities on Unytea
+      <div className="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-gray-900 via-purple-900 to-pink-900 p-8">
+        <div className="absolute inset-0 opacity-15" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.22) 1px, transparent 0)", backgroundSize: "36px 36px" }} />
+        <div className="relative z-10">
+          <h1 className="text-3xl font-bold text-white">Explore Communities</h1>
+          <p className="mt-2 max-w-2xl text-white/80">
+            Discover communities by topic, find your people, and join high-signal conversations.
           </p>
-        </div>
 
-        {/* Search Bar */}
-        <div className="flex items-center space-x-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder="Search communities..."
-              className="w-full rounded-xl border border-border bg-background py-3 pl-12 pr-4 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-            />
+          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {discoveryCategories.map((category) => {
+              const Icon = category.icon;
+              return (
+                <div key={category.name} className={`rounded-xl border border-white/20 bg-gradient-to-br ${category.color} p-4 backdrop-blur-sm`}>
+                  <div className="flex items-center gap-2 text-white">
+                    <Icon className="h-4 w-4" />
+                    <span className="font-medium">{category.name}</span>
+                  </div>
+                  <p className="mt-2 text-xs text-white/80">Discover active communities in {category.name.toLowerCase()}.</p>
+                </div>
+              );
+            })}
           </div>
-          <Button variant="outline" className="flex items-center space-x-2">
-            <Filter className="h-4 w-4" />
-            <span className="hidden sm:inline">Filters</span>
-          </Button>
         </div>
+      </div>
+
+      {/* Search Bar */}
+      <div className="flex items-center space-x-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder="Search communities..."
+            className="w-full rounded-xl border border-border bg-background py-3 pl-12 pr-4 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+          />
+        </div>
+        <Button variant="outline" className="flex items-center space-x-2">
+          <Filter className="h-4 w-4" />
+          <span className="hidden sm:inline">Filters</span>
+        </Button>
       </div>
 
       {/* Stats */}

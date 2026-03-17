@@ -126,10 +126,33 @@ export async function GET() {
 
     console.log("✅ API: Found memberships:", memberships.length);
 
-    const myCommunities = memberships.map((m) => ({
-      ...m.community,
-      role: m.role,
-    }));
+    const myCommunities = await Promise.all(
+      memberships.map(async (m) => {
+        const nextSession = await prisma.session.findFirst({
+          where: {
+            communityId: m.community.id,
+            status: {
+              in: ["SCHEDULED", "IN_PROGRESS"],
+            },
+          },
+          orderBy: {
+            scheduledAt: "asc",
+          },
+          select: {
+            id: true,
+            title: true,
+            scheduledAt: true,
+            status: true,
+          },
+        });
+
+        return {
+          ...m.community,
+          role: m.role,
+          nextSession,
+        };
+      })
+    );
 
     // Get IDs of communities user is already a member of
     const myCommunityIds = myCommunities.map((c) => c.id);
