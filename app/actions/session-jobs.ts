@@ -252,6 +252,7 @@ export async function sendSessionReminders() {
     const now = new Date();
 
     const windows = [
+      { minutes: 24 * 60, title: "Session starts in 24 hours", key: "24h" },
       { minutes: 60, title: "Session starts in 1 hour", key: "1h" },
       { minutes: 10, title: "Session starts in 10 minutes", key: "10m" },
     ];
@@ -271,6 +272,13 @@ export async function sendSessionReminders() {
         },
         include: {
           participations: {
+            where: {
+              OR: [
+                { eventsData: { path: ["rsvpStatus"], equals: "attending" } },
+                { eventsData: { path: ["rsvpStatus"], equals: "interested" } },
+                { eventsData: { path: ["rsvp"], equals: true } },
+              ],
+            },
             include: {
               user: { select: { id: true, name: true } },
             },
@@ -309,7 +317,7 @@ export async function sendSessionReminders() {
               data: {
                 type: "SESSION_REMINDER",
                 title: window.title,
-                message: `${session.title} starts at ${session.scheduledAt.toLocaleTimeString()}`,
+                message: `${session.title} starts at ${session.scheduledAt.toLocaleTimeString()} · Join now so you don't miss it`,
                 data: {
                   notificationKey: reminderKey,
                   sessionId: session.id,
@@ -317,6 +325,7 @@ export async function sendSessionReminders() {
                   scheduledAt: session.scheduledAt.toISOString(),
                   reminderType: window.key,
                   link: reminderLink,
+                  cta: "Join now",
                 },
                 userId,
               },

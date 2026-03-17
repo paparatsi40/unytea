@@ -70,6 +70,16 @@ function getUpcomingSessionWeight(nextSessionAt: Date | null, now: Date): number
   return 0;
 }
 
+function getSessionUrgencyLabel(date: Date): string {
+  const now = new Date();
+  const hoursUntil = (date.getTime() - now.getTime()) / (1000 * 60 * 60);
+
+  if (hoursUntil <= 2) return "🟢 Starting soon";
+  if (hoursUntil <= 24) return "🟢 Today";
+  if (hoursUntil <= 72) return "🟢 This week";
+  return "🟢 Upcoming";
+}
+
 function getBoostScore(settings: unknown): number {
   if (!settings || typeof settings !== "object") return 0;
   const value = (settings as Record<string, unknown>).boostScore;
@@ -454,7 +464,7 @@ export default async function ExploreCommunitiesPage({
                       >
                         <p className="text-sm font-semibold text-foreground">{session.title}</p>
                         <p className="mt-1 text-xs text-muted-foreground">
-                          Today · {session.scheduledAt.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
+                          {getSessionUrgencyLabel(session.scheduledAt)} · {session.scheduledAt.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
                         </p>
                         <p className="mt-2 text-sm text-muted-foreground">🔥 {session.attendingCount} attending</p>
                         <p className="mt-2 text-xs font-medium text-primary">View community →</p>
@@ -476,7 +486,7 @@ export default async function ExploreCommunitiesPage({
                       >
                         <p className="text-sm font-semibold text-foreground">{session.title}</p>
                         <p className="mt-1 text-xs text-muted-foreground">
-                          Tomorrow · {session.scheduledAt.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
+                          {getSessionUrgencyLabel(session.scheduledAt)} · {session.scheduledAt.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
                         </p>
                         <p className="mt-2 text-sm text-muted-foreground">🔥 {session.attendingCount} attending</p>
                         <p className="mt-2 text-xs font-medium text-primary">View community →</p>
@@ -498,7 +508,7 @@ export default async function ExploreCommunitiesPage({
                       >
                         <p className="text-sm font-semibold text-foreground">{session.title}</p>
                         <p className="mt-1 text-xs text-muted-foreground">
-                          {session.scheduledAt.toLocaleDateString("en-US", { weekday: "long" })} · {session.scheduledAt.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
+                          {getSessionUrgencyLabel(session.scheduledAt)} · {session.scheduledAt.toLocaleDateString("en-US", { weekday: "long" })} · {session.scheduledAt.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
                         </p>
                         <p className="mt-2 text-sm text-muted-foreground">🔥 {session.attendingCount} attending</p>
                         <p className="mt-2 text-xs font-medium text-primary">View community →</p>

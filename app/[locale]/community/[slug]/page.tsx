@@ -29,6 +29,17 @@ function formatSchedule(date: Date | null) {
   });
 }
 
+function sessionUrgencyLabel(date: Date | null) {
+  if (!date) return "🟢 Next session coming soon";
+  const now = new Date();
+  const hoursUntil = (date.getTime() - now.getTime()) / (1000 * 60 * 60);
+
+  if (hoursUntil <= 2) return "🟢 Starting soon";
+  if (hoursUntil <= 24) return "🟢 Today";
+  if (hoursUntil <= 72) return "🟢 This week";
+  return "🟢 Upcoming";
+}
+
 function trackPublicCommunityEvent(params: {
   eventName:
     | "community_preview_view"
@@ -354,8 +365,8 @@ export default async function CommunityPublicPreviewPage({
         <section className="rounded-xl border border-primary/30 bg-primary/5 p-6">
           <p className="text-xs uppercase tracking-wide text-muted-foreground">Next Live Session</p>
           <h2 className="mt-2 text-xl font-semibold text-foreground">{nextSession?.title || "Weekly Community Q&A"}</h2>
-          <p className="mt-1 text-sm text-muted-foreground">{formatSchedule(nextSession?.scheduledAt ?? null)}</p>
-          <p className="mt-1 text-sm text-muted-foreground">{nextSessionAttendingCount} attending</p>
+          <p className="mt-1 text-sm text-muted-foreground">{sessionUrgencyLabel(nextSession?.scheduledAt ?? null)} · {formatSchedule(nextSession?.scheduledAt ?? null)}</p>
+          <p className="mt-1 text-sm text-muted-foreground">🔥 {nextSessionAttendingCount} attending</p>
           <p className="mt-2 text-sm text-muted-foreground">Join the community to attend live sessions.</p>
           <p className="mt-1 text-xs text-muted-foreground">Members receive reminders automatically.</p>
           <div className="mt-4">
