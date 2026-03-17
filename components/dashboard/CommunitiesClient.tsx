@@ -381,8 +381,8 @@ export function CommunitiesClient() {
     <div className="mx-auto max-w-6xl space-y-5">
       {primaryCommunity && hero && (
         <section className="rounded-[28px] border border-border/70 bg-card shadow-sm">
-          <div className="rounded-[28px] bg-gradient-to-br from-background via-background to-muted/20 p-6 md:p-7">
-            <div className="max-w-3xl space-y-5">
+          <div className="rounded-[28px] bg-gradient-to-br from-background via-background to-muted/20 p-5 md:p-6">
+            <div className="max-w-3xl space-y-4">
               <div className="space-y-2">
                 <div className="flex flex-wrap items-center gap-2">
                   <h1 className="text-3xl font-semibold tracking-tight text-foreground">
@@ -503,7 +503,7 @@ export function CommunitiesClient() {
             return (
               <div
                 key={community.id}
-                className="rounded-3xl border border-border/70 bg-card px-5 py-3 shadow-sm transition-colors hover:bg-muted/20"
+                className="rounded-3xl border border-border/70 bg-card px-5 py-3.5 shadow-sm transition-colors hover:bg-muted/20"
               >
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                   <div className="min-w-0 flex-1">
@@ -519,7 +519,7 @@ export function CommunitiesClient() {
                       {community._count.members} members · {community._count.posts} posts
                     </p>
 
-                    <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
+                    <div className="mt-2.5 flex flex-wrap items-center gap-2 text-sm">
                       <span className={`font-medium ${state.tone}`}>{state.eyebrow}</span>
                       <span className="text-muted-foreground">·</span>
                       <span className="text-foreground">{state.detail}</span>
@@ -546,7 +546,7 @@ export function CommunitiesClient() {
         </div>
       </section>
 
-      <section className="rounded-3xl border border-border/70 bg-card p-5 shadow-sm">
+      <section className="rounded-3xl border border-border/70 bg-card px-5 py-4 shadow-sm">
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
           Quick actions
         </p>
