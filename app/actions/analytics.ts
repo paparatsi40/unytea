@@ -560,6 +560,202 @@ export async function getLiveCommunityHealthMetrics(communityId?: string) {
   }
 }
 
+export async function getNorthStarDecisionSnapshot(communityId?: string) {
+  try {
+    const userId = await getCurrentUserId();
+    if (!userId) return { success: false, error: "Not authenticated" };
+
+    const ownedCommunities = await prisma.community.findMany({
+      where: { ownerId: userId },
+      select: { id: true, name: true, slug: true },
+      orderBy: { createdAt: "desc" },
+    });
+
+    const allCommunityIds = ownedCommunities.map((c) => c.id);
+    if (allCommunityIds.length === 0) {
+      return {
+        success: true,
+        communities: [],
+        selectedCommunityId: null,
+        northStar: {
+          waa: 0,
+          avgLiveAttendance: 0,
+          returningAttendeesRate: 0,
+          feedParticipationRate: 0,
+          contentReuseRate: 0,
+        },
+        diagnosis: "No communities yet",
+        actions: [
+          {
+            title: "Create your first community",
+            why: "You need one active community to start generating weekly active attendees.",
+            href: "/dashboard/communities/new",
+            cta: "Create community",
+          },
+        ],
+      };
+    }
+
+    const selectedCommunityId =
+      communityId && allCommunityIds.includes(communityId) ? communityId : null;
+    const communityIds = selectedCommunityId ? [selectedCommunityId] : allCommunityIds;
+
+    const now = new Date();
+    const last7Days = subDays(now, 7);
+
+    const [activeMembersCount, postUsers, commentUsers, participationRows, completedSessions7d, recordingBackedSessions, attendeeRows] = await Promise.all([
+      prisma.member.count({
+        where: {
+          communityId: { in: communityIds },
+          status: "ACTIVE",
+        },
+      }),
+      prisma.post.findMany({
+        where: {
+          communityId: { in: communityIds },
+          createdAt: { gte: last7Days },
+        },
+        select: { authorId: true },
+        distinct: ["authorId"],
+      }),
+      prisma.comment.findMany({
+        where: {
+          createdAt: { gte: last7Days },
+          post: { communityId: { in: communityIds } },
+        },
+        select: { authorId: true },
+        distinct: ["authorId"],
+      }),
+      prisma.sessionParticipation.findMany({
+        where: {
+          createdAt: { gte: last7Days },
+          session: { communityId: { in: communityIds } },
+        },
+        select: { userId: true },
+        distinct: ["userId"],
+      }),
+      prisma.mentorSession.findMany({
+        where: {
+          communityId: { in: communityIds },
+          status: "COMPLETED",
+          scheduledAt: { gte: last7Days },
+        },
+        select: { id: true, attendeeCount: true, recording: { select: { id: true } } },
+      }),
+      prisma.mentorSession.count({
+        where: {
+          communityId: { in: communityIds },
+          status: "COMPLETED",
+          scheduledAt: { gte: last7Days },
+          recording: { isNot: null },
+        },
+      }),
+      prisma.sessionParticipation.groupBy({
+        by: ["userId"],
+        where: {
+          session: {
+            communityId: { in: communityIds },
+            status: "COMPLETED",
+            scheduledAt: { gte: last7Days },
+          },
+        },
+        _count: { userId: true },
+      }),
+    ]);
+
+    const waaSet = new Set<string>([
+      ...postUsers.map((u) => u.authorId),
+      ...commentUsers.map((u) => u.authorId),
+      ...participationRows.map((u) => u.userId),
+    ]);
+
+    const waa = waaSet.size;
+    const avgLiveAttendance = completedSessions7d.length
+      ? Math.round(
+          completedSessions7d.reduce((sum, s) => sum + (s.attendeeCount || 0), 0) /
+            completedSessions7d.length
+        )
+      : 0;
+
+    const uniqueAttendees = attendeeRows.length;
+    const returningAttendees = attendeeRows.filter((r) => (r._count?.userId || 0) > 1).length;
+    const returningAttendeesRate = uniqueAttendees
+      ? Math.round((returningAttendees / uniqueAttendees) * 100)
+      : 0;
+
+    const feedParticipationRate = activeMembersCount
+      ? Math.round((postUsers.length + commentUsers.length > 0 ? new Set([...postUsers.map((p) => p.authorId), ...commentUsers.map((c) => c.authorId)]).size : 0) / activeMembersCount * 100)
+      : 0;
+
+    const contentReuseRate = completedSessions7d.length
+      ? Math.round((recordingBackedSessions / completedSessions7d.length) * 100)
+      : 0;
+
+    const weakSignals: string[] = [];
+    if (waa < 20) weakSignals.push("weekly active attendees are low");
+    if (avgLiveAttendance < 12) weakSignals.push("average live attendance is low");
+    if (returningAttendeesRate < 35) weakSignals.push("returning attendees are weak");
+    if (feedParticipationRate < 10) weakSignals.push("feed participation is low");
+    if (contentReuseRate < 50) weakSignals.push("session-to-content reuse is low");
+
+    const actions = [] as Array<{ title: string; why: string; href: string; cta: string }>;
+
+    if (avgLiveAttendance < 12) {
+      actions.push({
+        title: "Improve attendance this week",
+        why: "Low attendance usually improves with earlier reminders and clearer session promise.",
+        href: "/dashboard/sessions",
+        cta: "Optimize next session",
+      });
+    }
+    if (feedParticipationRate < 10) {
+      actions.push({
+        title: "Trigger pre-session discussion",
+        why: "Communities with pre-live discussion convert better to attendance.",
+        href: "/dashboard/communities",
+        cta: "Post discussion prompt",
+      });
+    }
+    if (contentReuseRate < 50) {
+      actions.push({
+        title: "Publish recaps and recordings",
+        why: "Reused content increases retention and monetization opportunities.",
+        href: "/dashboard/knowledge-library",
+        cta: "Publish to library",
+      });
+    }
+
+    if (actions.length === 0) {
+      actions.push({
+        title: "Scale your best format",
+        why: "Your key drivers are healthy; next gain comes from more weekly sessions and distribution.",
+        href: "/dashboard/sessions",
+        cta: "Schedule next session",
+      });
+    }
+
+    return {
+      success: true,
+      communities: ownedCommunities,
+      selectedCommunityId,
+      northStar: {
+        waa,
+        avgLiveAttendance,
+        returningAttendeesRate,
+        feedParticipationRate,
+        contentReuseRate,
+      },
+      diagnosis: weakSignals.length
+        ? `Main bottleneck: ${weakSignals.slice(0, 2).join(" + ")}`
+        : "Healthy growth momentum across all core drivers",
+      actions: actions.slice(0, 3),
+    };
+  } catch (error) {
+    console.error("Error fetching north star decision snapshot:", error);
+    return { success: false, error: "Failed to fetch north star snapshot" };
+  }
+}
+
 export async function getRetentionCohorts(communityId?: string) {
   try {
     const userId = await getCurrentUserId();

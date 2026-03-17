@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { getLiveCommunityHealthMetrics, getOverviewAnalytics, getRetentionCohorts } from "@/app/actions/analytics";
+import { getLiveCommunityHealthMetrics, getNorthStarDecisionSnapshot, getOverviewAnalytics, getRetentionCohorts } from "@/app/actions/analytics";
 import { BarChart3, TrendingUp, Users, MessageSquare, FileText } from "lucide-react";
 import { StatsCard } from "@/components/analytics/StatsCard";
 import { CommunitySelector } from "@/components/analytics/CommunitySelector";
@@ -22,10 +22,11 @@ const session = await auth();
 
   const selectedCommunityId = searchParams?.communityId;
 
-  const [result, retentionResult, healthResult] = await Promise.all([
+  const [result, retentionResult, healthResult, northStarResult] = await Promise.all([
     getOverviewAnalytics(),
     getRetentionCohorts(selectedCommunityId),
     getLiveCommunityHealthMetrics(selectedCommunityId),
+    getNorthStarDecisionSnapshot(selectedCommunityId),
   ]);
 
   if (!result.success || !result.data) {
@@ -50,6 +51,9 @@ const session = await auth();
   const retentionTrend = retentionResult.success ? retentionResult.trend || 0 : 0;
   const retentionCommunityId = retentionResult.success ? retentionResult.selectedCommunityId : null;
   const health = healthResult.success ? healthResult.metrics : null;
+  const northStar = northStarResult.success ? northStarResult.northStar : null;
+  const northDiagnosis = northStarResult.success ? northStarResult.diagnosis : null;
+  const northActions = northStarResult.success ? northStarResult.actions || [] : [];
 
   const getReturningBenchmark = (value: number) => {
     if (value < 20) return { label: "Needs work", tone: "text-red-600" };
@@ -205,6 +209,61 @@ const session = await auth();
               Create Community
             </a>
           </div>
+        )}
+      </div>
+
+      {/* North Star Decision Framework */}
+      <div className="rounded-xl border border-border/50 bg-card/50 p-6">
+        <div className="mb-4">
+          <h2 className="text-xl font-bold text-foreground">North Star Decision Framework</h2>
+          <p className="text-sm text-muted-foreground">
+            Diagnose what to improve next from weekly active attendees and core drivers.
+          </p>
+        </div>
+
+        {northStar ? (
+          <>
+            <div className="grid gap-4 md:grid-cols-5">
+              <div className="rounded-lg border border-border/30 bg-background p-4">
+                <p className="text-xs text-muted-foreground">Weekly Active Attendees</p>
+                <p className="mt-1 text-2xl font-bold text-foreground">{northStar.waa}</p>
+              </div>
+              <div className="rounded-lg border border-border/30 bg-background p-4">
+                <p className="text-xs text-muted-foreground">Avg Live Attendance</p>
+                <p className="mt-1 text-2xl font-bold text-foreground">{northStar.avgLiveAttendance}</p>
+              </div>
+              <div className="rounded-lg border border-border/30 bg-background p-4">
+                <p className="text-xs text-muted-foreground">Returning Attendees</p>
+                <p className="mt-1 text-2xl font-bold text-foreground">{northStar.returningAttendeesRate}%</p>
+              </div>
+              <div className="rounded-lg border border-border/30 bg-background p-4">
+                <p className="text-xs text-muted-foreground">Feed Participation</p>
+                <p className="mt-1 text-2xl font-bold text-foreground">{northStar.feedParticipationRate}%</p>
+              </div>
+              <div className="rounded-lg border border-border/30 bg-background p-4">
+                <p className="text-xs text-muted-foreground">Content Reuse</p>
+                <p className="mt-1 text-2xl font-bold text-foreground">{northStar.contentReuseRate}%</p>
+              </div>
+            </div>
+
+            <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+              <strong>Diagnosis:</strong> {northDiagnosis}
+            </div>
+
+            {northActions.length > 0 && (
+              <div className="mt-4 grid gap-3 md:grid-cols-3">
+                {northActions.map((action: { title: string; why: string; href: string; cta: string }) => (
+                  <a key={action.title} href={action.href} className="rounded-lg border border-border/40 bg-background p-4 hover:border-primary/40">
+                    <p className="font-semibold text-foreground">{action.title}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">{action.why}</p>
+                    <p className="mt-3 text-xs font-semibold text-primary">{action.cta} →</p>
+                  </a>
+                ))}
+              </div>
+            )}
+          </>
+        ) : (
+          <p className="text-sm text-muted-foreground">Could not load north star diagnostics right now.</p>
         )}
       </div>
 
