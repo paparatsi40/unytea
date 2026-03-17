@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 function communityCategory(settings: unknown): string {
   if (!settings || typeof settings !== "object") return "General";
   const candidate = (settings as Record<string, unknown>).category;
