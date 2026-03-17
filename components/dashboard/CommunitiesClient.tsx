@@ -8,7 +8,6 @@ import {
   Plus,
   Users,
   Loader2,
-  Search,
   Lock,
   Crown,
   Calendar,
@@ -48,10 +47,11 @@ type Community = {
 };
 
 type CommunityCardState = "empty" | "upcoming" | "today" | "healthy";
+type HeroState = "critical" | "upcoming" | "live" | "healthy";
 
 function formatSessionDayTime(dateString: string) {
   const date = new Date(dateString);
-  const day = date.toLocaleDateString("en-US", { weekday: "short" });
+  const day = date.toLocaleDateString("en-US", { weekday: "long" });
   const time = date.toLocaleTimeString("en-US", {
     hour: "numeric",
     minute: "2-digit",
@@ -77,6 +77,7 @@ function getCardState(community: Community): {
   state: CommunityCardState;
   title: string;
   subtitle: string;
+  detail?: string;
   primaryLabel: string;
   primaryHref: string;
   primaryIcon: "calendar" | "radio" | "arrow";
@@ -116,11 +117,8 @@ function getCardState(community: Community): {
   if (isToday || nextSession.status === "IN_PROGRESS") {
     return {
       state: "today",
-      title: "🟢 Live today",
-      subtitle:
-        nextSession.status === "IN_PROGRESS"
-          ? `${nextSession.attendeeCount || 0} attending now`
-          : `Starts in ${hoursUntil(nextSession.scheduledAt)}h · ${nextSession.attendeeCount || 0} attending`,
+      title: nextSession.status === "IN_PROGRESS" ? "🟢 Live now" : `🟢 Live in ${hoursUntil(nextSession.scheduledAt)} hours`,
+      subtitle: `${nextSession.attendeeCount || 0} attending`,
       primaryLabel: "Start session",
       primaryHref:
         nextSession.status === "IN_PROGRESS"
@@ -134,7 +132,8 @@ function getCardState(community: Community): {
   return {
     state: "upcoming",
     title: "🟡 Next session",
-    subtitle: `${formatSessionDayTime(nextSession.scheduledAt)} · ${nextSession.attendeeCount || 0} attending`,
+    subtitle: formatSessionDayTime(nextSession.scheduledAt),
+    detail: `${nextSession.attendeeCount || 0} attending`,
     primaryLabel: "View session",
     primaryHref: `/dashboard/sessions/${nextSession.id}`,
     primaryIcon: "arrow",
@@ -148,7 +147,6 @@ export function CommunitiesClient() {
   const [communities, setCommunities] = useState<Community[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     async function fetchCommunities() {
@@ -173,47 +171,55 @@ export function CommunitiesClient() {
     fetchCommunities();
   }, [user, isLoading, router]);
 
-  const filteredCommunities = useMemo(
-    () => communities.filter((c) => c.name.toLowerCase().includes(searchQuery.toLowerCase())),
-    [communities, searchQuery]
-  );
-
   const momentum = useMemo(() => {
     const sessions = communities.reduce((sum, c) => sum + (c.weeklySessions || 0), 0);
     const attendees = communities.reduce((sum, c) => sum + (c.attendeesThisWeek || 0), 0);
     const members = communities.reduce((sum, c) => sum + c._count.members, 0);
-    const postsThisWeek = communities.reduce((sum, c) => sum + (c.postsThisWeek || 0), 0);
-    return { sessions, attendees, members, postsThisWeek };
+    const posts = communities.reduce((sum, c) => sum + (c.postsThisWeek || 0), 0);
+    return { sessions, attendees, members, posts };
   }, [communities]);
 
-  const communitiesWithoutSession = communities.filter((c) => !c.nextSession).length;
+  const hasLiveToday = communities.some((c) => {
+    if (!c.nextSession) return false;
+    if (c.nextSession.status === "IN_PROGRESS") return true;
+    const d = new Date(c.nextSession.scheduledAt);
+    return d.toDateString() === new Date().toDateString();
+  });
 
-  const hero = useMemo(() => {
-    if (communities.length === 0) {
-      return {
-        title: "🚀 You don’t have a community yet",
-        description: "Create your first community and run your first live session.",
-        cta: "Create community",
-        href: "/dashboard/communities/new",
-      };
-    }
+  const hasUpcoming = communities.some((c) => c.nextSession);
+  const healthy = communities.some((c) => (c.weeklySessions || 0) >= 2);
 
-    if (communitiesWithoutSession > 0) {
-      return {
-        title: "⚠️ Your community needs momentum",
-        description: "You have communities without upcoming live sessions scheduled.",
-        cta: "Schedule session",
-        href: "/dashboard/sessions/create",
-      };
-    }
+  const heroState: HeroState = !hasUpcoming ? "critical" : hasLiveToday ? "live" : healthy ? "healthy" : "upcoming";
 
-    return {
-      title: "🔥 Your community engine is running",
-      description: "You have upcoming live moments. Keep attendance momentum alive.",
-      cta: "View sessions",
-      href: "/dashboard/sessions",
-    };
-  }, [communities.length, communitiesWithoutSession]);
+  const hero =
+    heroState === "critical"
+      ? {
+          title: "🚨 Your community needs momentum",
+          description:
+            "You don’t have any upcoming live sessions. Communities with weekly sessions grow 3x faster.",
+          cta: "Schedule your first session",
+          href: "/dashboard/sessions/create",
+        }
+      : heroState === "live"
+        ? {
+            title: "🟢 You have a live moment today",
+            description: "Your community has a session today. Show up on time and drive attendance.",
+            cta: "Start session",
+            href: "/dashboard/sessions",
+          }
+        : heroState === "upcoming"
+          ? {
+              title: "🟡 Your next live moment is scheduled",
+              description: "Keep momentum by pushing RSVPs and reminding members before start.",
+              cta: "View session",
+              href: "/dashboard/sessions",
+            }
+          : {
+              title: "🔥 Your community engine is running",
+              description: "You’re running consistent sessions. Keep quality and attendance high.",
+              cta: "View sessions",
+              href: "/dashboard/sessions",
+            };
 
   const nextUp = useMemo(() => {
     const sessions = communities
@@ -227,7 +233,7 @@ export function CommunitiesClient() {
     if (!sessions.length) {
       return {
         title: "No session scheduled",
-        subtitle: "Schedule your next live session to keep your community active.",
+        subtitle: "Schedule your next live session to activate your community.",
         cta: "Schedule session",
         href: "/dashboard/sessions/create",
       };
@@ -236,14 +242,14 @@ export function CommunitiesClient() {
     const next = sessions[0];
     return {
       title: next.session!.title,
-      subtitle: `${formatSessionDayTime(next.session!.scheduledAt)} · ${next.session!.attendeeCount || 0} attending · ${next.community.name}`,
+      subtitle: `${formatSessionDayTime(next.session!.scheduledAt)} · ${next.session!.attendeeCount || 0} attending`,
       cta: "View session",
       href: `/dashboard/sessions/${next.session!.id}`,
     };
   }, [communities]);
 
   const nextBestAction = useMemo(() => {
-    if (momentum.sessions === 0) {
+    if (!hasUpcoming) {
       return {
         title: "Schedule your first session",
         description: "This is the #1 driver of community growth.",
@@ -255,7 +261,7 @@ export function CommunitiesClient() {
     if (momentum.members < 5) {
       return {
         title: "Invite 5 members",
-        description: "More members create stronger session momentum.",
+        description: "More members create stronger live momentum.",
         cta: "Invite members",
         href: "/dashboard/communities",
       };
@@ -263,11 +269,11 @@ export function CommunitiesClient() {
 
     return {
       title: "Ask your first question",
-      description: "Prime engagement before your next live session.",
+      description: "Prime engagement before your next session.",
       cta: "Create post",
       href: "/dashboard/feed",
     };
-  }, [momentum.sessions, momentum.members]);
+  }, [hasUpcoming, momentum.members]);
 
   if (isLoading || loading) {
     return (
@@ -318,12 +324,15 @@ export function CommunitiesClient() {
 
       <div className="rounded-2xl border border-border bg-card p-4">
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">This week</p>
-        <div className="mt-2 grid gap-3 md:grid-cols-4">
-          <div className="rounded-lg bg-muted/40 p-3 text-sm"><p className="text-muted-foreground">Sessions</p><p className="text-xl font-semibold text-foreground">{momentum.sessions}</p></div>
-          <div className="rounded-lg bg-muted/40 p-3 text-sm"><p className="text-muted-foreground">Attendees</p><p className="text-xl font-semibold text-foreground">{momentum.attendees}</p></div>
-          <div className="rounded-lg bg-muted/40 p-3 text-sm"><p className="text-muted-foreground">Members</p><p className="text-xl font-semibold text-foreground">{momentum.members}</p></div>
-          <div className="rounded-lg bg-muted/40 p-3 text-sm"><p className="text-muted-foreground">Posts this week</p><p className="text-xl font-semibold text-foreground">{momentum.postsThisWeek}</p></div>
-        </div>
+        <p className="mt-2 text-sm text-foreground">
+          Sessions: <span className="font-semibold">{momentum.sessions}</span>
+          {"  ·  "}
+          Attendees: <span className="font-semibold">{momentum.attendees}</span>
+          {"  ·  "}
+          Members: <span className="font-semibold">{momentum.members}</span>
+          {"  ·  "}
+          Posts: <span className="font-semibold">{momentum.posts}</span>
+        </p>
       </div>
 
       <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
@@ -333,27 +342,11 @@ export function CommunitiesClient() {
         <Link href={nextBestAction.href} className="mt-3 inline-flex"><Button size="sm" className="bg-amber-500 text-zinc-900 hover:bg-amber-400">{nextBestAction.cta}</Button></Link>
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        <Link href="/dashboard/sessions/create"><Button><Calendar className="mr-2 h-4 w-4" />Schedule session</Button></Link>
-        <Link href="/dashboard/communities"><Button variant="outline"><UserPlus className="mr-2 h-4 w-4" />Invite members</Button></Link>
-        <Link href="/dashboard/feed"><Button variant="outline"><MessageSquare className="mr-2 h-4 w-4" />Create post</Button></Link>
-        {communities.length === 0 && <Link href="/dashboard/communities/new"><Button variant="outline"><Plus className="mr-2 h-4 w-4" />Create community</Button></Link>}
-      </div>
-
-      <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="relative w-full lg:max-w-sm">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <input type="text" placeholder="Search your communities..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="h-10 w-full rounded-md border border-input bg-background pl-9 pr-3 text-sm" />
-        </div>
-        <div className="text-sm text-muted-foreground">{filteredCommunities.length} communities</div>
-      </div>
-
-      {filteredCommunities.length > 0 ? (
-        <div className={filteredCommunities.length === 1 ? "grid gap-4 max-w-2xl" : "grid gap-4 sm:grid-cols-2 xl:grid-cols-3"}>
-          {filteredCommunities.map((community) => {
+      {communities.length > 0 ? (
+        <div className={communities.length === 1 ? "grid gap-4 max-w-2xl" : "grid gap-4 sm:grid-cols-2 xl:grid-cols-3"}>
+          {communities.map((community) => {
             const card = getCardState(community);
             const lastPost = formatRelative(community.lastPostAt);
-            const lastSession = formatRelative(community.lastSessionAt);
 
             return (
               <div key={community.id} className="rounded-2xl border border-border bg-card p-5">
@@ -371,11 +364,11 @@ export function CommunitiesClient() {
                 <div className={`mt-4 rounded-lg border p-3 ${card.tone}`}>
                   <p className="text-sm font-semibold">{card.title}</p>
                   <p className="mt-1 text-sm">{card.subtitle}</p>
+                  {card.detail && <p className="mt-1 text-sm">{card.detail}</p>}
                 </div>
 
                 <div className="mt-3 text-xs text-muted-foreground">
-                  {lastPost ? <p>Last activity: post {lastPost}</p> : <p>Last activity: none yet</p>}
-                  {lastSession ? <p>Last session: {lastSession}</p> : <p>Last session: never hosted</p>}
+                  {lastPost ? <p>Last activity: post {lastPost}</p> : <p>Last activity: no posts yet</p>}
                 </div>
 
                 <div className="mt-4 flex items-center gap-2">
@@ -387,14 +380,18 @@ export function CommunitiesClient() {
                       {card.primaryIcon === "arrow" ? <ArrowRight className="ml-1.5 h-4 w-4" /> : null}
                     </Button>
                   </Link>
-                  <Link href={`/dashboard/c/${community.slug}`}><Button variant="outline">Enter community</Button></Link>
+                  {card.state !== "healthy" && (
+                    <Link href={`/dashboard/c/${community.slug}`}><Button variant="outline">Enter community</Button></Link>
+                  )}
                 </div>
 
-                <div className="mt-3 flex items-center gap-3 border-t border-border pt-3 text-xs text-muted-foreground">
-                  <Link href={`/dashboard/c/${community.slug}/invite`} className="inline-flex items-center hover:text-foreground"><UserPlus className="mr-1 h-3.5 w-3.5" />Invite members</Link>
-                  <Link href="/dashboard/feed" className="inline-flex items-center hover:text-foreground"><MessageSquare className="mr-1 h-3.5 w-3.5" />Create post</Link>
-                  {(community.weeklySessions || 0) === 0 && <span className="inline-flex items-center text-amber-700"><AlertTriangle className="mr-1 h-3.5 w-3.5" />At risk</span>}
-                </div>
+                {card.state !== "healthy" && (
+                  <div className="mt-3 flex items-center gap-3 border-t border-border pt-3 text-xs text-muted-foreground">
+                    <Link href={`/dashboard/c/${community.slug}/invite`} className="inline-flex items-center hover:text-foreground"><UserPlus className="mr-1 h-3.5 w-3.5" />Invite members</Link>
+                    <Link href="/dashboard/feed" className="inline-flex items-center hover:text-foreground"><MessageSquare className="mr-1 h-3.5 w-3.5" />Create post</Link>
+                    {card.state === "empty" && <span className="inline-flex items-center text-amber-700"><AlertTriangle className="mr-1 h-3.5 w-3.5" />At risk</span>}
+                  </div>
+                )}
               </div>
             );
           })}
@@ -402,14 +399,20 @@ export function CommunitiesClient() {
       ) : (
         <div className="flex min-h-[320px] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-card p-10 text-center">
           <Users className="h-10 w-10 text-primary" />
-          <h2 className="mt-4 text-xl font-bold text-foreground">{searchQuery ? "No communities found" : "No communities yet"}</h2>
-          <p className="mt-2 max-w-md text-sm text-muted-foreground">{searchQuery ? "Try another search term." : "Create your first community to start your community engine."}</p>
+          <h2 className="mt-4 text-xl font-bold text-foreground">No communities yet</h2>
+          <p className="mt-2 max-w-md text-sm text-muted-foreground">Create your first community to start your community engine.</p>
           <div className="mt-5 flex items-center gap-2">
             <Link href="/dashboard/communities/new"><Button><Plus className="mr-2 h-4 w-4" />Create community</Button></Link>
             <Link href="/dashboard/communities/explore"><Button variant="outline">Explore communities</Button></Link>
           </div>
         </div>
       )}
+
+      <div className="flex flex-wrap gap-2">
+        <Link href="/dashboard/sessions/create"><Button><Calendar className="mr-2 h-4 w-4" />Schedule session</Button></Link>
+        <Link href="/dashboard/communities"><Button variant="outline"><UserPlus className="mr-2 h-4 w-4" />Invite members</Button></Link>
+        <Link href="/dashboard/feed"><Button variant="outline"><MessageSquare className="mr-2 h-4 w-4" />Create post</Button></Link>
+      </div>
     </div>
   );
 }
