@@ -40,6 +40,31 @@ function sessionUrgencyLabel(date: Date | null) {
   return "🟢 Upcoming";
 }
 
+function dayNameFromIndex(dayOfWeek: number | null | undefined) {
+  if (dayOfWeek === null || dayOfWeek === undefined) return null;
+  const names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  return names[dayOfWeek] || null;
+}
+
+function everyLabel(series: {
+  frequency?: string | null;
+  dayOfWeek?: number | null;
+  startTime?: string | null;
+} | null | undefined) {
+  if (!series || series.frequency !== "WEEKLY") return null;
+  const day = dayNameFromIndex(series.dayOfWeek);
+  if (!day || !series.startTime) return null;
+
+  const [hourRaw, minuteRaw] = series.startTime.split(":");
+  const hour = Number(hourRaw);
+  const minute = Number(minuteRaw || "0");
+  if (!Number.isFinite(hour) || !Number.isFinite(minute)) return `Every ${day}`;
+
+  const sample = new Date();
+  sample.setHours(hour, minute, 0, 0);
+  return `Every ${day} · ${sample.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}`;
+}
+
 function trackPublicCommunityEvent(params: {
   eventName:
     | "community_preview_view"
@@ -156,6 +181,14 @@ export default async function CommunityPublicPreviewPage({
           id: true,
           title: true,
           scheduledAt: true,
+          series: {
+            select: {
+              frequency: true,
+              dayOfWeek: true,
+              startTime: true,
+              title: true,
+            },
+          },
         },
       },
       posts: {
@@ -304,7 +337,7 @@ export default async function CommunityPublicPreviewPage({
   const now = new Date();
   const weekEnd = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
 
-  const [sessionsThisWeek, nextSessionAttendingCount] = await Promise.all([
+  const [sessionsThisWeek, nextSessionAttendingCount, nextThreeSessions] = await Promise.all([
     prisma.mentorSession.count({
       where: {
         communityId: currentCommunity.id,
@@ -322,6 +355,23 @@ export default async function CommunityPublicPreviewPage({
           },
         })
       : Promise.resolve(0),
+    prisma.mentorSession.findMany({
+      where: {
+        communityId: currentCommunity.id,
+        status: "SCHEDULED",
+        scheduledAt: {
+          gte: now,
+          lte: weekEnd,
+        },
+      },
+      orderBy: { scheduledAt: "asc" },
+      take: 3,
+      select: {
+        id: true,
+        title: true,
+        scheduledAt: true,
+      },
+    }),
   ]);
 
   const accessTypeLabel = currentCommunity.isPaid ? "De pago" : "Gratis";
@@ -330,6 +380,7 @@ export default async function CommunityPublicPreviewPage({
       ? "Suscribirme (pago requerido)"
       : "Suscribirme"
     : "Iniciar sesión para suscribirme";
+  const weeklyIdentity = everyLabel(nextSession?.series);
 
   return (
 <div className="min-h-screen bg-background">
@@ -366,6 +417,7 @@ export default async function CommunityPublicPreviewPage({
           <p className="text-xs uppercase tracking-wide text-muted-foreground">Next Live Session</p>
           <h2 className="mt-2 text-xl font-semibold text-foreground">{nextSession?.title || "Weekly Community Q&A"}</h2>
           <p className="mt-1 text-sm text-muted-foreground">{sessionUrgencyLabel(nextSession?.scheduledAt ?? null)} · {formatSchedule(nextSession?.scheduledAt ?? null)}</p>
+          {weeklyIdentity && <p className="mt-1 text-xs text-muted-foreground">{weeklyIdentity}</p>}
           <p className="mt-1 text-sm text-muted-foreground">🔥 {nextSessionAttendingCount} attending</p>
           <p className="mt-2 text-sm text-muted-foreground">Join the community to attend live sessions.</p>
           <p className="mt-1 text-xs text-muted-foreground">Members receive reminders automatically.</p>
@@ -385,13 +437,21 @@ export default async function CommunityPublicPreviewPage({
         </section>
 
         <section className="rounded-xl border border-border bg-card p-6">
-          <h2 className="text-lg font-semibold text-foreground">What you get as a member</h2>
-          <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-            <li>• Weekly live sessions</li>
-            <li>• Access to session recordings</li>
-            <li>• Community discussions</li>
-            <li>• Ask questions directly to the host</li>
-          </ul>
+          <h2 className="text-lg font-semibold text-foreground">📅 This week</h2>
+          {nextThreeSessions.length === 0 ? (
+            <p className="mt-3 text-sm text-muted-foreground">Weekly programming is being scheduled now.</p>
+          ) : (
+            <div className="mt-3 space-y-3">
+              {nextThreeSessions.map((session) => (
+                <div key={session.id} className="rounded-lg border border-border p-3">
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                    {session.scheduledAt.toLocaleDateString("en-US", { weekday: "long" })} · {session.scheduledAt.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
+                  </p>
+                  <p className="mt-1 font-medium text-foreground">{session.title}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </section>
 
         <section className="rounded-xl border border-border bg-card p-6">

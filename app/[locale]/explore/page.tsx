@@ -80,6 +80,32 @@ function getSessionUrgencyLabel(date: Date): string {
   return "🟢 Upcoming";
 }
 
+function dayNameFromIndex(dayOfWeek: number | null | undefined) {
+  if (dayOfWeek === null || dayOfWeek === undefined) return null;
+  const names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  return names[dayOfWeek] || null;
+}
+
+function everySeriesLabel(series: {
+  frequency?: string | null;
+  dayOfWeek?: number | null;
+  startTime?: string | null;
+} | null | undefined) {
+  if (!series || series.frequency !== "WEEKLY") return null;
+  const day = dayNameFromIndex(series.dayOfWeek);
+  if (!day) return null;
+  if (!series.startTime) return `Every ${day}`;
+
+  const [h, m] = series.startTime.split(":");
+  const hour = Number(h);
+  const minute = Number(m || "0");
+  if (!Number.isFinite(hour) || !Number.isFinite(minute)) return `Every ${day}`;
+
+  const sample = new Date();
+  sample.setHours(hour, minute, 0, 0);
+  return `Every ${day} · ${sample.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}`;
+}
+
 function getBoostScore(settings: unknown): number {
   if (!settings || typeof settings !== "object") return 0;
   const value = (settings as Record<string, unknown>).boostScore;
@@ -189,6 +215,13 @@ export default async function ExploreCommunitiesPage({
           id: true,
           title: true,
           scheduledAt: true,
+          series: {
+            select: {
+              frequency: true,
+              dayOfWeek: true,
+              startTime: true,
+            },
+          },
         },
       },
       posts: {
@@ -538,6 +571,7 @@ export default async function ExploreCommunitiesPage({
                 const nextSessionText = community.nextSession
                   ? `Next: ${formatSessionSlot(community.nextSession.scheduledAt)}`
                   : "Weekly live sessions";
+                const seriesIdentity = everySeriesLabel(community.nextSession?.series);
 
                 const socialProof = community.nextSessionAttending > 0
                   ? `${community.nextSessionAttending} attending`
@@ -569,6 +603,7 @@ export default async function ExploreCommunitiesPage({
                     <p className="text-sm text-muted-foreground">👥 {community._count.members} members</p>
 
                     <p className="mt-3 text-sm font-medium text-foreground">🟢 {nextSessionText}</p>
+                    {seriesIdentity && <p className="text-xs text-muted-foreground">{seriesIdentity}</p>}
                     <p className="text-sm text-muted-foreground">🔥 {socialProof}</p>
                     <p className="mt-2 text-xs text-muted-foreground">💬 “{community.previewPost}”</p>
 
