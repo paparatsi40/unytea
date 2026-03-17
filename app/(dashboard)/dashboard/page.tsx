@@ -50,6 +50,7 @@ import {
   getCommunityOSSnapshot,
   getHostScoreSystem,
   getHostGamificationSnapshot,
+  getAIPlaybookRecommendations,
 } from "@/app/actions/dashboard";
 import { toast } from "sonner";
 
@@ -247,6 +248,32 @@ interface HostGamificationSnapshot {
   }>;
 }
 
+interface AIPlaybookRecommendation {
+  id: string;
+  priority: "critical" | "high" | "medium" | "low";
+  title: string;
+  problem: string;
+  action: string;
+  cta: string;
+  href: string;
+  explainability: string;
+}
+
+interface AIPlaybookSystem {
+  signals: {
+    attendanceRate: number;
+    sessionsPerWeek: number;
+    upcomingSessions: number;
+    postsLast7d: number;
+    newMembersLast7d: number;
+    recordingViews: number;
+    streak: number;
+    activeMembers: number;
+    lastSessionAttended: number;
+  };
+  recommendations: AIPlaybookRecommendation[];
+}
+
 export default function DashboardPage() {
   const { user } = useCurrentUser();
 
@@ -268,6 +295,7 @@ export default function DashboardPage() {
   const [communityOS, setCommunityOS] = useState<CommunityOSSnapshot | null>(null);
   const [hostScoreSystem, setHostScoreSystem] = useState<HostScoreSystem | null>(null);
   const [gamification, setGamification] = useState<HostGamificationSnapshot | null>(null);
+  const [aiPlaybook, setAiPlaybook] = useState<AIPlaybookSystem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Load dashboard data
@@ -293,6 +321,7 @@ export default function DashboardPage() {
         communityOSRes,
         hostScoreRes,
         gamificationRes,
+        aiPlaybookRes,
       ] = await Promise.all([
         getDashboardMetrics(),
         getNextLiveSession(),
@@ -307,6 +336,7 @@ export default function DashboardPage() {
         getCommunityOSSnapshot(),
         getHostScoreSystem(),
         getHostGamificationSnapshot(),
+        getAIPlaybookRecommendations(),
       ]);
 
       if (metricsRes.success) setMetrics(metricsRes.metrics || null);
@@ -352,6 +382,13 @@ export default function DashboardPage() {
           summary: hostScoreRes.summary,
           components: hostScoreRes.components || [],
           actions: hostScoreRes.actions || [],
+        });
+      }
+
+      if (aiPlaybookRes.success && aiPlaybookRes.signals) {
+        setAiPlaybook({
+          signals: aiPlaybookRes.signals,
+          recommendations: aiPlaybookRes.recommendations || [],
         });
       }
     } catch (error) {
@@ -519,6 +556,46 @@ export default function DashboardPage() {
                   </div>
                 </>
               )}
+            </CardContent>
+          </Card>
+        )}
+
+        {aiPlaybook && aiPlaybook.recommendations.length > 0 && (
+          <Card className="border-blue-200 bg-blue-50/40">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base text-blue-900">🧠 AI Recommendations</CardTitle>
+              <CardDescription>
+                Highest-impact actions for this week based on cadence, attendance, engagement and growth.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {aiPlaybook.recommendations.map((rec) => (
+                <div key={rec.id} className="rounded-lg border border-blue-100 bg-white p-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="font-semibold text-zinc-900">{rec.title}</p>
+                    <Badge
+                      variant="outline"
+                      className={`capitalize ${
+                        rec.priority === "critical"
+                          ? "border-red-300 text-red-700"
+                          : rec.priority === "high"
+                            ? "border-amber-300 text-amber-700"
+                            : rec.priority === "medium"
+                              ? "border-blue-300 text-blue-700"
+                              : "border-zinc-300 text-zinc-700"
+                      }`}
+                    >
+                      {rec.priority}
+                    </Badge>
+                  </div>
+                  <p className="mt-1 text-sm text-zinc-700">{rec.problem}</p>
+                  <p className="mt-1 text-sm text-zinc-600">→ {rec.action}</p>
+                  <p className="mt-2 text-xs text-zinc-500">{rec.explainability}</p>
+                  <Link href={rec.href} className="mt-2 inline-flex">
+                    <Button size="sm" variant="outline">{rec.cta}</Button>
+                  </Link>
+                </div>
+              ))}
             </CardContent>
           </Card>
         )}

@@ -946,6 +946,242 @@ export async function getHostGamificationSnapshot() {
   }
 }
 
+export async function getAIPlaybookRecommendations() {
+  try {
+    const userId = await getCurrentUserId();
+    if (!userId) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const now = new Date();
+    const last14Days = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+    const last7Days = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const next7Days = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+    const hostMemberships = await prisma.member.findMany({
+      where: {
+        userId,
+        role: { in: ["OWNER", "ADMIN", "MODERATOR"] },
+      },
+      select: { communityId: true },
+    });
+
+    const communityIds = hostMemberships.map((m) => m.communityId);
+
+    const [completedSessions, upcomingSessions, postsLast7d, newMembersLast7d, recordingViewsAgg, activeMembers] =
+      await Promise.all([
+        prisma.mentorSession.findMany({
+          where: {
+            OR: [{ mentorId: userId }, { communityId: { in: communityIds } }],
+            status: "COMPLETED",
+            endedAt: { gte: last14Days },
+          },
+          select: {
+            attendeeCount: true,
+            participations: { select: { id: true, eventsData: true } },
+            endedAt: true,
+          },
+          orderBy: { endedAt: "desc" },
+          take: 50,
+        }),
+        prisma.mentorSession.count({
+          where: {
+            OR: [{ mentorId: userId }, { communityId: { in: communityIds } }],
+            status: { in: ["SCHEDULED", "IN_PROGRESS"] },
+            scheduledAt: { gte: now, lte: next7Days },
+          },
+        }),
+        prisma.post.count({
+          where: {
+            communityId: { in: communityIds },
+            createdAt: { gte: last7Days },
+          },
+        }),
+        prisma.member.count({
+          where: {
+            communityId: { in: communityIds },
+            joinedAt: { gte: last7Days },
+          },
+        }),
+        prisma.post.aggregate({
+          where: {
+            communityId: { in: communityIds },
+            contentType: "SESSION_ANNOUNCEMENT",
+            createdAt: { gte: last14Days },
+          },
+          _sum: { viewCount: true },
+        }),
+        prisma.member.count({
+          where: {
+            communityId: { in: communityIds },
+            status: "ACTIVE",
+          },
+        }),
+      ]);
+
+    const totalRsvps = completedSessions.reduce((sum, session) => {
+      const count = session.participations.filter((p: any) => {
+        const data = (p.eventsData || {}) as Record<string, unknown>;
+        return data.rsvp === true || data.rsvpStatus === "attending";
+      }).length;
+      return sum + count;
+    }, 0);
+
+    const totalAttended = completedSessions.reduce(
+      (sum, s) => sum + (s.attendeeCount || s.participations.length || 0),
+      0
+    );
+
+    const attendanceRate = totalRsvps > 0 ? totalAttended / totalRsvps : 0;
+    const sessionsPerWeek = completedSessions.length / 2;
+
+    const getWeekKey = (date: Date) => {
+      const d = new Date(date);
+      d.setDate(d.getDate() - d.getDay());
+      d.setHours(0, 0, 0, 0);
+      return d.toISOString();
+    };
+
+    const currentWeekStart = new Date(now);
+    currentWeekStart.setDate(now.getDate() - now.getDay());
+    currentWeekStart.setHours(0, 0, 0, 0);
+
+    const activeWeeks = new Set(
+      completedSessions
+        .map((s) => s.endedAt)
+        .filter((d): d is Date => !!d)
+        .map((d) => getWeekKey(d))
+    );
+
+    let streak = 0;
+    const cursor = new Date(currentWeekStart);
+    for (let i = 0; i < 52; i++) {
+      if (!activeWeeks.has(cursor.toISOString())) break;
+      streak += 1;
+      cursor.setDate(cursor.getDate() - 7);
+    }
+
+    const signals = {
+      attendanceRate,
+      sessionsPerWeek,
+      upcomingSessions,
+      postsLast7d,
+      newMembersLast7d,
+      recordingViews: recordingViewsAgg._sum.viewCount || 0,
+      streak,
+      activeMembers,
+      lastSessionAttended: completedSessions[0]
+        ? completedSessions[0].attendeeCount || completedSessions[0].participations.length || 0
+        : 0,
+    };
+
+    const recommendations: Array<{
+      id: string;
+      priority: "critical" | "high" | "medium" | "low";
+      title: string;
+      problem: string;
+      action: string;
+      cta: string;
+      href: string;
+      explainability: string;
+    }> = [];
+
+    if (signals.upcomingSessions === 0) {
+      recommendations.push({
+        id: "no-sessions",
+        priority: "critical",
+        title: "No sessions scheduled next week",
+        problem: "Without upcoming sessions, community momentum drops quickly.",
+        action: "Schedule at least one live session this week to keep members active.",
+        cta: "Schedule session now",
+        href: "/dashboard/sessions/create",
+        explainability: `Upcoming sessions: ${signals.upcomingSessions}`,
+      });
+    }
+
+    if (signals.attendanceRate < 0.1) {
+      recommendations.push({
+        id: "low-attendance",
+        priority: "high",
+        title: "Attendance is low",
+        problem: "Your live attendance is below healthy benchmarks.",
+        action: "Ask members for questions before the session and trigger reminders 1h and 10m before live.",
+        cta: "Create question post",
+        href: "/dashboard/communities",
+        explainability: `Last session: ${signals.lastSessionAttended} attendees · Your attendance rate: ${Math.round(
+          signals.attendanceRate * 100
+        )}% · Top communities average: 22%`,
+      });
+    }
+
+    if (signals.postsLast7d < 3) {
+      recommendations.push({
+        id: "low-engagement",
+        priority: "medium",
+        title: "Your community is getting quiet",
+        problem: "Low discussion volume usually reduces RSVP and attendance.",
+        action: "Start one discussion prompt to reactivate members before your next session.",
+        cta: "Ask your community a question",
+        href: "/dashboard/communities",
+        explainability: `Posts in last 7 days: ${signals.postsLast7d}`,
+      });
+    }
+
+    if (signals.newMembersLast7d === 0) {
+      recommendations.push({
+        id: "no-growth",
+        priority: "medium",
+        title: "No new members this week",
+        problem: "Growth stalled this week.",
+        action: "Share your next session link and invite at least 5 new members.",
+        cta: "Invite members",
+        href: "/dashboard/communities",
+        explainability: `New members in last 7 days: ${signals.newMembersLast7d}`,
+      });
+    }
+
+    if (signals.recordingViews < 25) {
+      recommendations.push({
+        id: "low-replay",
+        priority: "low",
+        title: "Replay views can be stronger",
+        problem: "Your recap content is under-leveraged.",
+        action: "Share recap highlights to turn each session into reusable growth content.",
+        cta: "Promote recordings",
+        href: "/dashboard/recordings",
+        explainability: `Recording views (14d): ${signals.recordingViews}`,
+      });
+    }
+
+    if (recommendations.length === 0 || (signals.attendanceRate > 0.25 && signals.sessionsPerWeek >= 2)) {
+      recommendations.push({
+        id: "strong-performance",
+        priority: "low",
+        title: "Strong engagement this week",
+        problem: "Your fundamentals are working.",
+        action: "Keep your weekly cadence and preserve your momentum streak.",
+        cta: "Keep momentum",
+        href: "/dashboard/sessions",
+        explainability: `Attendance: ${Math.round(signals.attendanceRate * 100)}% · Sessions/week: ${signals.sessionsPerWeek.toFixed(1)} · Streak: ${signals.streak}`,
+      });
+    }
+
+    const priorityOrder = { critical: 4, high: 3, medium: 2, low: 1 } as const;
+    const topRecommendations = recommendations
+      .sort((a, b) => priorityOrder[b.priority] - priorityOrder[a.priority])
+      .slice(0, 3);
+
+    return {
+      success: true,
+      signals,
+      recommendations: topRecommendations,
+    };
+  } catch (error) {
+    console.error("Error getting AI playbook recommendations:", error);
+    return { success: false, error: "Failed to load AI recommendations" };
+  }
+}
+
 export async function getNextRecommendedAction() {
   try {
     const [metricsRes, nextSessionRes, hostAnalyticsRes] = await Promise.all([
