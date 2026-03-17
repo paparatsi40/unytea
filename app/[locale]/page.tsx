@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
 import { LanguageSelector } from "@/components/LanguageSelector";
@@ -31,6 +32,8 @@ export default function Home() {
   // const t = useTranslations("landing"); // TODO: Implementar traducciones para nueva landing
   const authT = useTranslations("auth");
   const { data: session } = useSession();
+  const params = useParams<{ locale: string }>();
+  const locale = params?.locale || "en";
   const isLoggedIn = !!session?.user;
 
   return (
@@ -45,6 +48,9 @@ export default function Home() {
             <span className="text-xl font-bold">Unytea</span>
           </div>
           <div className="hidden md:flex items-center gap-6">
+            <Link href={`/${locale}/explore`} className="text-sm font-medium hover:text-primary transition-colors">
+              Explore communities
+            </Link>
             <Link href="#features" className="text-sm font-medium hover:text-primary transition-colors">
               Features
             </Link>
@@ -113,6 +119,13 @@ export default function Home() {
                 >
                   Create Your Community Free
                   <ArrowRight className="w-5 h-5" />
+                </Link>
+                <Link
+                  href={`/${locale}/explore`}
+                  className="px-8 py-4 border-2 border-border rounded-xl font-semibold hover:border-primary transition-colors flex items-center justify-center gap-2"
+                >
+                  <Users className="w-5 h-5" />
+                  Explore communities
                 </Link>
                 <button
                   onClick={() => setShowDemoModal(true)}
