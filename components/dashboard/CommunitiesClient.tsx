@@ -8,7 +8,6 @@ import {
   Plus,
   Users,
   Loader2,
-  Lock,
   Crown,
   Calendar,
   ArrowRight,
