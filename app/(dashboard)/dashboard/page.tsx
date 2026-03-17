@@ -546,6 +546,29 @@ export default function DashboardPage() {
   const hasCommunity = metrics && metrics.communities > 0;
   const hasSessions = upcomingSessions.length > 0;
 
+  const primaryHeadline =
+    !hasCommunity
+      ? "Start your first community this week"
+      : nextAction?.title || "Keep your weekly momentum";
+
+  const primaryDescription =
+    !hasCommunity
+      ? "Create a community, schedule your first live session, and invite members in one flow."
+      : nextAction?.description ||
+        "Focus on one high-impact action to improve attendance and growth.";
+
+  const primaryHref = !hasCommunity
+    ? "/dashboard/communities/new"
+    : nextAction?.href || "/dashboard/sessions/create";
+
+  const primaryCta = !hasCommunity
+    ? "Create first community"
+    : nextAction?.cta || "Take next action";
+
+  const weeklyProgress = communityOS?.playbook
+    ? Math.round((communityOS.playbook.completedSteps / Math.max(1, communityOS.playbook.totalSteps)) * 100)
+    : 0;
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-zinc-50 flex items-center justify-center">
@@ -579,6 +602,47 @@ export default function DashboardPage() {
             </Link>
           </div>
         </div>
+
+        <Card className="border-zinc-200 bg-white">
+          <CardContent className="p-5">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div className="space-y-1">
+                <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Action First</p>
+                <h2 className="text-xl font-semibold text-zinc-900">{primaryHeadline}</h2>
+                <p className="text-sm text-zinc-600 max-w-2xl">{primaryDescription}</p>
+              </div>
+              <Link href={primaryHref}>
+                <Button className="bg-purple-600 hover:bg-purple-700">
+                  {primaryCta}
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              </Link>
+            </div>
+
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              <div className="rounded-lg bg-zinc-50 p-3">
+                <p className="text-xs text-zinc-500">Weekly progress</p>
+                <p className="mt-1 text-lg font-semibold text-zinc-900">{communityOS?.playbook ? `${communityOS.playbook.completedSteps}/${communityOS.playbook.totalSteps}` : "0/5"}</p>
+                <Progress value={weeklyProgress} className="mt-2 h-1.5" />
+              </div>
+              <div className="rounded-lg bg-zinc-50 p-3">
+                <p className="text-xs text-zinc-500">Next live</p>
+                <p className="mt-1 text-sm font-medium text-zinc-900">{nextSession ? `${formatDate(nextSession.scheduledAt)} · ${formatTime(nextSession.scheduledAt)}` : "No session scheduled"}</p>
+              </div>
+              <div className="rounded-lg bg-zinc-50 p-3">
+                <p className="text-xs text-zinc-500">WAA proxy</p>
+                <p className="mt-1 text-lg font-semibold text-zinc-900">{hostAnalytics?.avgAttendance ?? 0}</p>
+                <p className="text-xs text-zinc-500">avg live attendance</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <details className="rounded-lg border border-zinc-200 bg-white">
+          <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-zinc-700">
+            View operational details
+          </summary>
+          <div className="space-y-6 p-4 pt-0">
 
         {activation && (
           <Card className="border-emerald-200 bg-emerald-50/40">
@@ -1694,6 +1758,8 @@ export default function DashboardPage() {
             </Card>
           </div>
         </div>
+          </div>
+        </details>
       </div>
     </div>
   );
