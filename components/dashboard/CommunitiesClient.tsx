@@ -132,12 +132,23 @@ function getCommunityState(community: Community): {
 
 function getHeroContent(community: Community) {
   const nextSession = community.nextSession;
+  const hasRunASession =
+    Boolean(community.lastSessionAt) || (community.weeklySessions || 0) > 0;
 
-  if (!nextSession) {
+  if (!nextSession && !hasRunASession) {
     return {
       title: "⚡ Start your first session",
       subtitle: "Communities with weekly sessions grow 3x faster",
       primaryLabel: "Schedule first session",
+      primaryHref: "/dashboard/sessions/create",
+    };
+  }
+
+  if (!nextSession && hasRunASession) {
+    return {
+      title: "⚡ Schedule your next session",
+      subtitle: "Communities grow faster with a consistent weekly rhythm",
+      primaryLabel: "Schedule next session",
       primaryHref: "/dashboard/sessions/create",
     };
   }
