@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 import { CreditCard, Check, AlertCircle, ExternalLink, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +11,8 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function CommunityPaymentsPage() {
   const { toast } = useToast();
+  const params = useParams<{ slug: string }>();
+  const slug = params?.slug;
   
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -29,6 +32,8 @@ export default function CommunityPaymentsPage() {
 
   // Fetch Stripe Connect status and community settings
   useEffect(() => {
+    if (!slug) return;
+
     async function loadData() {
       try {
         // Check Stripe Connect status
@@ -38,9 +43,20 @@ export default function CommunityPaymentsPage() {
           setStripeStatus(status);
         }
 
-        // TODO: Fetch community payment settings
-        // This would need a new API endpoint
-        
+        const settingsRes = await fetch(`/api/communities/${slug}/payments`, {
+          cache: "no-store",
+        });
+
+        if (settingsRes.ok) {
+          const payload = await settingsRes.json();
+          if (payload?.settings) {
+            setSettings({
+              isPaid: !!payload.settings.isPaid,
+              monthlyPrice: String(payload.settings.monthlyPrice ?? "29"),
+              yearlyPrice: String(payload.settings.yearlyPrice ?? "290"),
+            });
+          }
+        }
       } catch (_error) {
         console.error("Error loading payment data:", _error);
       } finally {
@@ -49,7 +65,7 @@ export default function CommunityPaymentsPage() {
     }
 
     loadData();
-  }, []);
+  }, [slug]);
 
   const handleConnectStripe = async () => {
     setIsConnecting(true);
@@ -79,19 +95,40 @@ export default function CommunityPaymentsPage() {
   };
 
   const handleSaveSettings = async () => {
+    if (!slug) return;
+
     setIsSaving(true);
     try {
-      // TODO: Save community payment settings
-      // This would need a new API endpoint to update community isPaid and pricing
-      
+      const res = await fetch(`/api/communities/${slug}/payments`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(settings),
+      });
+
+      const payload = await res.json();
+
+      if (!res.ok) {
+        throw new Error(payload?.error || "Failed to save payment settings");
+      }
+
+      if (payload?.settings) {
+        setSettings({
+          isPaid: !!payload.settings.isPaid,
+          monthlyPrice: String(payload.settings.monthlyPrice ?? settings.monthlyPrice),
+          yearlyPrice: String(payload.settings.yearlyPrice ?? settings.yearlyPrice),
+        });
+      }
+
       toast({
         title: "Success",
         description: "Payment settings saved successfully.",
       });
-    } catch (_error) {
+    } catch (_error: any) {
       toast({
         title: "Error",
-        description: "Failed to save settings. Please try again.",
+        description: _error?.message || "Failed to save settings. Please try again.",
         variant: "destructive",
       });
     } finally {
