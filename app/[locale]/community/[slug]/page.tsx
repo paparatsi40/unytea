@@ -144,7 +144,7 @@ export default async function CommunityPublicPreviewPage({
   searchParams,
 }: {
   params: { locale: string; slug: string };
-  searchParams?: { src?: string; rank?: string; sort?: string };
+  searchParams?: { src?: string; rank?: string; sort?: string; paywall?: string };
 }) {
   const { slug, locale } = params;
   const source = searchParams?.src || "direct";
@@ -157,6 +157,7 @@ export default async function CommunityPublicPreviewPage({
       name: true,
       description: true,
       isPaid: true,
+      pricing: true,
       owner: {
         select: {
           name: true,
@@ -329,6 +330,10 @@ export default async function CommunityPublicPreviewPage({
       redirect(`/dashboard/c/${currentCommunity.slug}`);
     }
 
+    if ((result as { code?: string })?.code === "PAYMENT_REQUIRED") {
+      redirect(`/${locale}/community/${currentCommunity.slug}?paywall=1`);
+    }
+
     redirect(`/${locale}/community/${currentCommunity.slug}`);
   }
 
@@ -374,10 +379,17 @@ export default async function CommunityPublicPreviewPage({
     }),
   ]);
 
-  const accessTypeLabel = currentCommunity.isPaid ? "De pago" : "Gratis";
+  const defaultTier =
+    currentCommunity.pricing &&
+    typeof currentCommunity.pricing === "object" &&
+    ["free", "pro", "vip"].includes((currentCommunity.pricing as Record<string, unknown>).defaultTier as string)
+      ? ((currentCommunity.pricing as Record<string, unknown>).defaultTier as "free" | "pro" | "vip")
+      : "pro";
+
+  const accessTypeLabel = currentCommunity.isPaid ? `De pago · ${defaultTier.toUpperCase()}` : "Gratis";
   const subscribeLabel = userId
     ? currentCommunity.isPaid
-      ? "Suscribirme (pago requerido)"
+      ? `Suscribirme (${defaultTier.toUpperCase()})`
       : "Suscribirme"
     : "Iniciar sesión para suscribirme";
   const weeklyIdentity = everyLabel(nextSession?.series);
@@ -386,6 +398,11 @@ export default async function CommunityPublicPreviewPage({
 <div className="min-h-screen bg-background">
       <main className="mx-auto max-w-5xl space-y-6 px-4 py-10 sm:px-6">
         <section className="rounded-xl border border-border bg-card p-6">
+          {searchParams?.paywall === "1" && (
+            <div className="mb-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800">
+              Esta comunidad es de pago. Completa checkout para suscribirte.
+            </div>
+          )}
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <div className="mb-2 flex items-center gap-3">

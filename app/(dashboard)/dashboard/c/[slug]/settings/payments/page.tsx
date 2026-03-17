@@ -28,6 +28,12 @@ export default function CommunityPaymentsPage() {
     isPaid: false,
     monthlyPrice: "29",
     yearlyPrice: "290",
+    defaultTier: "pro" as "free" | "pro" | "vip",
+    tierPricing: {
+      free: "0",
+      pro: "29",
+      vip: "99",
+    },
   });
 
   // Fetch Stripe Connect status and community settings
@@ -54,6 +60,12 @@ export default function CommunityPaymentsPage() {
               isPaid: !!payload.settings.isPaid,
               monthlyPrice: String(payload.settings.monthlyPrice ?? "29"),
               yearlyPrice: String(payload.settings.yearlyPrice ?? "290"),
+              defaultTier: payload.settings.defaultTier === "free" || payload.settings.defaultTier === "vip" ? payload.settings.defaultTier : "pro",
+              tierPricing: {
+                free: String(payload.settings.tierPricing?.free ?? "0"),
+                pro: String(payload.settings.tierPricing?.pro ?? payload.settings.monthlyPrice ?? "29"),
+                vip: String(payload.settings.tierPricing?.vip ?? "99"),
+              },
             });
           }
         }
@@ -118,6 +130,15 @@ export default function CommunityPaymentsPage() {
           isPaid: !!payload.settings.isPaid,
           monthlyPrice: String(payload.settings.monthlyPrice ?? settings.monthlyPrice),
           yearlyPrice: String(payload.settings.yearlyPrice ?? settings.yearlyPrice),
+          defaultTier:
+            payload.settings.defaultTier === "free" || payload.settings.defaultTier === "vip"
+              ? payload.settings.defaultTier
+              : "pro",
+          tierPricing: {
+            free: String(payload.settings.tierPricing?.free ?? settings.tierPricing.free),
+            pro: String(payload.settings.tierPricing?.pro ?? settings.tierPricing.pro),
+            vip: String(payload.settings.tierPricing?.vip ?? settings.tierPricing.vip),
+          },
         });
       }
 
@@ -285,63 +306,124 @@ export default function CommunityPaymentsPage() {
 
           {/* Pricing Fields */}
           {settings.isPaid && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="monthlyPrice">
-                  Monthly Price (USD)
-                </Label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-                    $
-                  </span>
-                  <Input
-                    id="monthlyPrice"
-                    type="number"
-                    min="1"
-                    value={settings.monthlyPrice}
-                    onChange={(e) =>
-                      setSettings((prev) => ({
-                        ...prev,
-                        monthlyPrice: e.target.value,
-                      }))
-                    }
-                    className="pl-7"
-                    placeholder="29"
-                  />
+            <div className="space-y-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="monthlyPrice">Monthly Price (USD)</Label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                    <Input
+                      id="monthlyPrice"
+                      type="number"
+                      min="1"
+                      value={settings.monthlyPrice}
+                      onChange={(e) =>
+                        setSettings((prev) => ({
+                          ...prev,
+                          monthlyPrice: e.target.value,
+                          tierPricing: { ...prev.tierPricing, pro: e.target.value || prev.tierPricing.pro },
+                        }))
+                      }
+                      className="pl-7"
+                      placeholder="29"
+                    />
+                  </div>
                 </div>
-                <p className="text-xs text-gray-500">
-                  You receive: ${(parseFloat(settings.monthlyPrice || "0") * 0.95).toFixed(2)}/mo
-                  (5% platform fee)
-                </p>
+
+                <div className="space-y-2">
+                  <Label htmlFor="yearlyPrice">Yearly Price (USD)</Label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                    <Input
+                      id="yearlyPrice"
+                      type="number"
+                      min="1"
+                      value={settings.yearlyPrice}
+                      onChange={(e) =>
+                        setSettings((prev) => ({
+                          ...prev,
+                          yearlyPrice: e.target.value,
+                        }))
+                      }
+                      className="pl-7"
+                      placeholder="290"
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="yearlyPrice">
-                  Yearly Price (USD)
-                </Label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-                    $
-                  </span>
-                  <Input
-                    id="yearlyPrice"
-                    type="number"
-                    min="1"
-                    value={settings.yearlyPrice}
+              <div className="rounded-lg border p-4 space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="defaultTier">Default Paid Tier</Label>
+                  <select
+                    id="defaultTier"
+                    value={settings.defaultTier}
                     onChange={(e) =>
                       setSettings((prev) => ({
                         ...prev,
-                        yearlyPrice: e.target.value,
+                        defaultTier: e.target.value as "free" | "pro" | "vip",
                       }))
                     }
-                    className="pl-7"
-                    placeholder="290"
-                  />
+                    className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                  >
+                    <option value="free">Free</option>
+                    <option value="pro">Pro</option>
+                    <option value="vip">VIP</option>
+                  </select>
                 </div>
-                <p className="text-xs text-gray-500">
-                  You receive: ${(parseFloat(settings.yearlyPrice || "0") * 0.95).toFixed(2)}/yr
-                </p>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div className="space-y-1">
+                    <Label htmlFor="tierFree">Free tier</Label>
+                    <Input
+                      id="tierFree"
+                      type="number"
+                      min="0"
+                      value={settings.tierPricing.free}
+                      onChange={(e) =>
+                        setSettings((prev) => ({
+                          ...prev,
+                          tierPricing: { ...prev.tierPricing, free: e.target.value },
+                        }))
+                      }
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="tierPro">Pro tier</Label>
+                    <Input
+                      id="tierPro"
+                      type="number"
+                      min="1"
+                      value={settings.tierPricing.pro}
+                      onChange={(e) =>
+                        setSettings((prev) => ({
+                          ...prev,
+                          tierPricing: { ...prev.tierPricing, pro: e.target.value },
+                        }))
+                      }
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="tierVip">VIP tier</Label>
+                    <Input
+                      id="tierVip"
+                      type="number"
+                      min="1"
+                      value={settings.tierPricing.vip}
+                      onChange={(e) =>
+                        setSettings((prev) => ({
+                          ...prev,
+                          tierPricing: { ...prev.tierPricing, vip: e.target.value },
+                        }))
+                      }
+                    />
+                  </div>
+                </div>
               </div>
+
+              <p className="text-xs text-gray-500">
+                You receive: ${(parseFloat(settings.monthlyPrice || "0") * 0.95).toFixed(2)}/mo · ${(parseFloat(settings.yearlyPrice || "0") * 0.95).toFixed(2)}/yr after 5% platform fee
+              </p>
             </div>
           )}
 

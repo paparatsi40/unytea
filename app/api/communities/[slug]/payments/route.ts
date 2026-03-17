@@ -8,23 +8,64 @@ type RouteContext = {
   params: { slug: string };
 };
 
-function extractPricing(pricing: unknown): { monthlyPrice: string; yearlyPrice: string } {
+type TierPricing = {
+  free: string;
+  pro: string;
+  vip: string;
+};
+
+function extractPricing(pricing: unknown): {
+  monthlyPrice: string;
+  yearlyPrice: string;
+  defaultTier: "free" | "pro" | "vip";
+  tierPricing: TierPricing;
+} {
   if (!pricing || typeof pricing !== "object") {
-    return { monthlyPrice: "29", yearlyPrice: "290" };
+    return {
+      monthlyPrice: "29",
+      yearlyPrice: "290",
+      defaultTier: "pro",
+      tierPricing: { free: "0", pro: "29", vip: "99" },
+    };
   }
 
-  const rawMonthly = (pricing as Record<string, unknown>).monthlyPrice;
-  const rawYearly = (pricing as Record<string, unknown>).yearlyPrice;
+  const record = pricing as Record<string, unknown>;
+  const rawMonthly = record.monthlyPrice;
+  const rawYearly = record.yearlyPrice;
 
-  const monthlyPrice = typeof rawMonthly === "number" || typeof rawMonthly === "string"
-    ? String(rawMonthly)
-    : "29";
+  const monthlyPrice =
+    typeof rawMonthly === "number" || typeof rawMonthly === "string"
+      ? String(rawMonthly)
+      : "29";
 
-  const yearlyPrice = typeof rawYearly === "number" || typeof rawYearly === "string"
-    ? String(rawYearly)
-    : "290";
+  const yearlyPrice =
+    typeof rawYearly === "number" || typeof rawYearly === "string"
+      ? String(rawYearly)
+      : "290";
 
-  return { monthlyPrice, yearlyPrice };
+  const rawDefaultTier = record.defaultTier;
+  const defaultTier =
+    rawDefaultTier === "free" || rawDefaultTier === "pro" || rawDefaultTier === "vip"
+      ? rawDefaultTier
+      : "pro";
+
+  const rawTierPricing = record.tierPricing as Record<string, unknown> | undefined;
+  const tierPricing: TierPricing = {
+    free:
+      rawTierPricing && (typeof rawTierPricing.free === "number" || typeof rawTierPricing.free === "string")
+        ? String(rawTierPricing.free)
+        : "0",
+    pro:
+      rawTierPricing && (typeof rawTierPricing.pro === "number" || typeof rawTierPricing.pro === "string")
+        ? String(rawTierPricing.pro)
+        : monthlyPrice,
+    vip:
+      rawTierPricing && (typeof rawTierPricing.vip === "number" || typeof rawTierPricing.vip === "string")
+        ? String(rawTierPricing.vip)
+        : "99",
+  };
+
+  return { monthlyPrice, yearlyPrice, defaultTier, tierPricing };
 }
 
 export async function GET(_req: Request, context: RouteContext) {
@@ -70,6 +111,8 @@ export async function GET(_req: Request, context: RouteContext) {
         isPaid: community.isPaid,
         monthlyPrice: prices.monthlyPrice,
         yearlyPrice: prices.yearlyPrice,
+        defaultTier: prices.defaultTier,
+        tierPricing: prices.tierPricing,
       },
     });
   } catch (error) {
@@ -89,9 +132,22 @@ export async function PUT(req: Request, context: RouteContext) {
     const isPaid = !!body?.isPaid;
     const monthlyPrice = String(body?.monthlyPrice ?? "").trim();
     const yearlyPrice = String(body?.yearlyPrice ?? "").trim();
+    const defaultTier: "free" | "pro" | "vip" =
+      body?.defaultTier === "free" || body?.defaultTier === "pro" || body?.defaultTier === "vip"
+        ? body.defaultTier
+        : "pro";
+
+    const tierPricing = {
+      free: String(body?.tierPricing?.free ?? "0").trim(),
+      pro: String(body?.tierPricing?.pro ?? (monthlyPrice || "29")).trim(),
+      vip: String(body?.tierPricing?.vip ?? "99").trim(),
+    };
 
     const monthly = Number(monthlyPrice);
     const yearly = Number(yearlyPrice);
+    const freeTier = Number(tierPricing.free || "0");
+    const proTier = Number(tierPricing.pro || "0");
+    const vipTier = Number(tierPricing.vip || "0");
 
     if (isPaid) {
       if (!Number.isFinite(monthly) || monthly <= 0) {
@@ -99,6 +155,15 @@ export async function PUT(req: Request, context: RouteContext) {
       }
       if (!Number.isFinite(yearly) || yearly <= 0) {
         return NextResponse.json({ error: "Yearly price must be greater than 0" }, { status: 400 });
+      }
+      if (!Number.isFinite(freeTier) || freeTier < 0) {
+        return NextResponse.json({ error: "Free tier must be 0 or more" }, { status: 400 });
+      }
+      if (!Number.isFinite(proTier) || proTier <= 0) {
+        return NextResponse.json({ error: "Pro tier must be greater than 0" }, { status: 400 });
+      }
+      if (!Number.isFinite(vipTier) || vipTier <= 0) {
+        return NextResponse.json({ error: "VIP tier must be greater than 0" }, { status: 400 });
       }
     }
 
@@ -135,6 +200,12 @@ export async function PUT(req: Request, context: RouteContext) {
         pricing: {
           monthlyPrice: isPaid ? monthly : 0,
           yearlyPrice: isPaid ? yearly : 0,
+          defaultTier,
+          tierPricing: {
+            free: isPaid ? freeTier : 0,
+            pro: isPaid ? proTier : 0,
+            vip: isPaid ? vipTier : 0,
+          },
           currency: "USD",
           updatedAt: new Date().toISOString(),
         },

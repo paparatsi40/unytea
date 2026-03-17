@@ -208,6 +208,14 @@ export async function joinCommunity(communityId: string) {
       return { success: false, error: "Community not found" };
     }
 
+    if (community.isPaid) {
+      return {
+        success: false,
+        error: "Payment required to join this community",
+        code: "PAYMENT_REQUIRED",
+      };
+    }
+
     // Create membership
     const member = await prisma.member.create({
       data: {
