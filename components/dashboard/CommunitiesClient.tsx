@@ -4,19 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import {
-  Plus,
-  Users,
-  Loader2,
-  Crown,
-  Calendar,
-  ArrowRight,
-  Radio,
-  UserPlus,
-  MessageSquare,
-  Flame,
-  AlertTriangle,
-} from "lucide-react";
+import { Plus, Users, Loader2, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type Community = {
