@@ -153,15 +153,6 @@ function getHeroContent(community: Community) {
     };
   }
 
-  if (!nextSession) {
-    return {
-      title: "⚡ Schedule your next session",
-      subtitle: "Communities grow faster with a consistent weekly rhythm",
-      primaryLabel: "Schedule next session",
-      primaryHref: "/dashboard/sessions/create",
-    };
-  }
-
   const d = daysUntil(nextSession.scheduledAt);
 
   if (nextSession.status === "IN_PROGRESS") {
@@ -297,7 +288,7 @@ export function CommunitiesClient() {
     if (state.state === "empty") {
       return {
         title: "No upcoming session",
-        hint: "Schedule your next session to activate engagement",
+        hint: "Keep momentum going with your next session",
       };
     }
 
@@ -377,7 +368,7 @@ export function CommunitiesClient() {
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       {primaryCommunity && hero && (
-        <section className="rounded-3xl border border-border bg-card p-6 shadow-sm">
+        <section className="rounded-3xl border border-border bg-card p-5 shadow-sm">
           <div className="space-y-4">
             <div>
               <p className="text-2xl font-bold text-foreground">{primaryCommunity.name}</p>
@@ -412,21 +403,11 @@ export function CommunitiesClient() {
           <div className="mt-4 space-y-3 text-sm">
             {milestones.map((item) => (
               <div key={item.label} className="flex items-center gap-2">
-                <span
-                  className={
-                    item.done
-                      ? "text-emerald-600"
-                      : "text-muted-foreground"
-                  }
-                >
+                <span className={item.done ? "text-emerald-600" : "text-muted-foreground"}>
                   {item.done ? "✓" : "○"}
                 </span>
                 <span
-                  className={
-                    item.done
-                      ? "font-medium text-emerald-700"
-                      : "text-foreground"
-                  }
+                  className={item.done ? "font-medium text-emerald-700" : "text-foreground"}
                 >
                   {item.label}
                 </span>
@@ -456,9 +437,9 @@ export function CommunitiesClient() {
       <section className="space-y-3">
         <div className="flex items-center justify-between">
           <p className="text-sm font-semibold text-foreground">Your communities</p>
-          <p className="text-xs text-muted-foreground">
-            Ordered by priority
-          </p>
+          {sortedCommunities.length > 1 && (
+            <p className="text-xs text-muted-foreground">Ordered by priority</p>
+          )}
         </div>
 
         <div className="space-y-3">
@@ -498,7 +479,7 @@ export function CommunitiesClient() {
 
                   <div className="flex shrink-0 gap-2">
                     <Link href={state.primaryHref}>
-                      <Button size="sm" variant={isPrimary ? "default" : "outline"}>
+                      <Button size="sm" variant="outline">
                         {state.primaryLabel}
                       </Button>
                     </Link>
