@@ -579,6 +579,190 @@ export async function getHostAnalyticsV1() {
   }
 }
 
+export async function getHostScoreSystem() {
+  try {
+    const userId = await getCurrentUserId();
+    if (!userId) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const now = new Date();
+    const last14Days = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+    const last7Days = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const next14Days = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+
+    const hostMemberships = await prisma.member.findMany({
+      where: {
+        userId,
+        role: { in: ["OWNER", "ADMIN", "MODERATOR"] },
+      },
+      select: { communityId: true },
+    });
+
+    const communityIds = hostMemberships.map((m) => m.communityId);
+
+    const [completedSessions, upcomingSessions, recentPosts, recentComments, recapPosts, resourcesAdded] =
+      await Promise.all([
+        prisma.mentorSession.findMany({
+          where: {
+            OR: [{ mentorId: userId }, { communityId: { in: communityIds } }],
+            status: "COMPLETED",
+            endedAt: { gte: last14Days },
+          },
+          select: {
+            attendeeCount: true,
+            participations: {
+              select: { eventsData: true, id: true },
+            },
+          },
+        }),
+        prisma.mentorSession.count({
+          where: {
+            OR: [{ mentorId: userId }, { communityId: { in: communityIds } }],
+            status: "SCHEDULED",
+            scheduledAt: { gte: now, lte: next14Days },
+          },
+        }),
+        prisma.post.count({
+          where: {
+            communityId: { in: communityIds },
+            createdAt: { gte: last7Days },
+          },
+        }),
+        prisma.comment.count({
+          where: {
+            post: {
+              communityId: { in: communityIds },
+            },
+            createdAt: { gte: last7Days },
+          },
+        }),
+        prisma.post.count({
+          where: {
+            communityId: { in: communityIds },
+            contentType: "SESSION_ANNOUNCEMENT",
+            createdAt: { gte: last14Days },
+          },
+        }),
+        prisma.sessionResource.count({
+          where: {
+            session: {
+              OR: [{ mentorId: userId }, { communityId: { in: communityIds } }],
+            },
+            createdAt: { gte: last14Days },
+          },
+        }),
+      ]);
+
+    const sessionsCount = completedSessions.length;
+    const cadenceScore = Math.max(0, Math.min(100, Math.round((sessionsCount / 3) * 100)));
+
+    const totalRsvps = completedSessions.reduce((sum, session) => {
+      const count = session.participations.filter((p: any) => {
+        const data = (p.eventsData || {}) as Record<string, unknown>;
+        return data.rsvp === true || data.rsvpStatus === "attending";
+      }).length;
+      return sum + count;
+    }, 0);
+
+    const totalAttended = completedSessions.reduce(
+      (sum, s) => sum + (s.attendeeCount || s.participations.length || 0),
+      0
+    );
+
+    const rsvpToAttendanceRate = totalRsvps > 0 ? Math.round((totalAttended / totalRsvps) * 100) : 0;
+    const attendanceScore = Math.max(0, Math.min(100, rsvpToAttendanceRate));
+
+    const engagementEvents = recentPosts + recentComments;
+    const engagementScore = Math.max(0, Math.min(100, Math.round((engagementEvents / 20) * 100)));
+
+    const consistencyRaw = Math.round((upcomingSessions / 2) * 100);
+    const consistencyScore = Math.max(0, Math.min(100, consistencyRaw));
+
+    const contentUnits = recapPosts + resourcesAdded;
+    const contentScore = Math.max(0, Math.min(100, Math.round((contentUnits / 6) * 100)));
+
+    const hostScore = Math.round(
+      cadenceScore * 0.25 +
+      attendanceScore * 0.25 +
+      engagementScore * 0.2 +
+      consistencyScore * 0.15 +
+      contentScore * 0.15
+    );
+
+    const level = hostScore >= 85 ? "Elite" : hostScore >= 70 ? "Strong" : hostScore >= 50 ? "Growing" : "At risk";
+
+    const components = [
+      { key: "cadence", label: "Cadence", score: cadenceScore, href: "/dashboard/sessions/create" },
+      { key: "attendance", label: "Attendance", score: attendanceScore, href: "/dashboard/sessions" },
+      { key: "engagement", label: "Engagement", score: engagementScore, href: "/dashboard/communities" },
+      { key: "consistency", label: "Consistency", score: consistencyScore, href: "/dashboard/sessions/create" },
+      { key: "content", label: "Content Reuse", score: contentScore, href: "/dashboard/knowledge-library" },
+    ];
+
+    const weakest = [...components].sort((a, b) => a.score - b.score).slice(0, 2);
+
+    const actions = weakest.map((item) => {
+      if (item.key === "cadence") {
+        return {
+          title: "Schedule 2 sessions for next week",
+          description: "Communities that schedule ahead keep attendance stable.",
+          href: "/dashboard/sessions/create",
+          cta: "Schedule sessions",
+        };
+      }
+      if (item.key === "attendance") {
+        return {
+          title: "Push RSVP + reminders",
+          description: "Set clear session titles and remind members 24h/1h/10m before live.",
+          href: "/dashboard/sessions",
+          cta: "Improve attendance",
+        };
+      }
+      if (item.key === "engagement") {
+        return {
+          title: "Post one discussion prompt",
+          description: "Ask one question in feed before each live session.",
+          href: "/dashboard/communities",
+          cta: "Post in feed",
+        };
+      }
+      if (item.key === "content") {
+        return {
+          title: "Publish recap to library",
+          description: "Turn last session into reusable content this week.",
+          href: "/dashboard/knowledge-library",
+          cta: "Publish recap",
+        };
+      }
+      return {
+        title: "Create a weekly rhythm",
+        description: "Set a fixed weekly slot to increase habit and predictability.",
+        href: "/dashboard/sessions/create",
+        cta: "Set weekly slot",
+      };
+    });
+
+    return {
+      success: true,
+      hostScore,
+      level,
+      summary: {
+        completedSessions: sessionsCount,
+        rsvpToAttendanceRate,
+        engagementEvents,
+        upcomingSessions,
+        contentUnits,
+      },
+      components,
+      actions,
+    };
+  } catch (error) {
+    console.error("Error getting host score system:", error);
+    return { success: false, error: "Failed to load host score" };
+  }
+}
+
 export async function getNextRecommendedAction() {
   try {
     const [metricsRes, nextSessionRes, hostAnalyticsRes] = await Promise.all([
