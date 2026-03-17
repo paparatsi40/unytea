@@ -12,6 +12,7 @@ type Community = {
   name: string;
   slug: string;
   description: string | null;
+  coverImageUrl?: string | null;
   isPrivate: boolean;
   role: string;
   _count: {
@@ -120,26 +121,21 @@ function getCardState(community: Community): {
   };
 }
 
-function getPriority(cardState: CommunityCardState) {
-  if (cardState === "empty") {
-    return {
-      label: "Needs attention",
-      tone: "bg-rose-100 text-rose-800",
-    };
-  }
-
-  if (cardState === "healthy") {
-    return {
-      label: "Healthy",
-      tone: "bg-emerald-100 text-emerald-800",
-    };
-  }
-
-  return {
-    label: "Growing",
-    tone: "bg-amber-100 text-amber-800",
-  };
-}
+const DEFAULT_HERO_COVER = `data:image/svg+xml;utf8,${encodeURIComponent(`
+<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='300' viewBox='0 0 1200 300'>
+  <defs>
+    <linearGradient id='bg' x1='0' y1='0' x2='1' y2='1'>
+      <stop offset='0%' stop-color='#4c1d95'/>
+      <stop offset='55%' stop-color='#9333ea'/>
+      <stop offset='100%' stop-color='#f97316'/>
+    </linearGradient>
+  </defs>
+  <rect width='1200' height='300' fill='url(#bg)'/>
+  <circle cx='180' cy='70' r='130' fill='rgba(255,255,255,.12)'/>
+  <circle cx='980' cy='250' r='170' fill='rgba(255,255,255,.10)'/>
+  <circle cx='700' cy='40' r='90' fill='rgba(255,255,255,.10)'/>
+</svg>
+`)}`;
 
 export function CommunitiesClient() {
   const { user, isLoading } = useCurrentUser();
@@ -244,6 +240,8 @@ export function CommunitiesClient() {
     return `${formatSessionDayTime(primaryCommunity.nextSession.scheduledAt)} · ${primaryCommunity.nextSession.attendeeCount || 0} attending`;
   }, [primaryCommunity]);
 
+  const heroCoverImage = primaryCommunity?.coverImageUrl || DEFAULT_HERO_COVER;
+
   if (isLoading || loading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
@@ -296,7 +294,10 @@ export function CommunitiesClient() {
     <div className="space-y-5">
       {primaryCommunity && primaryCard && (
         <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
-          <div className="h-14 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-orange-500" />
+          <div className="relative h-20 overflow-hidden">
+            <img src={heroCoverImage} alt={`${primaryCommunity.name} cover`} className="h-full w-full object-cover" />
+            <div className="absolute inset-0 bg-black/20" />
+          </div>
           <div className="space-y-4 p-6 pt-5">
             <div>
               <p className="text-2xl font-bold text-foreground">{primaryCommunity.name}</p>
@@ -371,7 +372,6 @@ export function CommunitiesClient() {
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {communities.map((community) => {
             const card = getCardState(community);
-            const priority = getPriority(card.state);
             return (
               <div key={community.id} className="rounded-2xl border border-border bg-card p-5">
                 <p className="truncate text-lg font-semibold text-foreground">{community.name}</p>
@@ -382,9 +382,6 @@ export function CommunitiesClient() {
                   <p className="text-sm font-semibold">{card.title}</p>
                   <p className="mt-1 text-sm">{card.subtitle}</p>
                 </div>
-                <p className="mt-2 text-xs font-semibold">
-                  <span className={`rounded-full px-2 py-1 ${priority.tone}`}>{priority.label}</span>
-                </p>
                 <div className="mt-3 flex gap-2">
                   <Link href={card.primaryHref} className="flex-1">
                     <Button className="w-full" size="sm">
