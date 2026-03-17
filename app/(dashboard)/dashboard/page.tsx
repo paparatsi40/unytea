@@ -592,10 +592,37 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-zinc-50 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-purple-200 border-t-purple-600" />
-          <p className="text-zinc-500">Loading your dashboard...</p>
+      <div className="min-h-screen bg-zinc-50">
+        <div className="mx-auto max-w-7xl p-6 space-y-6 animate-pulse">
+          <div className="flex items-start justify-between">
+            <div className="space-y-2">
+              <div className="h-8 w-64 rounded bg-zinc-200" />
+              <div className="h-4 w-96 rounded bg-zinc-200" />
+            </div>
+            <div className="h-10 w-44 rounded bg-zinc-200" />
+          </div>
+
+          <div className="rounded-xl border border-zinc-200 bg-white p-5">
+            <div className="h-6 w-72 rounded bg-zinc-200" />
+            <div className="mt-2 h-4 w-full max-w-2xl rounded bg-zinc-200" />
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              <div className="h-24 rounded-lg bg-zinc-100" />
+              <div className="h-24 rounded-lg bg-zinc-100" />
+              <div className="h-24 rounded-lg bg-zinc-100" />
+            </div>
+          </div>
+
+          <div className="grid gap-4 lg:grid-cols-2">
+            <div className="h-44 rounded-xl border border-zinc-200 bg-white" />
+            <div className="h-44 rounded-xl border border-zinc-200 bg-white" />
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-4">
+            <div className="h-28 rounded-xl border border-zinc-200 bg-white" />
+            <div className="h-28 rounded-xl border border-zinc-200 bg-white" />
+            <div className="h-28 rounded-xl border border-zinc-200 bg-white" />
+            <div className="h-28 rounded-xl border border-zinc-200 bg-white" />
+          </div>
         </div>
       </div>
     );
