@@ -1185,7 +1185,7 @@ export async function getCommunityOSSnapshot() {
 
     const communityIds = hostCommunities.map((m) => m.communityId);
 
-    const [weeklySessions, questionsSubmitted, recapPosts, recordingViews] = await Promise.all([
+    const [weeklySessions, questionsSubmitted, recapPosts, recordingViews, weeklyHostedSessions, lastCompletedSession, activeMembers] = await Promise.all([
       prisma.mentorSession.findMany({
         where: {
           communityId: { in: communityIds },
@@ -1224,6 +1224,30 @@ export async function getCommunityOSSnapshot() {
         },
         _sum: { viewCount: true },
       }),
+      prisma.mentorSession.count({
+        where: {
+          communityId: { in: communityIds },
+          status: "COMPLETED",
+          endedAt: { gte: weekStart, lt: weekEnd },
+        },
+      }),
+      prisma.mentorSession.findFirst({
+        where: {
+          communityId: { in: communityIds },
+          status: "COMPLETED",
+        },
+        orderBy: { endedAt: "desc" },
+        select: {
+          attendeeCount: true,
+          participations: { select: { id: true } },
+        },
+      }),
+      prisma.member.count({
+        where: {
+          communityId: { in: communityIds },
+          status: "ACTIVE",
+        },
+      }),
     ]);
 
     const weeklyProgram = weeklySessions.slice(0, 6).map((s) => ({
@@ -1236,12 +1260,102 @@ export async function getCommunityOSSnapshot() {
       seriesStartTime: s.series?.startTime || null,
     }));
 
+    const lastAttendance = lastCompletedSession
+      ? lastCompletedSession.attendeeCount || lastCompletedSession.participations.length || 0
+      : 0;
+
+    const noSessionsThisWeek = weeklySessions.length === 0;
+    const lowAttendance = lastCompletedSession ? lastAttendance < 5 : false;
+    const newCommunity = activeMembers > 0 && activeMembers <= 5;
+
+    const baseSteps = [
+      {
+        id: "plan",
+        day: "Monday",
+        action: "Schedule your next session",
+        description: "Create at least 1 live session so members know what’s coming this week.",
+        cta: "Schedule session",
+        href: "/dashboard/sessions/create",
+        completed: weeklySessions.length > 0,
+      },
+      {
+        id: "promote",
+        day: "Tuesday",
+        action: "Ask your community a question before your session",
+        description: "Collect member questions early to increase RSVPs and attendance.",
+        cta: "Ask question in feed",
+        href: "/dashboard/communities",
+        completed: questionsSubmitted > 0,
+      },
+      {
+        id: "host",
+        day: "Day of session",
+        action: "Host your live session",
+        description: "Go live and engage members in real time.",
+        cta: "Open sessions",
+        href: "/dashboard/sessions",
+        completed: weeklyHostedSessions > 0,
+      },
+      {
+        id: "capture",
+        day: "After session",
+        action: "Share recap and key takeaways",
+        description: "Publish recap so members who missed live can still benefit.",
+        cta: "Share recap",
+        href: "/dashboard/recordings",
+        completed: recapPosts > 0,
+      },
+      {
+        id: "review",
+        day: "End of week",
+        action: "Review attendance and engagement",
+        description: "Use analytics to decide what to improve next week.",
+        cta: "Review analytics",
+        href: "/dashboard/analytics",
+        completed: (recordingViews._sum.viewCount || 0) > 0,
+      },
+    ];
+
+    const dynamicBanner = noSessionsThisWeek
+      ? {
+          icon: "⚠️",
+          title: "You don’t have sessions this week",
+          description: "Schedule your first session to start momentum.",
+          cta: "Schedule your first session",
+          href: "/dashboard/sessions/create",
+        }
+      : lowAttendance
+      ? {
+          icon: "⚠️",
+          title: "Low attendance in your last session",
+          description: "Ask questions before live and push reminders to recover attendance.",
+          cta: "Create question post",
+          href: "/dashboard/communities",
+        }
+      : newCommunity
+      ? {
+          icon: "🌱",
+          title: "Grow your first members",
+          description: "Invite 5 members and share your upcoming session link.",
+          cta: "Invite members",
+          href: "/dashboard/communities",
+        }
+      : {
+          icon: "✅",
+          title: "You’re on track this week",
+          description: "Keep following your weekly playbook to maintain momentum.",
+          cta: "View sessions",
+          href: "/dashboard/sessions",
+        };
+
+    const completedSteps = baseSteps.filter((s) => s.completed).length;
+
     const checklist = {
-      plan: weeklySessions.length > 0,
-      promote: questionsSubmitted > 0,
-      host: false,
-      capture: recapPosts > 0,
-      reuse: (recordingViews._sum.viewCount || 0) > 0,
+      plan: baseSteps[0].completed,
+      promote: baseSteps[1].completed,
+      host: baseSteps[2].completed,
+      capture: baseSteps[3].completed,
+      reuse: baseSteps[4].completed,
     };
 
     return {
@@ -1255,6 +1369,13 @@ export async function getCommunityOSSnapshot() {
           recordingViews: recordingViews._sum.viewCount || 0,
         },
         checklist,
+        playbook: {
+          title: "This week plan",
+          completedSteps,
+          totalSteps: baseSteps.length,
+          steps: baseSteps,
+          dynamicBanner,
+        },
       },
     };
   } catch (error) {

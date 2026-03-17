@@ -170,6 +170,27 @@ interface CommunityOSSnapshot {
     capture: boolean;
     reuse: boolean;
   };
+  playbook?: {
+    title: string;
+    completedSteps: number;
+    totalSteps: number;
+    dynamicBanner: {
+      icon: string;
+      title: string;
+      description: string;
+      cta: string;
+      href: string;
+    };
+    steps: Array<{
+      id: string;
+      day: string;
+      action: string;
+      description: string;
+      cta: string;
+      href: string;
+      completed: boolean;
+    }>;
+  };
 }
 
 interface HostScoreSystem {
@@ -636,13 +657,43 @@ export default function DashboardPage() {
                 </div>
 
                 <div>
-                  <p className="text-sm font-semibold text-zinc-900">Weekly playbook</p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-semibold text-zinc-900">{communityOS.playbook?.title || "This week plan"}</p>
+                    {communityOS.playbook && (
+                      <Badge variant="outline">
+                        {communityOS.playbook.completedSteps}/{communityOS.playbook.totalSteps} completed
+                      </Badge>
+                    )}
+                  </div>
+
+                  {communityOS.playbook?.dynamicBanner && (
+                    <div className="mt-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
+                      <p className="text-sm font-semibold text-amber-900">
+                        {communityOS.playbook.dynamicBanner.icon} {communityOS.playbook.dynamicBanner.title}
+                      </p>
+                      <p className="mt-1 text-xs text-amber-800">{communityOS.playbook.dynamicBanner.description}</p>
+                      <Link href={communityOS.playbook.dynamicBanner.href} className="mt-2 inline-flex">
+                        <Button size="sm" className="bg-amber-400 text-zinc-900 hover:bg-amber-300">
+                          {communityOS.playbook.dynamicBanner.cta}
+                        </Button>
+                      </Link>
+                    </div>
+                  )}
+
                   <div className="mt-2 space-y-2 text-sm">
-                    <p className={communityOS.checklist.plan ? "text-green-700" : "text-zinc-600"}>• Monday: Schedule sessions</p>
-                    <p className={communityOS.checklist.promote ? "text-green-700" : "text-zinc-600"}>• Tuesday: Ask questions in feed</p>
-                    <p className="text-zinc-600">• Wednesday/Friday: Host live sessions</p>
-                    <p className={communityOS.checklist.capture ? "text-green-700" : "text-zinc-600"}>• Saturday: Share recap</p>
-                    <p className={communityOS.checklist.reuse ? "text-green-700" : "text-zinc-600"}>• Sunday: Reuse into library/course</p>
+                    {(communityOS.playbook?.steps || []).map((step) => (
+                      <div key={step.id} className="rounded-lg border border-zinc-200 p-2.5">
+                        <p className={step.completed ? "text-green-700" : "text-zinc-700"}>
+                          {step.completed ? "☑" : "☐"} <span className="font-medium">{step.day}</span> · {step.action}
+                        </p>
+                        <p className="mt-1 text-xs text-zinc-500">{step.description}</p>
+                        {!step.completed && (
+                          <Link href={step.href} className="mt-1 inline-flex">
+                            <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">{step.cta}</Button>
+                          </Link>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
