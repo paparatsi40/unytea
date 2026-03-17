@@ -14,11 +14,18 @@ type TierPricing = {
   vip: string;
 };
 
+type TierStripePriceIds = {
+  free: string;
+  pro: string;
+  vip: string;
+};
+
 function extractPricing(pricing: unknown): {
   monthlyPrice: string;
   yearlyPrice: string;
   defaultTier: "free" | "pro" | "vip";
   tierPricing: TierPricing;
+  tierStripePriceIds: TierStripePriceIds;
 } {
   if (!pricing || typeof pricing !== "object") {
     return {
@@ -26,6 +33,7 @@ function extractPricing(pricing: unknown): {
       yearlyPrice: "290",
       defaultTier: "pro",
       tierPricing: { free: "0", pro: "29", vip: "99" },
+      tierStripePriceIds: { free: "", pro: "", vip: "" },
     };
   }
 
@@ -65,7 +73,14 @@ function extractPricing(pricing: unknown): {
         : "99",
   };
 
-  return { monthlyPrice, yearlyPrice, defaultTier, tierPricing };
+  const rawTierStripePriceIds = record.tierStripePriceIds as Record<string, unknown> | undefined;
+  const tierStripePriceIds: TierStripePriceIds = {
+    free: rawTierStripePriceIds && typeof rawTierStripePriceIds.free === "string" ? rawTierStripePriceIds.free : "",
+    pro: rawTierStripePriceIds && typeof rawTierStripePriceIds.pro === "string" ? rawTierStripePriceIds.pro : "",
+    vip: rawTierStripePriceIds && typeof rawTierStripePriceIds.vip === "string" ? rawTierStripePriceIds.vip : "",
+  };
+
+  return { monthlyPrice, yearlyPrice, defaultTier, tierPricing, tierStripePriceIds };
 }
 
 export async function GET(_req: Request, context: RouteContext) {
@@ -113,6 +128,7 @@ export async function GET(_req: Request, context: RouteContext) {
         yearlyPrice: prices.yearlyPrice,
         defaultTier: prices.defaultTier,
         tierPricing: prices.tierPricing,
+        tierStripePriceIds: prices.tierStripePriceIds,
       },
     });
   } catch (error) {
@@ -141,6 +157,12 @@ export async function PUT(req: Request, context: RouteContext) {
       free: String(body?.tierPricing?.free ?? "0").trim(),
       pro: String(body?.tierPricing?.pro ?? (monthlyPrice || "29")).trim(),
       vip: String(body?.tierPricing?.vip ?? "99").trim(),
+    };
+
+    const tierStripePriceIds = {
+      free: String(body?.tierStripePriceIds?.free ?? "").trim(),
+      pro: String(body?.tierStripePriceIds?.pro ?? "").trim(),
+      vip: String(body?.tierStripePriceIds?.vip ?? "").trim(),
     };
 
     const monthly = Number(monthlyPrice);
@@ -206,6 +228,11 @@ export async function PUT(req: Request, context: RouteContext) {
             pro: isPaid ? proTier : 0,
             vip: isPaid ? vipTier : 0,
           },
+          tierStripePriceIds: {
+            free: isPaid ? tierStripePriceIds.free : "",
+            pro: isPaid ? tierStripePriceIds.pro : "",
+            vip: isPaid ? tierStripePriceIds.vip : "",
+          },
           currency: "USD",
           updatedAt: new Date().toISOString(),
         },
@@ -224,6 +251,9 @@ export async function PUT(req: Request, context: RouteContext) {
         isPaid: updated.isPaid,
         monthlyPrice: prices.monthlyPrice,
         yearlyPrice: prices.yearlyPrice,
+        defaultTier: prices.defaultTier,
+        tierPricing: prices.tierPricing,
+        tierStripePriceIds: prices.tierStripePriceIds,
       },
     });
   } catch (error) {

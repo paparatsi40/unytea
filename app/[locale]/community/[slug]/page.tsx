@@ -144,7 +144,7 @@ export default async function CommunityPublicPreviewPage({
   searchParams,
 }: {
   params: { locale: string; slug: string };
-  searchParams?: { src?: string; rank?: string; sort?: string; paywall?: string };
+  searchParams?: { src?: string; rank?: string; sort?: string; paywall?: string; paid?: string; error?: string };
 }) {
   const { slug, locale } = params;
   const source = searchParams?.src || "direct";
@@ -331,7 +331,7 @@ export default async function CommunityPublicPreviewPage({
     }
 
     if ((result as { code?: string })?.code === "PAYMENT_REQUIRED") {
-      redirect(`/${locale}/community/${currentCommunity.slug}?paywall=1`);
+      redirect(`/api/stripe/community-checkout-start?communityId=${currentCommunity.id}&slug=${currentCommunity.slug}&locale=${locale}&tier=${defaultTier}`);
     }
 
     redirect(`/${locale}/community/${currentCommunity.slug}`);
@@ -379,17 +379,26 @@ export default async function CommunityPublicPreviewPage({
     }),
   ]);
 
+  const pricingRecord =
+    currentCommunity.pricing && typeof currentCommunity.pricing === "object"
+      ? (currentCommunity.pricing as Record<string, unknown>)
+      : null;
+
   const defaultTier =
-    currentCommunity.pricing &&
-    typeof currentCommunity.pricing === "object" &&
-    ["free", "pro", "vip"].includes((currentCommunity.pricing as Record<string, unknown>).defaultTier as string)
-      ? ((currentCommunity.pricing as Record<string, unknown>).defaultTier as "free" | "pro" | "vip")
+    pricingRecord && ["free", "pro", "vip"].includes(pricingRecord.defaultTier as string)
+      ? (pricingRecord.defaultTier as "free" | "pro" | "vip")
       : "pro";
+
+  const tierPricing = (pricingRecord?.tierPricing as Record<string, unknown> | undefined) || {};
+  const selectedTierPriceRaw = tierPricing[defaultTier];
+  const selectedTierPrice = typeof selectedTierPriceRaw === "number" || typeof selectedTierPriceRaw === "string"
+    ? Number(selectedTierPriceRaw)
+    : 0;
 
   const accessTypeLabel = currentCommunity.isPaid ? `De pago · ${defaultTier.toUpperCase()}` : "Gratis";
   const subscribeLabel = userId
     ? currentCommunity.isPaid
-      ? `Suscribirme (${defaultTier.toUpperCase()})`
+      ? `Suscribirme ${selectedTierPrice > 0 ? `(USD ${selectedTierPrice})` : `(${defaultTier.toUpperCase()})`}`
       : "Suscribirme"
     : "Iniciar sesión para suscribirme";
   const weeklyIdentity = everyLabel(nextSession?.series);
@@ -400,7 +409,12 @@ export default async function CommunityPublicPreviewPage({
         <section className="rounded-xl border border-border bg-card p-6">
           {searchParams?.paywall === "1" && (
             <div className="mb-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800">
-              Esta comunidad es de pago. Completa checkout para suscribirte.
+              Esta comunidad es de pago. Haz clic en “Suscribirme” para completar checkout.
+            </div>
+          )}
+          {searchParams?.paid === "1" && (
+            <div className="mb-4 rounded-lg border border-emerald-300 bg-emerald-50 p-3 text-sm text-emerald-800">
+              Pago confirmado. Ya puedes acceder como miembro.
             </div>
           )}
           <div className="flex flex-wrap items-center justify-between gap-3">

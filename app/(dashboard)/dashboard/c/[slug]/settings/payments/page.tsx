@@ -34,6 +34,11 @@ export default function CommunityPaymentsPage() {
       pro: "29",
       vip: "99",
     },
+    tierStripePriceIds: {
+      free: "",
+      pro: "",
+      vip: "",
+    },
   });
 
   // Fetch Stripe Connect status and community settings
@@ -65,6 +70,11 @@ export default function CommunityPaymentsPage() {
                 free: String(payload.settings.tierPricing?.free ?? "0"),
                 pro: String(payload.settings.tierPricing?.pro ?? payload.settings.monthlyPrice ?? "29"),
                 vip: String(payload.settings.tierPricing?.vip ?? "99"),
+              },
+              tierStripePriceIds: {
+                free: String(payload.settings.tierStripePriceIds?.free ?? ""),
+                pro: String(payload.settings.tierStripePriceIds?.pro ?? ""),
+                vip: String(payload.settings.tierStripePriceIds?.vip ?? ""),
               },
             });
           }
@@ -138,6 +148,11 @@ export default function CommunityPaymentsPage() {
             free: String(payload.settings.tierPricing?.free ?? settings.tierPricing.free),
             pro: String(payload.settings.tierPricing?.pro ?? settings.tierPricing.pro),
             vip: String(payload.settings.tierPricing?.vip ?? settings.tierPricing.vip),
+          },
+          tierStripePriceIds: {
+            free: String(payload.settings.tierStripePriceIds?.free ?? settings.tierStripePriceIds.free),
+            pro: String(payload.settings.tierStripePriceIds?.pro ?? settings.tierStripePriceIds.pro),
+            vip: String(payload.settings.tierStripePriceIds?.vip ?? settings.tierStripePriceIds.vip),
           },
         });
       }
@@ -416,6 +431,51 @@ export default function CommunityPaymentsPage() {
                           tierPricing: { ...prev.tierPricing, vip: e.target.value },
                         }))
                       }
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div className="space-y-1">
+                    <Label htmlFor="stripePriceFree">Stripe Price ID (Free)</Label>
+                    <Input
+                      id="stripePriceFree"
+                      value={settings.tierStripePriceIds.free}
+                      onChange={(e) =>
+                        setSettings((prev) => ({
+                          ...prev,
+                          tierStripePriceIds: { ...prev.tierStripePriceIds, free: e.target.value },
+                        }))
+                      }
+                      placeholder="price_... (optional)"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="stripePricePro">Stripe Price ID (Pro)</Label>
+                    <Input
+                      id="stripePricePro"
+                      value={settings.tierStripePriceIds.pro}
+                      onChange={(e) =>
+                        setSettings((prev) => ({
+                          ...prev,
+                          tierStripePriceIds: { ...prev.tierStripePriceIds, pro: e.target.value },
+                        }))
+                      }
+                      placeholder="price_..."
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="stripePriceVip">Stripe Price ID (VIP)</Label>
+                    <Input
+                      id="stripePriceVip"
+                      value={settings.tierStripePriceIds.vip}
+                      onChange={(e) =>
+                        setSettings((prev) => ({
+                          ...prev,
+                          tierStripePriceIds: { ...prev.tierStripePriceIds, vip: e.target.value },
+                        }))
+                      }
+                      placeholder="price_..."
                     />
                   </div>
                 </div>
