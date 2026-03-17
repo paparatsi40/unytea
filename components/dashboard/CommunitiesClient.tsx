@@ -153,15 +153,6 @@ function getHeroContent(community: Community) {
     };
   }
 
-  if (!nextSession) {
-    return {
-      title: "⚡ Schedule your next session",
-      subtitle: "Communities grow faster with a consistent weekly rhythm",
-      primaryLabel: "Schedule next session",
-      primaryHref: "/dashboard/sessions/create",
-    };
-  }
-
   const d = daysUntil(nextSession.scheduledAt);
 
   if (nextSession.status === "IN_PROGRESS") {
@@ -331,7 +322,7 @@ export function CommunitiesClient() {
       <div className="flex min-h-[400px] items-center justify-center">
         <div className="text-center">
           <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />
-          <p className="mt-4 text-muted-foreground">Loading communities...</p>
+          <p className="mt-4 text-sm text-muted-foreground">Loading communities...</p>
         </div>
       </div>
     );
@@ -353,13 +344,15 @@ export function CommunitiesClient() {
 
   if (!communities.length) {
     return (
-      <div className="flex min-h-[320px] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-card p-10 text-center">
-        <Users className="h-10 w-10 text-primary" />
-        <h2 className="mt-4 text-xl font-bold text-foreground">No communities yet</h2>
-        <p className="mt-2 max-w-md text-sm text-muted-foreground">
+      <div className="rounded-3xl border border-dashed border-border bg-card/70 p-10 text-center shadow-sm">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">
+          <Users className="h-6 w-6 text-primary" />
+        </div>
+        <h2 className="mt-4 text-xl font-semibold text-foreground">No communities yet</h2>
+        <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
           Create your first community to start your community engine.
         </p>
-        <div className="mt-5 flex items-center gap-2">
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
           <Link href="/dashboard/communities/new">
             <Button>
               <Plus className="mr-2 h-4 w-4" />
@@ -375,48 +368,75 @@ export function CommunitiesClient() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
+    <div className="mx-auto max-w-6xl space-y-5">
       {primaryCommunity && hero && (
-        <section className="rounded-3xl border border-border bg-card p-5 shadow-sm">
-          <div className="space-y-4">
-            <div>
-              <p className="text-2xl font-bold text-foreground">{primaryCommunity.name}</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {primaryCommunity._count.members} members · {primaryCommunity._count.posts} posts
-              </p>
-            </div>
+        <section className="rounded-[28px] border border-border/70 bg-card shadow-sm">
+          <div className="rounded-[28px] bg-gradient-to-br from-background via-background to-muted/20 p-6 md:p-7">
+            <div className="max-w-3xl space-y-5">
+              <div className="space-y-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h1 className="text-3xl font-semibold tracking-tight text-foreground">
+                    {primaryCommunity.name}
+                  </h1>
+                  <span className="rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
+                    In focus
+                  </span>
+                </div>
 
-            <div>
-              <p className="text-xl font-semibold text-foreground">{hero.title}</p>
-              <p className="mt-1 text-sm text-muted-foreground">{hero.subtitle}</p>
-            </div>
+                <p className="text-sm text-muted-foreground">
+                  {primaryCommunity._count.members} members · {primaryCommunity._count.posts} posts
+                </p>
+              </div>
 
-            <div className="flex flex-wrap gap-2">
-              <Link href={hero.primaryHref}>
-                <Button>{hero.primaryLabel}</Button>
-              </Link>
-              <Link href={`/dashboard/c/${primaryCommunity.slug}`}>
-                <Button variant="outline">Enter community</Button>
-              </Link>
+              <div className="space-y-2">
+                <p className="text-2xl font-semibold tracking-tight text-foreground">
+                  {hero.title}
+                </p>
+                <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
+                  {hero.subtitle}
+                </p>
+              </div>
+
+              <div className="flex flex-wrap gap-3">
+                <Link href={hero.primaryHref}>
+                  <Button className="h-11 px-5 text-sm font-medium">{hero.primaryLabel}</Button>
+                </Link>
+                <Link href={`/dashboard/c/${primaryCommunity.slug}`}>
+                  <Button variant="outline" className="h-11 px-5 text-sm font-medium">
+                    Enter community
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         </section>
       )}
 
-      <div className="grid gap-4 lg:grid-cols-[1.3fr_0.7fr]">
-        <section className="rounded-2xl border border-border bg-card p-5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+      <div className="grid gap-4 lg:grid-cols-[1.35fr_0.65fr]">
+        <section className="rounded-3xl border border-border/70 bg-card p-6 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
             Your progress
           </p>
 
-          <div className="mt-4 space-y-3 text-sm">
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
             {milestones.map((item) => (
-              <div key={item.label} className="flex items-center gap-2">
-                <span className={item.done ? "text-emerald-600" : "text-muted-foreground"}>
+              <div
+                key={item.label}
+                className="flex items-center gap-3 rounded-2xl border border-border/60 bg-background/60 px-4 py-3"
+              >
+                <div
+                  className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold ${
+                    item.done
+                      ? "bg-emerald-100 text-emerald-700"
+                      : "bg-muted text-muted-foreground"
+                  }`}
+                >
                   {item.done ? "✓" : "○"}
-                </span>
+                </div>
                 <span
-                  className={item.done ? "font-medium text-emerald-700" : "text-foreground"}
+                  className={`text-sm ${
+                    item.done ? "font-medium text-foreground" : "text-muted-foreground"
+                  }`}
                 >
                   {item.label}
                 </span>
@@ -425,19 +445,34 @@ export function CommunitiesClient() {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-border bg-card p-5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        <section className="rounded-3xl border border-border/70 bg-card p-6 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
             This week
           </p>
 
-          <div className="mt-4 space-y-2 text-sm">
-            <p className="font-medium text-foreground">{thisWeekSummary.title}</p>
-            <p className="text-muted-foreground">{thisWeekSummary.hint}</p>
+          <div className="mt-5 space-y-4">
+            <div className="space-y-1.5">
+              <p className="text-lg font-semibold tracking-tight text-foreground">
+                {thisWeekSummary.title}
+              </p>
+              <p className="text-sm leading-6 text-muted-foreground">{thisWeekSummary.hint}</p>
+            </div>
 
-            <div className="space-y-1 pt-3 text-foreground">
-              <p>📅 {momentum.sessions} session{momentum.sessions !== 1 ? "s" : ""} scheduled</p>
-              <p>👥 {momentum.members} members</p>
-              <p>💬 {momentum.posts} posts</p>
+            <div className="space-y-2 rounded-2xl border border-border/60 bg-background/60 p-4 text-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Sessions</span>
+                <span className="font-medium text-foreground">
+                  {momentum.sessions} scheduled
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Members</span>
+                <span className="font-medium text-foreground">{momentum.members}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Posts</span>
+                <span className="font-medium text-foreground">{momentum.posts}</span>
+              </div>
             </div>
           </div>
         </section>
@@ -459,7 +494,7 @@ export function CommunitiesClient() {
             return (
               <div
                 key={community.id}
-                className="rounded-2xl border border-border bg-card px-4 py-4"
+                className="rounded-3xl border border-border/70 bg-card px-5 py-4 shadow-sm transition-colors hover:bg-muted/20"
               >
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                   <div className="min-w-0 flex-1">
@@ -469,7 +504,7 @@ export function CommunitiesClient() {
                       </p>
 
                       {isPrimary && (
-                        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
+                        <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-primary">
                           In focus
                         </span>
                       )}
@@ -479,22 +514,22 @@ export function CommunitiesClient() {
                       {community._count.members} members · {community._count.posts} posts
                     </p>
 
-                    <p className={`mt-2 text-sm ${state.tone}`}>
-                      <span className="font-medium">{state.eyebrow}</span>
-                      <span className="text-muted-foreground"> · </span>
+                    <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
+                      <span className={`font-medium ${state.tone}`}>{state.eyebrow}</span>
+                      <span className="text-muted-foreground">·</span>
                       <span className="text-foreground">{state.detail}</span>
-                    </p>
+                    </div>
                   </div>
 
                   <div className="flex shrink-0 gap-2">
                     <Link href={state.primaryHref}>
-                      <Button size="sm" variant="outline">
+                      <Button size="sm" variant="outline" className="h-9 px-4">
                         {state.primaryLabel}
                       </Button>
                     </Link>
 
                     <Link href={`/dashboard/c/${community.slug}`}>
-                      <Button size="sm" variant="outline">
+                      <Button size="sm" variant="outline" className="h-9 px-4">
                         Enter
                       </Button>
                     </Link>
@@ -506,15 +541,17 @@ export function CommunitiesClient() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-border bg-card p-5">
-        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+      <section className="rounded-3xl border border-border/70 bg-card p-6 shadow-sm">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
           Quick actions
         </p>
 
-        <div className="mt-3 flex flex-wrap gap-2">
+        <div className="mt-4 flex flex-wrap gap-3">
           {quickActions.map((action) => (
             <Link key={action.label} href={action.href}>
-              <Button variant="outline">{action.label}</Button>
+              <Button variant="outline" className="h-10 px-4">
+                {action.label}
+              </Button>
             </Link>
           ))}
         </div>
