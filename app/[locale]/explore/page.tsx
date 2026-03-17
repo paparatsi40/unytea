@@ -5,6 +5,7 @@ import { ArrowRight, Clock, Flame } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ExploreFilters } from "@/components/explore/ExploreFilters";
+import { ExploreInfiniteFeed } from "@/components/explore/ExploreInfiniteFeed";
 
 const DEFAULT_CATEGORIES = ["AI", "Startups", "Fitness", "Marketing"];
 
@@ -379,6 +380,29 @@ export default async function ExploreCommunitiesPage({
   );
   const languages = Array.from(new Set(normalized.map((c) => c.language))).filter(Boolean);
 
+  const initialFeedItems = sorted.slice(0, 12).map((community) => ({
+    id: community.id,
+    slug: community.slug,
+    name: community.name,
+    description: community.description,
+    isPaid: community.isPaid,
+    owner: community.owner,
+    membersCount: community._count.members,
+    nextSession: community.nextSession
+      ? {
+          id: community.nextSession.id,
+          title: community.nextSession.title,
+          scheduledAt: community.nextSession.scheduledAt.toISOString(),
+        }
+      : null,
+    nextSessionAttending: community.nextSessionAttending,
+    sessionsThisWeek: community.sessionsThisWeek,
+    postsLast7d: community.recentPostCount,
+    newMembersLast7d: community.newMembersLast7d,
+    isNew: community.isNew,
+    rankingScore: community.rankingScore,
+  }));
+
   return (
     <div className="min-h-screen bg-background">
       <main className="mx-auto max-w-6xl space-y-8 px-4 py-10 sm:px-6">
@@ -591,65 +615,25 @@ export default async function ExploreCommunitiesPage({
         )}
 
         <section className="space-y-4">
-<div className="flex items-center justify-between">
+          <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold">All communities</h2>
             <p className="text-sm text-muted-foreground">{sorted.length} communities</p>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {sorted.map((community, index) => {
-              const nextSessionText = community.nextSession
-                ? `Next: ${formatSessionSlot(community.nextSession.scheduledAt)}`
-                : "New sessions every week";
-
-              const socialProof = community.nextSessionAttending > 0
-                ? `${community.nextSessionAttending} attending`
-                : community.sessionsThisWeek > 0
-                  ? "Weekly sessions"
-                  : community.isNew
-                    ? "Be one of the first members"
-                    : "Growing community";
-
-              const tagBadges = [
-                community.isNew ? "🆕 New" : null,
-                community.sessionsThisWeek > 0 ? "📅 Weekly sessions" : null,
-                community.recentPostCount >= 3 ? "💬 Active" : null,
-              ].filter(Boolean) as string[];
-
-              return (
-                <Link
-                  key={community.id}
-                  href={`/${locale}/community/${community.slug}?src=explore_card&rank=${index + 1}&sort=${selectedSort}`}
-                  className="group rounded-xl border border-border bg-card p-5 transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
-                >
-                  <div className="mb-3 flex flex-wrap items-center gap-2">
-                    <Badge variant="outline">{community.isPaid ? "Paid access" : "Free access"}</Badge>
-                    {tagBadges.slice(0, 2).map((tag) => (
-                      <Badge key={tag} variant="secondary">{tag}</Badge>
-                    ))}
-                  </div>
-
-                  <h3 className="text-lg font-semibold text-foreground">{community.name}</h3>
-                  <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
-                    {community.description?.trim() || "Learn with live sessions and community."}
-                  </p>
-
-                  <div className="mt-3 space-y-1 text-sm text-muted-foreground">
-                    <p>👤 {hostName(community.owner)} (Host)</p>
-                    <p>👥 {community._count.members} members</p>
-                    <p>🟢 {nextSessionText}</p>
-                    <p>🔥 {socialProof}</p>
-                    <p className="line-clamp-1">💬 “{community.previewPost}”</p>
-                  </div>
-
-                  <div className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary">
-                    View community <ArrowRight className="h-4 w-4" />
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </section>
+          <ExploreInfiniteFeed
+            locale={locale}
+            initialItems={initialFeedItems}
+            initialCursor={sorted.length > 12 ? 12 : null}
+            filters={{
+              q: query,
+              category: selectedCategory,
+              monetization: selectedMonetization,
+              language: selectedLanguage,
+              sessionsWeek: selectedSessionsWeek,
+              sort: selectedSort,
+            }}
+          />
+</section>
       </main>
     </div>
   );

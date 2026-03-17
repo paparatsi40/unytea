@@ -30,7 +30,13 @@ function formatSchedule(date: Date | null) {
 }
 
 function trackPublicCommunityEvent(params: {
-  eventName: "community_preview_view" | "join_cta_click" | "join_success";
+  eventName:
+    | "community_preview_view"
+    | "join_cta_click"
+    | "join_success"
+    | "community_card_click"
+    | "community_join_click"
+    | "community_join_success";
   communityId: string;
   communitySlug: string;
   source: string;
@@ -190,6 +196,21 @@ export default async function CommunityPublicPreviewPage({
     },
   });
 
+  if (source?.startsWith("explore")) {
+    trackPublicCommunityEvent({
+      eventName: "community_card_click",
+      communityId: currentCommunity.id,
+      communitySlug: currentCommunity.slug,
+      source,
+      locale,
+      userId,
+      extra: {
+        rank: searchParams?.rank || null,
+        sort: searchParams?.sort || null,
+      },
+    });
+  }
+
   if (userId) {
     const membership = await prisma.member.findUnique({
       where: {
@@ -225,6 +246,19 @@ export default async function CommunityPublicPreviewPage({
       },
     });
 
+    trackPublicCommunityEvent({
+      eventName: "community_join_click",
+      communityId: currentCommunity.id,
+      communitySlug: currentCommunity.slug,
+      source,
+      locale,
+      userId: joiner?.user?.id,
+      extra: {
+        rank: searchParams?.rank || null,
+        sort: searchParams?.sort || null,
+      },
+    });
+
     if (!joiner?.user?.id) {
       redirect(`/auth/signin?callbackUrl=/${locale}/community/${slug}`);
     }
@@ -233,6 +267,15 @@ export default async function CommunityPublicPreviewPage({
     if (result.success) {
       trackPublicCommunityEvent({
         eventName: "join_success",
+        communityId: currentCommunity.id,
+        communitySlug: currentCommunity.slug,
+        source,
+        locale,
+        userId: joiner.user.id,
+      });
+
+      trackPublicCommunityEvent({
+        eventName: "community_join_success",
         communityId: currentCommunity.id,
         communitySlug: currentCommunity.slug,
         source,
