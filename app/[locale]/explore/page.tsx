@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
-import { ArrowRight, Calendar, Clock, Flame, Users } from "lucide-react";
+import { ArrowRight, Clock, Flame } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ExploreFilters } from "@/components/explore/ExploreFilters";
@@ -299,7 +299,24 @@ export default async function ExploreCommunitiesPage({
       }))
     )
     .sort((a, b) => a.scheduledAt.getTime() - b.scheduledAt.getTime())
-    .slice(0, 8);
+    .slice(0, 6);
+
+  const startOfToday = new Date(now);
+  startOfToday.setHours(0, 0, 0, 0);
+  const startOfTomorrow = new Date(startOfToday.getTime() + 24 * 60 * 60 * 1000);
+  const startOfDayAfterTomorrow = new Date(startOfTomorrow.getTime() + 24 * 60 * 60 * 1000);
+
+  const todaySessions = liveThisWeek.filter(
+    (session) => session.scheduledAt >= startOfToday && session.scheduledAt < startOfTomorrow
+  );
+  const tomorrowSessions = liveThisWeek.filter(
+    (session) => session.scheduledAt >= startOfTomorrow && session.scheduledAt < startOfDayAfterTomorrow
+  );
+  const thisWeekSessions = liveThisWeek.filter(
+    (session) => session.scheduledAt >= startOfDayAfterTomorrow && session.scheduledAt <= weekAhead
+  );
+
+  const suggestedWhenEmpty = sorted.slice(0, 3);
 
   const categories = Array.from(
     new Set([...DEFAULT_CATEGORIES, ...normalized.map((c) => c.category)])
@@ -398,32 +415,98 @@ export default async function ExploreCommunitiesPage({
           )}
         </section>
 
-        <section className="space-y-3">
+        <section className="space-y-4">
           <div className="flex items-center gap-2">
             <Clock className="h-5 w-5 text-green-600" />
-            <h2 className="text-xl font-semibold">Live this week</h2>
+            <h2 className="text-xl font-semibold">🟢 Happening this week</h2>
           </div>
 
           {liveThisWeek.length === 0 ? (
-            <div className="rounded-xl border border-border bg-card p-5 text-sm text-muted-foreground">
-              New sessions every week. Explore communities and join the next live event.
+            <div className="space-y-3 rounded-xl border border-border bg-card p-5">
+              <p className="text-sm font-semibold text-foreground">🟢 Live sessions every week</p>
+              <p className="text-sm text-muted-foreground">
+                Join a community to attend the next live session.
+              </p>
+              <div className="grid gap-3 md:grid-cols-3">
+                {suggestedWhenEmpty.map((community, index) => (
+                  <Link
+                    key={community.id}
+                    href={`/${locale}/community/${community.slug}?src=explore_happening_empty&rank=${index + 1}`}
+                    className="rounded-lg border border-border bg-background p-3 transition hover:border-primary/50"
+                  >
+                    <p className="text-sm font-semibold text-foreground">{community.name}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">{community._count.members} members</p>
+                  </Link>
+                ))}
+              </div>
             </div>
           ) : (
-            <div className="grid gap-3 md:grid-cols-2">
-              {liveThisWeek.map((session) => (
-                <Link
-                  key={session.id}
-                  href={`/${locale}/community/${session.communitySlug}?src=explore_live_week`}
-                  className="rounded-xl border border-border bg-card p-4 transition hover:border-primary/50"
-                >
-                  <p className="text-sm font-semibold text-foreground">{session.title}</p>
-                  <p className="mt-1 text-sm text-muted-foreground">{session.communityName}</p>
-                  <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-                    <span className="inline-flex items-center gap-1"><Calendar className="h-3.5 w-3.5" /> {formatSessionSlot(session.scheduledAt)}</span>
-                    <span className="inline-flex items-center gap-1"><Users className="h-3.5 w-3.5" /> {session.attendingCount} attending</span>
+            <div className="space-y-4">
+              {todaySessions.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold text-foreground">Today</p>
+                  <div className="grid gap-3 md:grid-cols-2">
+                    {todaySessions.map((session) => (
+                      <Link
+                        key={session.id}
+                        href={`/${locale}/community/${session.communitySlug}?src=explore_happening_today`}
+                        className="rounded-xl border border-border bg-card p-4 transition hover:border-primary/50"
+                      >
+                        <p className="text-sm font-semibold text-foreground">{session.title}</p>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          Today · {session.scheduledAt.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
+                        </p>
+                        <p className="mt-2 text-sm text-muted-foreground">🔥 {session.attendingCount} attending</p>
+                        <p className="mt-2 text-xs font-medium text-primary">View community →</p>
+                      </Link>
+                    ))}
                   </div>
-                </Link>
-              ))}
+                </div>
+              )}
+
+              {tomorrowSessions.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold text-foreground">Tomorrow</p>
+                  <div className="grid gap-3 md:grid-cols-2">
+                    {tomorrowSessions.map((session) => (
+                      <Link
+                        key={session.id}
+                        href={`/${locale}/community/${session.communitySlug}?src=explore_happening_tomorrow`}
+                        className="rounded-xl border border-border bg-card p-4 transition hover:border-primary/50"
+                      >
+                        <p className="text-sm font-semibold text-foreground">{session.title}</p>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          Tomorrow · {session.scheduledAt.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
+                        </p>
+                        <p className="mt-2 text-sm text-muted-foreground">🔥 {session.attendingCount} attending</p>
+                        <p className="mt-2 text-xs font-medium text-primary">View community →</p>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {thisWeekSessions.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold text-foreground">This week</p>
+                  <div className="grid gap-3 md:grid-cols-2">
+                    {thisWeekSessions.map((session) => (
+                      <Link
+                        key={session.id}
+                        href={`/${locale}/community/${session.communitySlug}?src=explore_happening_week`}
+                        className="rounded-xl border border-border bg-card p-4 transition hover:border-primary/50"
+                      >
+                        <p className="text-sm font-semibold text-foreground">{session.title}</p>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {session.scheduledAt.toLocaleDateString("en-US", { weekday: "long" })} · {session.scheduledAt.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
+                        </p>
+                        <p className="mt-2 text-sm text-muted-foreground">🔥 {session.attendingCount} attending</p>
+                        <p className="mt-2 text-xs font-medium text-primary">View community →</p>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </section>
