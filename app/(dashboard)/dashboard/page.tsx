@@ -593,31 +593,43 @@ export default function DashboardPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-zinc-50">
-        <div className="mx-auto max-w-7xl p-6 space-y-6 animate-pulse">
+        <div className="mx-auto max-w-7xl p-6 space-y-6">
           <div className="flex items-start justify-between">
-            <div className="space-y-2">
-              <div className="h-8 w-64 rounded bg-zinc-200" />
-              <div className="h-4 w-96 rounded bg-zinc-200" />
+            <div>
+              <h1 className="text-2xl font-bold text-zinc-900">Welcome back 👋</h1>
+              <p className="text-zinc-500 mt-1">Preparing your dashboard…</p>
             </div>
-            <div className="h-10 w-44 rounded bg-zinc-200" />
+            <div className="h-10 w-44 rounded bg-zinc-200 animate-pulse" />
           </div>
 
-          <div className="rounded-xl border border-zinc-200 bg-white p-5">
-            <div className="h-6 w-72 rounded bg-zinc-200" />
-            <div className="mt-2 h-4 w-full max-w-2xl rounded bg-zinc-200" />
-            <div className="mt-4 grid gap-3 sm:grid-cols-3">
-              <div className="h-24 rounded-lg bg-zinc-100" />
-              <div className="h-24 rounded-lg bg-zinc-100" />
-              <div className="h-24 rounded-lg bg-zinc-100" />
-            </div>
-          </div>
+          <Card className="border-zinc-200 bg-white">
+            <CardContent className="p-5">
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div className="space-y-1 min-h-[64px]">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Action First</p>
+                  <h2 className="text-xl font-semibold text-zinc-900">Schedule your next session</h2>
+                  <p className="text-sm text-zinc-700">Communities with weekly sessions grow 3x faster.</p>
+                </div>
+                <Button className="bg-purple-600 hover:bg-purple-700" disabled>
+                  Schedule your first session
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              </div>
 
-          <div className="grid gap-4 lg:grid-cols-2">
+              <div className="mt-4 grid gap-3 sm:grid-cols-3 animate-pulse">
+                <div className="h-24 rounded-lg bg-zinc-100" />
+                <div className="h-24 rounded-lg bg-zinc-100" />
+                <div className="h-24 rounded-lg bg-zinc-100" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="grid gap-4 lg:grid-cols-2 animate-pulse">
             <div className="h-44 rounded-xl border border-zinc-200 bg-white" />
             <div className="h-44 rounded-xl border border-zinc-200 bg-white" />
           </div>
 
-          <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-4">
+          <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-4 animate-pulse">
             <div className="h-28 rounded-xl border border-zinc-200 bg-white" />
             <div className="h-28 rounded-xl border border-zinc-200 bg-white" />
             <div className="h-28 rounded-xl border border-zinc-200 bg-white" />
