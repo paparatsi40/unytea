@@ -53,6 +53,7 @@ import {
   getAIPlaybookRecommendations,
   getAutopilotDashboardSnapshot,
   getUserIdentitySnapshot,
+  getActivationEngineSnapshot,
 } from "@/app/actions/dashboard";
 import { toast } from "sonner";
 
@@ -335,6 +336,27 @@ interface UserIdentitySnapshot {
   }>;
 }
 
+interface ActivationSnapshot {
+  hasAttendedFirstSession: boolean;
+  timeToFirstSessionHours: number | null;
+  target24h: boolean;
+  rsvpStatus: "attending" | "interested" | null;
+  nextSession: {
+    id: string;
+    title: string;
+    scheduledAt: Date;
+    communityName: string;
+    communitySlug: string;
+    attendingCount: number;
+  } | null;
+  missedSession: {
+    id: string;
+    title: string;
+    slug: string | null;
+    community: { slug: string } | null;
+  } | null;
+}
+
 export default function DashboardPage() {
   const { user } = useCurrentUser();
 
@@ -359,6 +381,7 @@ export default function DashboardPage() {
   const [aiPlaybook, setAiPlaybook] = useState<AIPlaybookSystem | null>(null);
   const [autopilot, setAutopilot] = useState<AutopilotDashboard | null>(null);
   const [identity, setIdentity] = useState<UserIdentitySnapshot | null>(null);
+  const [activation, setActivation] = useState<ActivationSnapshot | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Load dashboard data
@@ -387,6 +410,7 @@ export default function DashboardPage() {
         aiPlaybookRes,
         autopilotRes,
         identityRes,
+        activationRes,
       ] = await Promise.all([
         getDashboardMetrics(),
         getNextLiveSession(),
@@ -404,6 +428,7 @@ export default function DashboardPage() {
         getAIPlaybookRecommendations(),
         getAutopilotDashboardSnapshot(),
         getUserIdentitySnapshot(8),
+        getActivationEngineSnapshot(),
       ]);
 
       if (metricsRes.success) setMetrics(metricsRes.metrics || null);
@@ -468,6 +493,10 @@ export default function DashboardPage() {
 
       if (identityRes.success && identityRes.identity) {
         setIdentity(identityRes.identity as UserIdentitySnapshot);
+      }
+
+      if (activationRes.success && activationRes.activation) {
+        setActivation(activationRes.activation as ActivationSnapshot);
       }
     } catch (error) {
       console.error("Error loading dashboard:", error);
@@ -550,6 +579,82 @@ export default function DashboardPage() {
             </Link>
           </div>
         </div>
+
+        {activation && (
+          <Card className="border-emerald-200 bg-emerald-50/40">
+            <CardContent className="p-5 space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Activation Engine</p>
+                  <h3 className="text-lg font-semibold text-zinc-900">
+                    {activation.hasAttendedFirstSession
+                      ? "✅ First session completed"
+                      : "You’re in 🎉 Let’s get you to your first session"}
+                  </h3>
+                  {!activation.hasAttendedFirstSession && (
+                    <p className="text-sm text-zinc-700">
+                      Goal: first live session in under 24h.
+                    </p>
+                  )}
+                </div>
+                {activation.hasAttendedFirstSession && activation.timeToFirstSessionHours !== null ? (
+                  <Badge className={`${activation.target24h ? "bg-emerald-600" : "bg-amber-500"} text-white`}>
+                    TTFS: {activation.timeToFirstSessionHours}h
+                  </Badge>
+                ) : (
+                  <Badge variant="outline">TTFS target: &lt;24h</Badge>
+                )}
+              </div>
+
+              {activation.nextSession ? (
+                <div className="rounded-lg border border-emerald-200 bg-white p-4">
+                  <p className="text-xs uppercase tracking-wide text-zinc-500">Next session</p>
+                  <p className="mt-1 text-base font-semibold text-zinc-900">{activation.nextSession.title}</p>
+                  <p className="mt-1 text-sm text-zinc-600">
+                    {formatDate(activation.nextSession.scheduledAt)} · {formatTime(activation.nextSession.scheduledAt)} · {activation.nextSession.communityName}
+                  </p>
+                  <p className="mt-1 text-sm text-zinc-600">🔥 {activation.nextSession.attendingCount} attending</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <Link
+                      href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
+                        activation.nextSession.title
+                      )}&dates=${new Date(activation.nextSession.scheduledAt)
+                        .toISOString()
+                        .replace(/[-:]/g, "")
+                        .split(".")[0]}Z/${new Date(new Date(activation.nextSession.scheduledAt).getTime() + 60 * 60 * 1000)
+                        .toISOString()
+                        .replace(/[-:]/g, "")
+                        .split(".")[0]}Z`}
+                      target="_blank"
+                    >
+                      <Button size="sm" variant="outline">Add to calendar</Button>
+                    </Link>
+                    <Link href={`/dashboard/sessions/${activation.nextSession.id}`}>
+                      <Button size="sm">Join when it starts</Button>
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+                <div className="rounded-lg border border-zinc-200 bg-white p-4">
+                  <p className="text-sm text-zinc-700">No upcoming sessions in your communities yet.</p>
+                  <Link href="/en/explore" className="mt-2 inline-flex">
+                    <Button size="sm">Find a live session this week</Button>
+                  </Link>
+                </div>
+              )}
+
+              {activation.missedSession && !activation.hasAttendedFirstSession && (
+                <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
+                  <p className="text-sm font-medium text-amber-900">Missed your first live?</p>
+                  <p className="text-sm text-amber-800">Watch the recording and jump into the next session.</p>
+                  <Link href={activation.missedSession.slug ? `/en/s/${activation.missedSession.slug}?src=missed_first_session` : `/dashboard/sessions/${activation.missedSession.id}`} className="mt-2 inline-flex">
+                    <Button size="sm" variant="outline">Watch recording</Button>
+                  </Link>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {identity && (
           <Card className="border-zinc-200 bg-white">

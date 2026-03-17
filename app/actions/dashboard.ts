@@ -113,6 +113,147 @@ export async function getDashboardMetrics() {
   }
 }
 
+export async function getActivationEngineSnapshot() {
+  try {
+    const userId = await getCurrentUserId();
+    if (!userId) return { success: false, error: "Unauthorized" };
+
+    const now = new Date();
+    const in14Days = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+
+    const activeMemberships = await prisma.member.findMany({
+      where: { userId, status: "ACTIVE" },
+      select: { communityId: true },
+    });
+
+    const communityIds = activeMemberships.map((m) => m.communityId);
+
+    const [user, firstAttendance, nextSession] = await Promise.all([
+      prisma.user.findUnique({ where: { id: userId }, select: { createdAt: true } }),
+      prisma.sessionParticipation.findFirst({
+        where: {
+          userId,
+          session: { status: "COMPLETED" },
+        },
+        orderBy: { createdAt: "asc" },
+        include: {
+          session: {
+            select: {
+              id: true,
+              endedAt: true,
+            },
+          },
+        },
+      }),
+      communityIds.length
+        ? prisma.mentorSession.findFirst({
+            where: {
+              communityId: { in: communityIds },
+              status: "SCHEDULED",
+              scheduledAt: { gte: now, lte: in14Days },
+            },
+            orderBy: { scheduledAt: "asc" },
+            select: {
+              id: true,
+              title: true,
+              slug: true,
+              scheduledAt: true,
+              community: { select: { name: true, slug: true } },
+              _count: {
+                select: {
+                  participations: true,
+                },
+              },
+            },
+          })
+        : Promise.resolve(null),
+    ]);
+
+    const hasAttendedFirstSession = !!firstAttendance;
+    const timeToFirstSessionHours =
+      firstAttendance?.session?.endedAt && user?.createdAt
+        ? Math.max(
+            0,
+            Math.round(
+              (new Date(firstAttendance.session.endedAt).getTime() -
+                new Date(user.createdAt).getTime()) /
+                (1000 * 60 * 60)
+            )
+          )
+        : null;
+
+    let rsvpStatus: "attending" | "interested" | null = null;
+    if (nextSession) {
+      const participation = await prisma.sessionParticipation.findUnique({
+        where: {
+          sessionId_userId: {
+            userId,
+            sessionId: nextSession.id,
+          },
+        },
+        select: { eventsData: true },
+      });
+
+      const rawStatus =
+        participation?.eventsData &&
+        typeof participation.eventsData === "object" &&
+        !Array.isArray(participation.eventsData)
+          ? (participation.eventsData as Record<string, unknown>).rsvpStatus
+          : null;
+
+      if (rawStatus === "attending") rsvpStatus = "attending";
+      if (rawStatus === "interested") rsvpStatus = "interested";
+    }
+
+    const missedSession =
+      !hasAttendedFirstSession && communityIds.length
+        ? await prisma.mentorSession.findFirst({
+            where: {
+              communityId: { in: communityIds },
+              status: "COMPLETED",
+              endedAt: { gte: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) },
+              recording: { isNot: null },
+            },
+            orderBy: { endedAt: "desc" },
+            select: {
+              id: true,
+              title: true,
+              slug: true,
+              community: { select: { slug: true } },
+            },
+          })
+        : null;
+
+    const nextSessionPayload = nextSession
+      ? {
+          id: nextSession.id,
+          title: nextSession.title,
+          scheduledAt: nextSession.scheduledAt,
+          communityName: nextSession.community?.name || "Community",
+          communitySlug: nextSession.community?.slug || "",
+          attendingCount: nextSession._count.participations,
+        }
+      : null;
+
+    return {
+      success: true,
+      activation: {
+        hasAttendedFirstSession,
+        timeToFirstSessionHours,
+        target24h: hasAttendedFirstSession
+          ? (timeToFirstSessionHours ?? 999) <= 24
+          : false,
+        nextSession: nextSessionPayload,
+        rsvpStatus,
+        missedSession,
+      },
+    };
+  } catch (error) {
+    console.error("Error getting activation engine snapshot:", error);
+    return { success: false, error: "Failed to load activation snapshot" };
+  }
+}
+
 export async function getUserIdentitySnapshot(limitCommunities: number = 6) {
   try {
     const userId = await getCurrentUserId();
