@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { ArrowRight, Calendar, Clock, Flame, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ExploreFilters } from "@/components/explore/ExploreFilters";
 
 const DEFAULT_CATEGORIES = ["AI", "Startups", "Fitness", "Marketing"];
 
@@ -45,6 +46,17 @@ function formatSessionSlot(date: Date) {
 function truncate(text: string, max = 90) {
   if (text.length <= max) return text;
   return `${text.slice(0, max - 1)}…`;
+}
+
+function cleanPreviewText(text: string) {
+  const raw = text.trim();
+  if (!raw) return "Start meaningful conversations and learn together.";
+
+  if (/session recap|testing|debug|lorem ipsum/i.test(raw)) {
+    return "Members ask focused questions, share wins, and help each other execute.";
+  }
+
+  return raw;
 }
 
 export async function generateMetadata({
@@ -241,7 +253,7 @@ export default async function ExploreCommunitiesPage({
       recentPostCount,
       trendingScore,
       isNew,
-      previewPost: truncate(previewPost, 78),
+      previewPost: truncate(cleanPreviewText(previewPost), 78),
     };
   });
 
@@ -312,65 +324,24 @@ export default async function ExploreCommunitiesPage({
           </Button>
         </div>
 
-        <form className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6" method="GET">
-          <input
-            name="q"
-            defaultValue={query}
-            placeholder="Search communities"
-            className="h-11 rounded-lg border border-border bg-card px-4 text-sm lg:col-span-2"
-          />
-
-          <select
-            name="monetization"
-            defaultValue={selectedMonetization}
-            className="h-11 rounded-lg border border-border bg-card px-3 text-sm"
-          >
-            <option value="all">Free + Paid</option>
-            <option value="free">Free</option>
-            <option value="paid">Paid</option>
-          </select>
-
-          <select
-            name="language"
-            defaultValue={selectedLanguage}
-            className="h-11 rounded-lg border border-border bg-card px-3 text-sm"
-          >
-            <option value="all">All languages</option>
-            {languages.map((language) => (
-              <option key={language} value={language}>
-                {language}
-              </option>
-            ))}
-          </select>
-
-          <select
-            name="sessionsWeek"
-            defaultValue={selectedSessionsWeek}
-            className="h-11 rounded-lg border border-border bg-card px-3 text-sm"
-          >
-            <option value="all">Any schedule</option>
-            <option value="yes">Sessions this week</option>
-          </select>
-
-          <select
-            name="sort"
-            defaultValue={selectedSort}
-            className="h-11 rounded-lg border border-border bg-card px-3 text-sm"
-          >
-            <option value="trending">Trending</option>
-            <option value="members">Most members</option>
-            <option value="newest">Newest</option>
-          </select>
-
-          <input type="hidden" name="category" value={selectedCategory} />
-          <Button type="submit" className="h-11 lg:col-span-1">Apply</Button>
-        </form>
+        <ExploreFilters
+          categories={categories}
+          languages={languages}
+          initial={{
+            q: query,
+            category: selectedCategory,
+            monetization: selectedMonetization,
+            language: selectedLanguage,
+            sessionsWeek: selectedSessionsWeek,
+            sort: selectedSort,
+          }}
+        />
 
         <section className="space-y-3">
           <div className="flex items-center gap-2">
             <Flame className="h-5 w-5 text-amber-500" />
-            <h2 className="text-xl font-semibold">Trending this week</h2>
-            <p className="text-xs text-amber-600">Ranked by members + activity + upcoming sessions</p>
+            <h2 className="text-xl font-semibold">Growing communities this week</h2>
+            <p className="text-xs text-amber-600">Ranked by member growth, activity, and upcoming sessions</p>
           </div>
 
           {trendingCommunities.length === 0 ? (
@@ -457,46 +428,6 @@ export default async function ExploreCommunitiesPage({
           )}
         </section>
 
-        <div className="flex flex-wrap gap-2">
-          <Link
-            href={`/${locale}/explore?${new URLSearchParams({
-              ...(query ? { q: query } : {}),
-              ...(selectedMonetization !== "all" ? { monetization: selectedMonetization } : {}),
-              ...(selectedLanguage !== "all" ? { language: selectedLanguage } : {}),
-              ...(selectedSessionsWeek !== "all" ? { sessionsWeek: selectedSessionsWeek } : {}),
-              ...(selectedSort !== "trending" ? { sort: selectedSort } : {}),
-            }).toString()}`}
-          >
-            <Badge variant={selectedCategory === "all" ? "default" : "secondary"} className="px-3 py-1">
-              All Categories
-            </Badge>
-          </Link>
-          {categories.map((category) => {
-            const href = `/${locale}/explore?${new URLSearchParams({
-              ...(query ? { q: query } : {}),
-              category,
-              ...(selectedMonetization !== "all" ? { monetization: selectedMonetization } : {}),
-              ...(selectedLanguage !== "all" ? { language: selectedLanguage } : {}),
-              ...(selectedSessionsWeek !== "all" ? { sessionsWeek: selectedSessionsWeek } : {}),
-              ...(selectedSort !== "trending" ? { sort: selectedSort } : {}),
-            }).toString()}`;
-
-            return (
-              <Link key={category} href={href}>
-                <Badge
-                  variant={
-                    selectedCategory.toLowerCase() === category.toLowerCase()
-                      ? "default"
-                      : "secondary"
-                  }
-                  className="px-3 py-1"
-                >
-                  {category}
-                </Badge>
-              </Link>
-            );
-          })}
-        </div>
 
         <section className="space-y-4">
           <div className="flex items-center justify-between">
