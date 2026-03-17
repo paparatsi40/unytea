@@ -35,6 +35,13 @@ type Community = {
 };
 
 type CommunityCardState = "empty" | "upcoming" | "today" | "healthy";
+type CommunityPriorityReason =
+  | "in_progress"
+  | "today"
+  | "no_upcoming"
+  | "low_attendance"
+  | "build_habit"
+  | "healthy";
 
 function formatSessionDayTime(dateString: string) {
   const date = new Date(dateString);
@@ -52,6 +59,70 @@ function daysUntil(dateString: string) {
   return Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
 }
 
+function getCommunityPriority(community: Community): {
+  score: number;
+  reason: CommunityPriorityReason;
+} {
+  const nextSession = community.nextSession;
+  const weeklySessions = community.weeklySessions || 0;
+  const attendeesThisWeek = community.attendeesThisWeek || 0;
+  const postsThisWeek = community.postsThisWeek || 0;
+  const members = community._count.members || 0;
+  const hasRunASession =
+    Boolean(community.lastSessionAt) || weeklySessions > 0;
+
+  let score = 0;
+  let reason: CommunityPriorityReason = "healthy";
+
+  if (nextSession) {
+    const now = new Date();
+    const sessionDate = new Date(nextSession.scheduledAt);
+    const isToday = sessionDate.toDateString() === now.toDateString();
+    const daysAway = Math.max(
+      0,
+      Math.ceil((sessionDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+    );
+
+    if (nextSession.status === "IN_PROGRESS") {
+      score += 100;
+      reason = "in_progress";
+    } else if (isToday) {
+      score += 95;
+      reason = "today";
+    } else if (daysAway <= 3 && (nextSession.attendeeCount || 0) === 0) {
+      score += 80;
+      reason = "low_attendance";
+    } else if (daysAway <= 3 && (nextSession.attendeeCount || 0) < 3) {
+      score += 70;
+      reason = "low_attendance";
+    } else if (weeklySessions < 2) {
+      score += 55;
+      reason = "build_habit";
+    } else {
+      score += 30;
+      reason = "healthy";
+    }
+
+    if (daysAway === 1) score += 6;
+    if ((nextSession.attendeeCount || 0) === 0) score += 10;
+  } else {
+    score += 90;
+    reason = "no_upcoming";
+
+    if (!hasRunASession) score += 5;
+    if (members >= 20) score += 8;
+    if (members >= 50) score += 12;
+    if (postsThisWeek >= 3) score += 6;
+    if (members <= 3 && postsThisWeek === 0) score -= 5;
+  }
+
+  if (weeklySessions >= 2 && attendeesThisWeek >= 10) {
+    score -= 15;
+  }
+
+  return { score, reason };
+}
+
 function getCommunityState(community: Community): {
   state: CommunityCardState;
   eyebrow: string;
@@ -59,7 +130,6 @@ function getCommunityState(community: Community): {
   primaryLabel: string;
   primaryHref: string;
   tone: string;
-  priority: number;
 } {
   const weeklySessions = community.weeklySessions || 0;
   const nextSession = community.nextSession;
@@ -72,7 +142,6 @@ function getCommunityState(community: Community): {
       primaryLabel: "Schedule",
       primaryHref: "/dashboard/sessions/create",
       tone: "text-amber-700",
-      priority: 100,
     };
   }
 
@@ -91,7 +160,6 @@ function getCommunityState(community: Community): {
           ? `/dashboard/sessions/${nextSession.id}/room`
           : `/dashboard/sessions/${nextSession.id}`,
       tone: "text-sky-700",
-      priority: 95,
     };
   }
 
@@ -103,7 +171,6 @@ function getCommunityState(community: Community): {
       primaryLabel: "View",
       primaryHref: `/dashboard/sessions/${nextSession.id}`,
       tone: "text-amber-700",
-      priority: 85,
     };
   }
 
@@ -115,7 +182,6 @@ function getCommunityState(community: Community): {
       primaryLabel: "View sessions",
       primaryHref: "/dashboard/sessions",
       tone: "text-emerald-700",
-      priority: 40,
     };
   }
 
@@ -126,7 +192,6 @@ function getCommunityState(community: Community): {
     primaryLabel: "View",
     primaryHref: `/dashboard/sessions/${nextSession.id}`,
     tone: "text-sky-700",
-    priority: 60,
   };
 }
 
@@ -134,78 +199,78 @@ function getHeroContent(community: Community) {
   const nextSession = community.nextSession;
   const hasRunASession =
     Boolean(community.lastSessionAt) || (community.weeklySessions || 0) > 0;
+  const priority = getCommunityPriority(community);
 
-  if (!nextSession && !hasRunASession) {
-    return {
-      title: "⚡ Start your first session",
-      subtitle: "Communities with weekly sessions grow 3x faster",
-      primaryLabel: "Schedule first session",
-      primaryHref: "/dashboard/sessions/create",
-    };
-  }
-
-  if (!nextSession && hasRunASession) {
-    return {
-      title: "⚡ Schedule your next session",
-      subtitle: "Communities grow faster with a consistent weekly rhythm",
-      primaryLabel: "Schedule next session",
-      primaryHref: "/dashboard/sessions/create",
-    };
-  }
-
-  if (!nextSession) {
-    return {
-      title: "⚡ Schedule your next session",
-      subtitle: "Communities grow faster with a consistent weekly rhythm",
-      primaryLabel: "Schedule next session",
-      primaryHref: "/dashboard/sessions/create",
-    };
-  }
-
-  const session = nextSession;
-  const d = daysUntil(session.scheduledAt);
-
-  if (session.status === "IN_PROGRESS") {
+  if (priority.reason === "in_progress" && nextSession) {
     return {
       title: "🔥 Session in progress",
-      subtitle: `${session.title} · ${session.attendeeCount || 0} attending`,
+      subtitle: `${nextSession.title} · ${nextSession.attendeeCount || 0} attending`,
       primaryLabel: "Start session",
-      primaryHref: `/dashboard/sessions/${session.id}/room`,
+      primaryHref: `/dashboard/sessions/${nextSession.id}/room`,
     };
   }
 
-  if (d === 0) {
+  if (priority.reason === "today" && nextSession) {
     return {
       title: "🔥 Next session today",
-      subtitle: `${formatSessionDayTime(session.scheduledAt)} · ${session.attendeeCount || 0} attending`,
+      subtitle: `${formatSessionDayTime(nextSession.scheduledAt)} · ${nextSession.attendeeCount || 0} attending`,
       primaryLabel: "View session",
-      primaryHref: `/dashboard/sessions/${session.id}`,
+      primaryHref: `/dashboard/sessions/${nextSession.id}`,
     };
   }
 
-  if ((session.attendeeCount || 0) === 0) {
+  if (priority.reason === "no_upcoming") {
+    if (!hasRunASession) {
+      return {
+        title: "⚡ Start your first session",
+        subtitle: "Communities with weekly sessions grow 3x faster",
+        primaryLabel: "Schedule first session",
+        primaryHref: "/dashboard/sessions/create",
+      };
+    }
+
+    return {
+      title: "⚡ Schedule your next session",
+      subtitle: "Communities grow faster with a consistent weekly rhythm",
+      primaryLabel: "Schedule next session",
+      primaryHref: "/dashboard/sessions/create",
+    };
+  }
+
+  if (priority.reason === "low_attendance" && nextSession) {
     return {
       title: "⚡ Boost your next session",
-      subtitle: `No attendees yet · ${formatSessionDayTime(session.scheduledAt)}`,
+      subtitle: `Low attendance so far · ${formatSessionDayTime(nextSession.scheduledAt)}`,
       primaryLabel: "View session",
-      primaryHref: `/dashboard/sessions/${session.id}`,
+      primaryHref: `/dashboard/sessions/${nextSession.id}`,
     };
   }
 
-  if (d === 1) {
+  if (nextSession) {
+    const d = daysUntil(nextSession.scheduledAt);
+
+    if (d === 1) {
+      return {
+        title: "🔥 Next session in 1 day",
+        subtitle: `${formatSessionDayTime(nextSession.scheduledAt)} · ${nextSession.attendeeCount || 0} attending`,
+        primaryLabel: "View session",
+        primaryHref: `/dashboard/sessions/${nextSession.id}`,
+      };
+    }
+
     return {
-      title: "🔥 Next session in 1 day",
-      subtitle: `${formatSessionDayTime(session.scheduledAt)} · ${session.attendeeCount || 0} attending`,
+      title: `🔥 Next session in ${d} days`,
+      subtitle: `${formatSessionDayTime(nextSession.scheduledAt)} · ${nextSession.attendeeCount || 0} attending`,
       primaryLabel: "View session",
-      primaryHref: `/dashboard/sessions/${session.id}`,
+      primaryHref: `/dashboard/sessions/${nextSession.id}`,
     };
   }
 
   return {
-    title: `🔥 Next session in ${d} days`,
-    subtitle: `${formatSessionDayTime(session.scheduledAt)} · ${session.attendeeCount || 0} attending`,
-    primaryLabel: "View session",
-    primaryHref: `/dashboard/sessions/${session.id}`,
+    title: "⚡ Schedule your next session",
+    subtitle: "Communities grow faster with a consistent weekly rhythm",
+    primaryLabel: "Schedule next session",
+    primaryHref: "/dashboard/sessions/create",
   };
 }
 
@@ -246,11 +311,11 @@ export function CommunitiesClient() {
 
   const sortedCommunities = useMemo(() => {
     return [...communities].sort((a, b) => {
-      const aState = getCommunityState(a);
-      const bState = getCommunityState(b);
+      const aPriority = getCommunityPriority(a);
+      const bPriority = getCommunityPriority(b);
 
-      if (bState.priority !== aState.priority) {
-        return bState.priority - aState.priority;
+      if (bPriority.score !== aPriority.score) {
+        return bPriority.score - aPriority.score;
       }
 
       return a.name.localeCompare(b.name);
@@ -293,26 +358,33 @@ export function CommunitiesClient() {
       };
     }
 
-    const state = getCommunityState(primaryCommunity);
+    const priority = getCommunityPriority(primaryCommunity);
 
-    if (state.state === "empty") {
+    if (priority.reason === "no_upcoming") {
       return {
         title: "No upcoming session",
         hint: "Keep momentum going with your next session",
       };
     }
 
-    if (state.state === "today") {
+    if (priority.reason === "in_progress" || priority.reason === "today") {
       return {
         title: "Session happening today",
         hint: "Keep momentum high and drive attendance",
       };
     }
 
-    if (primaryCommunity.nextSession && (primaryCommunity.nextSession.attendeeCount || 0) === 0) {
+    if (priority.reason === "low_attendance") {
       return {
         title: "Attendance needs a push",
         hint: "Ask a question before your next session",
+      };
+    }
+
+    if (priority.reason === "build_habit") {
+      return {
+        title: "Build your weekly rhythm",
+        hint: "Consistency helps communities grow faster",
       };
     }
 
@@ -511,8 +583,6 @@ export function CommunitiesClient() {
                       <p className="truncate text-base font-semibold text-foreground">
                         {community.name}
                       </p>
-
-
                     </div>
 
                     <p className="mt-1 text-sm text-muted-foreground">
