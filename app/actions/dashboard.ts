@@ -798,6 +798,104 @@ export async function getHostAlerts() {
   }
 }
 
+export async function getCommunityOSSnapshot() {
+  try {
+    const userId = await getCurrentUserId();
+    if (!userId) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const now = new Date();
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - now.getDay());
+    weekStart.setHours(0, 0, 0, 0);
+    const weekEnd = new Date(weekStart.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+    const hostCommunities = await prisma.member.findMany({
+      where: { userId, role: { in: ["OWNER", "ADMIN", "MODERATOR"] } },
+      select: { communityId: true },
+    });
+
+    const communityIds = hostCommunities.map((m) => m.communityId);
+
+    const [weeklySessions, questionsSubmitted, recapPosts, recordingViews] = await Promise.all([
+      prisma.mentorSession.findMany({
+        where: {
+          communityId: { in: communityIds },
+          status: "SCHEDULED",
+          scheduledAt: { gte: weekStart, lt: weekEnd },
+        },
+        orderBy: { scheduledAt: "asc" },
+        select: {
+          id: true,
+          title: true,
+          scheduledAt: true,
+          series: {
+            select: { title: true, frequency: true, dayOfWeek: true, startTime: true },
+          },
+        },
+      }),
+      prisma.post.count({
+        where: {
+          communityId: { in: communityIds },
+          contentType: "QUESTION",
+          createdAt: { gte: weekStart, lt: weekEnd },
+        },
+      }),
+      prisma.post.count({
+        where: {
+          communityId: { in: communityIds },
+          contentType: "SESSION_ANNOUNCEMENT",
+          createdAt: { gte: weekStart, lt: weekEnd },
+        },
+      }),
+      prisma.post.aggregate({
+        where: {
+          communityId: { in: communityIds },
+          contentType: "SESSION_ANNOUNCEMENT",
+          createdAt: { gte: weekStart, lt: weekEnd },
+        },
+        _sum: { viewCount: true },
+      }),
+    ]);
+
+    const weeklyProgram = weeklySessions.slice(0, 6).map((s) => ({
+      id: s.id,
+      title: s.title,
+      scheduledAt: s.scheduledAt,
+      seriesTitle: s.series?.title || null,
+      seriesFrequency: s.series?.frequency || null,
+      seriesDayOfWeek: s.series?.dayOfWeek ?? null,
+      seriesStartTime: s.series?.startTime || null,
+    }));
+
+    const checklist = {
+      plan: weeklySessions.length > 0,
+      promote: questionsSubmitted > 0,
+      host: false,
+      capture: recapPosts > 0,
+      reuse: (recordingViews._sum.viewCount || 0) > 0,
+    };
+
+    return {
+      success: true,
+      snapshot: {
+        weeklyProgram,
+        stats: {
+          sessionsScheduled: weeklySessions.length,
+          questionsSubmitted,
+          recapPosts,
+          recordingViews: recordingViews._sum.viewCount || 0,
+        },
+        checklist,
+      },
+    };
+  } catch (error) {
+    console.error("Error getting community OS snapshot:", error);
+    return { success: false, error: "Failed to load community OS snapshot" };
+  }
+}
+
 export async function getMemberLeaderboard(limit: number = 5) {
   try {
     const userId = await getCurrentUserId();

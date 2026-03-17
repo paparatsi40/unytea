@@ -46,6 +46,7 @@ import {
   getNextRecommendedAction,
   getHostAlerts,
   getMemberLeaderboard,
+  getCommunityOSSnapshot,
 } from "@/app/actions/dashboard";
 import { toast } from "sonner";
 
@@ -143,6 +144,31 @@ interface LeaderboardMember {
   score: number;
 }
 
+interface CommunityOSSnapshot {
+  weeklyProgram: Array<{
+    id: string;
+    title: string;
+    scheduledAt: Date;
+    seriesTitle: string | null;
+    seriesFrequency: string | null;
+    seriesDayOfWeek: number | null;
+    seriesStartTime: string | null;
+  }>;
+  stats: {
+    sessionsScheduled: number;
+    questionsSubmitted: number;
+    recapPosts: number;
+    recordingViews: number;
+  };
+  checklist: {
+    plan: boolean;
+    promote: boolean;
+    host: boolean;
+    capture: boolean;
+    reuse: boolean;
+  };
+}
+
 export default function DashboardPage() {
   const { user } = useCurrentUser();
 
@@ -161,6 +187,7 @@ export default function DashboardPage() {
   const [hostAlerts, setHostAlerts] = useState<HostAlert[]>([]);
   const [topContributors, setTopContributors] = useState<LeaderboardMember[]>([]);
   const [topAttendees, setTopAttendees] = useState<LeaderboardMember[]>([]);
+  const [communityOS, setCommunityOS] = useState<CommunityOSSnapshot | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Load dashboard data
@@ -183,6 +210,7 @@ export default function DashboardPage() {
         nextActionRes,
         hostAlertsRes,
         leaderboardRes,
+        communityOSRes,
       ] = await Promise.all([
         getDashboardMetrics(),
         getNextLiveSession(),
@@ -194,6 +222,7 @@ export default function DashboardPage() {
         getNextRecommendedAction(),
         getHostAlerts(),
         getMemberLeaderboard(5),
+        getCommunityOSSnapshot(),
       ]);
 
       if (metricsRes.success) setMetrics(metricsRes.metrics || null);
@@ -209,6 +238,7 @@ export default function DashboardPage() {
         setTopContributors(leaderboardRes.contributors || []);
         setTopAttendees(leaderboardRes.attendees || []);
       }
+      if (communityOSRes.success) setCommunityOS(communityOSRes.snapshot || null);
     } catch (error) {
       console.error("Error loading dashboard:", error);
       toast.error("Failed to load dashboard data");
@@ -372,6 +402,72 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         </div>
+
+        {communityOS && (
+          <Card className="border-zinc-200 bg-white">
+            <CardContent className="p-5 space-y-4">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Community OS</p>
+                  <h3 className="text-lg font-semibold text-zinc-900">Plan → Promote → Host → Capture → Reuse</h3>
+                </div>
+                <Badge variant="outline">This week</Badge>
+              </div>
+
+              <div className="grid gap-3 md:grid-cols-4">
+                <div className="rounded-lg bg-zinc-50 p-3">
+                  <p className="text-xs text-zinc-500">Sessions scheduled</p>
+                  <p className="mt-1 text-2xl font-bold text-zinc-900">{communityOS.stats.sessionsScheduled}</p>
+                </div>
+                <div className="rounded-lg bg-zinc-50 p-3">
+                  <p className="text-xs text-zinc-500">Questions submitted</p>
+                  <p className="mt-1 text-2xl font-bold text-zinc-900">{communityOS.stats.questionsSubmitted}</p>
+                </div>
+                <div className="rounded-lg bg-zinc-50 p-3">
+                  <p className="text-xs text-zinc-500">Recap posts</p>
+                  <p className="mt-1 text-2xl font-bold text-zinc-900">{communityOS.stats.recapPosts}</p>
+                </div>
+                <div className="rounded-lg bg-zinc-50 p-3">
+                  <p className="text-xs text-zinc-500">Recording views</p>
+                  <p className="mt-1 text-2xl font-bold text-zinc-900">{communityOS.stats.recordingViews}</p>
+                </div>
+              </div>
+
+              <div className="grid gap-4 lg:grid-cols-2">
+                <div>
+                  <p className="text-sm font-semibold text-zinc-900">Your weekly program</p>
+                  <div className="mt-2 space-y-2">
+                    {communityOS.weeklyProgram.length > 0 ? (
+                      communityOS.weeklyProgram.slice(0, 3).map((session) => (
+                        <div key={session.id} className="rounded-lg border border-zinc-200 p-3">
+                          <p className="text-xs uppercase tracking-wide text-zinc-500">
+                            {formatDate(session.scheduledAt)} · {formatTime(session.scheduledAt)}
+                          </p>
+                          <p className="mt-1 font-medium text-zinc-900">{session.title}</p>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="rounded-lg border border-dashed border-zinc-300 p-3 text-sm text-zinc-500">
+                        No sessions this week yet.
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-sm font-semibold text-zinc-900">Weekly playbook</p>
+                  <div className="mt-2 space-y-2 text-sm">
+                    <p className={communityOS.checklist.plan ? "text-green-700" : "text-zinc-600"}>• Monday: Schedule sessions</p>
+                    <p className={communityOS.checklist.promote ? "text-green-700" : "text-zinc-600"}>• Tuesday: Ask questions in feed</p>
+                    <p className="text-zinc-600">• Wednesday/Friday: Host live sessions</p>
+                    <p className={communityOS.checklist.capture ? "text-green-700" : "text-zinc-600"}>• Saturday: Share recap</p>
+                    <p className={communityOS.checklist.reuse ? "text-green-700" : "text-zinc-600"}>• Sunday: Reuse into library/course</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {nextAction && (
           <Card className="border-purple-200 bg-purple-50/70">
