@@ -128,7 +128,7 @@ export async function GET() {
 
     const myCommunities = await Promise.all(
       memberships.map(async (m) => {
-        const nextSession = await prisma.session.findFirst({
+        const nextSession = await prisma.mentorSession.findFirst({
           where: {
             communityId: m.community.id,
             status: {
