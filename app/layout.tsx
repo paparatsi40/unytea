@@ -39,6 +39,11 @@ export const metadata: Metadata = {
       "The community platform with soul. Better features, better design, better price than Skool.",
     creator: "@unytea",
   },
+  icons: {
+    icon: "/unytea-logo.png",
+    shortcut: "/unytea-logo.png",
+    apple: "/unytea-logo.png",
+  },
   robots: {
     index: true,
     follow: true,

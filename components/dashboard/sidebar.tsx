@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
@@ -38,12 +39,14 @@ export function DashboardSidebar() {
       {/* Logo */}
       <div className="flex h-16 items-center border-b border-border px-6">
         <Link href="/dashboard" className="flex items-center space-x-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-purple-600">
-            <span className="text-lg font-bold text-white">U</span>
-          </div>
-          <span className="text-xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-            Unytea
-          </span>
+          <Image
+            src="/unytea-logo.png"
+            alt="Unytea"
+            width={32}
+            height={32}
+            className="h-8 w-8 rounded-md object-cover"
+          />
+          <span className="text-xl font-bold text-foreground">Unytea</span>
         </Link>
       </div>
 

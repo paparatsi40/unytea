@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
@@ -42,9 +43,13 @@ export default function Home() {
       <nav className="fixed top-0 w-full z-50 glass-strong border-b bg-white/80 backdrop-blur-md">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-primary to-purple-600 rounded-lg flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-white" />
-            </div>
+            <Image
+              src="/unytea-logo.png"
+              alt="Unytea"
+              width={32}
+              height={32}
+              className="h-8 w-8 rounded-md object-cover"
+            />
             <span className="text-xl font-bold">Unytea</span>
           </div>
           <div className="hidden md:flex items-center gap-6">
