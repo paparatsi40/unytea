@@ -52,6 +52,7 @@ import {
   getHostGamificationSnapshot,
   getAIPlaybookRecommendations,
   getAutopilotDashboardSnapshot,
+  getUserIdentitySnapshot,
 } from "@/app/actions/dashboard";
 import { toast } from "sonner";
 
@@ -294,6 +295,46 @@ interface AutopilotDashboard {
   }>;
 }
 
+interface UserIdentitySnapshot {
+  user: {
+    id: string;
+    name: string | null;
+    username: string | null;
+    email: string;
+    image: string | null;
+    bio: string | null;
+    tagline: string | null;
+    interests: string[];
+    skills: string[];
+    location: string | null;
+    createdAt: Date;
+  };
+  stats: {
+    communitiesJoined: number;
+    sessionsAttended: number;
+    sessionsHosted: number;
+    contributions: number;
+  };
+  communities: Array<{
+    membershipId: string;
+    role: string;
+    joinedAt: Date;
+    community: {
+      id: string;
+      name: string;
+      slug: string;
+      imageUrl: string | null;
+      isPaid: boolean;
+      membersCount: number;
+      nextSession: {
+        id: string;
+        title: string;
+        scheduledAt: Date;
+      } | null;
+    };
+  }>;
+}
+
 export default function DashboardPage() {
   const { user } = useCurrentUser();
 
@@ -317,6 +358,7 @@ export default function DashboardPage() {
   const [gamification, setGamification] = useState<HostGamificationSnapshot | null>(null);
   const [aiPlaybook, setAiPlaybook] = useState<AIPlaybookSystem | null>(null);
   const [autopilot, setAutopilot] = useState<AutopilotDashboard | null>(null);
+  const [identity, setIdentity] = useState<UserIdentitySnapshot | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Load dashboard data
@@ -344,6 +386,7 @@ export default function DashboardPage() {
         gamificationRes,
         aiPlaybookRes,
         autopilotRes,
+        identityRes,
       ] = await Promise.all([
         getDashboardMetrics(),
         getNextLiveSession(),
@@ -360,6 +403,7 @@ export default function DashboardPage() {
         getHostGamificationSnapshot(),
         getAIPlaybookRecommendations(),
         getAutopilotDashboardSnapshot(),
+        getUserIdentitySnapshot(8),
       ]);
 
       if (metricsRes.success) setMetrics(metricsRes.metrics || null);
@@ -420,6 +464,10 @@ export default function DashboardPage() {
           health: autopilotRes.health,
           queue: autopilotRes.queue || [],
         });
+      }
+
+      if (identityRes.success && identityRes.identity) {
+        setIdentity(identityRes.identity as UserIdentitySnapshot);
       }
     } catch (error) {
       console.error("Error loading dashboard:", error);
@@ -502,6 +550,84 @@ export default function DashboardPage() {
             </Link>
           </div>
         </div>
+
+        {identity && (
+          <Card className="border-zinc-200 bg-white">
+            <CardContent className="p-5 space-y-4">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-12 w-12">
+                    <AvatarImage src={identity.user.image || ""} />
+                    <AvatarFallback>
+                      {(identity.user.name || "U").slice(0, 1).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Identity Layer</p>
+                    <h3 className="text-lg font-semibold text-zinc-900">
+                      {identity.user.name || "Creator"}
+                      {identity.user.username ? ` · @${identity.user.username}` : ""}
+                    </h3>
+                    <p className="text-sm text-zinc-600">{identity.user.tagline || identity.user.bio || "Build your cross-community reputation."}</p>
+                  </div>
+                </div>
+                <Link href="/dashboard/settings/profile">
+                  <Button variant="outline">Edit profile</Button>
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                <div className="rounded-lg bg-zinc-50 p-3">
+                  <p className="text-xs text-zinc-500">Communities</p>
+                  <p className="mt-1 text-xl font-bold text-zinc-900">{identity.stats.communitiesJoined}</p>
+                </div>
+                <div className="rounded-lg bg-zinc-50 p-3">
+                  <p className="text-xs text-zinc-500">Sessions attended</p>
+                  <p className="mt-1 text-xl font-bold text-zinc-900">{identity.stats.sessionsAttended}</p>
+                </div>
+                <div className="rounded-lg bg-zinc-50 p-3">
+                  <p className="text-xs text-zinc-500">Sessions hosted</p>
+                  <p className="mt-1 text-xl font-bold text-zinc-900">{identity.stats.sessionsHosted}</p>
+                </div>
+                <div className="rounded-lg bg-zinc-50 p-3">
+                  <p className="text-xs text-zinc-500">Contributions</p>
+                  <p className="mt-1 text-xl font-bold text-zinc-900">{identity.stats.contributions}</p>
+                </div>
+              </div>
+
+              {identity.communities.length > 0 && (
+                <div>
+                  <div className="mb-2 flex items-center justify-between">
+                    <p className="text-sm font-semibold text-zinc-900">Your communities</p>
+                    <Link href="/dashboard/communities">
+                      <Button variant="ghost" size="sm">View all</Button>
+                    </Link>
+                  </div>
+                  <div className="grid gap-2 md:grid-cols-2">
+                    {identity.communities.slice(0, 6).map((membership) => (
+                      <Link
+                        key={membership.membershipId}
+                        href={`/dashboard/c/${membership.community.slug}`}
+                        className="rounded-lg border border-zinc-200 p-3 hover:bg-zinc-50"
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="font-medium text-zinc-900">{membership.community.name}</p>
+                          <Badge variant="outline">{membership.role}</Badge>
+                        </div>
+                        <p className="mt-1 text-xs text-zinc-500">
+                          {membership.community.membersCount} members
+                          {membership.community.nextSession
+                            ? ` · Next: ${formatDate(membership.community.nextSession.scheduledAt)} ${formatTime(membership.community.nextSession.scheduledAt)}`
+                            : " · No upcoming session"}
+                        </p>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {(hostScoreSystem || gamification) && (
           <Card className="border-zinc-200 bg-white">

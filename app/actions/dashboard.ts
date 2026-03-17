@@ -113,6 +113,115 @@ export async function getDashboardMetrics() {
   }
 }
 
+export async function getUserIdentitySnapshot(limitCommunities: number = 6) {
+  try {
+    const userId = await getCurrentUserId();
+    if (!userId) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const now = new Date();
+
+    const [user, memberships, sessionsAttended, sessionsHosted, postsCreated, commentsCreated] = await Promise.all([
+      prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+          id: true,
+          name: true,
+          username: true,
+          email: true,
+          image: true,
+          bio: true,
+          tagline: true,
+          interests: true,
+          skills: true,
+          location: true,
+          createdAt: true,
+        },
+      }),
+      prisma.member.findMany({
+        where: { userId, status: "ACTIVE" },
+        include: {
+          community: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              imageUrl: true,
+              isPaid: true,
+              _count: { select: { members: true } },
+              sessions: {
+                where: {
+                  status: "SCHEDULED",
+                  scheduledAt: { gte: now },
+                },
+                orderBy: { scheduledAt: "asc" },
+                take: 1,
+                select: {
+                  id: true,
+                  title: true,
+                  scheduledAt: true,
+                },
+              },
+            },
+          },
+        },
+        orderBy: { joinedAt: "desc" },
+        take: limitCommunities,
+      }),
+      prisma.sessionParticipation.count({
+        where: {
+          userId,
+        },
+      }),
+      prisma.mentorSession.count({
+        where: {
+          mentorId: userId,
+          status: "COMPLETED",
+        },
+      }),
+      prisma.post.count({ where: { authorId: userId } }),
+      prisma.comment.count({ where: { authorId: userId } }),
+    ]);
+
+    if (!user) {
+      return { success: false, error: "User not found" };
+    }
+
+    const joinedCommunities = memberships.map((m) => ({
+      membershipId: m.id,
+      role: m.role,
+      joinedAt: m.joinedAt,
+      community: {
+        id: m.community.id,
+        name: m.community.name,
+        slug: m.community.slug,
+        imageUrl: m.community.imageUrl,
+        isPaid: m.community.isPaid,
+        membersCount: m.community._count.members,
+        nextSession: m.community.sessions[0] || null,
+      },
+    }));
+
+    return {
+      success: true,
+      identity: {
+        user,
+        stats: {
+          communitiesJoined: joinedCommunities.length,
+          sessionsAttended,
+          sessionsHosted,
+          contributions: postsCreated + commentsCreated,
+        },
+        communities: joinedCommunities,
+      },
+    };
+  } catch (error) {
+    console.error("Error getting user identity snapshot:", error);
+    return { success: false, error: "Failed to load user identity" };
+  }
+}
+
 /**
  * Get next upcoming live session
  */
