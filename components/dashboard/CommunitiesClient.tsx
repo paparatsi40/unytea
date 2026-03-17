@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Plus, Users, Loader2, Flame } from "lucide-react";
+import { Plus, Users, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type Community = {
@@ -43,16 +43,8 @@ function formatSessionDayTime(dateString: string) {
     hour: "numeric",
     minute: "2-digit",
   });
-  return `${day} · ${time}`;
-}
 
-function formatRelative(dateString?: string | null) {
-  if (!dateString) return null;
-  const diffMs = Date.now() - new Date(dateString).getTime();
-  const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  if (days <= 0) return "today";
-  if (days === 1) return "1 day ago";
-  return `${days} days ago`;
+  return `${day} · ${time}`;
 }
 
 function daysUntil(dateString: string) {
@@ -62,8 +54,8 @@ function daysUntil(dateString: string) {
 
 function getCardState(community: Community): {
   state: CommunityCardState;
+  eyebrow: string;
   title: string;
-  subtitle: string;
   primaryLabel: string;
   primaryHref: string;
   tone: string;
@@ -74,22 +66,22 @@ function getCardState(community: Community): {
   if (weeklySessions >= 2) {
     return {
       state: "healthy",
-      title: "🔥 Active this week",
-      subtitle: `${weeklySessions} sessions · ${community.avgAttendanceThisWeek || 0} avg attendees`,
+      eyebrow: "Healthy",
+      title: `${weeklySessions} sessions · ${community.avgAttendanceThisWeek || 0} avg attendees`,
       primaryLabel: "View sessions",
       primaryHref: "/dashboard/sessions",
-      tone: "border-emerald-200 bg-emerald-50 text-emerald-900",
+      tone: "text-emerald-700",
     };
   }
 
   if (!nextSession) {
     return {
       state: "empty",
-      title: "⚠ No upcoming session",
-      subtitle: "Needs attention",
-      primaryLabel: "Schedule first session",
+      eyebrow: "Needs attention",
+      title: "No upcoming session",
+      primaryLabel: "Schedule",
       primaryHref: "/dashboard/sessions/create",
-      tone: "border-amber-200 bg-amber-50 text-amber-900",
+      tone: "text-amber-700",
     };
   }
 
@@ -100,46 +92,31 @@ function getCardState(community: Community): {
   if (isToday || nextSession.status === "IN_PROGRESS") {
     return {
       state: "today",
-      title: "🟡 Next session",
-      subtitle: `${formatSessionDayTime(nextSession.scheduledAt)} · ${nextSession.attendeeCount || 0} attending`,
-      primaryLabel: nextSession.status === "IN_PROGRESS" ? "Start session" : "View session",
+      eyebrow: "Next session",
+      title: `${formatSessionDayTime(nextSession.scheduledAt)} · ${nextSession.attendeeCount || 0} attending`,
+      primaryLabel: nextSession.status === "IN_PROGRESS" ? "Start" : "View",
       primaryHref:
         nextSession.status === "IN_PROGRESS"
           ? `/dashboard/sessions/${nextSession.id}/room`
           : `/dashboard/sessions/${nextSession.id}`,
-      tone: "border-sky-200 bg-sky-50 text-sky-900",
+      tone: "text-sky-700",
     };
   }
 
   return {
     state: "upcoming",
-    title: "🟡 Next session",
-    subtitle: `${formatSessionDayTime(nextSession.scheduledAt)} · ${nextSession.attendeeCount || 0} attending`,
-    primaryLabel: "View session",
+    eyebrow: "Next session",
+    title: `${formatSessionDayTime(nextSession.scheduledAt)} · ${nextSession.attendeeCount || 0} attending`,
+    primaryLabel: "View",
     primaryHref: `/dashboard/sessions/${nextSession.id}`,
-    tone: "border-sky-200 bg-sky-50 text-sky-900",
+    tone: "text-sky-700",
   };
 }
-
-const DEFAULT_HERO_COVER = `data:image/svg+xml;utf8,${encodeURIComponent(`
-<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='300' viewBox='0 0 1200 300'>
-  <defs>
-    <linearGradient id='bg' x1='0' y1='0' x2='1' y2='1'>
-      <stop offset='0%' stop-color='#4c1d95'/>
-      <stop offset='55%' stop-color='#9333ea'/>
-      <stop offset='100%' stop-color='#f97316'/>
-    </linearGradient>
-  </defs>
-  <rect width='1200' height='300' fill='url(#bg)'/>
-  <circle cx='180' cy='70' r='130' fill='rgba(255,255,255,.12)'/>
-  <circle cx='980' cy='250' r='170' fill='rgba(255,255,255,.10)'/>
-  <circle cx='700' cy='40' r='90' fill='rgba(255,255,255,.10)'/>
-</svg>
-`)}`;
 
 export function CommunitiesClient() {
   const { user, isLoading } = useCurrentUser();
   const router = useRouter();
+
   const [communities, setCommunities] = useState<Community[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -147,6 +124,7 @@ export function CommunitiesClient() {
   useEffect(() => {
     async function fetchCommunities() {
       if (isLoading) return;
+
       if (!user) {
         router.push("/auth/signin");
         return;
@@ -154,7 +132,10 @@ export function CommunitiesClient() {
 
       try {
         const response = await fetch("/api/communities");
-        if (!response.ok) throw new Error("Failed to fetch communities");
+        if (!response.ok) {
+          throw new Error("Failed to fetch communities");
+        }
+
         const data = await response.json();
         setCommunities(data?.myCommunities || []);
       } catch (err) {
@@ -172,21 +153,80 @@ export function CommunitiesClient() {
     const attendees = communities.reduce((sum, c) => sum + (c.attendeesThisWeek || 0), 0);
     const members = communities.reduce((sum, c) => sum + c._count.members, 0);
     const posts = communities.reduce((sum, c) => sum + (c.postsThisWeek || 0), 0);
+
     return { sessions, attendees, members, posts };
   }, [communities]);
 
-  const hasUpcoming = communities.some((c) => c.nextSession);
+  const milestones = useMemo(
+    () => [
+      { label: "Community created", done: communities.length > 0 },
+      {
+        label: "First session",
+        done: communities.some((c) => (c.weeklySessions || 0) > 0 || Boolean(c.lastSessionAt)),
+      },
+      { label: "10 attendees", done: momentum.attendees >= 10 },
+      {
+        label: "Weekly habit",
+        done: communities.some((c) => (c.weeklySessions || 0) >= 2),
+      },
+    ],
+    [communities, momentum.attendees]
+  );
 
-  const nextBestAction = useMemo(() => {
-    if (!hasUpcoming) {
+  const primaryCommunity = communities[0] || null;
+  const primaryCard = primaryCommunity ? getCardState(primaryCommunity) : null;
+
+  const hero = useMemo(() => {
+    if (!primaryCommunity) return null;
+
+    if (!primaryCommunity.nextSession) {
       return {
-        title: "Schedule your first session",
-        subtitle: "Unlock engagement, recaps, and growth loops.",
-        cta: "Schedule session",
-        href: "/dashboard/sessions/create",
+        title: "⚡ Start your first session",
+        subtitle: "Communities with weekly sessions grow 3x faster",
+        primaryLabel: "Schedule first session",
+        primaryHref: "/dashboard/sessions/create",
       };
     }
 
+    const d = daysUntil(primaryCommunity.nextSession.scheduledAt);
+
+    if (d === 0) {
+      return {
+        title: "🔥 Next session today",
+        subtitle: `${formatSessionDayTime(primaryCommunity.nextSession.scheduledAt)} · ${primaryCommunity.nextSession.attendeeCount || 0} attending`,
+        primaryLabel:
+          primaryCommunity.nextSession.status === "IN_PROGRESS" ? "Start session" : "View session",
+        primaryHref:
+          primaryCommunity.nextSession.status === "IN_PROGRESS"
+            ? `/dashboard/sessions/${primaryCommunity.nextSession.id}/room`
+            : `/dashboard/sessions/${primaryCommunity.nextSession.id}`,
+      };
+    }
+
+    if (d === 1) {
+      return {
+        title: "🔥 Next session in 1 day",
+        subtitle: `${formatSessionDayTime(primaryCommunity.nextSession.scheduledAt)} · ${primaryCommunity.nextSession.attendeeCount || 0} attending`,
+        primaryLabel: "View session",
+        primaryHref: `/dashboard/sessions/${primaryCommunity.nextSession.id}`,
+      };
+    }
+
+    return {
+      title: `🔥 Next session in ${d} days`,
+      subtitle: `${formatSessionDayTime(primaryCommunity.nextSession.scheduledAt)} · ${primaryCommunity.nextSession.attendeeCount || 0} attending`,
+      primaryLabel: "View session",
+      primaryHref: `/dashboard/sessions/${primaryCommunity.nextSession.id}`,
+    };
+  }, [primaryCommunity]);
+
+  const showNextBestAction = useMemo(() => {
+    if (!primaryCommunity?.nextSession) return false;
+    if (momentum.attendees === 0) return true;
+    return false;
+  }, [primaryCommunity, momentum.attendees]);
+
+  const nextBestAction = useMemo(() => {
     if (momentum.attendees === 0) {
       return {
         title: "Improve attendance",
@@ -196,51 +236,13 @@ export function CommunitiesClient() {
       };
     }
 
-    return {
-      title: "View your next session",
-      subtitle: "Keep momentum by preparing your next live touchpoint.",
-      cta: "View sessions",
-      href: "/dashboard/sessions",
-    };
-  }, [hasUpcoming, momentum.attendees]);
-
-  const milestones = [
-    { label: "Community created", done: communities.length > 0 },
-    {
-      label: "First session",
-      done: communities.some((c) => (c.weeklySessions || 0) > 0 || Boolean(c.lastSessionAt)),
-    },
-    { label: "10 attendees", done: momentum.attendees >= 10 },
-    {
-      label: "Weekly habit",
-      done: communities.some((c) => (c.weeklySessions || 0) >= 2),
-    },
-  ];
+    return null;
+  }, [momentum.attendees]);
 
   const quickActions = [
-    { label: "Schedule session", href: "/dashboard/sessions/create", primary: true },
-    { label: "Invite members", href: "/dashboard/communities", primary: false },
-    { label: "Create post", href: "/dashboard/feed", primary: false },
+    { label: "Invite members", href: "/dashboard/communities" },
+    { label: "Create post", href: "/dashboard/feed" },
   ];
-
-  const primaryCommunity = communities[0] || null;
-  const primaryCard = primaryCommunity ? getCardState(primaryCommunity) : null;
-  const primaryLastPost = formatRelative(primaryCommunity?.lastPostAt);
-
-  const heroTitle = useMemo(() => {
-    if (!primaryCommunity?.nextSession) return "⚡ Start your first session";
-    const d = daysUntil(primaryCommunity.nextSession.scheduledAt);
-    if (d === 0) return "🔥 Next session today";
-    if (d === 1) return "🔥 Next session in 1 day";
-    return `🔥 Next session in ${d} days`;
-  }, [primaryCommunity]);
-
-  const heroSubtitle = useMemo(() => {
-    if (!primaryCommunity?.nextSession) return "Communities with weekly sessions grow 3x faster";
-    return `${formatSessionDayTime(primaryCommunity.nextSession.scheduledAt)} · ${primaryCommunity.nextSession.attendeeCount || 0} attending`;
-  }, [primaryCommunity]);
-
-  const heroCoverImage = primaryCommunity?.coverImageUrl || DEFAULT_HERO_COVER;
 
   if (isLoading || loading) {
     return (
@@ -291,112 +293,121 @@ export function CommunitiesClient() {
   }
 
   return (
-    <div className="space-y-5">
-      {primaryCommunity && primaryCard && (
-        <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
-          <div className="relative h-56 overflow-hidden">
-            <img
-              src={heroCoverImage}
-              alt={`${primaryCommunity.name} cover`}
-              className="h-full w-full object-cover object-center"
-            />
-            <div className="absolute inset-0 bg-black/20" />
-            <div className="absolute right-3 top-3 z-10">
-              <Link href={`/dashboard/c/${primaryCommunity.slug}/settings/appearance`}>
-                <Button size="sm" variant="secondary" className="h-8 bg-white/90 text-zinc-900 hover:bg-white">
-                  {primaryCommunity.coverImageUrl ? "Change cover image" : "Add cover image"}
-                </Button>
-              </Link>
-            </div>
-          </div>
-          <div className="space-y-4 p-6 pt-5">
+    <div className="mx-auto max-w-6xl space-y-6">
+      {primaryCommunity && hero && (
+        <section className="rounded-3xl border border-border bg-card p-6 shadow-sm">
+          <div className="space-y-4">
             <div>
               <p className="text-2xl font-bold text-foreground">{primaryCommunity.name}</p>
-              <p className="text-sm text-muted-foreground">
+              <p className="mt-1 text-sm text-muted-foreground">
                 {primaryCommunity._count.members} members · {primaryCommunity._count.posts} posts
               </p>
             </div>
 
-            <div className={`rounded-xl border p-4 ${primaryCard.tone}`}>
-              <p className="text-lg font-semibold">{heroTitle}</p>
-              <p className="mt-1 text-sm">{heroSubtitle}</p>
+            <div>
+              <p className="text-xl font-semibold text-foreground">{hero.title}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{hero.subtitle}</p>
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <Link href={primaryCard.primaryHref}>
-                <Button>{primaryCard.primaryLabel}</Button>
+              <Link href={hero.primaryHref}>
+                <Button>{hero.primaryLabel}</Button>
               </Link>
               <Link href={`/dashboard/c/${primaryCommunity.slug}`}>
                 <Button variant="outline">Enter community</Button>
               </Link>
-              <Link href={`/dashboard/c/${primaryCommunity.slug}/settings/appearance`}>
-                <Button variant="ghost">{primaryCommunity.coverImageUrl ? "Change cover image" : "Add cover image"}</Button>
-              </Link>
             </div>
-
-            <div className="rounded-xl border border-border/80 bg-muted/20 p-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Your progress</p>
-              <div className="mt-2 grid gap-1 text-sm">
-                {milestones.map((item) => (
-                  <p key={item.label} className={item.done ? "text-emerald-700" : "text-foreground"}>
-                    {item.done ? "✓" : "☐"} {item.label}
-                  </p>
-                ))}
-              </div>
-            </div>
-
-            <p className="text-xs text-muted-foreground">
-              Last activity: {primaryLastPost ? `post ${primaryLastPost}` : "no posts yet"}
-            </p>
           </div>
-        </div>
+        </section>
       )}
 
-      <div className="rounded-2xl border-2 border-amber-200 bg-amber-50 p-5">
-        <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-amber-900">
-          <Flame className="h-4 w-4" />
-          Next best action
-        </p>
-        <p className="mt-2 text-xl font-bold text-amber-950">{nextBestAction.title}</p>
-        <p className="mt-1 text-sm text-amber-900">{nextBestAction.subtitle}</p>
-        <Link href={nextBestAction.href} className="mt-4 inline-flex">
-          <Button className="bg-amber-500 text-zinc-900 hover:bg-amber-400">{nextBestAction.cta}</Button>
-        </Link>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <section className="rounded-2xl border border-border bg-card p-5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Your progress
+          </p>
+          <div className="mt-3 space-y-2 text-sm">
+            {milestones.map((item) => (
+              <p
+                key={item.label}
+                className={item.done ? "font-medium text-emerald-700" : "text-foreground"}
+              >
+                {item.done ? "✓" : "○"} {item.label}
+              </p>
+            ))}
+          </div>
+        </section>
+
+        <section className="rounded-2xl border border-border bg-card p-5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            This week
+          </p>
+
+          <div className="mt-3 space-y-2 text-sm text-foreground">
+            {momentum.sessions === 0 ? (
+              <>
+                <p>No session scheduled yet</p>
+                <p className="text-muted-foreground">
+                  → Schedule your first session to activate engagement
+                </p>
+              </>
+            ) : momentum.attendees === 0 ? (
+              <>
+                <p>⚠ Attendance is low</p>
+                <p className="text-muted-foreground">
+                  → Ask a question before your next session
+                </p>
+              </>
+            ) : (
+              <p>🔥 Good momentum</p>
+            )}
+
+            <div className="pt-1 space-y-1">
+              <p>📅 {momentum.sessions} session{momentum.sessions !== 1 ? "s" : ""} scheduled</p>
+              <p>👥 {momentum.members} members</p>
+              <p>💬 {momentum.posts} posts</p>
+            </div>
+          </div>
+        </section>
       </div>
 
-      <div className="rounded-2xl border border-border bg-card p-4">
-        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">This week</p>
-        <div className="mt-2 space-y-1 text-sm text-foreground">
-          {momentum.attendees === 0 ? (
-            <>
-              <p>⚠ Attendance is low (0%)</p>
-              <p>→ Ask a question before your next session</p>
-            </>
-          ) : (
-            <p>🔥 Good momentum</p>
-          )}
-          <p>📅 {momentum.sessions} session{momentum.sessions !== 1 ? "s" : ""} scheduled</p>
-          <p>👥 {momentum.members} members</p>
-          <p>💬 {momentum.posts} posts</p>
-        </div>
-      </div>
+      {showNextBestAction && nextBestAction && (
+        <section className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-amber-900">
+            Next best action
+          </p>
+          <p className="mt-2 text-xl font-semibold text-amber-950">{nextBestAction.title}</p>
+          <p className="mt-1 text-sm text-amber-900">{nextBestAction.subtitle}</p>
+          <Link href={nextBestAction.href} className="mt-4 inline-flex">
+            <Button className="bg-amber-500 text-zinc-900 hover:bg-amber-400">
+              {nextBestAction.cta}
+            </Button>
+          </Link>
+        </section>
+      )}
 
-      <div className="space-y-3">
+      <section className="space-y-3">
         <p className="text-sm font-semibold text-foreground">Your communities</p>
+
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {communities.map((community) => {
             const card = getCardState(community);
+
             return (
               <div key={community.id} className="rounded-2xl border border-border bg-card p-5">
                 <p className="truncate text-lg font-semibold text-foreground">{community.name}</p>
                 <p className="mt-1 text-xs text-muted-foreground">
                   {community._count.members} members · {community._count.posts} posts
                 </p>
-                <div className={`mt-3 rounded-lg border p-3 ${card.tone}`}>
-                  <p className="text-sm font-semibold">{card.title}</p>
-                  <p className="mt-1 text-sm">{card.subtitle}</p>
+
+                <div className="mt-4 space-y-1">
+                  <p className={`text-xs font-semibold uppercase tracking-wide ${card.tone}`}>
+                    {card.eyebrow}
+                  </p>
+                  <p className="text-sm text-foreground">{card.title}</p>
                 </div>
-                <div className="mt-3 flex gap-2">
+
+                <div className="mt-4 flex gap-2">
                   <Link href={card.primaryHref} className="flex-1">
                     <Button className="w-full" size="sm">
                       {card.primaryLabel}
@@ -412,18 +423,21 @@ export function CommunitiesClient() {
             );
           })}
         </div>
-      </div>
+      </section>
 
-      <div className="rounded-2xl border border-border bg-card p-4">
-        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Quick actions</p>
+      <section className="rounded-2xl border border-border bg-card p-5">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          Quick actions
+        </p>
+
         <div className="mt-3 flex flex-wrap gap-2">
           {quickActions.map((action) => (
             <Link key={action.label} href={action.href}>
-              <Button variant={action.primary ? "default" : "outline"}>{action.label}</Button>
+              <Button variant="outline">{action.label}</Button>
             </Link>
           ))}
         </div>
-      </div>
+      </section>
     </div>
   );
 }

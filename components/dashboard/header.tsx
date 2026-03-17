@@ -24,6 +24,7 @@ export function DashboardHeader() {
 
   const getInitials = (name?: string | null) => {
     if (!name) return "U";
+
     return name
       .split(" ")
       .map((n) => n[0])
@@ -33,11 +34,10 @@ export function DashboardHeader() {
   };
 
   return (
-    <header className="fixed left-64 right-0 top-0 z-30 h-16 border-b border-border bg-card/50 backdrop-blur-xl">
+    <header className="fixed left-64 right-0 top-0 z-30 h-16 border-b border-border bg-background/80 backdrop-blur-xl">
       <div className="flex h-full items-center justify-between px-6">
-        {/* Search */}
-        <div className="flex flex-1 items-center space-x-4">
-          <div className="relative w-full max-w-md">
+        <div className="flex flex-1 items-center">
+          <div className="relative w-full max-w-xs">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
               type="text"
@@ -47,49 +47,48 @@ export function DashboardHeader() {
           </div>
         </div>
 
-        {/* Right side */}
-        <div className="flex items-center space-x-4">
-          {/* Messages */}
+        <div className="flex items-center space-x-3">
           <Link href="/dashboard/messages">
             <Button variant="ghost" size="icon" className="relative" aria-label={t("navigation.messages")}>
               <MessageSquare className="h-5 w-5" />
             </Button>
           </Link>
 
-          {/* Notifications */}
           <NotificationCenter />
-
-          {/* Language Selector */}
           <LanguageSelector />
 
-          {/* User Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="flex items-center space-x-3 focus:outline-none">
-                <div className="text-right">
+                <div className="hidden text-right md:block">
                   <p className="text-sm font-semibold text-foreground">
                     {user?.name || t("navigation.profile")}
                   </p>
-                  <p className="text-xs text-muted-foreground">
-                    {user?.email}
-                  </p>
+                  <p className="text-xs text-muted-foreground">{user?.email}</p>
                 </div>
-                <Avatar className="h-10 w-10 cursor-pointer ring-2 ring-border hover:ring-primary transition-all">
+
+                <Avatar className="h-10 w-10 cursor-pointer ring-2 ring-border transition-all hover:ring-primary">
                   <AvatarImage src={user?.image || undefined} alt={user?.name || t("navigation.profile")} />
-                  <AvatarFallback className="bg-gradient-to-br from-purple-600 to-pink-600 text-white font-semibold">
+                  <AvatarFallback className="bg-gradient-to-br from-purple-600 to-pink-600 font-semibold text-white">
                     {getInitials(user?.name)}
                   </AvatarFallback>
                 </Avatar>
               </button>
             </DropdownMenuTrigger>
+
             <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>{t("dashboard.welcome")}</DropdownMenuLabel>
+              <DropdownMenuLabel>{user?.name || t("navigation.profile")}</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <UserIcon className="mr-2 h-4 w-4" />
-                <span>{t("navigation.profile")}</span>
+
+              <DropdownMenuItem asChild>
+                <Link href="/dashboard/settings">
+                  <UserIcon className="mr-2 h-4 w-4" />
+                  <span>{t("navigation.profile")}</span>
+                </Link>
               </DropdownMenuItem>
+
               <DropdownMenuSeparator />
+
               <DropdownMenuItem
                 onClick={() => signOut({ callbackUrl: "/" })}
                 className="text-red-600 focus:text-red-600"
