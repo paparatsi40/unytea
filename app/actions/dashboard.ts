@@ -1939,6 +1939,74 @@ export async function getMemberLeaderboard(limit: number = 5) {
   }
 }
 
+export async function getDashboardSnapshot() {
+  try {
+    const [
+      metricsRes,
+      nextSessionRes,
+      upcomingRes,
+      activityRes,
+      membersRes,
+      performanceRes,
+      hostAnalyticsRes,
+      nextActionRes,
+      hostAlertsRes,
+      leaderboardRes,
+      communityOSRes,
+      hostScoreRes,
+      gamificationRes,
+      aiPlaybookRes,
+      autopilotRes,
+      identityRes,
+      activationRes,
+    ] = await Promise.all([
+      getDashboardMetrics(),
+      getNextLiveSession(),
+      getUpcomingSessions(5),
+      getCommunityActivity(6),
+      getRecentMembers(4),
+      getPerformanceSnapshot(),
+      getHostAnalyticsV1(),
+      getNextRecommendedAction(),
+      getHostAlerts(),
+      getMemberLeaderboard(5),
+      getCommunityOSSnapshot(),
+      getHostScoreSystem(),
+      getHostGamificationSnapshot(),
+      getAIPlaybookRecommendations(),
+      getAutopilotDashboardSnapshot(),
+      getUserIdentitySnapshot(8),
+      getActivationEngineSnapshot(),
+    ]);
+
+    return {
+      success: true,
+      payload: {
+        metricsRes,
+        nextSessionRes,
+        upcomingRes,
+        activityRes,
+        membersRes,
+        performanceRes,
+        hostAnalyticsRes,
+        nextActionRes,
+        hostAlertsRes,
+        leaderboardRes,
+        communityOSRes,
+        hostScoreRes,
+        gamificationRes,
+        aiPlaybookRes,
+        autopilotRes,
+        identityRes,
+        activationRes,
+      },
+    };
+  } catch (error) {
+    console.error("Error getting dashboard snapshot:", error);
+    return { success: false, error: "Failed to load dashboard snapshot" };
+  }
+}
+
 export async function getAutopilotDashboardSnapshot() {
   try {
     const userId = await getCurrentUserId();

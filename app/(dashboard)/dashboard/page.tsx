@@ -36,25 +36,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import Link from "next/link";
-import {
-  getDashboardMetrics,
-  getNextLiveSession,
-  getUpcomingSessions,
-  getCommunityActivity,
-  getRecentMembers,
-  getPerformanceSnapshot,
-  getHostAnalyticsV1,
-  getNextRecommendedAction,
-  getHostAlerts,
-  getMemberLeaderboard,
-  getCommunityOSSnapshot,
-  getHostScoreSystem,
-  getHostGamificationSnapshot,
-  getAIPlaybookRecommendations,
-  getAutopilotDashboardSnapshot,
-  getUserIdentitySnapshot,
-  getActivationEngineSnapshot,
-} from "@/app/actions/dashboard";
+import { getDashboardSnapshot } from "@/app/actions/dashboard";
 import { toast } from "sonner";
 
 // Types
@@ -393,7 +375,12 @@ export default function DashboardPage() {
     try {
       setIsLoading(true);
 
-      const [
+      const snapshot = await getDashboardSnapshot();
+      if (!snapshot.success || !snapshot.payload) {
+        throw new Error("Failed to load dashboard snapshot");
+      }
+
+      const {
         metricsRes,
         nextSessionRes,
         upcomingRes,
@@ -411,25 +398,7 @@ export default function DashboardPage() {
         autopilotRes,
         identityRes,
         activationRes,
-      ] = await Promise.all([
-        getDashboardMetrics(),
-        getNextLiveSession(),
-        getUpcomingSessions(5),
-        getCommunityActivity(6),
-        getRecentMembers(4),
-        getPerformanceSnapshot(),
-        getHostAnalyticsV1(),
-        getNextRecommendedAction(),
-        getHostAlerts(),
-        getMemberLeaderboard(5),
-        getCommunityOSSnapshot(),
-        getHostScoreSystem(),
-        getHostGamificationSnapshot(),
-        getAIPlaybookRecommendations(),
-        getAutopilotDashboardSnapshot(),
-        getUserIdentitySnapshot(8),
-        getActivationEngineSnapshot(),
-      ]);
+      } = snapshot.payload;
 
       if (metricsRes.success) setMetrics(metricsRes.metrics || null);
       if (nextSessionRes.success) setNextSession(nextSessionRes.session ?? null);
