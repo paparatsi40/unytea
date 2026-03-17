@@ -293,7 +293,7 @@ export default async function CommunityPublicPreviewPage({
                 <Button className="w-full" disabled>Request pending approval</Button>
               ) : (
                 <form action={handleJoin}>
-                  <Button className="w-full" type="submit">{userId ? "Join community" : "Sign in to join community"}</Button>
+                  <Button className="w-full" type="submit">{userId ? "Suscribirme" : "Iniciar sesión para suscribirme"}</Button>
                 </form>
               )}
               <p className="mt-2 text-xs text-muted-foreground">Join to attend live sessions and access recordings.</p>
@@ -317,7 +317,7 @@ export default async function CommunityPublicPreviewPage({
               <Button disabled>Request pending approval</Button>
             ) : (
               <form action={handleJoin}>
-                <Button type="submit">{userId ? "Join community" : "Sign in to join community"}</Button>
+                <Button type="submit">{userId ? "Suscribirme" : "Iniciar sesión para suscribirme"}</Button>
               </form>
             )}
           </div>
@@ -383,7 +383,7 @@ export default async function CommunityPublicPreviewPage({
               <Button disabled>Request pending approval</Button>
             ) : (
               <form action={handleJoin}>
-                <Button type="submit">{userId ? "Join community" : "Sign in to join community"}</Button>
+                <Button type="submit">{userId ? "Suscribirme" : "Iniciar sesión para suscribirme"}</Button>
               </form>
             )}
             <Link href={`/${locale}/explore`}>
