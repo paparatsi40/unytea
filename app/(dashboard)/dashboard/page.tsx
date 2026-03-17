@@ -51,6 +51,7 @@ import {
   getHostScoreSystem,
   getHostGamificationSnapshot,
   getAIPlaybookRecommendations,
+  getAutopilotDashboardSnapshot,
 } from "@/app/actions/dashboard";
 import { toast } from "sonner";
 
@@ -274,6 +275,25 @@ interface AIPlaybookSystem {
   recommendations: AIPlaybookRecommendation[];
 }
 
+interface AutopilotDashboard {
+  health: {
+    completionRate: number;
+    totalJobs: number;
+    queued: number;
+    failed: number;
+  };
+  queue: Array<{
+    id: string;
+    status: "queued" | "running" | "done" | "failed";
+    jobType: string;
+    runAt: string | null;
+    retries: number;
+    error?: string;
+    sessionTitle: string;
+    communityName: string;
+  }>;
+}
+
 export default function DashboardPage() {
   const { user } = useCurrentUser();
 
@@ -296,6 +316,7 @@ export default function DashboardPage() {
   const [hostScoreSystem, setHostScoreSystem] = useState<HostScoreSystem | null>(null);
   const [gamification, setGamification] = useState<HostGamificationSnapshot | null>(null);
   const [aiPlaybook, setAiPlaybook] = useState<AIPlaybookSystem | null>(null);
+  const [autopilot, setAutopilot] = useState<AutopilotDashboard | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Load dashboard data
@@ -322,6 +343,7 @@ export default function DashboardPage() {
         hostScoreRes,
         gamificationRes,
         aiPlaybookRes,
+        autopilotRes,
       ] = await Promise.all([
         getDashboardMetrics(),
         getNextLiveSession(),
@@ -337,6 +359,7 @@ export default function DashboardPage() {
         getHostScoreSystem(),
         getHostGamificationSnapshot(),
         getAIPlaybookRecommendations(),
+        getAutopilotDashboardSnapshot(),
       ]);
 
       if (metricsRes.success) setMetrics(metricsRes.metrics || null);
@@ -389,6 +412,13 @@ export default function DashboardPage() {
         setAiPlaybook({
           signals: aiPlaybookRes.signals,
           recommendations: aiPlaybookRes.recommendations || [],
+        });
+      }
+
+      if (autopilotRes.success && autopilotRes.health) {
+        setAutopilot({
+          health: autopilotRes.health,
+          queue: autopilotRes.queue || [],
         });
       }
     } catch (error) {
@@ -596,6 +626,53 @@ export default function DashboardPage() {
                   </Link>
                 </div>
               ))}
+            </CardContent>
+          </Card>
+        )}
+
+        {autopilot && (
+          <Card className="border-emerald-200 bg-emerald-50/40">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base text-emerald-900">🤖 Autopilot Health</CardTitle>
+              <CardDescription>
+                End-to-end automation status for session loops.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                <div className="rounded-lg border border-emerald-100 bg-white p-3">
+                  <p className="text-xs text-zinc-500">Completion</p>
+                  <p className="text-xl font-bold text-emerald-700">{autopilot.health.completionRate}%</p>
+                </div>
+                <div className="rounded-lg border border-emerald-100 bg-white p-3">
+                  <p className="text-xs text-zinc-500">Queued</p>
+                  <p className="text-xl font-bold text-zinc-900">{autopilot.health.queued}</p>
+                </div>
+                <div className="rounded-lg border border-emerald-100 bg-white p-3">
+                  <p className="text-xs text-zinc-500">Failed</p>
+                  <p className="text-xl font-bold text-zinc-900">{autopilot.health.failed}</p>
+                </div>
+                <div className="rounded-lg border border-emerald-100 bg-white p-3">
+                  <p className="text-xs text-zinc-500">Total Jobs</p>
+                  <p className="text-xl font-bold text-zinc-900">{autopilot.health.totalJobs}</p>
+                </div>
+              </div>
+
+              {autopilot.queue.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">Queue</p>
+                  {autopilot.queue.slice(0, 5).map((job) => (
+                    <div key={job.id} className="rounded-lg border border-emerald-100 bg-white p-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-sm font-medium text-zinc-900">{job.sessionTitle}</p>
+                        <Badge variant="outline" className="capitalize">{job.status}</Badge>
+                      </div>
+                      <p className="mt-1 text-xs text-zinc-600">{job.communityName} · {job.jobType.replaceAll("_", " ")}</p>
+                      {job.runAt && <p className="mt-1 text-xs text-zinc-500">Run at: {new Date(job.runAt).toLocaleString()}</p>}
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         )}

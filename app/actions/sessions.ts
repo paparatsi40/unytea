@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { getCurrentUserId } from "@/lib/auth-utils";
 import { prisma } from "@/lib/prisma";
 import { nanoid } from "nanoid";
+import { startSessionAutopilot } from "./autopilot";
 
 /**
  * Create a new video session
@@ -610,6 +611,10 @@ async function createSingleSession(data: CreateSessionOrSeriesInput & { mentorId
   revalidatePath("/dashboard/sessions");
   revalidatePath("/dashboard/agenda");
 
+  if (data.communityId) {
+    await startSessionAutopilot(session.id, "session_created");
+  }
+
   return { success: true, session, type: "single" };
 }
 
@@ -676,6 +681,10 @@ async function createRecurringSeries(
       // Auto-post only the first session to feed (not all 8!)
       if (communityId && data.postToFeed !== false && index === 0) {
         await createSessionFeedPost(session, data);
+      }
+
+      if (communityId) {
+        await startSessionAutopilot(session.id, "series_instance_created");
       }
 
       return session;

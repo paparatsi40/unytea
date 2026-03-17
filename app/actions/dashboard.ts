@@ -1688,3 +1688,115 @@ export async function getMemberLeaderboard(limit: number = 5) {
     return { success: false, error: "Failed to load leaderboard" };
   }
 }
+
+export async function getAutopilotDashboardSnapshot() {
+  try {
+    const userId = await getCurrentUserId();
+    if (!userId) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const hostCommunities = await prisma.member.findMany({
+      where: { userId, role: { in: ["OWNER", "ADMIN", "MODERATOR"] } },
+      select: { communityId: true },
+    });
+
+    const communityIds = hostCommunities.map((m) => m.communityId);
+    if (communityIds.length === 0) {
+      return {
+        success: true,
+        health: { completionRate: 100, totalJobs: 0, queued: 0, failed: 0 },
+        queue: [],
+      };
+    }
+
+    const events = await prisma.sessionEvent.findMany({
+      where: {
+        communityId: { in: communityIds },
+        payload: {
+          path: ["autopilot", "kind"],
+          equals: "job",
+        },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 500,
+      include: {
+        session: {
+          select: {
+            id: true,
+            title: true,
+            scheduledAt: true,
+            community: { select: { name: true, slug: true } },
+          },
+        },
+      },
+    });
+
+    const jobs = events
+      .map((event) => {
+        const ap = (event.payload as any)?.autopilot;
+        if (!ap) return null;
+        return {
+          id: event.id,
+          status: ap.status as "queued" | "running" | "done" | "failed",
+          jobType: (ap.jobType as string) || "unknown",
+          runAt: ap.runAt ? new Date(ap.runAt) : null,
+          retries: Number(ap.retries || 0),
+          error: ap.error as string | undefined,
+          sessionId: ap.sessionId as string,
+          sessionTitle: event.session?.title || "Session",
+          communityName: event.session?.community?.name || "Community",
+        };
+      })
+      .filter(Boolean) as Array<{
+      id: string;
+      status: "queued" | "running" | "done" | "failed";
+      jobType: string;
+      runAt: Date | null;
+      retries: number;
+      error?: string;
+      sessionId: string;
+      sessionTitle: string;
+      communityName: string;
+    }>;
+
+    const done = jobs.filter((j) => j.status === "done").length;
+    const failed = jobs.filter((j) => j.status === "failed").length;
+    const queued = jobs.filter((j) => j.status === "queued").length;
+
+    const completionRate = done + failed > 0 ? Math.round((done / (done + failed)) * 100) : 100;
+
+    const queue = jobs
+      .filter((j) => j.status === "queued" || j.status === "running" || j.status === "failed")
+      .sort((a, b) => {
+        const aTime = a.runAt ? a.runAt.getTime() : Number.MAX_SAFE_INTEGER;
+        const bTime = b.runAt ? b.runAt.getTime() : Number.MAX_SAFE_INTEGER;
+        return aTime - bTime;
+      })
+      .slice(0, 8)
+      .map((j) => ({
+        id: j.id,
+        status: j.status,
+        jobType: j.jobType,
+        runAt: j.runAt?.toISOString() || null,
+        retries: j.retries,
+        error: j.error,
+        sessionTitle: j.sessionTitle,
+        communityName: j.communityName,
+      }));
+
+    return {
+      success: true,
+      health: {
+        completionRate,
+        totalJobs: jobs.length,
+        queued,
+        failed,
+      },
+      queue,
+    };
+  } catch (error) {
+    console.error("Error getting autopilot dashboard snapshot:", error);
+    return { success: false, error: "Failed to load autopilot snapshot" };
+  }
+}

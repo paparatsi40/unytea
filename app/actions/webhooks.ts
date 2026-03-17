@@ -8,6 +8,7 @@ import { createNotification } from "./notifications";
 import { generateAISessionSummary } from "./session-ai";
 import { generateSessionRecap } from "./session-jobs";
 import { PostContentType, Prisma } from "@prisma/client";
+import { markAutopilotStep } from "./autopilot";
 
 // LiveKit configuration
 const LIVEKIT_API_KEY = process.env.LIVEKIT_API_KEY || "";
@@ -113,6 +114,11 @@ async function handleRoomStarted(event: any) {
   // Auto-start recording
   await autoStartRecording(sessionId);
 
+  const session = await prisma.mentorSession.findUnique({
+    where: { id: sessionId },
+    select: { communityId: true },
+  });
+
   // Feed lifecycle posts
   await ensureSessionLifecyclePost(sessionId, "pre_session", {
     titlePrefix: "🧵 Pre-session thread",
@@ -128,6 +134,10 @@ async function handleRoomStarted(event: any) {
   await logSessionEvent(sessionId, "ROOM_STARTED", {
     roomSid: event.room?.sid,
     roomName,
+  });
+
+  await markAutopilotStep(sessionId, session?.communityId, "live", {
+    source: "room_started",
   });
 
   console.log(`[LiveKit] Session ${sessionId} started`);
@@ -185,6 +195,15 @@ async function handleRoomFinished(event: any) {
     roomSid: event.room?.sid,
     duration: event.room?.duration,
     numParticipants: event.room?.numParticipants,
+  });
+
+  const finishedSession = await prisma.mentorSession.findUnique({
+    where: { id: sessionId },
+    select: { communityId: true },
+  });
+
+  await markAutopilotStep(sessionId, finishedSession?.communityId, "captured", {
+    source: "room_finished",
   });
 
   // Trigger revalidation
@@ -613,6 +632,20 @@ async function triggerPostProcessing(sessionId: string, recordingId: string) {
 
   // 4) Recap post with AI summary package
   const recapResult = await generateSessionRecap(sessionId);
+
+  const postProcessingSession = await prisma.mentorSession.findUnique({
+    where: { id: sessionId },
+    select: { communityId: true },
+  });
+
+  await markAutopilotStep(sessionId, postProcessingSession?.communityId, "packaged", {
+    summaryGenerated: summaryResult.success,
+    recapGenerated: recapResult.success,
+  });
+
+  await markAutopilotStep(sessionId, postProcessingSession?.communityId, "distributed", {
+    source: "recording_ready",
+  });
 
   await logSessionEvent(sessionId, "POST_PROCESSING_TRIGGERED", {
     recordingId,

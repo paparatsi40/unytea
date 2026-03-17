@@ -5,6 +5,7 @@ import { nanoid } from "nanoid";
 import { revalidatePath } from "next/cache";
 import { PostContentType } from "@prisma/client";
 import { generateUpcomingSessions } from "../actions/sessions";
+import { runAutopilotDueJobs } from "./autopilot";
 
 /**
  * Session Jobs - Background tasks for recurring sessions
@@ -360,6 +361,7 @@ export async function runSessionJobs() {
   const autoPostResult = await autoPostUpcomingSessions();
   const ensureFutureResult = await ensureFutureSessions();
   const remindersResult = await sendSessionReminders();
+  const autopilotResult = await runAutopilotDueJobs();
 
   console.log("[runSessionJobs] Batch complete");
 
@@ -368,6 +370,7 @@ export async function runSessionJobs() {
     autoPost: autoPostResult,
     ensureFuture: ensureFutureResult,
     reminders: remindersResult,
+    autopilot: autopilotResult,
     timestamp: new Date().toISOString(),
   };
 }
