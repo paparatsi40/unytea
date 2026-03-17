@@ -364,7 +364,8 @@ export default function DashboardPage() {
   const [autopilot, setAutopilot] = useState<AutopilotDashboard | null>(null);
   const [identity, setIdentity] = useState<UserIdentitySnapshot | null>(null);
   const [activation, setActivation] = useState<ActivationSnapshot | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [, setIsLoading] = useState(true);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
 
   // Load dashboard data
   useEffect(() => {
@@ -590,55 +591,6 @@ export default function DashboardPage() {
             { label: "Create post", href: "/dashboard/feed" },
           ];
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-zinc-50">
-        <div className="mx-auto max-w-7xl p-6 space-y-6">
-          <div className="flex items-start justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-zinc-900">Welcome back 👋</h1>
-              <p className="text-zinc-500 mt-1">Preparing your dashboard…</p>
-            </div>
-            <div className="h-10 w-44 rounded bg-zinc-200 animate-pulse" />
-          </div>
-
-          <Card className="border-zinc-200 bg-white">
-            <CardContent className="p-5">
-              <div className="flex flex-wrap items-start justify-between gap-4">
-                <div className="space-y-1 min-h-[64px]">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Action First</p>
-                  <h2 className="text-xl font-semibold text-zinc-900">Schedule your next session</h2>
-                  <p className="text-sm text-zinc-700">Communities with weekly sessions grow 3x faster.</p>
-                </div>
-                <Button className="bg-purple-600 hover:bg-purple-700" disabled>
-                  Schedule your first session
-                  <ArrowRight className="h-4 w-4 ml-2" />
-                </Button>
-              </div>
-
-              <div className="mt-4 grid gap-3 sm:grid-cols-3 animate-pulse">
-                <div className="h-24 rounded-lg bg-zinc-100" />
-                <div className="h-24 rounded-lg bg-zinc-100" />
-                <div className="h-24 rounded-lg bg-zinc-100" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="grid gap-4 lg:grid-cols-2 animate-pulse">
-            <div className="h-44 rounded-xl border border-zinc-200 bg-white" />
-            <div className="h-44 rounded-xl border border-zinc-200 bg-white" />
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-4 animate-pulse">
-            <div className="h-28 rounded-xl border border-zinc-200 bg-white" />
-            <div className="h-28 rounded-xl border border-zinc-200 bg-white" />
-            <div className="h-28 rounded-xl border border-zinc-200 bg-white" />
-            <div className="h-28 rounded-xl border border-zinc-200 bg-white" />
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-zinc-50">
@@ -699,11 +651,11 @@ export default function DashboardPage() {
         </Card>
 
         <div className="grid gap-4 lg:grid-cols-2">
-          <Card className="border-zinc-200 bg-white">
+          <Card className="border-zinc-200 bg-white min-h-[220px]">
             <CardHeader className="pb-2">
               <CardTitle className="text-base">Your progress</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2">
+            <CardContent className="space-y-2 min-h-[160px]">
               {journeyItems.map((item) => (
                 <p key={item.label} className={`text-sm ${item.done ? "text-emerald-700" : "text-zinc-700"}`}>
                   {item.done ? "☑" : "☐"} {item.label}
@@ -712,11 +664,11 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-zinc-200 bg-white">
+          <Card className="border-zinc-200 bg-white min-h-[220px]">
             <CardHeader className="pb-2">
               <CardTitle className="text-base">This week plan</CardTitle>
             </CardHeader>
-            <CardContent className="grid gap-2">
+            <CardContent className="grid gap-2 min-h-[160px]">
               <Link href="/dashboard/sessions/create"><Button variant="outline" className="justify-between">Schedule 1 session <ArrowRight className="h-4 w-4"/></Button></Link>
               <Link href="/dashboard/feed"><Button variant="outline" className="justify-between">Ask 1 question in feed <ArrowRight className="h-4 w-4"/></Button></Link>
               <Link href="/dashboard/sessions"><Button variant="outline" className="justify-between">Host your session <ArrowRight className="h-4 w-4"/></Button></Link>
@@ -772,11 +724,14 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <details className="rounded-lg border border-zinc-200 bg-white">
+        <details
+          className="rounded-lg border border-zinc-200 bg-white"
+          onToggle={(event) => setAdvancedOpen((event.currentTarget as HTMLDetailsElement).open)}
+        >
           <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-zinc-700">
             Advanced
           </summary>
-          <div className="space-y-6 p-4 pt-0">
+          {advancedOpen && <div className="space-y-6 p-4 pt-0">
 
         {activation && (
           <Card className="border-emerald-200 bg-emerald-50/40">
@@ -1892,7 +1847,7 @@ export default function DashboardPage() {
             </Card>
           </div>
         </div>
-          </div>
+          </div>}
         </details>
       </div>
     </div>
