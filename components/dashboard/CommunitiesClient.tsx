@@ -294,22 +294,20 @@ export function CommunitiesClient() {
     <div className="space-y-5">
       {primaryCommunity && primaryCard && (
         <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
-          <div className="relative h-40 overflow-hidden">
+          <div className="relative h-56 overflow-hidden">
             <img
               src={heroCoverImage}
               alt={`${primaryCommunity.name} cover`}
               className="h-full w-full object-cover object-center"
             />
             <div className="absolute inset-0 bg-black/20" />
-            {(primaryCommunity.role === "OWNER" || primaryCommunity.role === "ADMIN") && (
-              <div className="absolute right-3 top-3 z-10">
-                <Link href={`/dashboard/c/${primaryCommunity.slug}/settings/appearance`}>
-                  <Button size="sm" variant="secondary" className="h-8 bg-white/90 text-zinc-900 hover:bg-white">
-                    {primaryCommunity.coverImageUrl ? "Change cover image" : "Add cover image"}
-                  </Button>
-                </Link>
-              </div>
-            )}
+            <div className="absolute right-3 top-3 z-10">
+              <Link href={`/dashboard/c/${primaryCommunity.slug}/settings/appearance`}>
+                <Button size="sm" variant="secondary" className="h-8 bg-white/90 text-zinc-900 hover:bg-white">
+                  {primaryCommunity.coverImageUrl ? "Change cover image" : "Add cover image"}
+                </Button>
+              </Link>
+            </div>
           </div>
           <div className="space-y-4 p-6 pt-5">
             <div>
@@ -330,6 +328,9 @@ export function CommunitiesClient() {
               </Link>
               <Link href={`/dashboard/c/${primaryCommunity.slug}`}>
                 <Button variant="outline">Enter community</Button>
+              </Link>
+              <Link href={`/dashboard/c/${primaryCommunity.slug}/settings/appearance`}>
+                <Button variant="ghost">{primaryCommunity.coverImageUrl ? "Change cover image" : "Add cover image"}</Button>
               </Link>
             </div>
 
