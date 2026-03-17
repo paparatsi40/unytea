@@ -546,28 +546,80 @@ export default function DashboardPage() {
   const hasCommunity = metrics && metrics.communities > 0;
   const hasSessions = upcomingSessions.length > 0;
 
-  const primaryHeadline =
-    !hasCommunity
-      ? "Start your first community this week"
-      : nextAction?.title || "Keep your weekly momentum";
+  const sessionToday = nextSession
+    ? (() => {
+        const d = new Date(nextSession.scheduledAt);
+        const now = new Date();
+        return d.toDateString() === now.toDateString();
+      })()
+    : false;
 
-  const primaryDescription =
-    !hasCommunity
-      ? "Create a community, schedule your first live session, and invite members in one flow."
-      : nextAction?.description ||
-        "Focus on one high-impact action to improve attendance and growth.";
+  const sessionSoon = nextSession
+    ? (() => {
+        const diff = new Date(nextSession.scheduledAt).getTime() - Date.now();
+        return diff > 0 && diff <= 24 * 60 * 60 * 1000;
+      })()
+    : false;
 
-  const primaryHref = !hasCommunity
-    ? "/dashboard/communities/new"
-    : nextAction?.href || "/dashboard/sessions/create";
+  const heroState: "no_sessions" | "today" | "upcoming" | "healthy" =
+    !hasSessions ? "no_sessions" : sessionToday ? "today" : sessionSoon ? "upcoming" : "healthy";
 
-  const primaryCta = !hasCommunity
-    ? "Create first community"
-    : nextAction?.cta || "Take next action";
+  const heroContent =
+    heroState === "no_sessions"
+      ? {
+          title: "🚨 You have no sessions this week",
+          description: "Your community is at risk of losing momentum.",
+          cta: "Schedule your first session",
+          href: "/dashboard/sessions/create",
+        }
+      : heroState === "today"
+        ? {
+            title: "🟢 Your session starts soon",
+            description: `${nextSession?.title || "Next session"} · ${nextSession?.attendeeCount || 0} attending`,
+            cta: "Join session",
+            href: nextSession ? `/dashboard/sessions/${nextSession.id}` : "/dashboard/sessions",
+          }
+        : heroState === "upcoming"
+          ? {
+              title: "🟡 Your next session is coming up",
+              description: `${nextSession?.title || "Next session"} · ${formatDate(nextSession?.scheduledAt || new Date())} ${formatTime(nextSession?.scheduledAt || new Date())}`,
+              cta: "View session",
+              href: nextSession ? `/dashboard/sessions/${nextSession.id}` : "/dashboard/sessions",
+            }
+          : {
+              title: "🔥 Your community is on track",
+              description: `${metrics?.sessionsThisWeek || 0} sessions this week · ${hostAnalytics?.avgAttendance || 0} avg attendees`,
+              cta: "View sessions",
+              href: "/dashboard/sessions",
+            };
 
   const weeklyProgress = communityOS?.playbook
     ? Math.round((communityOS.playbook.completedSteps / Math.max(1, communityOS.playbook.totalSteps)) * 100)
     : 0;
+
+  const journeyItems = [
+    { label: "Create community", done: (metrics?.communities || 0) > 0 },
+    { label: "Host first session", done: (hostAnalytics?.sessionsHosted || 0) >= 1 },
+    { label: "Get 10 attendees", done: (hostAnalytics?.avgAttendance || 0) >= 10 },
+    { label: "Build weekly habit", done: (metrics?.sessionsThisWeek || 0) >= 1 },
+  ];
+
+  const quickActions =
+    heroState === "no_sessions"
+      ? [
+          { label: "Schedule session", href: "/dashboard/sessions/create" },
+          { label: "Invite members", href: "/dashboard/communities" },
+        ]
+      : heroState === "today"
+        ? [
+            { label: "Start session", href: nextSession ? `/dashboard/sessions/${nextSession.id}` : "/dashboard/sessions" },
+            { label: "View attendees", href: "/dashboard/analytics" },
+          ]
+        : [
+            { label: "View session", href: nextSession ? `/dashboard/sessions/${nextSession.id}` : "/dashboard/sessions" },
+            { label: "Invite members", href: "/dashboard/communities" },
+            { label: "Create post", href: "/dashboard/feed" },
+          ];
 
   if (isLoading) {
     return (
@@ -608,12 +660,12 @@ export default function DashboardPage() {
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div className="space-y-1">
                 <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Action First</p>
-                <h2 className="text-xl font-semibold text-zinc-900">{primaryHeadline}</h2>
-                <p className="text-sm text-zinc-600 max-w-2xl">{primaryDescription}</p>
+                <h2 className="text-xl font-semibold text-zinc-900">{heroContent.title}</h2>
+                <p className="text-sm text-zinc-600 max-w-2xl">{heroContent.description}</p>
               </div>
-              <Link href={primaryHref}>
+              <Link href={heroContent.href}>
                 <Button className="bg-purple-600 hover:bg-purple-700">
-                  {primaryCta}
+                  {heroContent.cta}
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
               </Link>
@@ -638,9 +690,83 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
+        <div className="grid gap-4 lg:grid-cols-2">
+          <Card className="border-zinc-200 bg-white">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">Your progress</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {journeyItems.map((item) => (
+                <p key={item.label} className={`text-sm ${item.done ? "text-emerald-700" : "text-zinc-700"}`}>
+                  {item.done ? "☑" : "☐"} {item.label}
+                </p>
+              ))}
+            </CardContent>
+          </Card>
+
+          <Card className="border-zinc-200 bg-white">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">This week plan</CardTitle>
+            </CardHeader>
+            <CardContent className="grid gap-2">
+              <Link href="/dashboard/sessions/create"><Button variant="outline" className="justify-between">Schedule 1 session <ArrowRight className="h-4 w-4"/></Button></Link>
+              <Link href="/dashboard/feed"><Button variant="outline" className="justify-between">Ask 1 question in feed <ArrowRight className="h-4 w-4"/></Button></Link>
+              <Link href="/dashboard/sessions"><Button variant="outline" className="justify-between">Host your session <ArrowRight className="h-4 w-4"/></Button></Link>
+              <Link href="/dashboard/recordings"><Button variant="outline" className="justify-between">Share recap <ArrowRight className="h-4 w-4"/></Button></Link>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid gap-4 lg:grid-cols-3">
+          <Card className="border-amber-200 bg-amber-50/40 lg:col-span-1">
+            <CardContent className="p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-amber-700">Highest impact action</p>
+              <p className="mt-2 text-sm font-semibold text-zinc-900">{heroState === "no_sessions" ? "Schedule your next session" : heroState === "today" ? "Go live on time" : "Increase RSVPs before session"}</p>
+              <p className="mt-1 text-sm text-zinc-700">{heroState === "no_sessions" ? "Communities with weekly sessions grow 3x faster." : "One focused action now drives this week's attendance."}</p>
+              <Link href={heroContent.href} className="mt-3 inline-flex"><Button size="sm">{heroContent.cta}</Button></Link>
+            </CardContent>
+          </Card>
+
+          <Card className="border-zinc-200 bg-white lg:col-span-1">
+            <CardHeader className="pb-2"><CardTitle className="text-base">This week</CardTitle></CardHeader>
+            <CardContent className="space-y-2 text-sm text-zinc-700">
+              <p>Sessions: <span className="font-semibold text-zinc-900">{metrics?.sessionsThisWeek || 0}</span></p>
+              <p>Avg attendance: <span className="font-semibold text-zinc-900">{hostAnalytics?.avgAttendance || 0}</span></p>
+              <p>Active members: <span className="font-semibold text-zinc-900">{hostAnalytics?.activeMembers || 0}</span></p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-zinc-200 bg-white lg:col-span-1">
+            <CardHeader className="pb-2"><CardTitle className="text-base">Next session</CardTitle></CardHeader>
+            <CardContent className="space-y-2">
+              {nextSession ? (
+                <>
+                  <p className="font-semibold text-zinc-900">{nextSession.title}</p>
+                  <p className="text-sm text-zinc-600">{formatDate(nextSession.scheduledAt)} {formatTime(nextSession.scheduledAt)} · {nextSession.attendeeCount} attending</p>
+                  <Link href={`/dashboard/sessions/${nextSession.id}`}><Button size="sm" variant="outline">View session</Button></Link>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm text-zinc-600">No session scheduled</p>
+                  <Link href="/dashboard/sessions/create"><Button size="sm">Schedule session</Button></Link>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card className="border-zinc-200 bg-white">
+          <CardHeader className="pb-2"><CardTitle className="text-base">Quick actions</CardTitle></CardHeader>
+          <CardContent className="flex flex-wrap gap-2">
+            {quickActions.map((a) => (
+              <Link key={a.label} href={a.href}><Button variant="outline">{a.label}</Button></Link>
+            ))}
+          </CardContent>
+        </Card>
+
         <details className="rounded-lg border border-zinc-200 bg-white">
           <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-zinc-700">
-            View operational details
+            Advanced
           </summary>
           <div className="space-y-6 p-4 pt-0">
 
