@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Plus, Users, Loader2, Flame } from "lucide-react";
+import { Plus, Users, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type Community = {
@@ -12,6 +12,8 @@ type Community = {
   name: string;
   slug: string;
   description: string | null;
+  imageUrl?: string | null;
+  coverImageUrl?: string | null;
   isPrivate: boolean;
   role: string;
   _count: {
@@ -37,7 +39,7 @@ type CommunityCardState = "empty" | "upcoming" | "today" | "healthy";
 
 function formatSessionDayTime(dateString: string) {
   const date = new Date(dateString);
-  const day = date.toLocaleDateString("en-US", { weekday: "long" });
+  const day = date.toLocaleDateString("en-US", { weekday: "short" });
   const time = date.toLocaleTimeString("en-US", {
     hour: "numeric",
     minute: "2-digit",
@@ -63,11 +65,10 @@ function getCardState(community: Community): {
   state: CommunityCardState;
   title: string;
   subtitle: string;
-  detail?: string;
-  nextStep?: string;
   primaryLabel: string;
   primaryHref: string;
   tone: string;
+  shortStatus: string;
 } {
   const weeklySessions = community.weeklySessions || 0;
   const nextSession = community.nextSession;
@@ -75,11 +76,12 @@ function getCardState(community: Community): {
   if (weeklySessions >= 2) {
     return {
       state: "healthy",
-      title: "Weekly rhythm is active",
-      subtitle: `${weeklySessions} sessions this week · ${community.avgAttendanceThisWeek || 0} avg attendees`,
+      title: "Keep weekly rhythm",
+      subtitle: `${weeklySessions} sessions this week`,
       primaryLabel: "View sessions",
       primaryHref: "/dashboard/sessions",
       tone: "border-emerald-200 bg-emerald-50 text-emerald-900",
+      shortStatus: "🟢 Healthy",
     };
   }
 
@@ -88,10 +90,10 @@ function getCardState(community: Community): {
       state: "empty",
       title: "Start your first session",
       subtitle: "Communities with weekly sessions grow 3x faster",
-      nextStep: "Schedule your first live session",
-      primaryLabel: "Schedule first session",
+      primaryLabel: "Start session",
       primaryHref: "/dashboard/sessions/create",
       tone: "border-amber-200 bg-amber-50 text-amber-900",
+      shortStatus: "⚠️ No upcoming session",
     };
   }
 
@@ -102,30 +104,26 @@ function getCardState(community: Community): {
   if (isToday || nextSession.status === "IN_PROGRESS") {
     return {
       state: "today",
-      title:
-        nextSession.status === "IN_PROGRESS"
-          ? "Live now"
-          : `Live in ${hoursUntil(nextSession.scheduledAt)} hours`,
+      title: nextSession.status === "IN_PROGRESS" ? "Go live now" : `Live in ${hoursUntil(nextSession.scheduledAt)}h`,
       subtitle: `${nextSession.attendeeCount || 0} attending`,
-      nextStep: "Show up on time and drive attendance",
       primaryLabel: "Start session",
       primaryHref:
         nextSession.status === "IN_PROGRESS"
           ? `/dashboard/sessions/${nextSession.id}/room`
           : `/dashboard/sessions/${nextSession.id}`,
       tone: "border-emerald-200 bg-emerald-50 text-emerald-900",
+      shortStatus: "🟡 Session today",
     };
   }
 
   return {
     state: "upcoming",
-    title: "Next session scheduled",
+    title: "Next session is scheduled",
     subtitle: formatSessionDayTime(nextSession.scheduledAt),
-    detail: `${nextSession.attendeeCount || 0} attending`,
-    nextStep: "Push reminders to increase attendance",
     primaryLabel: "View session",
     primaryHref: `/dashboard/sessions/${nextSession.id}`,
     tone: "border-sky-200 bg-sky-50 text-sky-900",
+    shortStatus: "🟡 Growing",
   };
 }
 
@@ -135,6 +133,8 @@ function getPriority(cardState: CommunityCardState) {
       label: "Needs attention",
       level: "High",
       tone: "bg-rose-100 text-rose-800",
+      rank: 0,
+      short: "🔥 Needs attention",
     };
   }
 
@@ -143,6 +143,8 @@ function getPriority(cardState: CommunityCardState) {
       label: "Healthy",
       level: "Low",
       tone: "bg-emerald-100 text-emerald-800",
+      rank: 2,
+      short: "🟢 Healthy",
     };
   }
 
@@ -150,6 +152,8 @@ function getPriority(cardState: CommunityCardState) {
     label: "Growing",
     level: "Medium",
     tone: "bg-amber-100 text-amber-800",
+    rank: 1,
+    short: "🟡 Growing",
   };
 }
 
@@ -191,61 +195,50 @@ export function CommunitiesClient() {
     return { sessions, attendees, members, posts };
   }, [communities]);
 
-  const hasUpcoming = communities.some((c) => c.nextSession);
+  const prioritizedCommunities = useMemo(() => {
+    return communities
+      .map((community) => {
+        const card = getCardState(community);
+        const priority = getPriority(card.state);
+        return { community, card, priority };
+      })
+      .sort((a, b) => {
+        if (a.priority.rank !== b.priority.rank) {
+          return a.priority.rank - b.priority.rank;
+        }
+        return b.community._count.members - a.community._count.members;
+      });
+  }, [communities]);
 
-  const nextBestAction = useMemo(() => {
-    if (!hasUpcoming) {
-      return {
-        title: "Schedule your first session",
-        subtitle: "Unlock engagement, recaps, and growth loops",
-        cta: "Schedule session",
-        href: "/dashboard/sessions/create",
+  const primaryEntry = prioritizedCommunities[0] || null;
+  const primaryCommunity = primaryEntry?.community || null;
+  const primaryCard = primaryEntry?.card || null;
+  const primaryPriority = primaryEntry?.priority || null;
+  const primaryLastPost = formatRelative(primaryCommunity?.lastPostAt);
+
+  const heroBackgroundStyle = primaryCommunity?.coverImageUrl
+    ? {
+        backgroundImage: `linear-gradient(135deg, rgba(17, 24, 39, 0.72), rgba(88, 28, 135, 0.65)), url(${primaryCommunity.coverImageUrl})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }
+    : {
+        backgroundImage:
+          "linear-gradient(130deg, rgb(88, 28, 135) 0%, rgb(168, 85, 247) 45%, rgb(249, 115, 22) 100%)",
       };
-    }
-
-    if (momentum.attendees === 0) {
-      return {
-        title: "Boost attendance before your next session",
-        subtitle: "Post one question in your community to warm up members",
-        cta: "Create post",
-        href: "/dashboard/feed",
-      };
-    }
-
-    if (momentum.members < 5) {
-      return {
-        title: "Invite 5 members this week",
-        subtitle: "More members now means stronger session momentum later",
-        cta: "Invite members",
-        href: "/dashboard/communities",
-      };
-    }
-
-    return {
-      title: "Keep your weekly habit alive",
-      subtitle: "Run at least one session this week to keep growth compounding",
-      cta: "View sessions",
-      href: "/dashboard/sessions",
-    };
-  }, [hasUpcoming, momentum.attendees, momentum.members]);
 
   const milestones = [
-    { label: "First community created", done: communities.length > 0 },
+    { label: "Community created", done: communities.length > 0 },
     {
-      label: "First session hosted",
+      label: "First session",
       done: communities.some((c) => (c.weeklySessions || 0) > 0 || Boolean(c.lastSessionAt)),
     },
-    { label: "10 attendees reached", done: momentum.attendees >= 10 },
+    { label: "10 attendees", done: momentum.attendees >= 10 },
     {
-      label: "Weekly habit built",
+      label: "Weekly habit",
       done: communities.some((c) => (c.weeklySessions || 0) >= 2),
     },
   ];
-
-  const primaryCommunity = communities[0] || null;
-  const primaryCard = primaryCommunity ? getCardState(primaryCommunity) : null;
-  const primaryPriority = primaryCard ? getPriority(primaryCard.state) : null;
-  const primaryLastPost = formatRelative(primaryCommunity?.lastPostAt);
 
   if (isLoading || loading) {
     return (
@@ -298,39 +291,42 @@ export function CommunitiesClient() {
   return (
     <div className="space-y-5">
       {primaryCommunity && primaryCard && primaryPriority && (
-        <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
-          <div className="h-14 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-orange-500" />
-          <div className="space-y-4 p-6 pt-5">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <p className="text-2xl font-bold text-foreground">{primaryCommunity.name}</p>
-                <p className="text-sm text-muted-foreground">
-                  {primaryCommunity._count.members} members · {primaryCommunity._count.posts} posts
-                </p>
+        <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-md">
+          <div className="relative min-h-[320px] border-b border-white/20" style={heroBackgroundStyle}>
+            <div className="absolute inset-0 bg-black/15 backdrop-blur-[1px]" />
+            <div className="absolute inset-0 shadow-[inset_0_-120px_120px_-60px_rgba(0,0,0,0.55)]" />
+            <div className="relative z-10 flex min-h-[320px] flex-col justify-end gap-4 px-6 pb-8 pt-24 text-white">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className="text-3xl font-bold tracking-tight">{primaryCommunity.name}</p>
+                <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${primaryPriority.tone}`}>
+                  Priority: {primaryPriority.level} · {primaryPriority.label}
+                </span>
               </div>
-              <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${primaryPriority.tone}`}>
-                Priority: {primaryPriority.level} · {primaryPriority.label}
-              </span>
-            </div>
 
-            <div className={`rounded-xl border p-4 ${primaryCard.tone}`}>
-              <p className="text-lg font-semibold">⚡ {primaryCard.title}</p>
-              <p className="mt-1 text-sm">{primaryCard.subtitle}</p>
-              {primaryCard.detail && <p className="mt-1 text-sm">{primaryCard.detail}</p>}
-            </div>
+              <div>
+                <p className="text-2xl font-semibold">⚡ {primaryCard.title}</p>
+                <p className="mt-1 max-w-xl text-sm text-white/90">{primaryCard.subtitle}</p>
+              </div>
 
-            <div className="flex flex-wrap gap-2">
-              <Link href={primaryCard.primaryHref}>
-                <Button>{primaryCard.primaryLabel}</Button>
-              </Link>
-              <Link href={`/dashboard/c/${primaryCommunity.slug}`}>
-                <Button variant="outline">Enter community</Button>
-              </Link>
+              <div className="flex flex-wrap gap-2 pt-1">
+                <Link href={primaryCard.primaryHref}>
+                  <Button size="lg" className="h-11 bg-white text-zinc-900 hover:bg-zinc-100">
+                    {primaryCard.primaryLabel}
+                  </Button>
+                </Link>
+                <Link href={`/dashboard/c/${primaryCommunity.slug}`}>
+                  <Button size="lg" variant="outline" className="h-11 border-white/60 bg-white/10 text-white hover:bg-white/20">
+                    Enter community
+                  </Button>
+                </Link>
+              </div>
             </div>
+          </div>
 
+          <div className="space-y-3 p-5">
             <div className="rounded-xl border border-border/80 bg-muted/20 p-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Milestones</p>
-              <div className="mt-2 grid gap-1 text-sm">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Your progress</p>
+              <div className="mt-2 grid grid-cols-2 gap-1 text-sm">
                 {milestones.map((item) => (
                   <p key={item.label} className={item.done ? "text-emerald-700" : "text-foreground"}>
                     {item.done ? "✔" : "⬜"} {item.label}
@@ -346,26 +342,17 @@ export function CommunitiesClient() {
         </div>
       )}
 
-      <div className="rounded-2xl border-2 border-amber-200 bg-amber-50 p-5">
-        <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-amber-900">
-          <Flame className="h-4 w-4" />
-          Next best action
-        </p>
-        <p className="mt-2 text-xl font-bold text-amber-950">{nextBestAction.title}</p>
-        <p className="mt-1 text-sm text-amber-900">{nextBestAction.subtitle}</p>
-        <Link href={nextBestAction.href} className="mt-4 inline-flex">
-          <Button className="bg-amber-500 text-zinc-900 hover:bg-amber-400">{nextBestAction.cta}</Button>
-        </Link>
-      </div>
-
       <div className="rounded-2xl border border-border bg-card p-4">
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">This week</p>
         <div className="mt-2 space-y-1 text-sm text-foreground">
-          <p>
-            {momentum.attendees === 0
-              ? "⚠ Attendance is low (0%) → Ask a question post before your session"
-              : `✅ ${momentum.attendees} attendees this week`}
-          </p>
+          {momentum.attendees === 0 ? (
+            <>
+              <p>⚠️ Attendance is low (0%)</p>
+              <p>👉 Fix: Ask a question post before your session</p>
+            </>
+          ) : (
+            <p>✅ {momentum.attendees} attendees this week</p>
+          )}
           <p>📅 {momentum.sessions} session{momentum.sessions !== 1 ? "s" : ""} scheduled</p>
           <p>👥 {momentum.members} members</p>
           <p>💬 {momentum.posts} posts</p>
@@ -374,40 +361,29 @@ export function CommunitiesClient() {
 
       <div className="space-y-3">
         <p className="text-sm font-semibold text-foreground">Your communities</p>
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {communities.map((community) => {
-            const card = getCardState(community);
-            const priority = getPriority(card.state);
-            return (
-              <div key={community.id} className="rounded-2xl border border-border bg-card p-5">
-                <div className="flex items-start justify-between gap-2">
-                  <p className="truncate text-lg font-semibold text-foreground">{community.name}</p>
-                  <span className={`rounded-full px-2 py-1 text-[11px] font-semibold ${priority.tone}`}>
-                    {priority.label}
-                  </span>
-                </div>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {community._count.members} members · {community._count.posts} posts
-                </p>
-                <div className={`mt-3 rounded-lg border p-3 ${card.tone}`}>
-                  <p className="text-sm font-semibold">{card.title}</p>
-                  <p className="mt-1 text-sm">{card.subtitle}</p>
-                </div>
-                <div className="mt-3 flex gap-2">
-                  <Link href={card.primaryHref} className="flex-1">
-                    <Button className="w-full" size="sm">
-                      {card.primaryLabel}
-                    </Button>
-                  </Link>
-                  <Link href={`/dashboard/c/${community.slug}`}>
-                    <Button size="sm" variant="outline">
-                      Enter
-                    </Button>
-                  </Link>
-                </div>
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          {prioritizedCommunities.map(({ community, card, priority }) => (
+            <div key={community.id} className="rounded-2xl border border-border bg-card p-4">
+              <div className="flex items-start justify-between gap-2">
+                <p className="truncate text-base font-semibold text-foreground">{community.name}</p>
+                <span className={`rounded-full px-2 py-1 text-[11px] font-semibold ${priority.tone}`}>{priority.short}</span>
               </div>
-            );
-          })}
+              <p className="mt-1 text-sm text-foreground">{card.shortStatus}</p>
+              <p className="text-xs text-muted-foreground">{community._count.members} members</p>
+              <div className="mt-3 flex gap-2">
+                <Link href={card.primaryHref} className="flex-1">
+                  <Button className="h-9 w-full" size="sm">
+                    {card.primaryLabel}
+                  </Button>
+                </Link>
+                <Link href={`/dashboard/c/${community.slug}`}>
+                  <Button size="sm" variant="outline" className="h-9">
+                    Enter
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
