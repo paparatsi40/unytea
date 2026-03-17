@@ -309,6 +309,90 @@ export async function getPublicSessionsForSEO(
   }
 }
 
+export async function getRelatedCommunitiesHostingThisWeek(
+  currentCommunityId: string,
+  limit: number = 4
+) {
+  try {
+    const now = new Date();
+    const weekEnd = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+    const communities = await prisma.community.findMany({
+      where: {
+        id: { not: currentCommunityId },
+        isPrivate: false,
+        sessions: {
+          some: {
+            status: "SCHEDULED",
+            scheduledAt: {
+              gte: now,
+              lte: weekEnd,
+            },
+          },
+        },
+      },
+      select: {
+        id: true,
+        slug: true,
+        name: true,
+        description: true,
+        imageUrl: true,
+        _count: {
+          select: { members: true },
+        },
+        sessions: {
+          where: {
+            status: "SCHEDULED",
+            scheduledAt: {
+              gte: now,
+              lte: weekEnd,
+            },
+          },
+          orderBy: { scheduledAt: "asc" },
+          take: 1,
+          select: {
+            id: true,
+            title: true,
+            scheduledAt: true,
+            _count: {
+              select: { participations: true },
+            },
+          },
+        },
+      },
+      orderBy: {
+        members: {
+          _count: "desc",
+        },
+      },
+      take: limit,
+    });
+
+    return {
+      success: true,
+      communities: communities.map((community) => ({
+        id: community.id,
+        slug: community.slug,
+        name: community.name,
+        description: community.description,
+        imageUrl: community.imageUrl,
+        memberCount: community._count.members,
+        nextSession: community.sessions[0]
+          ? {
+              id: community.sessions[0].id,
+              title: community.sessions[0].title,
+              scheduledAt: community.sessions[0].scheduledAt,
+              attendingCount: community.sessions[0]._count.participations,
+            }
+          : null,
+      })),
+    };
+  } catch (error) {
+    console.error("Error fetching related communities:", error);
+    return { success: false, error: "Failed to load related communities" };
+  }
+}
+
 export async function getNextCommunitySession(communityId: string) {
   try {
     const nextSession = await prisma.mentorSession.findFirst({

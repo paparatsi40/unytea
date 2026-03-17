@@ -4,6 +4,7 @@ import {
   getPublicSession,
   getRelatedSessions,
   getNextCommunitySession,
+  getRelatedCommunitiesHostingThisWeek,
 } from "@/app/actions/public-sessions";
 import { PublicSessionPage } from "@/components/sessions/PublicSessionPage";
 
@@ -88,12 +89,17 @@ export default async function PublicSessionRoute({ params }: PublicSessionRouteP
     3
   );
 
-  const nextSessionResult = await getNextCommunitySession(session.community.id);
+  const [nextSessionResult, relatedCommunitiesResult] = await Promise.all([
+    getNextCommunitySession(session.community.id),
+    getRelatedCommunitiesHostingThisWeek(session.community.id, 4),
+  ]);
 
   return (
     <PublicSessionPage
       session={session}
+      locale="en"
       relatedSessions={relatedResult.success ? relatedResult.sessions || [] : []}
+      relatedCommunities={relatedCommunitiesResult.success ? relatedCommunitiesResult.communities || [] : []}
       nextSession={nextSessionResult.success ? nextSessionResult.session ?? null : null}
     />
   );

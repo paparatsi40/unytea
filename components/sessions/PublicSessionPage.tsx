@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { format } from "date-fns";
 
 interface PublicSessionPageProps {
+  locale?: string;
   session: {
     id: string;
     slug: string;
@@ -75,9 +76,23 @@ interface PublicSessionPageProps {
     scheduledAt: Date;
     duration: number | null;
   } | null;
+  relatedCommunities?: {
+    id: string;
+    slug: string;
+    name: string;
+    description: string | null;
+    imageUrl: string | null;
+    memberCount: number;
+    nextSession: {
+      id: string;
+      title: string;
+      scheduledAt: Date;
+      attendingCount: number;
+    } | null;
+  }[];
 }
 
-export function PublicSessionPage({ session, relatedSessions, nextSession }: PublicSessionPageProps) {
+export function PublicSessionPage({ locale = "en", session, relatedSessions, nextSession, relatedCommunities }: PublicSessionPageProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 const [isPlaying, setIsPlaying] = useState(false);
@@ -520,46 +535,83 @@ const roomParams = new URLSearchParams();
             {relatedSessions && relatedSessions.length > 0 && (
               <div className="mt-8">
                 <h3 className="mb-4 text-xl font-semibold text-white">
-                  More from {session.community.name}
+                  Related sessions
                 </h3>
                 <div className="grid gap-4 sm:grid-cols-2">
                   {relatedSessions.map((related) => {
                     const hasPublicPage = Boolean(related.slug);
                     return (
-                    <Card
-                      key={related.id}
-                      className={`border-zinc-800 bg-zinc-900/50 transition-colors ${hasPublicPage ? "cursor-pointer hover:bg-zinc-800" : "opacity-70"}`}
-                      onClick={() => {
-                        if (!hasPublicPage) return;
-                        const qs = new URLSearchParams();
-                        if (ref) qs.set("ref", ref);
-                        qs.set("src", "public_related_card");
-                        if (src) qs.set("parent_src", src);
-                        const suffix = qs.toString() ? `?${qs.toString()}` : "";
-router.push(`/sessions/${related.slug}${suffix}`);
-                      }}
-                    >
-                      <CardContent className="p-4">
-                        <h4 className="mb-2 font-medium text-white line-clamp-2">
-                          {related.title}
-                        </h4>
-                        <div className="flex items-center gap-3 text-sm text-zinc-500">
-                          <Avatar className="h-6 w-6">
-                            <AvatarImage src={related.host.image || undefined} />
-                            <AvatarFallback className="bg-zinc-700 text-xs">
-                              {related.host.name?.charAt(0) || "H"}
-                            </AvatarFallback>
-                          </Avatar>
-                          <span>{related.host.name}</span>
-                        </div>
-                        {!hasPublicPage && (
-                          <p className="mt-2 text-xs text-zinc-500">No public page for this session</p>
-                        )}
-                      </CardContent>
-                    </Card>
+                      <Card
+                        key={related.id}
+                        className={`border-zinc-800 bg-zinc-900/50 transition-colors ${hasPublicPage ? "cursor-pointer hover:bg-zinc-800" : "opacity-70"}`}
+                        onClick={() => {
+                          if (!hasPublicPage) return;
+                          const qs = new URLSearchParams();
+                          if (ref) qs.set("ref", ref);
+                          qs.set("src", "public_related_card");
+                          if (src) qs.set("parent_src", src);
+                          const suffix = qs.toString() ? `?${qs.toString()}` : "";
+                          router.push(`/${locale}/s/${related.slug}${suffix}`);
+                        }}
+                      >
+                        <CardContent className="p-4">
+                          <h4 className="mb-2 font-medium text-white line-clamp-2">
+                            {related.title}
+                          </h4>
+                          <div className="flex items-center gap-3 text-sm text-zinc-500">
+                            <Avatar className="h-6 w-6">
+                              <AvatarImage src={related.host.image || undefined} />
+                              <AvatarFallback className="bg-zinc-700 text-xs">
+                                {related.host.name?.charAt(0) || "H"}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span>{related.host.name}</span>
+                          </div>
+                          {!hasPublicPage && (
+                            <p className="mt-2 text-xs text-zinc-500">No public page for this session</p>
+                          )}
+                        </CardContent>
+                      </Card>
                     );
                   })}
-</div>
+                </div>
+              </div>
+            )}
+
+            {/* Cross-community discovery */}
+            {relatedCommunities && relatedCommunities.length > 0 && (
+              <div className="mt-8">
+                <h3 className="mb-2 text-xl font-semibold text-white">Other communities hosting this week</h3>
+                <p className="mb-4 text-sm text-zinc-400">Discover active communities and join their next live sessions.</p>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {relatedCommunities.map((community) => (
+                    <Card
+                      key={community.id}
+                      className="cursor-pointer border-zinc-800 bg-zinc-900/50 transition-colors hover:bg-zinc-800"
+                      onClick={() => router.push(`/${locale}/community/${community.slug}`)}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-start gap-3">
+                          <Avatar className="h-10 w-10">
+                            <AvatarImage src={community.imageUrl || undefined} />
+                            <AvatarFallback className="bg-zinc-700 text-white">
+                              {community.name.charAt(0).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="min-w-0 flex-1">
+                            <p className="font-medium text-white truncate">{community.name}</p>
+                            <p className="mt-1 text-xs text-zinc-400">{community.memberCount} members</p>
+                            {community.nextSession && (
+                              <p className="mt-2 text-xs text-emerald-400">
+                                {format(new Date(community.nextSession.scheduledAt), "EEE, MMM d · h:mm a")} · {community.nextSession.attendingCount} attending
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
               </div>
             )}
           </div>
@@ -711,7 +763,7 @@ router.push(`/sessions/${related.slug}${suffix}`);
                 <Button
                   variant="outline"
                   className="w-full border-zinc-700 text-zinc-300 hover:bg-zinc-800"
-                  onClick={() => router.push("/communities")}
+                  onClick={() => router.push(`/${locale}/explore`)}
                 >
                   Explore Communities
                 </Button>

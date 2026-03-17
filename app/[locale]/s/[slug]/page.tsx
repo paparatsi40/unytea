@@ -1,6 +1,11 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getPublicSessionBySlug } from "@/app/actions/public-sessions";
+import {
+  getPublicSessionBySlug,
+  getRelatedSessions,
+  getNextCommunitySession,
+  getRelatedCommunitiesHostingThisWeek,
+} from "@/app/actions/public-sessions";
 import { PublicSessionPage } from "@/components/sessions/PublicSessionPage";
 import { SessionJsonLd } from "@/components/sessions/SessionJsonLd";
 
@@ -83,10 +88,22 @@ export default async function Page({ params }: Props) {
     notFound();
   }
 
+  const [relatedResult, nextSessionResult, relatedCommunitiesResult] = await Promise.all([
+    getRelatedSessions(session.community.id, session.id, 3),
+    getNextCommunitySession(session.community.id),
+    getRelatedCommunitiesHostingThisWeek(session.community.id, 4),
+  ]);
+
   return (
     <>
       <SessionJsonLd session={session} />
-      <PublicSessionPage session={session} />
+      <PublicSessionPage
+        session={session}
+        locale={params.locale}
+        relatedSessions={relatedResult.success ? relatedResult.sessions || [] : []}
+        relatedCommunities={relatedCommunitiesResult.success ? relatedCommunitiesResult.communities || [] : []}
+        nextSession={nextSessionResult.success ? nextSessionResult.session ?? null : null}
+      />
     </>
   );
 }
