@@ -78,6 +78,7 @@ function getCardState(community: Community): {
   title: string;
   subtitle: string;
   detail?: string;
+  nextStep?: string;
   primaryLabel: string;
   primaryHref: string;
   primaryIcon: "calendar" | "radio" | "arrow";
@@ -103,6 +104,7 @@ function getCardState(community: Community): {
       state: "empty",
       title: "🚨 No sessions scheduled",
       subtitle: "Your community is inactive",
+      nextStep: "Next step: schedule your first session",
       primaryLabel: "Schedule your first session",
       primaryHref: "/dashboard/sessions/create",
       primaryIcon: "calendar",
@@ -117,7 +119,10 @@ function getCardState(community: Community): {
   if (isToday || nextSession.status === "IN_PROGRESS") {
     return {
       state: "today",
-      title: nextSession.status === "IN_PROGRESS" ? "🟢 Live now" : `🟢 Live in ${hoursUntil(nextSession.scheduledAt)} hours`,
+      title:
+        nextSession.status === "IN_PROGRESS"
+          ? "🟢 Live now"
+          : `🟢 Live in ${hoursUntil(nextSession.scheduledAt)} hours`,
       subtitle: `${nextSession.attendeeCount || 0} attending`,
       primaryLabel: "Start session",
       primaryHref:
@@ -189,36 +194,33 @@ export function CommunitiesClient() {
   const hasUpcoming = communities.some((c) => c.nextSession);
   const healthy = communities.some((c) => (c.weeklySessions || 0) >= 2);
 
-  const heroState: HeroState = !hasUpcoming ? "critical" : hasLiveToday ? "live" : healthy ? "healthy" : "upcoming";
+  const heroState: HeroState = !hasUpcoming
+    ? "critical"
+    : hasLiveToday
+      ? "live"
+      : healthy
+        ? "healthy"
+        : "upcoming";
 
   const hero =
     heroState === "critical"
       ? {
           title: "🚨 Your community needs momentum",
-          description:
-            "You don’t have any upcoming live sessions. Communities with weekly sessions grow 3x faster.",
-          cta: "Schedule your first session",
-          href: "/dashboard/sessions/create",
+          description: "You don’t have any upcoming live sessions.",
         }
       : heroState === "live"
         ? {
             title: "🟢 You have a live moment today",
             description: "Your community has a session today. Show up on time and drive attendance.",
-            cta: "Start session",
-            href: "/dashboard/sessions",
           }
         : heroState === "upcoming"
           ? {
               title: "🟡 Your next live moment is scheduled",
-              description: "Keep momentum by pushing RSVPs and reminding members before start.",
-              cta: "View session",
-              href: "/dashboard/sessions",
+              description: "Keep momentum by pushing RSVPs and reminders before start.",
             }
           : {
               title: "🔥 Your community engine is running",
               description: "You’re running consistent sessions. Keep quality and attendance high.",
-              cta: "View sessions",
-              href: "/dashboard/sessions",
             };
 
   const nextUp = useMemo(() => {
@@ -233,7 +235,8 @@ export function CommunitiesClient() {
     if (!sessions.length) {
       return {
         title: "No session scheduled",
-        subtitle: "Schedule your next live session to activate your community.",
+        subtitle: "Your next milestone: host your first live session",
+        unlocks: ["Member engagement", "Recaps", "Growth loops"],
         cta: "Schedule session",
         href: "/dashboard/sessions/create",
       };
@@ -243,10 +246,18 @@ export function CommunitiesClient() {
     return {
       title: next.session!.title,
       subtitle: `${formatSessionDayTime(next.session!.scheduledAt)} · ${next.session!.attendeeCount || 0} attending`,
+      unlocks: [] as string[],
       cta: "View session",
       href: `/dashboard/sessions/${next.session!.id}`,
     };
   }, [communities]);
+
+  const progressItems = [
+    { label: "Create community", done: communities.length > 0 },
+    { label: "Host first session", done: communities.some((c) => (c.weeklySessions || 0) > 0 || Boolean(c.lastSessionAt)) },
+    { label: "Get 10 attendees", done: momentum.attendees >= 10 },
+    { label: "Build weekly habit", done: communities.some((c) => (c.weeklySessions || 0) >= 2) },
+  ];
 
   const nextBestAction = useMemo(() => {
     if (!hasUpcoming) {
@@ -275,6 +286,18 @@ export function CommunitiesClient() {
     };
   }, [hasUpcoming, momentum.members]);
 
+  const quickActions = !hasUpcoming
+    ? [
+        { label: "Schedule session", href: "/dashboard/sessions/create", primary: true },
+        { label: "Invite members", href: "/dashboard/communities", primary: false },
+        { label: "Create post", href: "/dashboard/feed", primary: false },
+      ]
+    : [
+        { label: "View session", href: "/dashboard/sessions", primary: true },
+        { label: "Create post", href: "/dashboard/feed", primary: false },
+        { label: "Invite members", href: "/dashboard/communities", primary: false },
+      ];
+
   if (isLoading || loading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
@@ -301,17 +324,18 @@ export function CommunitiesClient() {
   return (
     <div className="space-y-6">
       <div className="rounded-2xl border border-border bg-card p-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">{hero.title}</h1>
-            <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{hero.description}</p>
-          </div>
-          <Link href={hero.href}>
-            <Button>
-              {hero.cta}
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </Link>
+        <h1 className="text-2xl font-bold text-foreground">{hero.title}</h1>
+        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{hero.description}</p>
+      </div>
+
+      <div className="rounded-2xl border border-border bg-card p-4">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Your progress</p>
+        <div className="mt-2 grid gap-2 md:grid-cols-2">
+          {progressItems.map((item) => (
+            <p key={item.label} className={`text-sm ${item.done ? "text-emerald-700" : "text-zinc-700"}`}>
+              {item.done ? "☑" : "☐"} {item.label}
+            </p>
+          ))}
         </div>
       </div>
 
@@ -319,20 +343,22 @@ export function CommunitiesClient() {
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Next up</p>
         <p className="mt-1 text-base font-semibold text-foreground">{nextUp.title}</p>
         <p className="text-sm text-muted-foreground">{nextUp.subtitle}</p>
+        {nextUp.unlocks.length > 0 && (
+          <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
+            {nextUp.unlocks.map((u) => <li key={u}>- {u}</li>)}
+          </ul>
+        )}
         <Link href={nextUp.href} className="mt-3 inline-flex"><Button size="sm">{nextUp.cta}</Button></Link>
       </div>
 
       <div className="rounded-2xl border border-border bg-card p-4">
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">This week</p>
-        <p className="mt-2 text-sm text-foreground">
-          Sessions: <span className="font-semibold">{momentum.sessions}</span>
-          {"  ·  "}
-          Attendees: <span className="font-semibold">{momentum.attendees}</span>
-          {"  ·  "}
-          Members: <span className="font-semibold">{momentum.members}</span>
-          {"  ·  "}
-          Posts: <span className="font-semibold">{momentum.posts}</span>
-        </p>
+        <div className="mt-2 space-y-1 text-sm text-foreground">
+          <p><span className="font-semibold">{momentum.sessions}</span> session{momentum.sessions !== 1 ? "s" : ""} scheduled</p>
+          <p><span className="font-semibold">{momentum.attendees}</span> attendees {momentum.attendees === 0 ? "→ needs improvement" : ""}</p>
+          <p><span className="font-semibold">{momentum.members}</span> members</p>
+          <p><span className="font-semibold">{momentum.posts}</span> posts</p>
+        </div>
       </div>
 
       <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
@@ -369,6 +395,7 @@ export function CommunitiesClient() {
 
                 <div className="mt-3 text-xs text-muted-foreground">
                   {lastPost ? <p>Last activity: post {lastPost}</p> : <p>Last activity: no posts yet</p>}
+                  {card.nextStep && <p className="mt-1 font-medium text-zinc-700">{card.nextStep}</p>}
                 </div>
 
                 <div className="mt-4 flex items-center gap-2">
@@ -409,9 +436,11 @@ export function CommunitiesClient() {
       )}
 
       <div className="flex flex-wrap gap-2">
-        <Link href="/dashboard/sessions/create"><Button><Calendar className="mr-2 h-4 w-4" />Schedule session</Button></Link>
-        <Link href="/dashboard/communities"><Button variant="outline"><UserPlus className="mr-2 h-4 w-4" />Invite members</Button></Link>
-        <Link href="/dashboard/feed"><Button variant="outline"><MessageSquare className="mr-2 h-4 w-4" />Create post</Button></Link>
+        {quickActions.map((action) => (
+          <Link key={action.label} href={action.href}>
+            <Button variant={action.primary ? "default" : "outline"}>{action.label}</Button>
+          </Link>
+        ))}
       </div>
     </div>
   );
