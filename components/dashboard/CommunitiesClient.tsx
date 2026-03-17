@@ -174,7 +174,6 @@ export function CommunitiesClient() {
   );
 
   const primaryCommunity = communities[0] || null;
-  const primaryCard = primaryCommunity ? getCardState(primaryCommunity) : null;
 
   const hero = useMemo(() => {
     if (!primaryCommunity) return null;
