@@ -206,7 +206,8 @@ export function CommunitiesClient() {
     heroState === "critical"
       ? {
           title: "🚨 Your community needs momentum",
-          description: "You don’t have any upcoming live sessions. Start your first session to activate engagement.",
+          description:
+            "You don’t have any upcoming live sessions. Start your first session to activate engagement.",
         }
       : heroState === "live"
         ? {
@@ -254,16 +255,23 @@ export function CommunitiesClient() {
 
   const progressItems = [
     { label: "Create community", done: communities.length > 0 },
-    { label: "Host first session", done: communities.some((c) => (c.weeklySessions || 0) > 0 || Boolean(c.lastSessionAt)) },
+    {
+      label: "Host first session",
+      done: communities.some(
+        (c) => (c.weeklySessions || 0) > 0 || Boolean(c.lastSessionAt)
+      ),
+    },
     { label: "Get 10 attendees", done: momentum.attendees >= 10 },
-    { label: "Build weekly habit", done: communities.some((c) => (c.weeklySessions || 0) >= 2) },
+    {
+      label: "Build weekly habit",
+      done: communities.some((c) => (c.weeklySessions || 0) >= 2),
+    },
   ];
 
   const nextBestAction = useMemo(() => {
     if (!hasUpcoming) {
       return {
         title: "Schedule your first session",
-        description: "This is the #1 driver of community growth.",
         cta: "Schedule session",
         href: "/dashboard/sessions/create",
       };
@@ -272,7 +280,6 @@ export function CommunitiesClient() {
     if (momentum.members < 5) {
       return {
         title: "Invite 5 members",
-        description: "More members create stronger live momentum.",
         cta: "Invite members",
         href: "/dashboard/communities",
       };
@@ -280,7 +287,6 @@ export function CommunitiesClient() {
 
     return {
       title: "Ask your first question",
-      description: "Prime engagement before your next session.",
       cta: "Create post",
       href: "/dashboard/feed",
     };
@@ -297,6 +303,11 @@ export function CommunitiesClient() {
         { label: "Create post", href: "/dashboard/feed", primary: false },
         { label: "Invite members", href: "/dashboard/communities", primary: false },
       ];
+
+  const primaryCommunity = communities[0] || null;
+  const primaryCard = primaryCommunity ? getCardState(primaryCommunity) : null;
+  const primaryLastPost = formatRelative(primaryCommunity?.lastPostAt);
+  const primaryLastSession = formatRelative(primaryCommunity?.lastSessionAt);
 
   if (isLoading || loading) {
     return (
@@ -315,7 +326,9 @@ export function CommunitiesClient() {
         <div className="text-center">
           <h2 className="text-2xl font-bold text-foreground">Error loading communities</h2>
           <p className="mt-2 text-muted-foreground">{error}</p>
-          <Button onClick={() => window.location.reload()} className="mt-4">Retry</Button>
+          <Button onClick={() => window.location.reload()} className="mt-4">
+            Retry
+          </Button>
         </div>
       </div>
     );
@@ -347,11 +360,15 @@ export function CommunitiesClient() {
           <>
             <p className="mt-2 text-sm font-medium text-foreground">This unlocks:</p>
             <ul className="mt-1 space-y-1 text-sm text-muted-foreground">
-              {nextUp.unlocks.map((u) => <li key={u}>- {u}</li>)}
+              {nextUp.unlocks.map((u) => (
+                <li key={u}>- {u}</li>
+              ))}
             </ul>
           </>
         )}
-        <Link href={nextUp.href} className="mt-3 inline-flex"><Button size="sm">{nextUp.cta}</Button></Link>
+        <Link href={nextUp.href} className="mt-3 inline-flex">
+          <Button size="sm">{nextUp.cta}</Button>
+        </Link>
       </div>
 
       <div className="rounded-2xl border border-border bg-card p-4">
@@ -371,69 +388,79 @@ export function CommunitiesClient() {
       <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
         <p className="flex items-center gap-2 text-sm font-semibold text-amber-900"><Flame className="h-4 w-4" />Next best action</p>
         <p className="mt-1 text-base font-semibold text-amber-950">{nextBestAction.title}</p>
-        <Link href={nextBestAction.href} className="mt-3 inline-flex"><Button size="sm" className="bg-amber-500 text-zinc-900 hover:bg-amber-400">{nextBestAction.cta}</Button></Link>
+        <Link href={nextBestAction.href} className="mt-3 inline-flex">
+          <Button size="sm" className="bg-amber-500 text-zinc-900 hover:bg-amber-400">{nextBestAction.cta}</Button>
+        </Link>
       </div>
 
-      {communities.length > 0 ? (
-        <div className={communities.length === 1 ? "grid gap-4 max-w-2xl" : "grid gap-4 sm:grid-cols-2 xl:grid-cols-3"}>
-          {communities.map((community) => {
-            const card = getCardState(community);
-            const lastPost = formatRelative(community.lastPostAt);
+      {primaryCommunity && primaryCard && (
+        <>
+          <div className="overflow-hidden rounded-3xl border border-border bg-card">
+            <div className="h-32 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-orange-500" />
+            <div className="-mt-8 p-6">
+              <p className="text-2xl font-bold text-white drop-shadow-sm">{primaryCommunity.name}</p>
+              <p className="text-sm text-zinc-100">{primaryCommunity.description || "Mentoring & Community"}</p>
+              <p className="mt-3 text-xs text-zinc-200">
+                {primaryCommunity._count.members} members · {primaryCommunity._count.posts} posts
+              </p>
 
+              <div className={`mt-4 rounded-lg border p-3 ${primaryCard.tone}`}>
+                <p className="text-sm font-semibold">{primaryCard.title}</p>
+                <p className="mt-1 text-sm">{primaryCard.subtitle}</p>
+                {primaryCard.detail && <p className="mt-1 text-sm">{primaryCard.detail}</p>}
+              </div>
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Link href={primaryCard.state === "empty" ? "/dashboard/sessions/create" : primaryCard.primaryHref}>
+                  <Button>
+                    {primaryCard.state === "empty" ? "Start your first live session" : primaryCard.primaryLabel}
+                  </Button>
+                </Link>
+                <Link href={`/dashboard/c/${primaryCommunity.slug}`}>
+                  <Button variant="outline">Enter community</Button>
+                </Link>
+              </div>
+
+              <p className="mt-3 text-xs text-zinc-200">
+                Last activity: {primaryLastPost ? `post ${primaryLastPost}` : "no posts yet"}
+              </p>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-border bg-card p-5">
+            <p className="text-sm font-semibold text-foreground">Community status</p>
+            <p className="mt-3 text-sm text-zinc-700">Next step: {primaryCard.nextStep || "Keep weekly consistency"}</p>
+            <p className="mt-2 text-sm text-zinc-700">
+              Health: {primaryCard.state === "empty" ? "🔴 At risk" : primaryCard.state === "healthy" ? "🟢 Healthy" : "🟡 Building momentum"}
+            </p>
+            <p className="mt-2 text-sm text-zinc-700">Last session: {primaryLastSession || "Never hosted"}</p>
+          </div>
+        </>
+      )}
+
+      {communities.length > 1 && (
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {communities.slice(1).map((community) => {
+            const card = getCardState(community);
             return (
               <div key={community.id} className="rounded-2xl border border-border bg-card p-5">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="truncate text-lg font-semibold text-foreground">{community.name}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">{community._count.members} members · {community._count.posts} posts</p>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    {community.role === "OWNER" && <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700"><Crown className="mr-1 inline h-3 w-3" />Owner</span>}
-                    {community.isPrivate && <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-semibold text-zinc-700"><Lock className="mr-1 inline h-3 w-3" />Private</span>}
-                  </div>
-                </div>
-
-                <div className={`mt-4 rounded-lg border p-3 ${card.tone}`}>
+                <p className="truncate text-lg font-semibold text-foreground">{community.name}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{community._count.members} members · {community._count.posts} posts</p>
+                <div className={`mt-3 rounded-lg border p-3 ${card.tone}`}>
                   <p className="text-sm font-semibold">{card.title}</p>
                   <p className="mt-1 text-sm">{card.subtitle}</p>
-                  {card.detail && <p className="mt-1 text-sm">{card.detail}</p>}
                 </div>
-
-                <div className="mt-3 text-xs text-muted-foreground">
-                  {card.nextStep && <p className="font-medium text-zinc-700">{card.nextStep}</p>}
-                  {lastPost ? <p className={card.nextStep ? "mt-1" : ""}>Last activity: post {lastPost}</p> : <p className={card.nextStep ? "mt-1" : ""}>Last activity: no posts yet</p>}
+                <div className="mt-3 flex gap-2">
+                  <Link href={card.primaryHref} className="flex-1"><Button className="w-full" size="sm">{card.primaryLabel}</Button></Link>
+                  <Link href={`/dashboard/c/${community.slug}`}><Button size="sm" variant="outline">Enter</Button></Link>
                 </div>
-
-                <p className="mt-2 text-xs font-medium text-zinc-700">
-                  Community health: {(card.state === "empty") ? "🔴 At risk" : (card.state === "healthy") ? "🟢 Healthy" : "🟡 Building momentum"}
-                </p>
-
-                <div className="mt-4 flex items-center gap-2">
-                  <Link href={card.primaryHref} className="flex-1">
-                    <Button className="w-full">
-                      {card.primaryIcon === "calendar" ? <Calendar className="mr-1.5 h-4 w-4" /> : null}
-                      {card.primaryIcon === "radio" ? <Radio className="mr-1.5 h-4 w-4" /> : null}
-                      {card.primaryLabel}
-                      {card.primaryIcon === "arrow" ? <ArrowRight className="ml-1.5 h-4 w-4" /> : null}
-                    </Button>
-                  </Link>
-                  {card.state !== "healthy" && (
-                    <Link href={`/dashboard/c/${community.slug}`}><Button variant="outline">Enter community</Button></Link>
-                  )}
-                </div>
-
-                {card.state !== "healthy" && (
-                  <div className="mt-3 flex items-center gap-3 border-t border-border pt-3 text-xs text-muted-foreground">
-                    <Link href={`/dashboard/c/${community.slug}/invite`} className="inline-flex items-center hover:text-foreground"><UserPlus className="mr-1 h-3.5 w-3.5" />Invite members</Link>
-                    <Link href="/dashboard/feed" className="inline-flex items-center hover:text-foreground"><MessageSquare className="mr-1 h-3.5 w-3.5" />Create post</Link>
-                    {card.state === "empty" && <span className="inline-flex items-center text-amber-700"><AlertTriangle className="mr-1 h-3.5 w-3.5" />At risk</span>}
-                  </div>
-                )}
               </div>
             );
           })}
         </div>
-      ) : (
+      )}
+
+      {!communities.length && (
         <div className="flex min-h-[320px] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-card p-10 text-center">
           <Users className="h-10 w-10 text-primary" />
           <h2 className="mt-4 text-xl font-bold text-foreground">No communities yet</h2>
