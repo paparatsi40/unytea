@@ -206,7 +206,7 @@ export function CommunitiesClient() {
     heroState === "critical"
       ? {
           title: "🚨 Your community needs momentum",
-          description: "You don’t have any upcoming live sessions.",
+          description: "You don’t have any upcoming live sessions. Start your first session to activate engagement.",
         }
       : heroState === "live"
         ? {
@@ -234,8 +234,8 @@ export function CommunitiesClient() {
 
     if (!sessions.length) {
       return {
-        title: "No session scheduled",
-        subtitle: "Your next milestone: host your first live session",
+        title: "Your next milestone: Host your first live session",
+        subtitle: "No session scheduled",
         unlocks: ["Member engagement", "Recaps", "Growth loops"],
         cta: "Schedule session",
         href: "/dashboard/sessions/create",
@@ -330,7 +330,7 @@ export function CommunitiesClient() {
 
       <div className="rounded-2xl border border-border bg-card p-4">
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Your progress</p>
-        <div className="mt-2 grid gap-2 md:grid-cols-2">
+        <div className="mt-2 space-y-1">
           {progressItems.map((item) => (
             <p key={item.label} className={`text-sm ${item.done ? "text-emerald-700" : "text-zinc-700"}`}>
               {item.done ? "☑" : "☐"} {item.label}
@@ -344,9 +344,12 @@ export function CommunitiesClient() {
         <p className="mt-1 text-base font-semibold text-foreground">{nextUp.title}</p>
         <p className="text-sm text-muted-foreground">{nextUp.subtitle}</p>
         {nextUp.unlocks.length > 0 && (
-          <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
-            {nextUp.unlocks.map((u) => <li key={u}>- {u}</li>)}
-          </ul>
+          <>
+            <p className="mt-2 text-sm font-medium text-foreground">This unlocks:</p>
+            <ul className="mt-1 space-y-1 text-sm text-muted-foreground">
+              {nextUp.unlocks.map((u) => <li key={u}>- {u}</li>)}
+            </ul>
+          </>
         )}
         <Link href={nextUp.href} className="mt-3 inline-flex"><Button size="sm">{nextUp.cta}</Button></Link>
       </div>
@@ -355,7 +358,11 @@ export function CommunitiesClient() {
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">This week</p>
         <div className="mt-2 space-y-1 text-sm text-foreground">
           <p><span className="font-semibold">{momentum.sessions}</span> session{momentum.sessions !== 1 ? "s" : ""} scheduled</p>
-          <p><span className="font-semibold">{momentum.attendees}</span> attendees {momentum.attendees === 0 ? "→ needs improvement" : ""}</p>
+          <p>
+            {momentum.attendees === 0
+              ? "No one attended yet → improve attendance"
+              : <><span className="font-semibold">{momentum.attendees}</span> attendees</>}
+          </p>
           <p><span className="font-semibold">{momentum.members}</span> members</p>
           <p><span className="font-semibold">{momentum.posts}</span> posts</p>
         </div>
@@ -364,7 +371,6 @@ export function CommunitiesClient() {
       <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
         <p className="flex items-center gap-2 text-sm font-semibold text-amber-900"><Flame className="h-4 w-4" />Next best action</p>
         <p className="mt-1 text-base font-semibold text-amber-950">{nextBestAction.title}</p>
-        <p className="text-sm text-amber-800">{nextBestAction.description}</p>
         <Link href={nextBestAction.href} className="mt-3 inline-flex"><Button size="sm" className="bg-amber-500 text-zinc-900 hover:bg-amber-400">{nextBestAction.cta}</Button></Link>
       </div>
 
@@ -394,9 +400,13 @@ export function CommunitiesClient() {
                 </div>
 
                 <div className="mt-3 text-xs text-muted-foreground">
-                  {lastPost ? <p>Last activity: post {lastPost}</p> : <p>Last activity: no posts yet</p>}
-                  {card.nextStep && <p className="mt-1 font-medium text-zinc-700">{card.nextStep}</p>}
+                  {card.nextStep && <p className="font-medium text-zinc-700">{card.nextStep}</p>}
+                  {lastPost ? <p className={card.nextStep ? "mt-1" : ""}>Last activity: post {lastPost}</p> : <p className={card.nextStep ? "mt-1" : ""}>Last activity: no posts yet</p>}
                 </div>
+
+                <p className="mt-2 text-xs font-medium text-zinc-700">
+                  Community health: {(card.state === "empty") ? "🔴 At risk" : (card.state === "healthy") ? "🟢 Healthy" : "🟡 Building momentum"}
+                </p>
 
                 <div className="mt-4 flex items-center gap-2">
                   <Link href={card.primaryHref} className="flex-1">
