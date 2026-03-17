@@ -126,6 +126,12 @@ export async function GET() {
 
     console.log("✅ API: Found memberships:", memberships.length);
 
+    const startOfWeek = new Date();
+    const day = startOfWeek.getDay();
+    const diffToMonday = (day + 6) % 7;
+    startOfWeek.setDate(startOfWeek.getDate() - diffToMonday);
+    startOfWeek.setHours(0, 0, 0, 0);
+
     const myCommunities = await Promise.all(
       memberships.map(async (m) => {
         const nextSession = await prisma.mentorSession.findFirst({
@@ -143,6 +149,29 @@ export async function GET() {
             title: true,
             scheduledAt: true,
             status: true,
+            attendeeCount: true,
+          },
+        });
+
+        const weeklySessions = await prisma.mentorSession.count({
+          where: {
+            communityId: m.community.id,
+            scheduledAt: { gte: startOfWeek },
+            status: { in: ["SCHEDULED", "IN_PROGRESS", "COMPLETED"] },
+          },
+        });
+
+        const weeklyAttendance = await prisma.mentorSession.aggregate({
+          where: {
+            communityId: m.community.id,
+            scheduledAt: { gte: startOfWeek },
+            status: { in: ["IN_PROGRESS", "COMPLETED"] },
+          },
+          _avg: {
+            attendeeCount: true,
+          },
+          _sum: {
+            attendeeCount: true,
           },
         });
 
@@ -150,6 +179,9 @@ export async function GET() {
           ...m.community,
           role: m.role,
           nextSession,
+          weeklySessions,
+          avgAttendanceThisWeek: Math.round(weeklyAttendance._avg.attendeeCount || 0),
+          attendeesThisWeek: weeklyAttendance._sum.attendeeCount || 0,
         };
       })
     );
