@@ -153,49 +153,59 @@ function getHeroContent(community: Community) {
     };
   }
 
-  const d = daysUntil(nextSession.scheduledAt);
+  if (!nextSession) {
+    return {
+      title: "⚡ Schedule your next session",
+      subtitle: "Communities grow faster with a consistent weekly rhythm",
+      primaryLabel: "Schedule next session",
+      primaryHref: "/dashboard/sessions/create",
+    };
+  }
 
-  if (nextSession.status === "IN_PROGRESS") {
+  const session = nextSession;
+  const d = daysUntil(session.scheduledAt);
+
+  if (session.status === "IN_PROGRESS") {
     return {
       title: "🔥 Session in progress",
-      subtitle: `${nextSession.title} · ${nextSession.attendeeCount || 0} attending`,
+      subtitle: `${session.title} · ${session.attendeeCount || 0} attending`,
       primaryLabel: "Start session",
-      primaryHref: `/dashboard/sessions/${nextSession.id}/room`,
+      primaryHref: `/dashboard/sessions/${session.id}/room`,
     };
   }
 
   if (d === 0) {
     return {
       title: "🔥 Next session today",
-      subtitle: `${formatSessionDayTime(nextSession.scheduledAt)} · ${nextSession.attendeeCount || 0} attending`,
+      subtitle: `${formatSessionDayTime(session.scheduledAt)} · ${session.attendeeCount || 0} attending`,
       primaryLabel: "View session",
-      primaryHref: `/dashboard/sessions/${nextSession.id}`,
+      primaryHref: `/dashboard/sessions/${session.id}`,
     };
   }
 
-  if ((nextSession.attendeeCount || 0) === 0) {
+  if ((session.attendeeCount || 0) === 0) {
     return {
       title: "⚡ Boost your next session",
-      subtitle: `No attendees yet · ${formatSessionDayTime(nextSession.scheduledAt)}`,
+      subtitle: `No attendees yet · ${formatSessionDayTime(session.scheduledAt)}`,
       primaryLabel: "View session",
-      primaryHref: `/dashboard/sessions/${nextSession.id}`,
+      primaryHref: `/dashboard/sessions/${session.id}`,
     };
   }
 
   if (d === 1) {
     return {
       title: "🔥 Next session in 1 day",
-      subtitle: `${formatSessionDayTime(nextSession.scheduledAt)} · ${nextSession.attendeeCount || 0} attending`,
+      subtitle: `${formatSessionDayTime(session.scheduledAt)} · ${session.attendeeCount || 0} attending`,
       primaryLabel: "View session",
-      primaryHref: `/dashboard/sessions/${nextSession.id}`,
+      primaryHref: `/dashboard/sessions/${session.id}`,
     };
   }
 
   return {
     title: `🔥 Next session in ${d} days`,
-    subtitle: `${formatSessionDayTime(nextSession.scheduledAt)} · ${nextSession.attendeeCount || 0} attending`,
+    subtitle: `${formatSessionDayTime(session.scheduledAt)} · ${session.attendeeCount || 0} attending`,
     primaryLabel: "View session",
-    primaryHref: `/dashboard/sessions/${nextSession.id}`,
+    primaryHref: `/dashboard/sessions/${session.id}`,
   };
 }
 
