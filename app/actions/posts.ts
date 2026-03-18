@@ -20,8 +20,9 @@ export async function createPost(formData: FormData) {
     const content = formData.get("content") as string;
     const title = formData.get("title") as string | null;
     const contentType = (formData.get("contentType") as string | null) || "DISCUSSION";
+    const attachmentsRaw = formData.get("attachments") as string | null;
 
-    if (!communityId || !content) {
+    if (!communityId || (!content?.trim() && !attachmentsRaw)) {
       return { success: false, error: "Missing required fields" };
     }
 
@@ -39,15 +40,19 @@ export async function createPost(formData: FormData) {
       return { success: false, error: "Not a member of this community" };
     }
 
+    const parsedAttachments = attachmentsRaw ? JSON.parse(attachmentsRaw) : null;
+    const normalizedContent = content?.trim() || (parsedAttachments ? "Shared an attachment" : "");
+
     // Create post
     const post = await prisma.post.create({
       data: {
         title: title || null,
-        content,
+        content: normalizedContent,
         authorId: userId,
         communityId,
         isPublished: true,
         publishedAt: new Date(),
+        attachments: parsedAttachments,
         contentType: ["DISCUSSION", "QUESTION", "ANNOUNCEMENT", "RESOURCE"].includes(contentType)
           ? (contentType as any)
           : "DISCUSSION",

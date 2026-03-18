@@ -22,16 +22,7 @@ type Post = {
     name: string | null;
     image: string | null;
   };
-  attachments?: {
-    sessionId?: string;
-    sessionTitle?: string;
-    sessionDescription?: string;
-    scheduledAt?: string;
-    duration?: number;
-    mentorId?: string;
-    mentorName?: string;
-    mentorImage?: string | null;
-  } | null;
+  attachments?: any;
   _count?: {
     comments: number;
     reactions: number;
@@ -266,6 +257,35 @@ export function PremiumPostCard({ post }: { post: Post }) {
           <div className="mb-4 text-sm leading-relaxed text-gray-700 whitespace-pre-wrap">
             {post.content}
           </div>
+
+          {Array.isArray(post.attachments) && post.attachments.length > 0 && (
+            <div className="mb-4 grid gap-2 sm:grid-cols-2">
+              {post.attachments.map((attachment: any, index: number) => {
+                const isImage = attachment?.type === "image" || /\.(png|jpe?g|gif|webp|svg)$/i.test(attachment?.url || "");
+                return (
+                  <a
+                    key={`${attachment?.url || "file"}-${index}`}
+                    href={attachment?.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="overflow-hidden rounded-lg border border-gray-200 bg-gray-50 hover:bg-gray-100"
+                  >
+                    {isImage ? (
+                      <img
+                        src={attachment?.url}
+                        alt={attachment?.name || "Attachment"}
+                        className="h-36 w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex items-center gap-2 px-3 py-3 text-sm text-gray-700">
+                        <span className="truncate">{attachment?.name || "Attachment"}</span>
+                      </div>
+                    )}
+                  </a>
+                );
+              })}
+            </div>
+          )}
         </>
       )}
 

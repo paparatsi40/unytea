@@ -1,13 +1,12 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { PremiumPostCard } from "@/components/community/PremiumPostCard";
 import { createPost } from "@/app/actions/posts";
 import { 
   Sparkles, 
   Send, 
-  Image as ImageIcon, 
   Smile, 
   AtSign, 
   Loader2, 
@@ -21,11 +20,14 @@ import {
   Radio,
   HelpCircle,
   Clock,
+  Paperclip,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { toast } from "sonner";
+import { useUploadThing } from "@/lib/uploadthing";
 
 type Post = {
   id: string;
@@ -39,16 +41,7 @@ type Post = {
     name: string | null;
     image: string | null;
   };
-  attachments?: {
-    sessionId?: string;
-    sessionTitle?: string;
-    sessionDescription?: string;
-    scheduledAt?: string;
-    duration?: number;
-    mentorId?: string;
-    mentorName?: string;
-    mentorImage?: string | null;
-  } | null;
+  attachments?: any;
   _count?: {
     comments: number;
     reactions: number;
@@ -89,6 +82,12 @@ export function PremiumPostFeed({
   const [focused, setFocused] = useState(false);
   const [composerMode, setComposerMode] = useState<ComposerMode>("default");
   const [activeFilter, setActiveFilter] = useState<FeedFilter>("all");
+  const [attachments, setAttachments] = useState<{ url: string; name: string; type: "image" | "document" | "media" }[]>([]);
+  const [isUploadingAttachment, setIsUploadingAttachment] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { startUpload: startImageUpload } = useUploadThing("imageUploader");
+  const { startUpload: startDocumentUpload } = useUploadThing("documentUploader");
+  const { startUpload: startMediaUpload } = useUploadThing("mediaUploader");
 
   // Set title based on composer mode
   useEffect(() => {
@@ -128,6 +127,10 @@ export function PremiumPostFeed({
         formData.append("title", title.trim());
       }
 
+      if (attachments.length > 0) {
+        formData.append("attachments", JSON.stringify(attachments));
+      }
+
       const result = await createPost(formData);
 
       if (!result.success) {
@@ -145,13 +148,15 @@ export function PremiumPostFeed({
       setTitle("");
       setFocused(false);
       setComposerMode("default");
+      setAttachments([]);
 
       if (result.post) {
         const optimisticPost: Post = {
           id: result.post.id,
           title: (result.post as any).title ?? (title.trim() || null),
-          content: (result.post as any).content ?? content.trim(),
+          content: (result.post as any).content ?? (content.trim() || (attachments.length > 0 ? "Shared an attachment" : "")),
           contentType: (result.post as any).contentType ?? contentType,
+          attachments: (result.post as any).attachments ?? attachments,
           createdAt: (result.post as any).createdAt ? new Date((result.post as any).createdAt) : new Date(),
           author: {
             id: user.id,
@@ -171,6 +176,53 @@ export function PremiumPostFeed({
       toast.error("Failed to create post");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleAttachmentClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const removeAttachment = (urlToRemove: string) => {
+    setAttachments((prev) => prev.filter((attachment) => attachment.url !== urlToRemove));
+  };
+
+  const handleAttachmentSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    try {
+      setIsUploadingAttachment(true);
+      const uploadedAttachments: { url: string; name: string; type: "image" | "document" | "media" }[] = [];
+
+      for (const file of files) {
+        const isImage = file.type.startsWith("image/");
+        const isMedia = file.type.startsWith("video/") || file.type.startsWith("audio/");
+
+        const uploadedFiles = isImage
+          ? await startImageUpload([file])
+          : isMedia
+            ? await startMediaUpload([file])
+            : await startDocumentUpload([file]);
+
+        if (uploadedFiles && uploadedFiles.length > 0) {
+          uploadedAttachments.push({
+            url: uploadedFiles[0].url,
+            name: uploadedFiles[0].name || file.name,
+            type: isImage ? "image" : isMedia ? "media" : "document",
+          });
+        }
+      }
+
+      if (uploadedAttachments.length > 0) {
+        setAttachments((prev) => [...prev, ...uploadedAttachments]);
+      }
+    } catch (error) {
+      const errorMessage = (error as Error)?.message || "Failed to upload attachment";
+      toast.error(errorMessage);
+    } finally {
+      setIsUploadingAttachment(false);
+      e.target.value = "";
     }
   };
 
@@ -438,6 +490,26 @@ export function PremiumPostFeed({
             </div>
           )}
 
+          {attachments.length > 0 && (
+            <div className="mb-3 flex flex-wrap gap-2">
+              {attachments.map((attachment) => (
+                <div
+                  key={attachment.url}
+                  className="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-gray-50 px-3 py-1 text-xs text-gray-700"
+                >
+                  <span className="max-w-[200px] truncate">{attachment.name}</span>
+                  <button
+                    type="button"
+                    onClick={() => removeAttachment(attachment.url)}
+                    className="rounded-full p-0.5 text-gray-500 hover:bg-gray-200 hover:text-gray-800"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
           {/* Content Textarea */}
           <div className="relative">
             <textarea
@@ -462,11 +534,23 @@ export function PremiumPostFeed({
             <div className="flex items-center space-x-1">
               <button
                 type="button"
+                onClick={handleAttachmentClick}
                 className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-50 hover:text-gray-600"
-                title="Add image"
+                title="Add attachment"
+                disabled={isUploadingAttachment}
               >
-                <ImageIcon className="h-4 w-4" />
+                {isUploadingAttachment ? <Loader2 className="h-4 w-4 animate-spin" /> : <Paperclip className="h-4 w-4" />}
               </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                accept="image/*,application/pdf,text/plain,video/*,audio/*"
+                className="hidden"
+                onChange={handleAttachmentSelected}
+                disabled={isUploadingAttachment}
+              />
+
               <button
                 type="button"
                 className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-50 hover:text-gray-600"
@@ -498,7 +582,7 @@ export function PremiumPostFeed({
               </button>
               <button
                 type="submit"
-                disabled={isSubmitting || !content.trim()}
+                disabled={isSubmitting || isUploadingAttachment || (!content.trim() && attachments.length === 0)}
                 className="flex items-center space-x-2 rounded-lg bg-purple-600 px-4 py-1.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-purple-700 disabled:opacity-50 disabled:hover:bg-purple-600"
               >
                 {isSubmitting ? (
