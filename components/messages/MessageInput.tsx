@@ -43,6 +43,7 @@ export function MessageInput({ conversationId, onMessageSent }: MessageInputProp
 
     setErrorText("");
     setIsSending(true);
+
     const result = await sendMessage(
       conversationId,
       trimmed,
@@ -54,7 +55,6 @@ export function MessageInput({ conversationId, onMessageSent }: MessageInputProp
       setAttachments([]);
       onMessageSent?.();
 
-      // Reset textarea height
       if (textareaRef.current) {
         textareaRef.current.style.height = "auto";
       }
@@ -86,9 +86,8 @@ export function MessageInput({ conversationId, onMessageSent }: MessageInputProp
       setErrorText("");
     }
 
-    // Auto-resize textarea
     e.target.style.height = "auto";
-    e.target.style.height = Math.min(e.target.scrollHeight, 150) + "px";
+    e.target.style.height = Math.min(e.target.scrollHeight, 140) + "px";
   };
 
   const handleAttachmentClick = () => {
@@ -145,7 +144,7 @@ export function MessageInput({ conversationId, onMessageSent }: MessageInputProp
   };
 
   return (
-    <div className="border-t border-gray-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 px-4 md:px-5 py-3 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-[0_-4px_18px_rgba(15,23,42,0.06)]">
+    <div className="border-t border-gray-200 bg-white/95 px-4 py-3 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur supports-[backdrop-filter]:bg-white/80 shadow-[0_-4px_18px_rgba(15,23,42,0.05)]">
       {attachments.length > 0 && (
         <div className="mb-3 flex flex-wrap gap-2">
           {attachments.map((attachment) => (
@@ -166,9 +165,8 @@ export function MessageInput({ conversationId, onMessageSent }: MessageInputProp
         </div>
       )}
 
-      <div className="flex items-end gap-3.5">
-        {/* Textarea */}
-        <div className="flex-1 relative">
+      <div className="flex items-end gap-3">
+        <div className="relative flex-1">
           <textarea
             ref={textareaRef}
             value={message}
@@ -176,37 +174,35 @@ export function MessageInput({ conversationId, onMessageSent }: MessageInputProp
             onKeyDown={handleKeyDown}
             placeholder="Type a message... (Shift+Enter for new line)"
             disabled={isSending}
-            className={`w-full resize-none bg-white border rounded-xl px-4 py-2.5 pr-24 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 disabled:opacity-50 transition-all ${
+            className={`w-full resize-none rounded-2xl border bg-white px-4 py-3 pr-24 text-sm text-gray-900 placeholder:text-gray-400 transition-all focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 disabled:opacity-50 ${
               errorText ? "border-red-400" : "border-gray-300"
             }`}
             rows={1}
-            style={{ minHeight: "44px", maxHeight: "140px" }}
+            style={{ minHeight: "46px", maxHeight: "140px" }}
           />
 
-          {/* Toolbar */}
-          <div className="absolute right-2.5 bottom-2 flex items-center gap-0.5">
-            {/* Emoji picker (placeholder) */}
+          <div className="absolute bottom-2 right-2 flex items-center gap-0.5">
             <button
               type="button"
-              className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-800 transition-colors"
+              className="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-800"
               title="Add emoji"
             >
-              <Smile className="w-4 h-4" />
+              <Smile className="h-4 w-4" />
             </button>
 
-            {/* File upload */}
             <button
               type="button"
               onClick={handleAttachmentClick}
-              className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-800 transition-colors"
+              className="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-800"
               title="Attach file"
             >
               {isUploadingAttachment ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
-                <Paperclip className="w-4 h-4" />
+                <Paperclip className="h-4 w-4" />
               )}
             </button>
+
             <input
               ref={fileInputRef}
               type="file"
@@ -217,33 +213,35 @@ export function MessageInput({ conversationId, onMessageSent }: MessageInputProp
               disabled={isUploadingAttachment}
             />
 
-            {/* Character count */}
             {message.length > 0 && (
-              <span className={`text-xs px-2 ${message.length > MAX_MESSAGE_LENGTH ? "text-red-500" : "text-gray-500"}`}>
+              <span
+                className={`px-2 text-xs ${
+                  message.length > MAX_MESSAGE_LENGTH ? "text-red-500" : "text-gray-500"
+                }`}
+              >
                 {message.length}/{MAX_MESSAGE_LENGTH}
               </span>
             )}
           </div>
         </div>
 
-        {/* Send button */}
         <button
           onClick={handleSend}
           disabled={(!message.trim() && attachments.length === 0) || isSending || isUploadingAttachment}
-          className="flex-shrink-0 h-10 w-10 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:shadow-purple-500/20 transition-all flex items-center justify-center"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white transition-all hover:shadow-lg hover:shadow-purple-500/20 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isSending ? (
-            <Loader2 className="w-5 h-5 animate-spin" />
+            <Loader2 className="h-5 w-5 animate-spin" />
           ) : (
-            <Send className="w-5 h-5" />
+            <Send className="h-5 w-5" />
           )}
         </button>
       </div>
 
-      {/* Hint */}
       <div className="mt-1 flex items-center justify-between gap-3">
         <p className="text-[10px] text-gray-400">
-          Enter to send · Shift+Enter for new line{isUploadingAttachment ? " · Uploading..." : ""}
+          Enter to send · Shift+Enter for new line
+          {isUploadingAttachment ? " · Uploading..." : ""}
         </p>
         {errorText ? <p className="text-[10px] text-red-500">{errorText}</p> : null}
       </div>

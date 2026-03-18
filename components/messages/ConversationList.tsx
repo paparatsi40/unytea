@@ -15,8 +15,8 @@ interface ConversationListProps {
   refreshToken?: number;
 }
 
-export function ConversationList({ 
-  activeConversationId, 
+export function ConversationList({
+  activeConversationId,
   onSelectConversation,
   onNewMessage,
   onUnreadTotalChange,
@@ -31,6 +31,20 @@ export function ConversationList({
   const previousUnreadByConversationRef = useRef<Record<string, number>>({});
   const isFirstLoadRef = useRef(true);
   const { toast } = useToast();
+
+  const getOtherUser = (conversation: any) => {
+    return conversation.participant1.id === user?.id
+      ? conversation.participant2
+      : conversation.participant1;
+  };
+
+  const getLastMessage = (conversation: any) => {
+    return conversation.messages?.[0];
+  };
+
+  const getUnreadCount = (conversation: any) => {
+    return conversation._count?.messages || 0;
+  };
 
   const loadConversations = async () => {
     const result = await getUserConversations();
@@ -83,7 +97,6 @@ export function ConversationList({
   useEffect(() => {
     loadConversations();
 
-    // Auto-refresh every 10 seconds
     const interval = setInterval(loadConversations, 10000);
     return () => clearInterval(interval);
   }, [refreshToken]);
@@ -103,6 +116,7 @@ export function ConversationList({
         const fullName = `${otherUser.firstName || ""} ${otherUser.lastName || ""}`.trim();
         const name = (otherUser.name || "").toLowerCase();
         const username = (otherUser.username || "").toLowerCase();
+
         return (
           fullName.toLowerCase().includes(query) ||
           name.includes(query) ||
@@ -114,57 +128,45 @@ export function ConversationList({
     setFilteredConversations(next);
   }, [searchQuery, conversations, filter]);
 
-  const getOtherUser = (conversation: any) => {
-    return conversation.participant1.id === user?.id
-      ? conversation.participant2
-      : conversation.participant1;
-  };
-
-  const getLastMessage = (conversation: any) => {
-    return conversation.messages?.[0];
-  };
-
-  const getUnreadCount = (conversation: any) => {
-    return conversation._count?.messages || 0;
-  };
-
   const unreadTotal = conversations.reduce(
     (sum, conv) => sum + getUnreadCount(conv),
     0
   );
 
   return (
-    <div className="w-full md:w-80 border-r border-gray-200 flex flex-col bg-white">
+    <div className="flex w-full flex-col border-r border-gray-200 bg-white md:w-[310px]">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200">
-        <div className="flex items-center justify-between mb-4">
+      <div className="border-b border-gray-200 px-4 py-5">
+        <div className="mb-4 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-gray-900">Messages</h1>
+            <h1 className="text-[2rem] font-semibold tracking-tight text-gray-950">
+              Messages
+            </h1>
             {unreadTotal > 0 && (
-              <span className="rounded-full bg-purple-500 px-2 py-0.5 text-xs font-semibold text-white">
+              <span className="rounded-full bg-purple-600 px-2 py-0.5 text-xs font-semibold text-white">
                 {unreadTotal > 99 ? "99+" : unreadTotal}
               </span>
             )}
           </div>
+
           <button
             onClick={onNewMessage}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-purple-200 bg-purple-50 px-2.5 py-1.5 text-xs font-semibold text-purple-700 hover:bg-purple-100 hover:border-purple-300 transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-purple-200 bg-purple-50 px-3 py-2 text-xs font-semibold text-purple-700 transition-colors hover:border-purple-300 hover:bg-purple-100"
             title="New message"
           >
-            <MessageSquarePlus className="w-4 h-4" />
+            <MessageSquarePlus className="h-4 w-4" />
             <span>New</span>
           </button>
         </div>
 
-        {/* Search */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
             placeholder="Search by name or username..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white border border-gray-300 rounded-lg pl-10 pr-4 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500"
+            className="w-full rounded-xl border border-gray-300 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder:text-gray-400 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
           />
         </div>
 
@@ -172,7 +174,7 @@ export function ConversationList({
           <button
             type="button"
             onClick={() => setFilter("all")}
-            className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+            className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
               filter === "all"
                 ? "bg-purple-600 text-white"
                 : "bg-gray-100 text-gray-600 hover:bg-gray-200"
@@ -180,10 +182,11 @@ export function ConversationList({
           >
             All
           </button>
+
           <button
             type="button"
             onClick={() => setFilter("unread")}
-            className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+            className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
               filter === "unread"
                 ? "bg-purple-600 text-white"
                 : "bg-gray-100 text-gray-600 hover:bg-gray-200"
@@ -194,18 +197,18 @@ export function ConversationList({
         </div>
       </div>
 
-      {/* Conversations List */}
+      {/* List */}
       <div className="flex-1 overflow-y-auto">
         {isLoading ? (
-          <div className="flex items-center justify-center h-32">
-            <Loader2 className="w-6 h-6 animate-spin text-purple-500" />
+          <div className="flex h-32 items-center justify-center">
+            <Loader2 className="h-6 w-6 animate-spin text-purple-500" />
           </div>
         ) : filteredConversations.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full p-8 text-center">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center mb-4">
+          <div className="flex h-full flex-col items-center justify-center p-8 text-center">
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20">
               <span className="text-3xl">💬</span>
             </div>
-            <h3 className="text-sm font-semibold text-gray-900 mb-1">
+            <h3 className="mb-1 text-sm font-semibold text-gray-900">
               {searchQuery ? "No conversations found" : "No messages yet"}
             </h3>
             <p className="text-xs text-gray-500">
@@ -219,51 +222,56 @@ export function ConversationList({
               const lastMessage = getLastMessage(conversation);
               const unreadCount = getUnreadCount(conversation);
               const isActive = conversation.id === activeConversationId;
-              const displayName = otherUser.firstName || otherUser.name || otherUser.username || "User";
+              const displayName =
+                otherUser.firstName || otherUser.name || otherUser.username || "User";
 
               return (
                 <button
                   key={conversation.id}
                   onClick={() => onSelectConversation(conversation.id, otherUser)}
-                  className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors ${
+                  className={`w-full px-4 py-3 text-left transition-colors ${
                     isActive
-                      ? "bg-purple-50/80 border-r-2 border-purple-500 shadow-[inset_0_0_0_1px_rgba(168,85,247,0.15)]"
-                      : ""
+                      ? "border-r-2 border-purple-500 bg-purple-50/80 shadow-[inset_0_0_0_1px_rgba(168,85,247,0.14)]"
+                      : "hover:bg-gray-50"
                   }`}
                 >
                   <div className="flex items-start gap-3">
-                    {/* Avatar */}
-                    <div className="relative flex-shrink-0">
-                      <div className="w-11 h-11 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold text-sm">
+                    <div className="relative shrink-0">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-pink-500 text-sm font-semibold text-white">
                         {otherUser.image ? (
-                          <img 
-                            src={otherUser.image} 
+                          <img
+                            src={otherUser.image}
                             alt={displayName}
-                            className="w-full h-full rounded-full object-cover"
+                            className="h-full w-full rounded-full object-cover"
                           />
                         ) : (
                           displayName[0].toUpperCase()
                         )}
                       </div>
+
                       {unreadCount > 0 && (
-                        <div className="absolute -top-1 -right-1 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center text-xs font-bold text-white">
+                        <div className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-[10px] font-bold text-white">
                           {unreadCount > 9 ? "9+" : unreadCount}
                         </div>
                       )}
                     </div>
 
-                    {/* Content */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2 mb-0.5">
-                        <h3 className={`text-sm font-semibold truncate leading-5 ${
-                          unreadCount > 0 ? "text-gray-900" : "text-gray-800"
-                        }`}>
+                    <div className="min-w-0 flex-1">
+                      <div className="mb-0.5 flex items-start justify-between gap-2">
+                        <h3
+                          className={`truncate text-sm font-semibold leading-5 ${
+                            unreadCount > 0 ? "text-gray-950" : "text-gray-800"
+                          }`}
+                        >
                           {displayName}
                         </h3>
+
                         {lastMessage && (
-                          <span className={`text-[11px] flex-shrink-0 pt-0.5 ${
-                            isActive ? "text-purple-700" : "text-gray-500"
-                          }`}>
+                          <span
+                            className={`shrink-0 pt-0.5 text-[11px] ${
+                              isActive ? "text-purple-700" : "text-gray-500"
+                            }`}
+                          >
                             {formatDistanceToNow(new Date(lastMessage.createdAt), {
                               addSuffix: false,
                             })}
@@ -272,16 +280,18 @@ export function ConversationList({
                       </div>
 
                       {lastMessage ? (
-                        <p className={`text-[13px] truncate leading-5 ${
-                          unreadCount > 0 ? "text-gray-800 font-medium" : "text-gray-600"
-                        }`}>
+                        <p
+                          className={`truncate text-[13px] leading-5 ${
+                            unreadCount > 0 ? "font-medium text-gray-800" : "text-gray-600"
+                          }`}
+                        >
                           {lastMessage.sender.id === user?.id ? (
                             <span className="text-gray-500">You: </span>
                           ) : null}
                           <span>{lastMessage.content || "Sent an attachment"}</span>
                         </p>
                       ) : (
-                        <p className="text-sm text-gray-500 italic">No messages yet</p>
+                        <p className="text-sm italic text-gray-500">No messages yet</p>
                       )}
                     </div>
                   </div>
