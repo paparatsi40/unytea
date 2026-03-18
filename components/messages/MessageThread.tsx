@@ -109,7 +109,7 @@ export function MessageThread({ conversationId, otherUser, subtitle = "Direct co
   }
 
   return (
-    <div className="flex-1 flex flex-col h-full">
+    <div className="flex-1 flex min-h-0 flex-col h-full">
       {/* Header */}
       <div className="border-b border-gray-200 bg-white p-4">
         <div className="flex items-center justify-between">
@@ -155,7 +155,7 @@ export function MessageThread({ conversationId, otherUser, subtitle = "Direct co
       {/* Messages */}
       <div 
         ref={containerRef}
-        className="flex-1 overflow-y-auto overflow-x-hidden px-4 pt-2 pb-3 bg-gray-50"
+        className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-6 pt-2 pb-5 bg-gray-50"
       >
         {error && (
           <div className="text-center p-4">
@@ -176,7 +176,8 @@ export function MessageThread({ conversationId, otherUser, subtitle = "Direct co
             </p>
           </div>
         ) : (
-          <div className="flex min-h-[48%] flex-col justify-end gap-2 pb-1">
+          <div className="flex min-h-full flex-col justify-end">
+            <div className="space-y-3">
             {messages.map((message, index) => {
               const currentDay = new Date(message.createdAt).toDateString();
               const previousDay = index > 0 ? new Date(messages[index - 1].createdAt).toDateString() : null;
@@ -186,11 +187,11 @@ export function MessageThread({ conversationId, otherUser, subtitle = "Direct co
                 <div key={message.id} className="space-y-1.5">
                   {showDaySeparator && (
                     <div className="flex items-center gap-3 py-1">
-                      <div className="h-px flex-1 bg-gray-200" />
-                      <span className="text-[11px] font-medium uppercase tracking-wide text-gray-500">
+                      <div className="h-px flex-1 bg-gray-200/80" />
+                      <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500">
                         {formatDayLabel(message.createdAt)}
                       </span>
-                      <div className="h-px flex-1 bg-gray-200" />
+                      <div className="h-px flex-1 bg-gray-200/80" />
                     </div>
                   )}
                   <MessageBubble
@@ -202,6 +203,7 @@ export function MessageThread({ conversationId, otherUser, subtitle = "Direct co
               );
             })}
             <div ref={messagesEndRef} />
+            </div>
           </div>
         )}
       </div>

@@ -79,7 +79,7 @@ export function MessageBubble({ message, isOwnMessage, onDelete }: MessageBubble
       )}
 
       {/* Message content */}
-      <div className={`flex flex-col max-w-[70%] ${isOwnMessage ? "items-end" : "items-start"}`}>
+      <div className={`flex flex-col max-w-[70%] space-y-1 ${isOwnMessage ? "items-end" : "items-start"}`}>
         {/* Attachments */}
         {attachments.length > 0 && (
           <div className="mb-1 space-y-1">
@@ -155,8 +155,8 @@ export function MessageBubble({ message, isOwnMessage, onDelete }: MessageBubble
         </div>
 
         {/* Timestamp and read receipt */}
-        <div className="flex items-center gap-1 mt-0.5 px-2">
-          <span className="text-[10px] text-gray-500/90">
+        <div className="flex items-center gap-1 mt-0 px-2">
+          <span className="text-[10px] leading-none text-gray-500/85">
             {formatDistanceToNow(new Date(message.createdAt), { addSuffix: true })}
           </span>
           {isOwnMessage && (
