@@ -6,6 +6,7 @@ import { Loader2, Search, X } from "lucide-react";
 import { ConversationList } from "@/components/messages/ConversationList";
 import { MessageThread } from "@/components/messages/MessageThread";
 import { getOrCreateConversation, searchMessageCandidates } from "@/app/actions/messages";
+import { useToast } from "@/hooks/use-toast";
 
 interface OtherUser {
   id: string;
@@ -28,6 +29,8 @@ export default function MessagesPage() {
   const [isMobileThreadOpen, setIsMobileThreadOpen] = useState(false);
   const [candidates, setCandidates] = useState<OtherUser[]>([]);
   const [isSearchingCandidates, setIsSearchingCandidates] = useState(false);
+  const [composerError, setComposerError] = useState("");
+  const { toast } = useToast();
 
   const handleSelectConversation = (conversationId: string, otherUser: OtherUser) => {
     setActiveConversationId(conversationId);
@@ -36,24 +39,36 @@ export default function MessagesPage() {
   };
 
   const handleNewMessage = () => {
+    setComposerError("");
     setIsComposerOpen(true);
   };
 
   const handleStartConversation = async (user: OtherUser) => {
+    setComposerError("");
     const result = await getOrCreateConversation(user.id);
-          if (result.success && result.conversation) {
-        const otherUser =
-          result.conversation.participant1.id === user.id
-            ? result.conversation.participant1
-            : result.conversation.participant2;
 
-        setActiveConversationId(result.conversation.id);
-        setActiveOtherUser(otherUser);
-        setIsMobileThreadOpen(true);
-        setIsComposerOpen(false);
-        setCandidateQuery("");
-        setCandidates([]);
-      }
+    if (result.success && result.conversation) {
+      const otherUser =
+        result.conversation.participant1.id === user.id
+          ? result.conversation.participant1
+          : result.conversation.participant2;
+
+      setActiveConversationId(result.conversation.id);
+      setActiveOtherUser(otherUser);
+      setIsMobileThreadOpen(true);
+      setIsComposerOpen(false);
+      setCandidateQuery("");
+      setCandidates([]);
+      return;
+    }
+
+    const errorMessage = result.error || "Could not start this conversation.";
+    setComposerError(errorMessage);
+    toast({
+      title: "Cannot start conversation",
+      description: errorMessage,
+      variant: "destructive",
+    });
   };
 
   useEffect(() => {
@@ -93,9 +108,12 @@ export default function MessagesPage() {
       }
 
       setIsSearchingCandidates(true);
+      setComposerError("");
       const result = await searchMessageCandidates(candidateQuery);
       if (result.success && result.users) {
         setCandidates(result.users);
+      } else if (!result.success) {
+        setComposerError(result.error || "Could not load members.");
       }
       setIsSearchingCandidates(false);
     };
@@ -197,7 +215,10 @@ export default function MessagesPage() {
             <div className="flex items-center justify-between border-b border-gray-200 p-4">
               <h3 className="text-lg font-semibold text-gray-900">Start new conversation</h3>
               <button
-                onClick={() => setIsComposerOpen(false)}
+                onClick={() => {
+                  setComposerError("");
+                  setIsComposerOpen(false);
+                }}
                 className="rounded-md p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-800"
               >
                 <X className="h-4 w-4" />
@@ -205,6 +226,12 @@ export default function MessagesPage() {
             </div>
 
             <div className="p-4">
+              {composerError ? (
+                <div className="mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                  {composerError}
+                </div>
+              ) : null}
+
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input
