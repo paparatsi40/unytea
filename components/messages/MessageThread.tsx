@@ -107,6 +107,8 @@ export function MessageThread({
     loadMessages();
   };
 
+  const isLowVolumeThread = messages.length > 0 && messages.length <= 2;
+
   if (isLoading) {
     return (
       <div className="flex flex-1 items-center justify-center bg-gray-50">
@@ -164,7 +166,11 @@ export function MessageThread({
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden bg-gray-50 px-5 pb-4 pt-3">
+      <div
+        className={`flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-5 pb-4 ${
+          isLowVolumeThread ? "bg-white pt-1" : "bg-gray-50 pt-3"
+        }`}
+      >
         {error && (
           <div className="mb-4 flex justify-center">
             <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
@@ -195,8 +201,12 @@ export function MessageThread({
             </p>
           </div>
         ) : (
-          <div className="flex min-h-full flex-col justify-end pb-4">
-            <div className="space-y-2">
+          <div className="flex min-h-full flex-col">
+            <div
+              className={`mt-auto ${
+                isLowVolumeThread ? "space-y-1.5 pb-1" : "space-y-2 pb-4"
+              }`}
+            >
               {messages.map((message, index) => {
                 const currentDay = new Date(message.createdAt).toDateString();
                 const previousDay =
@@ -209,7 +219,7 @@ export function MessageThread({
                 return (
                   <div key={message.id} className="space-y-1">
                     {showDaySeparator && (
-                      <div className="flex justify-center py-0.5">
+                      <div className={`flex justify-center ${isLowVolumeThread ? "py-0" : "py-0.5"}`}>
                         <span className="rounded-full bg-white px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 shadow-sm ring-1 ring-gray-200">
                           {formatDayLabel(message.createdAt)}
                         </span>
