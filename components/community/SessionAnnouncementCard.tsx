@@ -101,9 +101,14 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
   const normalizedPreview = previewSource
     .replace(/[“”"']/g, "")
     .replace(/[•|]+/g, " ")
+    .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, "")
+    .replace(/\b(video session|live session|session recap|recording recap)\b/gi, "")
+    .replace(/\b\d+\s*min(utes)?\b/gi, "")
+    .replace(/\b(today|tomorrow|sun|mon|tue|wed|thu|fri|sat)\b[:,]?/gi, "")
     .replace(/\s+/g, " ")
+    .replace(/[·,:;\-]+\s*$/g, "")
     .trim();
-  const contextLine = normalizedPreview.length > 96 ? `${normalizedPreview.slice(0, 95).trimEnd()}…` : normalizedPreview;
+  const contextLine = normalizedPreview.length > 76 ? `${normalizedPreview.slice(0, 75).trimEnd()}…` : normalizedPreview;
 
   const metaParts: string[] = [];
   if (scheduledAt) {
