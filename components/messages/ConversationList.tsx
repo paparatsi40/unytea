@@ -148,7 +148,7 @@ export function ConversationList({
           </div>
           <button
             onClick={onNewMessage}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-purple-200 bg-purple-50 px-2.5 py-1.5 text-xs font-semibold text-purple-700 hover:bg-purple-100 hover:border-purple-300 transition-colors"
             title="New message"
           >
             <MessageSquarePlus className="w-4 h-4" />

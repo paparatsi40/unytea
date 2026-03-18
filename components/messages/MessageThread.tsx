@@ -176,16 +176,16 @@ export function MessageThread({ conversationId, otherUser, subtitle = "Direct co
             </p>
           </div>
         ) : (
-          <div className="flex min-h-[56%] flex-col justify-end gap-3 pb-2">
+          <div className="flex min-h-[48%] flex-col justify-end gap-2 pb-1">
             {messages.map((message, index) => {
               const currentDay = new Date(message.createdAt).toDateString();
               const previousDay = index > 0 ? new Date(messages[index - 1].createdAt).toDateString() : null;
               const showDaySeparator = index === 0 || currentDay !== previousDay;
 
               return (
-                <div key={message.id} className="space-y-2">
+                <div key={message.id} className="space-y-1.5">
                   {showDaySeparator && (
-                    <div className="flex items-center gap-3 py-2">
+                    <div className="flex items-center gap-3 py-1">
                       <div className="h-px flex-1 bg-gray-200" />
                       <span className="text-[11px] font-medium uppercase tracking-wide text-gray-500">
                         {formatDayLabel(message.createdAt)}

@@ -175,10 +175,10 @@ export default function MessagesPage() {
               />
             </div>
 
-            <aside className="hidden xl:flex w-80 border-l border-gray-200 bg-white p-5 flex-col gap-5">
+            <aside className="hidden xl:flex w-80 border-l border-gray-200 bg-white p-4 flex-col gap-4">
               <div>
                 <p className="text-xs uppercase tracking-wide text-gray-500">Contact</p>
-                <div className="mt-3 flex items-center gap-3">
+                <div className="mt-2.5 flex items-center gap-3">
                   <div className="h-11 w-11 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 overflow-hidden flex items-center justify-center text-white font-semibold">
                     {activeOtherUser.image ? (
                       <img
@@ -214,12 +214,12 @@ export default function MessagesPage() {
                 </Link>
               </div>
 
-              <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+              <div className="rounded-xl border border-gray-200 bg-gray-50 p-3.5">
                 <p className="text-xs uppercase tracking-wide text-gray-500">Context</p>
                 <p className="mt-2 text-sm text-gray-900">Direct conversation</p>
                 <p className="mt-1 text-xs text-gray-500">Started from inbox or community members.</p>
 
-                <div className="mt-3 rounded-lg border border-gray-200 bg-white p-3">
+                <div className="mt-2.5 rounded-lg border border-gray-200 bg-white p-2.5">
                   <p className="text-[11px] uppercase tracking-wide text-gray-500">Communities in common</p>
                   {sharedCommunities.length > 0 ? (
                     <div className="mt-2 flex flex-wrap gap-1.5">
@@ -240,7 +240,7 @@ export default function MessagesPage() {
                 </div>
               </div>
 
-              <div className="rounded-xl border border-purple-200 bg-purple-50 p-4">
+              <div className="rounded-xl border border-purple-200 bg-purple-50 p-3.5">
                 <p className="text-xs uppercase tracking-wide text-purple-700">Unread</p>
                 <p className="mt-2 text-2xl font-bold text-purple-900">{unreadTotal}</p>
                 <p className="text-xs text-purple-700/80">total unread messages in your inbox</p>

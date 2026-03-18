@@ -166,7 +166,7 @@ export function MessageInput({ conversationId, onMessageSent }: MessageInputProp
         </div>
       )}
 
-      <div className="flex items-end gap-3">
+      <div className="flex items-end gap-3.5">
         {/* Textarea */}
         <div className="flex-1 relative">
           <textarea
@@ -184,7 +184,7 @@ export function MessageInput({ conversationId, onMessageSent }: MessageInputProp
           />
 
           {/* Toolbar */}
-          <div className="absolute right-2 bottom-2 flex items-center gap-1">
+          <div className="absolute right-2.5 bottom-2 flex items-center gap-0.5">
             {/* Emoji picker (placeholder) */}
             <button
               type="button"
@@ -241,11 +241,11 @@ export function MessageInput({ conversationId, onMessageSent }: MessageInputProp
       </div>
 
       {/* Hint */}
-      <div className="mt-1.5 flex items-center justify-between gap-3">
-        <p className="text-[11px] text-gray-500">
+      <div className="mt-1 flex items-center justify-between gap-3">
+        <p className="text-[10px] text-gray-400">
           Enter to send · Shift+Enter for new line{isUploadingAttachment ? " · Uploading..." : ""}
         </p>
-        {errorText ? <p className="text-[11px] text-red-500">{errorText}</p> : null}
+        {errorText ? <p className="text-[10px] text-red-500">{errorText}</p> : null}
       </div>
     </div>
   );

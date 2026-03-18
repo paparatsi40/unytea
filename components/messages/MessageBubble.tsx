@@ -155,8 +155,8 @@ export function MessageBubble({ message, isOwnMessage, onDelete }: MessageBubble
         </div>
 
         {/* Timestamp and read receipt */}
-        <div className="flex items-center gap-1 mt-1 px-2">
-          <span className="text-xs text-gray-500">
+        <div className="flex items-center gap-1 mt-0.5 px-2">
+          <span className="text-[10px] text-gray-500/90">
             {formatDistanceToNow(new Date(message.createdAt), { addSuffix: true })}
           </span>
           {isOwnMessage && (
