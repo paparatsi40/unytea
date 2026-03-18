@@ -8,6 +8,7 @@ import { SessionAnnouncementCard } from "@/components/community/SessionAnnouncem
 import { deletePost, updatePost } from "@/app/actions/posts";
 import { MessageCircle, Share2, MoreHorizontal, Clock, Edit2, Trash2, X, Check } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { toast } from "sonner";
 
 type Post = {
   id: string;
@@ -51,6 +52,7 @@ export function PremiumPostCard({ post }: { post: Post }) {
   const [editContent, setEditContent] = useState(post.content);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
   
   const authorName = post.author.name || "Anonymous";
   const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
@@ -98,6 +100,21 @@ export function PremiumPostCard({ post }: { post: Post }) {
     setEditContent(post.content);
     setIsEditing(false);
     setShowMenu(false);
+  };
+
+  const handleShare = async () => {
+    if (isSharing) return;
+    setIsSharing(true);
+
+    try {
+      const postUrl = `${window.location.origin}${window.location.pathname}#post-${post.id}`;
+      await navigator.clipboard.writeText(postUrl);
+      toast.success("Link copied", { description: "Post link is ready to share." });
+    } catch {
+      toast.error("Couldn't copy link", { description: "Please copy URL from your browser." });
+    } finally {
+      setIsSharing(false);
+    }
   };
 
   if (isDeleting) {
@@ -278,8 +295,13 @@ export function PremiumPostCard({ post }: { post: Post }) {
           </button>
 
           {/* Share Button */}
-          <button className="flex items-center space-x-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-900">
+          <button
+            onClick={handleShare}
+            disabled={isSharing}
+            className="flex items-center space-x-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-900 disabled:opacity-60"
+          >
             <Share2 className="h-4 w-4" />
+            <span>{isSharing ? "Copying..." : "Share"}</span>
           </button>
         </div>
       )}
