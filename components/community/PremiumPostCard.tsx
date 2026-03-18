@@ -6,7 +6,7 @@ import { PostReactions } from "@/components/community/PostReactions";
 import { CommentSection } from "@/components/community/CommentSection";
 import { SessionAnnouncementCard } from "@/components/community/SessionAnnouncementCard";
 import { deletePost, togglePostPin, updatePost } from "@/app/actions/posts";
-import { MessageCircle, Share2, MoreHorizontal, Clock, Edit2, Trash2, X, Check, Pin } from "lucide-react";
+import { MessageCircle, Link2, MoreHorizontal, Clock, Edit2, Trash2, X, Check, Pin } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 
@@ -62,6 +62,7 @@ export function PremiumPostCard({ post, canModeratePost = false }: { post: Post;
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
+  const [isLinkCopied, setIsLinkCopied] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [isPinned, setIsPinned] = useState(Boolean(post.isPinned));
   const [isPinToggling, setIsPinToggling] = useState(false);
@@ -124,6 +125,8 @@ export function PremiumPostCard({ post, canModeratePost = false }: { post: Post;
     try {
       const postUrl = `${window.location.origin}${window.location.pathname}#post-${post.id}`;
       await navigator.clipboard.writeText(postUrl);
+      setIsLinkCopied(true);
+      setTimeout(() => setIsLinkCopied(false), 1800);
       toast.success("Link copied", { description: "Post link is ready to share." });
     } catch {
       toast.error("Couldn't copy link", { description: "Please copy URL from your browser." });
@@ -391,10 +394,14 @@ export function PremiumPostCard({ post, canModeratePost = false }: { post: Post;
           <button
             onClick={handleShare}
             disabled={isSharing}
-            className="flex items-center space-x-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-900 disabled:opacity-60"
+            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-60 ${
+              isLinkCopied
+                ? "bg-emerald-50 text-emerald-700"
+                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            }`}
           >
-            <Share2 className="h-4 w-4" />
-            <span>{isSharing ? "Copying..." : "Share"}</span>
+            <Link2 className="h-4 w-4" />
+            <span>{isSharing ? "Copying..." : isLinkCopied ? "Copied" : "Copy link"}</span>
           </button>
         </div>
       )}
