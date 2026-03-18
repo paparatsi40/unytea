@@ -140,7 +140,7 @@ function getCommunityState(community: Community): {
       eyebrow: "Needs attention",
       detail: "No upcoming session",
       primaryLabel: "Schedule",
-      primaryHref: "/dashboard/sessions/create",
+      primaryHref: "/dashboard/sessions",
       tone: "text-amber-700",
     };
   }
@@ -225,7 +225,7 @@ function getHeroContent(community: Community) {
         title: "⚡ Start your first session",
         subtitle: "Communities with weekly sessions grow 3x faster",
         primaryLabel: "Schedule first session",
-        primaryHref: "/dashboard/sessions/create",
+        primaryHref: "/dashboard/sessions",
       };
     }
 
@@ -233,7 +233,7 @@ function getHeroContent(community: Community) {
       title: "⚡ Schedule your next session",
       subtitle: "Communities grow faster with a consistent weekly rhythm",
       primaryLabel: "Schedule next session",
-      primaryHref: "/dashboard/sessions/create",
+      primaryHref: "/dashboard/sessions",
     };
   }
 
@@ -270,7 +270,7 @@ function getHeroContent(community: Community) {
     title: "⚡ Schedule your next session",
     subtitle: "Communities grow faster with a consistent weekly rhythm",
     primaryLabel: "Schedule next session",
-    primaryHref: "/dashboard/sessions/create",
+    primaryHref: "/dashboard/sessions",
   };
 }
 
