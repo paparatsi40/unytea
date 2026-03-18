@@ -120,7 +120,6 @@ export function MessageThread({
 
   return (
     <div className="flex h-full min-h-0 flex-1 flex-col bg-white">
-      {/* Header */}
       <div className="border-b border-gray-200 bg-white px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex min-w-0 items-center gap-3">
@@ -165,7 +164,6 @@ export function MessageThread({
         </div>
       </div>
 
-      {/* Messages */}
       <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden bg-gray-50 px-5 pb-4 pt-3">
         {error && (
           <div className="mb-4 flex justify-center">
@@ -197,8 +195,8 @@ export function MessageThread({
             </p>
           </div>
         ) : (
-          <div className="flex min-h-full flex-col justify-end pb-2">
-            <div className="space-y-2.5">
+          <div className="flex min-h-full flex-col justify-end pb-4">
+            <div className="space-y-2">
               {messages.map((message, index) => {
                 const currentDay = new Date(message.createdAt).toDateString();
                 const previousDay =
@@ -211,12 +209,10 @@ export function MessageThread({
                 return (
                   <div key={message.id} className="space-y-1">
                     {showDaySeparator && (
-                      <div className="flex items-center gap-3 py-0.5">
-                        <div className="h-px flex-1 bg-gray-200/90" />
-                        <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500">
+                      <div className="flex justify-center py-0.5">
+                        <span className="rounded-full bg-white px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 shadow-sm ring-1 ring-gray-200">
                           {formatDayLabel(message.createdAt)}
                         </span>
-                        <div className="h-px flex-1 bg-gray-200/90" />
                       </div>
                     )}
 
@@ -235,7 +231,6 @@ export function MessageThread({
         )}
       </div>
 
-      {/* Input */}
       <div className="border-t border-gray-200 bg-white/95 backdrop-blur-sm">
         <MessageInput
           conversationId={conversationId}
