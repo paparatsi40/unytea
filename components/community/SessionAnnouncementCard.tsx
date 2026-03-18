@@ -12,6 +12,23 @@ import { getSessionFeedState } from "@/app/actions/community-feed";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
+type SessionAnnouncementAttachment = {
+  sessionId?: string;
+  sessionTitle?: string;
+  sessionDescription?: string;
+  scheduledAt?: string;
+  duration?: number;
+  mentorId?: string;
+  mentorName?: string;
+  mentorImage?: string | null;
+};
+
+type PostAttachment = {
+  url: string;
+  name: string;
+  type: "image" | "document" | "media";
+};
+
 interface SessionAnnouncementCardProps {
   post: {
     id: string;
@@ -24,16 +41,7 @@ interface SessionAnnouncementCardProps {
       name: string | null;
       image: string | null;
     };
-    attachments?: {
-      sessionId?: string;
-      sessionTitle?: string;
-      sessionDescription?: string;
-      scheduledAt?: string;
-      duration?: number;
-      mentorId?: string;
-      mentorName?: string;
-      mentorImage?: string | null;
-    } | null;
+    attachments?: SessionAnnouncementAttachment | PostAttachment[] | null;
   };
 }
 
