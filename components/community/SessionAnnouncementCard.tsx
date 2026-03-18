@@ -229,18 +229,15 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
 
   return (
     <div
-      className="group relative overflow-hidden rounded-2xl border border-purple-200/50 bg-gradient-to-br from-purple-50 via-white to-pink-50 shadow-lg transition-all duration-300 hover:shadow-xl hover:border-purple-300"
+      className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:shadow-md"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Animated background decoration */}
-      <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-purple-200/30 blur-3xl transition-all group-hover:bg-purple-300/40" />
-      <div className="absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-pink-200/30 blur-3xl transition-all group-hover:bg-pink-300/40" />
 
       {/* Header with badge */}
-      <div className="relative flex items-center gap-3 border-b border-purple-100/50 px-6 py-4">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-pink-500 shadow-md">
-          <Video className="h-5 w-5 text-white" />
+      <div className="relative flex items-center gap-2.5 border-b border-gray-100 px-4 py-3">
+        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-100 text-purple-700">
+          <Video className="h-4 w-4" />
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2">
@@ -269,9 +266,9 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
       </div>
 
       {/* Content */}
-      <div className="relative px-6 py-5">
+      <div className="relative px-4 py-3.5">
         {/* Session Title */}
-        <h3 className="text-xl font-bold text-gray-900 group-hover:text-purple-700 transition-colors">
+        <h3 className="text-lg font-semibold text-gray-900 group-hover:text-purple-700 transition-colors">
           {sessionData.sessionTitle || post.title}
         </h3>
 
@@ -283,7 +280,7 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
 
         {/* Session Details */}
         {scheduledAt && (
-          <div className="mt-4 flex flex-wrap items-center gap-4 text-sm">
+          <div className="mt-3 flex flex-wrap items-center gap-3 text-xs">
             <div className="flex items-center gap-1.5 text-purple-700 font-medium">
               <Calendar className="h-4 w-4" />
               {formatDate(scheduledAt)}
@@ -321,7 +318,7 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
 
         {/* Host Info */}
         {sessionData.mentorName && (
-          <div className="mt-4 flex items-center gap-3">
+          <div className="mt-3 flex items-center gap-2.5">
             <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-purple-400 to-pink-400">
               {sessionData.mentorImage ? (
                 <img
@@ -343,8 +340,8 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
 
         {/* Session discussion block */}
         {(isUpcoming || isLive || hasRecording) && (
-          <div className="mt-5 rounded-xl border border-purple-200/70 bg-white/80 p-3">
-            <div className="mb-2 flex items-center justify-between">
+          <div className="mt-3 rounded-lg border border-purple-100 bg-purple-50/30 p-2.5">
+            <div className="mb-1.5 flex items-center justify-between">
               <p className="text-xs font-medium uppercase tracking-wide text-purple-700">
                 {isLive ? "Live discussion" : hasRecording ? "Post-session discussion" : "Pre-session discussion"}
               </p>
@@ -357,10 +354,11 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
                 placeholder={isLive ? "Ask a question live..." : hasRecording ? "Add a follow-up question..." : "Drop your question for the host..."}
-                className="flex-1 rounded-md border border-purple-200 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-purple-400"
+                className="flex-1 rounded-md border border-purple-200 bg-white px-3 py-1.5 text-xs text-gray-900 outline-none focus:border-purple-400"
               />
               <Button
                 type="button"
+                size="sm"
                 onClick={handleAskQuestion}
                 disabled={isQuestionSubmitting}
                 className="bg-purple-600 text-white hover:bg-purple-700"
@@ -375,11 +373,12 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
         )}
 
         {/* CTA Buttons */}
-        <div className="mt-5 space-y-2">
+        <div className="mt-3 space-y-1.5">
           {isUpcoming && (
             <>
               <Button
                 type="button"
+                size="sm"
                 variant={rsvpStatus === "attending" ? "outline" : "default"}
                 disabled={isSubmitting}
                 onClick={() => handleSetRSVP("attending")}
@@ -390,6 +389,7 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
               </Button>
               <Button
                 type="button"
+                size="sm"
                 variant={rsvpStatus === "interested" ? "outline" : "secondary"}
                 disabled={isSubmitting}
                 onClick={() => handleSetRSVP("interested")}
@@ -398,12 +398,12 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
                 <Calendar className="mr-2 h-4 w-4" />
                 {isSubmitting ? "Updating..." : "Interested"}
               </Button>
-              <Button asChild variant="outline" className="w-full rounded-full">
+              <Button asChild size="sm" variant="outline" className="w-full rounded-full">
                 <a href={buildGoogleCalendarUrl()} target="_blank" rel="noreferrer">
                   Add to Google Calendar
                 </a>
               </Button>
-              <Button type="button" variant="outline" className="w-full rounded-full" onClick={downloadAppleCalendarIcs}>
+              <Button type="button" size="sm" variant="outline" className="w-full rounded-full" onClick={downloadAppleCalendarIcs}>
                 Add to Apple Calendar
               </Button>
             </>
@@ -412,8 +412,9 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
           {isLive ? (
             <Link href={`/dashboard/sessions/${sessionData.sessionId}/room?src=feed_session_card_live`}>
 <Button
-                className={`w-full rounded-full bg-red-600 text-white font-semibold shadow-md transition-all hover:bg-red-700 ${
-                  isHovered ? "shadow-lg scale-[1.02]" : ""
+                size="sm"
+                className={`w-full rounded-full bg-red-600 text-white font-semibold transition-all hover:bg-red-700 ${
+                  isHovered ? "shadow-md" : ""
                 }`}
               >
                 <Radio className="mr-2 h-4 w-4 animate-pulse" />
@@ -424,8 +425,9 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
           ) : hasRecording && sessionState?.recordingUrl ? (
             <Link href={`${sessionState.recordingUrl}${sessionState.recordingUrl.includes("?") ? "&" : "?"}src=feed_session_recording`} target="_blank">
 <Button
-                className={`w-full rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold shadow-md transition-all ${
-                  isHovered ? "shadow-lg scale-[1.02]" : ""
+                size="sm"
+                className={`w-full rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold transition-all ${
+                  isHovered ? "shadow-md" : ""
                 }`}
               >
                 <Video className="mr-2 h-4 w-4" />
@@ -435,8 +437,9 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
             </Link>
           ) : (
             <Link href={`/dashboard/sessions/${sessionData.sessionId}/room?src=feed_session_card`}><Button
-                className={`w-full rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold shadow-md transition-all ${
-                  isHovered ? "shadow-lg scale-[1.02]" : ""
+                size="sm"
+                className={`w-full rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold transition-all ${
+                  isHovered ? "shadow-md" : ""
                 }`}
               >
                 <Video className="mr-2 h-4 w-4" />
@@ -448,8 +451,7 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
         </div>
       </div>
 
-      {/* Bottom decoration */}
-      <div className="relative h-1 w-full bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500" />
+      <div className="h-0.5 w-full bg-gray-100" />
     </div>
   );
 }
