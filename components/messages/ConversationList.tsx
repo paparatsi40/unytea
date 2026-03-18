@@ -231,13 +231,15 @@ export function ConversationList({
 
                       {lastMessage ? (
                         <p className={`text-sm truncate ${
-                          unreadCount > 0 ? "text-white/90 font-medium" : "text-white/60"
+                          unreadCount > 0 ? "text-white/95 font-medium" : "text-white/75"
                         }`}>
-                          {lastMessage.sender.id === user?.id && "You: "}
-                          {lastMessage.content}
+                          {lastMessage.sender.id === user?.id ? (
+                            <span className="text-white/50">You: </span>
+                          ) : null}
+                          <span>{lastMessage.content || "Sent an attachment"}</span>
                         </p>
                       ) : (
-                        <p className="text-sm text-white/40 italic">No messages yet</p>
+                        <p className="text-sm text-white/50 italic">No messages yet</p>
                       )}
                     </div>
                   </div>

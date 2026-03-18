@@ -114,7 +114,7 @@ export function MessageThread({ conversationId, otherUser }: MessageThreadProps)
       {/* Messages */}
       <div 
         ref={containerRef}
-        className="flex-1 overflow-y-auto p-4 space-y-4"
+        className="flex-1 overflow-y-auto p-4 space-y-4 bg-zinc-950/30"
       >
         {error && (
           <div className="text-center p-4">
@@ -123,7 +123,7 @@ export function MessageThread({ conversationId, otherUser }: MessageThreadProps)
         )}
 
         {messages.length === 0 && !error ? (
-          <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
+          <div className="min-h-full flex flex-col items-center justify-center text-center p-8">
             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center mb-4">
               <span className="text-3xl">💬</span>
             </div>
