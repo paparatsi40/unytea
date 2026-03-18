@@ -192,12 +192,18 @@ export function PremiumPostFeed({
   const userFullName = user ? (user.name || "") : "";
 
   const filteredPosts = useMemo(() => {
-    return posts.filter((post) => {
+    const visible = posts.filter((post) => {
       if (activeFilter === "all") return true;
       if (activeFilter === "updates") return post.contentType === "ANNOUNCEMENT";
       if (activeFilter === "questions") return post.contentType === "QUESTION";
       if (activeFilter === "resources") return post.contentType === "RESOURCE";
       return post.contentType === "DISCUSSION" || !post.contentType;
+    });
+
+    return visible.sort((a, b) => {
+      if (a.isPinned && !b.isPinned) return -1;
+      if (!a.isPinned && b.isPinned) return 1;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
   }, [posts, activeFilter]);
 
