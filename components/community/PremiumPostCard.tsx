@@ -368,16 +368,23 @@ export function PremiumPostCard({ post, canModeratePost = false }: { post: Post;
           </div>
 
           {/* Comment Button */}
-          <button 
+          <button
             onClick={() => setShowComments(!showComments)}
-            className={`flex items-center space-x-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-              showComments 
-                ? 'bg-purple-50 text-purple-600' 
-                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+              showComments
+                ? "bg-purple-50 text-purple-700"
+                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             }`}
           >
             <MessageCircle className="h-4 w-4" />
-            <span>{commentCount}</span>
+            <span>Comments</span>
+            <span
+              className={`rounded-full px-1.5 py-0.5 text-[10px] leading-none ${
+                showComments ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-600"
+              }`}
+            >
+              {commentCount}
+            </span>
           </button>
 
           {/* Share Button */}
