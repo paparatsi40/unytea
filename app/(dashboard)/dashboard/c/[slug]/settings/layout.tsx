@@ -67,9 +67,9 @@ export default function CommunitySettingsLayout({
     },
     {
       name: "Advanced",
-      href: `/dashboard/c/${slug}/settings/sections`,
+      href: `/dashboard/c/${slug}/settings/landing`,
       icon: Sliders,
-      description: "Advanced layout options",
+      description: "Open landing builder",
       available: true,
     },
   ];
