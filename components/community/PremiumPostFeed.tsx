@@ -64,6 +64,8 @@ type UpcomingSession = {
   duration: number;
   mentorName: string | null;
   attendeeCount: number;
+  roomId?: string | null;
+  status?: "SCHEDULED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED" | "NO_SHOW";
 };
 
 export function PremiumPostFeed({ 
@@ -254,12 +256,21 @@ export function PremiumPostFeed({
               </div>
 
               <div className="flex items-center gap-3 mt-3">
-                <Link href={`/dashboard/sessions/${upcomingSession.id}/room`}>
-                  <Button size="sm" className="bg-amber-600 hover:bg-amber-700 text-white">
-                    <Play className="h-4 w-4 mr-1.5" />
-                    Join Room
-                  </Button>
-                </Link>
+                {upcomingSession.roomId ? (
+                  <Link href={`/dashboard/sessions/${upcomingSession.id}/room`}>
+                    <Button size="sm" className="bg-amber-600 hover:bg-amber-700 text-white">
+                      <Play className="h-4 w-4 mr-1.5" />
+                      {upcomingSession.status === "IN_PROGRESS" ? "Join now" : "Open room"}
+                    </Button>
+                  </Link>
+                ) : (
+                  <Link href="/dashboard/sessions">
+                    <Button size="sm" className="bg-amber-600 hover:bg-amber-700 text-white">
+                      <Clock className="h-4 w-4 mr-1.5" />
+                      Open sessions
+                    </Button>
+                  </Link>
+                )}
                 <Button 
                   variant="outline" 
                   size="sm"

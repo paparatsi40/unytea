@@ -122,6 +122,8 @@ export default async function CommunityFeedPage({
         duration: upcomingSession.duration,
         mentorName: upcomingSession.mentor?.name || null,
         attendeeCount: upcomingSession._count.participations,
+        roomId: upcomingSession.roomId,
+        status: upcomingSession.status,
       }
     : null;
 
@@ -173,12 +175,21 @@ export default async function CommunityFeedPage({
                   </p>
                 </div>
                 <div className="mt-4 flex gap-2">
-                  <Link href={`/dashboard/sessions/${mappedUpcomingSession.id}/room`} className="flex-1">
-                    <Button className="w-full bg-purple-600 hover:bg-purple-700">
-                      <Play className="mr-2 h-4 w-4" />
-                      Join
-                    </Button>
-                  </Link>
+                  {mappedUpcomingSession.roomId ? (
+                    <Link href={`/dashboard/sessions/${mappedUpcomingSession.id}/room`} className="flex-1">
+                      <Button className="w-full bg-purple-600 hover:bg-purple-700">
+                        <Play className="mr-2 h-4 w-4" />
+                        {mappedUpcomingSession.status === "IN_PROGRESS" ? "Join now" : "Open room"}
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Link href="/dashboard/sessions" className="flex-1">
+                      <Button className="w-full bg-purple-600 hover:bg-purple-700">
+                        <Calendar className="mr-2 h-4 w-4" />
+                        Open sessions
+                      </Button>
+                    </Link>
+                  )}
                   <Link href="/dashboard/sessions" className="flex-1">
                     <Button variant="outline" className="w-full border-zinc-700 bg-zinc-800/50 text-zinc-200 hover:bg-zinc-800">
                       View all
