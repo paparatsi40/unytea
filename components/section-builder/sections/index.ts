@@ -56,8 +56,6 @@ export const SECTION_ORDER: SectionType[] = [
   "gallery",
   "faq",
   "cta",
-  "pricing",
-  "video",
 ];
 
 /**
