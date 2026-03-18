@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useParams } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Settings, Users, Eye, CreditCard, LayoutTemplate } from "lucide-react";
+import { Settings, Users, Eye, CreditCard } from "lucide-react";
 
 export default function CommunitySettingsLayout({
   children,
@@ -27,12 +27,7 @@ export default function CommunitySettingsLayout({
       icon: Eye,
       description: "Customize layout and branding",
     },
-    {
-      name: "Section Presets",
-      href: `/dashboard/c/${slug}/settings/sections`,
-      icon: LayoutTemplate,
-      description: "Manage landing sections",
-    },
+
     {
       name: "Members",
       href: `/dashboard/c/${slug}/members`,
