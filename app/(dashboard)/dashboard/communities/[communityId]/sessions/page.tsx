@@ -21,7 +21,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CopyInviteLinkButton } from "@/components/sessions/CopyInviteLinkButton";
 
 interface CommunitySessionsPageProps {
   params: Promise<{
@@ -31,7 +30,6 @@ interface CommunitySessionsPageProps {
     filter?: string;
     pastFilter?: string;
     window?: string;
-    quickStart?: string;
   }>;
 }
 
@@ -73,18 +71,14 @@ function getAttendanceRecommendation(attendance: any) {
   }
 
   if ((attendance.trend?.avgAttendanceDelta || 0) > 0 || (attendance.trend?.rsvpToJoinRateDelta || 0) > 0) {
-return {
+    return {
       title: "Momentum is improving",
       description: "Keep cadence stable this week and push one extra live session announcement.",
       tone: "positive" as const,
     };
   }
 
-  return {
-    title: "Stable baseline",
-    description: "Run one focused experiment this week (topic, time slot, or reminder copy) and track deltas.",
-    tone: "neutral" as const,
-  };
+  return null;
 }
 
 export default async function CommunitySessionsPage({ params, searchParams }: CommunitySessionsPageProps) {
@@ -95,9 +89,8 @@ try {
     }
 
     const { communityId } = await params;
-    const { filter = "all", pastFilter = "all", window = "30", quickStart } = await searchParams;
+    const { filter = "all", pastFilter = "all", window = "30" } = await searchParams;
     const metricWindow = ["7", "30", "90"].includes(window) ? Number(window) : 30;
-    const showQuickStart = quickStart === "1";
 
     // Verify community exists and user is a member
     const community = await prisma.community.findUnique({
@@ -247,11 +240,6 @@ const sessionDate = new Date(s.scheduledAt);
     });
 
     const primarySession = liveSessions[0] || upcoming[0] || null;
-    const invitePath = primarySession
-      ? primarySession.visibility === "public" && primarySession.slug
-        ? `/sessions/${primarySession.slug}?ref=community_invite&src=host_invite`
-        : `/dashboard/sessions/${primarySession.id}?src=host_invite`
-      : null;
 
     async function handleRSVP(sessionId: string, _formData: FormData) {
 "use server";
@@ -304,113 +292,78 @@ const sessionDate = new Date(s.scheduledAt);
             </div>
           </div>
 
-          {showQuickStart && canCreateSessions && (
-            <div className="mb-6 rounded-xl border border-purple-500/30 bg-purple-500/10 p-4">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-sm font-semibold text-white">Schedule your first live session</p>
-                  <p className="mt-1 text-xs text-zinc-300">Communities with weekly sessions grow 3x faster.</p>
-                  <p className="mt-1 text-xs text-zinc-500">Most communities host their first session within 24 hours.</p>
-                </div>
-                <Badge className="border-purple-400/40 bg-purple-500/20 text-purple-200">Recommended first session: Community Q&A · 30 min</Badge>
+          <div className="mb-6 rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-zinc-500">Next / Current session</p>
+                {primarySession ? (
+                  <>
+                    <h2 className="mt-1 text-lg font-semibold text-white">{primarySession.title}</h2>
+                    <p className="mt-1 text-sm text-zinc-400">
+                      {primarySession.status === "IN_PROGRESS"
+                        ? "Your community is live now. Keep momentum and drive join rate."
+                        : `${formatSessionDate(new Date(primarySession.scheduledAt))} · ${formatSessionTime(new Date(primarySession.scheduledAt))} · ${primarySession.duration || 60} min · with ${primarySession.mentor?.name || "Host"}`}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <h2 className="mt-1 text-lg font-semibold text-white">No session scheduled yet</h2>
+                    <p className="mt-1 text-sm text-zinc-400">Schedule your next live touchpoint to keep weekly community cadence.</p>
+                  </>
+                )}
               </div>
-              <div className="mt-3 grid gap-2 sm:grid-cols-3">
-                <div className="rounded-lg border border-purple-500/40 bg-zinc-900/60 p-3 shadow-[0_0_0_1px_rgba(168,85,247,0.25)]">
-                  <div className="mb-2 flex items-center justify-between">
-                    <Badge className="border-purple-400/40 bg-purple-500/20 text-[10px] text-purple-100">⭐ Best first session</Badge>
-                  </div>
-                  <CreateSessionDialog
-                    triggerText="⏱ 30 min Community Q&A"
-                    className="w-full bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-md text-sm"
-                    communityId={communityId}
-defaultDuration={30}
-                    presetTitle="Community Q&A"
-                    presetDescription="Ask anything about this community topic."
-                  />
-                  <p className="mt-2 text-[11px] text-zinc-400">Best for your first session</p>
-                </div>
-                <div className="rounded-lg border border-zinc-700 bg-zinc-900/60 p-3">
-                  <CreateSessionDialog
-                    triggerText="⏱ 45 min Workshop"
-                    className="w-full bg-zinc-800 hover:bg-zinc-700 text-white px-3 py-2 rounded-md text-sm"
-                    communityId={communityId}
-                    defaultDuration={45}
-                    presetTitle="Workshop Session"
-                    presetDescription="Teach one specific topic with practical examples."
-                  />
-                  <p className="mt-2 text-[11px] text-zinc-400">Teach a specific topic</p>
-                </div>
-                <div className="rounded-lg border border-zinc-700 bg-zinc-900/60 p-3">
-                  <CreateSessionDialog
-                    triggerText="⏱ 60 min Masterclass"
-                    className="w-full bg-zinc-800 hover:bg-zinc-700 text-white px-3 py-2 rounded-md text-sm"
-                    communityId={communityId}
-                    defaultDuration={60}
-                    presetTitle="Masterclass"
-                    presetDescription="Deep dive into a focused topic with examples and Q&A."
-                  />
-                  <p className="mt-2 text-[11px] text-zinc-400">Deep dive session</p>
-                </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                {primarySession ? (
+                  <>
+                    <Link href={`/dashboard/sessions/${primarySession.id}/room?src=sessions_hub_primary_action`}>
+                      <Button className={`${primarySession.status === "IN_PROGRESS" ? "bg-red-600 hover:bg-red-700" : "bg-purple-600 hover:bg-purple-700"} text-white`}>
+                        {primarySession.status === "IN_PROGRESS" ? "Join live" : "Open session"}
+                      </Button>
+                    </Link>
+                    {primarySession.status !== "IN_PROGRESS" && (
+                      <form action={handleRSVP.bind(null, primarySession.id)}>
+                        <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
+                          {primarySession.participations?.length ? "Attending" : "RSVP"}
+                        </Button>
+                      </form>
+                    )}
+                  </>
+                ) : (
+                  canCreateSessions && (
+                    <CreateSessionDialog
+                      triggerText="Schedule session"
+                      className="bg-purple-600 hover:bg-purple-700 text-white"
+                      communityId={communityId}
+                    />
+                  )
+                )}
               </div>
-              <p className="mt-3 text-xs text-zinc-300">Tip: Start with a weekly Q&A to build engagement.</p>
             </div>
-          )}
+          </div>
 
           {attendance && (
 <>
-            <div className="mb-2 flex flex-wrap items-center gap-2 text-[11px] text-zinc-300">
-              <span className="rounded border border-zinc-600 bg-zinc-900 px-2 py-1">Upcoming: {filter}</span>
-              <span className="rounded border border-zinc-600 bg-zinc-900 px-2 py-1">Past: {pastFilter}</span>
-              <span className="rounded border border-zinc-600 bg-zinc-900 px-2 py-1">Window: {metricWindow}d</span>
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+              <p className="text-sm font-semibold text-zinc-100">Session performance</p>
+              <div className="flex items-center gap-2 text-xs">
+                <span className="text-zinc-500">Window:</span>
+                {([7, 30, 90] as const).map((days) => (
+                  <Link
+                    key={days}
+                    href={`/dashboard/communities/${communityId}/sessions?filter=${filter}&pastFilter=${pastFilter}&window=${days}`}
+                    className={`rounded border px-2 py-1 transition ${
+                      metricWindow === days
+                        ? "border-zinc-500 bg-zinc-800 text-zinc-100"
+                        : "border-zinc-700 bg-zinc-900 text-zinc-400 hover:bg-zinc-800"
+                    }`}
+                  >
+                    {days}d
+                  </Link>
+                ))}
+              </div>
             </div>
-            <div className="mb-3 flex flex-wrap items-center gap-2 text-xs">
-              <span className="text-zinc-500">Window:</span>
-              {([7, 30, 90] as const).map((days) => (
-                <Link
-                  key={days}
-                  href={`/dashboard/communities/${communityId}/sessions?filter=${filter}&pastFilter=${pastFilter}&window=${days}`}
-                  className={`rounded border px-2 py-1 transition ${
-                    metricWindow === days
-                      ? "border-zinc-500 bg-zinc-800 text-zinc-100"
-                      : "border-zinc-700 bg-zinc-900 text-zinc-400 hover:bg-zinc-800"
-                  }`}
-                >
-                  {days}d
-                </Link>
-              ))}
-              <Link
-                href={`/dashboard/communities/${communityId}/sessions?filter=all&pastFilter=all&window=30`}
-                className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-zinc-400 transition hover:bg-zinc-800"
-              >
-                Reset filters
-              </Link>
-              <Link
-                href={`/dashboard/communities/${communityId}/sessions?filter=live&pastFilter=all&window=7`}
-                className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-zinc-400 transition hover:bg-zinc-800"
-              >
-                Live now preset
-              </Link>
-              <Link
-                href={`/dashboard/communities/${communityId}/sessions?filter=all&pastFilter=public&window=30`}
-                className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-zinc-400 transition hover:bg-zinc-800"
-              >
-                Replay focus preset
-              </Link>
-              <Link
-                href={`/dashboard/communities/${communityId}/sessions?filter=today&pastFilter=all&window=7`}
-                className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-zinc-400 transition hover:bg-zinc-800"
-              >
-                Attendance focus preset
-              </Link>
-              <Link
-                href={`/dashboard/communities/${communityId}/sessions?filter=${filter}&pastFilter=${pastFilter}&window=${metricWindow}`}
-                target="_blank"
-                className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-[11px] text-zinc-400 transition hover:bg-zinc-800"
-              >
-                Open current view ↗
-              </Link>
-</div>
-            <div className="mb-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
 <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4">
                 <p className="text-xs uppercase tracking-wide text-zinc-500">Avg attendance</p>
                 <p className="mt-1 text-2xl font-semibold text-white">{attendance.avgAttendance}</p>
@@ -453,7 +406,7 @@ defaultDuration={30}
                 </p>
               </div>
 </div>
-            {recommendation && (
+            {recommendation && recommendation.tone === "warning" && (
               <div className={`mb-6 rounded-lg border p-4 ${
                 recommendation.tone === "positive"
                   ? "border-emerald-500/30 bg-emerald-500/10"
@@ -478,87 +431,6 @@ defaultDuration={30}
           )}
 
 
-          {primarySession && invitePath && (
-            <div className="mb-4 rounded-lg border border-blue-500/30 bg-blue-500/10 p-4">
-              <p className="text-sm font-semibold text-white">Invite members to this session</p>
-              <p className="mt-1 text-xs text-zinc-300">Host creates session, attendance starts with invites.</p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <CopyInviteLinkButton invitePath={invitePath} />
-                <Link href={invitePath} target="_blank">
-                  <Button variant="outline" className="border-zinc-700 text-zinc-200 hover:bg-zinc-800">
-                    Open invite page
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          )}
-
-          {primarySession && (
-            <div className="mb-6 rounded-lg border border-zinc-800 bg-zinc-900/60 p-4">
-<div className="mb-2 flex items-center justify-between">
-                <p className="text-sm font-medium text-zinc-200">QA Quick Flow</p>
-                <span className="text-xs text-zinc-500">Validate loop in ~1 min</span>
-              </div>
-              <p className="mb-2 text-xs text-zinc-400">
-                Test create → join → recap/replay → public/share on the current primary session.
-              </p>
-              <div className="mb-3 flex flex-wrap items-center gap-2 text-xs">
-                <span className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-zinc-300">
-                  Status: {primarySession.status}
-                </span>
-                <span className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-zinc-300">
-                  Visibility: {primarySession.visibility}
-                </span>
-                <span className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-zinc-400">
-                  Last updated: {new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
-                </span>
-              </div>
-              <div className="mb-3 flex flex-wrap gap-2">
-                <Link href={`/dashboard/sessions/${primarySession.id}/room?src=sessions_hub_qa`}>
-                  <Button size="sm" className="bg-emerald-600 text-white hover:bg-emerald-700">
-                    Join room
-                  </Button>
-                </Link>
-                <Link href={`/dashboard/sessions/${primarySession.id}?src=sessions_hub_qa`}>
-                  <Button size="sm" variant="outline" className="border-zinc-700 text-zinc-200">
-                    Session detail
-                  </Button>
-                </Link>
-                <Link href="/dashboard/notifications?src=sessions_hub_qa">
-                  <Button size="sm" variant="outline" className="border-zinc-700 text-zinc-200">
-                    Notifications
-                  </Button>
-                </Link>
-                <Link href={`/dashboard/c/${community.slug}?src=sessions_hub_qa`}>
-                  <Button size="sm" variant="outline" className="border-zinc-700 text-zinc-200">
-                    Community feed
-                  </Button>
-                </Link>
-{primarySession.visibility === "public" && primarySession.slug && (
-                  <>
-                    <Link href={`/sessions/${primarySession.slug}?ref=sessions_hub&src=qa_flow`} target="_blank">
-                      <Button size="sm" variant="outline" className="border-zinc-700 text-zinc-200">
-                        Public page
-                      </Button>
-                    </Link>
-                    <code className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs text-zinc-400">
-                      /sessions/{primarySession.slug}?ref=sessions_hub&src=qa_flow
-                    </code>
-                  </>
-                )}
-              </div>
-              <div className="grid gap-2 text-xs text-zinc-300 sm:grid-cols-2">
-                <div className="rounded border border-zinc-800 bg-zinc-900 px-3 py-2">✅ RSVP in session detail</div>
-                <div className="rounded border border-zinc-800 bg-zinc-900 px-3 py-2">✅ Join room and verify live</div>
-                <div className="rounded border border-zinc-800 bg-zinc-900 px-3 py-2">✅ End session and open replay</div>
-                <div className="rounded border border-zinc-800 bg-zinc-900 px-3 py-2">✅ Open public page and test join CTA</div>
-              </div>
-              <div className="mt-3 rounded border border-zinc-800 bg-zinc-950 px-3 py-2 text-[11px] text-zinc-400">
-                Tracking keys: <code>src=sessions_hub_qa</code>, <code>src=qa_flow</code>, <code>src=public_session_join_cta</code>
-              </div>
-            </div>
-          )}
-
           <Tabs defaultValue="upcoming" className="w-full">
 <TabsList className="bg-zinc-900 border-zinc-800 mb-6">
               <TabsTrigger value="upcoming" className="data-[state=active]:bg-zinc-800 text-zinc-300">
@@ -573,62 +445,6 @@ defaultDuration={30}
             </TabsList>
 
             <TabsContent value="upcoming" className="space-y-4">
-              {/* Show primary session prominently (LIVE first, then next upcoming) */}
-              {primarySession && (
-                <div className={`rounded-xl p-6 ${
-                  primarySession.status === "IN_PROGRESS"
-                    ? "border border-red-500/30 bg-gradient-to-r from-red-900/20 to-rose-900/20"
-                    : "border border-purple-500/30 bg-gradient-to-r from-purple-900/20 to-pink-900/20"
-                }`}>
-                  <div className="mb-2 flex items-center gap-2">
-                    <Badge className={`${primarySession.status === "IN_PROGRESS" ? "bg-red-600" : "bg-purple-600"} text-xs text-white`}>
-                      {primarySession.status === "IN_PROGRESS" ? "Live Now" : "Next Live Session"}
-                    </Badge>
-                    {primarySession.status !== "IN_PROGRESS" && (
-                      <span className="text-xs text-zinc-400">
-                        {formatDistanceToNow(new Date(primarySession.scheduledAt), { addSuffix: true })}
-                      </span>
-                    )}
-                  </div>
-                  <h3 className="mb-1 text-xl font-semibold text-white">{primarySession.title}</h3>
-                  <div className="mb-4 flex items-center gap-4 text-sm text-zinc-400">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="h-4 w-4" />
-                      {formatSessionDate(new Date(primarySession.scheduledAt))}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
-                      {formatSessionTime(new Date(primarySession.scheduledAt))}
-                    </span>
-                    <span>{primarySession.duration} min</span>
-                    <span>•</span>
-                    <span>{primarySession._count?.participations || 0} attending</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Link href={`/dashboard/sessions/${primarySession.id}/room?src=sessions_hub_next_live`}>
-<Button className={`${primarySession.status === "IN_PROGRESS" ? "bg-red-600 hover:bg-red-700" : "bg-purple-600 hover:bg-purple-700"} text-white`}>
-                        {primarySession.status === "IN_PROGRESS" ? "Join Live Now" : "Join Session"}
-                        <ArrowRight className="ml-1 h-4 w-4" />
-                      </Button>
-                    </Link>
-                    {primarySession.visibility === "public" && primarySession.slug && (
-                      <Link href={`/sessions/${primarySession.slug}?ref=sessions_hub&src=primary_session`} target="_blank">
-                        <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
-                          Public Page
-                        </Button>
-                      </Link>
-                    )}
-                    {primarySession.status !== "IN_PROGRESS" && (
-                      <form action={handleRSVP.bind(null, primarySession.id)}>
-                        <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
-                          {primarySession.participations?.length ? "Attending" : "RSVP"}
-                        </Button>
-                      </form>
-                    )}
-</div>
-                </div>
-              )}
-
               <div className="mb-4 flex flex-wrap items-center gap-2">
                 {upcomingLiveCount > 0 && (
                   <Badge className="bg-red-600 text-white text-xs">{upcomingLiveCount} live now</Badge>
