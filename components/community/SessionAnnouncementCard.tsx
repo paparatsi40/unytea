@@ -96,7 +96,14 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
   const ctaLabel = isLive ? "Join live" : hasRecording ? "Watch recording" : isUpcoming ? "Join session" : "View session";
 
   const sharedByLabel = post.author.name ? `${post.author.name} shared a session` : "Shared session";
-  const contextLine = (sessionData.sessionDescription || post.content || "").trim();
+
+  const previewSource = (sessionData.sessionDescription || post.content || "").trim();
+  const normalizedPreview = previewSource
+    .replace(/[“”"']/g, "")
+    .replace(/[•|]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  const contextLine = normalizedPreview.length > 96 ? `${normalizedPreview.slice(0, 95).trimEnd()}…` : normalizedPreview;
 
   const metaParts: string[] = [];
   if (scheduledAt) {
@@ -120,7 +127,7 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
 
       <h3 className="text-sm font-semibold text-gray-900">{sessionData.sessionTitle || post.title || "Live session"}</h3>
 
-      {contextLine ? <p className="mt-1 text-xs text-gray-600 line-clamp-2">{contextLine}</p> : null}
+      {contextLine ? <p className="mt-1 text-xs text-gray-600 line-clamp-1">{contextLine}</p> : null}
 
       {metaParts.length > 0 ? (
         <p className="mt-2 text-xs text-gray-600">{metaParts.join(" · ")}</p>
