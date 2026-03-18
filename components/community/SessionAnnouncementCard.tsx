@@ -94,7 +94,10 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
       ? `${sessionState.recordingUrl}${sessionState.recordingUrl.includes("?") ? "&" : "?"}src=feed_session_recording`
       : `/dashboard/sessions/${sessionData.sessionId}/room?src=feed_session_card`;
 
-  const ctaLabel = isLive ? "Join live" : hasRecording ? "Watch recording" : "Open session";
+  const ctaLabel = isLive ? "Join live" : hasRecording ? "Watch recording" : isUpcoming ? "Join session" : "View session";
+
+  const sharedByLabel = post.author.name ? `${post.author.name} shared a session` : "Shared session";
+  const contextLine = (sessionData.sessionDescription || post.content || "").trim();
 
   return (
     <article className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
@@ -103,7 +106,7 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
           <div className="flex h-7 w-7 items-center justify-center rounded-full bg-purple-100 text-purple-700">
             {isLive ? <Radio className="h-3.5 w-3.5" /> : <Video className="h-3.5 w-3.5" />}
           </div>
-          <p className="text-xs font-medium text-gray-600">Session shared</p>
+          <p className="text-xs font-medium text-gray-600">{sharedByLabel}</p>
         </div>
 
         <Badge className={`border-0 text-[10px] ${isLive ? "bg-red-600 text-white" : "bg-gray-100 text-gray-700"}`}>
@@ -112,6 +115,8 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
       </div>
 
       <h3 className="text-sm font-semibold text-gray-900">{sessionData.sessionTitle || post.title || "Live session"}</h3>
+
+      {contextLine ? <p className="mt-1 text-xs text-gray-600 line-clamp-1">{contextLine}</p> : null}
 
       <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-gray-600">
         {scheduledAt && (
