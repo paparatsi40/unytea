@@ -328,6 +328,13 @@ const sessionDate = new Date(s.scheduledAt);
                         </Button>
                       </form>
                     )}
+                    {canCreateSessions && (
+                      <Link href={`/dashboard/sessions/${primarySession.id}?src=sessions_hub_manage_primary`}>
+                        <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
+                          Manage
+                        </Button>
+                      </Link>
+                    )}
                   </>
                 ) : (
                   canCreateSessions && (
@@ -347,6 +354,13 @@ const sessionDate = new Date(s.scheduledAt);
             <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
               <p className="text-sm font-semibold text-zinc-100">Session performance</p>
               <div className="flex items-center gap-2 text-xs">
+                {canCreateSessions && (
+                  <Link href="/dashboard/notifications?src=sessions_hub_reminders">
+                    <Button variant="outline" className="h-7 border-zinc-700 px-2 text-[11px] text-zinc-300 hover:bg-zinc-800">
+                      Reminders
+                    </Button>
+                  </Link>
+                )}
                 <span className="text-zinc-500">Window:</span>
                 {([7, 30, 90] as const).map((days) => (
                   <Link
@@ -425,6 +439,11 @@ const sessionDate = new Date(s.scheduledAt);
           )}
 
 
+          <div className="mb-3 flex items-center justify-between">
+            <p className="text-sm font-semibold text-zinc-100">Schedule surface</p>
+            <p className="text-xs text-zinc-500">Upcoming, past, and calendar views</p>
+          </div>
+
           <Tabs defaultValue="upcoming" className="w-full">
 <TabsList className="bg-zinc-900 border-zinc-800 mb-6">
               <TabsTrigger value="upcoming" className="data-[state=active]:bg-zinc-800 text-zinc-300">
@@ -466,56 +485,48 @@ const sessionDate = new Date(s.scheduledAt);
               </div>
 
               {filteredUpcoming.length === 0 ? (
-<div className="rounded-2xl border border-dashed border-zinc-800 bg-zinc-900 p-12 text-center">
-                  <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800">
-                    <Video className="h-8 w-8 text-zinc-400" />
-                  </div>
-                  <h3 className="mb-2 text-lg font-medium text-white">
-                    {filter === "live"
-                      ? "No sessions live right now"
-                      : filter === "today"
-                      ? "No sessions scheduled for today"
-                      : filter === "week"
-                      ? "No sessions scheduled this week"
-                      : "Host your first live session for this community"}
-                  </h3>
-                  <p className="mb-6 text-zinc-400 max-w-sm mx-auto">
-                    {filter === "all"
-                      ? "Run coaching calls, workshops, or Q&A sessions. Members love live interactions!"
-                      : "Try another filter or schedule a new session to keep your weekly cadence."}
-                  </p>
-                  {canCreateSessions && (
-                    <CreateSessionDialog
-                      triggerText={filter === "all" ? "Start your first live session" : "Create a live session"}
-                      className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2.5 rounded-lg font-medium inline-flex items-center gap-2"
-                      communityId={communityId}
-                    />
-)}
-                  <div className="mt-4 flex items-center justify-center gap-2">
-                    {filter !== "all" && (
-                      <Link href={`/dashboard/communities/${communityId}/sessions?filter=all&window=${metricWindow}`}>
-                        <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
-                          Clear filter
-                        </Button>
-                      </Link>
-                    )}
-                  </div>
-                  {filter === "all" && (
-                    <div className="mx-auto mt-4 max-w-xs rounded-lg border border-zinc-800 bg-zinc-950 p-3 text-left">
-                      <p className="text-xs uppercase tracking-wide text-zinc-500">Next live session</p>
-                      <p className="mt-1 text-sm font-semibold text-zinc-100">Community Q&A</p>
-                      <p className="text-xs text-zinc-400">Friday · 6:00 PM</p>
-                      <p className="mt-1 text-xs text-zinc-500">0 attending</p>
-                      <p className="mt-1 text-[11px] text-zinc-300">Members will receive reminders automatically</p>
-                      <p className="mt-1 text-[11px] text-zinc-400">Members can RSVP and join with one click</p>
+<div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-start gap-3">
+                      <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-full bg-zinc-800">
+                        <Video className="h-4.5 w-4.5 text-zinc-400" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-semibold text-white">
+                          {filter === "live"
+                            ? "No sessions live right now"
+                            : filter === "today"
+                            ? "No sessions scheduled for today"
+                            : filter === "week"
+                            ? "No sessions scheduled this week"
+                            : "No upcoming sessions yet"}
+                        </h3>
+                        <p className="mt-1 text-xs text-zinc-400">
+                          {filter === "all"
+                            ? "Schedule your next live touchpoint to keep weekly community cadence."
+                            : "Try another filter or schedule a session for this window."}
+                        </p>
+                      </div>
                     </div>
-                  )}
-                  <div className="mt-2 flex items-center justify-center gap-2 text-sm text-zinc-500">
-                    <Sparkles className="h-4 w-4" />
-                    <span>Communities with weekly sessions grow 3x faster</span>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      {canCreateSessions && (
+                        <CreateSessionDialog
+                          triggerText="Schedule session"
+                          className="bg-purple-600 hover:bg-purple-700 text-white"
+                          communityId={communityId}
+                        />
+                      )}
+                      {filter !== "all" && (
+                        <Link href={`/dashboard/communities/${communityId}/sessions?filter=all&window=${metricWindow}`}>
+                          <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
+                            Clear filter
+                          </Button>
+                        </Link>
+                      )}
+                    </div>
                   </div>
-                  <p className="mt-1 text-xs text-zinc-600">Most communities host their first session within 24 hours.</p>
-</div>
+                </div>
               ) : (
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {filteredUpcoming.map((s) => (
@@ -580,9 +591,11 @@ const sessionDate = new Date(s.scheduledAt);
                           </form>
                         )}
                         {canCreateSessions && (
-                          <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
-                            Edit
-                          </Button>
+                          <Link href={`/dashboard/sessions/${s.id}?src=sessions_hub_manage_card`}>
+                            <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
+                              Manage
+                            </Button>
+                          </Link>
                         )}
                       </div>
 </div>
