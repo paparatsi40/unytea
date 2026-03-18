@@ -383,7 +383,7 @@ const session = await auth();
       {/* Info */}
       <div className="rounded-lg border-l-4 border-primary bg-primary/5 p-4">
         <p className="text-sm text-foreground">
-          <strong>💡 Pro Tip:</strong> Select a specific community from the dropdown above to see detailed analytics including member insights, engagement metrics, and content performance.
+          <strong>💡 Pro Tip:</strong> Use the community selector in the top-right corner ("All Communities") to view detailed analytics per community, including member insights, engagement metrics, and content performance.
         </p>
       </div>
     </div>
