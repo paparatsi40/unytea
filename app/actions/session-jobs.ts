@@ -482,7 +482,7 @@ Share your thoughts below or ask follow-up questions.
 
     // Revalidate feed
     revalidatePath(`/dashboard/communities/${session.community?.slug}/feed`);
-    revalidatePath("/dashboard/feed");
+    revalidatePath("/dashboard/communities");
 
     console.log(`[generateSessionRecap] Created recap post ${post.id} for session ${sessionId}`);
 

@@ -396,7 +396,7 @@ export function CommunitiesClient() {
 
   const quickActions = [
     { label: "Invite members", href: "/dashboard/communities" },
-    { label: "Create post", href: "/dashboard/feed" },
+    { label: "Create post", href: "/dashboard/communities" },
   ];
 
   if (isLoading || loading) {

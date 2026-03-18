@@ -588,7 +588,7 @@ export default function DashboardPage() {
         : [
             { label: "View session", href: nextSession ? `/dashboard/sessions/${nextSession.id}` : "/dashboard/sessions" },
             { label: "Invite members", href: "/dashboard/communities" },
-            { label: "Create post", href: "/dashboard/feed" },
+            { label: "Create post", href: "/dashboard/communities" },
           ];
 
 
@@ -670,7 +670,7 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent className="grid gap-2 min-h-[160px]">
               <Link href="/dashboard/sessions/create"><Button variant="outline" className="justify-between">Schedule 1 session <ArrowRight className="h-4 w-4"/></Button></Link>
-              <Link href="/dashboard/feed"><Button variant="outline" className="justify-between">Ask 1 question in feed <ArrowRight className="h-4 w-4"/></Button></Link>
+              <Link href="/dashboard/communities"><Button variant="outline" className="justify-between">Ask 1 question in feed <ArrowRight className="h-4 w-4"/></Button></Link>
               <Link href="/dashboard/sessions"><Button variant="outline" className="justify-between">Host your session <ArrowRight className="h-4 w-4"/></Button></Link>
               <Link href="/dashboard/recordings"><Button variant="outline" className="justify-between">Share recap <ArrowRight className="h-4 w-4"/></Button></Link>
             </CardContent>
