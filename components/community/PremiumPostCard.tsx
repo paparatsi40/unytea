@@ -16,6 +16,17 @@ type PostAttachment = {
   type: "image" | "document" | "media";
 };
 
+type SessionAnnouncementAttachment = {
+  sessionId?: string;
+  sessionTitle?: string;
+  sessionDescription?: string;
+  scheduledAt?: string;
+  duration?: number;
+  mentorId?: string;
+  mentorName?: string;
+  mentorImage?: string | null;
+};
+
 type Post = {
   id: string;
   title: string | null;
@@ -28,7 +39,7 @@ type Post = {
     name: string | null;
     image: string | null;
   };
-  attachments?: PostAttachment[] | null;
+  attachments?: PostAttachment[] | SessionAnnouncementAttachment | null;
   _count?: {
     comments: number;
     reactions: number;
