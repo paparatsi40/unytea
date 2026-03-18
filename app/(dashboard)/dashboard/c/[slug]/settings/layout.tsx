@@ -3,8 +3,7 @@
 import Link from "next/link";
 import { usePathname, useParams } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Settings, Palette, Users, Shield, Bell, Sliders, Eye, CreditCard } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Settings, Users, Eye, CreditCard, LayoutTemplate } from "lucide-react";
 
 export default function CommunitySettingsLayout({
   children,
@@ -21,56 +20,30 @@ export default function CommunitySettingsLayout({
       href: `/dashboard/c/${slug}/settings`,
       icon: Settings,
       description: "Basic community settings",
-      available: true,
     },
     {
       name: "Appearance",
-      href: `/dashboard/c/${slug}/settings/appearance`,
-      icon: Palette,
-      description: "Customize layout and branding",
-      available: true,
-    },
-    {
-      name: "Landing Page",
       href: `/dashboard/c/${slug}/settings/landing`,
       icon: Eye,
-      description: "Customize public landing page",
-      available: true,
+      description: "Customize layout and branding",
+    },
+    {
+      name: "Section Presets",
+      href: `/dashboard/c/${slug}/settings/sections`,
+      icon: LayoutTemplate,
+      description: "Manage landing sections",
     },
     {
       name: "Members",
       href: `/dashboard/c/${slug}/members`,
       icon: Users,
       description: "Manage roles and permissions",
-      available: true,
     },
     {
       name: "Payments",
       href: `/dashboard/c/${slug}/settings/payments`,
       icon: CreditCard,
       description: "Configure membership pricing",
-      available: true,
-    },
-    {
-      name: "Moderation",
-      href: "#",
-      icon: Shield,
-      description: "Content moderation settings",
-      available: false,
-    },
-    {
-      name: "Notifications",
-      href: "#",
-      icon: Bell,
-      description: "Notification preferences",
-      available: false,
-    },
-    {
-      name: "Advanced",
-      href: `/dashboard/c/${slug}/settings/landing`,
-      icon: Sliders,
-      description: "Open landing builder",
-      available: true,
     },
   ];
 
@@ -92,24 +65,6 @@ export default function CommunitySettingsLayout({
               const Icon = item.icon;
               const isActive = pathname === item.href;
               
-              if (!item.available) {
-                return (
-                  <div
-                    key={item.name}
-                    className="flex items-start gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-400"
-                  >
-                    <Icon className="h-5 w-5 shrink-0 mt-0.5" />
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="font-medium">{item.name}</span>
-                        <Badge variant="secondary" className="text-[10px]">Soon</Badge>
-                      </div>
-                      <div className="text-xs text-gray-400">{item.description}</div>
-                    </div>
-                  </div>
-                );
-              }
-
               return (
                 <Link
                   key={item.href}
