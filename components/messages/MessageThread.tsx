@@ -6,6 +6,7 @@ import { MessageInput } from "./MessageInput";
 import { getConversationMessages, markMessagesAsRead } from "@/app/actions/messages";
 import { ChevronLeft, Loader2, MoreVertical } from "lucide-react";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { usePusher } from "@/hooks/use-pusher";
 
 interface MessageThreadProps {
   conversationId: string;
@@ -29,6 +30,7 @@ export function MessageThread({ conversationId, otherUser, onBack, showBackButto
   const [error, setError] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const { onMessage } = usePusher(conversationId, user?.id || "");
 
   const loadMessages = async () => {
     const result = await getConversationMessages(conversationId);
@@ -61,6 +63,15 @@ export function MessageThread({ conversationId, otherUser, onBack, showBackButto
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
+
+  useEffect(() => {
+    const unsubscribe = onMessage((incomingMessage) => {
+      if (incomingMessage.conversationId !== conversationId) return;
+      loadMessages();
+    });
+
+    return () => unsubscribe();
+  }, [onMessage, conversationId]);
 
   const handleMessageSent = () => {
     loadMessages();

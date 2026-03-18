@@ -9,6 +9,7 @@ interface PusherMessage {
   senderId: string;
   senderName: string;
   timestamp: string;
+  conversationId?: string;
 }
 
 type MessageHandler = (message: PusherMessage) => void;

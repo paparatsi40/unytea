@@ -4,6 +4,7 @@ import { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { Check, CheckCheck, MoreVertical, Trash2, Image as ImageIcon } from "lucide-react";
 import { deleteMessage } from "@/app/actions/messages";
+import { useToast } from "@/hooks/use-toast";
 
 interface MessageBubbleProps {
   message: {
@@ -25,7 +26,9 @@ interface MessageBubbleProps {
 
 export function MessageBubble({ message, isOwnMessage, onDelete }: MessageBubbleProps) {
   const [showMenu, setShowMenu] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const { toast } = useToast();
 
   const attachments = (() => {
     if (!message.attachments) return [];
@@ -40,16 +43,20 @@ export function MessageBubble({ message, isOwnMessage, onDelete }: MessageBubble
   })();
 
   const handleDelete = async () => {
-    if (!confirm("Delete this message?")) return;
-
     setIsDeleting(true);
     const result = await deleteMessage(message.id);
-    
+
     if (result.success) {
       onDelete?.();
+      setShowDeleteConfirm(false);
     } else {
-      alert(result.error || "Failed to delete message");
+      toast({
+        title: "Delete failed",
+        description: result.error || "Failed to delete message",
+        variant: "destructive",
+      });
     }
+
     setIsDeleting(false);
     setShowMenu(false);
   };
@@ -82,7 +89,7 @@ export function MessageBubble({ message, isOwnMessage, onDelete }: MessageBubble
                   <img 
                     src={url} 
                     alt="Attachment" 
-                    className="max-w-xs rounded-lg border border-white/10"
+                    className="max-w-xs rounded-lg border border-gray-200"
                   />
                 ) : (
                   <a 
@@ -92,7 +99,7 @@ export function MessageBubble({ message, isOwnMessage, onDelete }: MessageBubble
                     className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${
                       isOwnMessage 
                         ? "bg-gradient-to-r from-purple-600 to-pink-600 border-white/10 text-white" 
-                        : "bg-white/5 border-white/10 text-white/90"
+                        : "bg-white border-gray-200 text-gray-800"
                     }`}
                   >
                     <ImageIcon className="w-4 h-4" />
@@ -129,14 +136,17 @@ export function MessageBubble({ message, isOwnMessage, onDelete }: MessageBubble
               </button>
 
               {showMenu && (
-                <div className="absolute right-0 mt-1 w-32 bg-zinc-900 border border-white/10 rounded-lg shadow-xl overflow-hidden z-10">
+                <div className="absolute right-0 mt-1 w-36 bg-white border border-gray-200 rounded-lg shadow-xl overflow-hidden z-10">
                   <button
-                    onClick={handleDelete}
+                    onClick={() => {
+                      setShowMenu(false);
+                      setShowDeleteConfirm(true);
+                    }}
                     disabled={isDeleting}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50"
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
                   >
                     <Trash2 className="w-4 h-4" />
-                    {isDeleting ? "Deleting..." : "Delete"}
+                    Delete
                   </button>
                 </div>
               )}
@@ -146,17 +156,40 @@ export function MessageBubble({ message, isOwnMessage, onDelete }: MessageBubble
 
         {/* Timestamp and read receipt */}
         <div className="flex items-center gap-1 mt-1 px-2">
-          <span className="text-xs text-white/40">
+          <span className="text-xs text-gray-500">
             {formatDistanceToNow(new Date(message.createdAt), { addSuffix: true })}
           </span>
           {isOwnMessage && (
             message.isRead ? (
-              <CheckCheck className="w-3 h-3 text-blue-400" />
+              <CheckCheck className="w-3 h-3 text-blue-500" />
             ) : (
-              <Check className="w-3 h-3 text-white/40" />
+              <Check className="w-3 h-3 text-gray-400" />
             )
           )}
         </div>
+
+        {showDeleteConfirm && (
+          <div className="mt-2 w-full rounded-lg border border-red-200 bg-red-50 p-3">
+            <p className="text-xs text-red-700">Delete this message permanently?</p>
+            <div className="mt-2 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setShowDeleteConfirm(false)}
+                className="rounded-md px-2.5 py-1 text-xs font-medium text-gray-700 hover:bg-gray-100"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="rounded-md bg-red-600 px-2.5 py-1 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-60"
+              >
+                {isDeleting ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
