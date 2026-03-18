@@ -108,7 +108,15 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
     .replace(/\s+/g, " ")
     .replace(/[·,:;\-]+\s*$/g, "")
     .trim();
-  const contextLine = normalizedPreview.length > 76 ? `${normalizedPreview.slice(0, 75).trimEnd()}…` : normalizedPreview;
+  const compactPreview = normalizedPreview.length > 76 ? `${normalizedPreview.slice(0, 75).trimEnd()}…` : normalizedPreview;
+
+  const fallbackPreview = hasRecording
+    ? "Session recap and follow-up questions from the recording."
+    : isLive
+      ? "Live now — join the conversation and bring your questions."
+      : "Quick preview of the upcoming session for the community.";
+
+  const contextLine = compactPreview.length >= 24 ? compactPreview : fallbackPreview;
 
   const metaParts: string[] = [];
   if (scheduledAt) {
