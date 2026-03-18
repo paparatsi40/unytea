@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { Loader2, Search, X } from "lucide-react";
 import { ConversationList } from "@/components/messages/ConversationList";
 import { MessageThread } from "@/components/messages/MessageThread";
-import { getOrCreateConversation, searchMessageCandidates } from "@/app/actions/messages";
+import { getOrCreateConversation, getSharedMessageContext, searchMessageCandidates } from "@/app/actions/messages";
 import { useToast } from "@/hooks/use-toast";
 
 interface OtherUser {
@@ -31,6 +32,7 @@ export default function MessagesPage() {
   const [isSearchingCandidates, setIsSearchingCandidates] = useState(false);
   const [composerError, setComposerError] = useState("");
   const [inboxRefreshToken, setInboxRefreshToken] = useState(0);
+  const [sharedCommunities, setSharedCommunities] = useState<Array<{ id: string; name: string; slug: string }>>([]);
   const { toast } = useToast();
 
   const handleSelectConversation = (conversationId: string, otherUser: OtherUser) => {
@@ -123,6 +125,22 @@ export default function MessagesPage() {
     return () => clearTimeout(timeout);
   }, [candidateQuery, isComposerOpen]);
 
+  useEffect(() => {
+    if (!activeOtherUser?.id) {
+      setSharedCommunities([]);
+      return;
+    }
+
+    const loadSharedContext = async () => {
+      const result = await getSharedMessageContext(activeOtherUser.id);
+      if (result.success && result.sharedCommunities) {
+        setSharedCommunities(result.sharedCommunities);
+      }
+    };
+
+    loadSharedContext();
+  }, [activeOtherUser?.id]);
+
   const handleMobileBack = () => {
     setIsMobileThreadOpen(false);
   };
@@ -146,10 +164,11 @@ export default function MessagesPage() {
 
         {activeConversationId && activeOtherUser ? (
           <>
-            <div className={`${isMobileThreadOpen ? "flex" : "hidden"} md:flex flex-1`}>
+            <div className={`${isMobileThreadOpen ? "flex" : "hidden"} md:flex flex-1 min-w-0`}>
               <MessageThread
                 conversationId={activeConversationId}
                 otherUser={activeOtherUser}
+                subtitle={sharedCommunities.length > 0 ? `Shared communities: ${sharedCommunities.length}` : "Direct conversation"}
                 onBack={handleMobileBack}
                 showBackButton
                 onConversationRead={handleConversationRead}
@@ -180,12 +199,41 @@ export default function MessagesPage() {
                     )}
                   </div>
                 </div>
+
+                {activeOtherUser.username ? (
+                  <Link
+                    href={`/u/${activeOtherUser.username}`}
+                    className="mt-3 inline-flex rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
+                  >
+                    View profile
+                  </Link>
+                ) : null}
               </div>
 
               <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
                 <p className="text-xs uppercase tracking-wide text-gray-500">Context</p>
                 <p className="mt-2 text-sm text-gray-900">Direct conversation</p>
                 <p className="mt-1 text-xs text-gray-500">Started from inbox or community members.</p>
+
+                <div className="mt-3 rounded-lg border border-gray-200 bg-white p-3">
+                  <p className="text-[11px] uppercase tracking-wide text-gray-500">Communities in common</p>
+                  {sharedCommunities.length > 0 ? (
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {sharedCommunities.slice(0, 3).map((community) => (
+                        <span key={community.id} className="rounded-full bg-purple-100 px-2 py-0.5 text-[11px] font-medium text-purple-800">
+                          {community.name}
+                        </span>
+                      ))}
+                      {sharedCommunities.length > 3 ? (
+                        <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[11px] text-gray-600">
+                          +{sharedCommunities.length - 3} more
+                        </span>
+                      ) : null}
+                    </div>
+                  ) : (
+                    <p className="mt-2 text-xs text-gray-500">No active shared communities found.</p>
+                  )}
+                </div>
               </div>
 
               <div className="rounded-xl border border-purple-200 bg-purple-50 p-4">

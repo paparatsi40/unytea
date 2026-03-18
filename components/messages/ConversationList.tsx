@@ -224,14 +224,14 @@ export function ConversationList({
                 <button
                   key={conversation.id}
                   onClick={() => onSelectConversation(conversation.id, otherUser)}
-                  className={`w-full p-4 text-left hover:bg-gray-50 transition-colors ${
-                    isActive ? "bg-purple-50/60 border-r-2 border-purple-500" : ""
+                  className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors ${
+                    isActive ? "bg-purple-50/70 border-r-2 border-purple-500" : ""
                   }`}
                 >
                   <div className="flex items-start gap-3">
                     {/* Avatar */}
                     <div className="relative flex-shrink-0">
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold">
+                      <div className="w-11 h-11 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold text-sm">
                         {otherUser.image ? (
                           <img 
                             src={otherUser.image} 
@@ -251,23 +251,23 @@ export function ConversationList({
 
                     {/* Content */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-baseline justify-between gap-2 mb-1">
-                        <h3 className={`font-semibold truncate ${
+                      <div className="flex items-start justify-between gap-2 mb-0.5">
+                        <h3 className={`text-sm font-semibold truncate ${
                           unreadCount > 0 ? "text-gray-900" : "text-gray-800"
                         }`}>
                           {displayName}
                         </h3>
                         {lastMessage && (
-                          <span className="text-xs text-gray-500 flex-shrink-0">
-                            {formatDistanceToNow(new Date(lastMessage.createdAt), { 
-                              addSuffix: false 
+                          <span className="text-[11px] text-gray-500 flex-shrink-0 pt-0.5">
+                            {formatDistanceToNow(new Date(lastMessage.createdAt), {
+                              addSuffix: false,
                             })}
                           </span>
                         )}
                       </div>
 
                       {lastMessage ? (
-                        <p className={`text-sm truncate ${
+                        <p className={`text-[13px] truncate ${
                           unreadCount > 0 ? "text-gray-800 font-medium" : "text-gray-600"
                         }`}>
                           {lastMessage.sender.id === user?.id ? (

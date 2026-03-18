@@ -406,6 +406,59 @@ export async function getUserConversations() {
 /**
  * Search members for starting a new direct conversation
  */
+export async function getSharedMessageContext(otherUserId: string) {
+  try {
+    const currentUserId = await getCurrentUserId();
+    if (!currentUserId) {
+      return { success: false, error: "Not authenticated" };
+    }
+
+    if (!otherUserId || otherUserId === currentUserId) {
+      return { success: true, sharedCommunities: [] };
+    }
+
+    const currentMemberships = await prisma.member.findMany({
+      where: {
+        userId: currentUserId,
+        status: "ACTIVE",
+      },
+      select: { communityId: true },
+    });
+
+    const currentCommunityIds = currentMemberships.map((membership) => membership.communityId);
+    if (currentCommunityIds.length === 0) {
+      return { success: true, sharedCommunities: [] };
+    }
+
+    const sharedMemberships = await prisma.member.findMany({
+      where: {
+        userId: otherUserId,
+        status: "ACTIVE",
+        communityId: { in: currentCommunityIds },
+      },
+      include: {
+        community: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+          },
+        },
+      },
+      take: 5,
+      orderBy: { updatedAt: "desc" },
+    });
+
+    return {
+      success: true,
+      sharedCommunities: sharedMemberships.map((membership) => membership.community),
+    };
+  } catch (error) {
+    console.error("Error getting shared message context:", error);
+    return { success: false, error: "Failed to load shared communities" };
+  }
+}
+
 export async function searchMessageCandidates(query: string) {
   try {
     const currentUserId = await getCurrentUserId();
