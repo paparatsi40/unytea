@@ -143,7 +143,24 @@ export function PremiumPostFeed({
       setComposerMode("default");
 
       if (result.post) {
-        setPosts((prev) => [result.post as Post, ...prev]);
+        const optimisticPost: Post = {
+          id: result.post.id,
+          title: (result.post as any).title ?? (title.trim() || null),
+          content: (result.post as any).content ?? content.trim(),
+          contentType: (result.post as any).contentType ?? contentType,
+          createdAt: (result.post as any).createdAt ? new Date((result.post as any).createdAt) : new Date(),
+          author: {
+            id: user.id,
+            name: user.name || "You",
+            image: user.image || null,
+          },
+          _count: {
+            comments: 0,
+            reactions: 0,
+          },
+        };
+
+        setPosts((prev) => [optimisticPost, ...prev]);
       }
     } catch (error) {
       console.error("❌ Error creating post:", error);
