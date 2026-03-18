@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Search, MessageSquarePlus, Loader2 } from "lucide-react";
 import { getUserConversations } from "@/app/actions/messages";
 import { formatDistanceToNow } from "date-fns";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { useToast } from "@/hooks/use-toast";
 
 interface ConversationListProps {
   activeConversationId?: string;
@@ -27,10 +28,13 @@ export function ConversationList({
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState<"all" | "unread">("all");
   const [isLoading, setIsLoading] = useState(true);
+  const previousUnreadByConversationRef = useRef<Record<string, number>>({});
+  const isFirstLoadRef = useRef(true);
+  const { toast } = useToast();
 
   const loadConversations = async () => {
     const result = await getUserConversations();
-    
+
     if (result.success && result.conversations) {
       setConversations(result.conversations);
       setFilteredConversations(result.conversations);
@@ -40,8 +44,39 @@ export function ConversationList({
         0
       );
       onUnreadTotalChange?.(unreadTotal);
+
+      const nextUnreadByConversation = result.conversations.reduce(
+        (acc: Record<string, number>, conv: any) => {
+          acc[conv.id] = conv._count?.messages || 0;
+          return acc;
+        },
+        {}
+      );
+
+      if (!isFirstLoadRef.current) {
+        result.conversations.forEach((conv: any) => {
+          if (conv.id === activeConversationId) return;
+
+          const previousUnread = previousUnreadByConversationRef.current[conv.id] || 0;
+          const currentUnread = nextUnreadByConversation[conv.id] || 0;
+
+          if (currentUnread > previousUnread) {
+            const otherUser = getOtherUser(conv);
+            const displayName = otherUser.firstName || otherUser.name || otherUser.username || "User";
+            const diff = currentUnread - previousUnread;
+
+            toast({
+              title: `New message from ${displayName}`,
+              description: diff > 1 ? `${diff} new unread messages` : "1 new unread message",
+            });
+          }
+        });
+      }
+
+      previousUnreadByConversationRef.current = nextUnreadByConversation;
+      isFirstLoadRef.current = false;
     }
-    
+
     setIsLoading(false);
   };
 
