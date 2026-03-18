@@ -463,7 +463,7 @@ export default function SectionsManagerPage() {
                             {editingSection === section.id && (
                               <div className="mt-4 rounded-lg border border-border bg-muted/50 p-4">
                                 <p className="text-sm text-muted-foreground">
-                                  Section editor coming soon...
+                                  Use Landing Page Builder to edit section content and styling. Here you can reorder, hide, and remove sections.
                                 </p>
                               </div>
                             )}
@@ -486,7 +486,7 @@ export default function SectionsManagerPage() {
         <ul className="space-y-1 text-sm text-blue-800">
           <li>• Drag sections to reorder them</li>
           <li>• Use the eye icon to show/hide sections</li>
-          <li>• Click the gear icon to edit section content</li>
+          <li>• Use Landing Page Builder for section content editing</li>
           <li>• Don't forget to save your changes!</li>
         </ul>
       </div>
