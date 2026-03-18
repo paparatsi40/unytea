@@ -46,7 +46,7 @@ interface SessionAnnouncementCardProps {
 }
 
 export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) {
-  const sessionData = post.attachments;
+  const sessionData = Array.isArray(post.attachments) ? null : post.attachments;
   const [isHovered, setIsHovered] = useState(false);
   const [rsvpStatus, setRsvpStatus] = useState<"attending" | "interested" | null>(null);
   const [attendingCount, setAttendingCount] = useState(0);
