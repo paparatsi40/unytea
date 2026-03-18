@@ -283,6 +283,11 @@
       "days": "days"
     }
   },
+  "navigation": {
+    "messages": "Messages",
+    "profile": "Profile",
+    "logout": "Log out"
+  },
   "onboarding": {
     "title": "Welcome to Unytea!",
     "subtitle": "Let's get you set up in just a few steps",
