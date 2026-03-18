@@ -1,5 +1,5 @@
 import { auth } from "@/lib/auth";
-import { redirect, notFound, unstable_rethrow } from "next/navigation";
+import { redirect, notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Video, Calendar, Clock, ArrowRight, Sparkles } from "lucide-react";
 import { CreateSessionDialog } from "@/components/sessions/CreateSessionDialog";
@@ -828,7 +828,6 @@ const sessionDate = new Date(s.scheduledAt);
       </div>
     );
   } catch (error) {
-    unstable_rethrow(error);
     console.error("Error in CommunitySessionsPage:", error);
     return (
       <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
