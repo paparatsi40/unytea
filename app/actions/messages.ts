@@ -324,6 +324,55 @@ export async function getUserConversations() {
 }
 
 /**
+ * Search members for starting a new direct conversation
+ */
+export async function searchMessageCandidates(query: string) {
+  try {
+    const currentUserId = await getCurrentUserId();
+    if (!currentUserId) {
+      return { success: false, error: "Not authenticated" };
+    }
+
+    const normalizedQuery = query.trim();
+    if (!normalizedQuery) {
+      return { success: true, users: [] };
+    }
+
+    const users = await prisma.user.findMany({
+      where: {
+        id: { not: currentUserId },
+        memberships: {
+          some: {
+            status: "ACTIVE",
+          },
+        },
+        OR: [
+          { name: { contains: normalizedQuery, mode: "insensitive" } },
+          { username: { contains: normalizedQuery, mode: "insensitive" } },
+          { firstName: { contains: normalizedQuery, mode: "insensitive" } },
+          { lastName: { contains: normalizedQuery, mode: "insensitive" } },
+        ],
+      },
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        firstName: true,
+        lastName: true,
+        image: true,
+      },
+      take: 20,
+      orderBy: { updatedAt: "desc" },
+    });
+
+    return { success: true, users };
+  } catch (error) {
+    console.error("Error searching message candidates:", error);
+    return { success: false, error: "Failed to search users" };
+  }
+}
+
+/**
  * Get messages for a conversation
  */
 export async function getConversationMessages(conversationId: string, cursor?: string) {

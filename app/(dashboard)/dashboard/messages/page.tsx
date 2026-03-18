@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { Loader2, Search, X } from "lucide-react";
 import { ConversationList } from "@/components/messages/ConversationList";
 import { MessageThread } from "@/components/messages/MessageThread";
-import { getOrCreateConversation } from "@/app/actions/messages";
+import { getOrCreateConversation, searchMessageCandidates } from "@/app/actions/messages";
 
 interface OtherUser {
   id: string;
@@ -20,6 +21,12 @@ export default function MessagesPage() {
   const [activeConversationId, setActiveConversationId] = useState<string>();
   const [activeOtherUser, setActiveOtherUser] = useState<OtherUser | null>(null);
   const [bootstrapping, setBootstrapping] = useState(false);
+  const [unreadTotal, setUnreadTotal] = useState(0);
+
+  const [isComposerOpen, setIsComposerOpen] = useState(false);
+  const [candidateQuery, setCandidateQuery] = useState("");
+  const [candidates, setCandidates] = useState<OtherUser[]>([]);
+  const [isSearchingCandidates, setIsSearchingCandidates] = useState(false);
 
   const handleSelectConversation = (conversationId: string, otherUser: OtherUser) => {
     setActiveConversationId(conversationId);
@@ -27,8 +34,23 @@ export default function MessagesPage() {
   };
 
   const handleNewMessage = () => {
-    // TODO: Open modal to select user and create new conversation
-    alert("New message feature coming soon!");
+    setIsComposerOpen(true);
+  };
+
+  const handleStartConversation = async (user: OtherUser) => {
+    const result = await getOrCreateConversation(user.id);
+    if (result.success && result.conversation) {
+      const otherUser =
+        result.conversation.participant1.id === user.id
+          ? result.conversation.participant1
+          : result.conversation.participant2;
+
+      setActiveConversationId(result.conversation.id);
+      setActiveOtherUser(otherUser);
+      setIsComposerOpen(false);
+      setCandidateQuery("");
+      setCandidates([]);
+    }
   };
 
   useEffect(() => {
@@ -57,70 +79,170 @@ export default function MessagesPage() {
     bootstrapConversation();
   }, [searchParams, activeConversationId, bootstrapping]);
 
+  useEffect(() => {
+    if (!isComposerOpen) return;
+
+    const run = async () => {
+      if (!candidateQuery.trim()) {
+        setCandidates([]);
+        return;
+      }
+
+      setIsSearchingCandidates(true);
+      const result = await searchMessageCandidates(candidateQuery);
+      if (result.success && result.users) {
+        setCandidates(result.users);
+      }
+      setIsSearchingCandidates(false);
+    };
+
+    const timeout = setTimeout(run, 250);
+    return () => clearTimeout(timeout);
+  }, [candidateQuery, isComposerOpen]);
+
   return (
-    <div className="h-[calc(100vh-4rem)] flex">
-      <ConversationList
-        activeConversationId={activeConversationId}
-        onSelectConversation={handleSelectConversation}
-        onNewMessage={handleNewMessage}
-      />
+    <>
+      <div className="h-[calc(100vh-4rem)] flex">
+        <ConversationList
+          activeConversationId={activeConversationId}
+          onSelectConversation={handleSelectConversation}
+          onNewMessage={handleNewMessage}
+          onUnreadTotalChange={setUnreadTotal}
+        />
 
-      {activeConversationId && activeOtherUser ? (
-        <>
-          <MessageThread conversationId={activeConversationId} otherUser={activeOtherUser} />
+        {activeConversationId && activeOtherUser ? (
+          <>
+            <MessageThread conversationId={activeConversationId} otherUser={activeOtherUser} />
 
-          <aside className="hidden xl:flex w-80 border-l border-white/10 bg-zinc-950/40 p-5 flex-col gap-5">
-            <div>
-              <p className="text-xs uppercase tracking-wide text-white/40">Contact</p>
-              <div className="mt-3 flex items-center gap-3">
-                <div className="h-11 w-11 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 overflow-hidden flex items-center justify-center text-white font-semibold">
-                  {activeOtherUser.image ? (
-                    <img
-                      src={activeOtherUser.image}
-                      alt={activeOtherUser.name || "User"}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    (activeOtherUser.firstName || activeOtherUser.name || "U").charAt(0).toUpperCase()
-                  )}
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-white">
-                    {activeOtherUser.firstName || activeOtherUser.name || "User"}
-                  </p>
-                  {activeOtherUser.username && (
-                    <p className="text-xs text-white/50">@{activeOtherUser.username}</p>
-                  )}
+            <aside className="hidden xl:flex w-80 border-l border-white/10 bg-zinc-950/40 p-5 flex-col gap-5">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-white/40">Contact</p>
+                <div className="mt-3 flex items-center gap-3">
+                  <div className="h-11 w-11 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 overflow-hidden flex items-center justify-center text-white font-semibold">
+                    {activeOtherUser.image ? (
+                      <img
+                        src={activeOtherUser.image}
+                        alt={activeOtherUser.name || "User"}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      (activeOtherUser.firstName || activeOtherUser.name || "U").charAt(0).toUpperCase()
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-white">
+                      {activeOtherUser.firstName || activeOtherUser.name || "User"}
+                    </p>
+                    {activeOtherUser.username && (
+                      <p className="text-xs text-white/50">@{activeOtherUser.username}</p>
+                    )}
+                  </div>
                 </div>
               </div>
+
+              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                <p className="text-xs uppercase tracking-wide text-white/40">Context</p>
+                <p className="mt-2 text-sm text-white/80">Direct conversation</p>
+                <p className="mt-1 text-xs text-white/50">Started from inbox or community members.</p>
+              </div>
+
+              <div className="rounded-xl border border-purple-500/30 bg-purple-500/10 p-4">
+                <p className="text-xs uppercase tracking-wide text-purple-200/80">Unread</p>
+                <p className="mt-2 text-2xl font-bold text-white">{unreadTotal}</p>
+                <p className="text-xs text-white/60">total unread messages in your inbox</p>
+              </div>
+            </aside>
+          </>
+        ) : (
+          <div className="flex-1 flex flex-col items-center justify-center bg-zinc-950">
+            <div className="text-center p-8">
+              <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center mb-6">
+                <span className="text-5xl">💬</span>
+              </div>
+              <h2 className="text-2xl font-bold text-white mb-2">Your Messages</h2>
+              <p className="text-white/60 max-w-md mb-6">
+                Select a conversation from the left to start chatting, or click the + button to start a new conversation.
+              </p>
+              <button
+                onClick={handleNewMessage}
+                className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-purple-500/20 transition-all"
+              >
+                Start New Conversation
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {isComposerOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <div className="w-full max-w-lg rounded-2xl border border-white/10 bg-zinc-900 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-white/10 p-4">
+              <h3 className="text-lg font-semibold text-white">Start new conversation</h3>
+              <button
+                onClick={() => setIsComposerOpen(false)}
+                className="rounded-md p-1.5 text-white/60 hover:bg-white/10 hover:text-white"
+              >
+                <X className="h-4 w-4" />
+              </button>
             </div>
 
-            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-              <p className="text-xs uppercase tracking-wide text-white/40">Context</p>
-              <p className="mt-2 text-sm text-white/80">Direct conversation</p>
-              <p className="mt-1 text-xs text-white/50">Started from inbox or community members.</p>
+            <div className="p-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
+                <input
+                  value={candidateQuery}
+                  onChange={(e) => setCandidateQuery(e.target.value)}
+                  placeholder="Search member by name or username"
+                  className="w-full rounded-xl border border-white/10 bg-white/5 py-2.5 pl-10 pr-3 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                />
+              </div>
+
+              <div className="mt-4 max-h-80 overflow-y-auto space-y-2">
+                {isSearchingCandidates ? (
+                  <div className="flex items-center justify-center py-8 text-white/60">
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  </div>
+                ) : candidates.length === 0 ? (
+                  <p className="py-8 text-center text-sm text-white/50">Type to search members.</p>
+                ) : (
+                  candidates.map((candidate) => {
+                    const displayName =
+                      candidate.firstName || candidate.name || candidate.username || "User";
+                    return (
+                      <button
+                        key={candidate.id}
+                        onClick={() => handleStartConversation(candidate)}
+                        className="w-full rounded-xl border border-white/10 bg-white/[0.03] p-3 text-left hover:bg-white/[0.06] transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-full overflow-hidden bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-sm font-semibold">
+                            {candidate.image ? (
+                              <img
+                                src={candidate.image}
+                                alt={displayName}
+                                className="h-full w-full object-cover"
+                              />
+                            ) : (
+                              displayName.charAt(0).toUpperCase()
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-medium text-white">{displayName}</p>
+                            {candidate.username && (
+                              <p className="truncate text-xs text-white/50">@{candidate.username}</p>
+                            )}
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })
+                )}
+              </div>
             </div>
-          </aside>
-        </>
-      ) : (
-        <div className="flex-1 flex flex-col items-center justify-center bg-zinc-950">
-          <div className="text-center p-8">
-            <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center mb-6">
-              <span className="text-5xl">💬</span>
-            </div>
-            <h2 className="text-2xl font-bold text-white mb-2">Your Messages</h2>
-            <p className="text-white/60 max-w-md mb-6">
-              Select a conversation from the left to start chatting, or click the + button to start a new conversation.
-            </p>
-            <button
-              onClick={handleNewMessage}
-              className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-purple-500/20 transition-all"
-            >
-              Start New Conversation
-            </button>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

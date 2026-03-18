@@ -10,12 +10,14 @@ interface ConversationListProps {
   activeConversationId?: string;
   onSelectConversation: (conversationId: string, otherUser: any) => void;
   onNewMessage: () => void;
+  onUnreadTotalChange?: (count: number) => void;
 }
 
 export function ConversationList({ 
   activeConversationId, 
   onSelectConversation,
-  onNewMessage 
+  onNewMessage,
+  onUnreadTotalChange,
 }: ConversationListProps) {
   const { user } = useCurrentUser();
   const [conversations, setConversations] = useState<any[]>([]);
@@ -30,6 +32,12 @@ export function ConversationList({
     if (result.success && result.conversations) {
       setConversations(result.conversations);
       setFilteredConversations(result.conversations);
+
+      const unreadTotal = result.conversations.reduce(
+        (sum: number, conv: any) => sum + (conv._count?.messages || 0),
+        0
+      );
+      onUnreadTotalChange?.(unreadTotal);
     }
     
     setIsLoading(false);
