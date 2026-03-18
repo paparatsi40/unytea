@@ -32,7 +32,7 @@ export default async function CommunityFeedPage({
           userId,
           status: "ACTIVE",
         },
-        select: { id: true },
+        select: { id: true, role: true },
       },
     },
   });
@@ -135,6 +135,8 @@ export default async function CommunityFeedPage({
       commentCount: post._count.comments,
     }));
 
+  const canModeratePosts = ["OWNER", "ADMIN", "MODERATOR"].includes(community.members[0]?.role ?? "");
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 px-4 py-6 lg:grid-cols-12">
@@ -144,6 +146,7 @@ export default async function CommunityFeedPage({
             communityId={community.id}
             upcomingSession={mappedUpcomingSession}
             hotTopics={mappedHotTopics}
+            canModeratePosts={canModeratePosts}
           />
         </div>
 

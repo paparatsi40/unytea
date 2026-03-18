@@ -29,6 +29,12 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { useUploadThing } from "@/lib/uploadthing";
 
+type PostAttachment = {
+  url: string;
+  name: string;
+  type: "image" | "document" | "media";
+};
+
 type Post = {
   id: string;
   title: string | null;
@@ -41,7 +47,7 @@ type Post = {
     name: string | null;
     image: string | null;
   };
-  attachments?: any;
+  attachments?: PostAttachment[] | null;
   _count?: {
     comments: number;
     reactions: number;
@@ -67,11 +73,13 @@ export function PremiumPostFeed({
   communityId,
   upcomingSession,
   hotTopics,
+  canModeratePosts = false,
 }: { 
   posts: Post[]; 
   communityId: string;
   upcomingSession?: UpcomingSession | null;
   hotTopics?: { id: string; title: string; commentCount: number }[];
+  canModeratePosts?: boolean;
 }) {
   const { user } = useCurrentUser();
   const [posts, setPosts] = useState<Post[]>(initialPosts);
@@ -82,7 +90,7 @@ export function PremiumPostFeed({
   const [focused, setFocused] = useState(false);
   const [composerMode, setComposerMode] = useState<ComposerMode>("default");
   const [activeFilter, setActiveFilter] = useState<FeedFilter>("all");
-  const [attachments, setAttachments] = useState<{ url: string; name: string; type: "image" | "document" | "media" }[]>([]);
+  const [attachments, setAttachments] = useState<PostAttachment[]>([]);
   const [isUploadingAttachment, setIsUploadingAttachment] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { startUpload: startImageUpload } = useUploadThing("imageUploader");
@@ -104,7 +112,7 @@ export function PremiumPostFeed({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || !content.trim() || !communityId) return;
+    if (!user || (!content.trim() && attachments.length === 0) || !communityId) return;
 
     setIsSubmitting(true);
 
@@ -151,13 +159,18 @@ export function PremiumPostFeed({
       setAttachments([]);
 
       if (result.post) {
+        const postFromAction = result.post as Partial<Post> & { id: string; createdAt?: string | Date };
+
         const optimisticPost: Post = {
-          id: result.post.id,
-          title: (result.post as any).title ?? (title.trim() || null),
-          content: (result.post as any).content ?? (content.trim() || (attachments.length > 0 ? "Shared an attachment" : "")),
-          contentType: (result.post as any).contentType ?? contentType,
-          attachments: (result.post as any).attachments ?? attachments,
-          createdAt: (result.post as any).createdAt ? new Date((result.post as any).createdAt) : new Date(),
+          id: postFromAction.id,
+          title: postFromAction.title ?? (title.trim() || null),
+          content:
+            postFromAction.content ??
+            (content.trim() || (attachments.length > 0 ? "Shared an attachment" : "")),
+          contentType: postFromAction.contentType ?? contentType,
+          attachments: (postFromAction.attachments as PostAttachment[] | null | undefined) ?? attachments,
+          isPinned: Boolean(postFromAction.isPinned),
+          createdAt: postFromAction.createdAt ? new Date(postFromAction.createdAt) : new Date(),
           author: {
             id: user.id,
             name: user.name || "You",
@@ -193,7 +206,7 @@ export function PremiumPostFeed({
 
     try {
       setIsUploadingAttachment(true);
-      const uploadedAttachments: { url: string; name: string; type: "image" | "document" | "media" }[] = [];
+      const uploadedAttachments: PostAttachment[] = [];
 
       for (const file of files) {
         const isImage = file.type.startsWith("image/");
@@ -661,7 +674,7 @@ export function PremiumPostFeed({
         <div className="space-y-4">
           {filteredPosts.map((post) => (
             <div key={post.id} id={`post-${post.id}`}>
-              <PremiumPostCard post={post} />
+              <PremiumPostCard post={post} canModeratePost={canModeratePosts} />
             </div>
           ))}
         </div>

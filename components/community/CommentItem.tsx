@@ -6,6 +6,7 @@ import { MessageCircle, Heart, Trash2, Clock } from "lucide-react";
 import { CommentForm } from "./CommentForm";
 import { deleteComment } from "@/app/actions/comments";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { toast } from "sonner";
 
 type Comment = {
   id: string;
@@ -39,25 +40,24 @@ export function CommentItem({
   const { user } = useCurrentUser();
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const authorName = comment.author.name || "Anonymous";
   const timeAgo = formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true });
   const isAuthor = user?.id === comment.author.id;
 
   const handleDelete = async () => {
-    if (!confirm("Are you sure you want to delete this comment?")) {
-      return;
-    }
-
     setIsDeleting(true);
     const result = await deleteComment(comment.id);
 
     if (result.success) {
+      setConfirmDelete(false);
       onReplySuccess?.();
-    } else {
-      alert(result.error || "Failed to delete comment");
-      setIsDeleting(false);
+      return;
     }
+
+    toast.error(result.error || "Failed to delete comment");
+    setIsDeleting(false);
   };
 
   const handleReplySuccess = () => {
@@ -98,7 +98,7 @@ export function CommentItem({
             </span>
             {isAuthor && (
               <button
-                onClick={handleDelete}
+                onClick={() => setConfirmDelete((prev) => !prev)}
                 disabled={isDeleting}
                 className="ml-auto opacity-0 transition-opacity group-hover:opacity-100"
               >
@@ -131,6 +131,27 @@ export function CommentItem({
               </button>
             )}
           </div>
+
+          {confirmDelete && isAuthor && (
+            <div className="mt-2 flex items-center justify-between gap-2 rounded-lg border border-red-200 bg-red-50 px-2.5 py-2">
+              <p className="text-[11px] font-medium text-red-700">Delete this comment?</p>
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => setConfirmDelete(false)}
+                  className="rounded-md px-2 py-1 text-[11px] font-medium text-gray-600 hover:bg-white"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="rounded-md bg-red-600 px-2.5 py-1 text-[11px] font-medium text-white hover:bg-red-700 disabled:opacity-60"
+                >
+                  {isDeleting ? "Deleting..." : "Delete"}
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Reply Form */}
           {showReplyForm && !isReply && (

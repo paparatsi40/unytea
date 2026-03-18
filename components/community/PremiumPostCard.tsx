@@ -5,10 +5,16 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 import { PostReactions } from "@/components/community/PostReactions";
 import { CommentSection } from "@/components/community/CommentSection";
 import { SessionAnnouncementCard } from "@/components/community/SessionAnnouncementCard";
-import { deletePost, updatePost } from "@/app/actions/posts";
+import { deletePost, togglePostPin, updatePost } from "@/app/actions/posts";
 import { MessageCircle, Share2, MoreHorizontal, Clock, Edit2, Trash2, X, Check, Pin } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
+
+type PostAttachment = {
+  url: string;
+  name: string;
+  type: "image" | "document" | "media";
+};
 
 type Post = {
   id: string;
@@ -22,14 +28,14 @@ type Post = {
     name: string | null;
     image: string | null;
   };
-  attachments?: any;
+  attachments?: PostAttachment[] | null;
   _count?: {
     comments: number;
     reactions: number;
   };
 };
 
-export function PremiumPostCard({ post }: { post: Post }) {
+export function PremiumPostCard({ post, canModeratePost = false }: { post: Post; canModeratePost?: boolean }) {
   const { user } = useCurrentUser();
   
   // If this is a session announcement, render the special card
@@ -46,6 +52,9 @@ export function PremiumPostCard({ post }: { post: Post }) {
   const [isSaving, setIsSaving] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [isPinned, setIsPinned] = useState(Boolean(post.isPinned));
+  const [isPinToggling, setIsPinToggling] = useState(false);
+  const [commentCount, setCommentCount] = useState(post._count?.comments ?? 0);
   
   const authorName = post.author.name || "Anonymous";
   const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
@@ -112,6 +121,24 @@ export function PremiumPostCard({ post }: { post: Post }) {
     }
   };
 
+  const handleTogglePin = async () => {
+    if (isPinToggling) return;
+    setIsPinToggling(true);
+
+    const result = await togglePostPin(post.id);
+
+    if (!result.success) {
+      toast.error(result.error || "Failed to update pin state");
+      setIsPinToggling(false);
+      return;
+    }
+
+    setIsPinned(Boolean(result.isPinned));
+    setShowMenu(false);
+    toast.success(result.isPinned ? "Post pinned" : "Post unpinned");
+    setIsPinToggling(false);
+  };
+
   if (isDeleting) {
     return (
       <article className="rounded-xl border border-gray-100 bg-gray-50 p-6 opacity-50">
@@ -122,7 +149,7 @@ export function PremiumPostCard({ post }: { post: Post }) {
 
   return (
     <article className="group/card rounded-xl border border-gray-100 bg-white p-6 shadow-sm transition-all hover:border-gray-200 hover:shadow-md">
-      {post.isPinned && (
+      {isPinned && (
         <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-purple-50 px-2.5 py-1 text-[11px] font-semibold text-purple-700">
           <Pin className="h-3.5 w-3.5" />
           Pinned
@@ -159,8 +186,8 @@ export function PremiumPostCard({ post }: { post: Post }) {
           </div>
         </div>
 
-        {/* Menu Button - Only show for author */}
-        {isAuthor && (
+        {/* Menu Button - show for author or moderators */}
+        {(isAuthor || canModeratePost) && (
           <div className="relative">
             <button
               onClick={() => setShowMenu(!showMenu)}
@@ -177,26 +204,40 @@ export function PremiumPostCard({ post }: { post: Post }) {
                   onClick={() => setShowMenu(false)}
                 />
                 <div className="absolute right-0 top-full z-20 mt-1 w-48 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg animate-in fade-in slide-in-from-top-2 duration-200">
-                  <button
-                    onClick={() => {
-                      setIsEditing(true);
-                      setShowMenu(false);
-                    }}
-                    className="flex w-full items-center space-x-2 px-4 py-2.5 text-left text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
-                  >
-                    <Edit2 className="h-4 w-4" />
-                    <span>Edit post</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      setConfirmDelete(true);
-                      setShowMenu(false);
-                    }}
-                    className="flex w-full items-center space-x-2 px-4 py-2.5 text-left text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    <span>Delete post</span>
-                  </button>
+                  {canModeratePost && (
+                    <button
+                      onClick={handleTogglePin}
+                      disabled={isPinToggling}
+                      className="flex w-full items-center space-x-2 px-4 py-2.5 text-left text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-60"
+                    >
+                      <Pin className="h-4 w-4" />
+                      <span>{isPinToggling ? "Updating..." : isPinned ? "Unpin post" : "Pin post"}</span>
+                    </button>
+                  )}
+                  {isAuthor && (
+                    <>
+                      <button
+                        onClick={() => {
+                          setIsEditing(true);
+                          setShowMenu(false);
+                        }}
+                        className="flex w-full items-center space-x-2 px-4 py-2.5 text-left text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                      >
+                        <Edit2 className="h-4 w-4" />
+                        <span>Edit post</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          setConfirmDelete(true);
+                          setShowMenu(false);
+                        }}
+                        className="flex w-full items-center space-x-2 px-4 py-2.5 text-left text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        <span>Delete post</span>
+                      </button>
+                    </>
+                  )}
                 </div>
               </>
             )}
@@ -298,10 +339,10 @@ export function PremiumPostCard({ post }: { post: Post }) {
               <span>{post._count.reactions} reactions</span>
             </div>
           )}
-          {post._count.comments > 0 && (
+          {commentCount > 0 && (
             <div className="flex items-center space-x-1.5 text-xs text-gray-500">
               <MessageCircle className="h-4 w-4" />
-              <span>{post._count.comments} comments</span>
+              <span>{commentCount} comments</span>
             </div>
           )}
         </div>
@@ -325,7 +366,7 @@ export function PremiumPostCard({ post }: { post: Post }) {
             }`}
           >
             <MessageCircle className="h-4 w-4" />
-            <span>{post._count?.comments || 0}</span>
+            <span>{commentCount}</span>
           </button>
 
           {/* Share Button */}
@@ -363,7 +404,7 @@ export function PremiumPostCard({ post }: { post: Post }) {
       {/* Comment Section */}
       {showComments && !isEditing && (
         <div className="mt-6 border-t border-gray-50 pt-6">
-          <CommentSection postId={post.id} />
+          <CommentSection postId={post.id} onCountChange={setCommentCount} />
         </div>
       )}
     </article>

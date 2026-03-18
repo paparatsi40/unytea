@@ -25,9 +25,10 @@ type Comment = {
 type CommentSectionProps = {
   postId: string;
   initialComments?: Comment[];
+  onCountChange?: (count: number) => void;
 };
 
-export function CommentSection({ postId, initialComments = [] }: CommentSectionProps) {
+export function CommentSection({ postId, initialComments = [], onCountChange }: CommentSectionProps) {
   const [comments, setComments] = useState<Comment[]>(initialComments);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -57,6 +58,10 @@ export function CommentSection({ postId, initialComments = [] }: CommentSectionP
   const handleCommentSuccess = () => {
     loadComments(); // Reload comments after new comment
   };
+
+  useEffect(() => {
+    onCountChange?.(comments.length);
+  }, [comments.length, onCountChange]);
 
   return (
     <div className="space-y-6">
