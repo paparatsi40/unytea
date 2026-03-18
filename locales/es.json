@@ -11,6 +11,12 @@
     "edit": "Editar",
     "close": "Cerrar"
   },
+  "sectionBuilder": {
+    "sections": "Secciones",
+    "properties": "Propiedades",
+    "selectSection": "Selecciona una sección para editar su configuración",
+    "unknownSection": "Sección desconocida"
+  },
   "auth": {
     "welcomeBack": "Bienvenido de Vuelta",
     "signInSubtitle": "Inicia sesión en tu cuenta de Unytea",

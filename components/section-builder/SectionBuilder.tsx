@@ -166,7 +166,7 @@ export function SectionBuilder({
   return (
     <div className="flex h-[800px] gap-4">
       {/* LEFT: Palette */}
-      <aside className="w-72 shrink-0 overflow-y-auto rounded-2xl border border-border bg-card p-4">
+      <aside className="w-80 shrink-0 overflow-y-auto rounded-2xl border border-border bg-card p-4">
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-sm font-bold">{t("sectionBuilder.sections")}</h3>
           <div className="flex gap-2">

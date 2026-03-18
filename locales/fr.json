@@ -1,4 +1,10 @@
 {
+  "sectionBuilder": {
+    "sections": "Sections",
+    "properties": "Propriétés",
+    "selectSection": "Sélectionnez une section pour modifier ses paramètres",
+    "unknownSection": "Section inconnue"
+  },
   "auth": {
     "welcomeBack": "Bon Retour",
     "signInSubtitle": "Connectez-vous à votre compte Unytea",
