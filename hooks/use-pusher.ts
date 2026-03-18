@@ -123,13 +123,17 @@ export function usePusher(channelId: string, userId: string) {
   // Subscribe to messages
   const onMessage = useCallback((handler: MessageHandler) => {
     messageHandlersRef.current.add(handler);
-    return () => messageHandlersRef.current.delete(handler);
+    return () => {
+      messageHandlersRef.current.delete(handler);
+    };
   }, []);
 
   // Subscribe to connection state changes
   const onConnectionChange = useCallback((handler: ConnectionHandler) => {
     connectionHandlersRef.current.add(handler);
-    return () => connectionHandlersRef.current.delete(handler);
+    return () => {
+      connectionHandlersRef.current.delete(handler);
+    };
   }, []);
 
   // Send typing indicator
