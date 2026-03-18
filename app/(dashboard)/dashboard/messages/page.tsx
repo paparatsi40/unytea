@@ -146,10 +146,10 @@ export default function MessagesPage() {
                 <p className="mt-1 text-xs text-gray-500">Started from inbox or community members.</p>
               </div>
 
-              <div className="rounded-xl border border-purple-500/30 bg-purple-500/10 p-4">
-                <p className="text-xs uppercase tracking-wide text-purple-200/80">Unread</p>
-                <p className="mt-2 text-2xl font-bold text-white">{unreadTotal}</p>
-                <p className="text-xs text-white/60">total unread messages in your inbox</p>
+              <div className="rounded-xl border border-purple-200 bg-purple-50 p-4">
+                <p className="text-xs uppercase tracking-wide text-purple-700">Unread</p>
+                <p className="mt-2 text-2xl font-bold text-purple-900">{unreadTotal}</p>
+                <p className="text-xs text-purple-700/80">total unread messages in your inbox</p>
               </div>
             </aside>
           </>
