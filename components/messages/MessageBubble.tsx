@@ -27,7 +27,17 @@ export function MessageBubble({ message, isOwnMessage, onDelete }: MessageBubble
   const [showMenu, setShowMenu] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const attachments = message.attachments ? JSON.parse(message.attachments) : [];
+  const attachments = (() => {
+    if (!message.attachments) return [];
+
+    try {
+      return typeof message.attachments === "string"
+        ? JSON.parse(message.attachments)
+        : message.attachments;
+    } catch {
+      return [];
+    }
+  })();
 
   const handleDelete = async () => {
     if (!confirm("Delete this message?")) return;
@@ -98,9 +108,15 @@ export function MessageBubble({ message, isOwnMessage, onDelete }: MessageBubble
         <div className={`relative px-4 py-2 rounded-2xl ${
           isOwnMessage 
             ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-tr-none" 
-            : "bg-white/5 backdrop-blur-sm text-white/90 rounded-tl-none"
+            : "bg-white border border-gray-200 text-gray-900 rounded-tl-none"
         }`}>
-          <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
+          {message.content ? (
+            <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
+          ) : (
+            <p className={`text-xs italic ${isOwnMessage ? "text-white/80" : "text-gray-500"}`}>
+              Attachment
+            </p>
+          )}
           
           {/* Actions menu (only for own messages) */}
           {isOwnMessage && (
