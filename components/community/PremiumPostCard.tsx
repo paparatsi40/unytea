@@ -6,7 +6,7 @@ import { PostReactions } from "@/components/community/PostReactions";
 import { CommentSection } from "@/components/community/CommentSection";
 import { SessionAnnouncementCard } from "@/components/community/SessionAnnouncementCard";
 import { deletePost, updatePost } from "@/app/actions/posts";
-import { MessageCircle, Share2, MoreHorizontal, Clock, Edit2, Trash2, X, Check } from "lucide-react";
+import { MessageCircle, Share2, MoreHorizontal, Clock, Edit2, Trash2, X, Check, Pin } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 
@@ -15,6 +15,7 @@ type Post = {
   title: string | null;
   content: string;
   contentType?: string;
+  isPinned?: boolean;
   createdAt: Date;
   author: {
     id: string;
@@ -130,6 +131,13 @@ export function PremiumPostCard({ post }: { post: Post }) {
 
   return (
     <article className="group/card rounded-xl border border-gray-100 bg-white p-6 shadow-sm transition-all hover:border-gray-200 hover:shadow-md">
+      {post.isPinned && (
+        <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-purple-50 px-2.5 py-1 text-[11px] font-semibold text-purple-700">
+          <Pin className="h-3.5 w-3.5" />
+          Pinned
+        </div>
+      )}
+
       {/* Author Header */}
       <div className="mb-4 flex items-start justify-between">
         <div className="flex items-center space-x-3">

@@ -32,6 +32,7 @@ type Post = {
   title: string | null;
   content: string;
   contentType?: string;
+  isPinned?: boolean;
   createdAt: Date;
   author: {
     id: string;
