@@ -13,14 +13,15 @@ export const metadata = {
 export default async function AnalyticsPage({
   searchParams,
 }: {
-  searchParams?: { communityId?: string };
+  searchParams: Promise<{ communityId?: string }>;
 }) {
 const session = await auth();
   if (!session?.user?.id) {
     redirect("/auth/signin");
   }
 
-  const selectedCommunityId = searchParams?.communityId;
+  const resolvedSearchParams = await searchParams;
+  const selectedCommunityId = resolvedSearchParams?.communityId;
 
   const [result, retentionResult, healthResult, northStarResult] = await Promise.all([
     getOverviewAnalytics(),
