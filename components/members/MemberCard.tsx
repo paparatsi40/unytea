@@ -7,6 +7,7 @@ import { formatDistanceToNow } from "date-fns";
 
 type Member = {
   id: string;
+  communityId?: string;
   user: {
     id: string;
     name: string | null;
@@ -149,7 +150,7 @@ export function MemberCard({ member }: { member: Member }) {
         {/* Actions */}
         <div className="flex items-center space-x-2">
           <Link
-            href={`/dashboard/messages?user=${member.user.id}`}
+            href={`/dashboard/messages?user=${member.user.id}${member.communityId ? `&community=${member.communityId}` : ""}`}
             className="flex flex-1 items-center justify-center space-x-1 rounded-lg bg-purple-50 px-3 py-2 text-sm font-medium text-purple-600 transition-colors hover:bg-purple-100"
           >
             <MessageCircle className="h-4 w-4" />

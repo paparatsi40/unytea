@@ -8,7 +8,7 @@ import { checkAndUnlockAchievements } from "./achievements";
 /**
  * Get or create a conversation between two users
  */
-export async function getOrCreateConversation(otherUserId: string) {
+export async function getOrCreateConversation(otherUserId: string, _communityId?: string) {
   try {
     const currentUserId = await getCurrentUserId();
     if (!currentUserId) {

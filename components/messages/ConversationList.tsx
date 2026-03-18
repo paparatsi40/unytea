@@ -21,6 +21,7 @@ export function ConversationList({
   const [conversations, setConversations] = useState<any[]>([]);
   const [filteredConversations, setFilteredConversations] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [filter, setFilter] = useState<"all" | "unread">("all");
   const [isLoading, setIsLoading] = useState(true);
 
   const loadConversations = async () => {
@@ -43,17 +44,30 @@ export function ConversationList({
   }, []);
 
   useEffect(() => {
-    if (searchQuery.trim()) {
-      const filtered = conversations.filter((conv) => {
-        const otherUser = getOtherUser(conv);
-        const name = otherUser.firstName || otherUser.name || otherUser.username || "";
-        return name.toLowerCase().includes(searchQuery.toLowerCase());
-      });
-      setFilteredConversations(filtered);
-    } else {
-      setFilteredConversations(conversations);
+    const query = searchQuery.trim().toLowerCase();
+
+    let next = [...conversations];
+
+    if (filter === "unread") {
+      next = next.filter((conv) => getUnreadCount(conv) > 0);
     }
-  }, [searchQuery, conversations]);
+
+    if (query) {
+      next = next.filter((conv) => {
+        const otherUser = getOtherUser(conv);
+        const fullName = `${otherUser.firstName || ""} ${otherUser.lastName || ""}`.trim();
+        const name = (otherUser.name || "").toLowerCase();
+        const username = (otherUser.username || "").toLowerCase();
+        return (
+          fullName.toLowerCase().includes(query) ||
+          name.includes(query) ||
+          username.includes(query)
+        );
+      });
+    }
+
+    setFilteredConversations(next);
+  }, [searchQuery, conversations, filter]);
 
   const getOtherUser = (conversation: any) => {
     return conversation.participant1.id === user?.id
@@ -89,11 +103,36 @@ export function ConversationList({
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
           <input
             type="text"
-            placeholder="Search conversations..."
+            placeholder="Search by name or username..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-white/5 border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50"
           />
+        </div>
+
+        <div className="mt-3 flex gap-2">
+          <button
+            type="button"
+            onClick={() => setFilter("all")}
+            className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+              filter === "all"
+                ? "bg-purple-600 text-white"
+                : "bg-white/5 text-white/70 hover:bg-white/10"
+            }`}
+          >
+            All
+          </button>
+          <button
+            type="button"
+            onClick={() => setFilter("unread")}
+            className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+              filter === "unread"
+                ? "bg-purple-600 text-white"
+                : "bg-white/5 text-white/70 hover:bg-white/10"
+            }`}
+          >
+            Unread
+          </button>
         </div>
       </div>
 
