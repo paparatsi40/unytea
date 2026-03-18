@@ -53,28 +53,28 @@ export function PremiumPostCard({ post }: { post: Post }) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   
   const authorName = post.author.name || "Anonymous";
   const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
   const isAuthor = user?.id === post.author.id;
 
   const handleDelete = async () => {
-    if (!confirm("Are you sure you want to delete this post?")) return;
-    
     setIsDeleting(true);
     const result = await deletePost(post.id);
-    
+
     if (result.success) {
       // Post will be removed by revalidation
-    } else {
-      alert(result.error || "Failed to delete post");
-      setIsDeleting(false);
+      return;
     }
+
+    toast.error(result.error || "Failed to delete post");
+    setIsDeleting(false);
   };
 
   const handleSave = async () => {
     if (!editContent.trim()) {
-      alert("Content cannot be empty");
+      toast.error("Content cannot be empty");
       return;
     }
 
@@ -88,10 +88,12 @@ export function PremiumPostCard({ post }: { post: Post }) {
     if (result.success) {
       setIsEditing(false);
       setShowMenu(false);
-      // Refresh will happen via revalidation
-    } else {
-      alert(result.error || "Failed to update post");
+      setConfirmDelete(false);
+      toast.success("Post updated");
+      return;
     }
+
+    toast.error(result.error || "Failed to update post");
     setIsSaving(false);
   };
 
@@ -100,6 +102,7 @@ export function PremiumPostCard({ post }: { post: Post }) {
     setEditContent(post.content);
     setIsEditing(false);
     setShowMenu(false);
+    setConfirmDelete(false);
   };
 
   const handleShare = async () => {
@@ -186,7 +189,10 @@ export function PremiumPostCard({ post }: { post: Post }) {
                     <span>Edit post</span>
                   </button>
                   <button
-                    onClick={handleDelete}
+                    onClick={() => {
+                      setConfirmDelete(true);
+                      setShowMenu(false);
+                    }}
                     className="flex w-full items-center space-x-2 px-4 py-2.5 text-left text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -303,6 +309,26 @@ export function PremiumPostCard({ post }: { post: Post }) {
             <Share2 className="h-4 w-4" />
             <span>{isSharing ? "Copying..." : "Share"}</span>
           </button>
+        </div>
+      )}
+
+      {confirmDelete && !isEditing && (
+        <div className="mt-4 flex items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2">
+          <p className="text-xs font-medium text-red-700">Delete this post permanently?</p>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setConfirmDelete(false)}
+              className="rounded-md px-2 py-1 text-xs font-medium text-gray-600 hover:bg-white"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleDelete}
+              className="rounded-md bg-red-600 px-2.5 py-1 text-xs font-medium text-white hover:bg-red-700"
+            >
+              Delete
+            </button>
+          </div>
         </div>
       )}
 

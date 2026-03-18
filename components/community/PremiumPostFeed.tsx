@@ -25,6 +25,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import { toast } from "sonner";
 
 type Post = {
   id: string;
@@ -127,7 +128,7 @@ export function PremiumPostFeed({
       const result = await createPost(formData);
 
       if (!result.success) {
-        alert(result.error || "Failed to create post");
+        toast.error(result.error || "Failed to create post");
         setIsSubmitting(false);
         return;
       }
@@ -164,7 +165,7 @@ export function PremiumPostFeed({
       }
     } catch (error) {
       console.error("❌ Error creating post:", error);
-      alert("Failed to create post");
+      toast.error("Failed to create post");
     } finally {
       setIsSubmitting(false);
     }
