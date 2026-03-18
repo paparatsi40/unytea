@@ -402,13 +402,13 @@ export function PremiumPostFeed({
       )}
 
       {/* GUIDED COMPOSER */}
-      <div className={`mb-6 overflow-hidden rounded-xl border ${focused ? 'border-purple-200 shadow-lg' : 'border-gray-200'} bg-white transition-all`}>
-        {/* Composer Mode Selector - Always Visible */}
-        <div className="flex items-center gap-1 p-2 border-b border-gray-100 overflow-x-auto">
+      <div className={`mb-5 overflow-hidden rounded-xl border ${focused ? 'border-purple-200 shadow-md' : 'border-gray-200'} bg-white transition-all`}>
+        {/* Composer Mode Selector - creation intents */}
+        <div className="flex items-center gap-1 p-1.5 border-b border-gray-100 bg-gray-50/60 overflow-x-auto">
           <button
             type="button"
             onClick={() => setComposerMode("default")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap ${
               composerMode === "default" 
                 ? "bg-gray-100 text-gray-900" 
                 : "text-gray-500 hover:bg-gray-50"
@@ -420,7 +420,7 @@ export function PremiumPostFeed({
           <button
             type="button"
             onClick={() => setComposerMode("question")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap ${
               composerMode === "question" 
                 ? "bg-blue-100 text-blue-700" 
                 : "text-gray-500 hover:bg-gray-50"
@@ -432,7 +432,7 @@ export function PremiumPostFeed({
           <button
             type="button"
             onClick={() => setComposerMode("win")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap ${
               composerMode === "win" 
                 ? "bg-amber-100 text-amber-700" 
                 : "text-gray-500 hover:bg-gray-50"
@@ -444,7 +444,7 @@ export function PremiumPostFeed({
           <button
             type="button"
             onClick={() => setComposerMode("resource")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap ${
               composerMode === "resource" 
                 ? "bg-green-100 text-green-700" 
                 : "text-gray-500 hover:bg-gray-50"
@@ -456,7 +456,7 @@ export function PremiumPostFeed({
           <button
             type="button"
             onClick={() => setComposerMode("discussion")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap ${
               composerMode === "discussion" 
                 ? "bg-purple-100 text-purple-700" 
                 : "text-gray-500 hover:bg-gray-50"
@@ -541,8 +541,8 @@ export function PremiumPostFeed({
               onChange={(e) => setContent(e.target.value)}
               onFocus={() => setFocused(true)}
               placeholder={getPlaceholder()}
-              className="w-full resize-none rounded-xl border border-gray-200 bg-white px-4 py-4 text-base leading-relaxed text-gray-900 placeholder-gray-400 transition-all focus:border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-100"
-              rows={focused ? 5 : 3}
+              className="w-full resize-none rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm leading-relaxed text-gray-900 placeholder-gray-400 transition-all focus:border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-100"
+              rows={focused ? 4 : 2}
             />
             
             {/* Character Count */}
@@ -632,11 +632,11 @@ export function PremiumPostFeed({
         </form>
       </div>
 
-      <div className="mb-4 flex flex-wrap items-center gap-2">
+      <div className="mb-4 mt-1 flex flex-wrap items-center gap-1.5 rounded-lg border border-gray-100 bg-gray-50/70 p-1.5">
         <button
           type="button"
           onClick={() => setActiveFilter("all")}
-          className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+          className={`rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors ${
             activeFilter === "all" ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
           }`}
         >
@@ -645,7 +645,7 @@ export function PremiumPostFeed({
         <button
           type="button"
           onClick={() => setActiveFilter("updates")}
-          className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+          className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors ${
             activeFilter === "updates" ? "bg-blue-600 text-white" : "bg-blue-50 text-blue-700 hover:bg-blue-100"
           }`}
         >
@@ -654,7 +654,7 @@ export function PremiumPostFeed({
         <button
           type="button"
           onClick={() => setActiveFilter("questions")}
-          className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+          className={`rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors ${
             activeFilter === "questions" ? "bg-purple-600 text-white" : "bg-purple-50 text-purple-700 hover:bg-purple-100"
           }`}
         >
@@ -663,7 +663,7 @@ export function PremiumPostFeed({
         <button
           type="button"
           onClick={() => setActiveFilter("resources")}
-          className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+          className={`rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors ${
             activeFilter === "resources" ? "bg-green-600 text-white" : "bg-green-50 text-green-700 hover:bg-green-100"
           }`}
         >
@@ -672,7 +672,7 @@ export function PremiumPostFeed({
         <button
           type="button"
           onClick={() => setActiveFilter("discussion")}
-          className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+          className={`rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors ${
             activeFilter === "discussion" ? "bg-amber-600 text-white" : "bg-amber-50 text-amber-700 hover:bg-amber-100"
           }`}
         >
