@@ -6,7 +6,11 @@ import Link from "next/link";
 import { Loader2, Search, X } from "lucide-react";
 import { ConversationList } from "@/components/messages/ConversationList";
 import { MessageThread } from "@/components/messages/MessageThread";
-import { getOrCreateConversation, getSharedMessageContext, searchMessageCandidates } from "@/app/actions/messages";
+import {
+  getOrCreateConversation,
+  getSharedMessageContext,
+  searchMessageCandidates,
+} from "@/app/actions/messages";
 import { useToast } from "@/hooks/use-toast";
 
 interface OtherUser {
@@ -32,7 +36,9 @@ export default function MessagesPage() {
   const [isSearchingCandidates, setIsSearchingCandidates] = useState(false);
   const [composerError, setComposerError] = useState("");
   const [inboxRefreshToken, setInboxRefreshToken] = useState(0);
-  const [sharedCommunities, setSharedCommunities] = useState<Array<{ id: string; name: string; slug: string }>>([]);
+  const [sharedCommunities, setSharedCommunities] = useState<
+    Array<{ id: string; name: string; slug: string }>
+  >([]);
   const { toast } = useToast();
 
   const handleSelectConversation = (conversationId: string, otherUser: OtherUser) => {
@@ -113,11 +119,13 @@ export default function MessagesPage() {
       setIsSearchingCandidates(true);
       setComposerError("");
       const result = await searchMessageCandidates(candidateQuery);
+
       if (result.success && result.users) {
         setCandidates(result.users);
       } else if (!result.success) {
         setComposerError(result.error || "Could not load members.");
       }
+
       setIsSearchingCandidates(false);
     };
 
@@ -151,8 +159,8 @@ export default function MessagesPage() {
 
   return (
     <>
-      <div className="h-[calc(100vh-4rem)] flex">
-        <div className={`${isMobileThreadOpen ? "hidden" : "flex"} md:flex w-full md:w-auto`}>
+      <div className="flex h-[calc(100vh-4rem)] bg-gray-50">
+        <div className={`${isMobileThreadOpen ? "hidden" : "flex"} w-full md:flex md:w-auto`}>
           <ConversationList
             activeConversationId={activeConversationId}
             onSelectConversation={handleSelectConversation}
@@ -164,22 +172,31 @@ export default function MessagesPage() {
 
         {activeConversationId && activeOtherUser ? (
           <>
-            <div className={`${isMobileThreadOpen ? "flex" : "hidden"} md:flex flex-1 min-w-0`}>
-              <MessageThread
-                conversationId={activeConversationId}
-                otherUser={activeOtherUser}
-                subtitle={sharedCommunities.length > 0 ? `Shared communities: ${sharedCommunities.length}` : "Direct conversation"}
-                onBack={handleMobileBack}
-                showBackButton
-                onConversationRead={handleConversationRead}
-              />
+            <div className={`${isMobileThreadOpen ? "flex" : "hidden"} min-w-0 flex-1 md:flex`}>
+              <div className="flex min-w-0 flex-1 justify-center">
+                <div className="flex w-full min-w-0 max-w-[980px]">
+                  <MessageThread
+                    conversationId={activeConversationId}
+                    otherUser={activeOtherUser}
+                    subtitle={
+                      sharedCommunities.length > 0
+                        ? `Shared communities: ${sharedCommunities.length}`
+                        : "Direct conversation"
+                    }
+                    onBack={handleMobileBack}
+                    showBackButton
+                    onConversationRead={handleConversationRead}
+                  />
+                </div>
+              </div>
             </div>
 
-            <aside className="hidden xl:flex w-80 border-l border-gray-200 bg-white p-4 flex-col gap-4">
+            <aside className="hidden w-[300px] shrink-0 border-l border-gray-200 bg-white p-4 xl:flex xl:flex-col xl:gap-4">
               <div>
                 <p className="text-xs uppercase tracking-wide text-gray-500">Contact</p>
+
                 <div className="mt-2.5 flex items-center gap-3">
-                  <div className="h-11 w-11 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 overflow-hidden flex items-center justify-center text-white font-semibold">
+                  <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-purple-500 to-pink-500 font-semibold text-white">
                     {activeOtherUser.image ? (
                       <img
                         src={activeOtherUser.image}
@@ -187,15 +204,20 @@ export default function MessagesPage() {
                         className="h-full w-full object-cover"
                       />
                     ) : (
-                      (activeOtherUser.firstName || activeOtherUser.name || "U").charAt(0).toUpperCase()
+                      (activeOtherUser.firstName || activeOtherUser.name || "U")
+                        .charAt(0)
+                        .toUpperCase()
                     )}
                   </div>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-900">
+
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-gray-900">
                       {activeOtherUser.firstName || activeOtherUser.name || "User"}
                     </p>
                     {activeOtherUser.username && (
-                      <p className="text-xs text-gray-500">@{activeOtherUser.username}</p>
+                      <p className="truncate text-xs text-gray-500">
+                        @{activeOtherUser.username}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -205,7 +227,7 @@ export default function MessagesPage() {
                   className={`mt-3 inline-flex rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
                     activeOtherUser.username
                       ? "border-gray-300 text-gray-700 hover:bg-gray-50"
-                      : "border-gray-200 text-gray-400 pointer-events-none"
+                      : "pointer-events-none border-gray-200 text-gray-400"
                   }`}
                   aria-disabled={!activeOtherUser.username}
                   title={activeOtherUser.username ? "View profile" : "Profile unavailable"}
@@ -216,18 +238,27 @@ export default function MessagesPage() {
 
               <div className="rounded-xl border border-gray-200 bg-gray-50 p-3.5">
                 <p className="text-xs uppercase tracking-wide text-gray-500">Context</p>
-                <p className="mt-2 text-sm text-gray-900">Direct conversation</p>
-                <p className="mt-1 text-xs text-gray-500">Started from inbox or community members.</p>
+                <p className="mt-2 text-sm font-medium text-gray-900">Direct conversation</p>
+                <p className="mt-1 text-xs text-gray-500">
+                  Started from inbox or community members.
+                </p>
 
-                <div className="mt-2.5 rounded-lg border border-gray-200 bg-white p-2.5">
-                  <p className="text-[11px] uppercase tracking-wide text-gray-500">Communities in common</p>
+                <div className="mt-3 rounded-lg border border-gray-200 bg-white p-2.5">
+                  <p className="text-[11px] uppercase tracking-wide text-gray-500">
+                    Communities in common
+                  </p>
+
                   {sharedCommunities.length > 0 ? (
                     <div className="mt-2 flex flex-wrap gap-1.5">
                       {sharedCommunities.slice(0, 3).map((community) => (
-                        <span key={community.id} className="rounded-full bg-purple-100 px-2 py-0.5 text-[11px] font-medium text-purple-800">
+                        <span
+                          key={community.id}
+                          className="rounded-full bg-purple-100 px-2 py-0.5 text-[11px] font-medium text-purple-800"
+                        >
                           {community.name}
                         </span>
                       ))}
+
                       {sharedCommunities.length > 3 ? (
                         <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[11px] text-gray-600">
                           +{sharedCommunities.length - 3} more
@@ -235,7 +266,9 @@ export default function MessagesPage() {
                       ) : null}
                     </div>
                   ) : (
-                    <p className="mt-2 text-xs text-gray-500">No active shared communities found.</p>
+                    <p className="mt-2 text-xs text-gray-500">
+                      No active shared communities found.
+                    </p>
                   )}
                 </div>
               </div>
@@ -243,23 +276,30 @@ export default function MessagesPage() {
               <div className="rounded-xl border border-purple-200 bg-purple-50 p-3.5">
                 <p className="text-xs uppercase tracking-wide text-purple-700">Unread</p>
                 <p className="mt-2 text-2xl font-bold text-purple-900">{unreadTotal}</p>
-                <p className="text-xs text-purple-700/80">total unread messages in your inbox</p>
+                <p className="text-xs text-purple-700/80">
+                  total unread messages in your inbox
+                </p>
               </div>
             </aside>
           </>
         ) : (
-          <div className="hidden md:flex flex-1 flex-col items-center justify-center bg-gray-50">
-            <div className="text-center p-8">
-              <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center mb-6">
-                <span className="text-5xl">💬</span>
+          <div className="hidden flex-1 items-center justify-center md:flex">
+            <div className="mx-auto max-w-xl rounded-3xl border border-gray-200 bg-white p-10 text-center shadow-sm">
+              <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-purple-500/15 to-pink-500/15">
+                <span className="text-4xl">💬</span>
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Your Messages</h2>
-              <p className="text-gray-600 max-w-md mb-6">
-                Select a conversation from the left to start chatting, or click the + button to start a new conversation.
+
+              <h2 className="text-2xl font-bold tracking-tight text-gray-900">
+                Your Messages
+              </h2>
+              <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-gray-600">
+                Select a conversation from the left to start chatting, or create a new
+                conversation with a member.
               </p>
+
               <button
                 onClick={handleNewMessage}
-                className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-purple-500/20 transition-all"
+                className="mt-6 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-3 font-semibold text-white transition-all hover:shadow-lg hover:shadow-purple-500/20"
               >
                 Start New Conversation
               </button>
@@ -272,7 +312,9 @@ export default function MessagesPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
           <div className="w-full max-w-lg rounded-2xl border border-gray-200 bg-white shadow-2xl">
             <div className="flex items-center justify-between border-b border-gray-200 p-4">
-              <h3 className="text-lg font-semibold text-gray-900">Start new conversation</h3>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Start new conversation
+              </h3>
               <button
                 onClick={() => {
                   setComposerError("");
@@ -292,34 +334,37 @@ export default function MessagesPage() {
               ) : null}
 
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                 <input
                   value={candidateQuery}
                   onChange={(e) => setCandidateQuery(e.target.value)}
                   placeholder="Search member by name or username"
-                  className="w-full rounded-xl border border-gray-300 bg-white py-2.5 pl-10 pr-3 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500"
+                  className="w-full rounded-xl border border-gray-300 bg-white py-2.5 pl-10 pr-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/30"
                 />
               </div>
 
-              <div className="mt-4 max-h-80 overflow-y-auto space-y-2">
+              <div className="mt-4 max-h-80 space-y-2 overflow-y-auto">
                 {isSearchingCandidates ? (
                   <div className="flex items-center justify-center py-8 text-gray-500">
                     <Loader2 className="h-5 w-5 animate-spin" />
                   </div>
                 ) : candidates.length === 0 ? (
-                  <p className="py-8 text-center text-sm text-gray-500">Type to search members.</p>
+                  <p className="py-8 text-center text-sm text-gray-500">
+                    Type to search members.
+                  </p>
                 ) : (
                   candidates.map((candidate) => {
                     const displayName =
                       candidate.firstName || candidate.name || candidate.username || "User";
+
                     return (
                       <button
                         key={candidate.id}
                         onClick={() => handleStartConversation(candidate)}
-                        className="w-full rounded-xl border border-gray-200 bg-gray-50 p-3 text-left hover:bg-gray-100 transition-colors"
+                        className="w-full rounded-xl border border-gray-200 bg-gray-50 p-3 text-left transition-colors hover:bg-gray-100"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-full overflow-hidden bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-sm font-semibold">
+                          <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-purple-500 to-pink-500 text-sm font-semibold text-white">
                             {candidate.image ? (
                               <img
                                 src={candidate.image}
@@ -330,10 +375,15 @@ export default function MessagesPage() {
                               displayName.charAt(0).toUpperCase()
                             )}
                           </div>
+
                           <div className="min-w-0">
-                            <p className="truncate text-sm font-medium text-gray-900">{displayName}</p>
+                            <p className="truncate text-sm font-medium text-gray-900">
+                              {displayName}
+                            </p>
                             {candidate.username && (
-                              <p className="truncate text-xs text-gray-500">@{candidate.username}</p>
+                              <p className="truncate text-xs text-gray-500">
+                                @{candidate.username}
+                              </p>
                             )}
                           </div>
                         </div>
