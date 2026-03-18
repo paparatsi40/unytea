@@ -97,19 +97,8 @@ export default function SessionRoomPage({
   }
 
   if (!videoSession?.roomId) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-zinc-950">
-        <div className="text-center">
-          <p className="text-lg text-red-400">Invalid session</p>
-          <button
-            onClick={() => router.push("/dashboard/sessions")}
-            className="mt-4 text-sm text-purple-400 hover:underline"
-          >
-            Back to sessions
-          </button>
-        </div>
-      </div>
-    );
+    router.replace("/dashboard/sessions");
+    return null;
   }
 
   const isHost = user?.id === videoSession.mentorId;
