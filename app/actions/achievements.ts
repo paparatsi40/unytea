@@ -4,6 +4,14 @@ import { prisma } from "@/lib/prisma";
 import { ACHIEVEMENTS, AchievementType } from "@/lib/achievements-data";
 import { revalidatePath } from "next/cache";
 
+const APPROXIMATED_CRITERIA = new Set([
+  "post_streak",
+  "unique_conversations",
+  "conversations_started",
+  "helpful_reactions",
+  "check_in_streak",
+]);
+
 type AchievementStats = {
   postCount: number;
   commentCount: number;
@@ -213,6 +221,23 @@ function shouldUnlockCriteria(
   return getProgressForCriteria(criteria, stats) >= 100;
 }
 
+async function findAchievementRecord(achievementType: AchievementType) {
+  const achievementDef = ACHIEVEMENTS[achievementType];
+  return prisma.achievement.findFirst({
+    where: {
+      OR: [
+        { name: achievementDef.name },
+        {
+          criteria: {
+            path: ["achievementType"],
+            equals: achievementType,
+          },
+        },
+      ],
+    },
+  });
+}
+
 /**
  * Check if user has unlocked an achievement
  */
@@ -221,11 +246,15 @@ export async function checkUserAchievement(
   achievementType: AchievementType
 ) {
   try {
-    const existing = await prisma.userAchievement.findFirst({
+    const achievement = await findAchievementRecord(achievementType);
+
+    if (!achievement) return false;
+
+    const existing = await prisma.userAchievement.findUnique({
       where: {
-        userId,
-        achievement: {
-          name: ACHIEVEMENTS[achievementType].name,
+        userId_achievementId: {
+          userId,
+          achievementId: achievement.id,
         },
       },
     });
@@ -252,9 +281,7 @@ export async function unlockAchievement(
 
     const achievementDef = ACHIEVEMENTS[achievementType];
 
-    let achievement = await prisma.achievement.findFirst({
-      where: { name: achievementDef.name },
-    });
+    let achievement = await findAchievementRecord(achievementType);
 
     if (!achievement) {
       achievement = await prisma.achievement.create({
@@ -263,7 +290,10 @@ export async function unlockAchievement(
           description: achievementDef.description,
           icon: achievementDef.icon,
           points: achievementDef.points,
-          criteria: achievementDef.criteria as any,
+          criteria: {
+            ...(achievementDef.criteria as any),
+            achievementType,
+          } as any,
         },
       });
     }
@@ -341,6 +371,7 @@ export async function getUserAchievements(userId: string) {
         isUnlocked,
         unlockedAt: unlockedData?.unlockedAt || null,
         progress,
+        isApproximate: APPROXIMATED_CRITERIA.has(achievement.criteria.type),
       };
     });
 
