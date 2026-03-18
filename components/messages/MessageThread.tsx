@@ -107,7 +107,7 @@ export function MessageThread({
     loadMessages();
   };
 
-  const isLowVolumeThread = messages.length > 0 && messages.length <= 2;
+  const isLowVolumeThread = messages.length > 0 && messages.length <= 8;
 
   if (isLoading) {
     return (
@@ -204,7 +204,9 @@ export function MessageThread({
           <div className="flex min-h-full flex-col">
             <div
               className={`mt-auto ${
-                isLowVolumeThread ? "space-y-1.5 pb-1" : "space-y-2 pb-4"
+                isLowVolumeThread
+                  ? "mx-auto w-full max-w-[760px] rounded-2xl border border-gray-200/80 bg-gray-50/90 px-4 py-3 shadow-sm space-y-1.5"
+                  : "space-y-2 pb-4"
               }`}
             >
               {messages.map((message, index) => {
