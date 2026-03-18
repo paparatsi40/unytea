@@ -407,13 +407,7 @@ const sessionDate = new Date(s.scheduledAt);
               </div>
 </div>
             {recommendation && recommendation.tone === "warning" && (
-              <div className={`mb-6 rounded-lg border p-4 ${
-                recommendation.tone === "positive"
-                  ? "border-emerald-500/30 bg-emerald-500/10"
-                  : recommendation.tone === "warning"
-                  ? "border-amber-500/30 bg-amber-500/10"
-                  : "border-zinc-700 bg-zinc-900"
-              }`}>
+              <div className="mb-6 rounded-lg border border-amber-500/30 bg-amber-500/10 p-4">
                 <p className="text-sm font-semibold text-white">{recommendation.title}</p>
                 <p className="mt-1 text-sm text-zinc-300">{recommendation.description}</p>
                 {recommendation.title === "Low RSVP → Join conversion" && (
