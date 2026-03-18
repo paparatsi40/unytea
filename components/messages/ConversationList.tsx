@@ -167,15 +167,15 @@ export function ConversationList({
             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center mb-4">
               <span className="text-3xl">💬</span>
             </div>
-            <h3 className="text-sm font-semibold text-white mb-1">
+            <h3 className="text-sm font-semibold text-gray-900 mb-1">
               {searchQuery ? "No conversations found" : "No messages yet"}
             </h3>
-            <p className="text-xs text-white/60">
+            <p className="text-xs text-gray-500">
               {searchQuery ? "Try a different search" : "Start a new conversation"}
             </p>
           </div>
         ) : (
-          <div className="divide-y divide-white/5">
+          <div className="divide-y divide-gray-100">
             {filteredConversations.map((conversation) => {
               const otherUser = getOtherUser(conversation);
               const lastMessage = getLastMessage(conversation);
@@ -187,8 +187,8 @@ export function ConversationList({
                 <button
                   key={conversation.id}
                   onClick={() => onSelectConversation(conversation.id, otherUser)}
-                  className={`w-full p-4 text-left hover:bg-white/5 transition-colors ${
-                    isActive ? "bg-white/5 border-r-2 border-purple-500" : ""
+                  className={`w-full p-4 text-left hover:bg-gray-50 transition-colors ${
+                    isActive ? "bg-purple-50/60 border-r-2 border-purple-500" : ""
                   }`}
                 >
                   <div className="flex items-start gap-3">
@@ -216,12 +216,12 @@ export function ConversationList({
                     <div className="flex-1 min-w-0">
                       <div className="flex items-baseline justify-between gap-2 mb-1">
                         <h3 className={`font-semibold truncate ${
-                          unreadCount > 0 ? "text-white" : "text-white/90"
+                          unreadCount > 0 ? "text-gray-900" : "text-gray-800"
                         }`}>
                           {displayName}
                         </h3>
                         {lastMessage && (
-                          <span className="text-xs text-white/40 flex-shrink-0">
+                          <span className="text-xs text-gray-500 flex-shrink-0">
                             {formatDistanceToNow(new Date(lastMessage.createdAt), { 
                               addSuffix: false 
                             })}
@@ -231,15 +231,15 @@ export function ConversationList({
 
                       {lastMessage ? (
                         <p className={`text-sm truncate ${
-                          unreadCount > 0 ? "text-white/95 font-medium" : "text-white/75"
+                          unreadCount > 0 ? "text-gray-800 font-medium" : "text-gray-600"
                         }`}>
                           {lastMessage.sender.id === user?.id ? (
-                            <span className="text-white/50">You: </span>
+                            <span className="text-gray-500">You: </span>
                           ) : null}
                           <span>{lastMessage.content || "Sent an attachment"}</span>
                         </p>
                       ) : (
-                        <p className="text-sm text-white/50 italic">No messages yet</p>
+                        <p className="text-sm text-gray-500 italic">No messages yet</p>
                       )}
                     </div>
                   </div>
