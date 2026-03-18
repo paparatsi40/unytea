@@ -3,33 +3,56 @@
 import { useState, useRef, KeyboardEvent } from "react";
 import { Send, Paperclip, Smile, Loader2 } from "lucide-react";
 import { sendMessage } from "@/app/actions/messages";
+import { useToast } from "@/hooks/use-toast";
 
 interface MessageInputProps {
   conversationId: string;
   onMessageSent?: () => void;
 }
 
+const MAX_MESSAGE_LENGTH = 2000;
+
 export function MessageInput({ conversationId, onMessageSent }: MessageInputProps) {
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const [errorText, setErrorText] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { toast } = useToast();
 
   const handleSend = async () => {
-    if (!message.trim() || isSending) return;
+    if (isSending) return;
 
+    const trimmed = message.trim();
+    if (!trimmed) {
+      setErrorText("Message cannot be empty.");
+      return;
+    }
+
+    if (trimmed.length > MAX_MESSAGE_LENGTH) {
+      setErrorText(`Message must be ${MAX_MESSAGE_LENGTH} characters or less.`);
+      return;
+    }
+
+    setErrorText("");
     setIsSending(true);
-    const result = await sendMessage(conversationId, message.trim());
+    const result = await sendMessage(conversationId, trimmed);
 
     if (result.success) {
       setMessage("");
       onMessageSent?.();
-      
+
       // Reset textarea height
       if (textareaRef.current) {
         textareaRef.current.style.height = "auto";
       }
     } else {
-      alert(result.error || "Failed to send message");
+      const errorMessage = result.error || "Failed to send message";
+      setErrorText(errorMessage);
+      toast({
+        title: "Message not sent",
+        description: errorMessage,
+        variant: "destructive",
+      });
     }
 
     setIsSending(false);
@@ -43,8 +66,13 @@ export function MessageInput({ conversationId, onMessageSent }: MessageInputProp
   };
 
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setMessage(e.target.value);
-    
+    const nextValue = e.target.value;
+    setMessage(nextValue);
+
+    if (errorText) {
+      setErrorText("");
+    }
+
     // Auto-resize textarea
     e.target.style.height = "auto";
     e.target.style.height = Math.min(e.target.scrollHeight, 150) + "px";
@@ -62,7 +90,9 @@ export function MessageInput({ conversationId, onMessageSent }: MessageInputProp
             onKeyDown={handleKeyDown}
             placeholder="Type a message... (Shift+Enter for new line)"
             disabled={isSending}
-            className="w-full resize-none bg-white border border-gray-300 rounded-xl px-4 py-3 pr-24 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 disabled:opacity-50 transition-all"
+            className={`w-full resize-none bg-white border rounded-xl px-4 py-3 pr-24 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 disabled:opacity-50 transition-all ${
+              errorText ? "border-red-400" : "border-gray-300"
+            }`}
             rows={1}
             style={{ minHeight: "48px", maxHeight: "150px" }}
           />
@@ -89,8 +119,8 @@ export function MessageInput({ conversationId, onMessageSent }: MessageInputProp
 
             {/* Character count */}
             {message.length > 0 && (
-              <span className="text-xs text-gray-500 px-2">
-                {message.length}/2000
+              <span className={`text-xs px-2 ${message.length > MAX_MESSAGE_LENGTH ? "text-red-500" : "text-gray-500"}`}>
+                {message.length}/{MAX_MESSAGE_LENGTH}
               </span>
             )}
           </div>
@@ -111,9 +141,12 @@ export function MessageInput({ conversationId, onMessageSent }: MessageInputProp
       </div>
 
       {/* Hint */}
-      <p className="text-xs text-gray-500 mt-2">
-        Press Enter to send, Shift+Enter for new line
-      </p>
+      <div className="mt-2 flex items-center justify-between gap-3">
+        <p className="text-xs text-gray-500">
+          Press Enter to send, Shift+Enter for new line
+        </p>
+        {errorText ? <p className="text-xs text-red-500">{errorText}</p> : null}
+      </div>
     </div>
   );
 }
