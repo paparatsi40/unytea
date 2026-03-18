@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { MessageBubble } from "./MessageBubble";
 import { MessageInput } from "./MessageInput";
 import { getConversationMessages, markMessagesAsRead } from "@/app/actions/messages";
@@ -40,44 +40,53 @@ const formatDayLabel = (dateLike: string | Date) => {
   });
 };
 
-export function MessageThread({ conversationId, otherUser, subtitle = "Direct conversation", onBack, showBackButton = false, onConversationRead }: MessageThreadProps) {
+export function MessageThread({
+  conversationId,
+  otherUser,
+  subtitle = "Direct conversation",
+  onBack,
+  showBackButton = false,
+  onConversationRead,
+}: MessageThreadProps) {
   const { user } = useCurrentUser();
   const [messages, setMessages] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
   const { onMessage } = usePusher(conversationId, user?.id || "");
 
-  const loadMessages = async () => {
+  const displayName =
+    otherUser.firstName || otherUser.name || otherUser.username || "User";
+
+  const loadMessages = useCallback(async () => {
     const result = await getConversationMessages(conversationId);
-    
+
     if (result.success && result.messages) {
       setMessages(result.messages);
       setError("");
-      
-      // Mark messages as read
+
       await markMessagesAsRead(conversationId);
       onConversationRead?.();
     } else {
       setError(result.error || "Failed to load messages");
     }
-    
+
     setIsLoading(false);
-  };
+  }, [conversationId, onConversationRead]);
 
   useEffect(() => {
     loadMessages();
 
-    // Auto-refresh messages every 5 seconds
     const interval = setInterval(loadMessages, 5000);
     return () => clearInterval(interval);
-  }, [conversationId]);
+  }, [loadMessages]);
 
   useEffect(() => {
-    // Scroll to bottom when new messages arrive
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+      messagesEndRef.current.scrollIntoView({
+        behavior: messages.length <= 2 ? "auto" : "smooth",
+        block: "end",
+      });
     }
   }, [messages]);
 
@@ -88,7 +97,7 @@ export function MessageThread({ conversationId, otherUser, subtitle = "Direct co
     });
 
     return () => unsubscribe();
-  }, [onMessage, conversationId]);
+  }, [onMessage, conversationId, loadMessages]);
 
   const handleMessageSent = () => {
     loadMessages();
@@ -98,121 +107,141 @@ export function MessageThread({ conversationId, otherUser, subtitle = "Direct co
     loadMessages();
   };
 
-  const displayName = otherUser.firstName || otherUser.name || otherUser.username || "User";
-
   if (isLoading) {
     return (
-      <div className="flex-1 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+      <div className="flex flex-1 items-center justify-center bg-gray-50">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
+          <p className="text-sm text-gray-500">Loading conversation...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex-1 flex min-h-0 flex-col h-full">
+    <div className="flex h-full min-h-0 flex-1 flex-col bg-white">
       {/* Header */}
-      <div className="border-b border-gray-200 bg-white p-4">
+      <div className="border-b border-gray-200 bg-white px-4 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 items-center gap-3">
             {showBackButton && (
               <button
                 type="button"
                 onClick={onBack}
-                className="md:hidden p-2 -ml-2 rounded-lg hover:bg-gray-100 text-gray-600"
+                className="-ml-2 rounded-lg p-2 text-gray-600 hover:bg-gray-100 md:hidden"
                 aria-label="Back to conversations"
               >
-                <ChevronLeft className="w-5 h-5" />
+                <ChevronLeft className="h-5 w-5" />
               </button>
             )}
 
-            {/* Avatar */}
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-pink-500 text-sm font-semibold text-white shadow-sm">
               {otherUser.image ? (
-                <img 
-                  src={otherUser.image} 
+                <img
+                  src={otherUser.image}
                   alt={displayName}
-                  className="w-full h-full rounded-full object-cover"
+                  className="h-full w-full rounded-full object-cover"
                 />
               ) : (
                 displayName[0].toUpperCase()
               )}
             </div>
 
-            {/* Name */}
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">{displayName}</h2>
-              <p className="text-xs text-gray-500">{subtitle}</p>
+            <div className="min-w-0">
+              <h2 className="truncate text-lg font-semibold text-gray-900">
+                {displayName}
+              </h2>
+              <p className="truncate text-sm text-gray-500">{subtitle}</p>
             </div>
           </div>
 
-          {/* Actions */}
-          <button className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-800 transition-colors">
-            <MoreVertical className="w-5 h-5" />
+          <button
+            type="button"
+            className="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-800"
+            aria-label="Conversation actions"
+          >
+            <MoreVertical className="h-5 w-5" />
           </button>
         </div>
       </div>
 
       {/* Messages */}
-      <div 
-        ref={containerRef}
-        className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-6 pt-2 pb-5 bg-gray-50"
-      >
+      <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden bg-gray-50 px-5 pb-4 pt-3">
         {error && (
-          <div className="text-center p-4">
-            <p className="text-red-400">{error}</p>
+          <div className="mb-4 flex justify-center">
+            <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+              <div className="flex items-center gap-3">
+                <span>{error}</span>
+                <button
+                  type="button"
+                  onClick={loadMessages}
+                  className="font-medium text-red-700 underline underline-offset-2"
+                >
+                  Retry
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
         {messages.length === 0 && !error ? (
-          <div className="min-h-full flex flex-col items-center justify-center text-center p-8">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center mb-4">
+          <div className="flex min-h-full flex-col items-center justify-center p-8 text-center">
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20">
               <span className="text-3xl">💬</span>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <h3 className="mb-2 text-lg font-semibold text-gray-900">
               Start the conversation
             </h3>
-            <p className="text-gray-600 max-w-sm">
+            <p className="max-w-sm text-gray-600">
               Say hi to {displayName}! Send your first message below.
             </p>
           </div>
         ) : (
-          <div className="flex min-h-full flex-col justify-end">
-            <div className="space-y-3">
-            {messages.map((message, index) => {
-              const currentDay = new Date(message.createdAt).toDateString();
-              const previousDay = index > 0 ? new Date(messages[index - 1].createdAt).toDateString() : null;
-              const showDaySeparator = index === 0 || currentDay !== previousDay;
+          <div className="flex min-h-full flex-col justify-end pb-2">
+            <div className="space-y-2.5">
+              {messages.map((message, index) => {
+                const currentDay = new Date(message.createdAt).toDateString();
+                const previousDay =
+                  index > 0
+                    ? new Date(messages[index - 1].createdAt).toDateString()
+                    : null;
+                const showDaySeparator =
+                  index === 0 || currentDay !== previousDay;
 
-              return (
-                <div key={message.id} className="space-y-1.5">
-                  {showDaySeparator && (
-                    <div className="flex items-center gap-3 py-1">
-                      <div className="h-px flex-1 bg-gray-200/80" />
-                      <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500">
-                        {formatDayLabel(message.createdAt)}
-                      </span>
-                      <div className="h-px flex-1 bg-gray-200/80" />
-                    </div>
-                  )}
-                  <MessageBubble
-                    message={message}
-                    isOwnMessage={message.sender.id === user?.id}
-                    onDelete={handleMessageDeleted}
-                  />
-                </div>
-              );
-            })}
-            <div ref={messagesEndRef} />
+                return (
+                  <div key={message.id} className="space-y-1">
+                    {showDaySeparator && (
+                      <div className="flex items-center gap-3 py-0.5">
+                        <div className="h-px flex-1 bg-gray-200/90" />
+                        <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500">
+                          {formatDayLabel(message.createdAt)}
+                        </span>
+                        <div className="h-px flex-1 bg-gray-200/90" />
+                      </div>
+                    )}
+
+                    <MessageBubble
+                      message={message}
+                      isOwnMessage={message.sender.id === user?.id}
+                      onDelete={handleMessageDeleted}
+                    />
+                  </div>
+                );
+              })}
+
+              <div ref={messagesEndRef} className="h-1" />
             </div>
           </div>
         )}
       </div>
 
       {/* Input */}
-      <MessageInput 
-        conversationId={conversationId}
-        onMessageSent={handleMessageSent}
-      />
+      <div className="border-t border-gray-200 bg-white/95 backdrop-blur-sm">
+        <MessageInput
+          conversationId={conversationId}
+          onMessageSent={handleMessageSent}
+        />
+      </div>
     </div>
   );
 }
