@@ -5,10 +5,59 @@ import { revalidatePath } from "next/cache";
 import { getCurrentUserId } from "@/lib/auth-utils";
 import { checkAndUnlockAchievements } from "./achievements";
 
+async function canUsersDirectMessage(
+  currentUserId: string,
+  otherUserId: string,
+  communityId?: string
+) {
+  const currentMemberships = await prisma.member.findMany({
+    where: {
+      userId: currentUserId,
+      status: "ACTIVE",
+    },
+    select: { communityId: true },
+  });
+
+  const currentCommunityIds = currentMemberships.map((membership) => membership.communityId);
+  if (currentCommunityIds.length === 0) {
+    return false;
+  }
+
+  if (communityId) {
+    if (!currentCommunityIds.includes(communityId)) {
+      return false;
+    }
+
+    const otherInCommunity = await prisma.member.findFirst({
+      where: {
+        userId: otherUserId,
+        communityId,
+        status: "ACTIVE",
+      },
+      select: { id: true },
+    });
+
+    return Boolean(otherInCommunity);
+  }
+
+  const sharedMembership = await prisma.member.findFirst({
+    where: {
+      userId: otherUserId,
+      status: "ACTIVE",
+      communityId: {
+        in: currentCommunityIds,
+      },
+    },
+    select: { id: true },
+  });
+
+  return Boolean(sharedMembership);
+}
+
 /**
  * Get or create a conversation between two users
  */
-export async function getOrCreateConversation(otherUserId: string, _communityId?: string) {
+export async function getOrCreateConversation(otherUserId: string, communityId?: string) {
   try {
     const currentUserId = await getCurrentUserId();
     if (!currentUserId) {
@@ -17,6 +66,14 @@ export async function getOrCreateConversation(otherUserId: string, _communityId?
 
     if (currentUserId === otherUserId) {
       return { success: false, error: "Cannot message yourself" };
+    }
+
+    const canMessage = await canUsersDirectMessage(currentUserId, otherUserId, communityId);
+    if (!canMessage) {
+      return {
+        success: false,
+        error: "You can only message members who share an active community with you.",
+      };
     }
 
     // Sort user IDs to ensure consistent conversation lookup
@@ -338,12 +395,28 @@ export async function searchMessageCandidates(query: string) {
       return { success: true, users: [] };
     }
 
+    const currentMemberships = await prisma.member.findMany({
+      where: {
+        userId: currentUserId,
+        status: "ACTIVE",
+      },
+      select: { communityId: true },
+    });
+
+    const currentCommunityIds = currentMemberships.map((membership) => membership.communityId);
+    if (currentCommunityIds.length === 0) {
+      return { success: true, users: [] };
+    }
+
     const users = await prisma.user.findMany({
       where: {
         id: { not: currentUserId },
         memberships: {
           some: {
             status: "ACTIVE",
+            communityId: {
+              in: currentCommunityIds,
+            },
           },
         },
         OR: [
