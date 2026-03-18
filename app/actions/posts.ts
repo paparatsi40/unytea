@@ -19,6 +19,7 @@ export async function createPost(formData: FormData) {
     const communityId = formData.get("communityId") as string;
     const content = formData.get("content") as string;
     const title = formData.get("title") as string | null;
+    const contentType = (formData.get("contentType") as string | null) || "DISCUSSION";
 
     if (!communityId || !content) {
       return { success: false, error: "Missing required fields" };
@@ -47,6 +48,9 @@ export async function createPost(formData: FormData) {
         communityId,
         isPublished: true,
         publishedAt: new Date(),
+        contentType: ["DISCUSSION", "QUESTION", "ANNOUNCEMENT", "RESOURCE"].includes(contentType)
+          ? (contentType as any)
+          : "DISCUSSION",
       },
     });
 

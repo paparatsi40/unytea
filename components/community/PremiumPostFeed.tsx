@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { PremiumPostCard } from "@/components/community/PremiumPostCard";
 import { createPost } from "@/app/actions/posts";
@@ -20,6 +20,7 @@ import {
   Play,
   Radio,
   HelpCircle,
+  Clock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -53,6 +54,7 @@ type Post = {
 };
 
 type ComposerMode = "default" | "question" | "win" | "resource" | "discussion";
+type FeedFilter = "all" | "updates" | "questions" | "resources" | "discussion";
 
 type UpcomingSession = {
   id: string;
@@ -75,13 +77,14 @@ export function PremiumPostFeed({
   hotTopics?: { id: string; title: string; commentCount: number }[];
 }) {
   const { user } = useCurrentUser();
-  const [posts, _setPosts] = useState<Post[]>(initialPosts);
+  const [posts, setPosts] = useState<Post[]>(initialPosts);
   const [content, setContent] = useState("");
   const [title, setTitle] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [focused, setFocused] = useState(false);
   const [composerMode, setComposerMode] = useState<ComposerMode>("default");
+  const [activeFilter, setActiveFilter] = useState<FeedFilter>("all");
 
   // Set title based on composer mode
   useEffect(() => {
@@ -106,6 +109,17 @@ export function PremiumPostFeed({
       const formData = new FormData();
       formData.append("communityId", communityId);
       formData.append("content", content.trim());
+
+      const contentType =
+        composerMode === "question"
+          ? "QUESTION"
+          : composerMode === "resource"
+            ? "RESOURCE"
+            : composerMode === "win"
+              ? "ANNOUNCEMENT"
+              : "DISCUSSION";
+      formData.append("contentType", contentType);
+
       if (title.trim()) {
         formData.append("title", title.trim());
       }
@@ -128,8 +142,9 @@ export function PremiumPostFeed({
       setFocused(false);
       setComposerMode("default");
 
-      // Refresh posts
-      setTimeout(() => window.location.reload(), 1000);
+      if (result.post) {
+        setPosts((prev) => [result.post as Post, ...prev]);
+      }
     } catch (error) {
       console.error("❌ Error creating post:", error);
       alert("Failed to create post");
@@ -154,6 +169,16 @@ export function PremiumPostFeed({
   };
 
   const userFullName = user ? (user.name || "") : "";
+
+  const filteredPosts = useMemo(() => {
+    return posts.filter((post) => {
+      if (activeFilter === "all") return true;
+      if (activeFilter === "updates") return post.contentType === "ANNOUNCEMENT";
+      if (activeFilter === "questions") return post.contentType === "QUESTION";
+      if (activeFilter === "resources") return post.contentType === "RESOURCE";
+      return post.contentType === "DISCUSSION" || !post.contentType;
+    });
+  }, [posts, activeFilter]);
 
   // Calculate time until session
   const getTimeUntil = (date: Date) => {
@@ -463,10 +488,58 @@ export function PremiumPostFeed({
         </form>
       </div>
 
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={() => setActiveFilter("all")}
+          className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+            activeFilter === "all" ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+          }`}
+        >
+          All
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveFilter("updates")}
+          className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+            activeFilter === "updates" ? "bg-blue-600 text-white" : "bg-blue-50 text-blue-700 hover:bg-blue-100"
+          }`}
+        >
+          <Clock className="h-3.5 w-3.5" /> Updates
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveFilter("questions")}
+          className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+            activeFilter === "questions" ? "bg-purple-600 text-white" : "bg-purple-50 text-purple-700 hover:bg-purple-100"
+          }`}
+        >
+          Questions
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveFilter("resources")}
+          className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+            activeFilter === "resources" ? "bg-green-600 text-white" : "bg-green-50 text-green-700 hover:bg-green-100"
+          }`}
+        >
+          Resources
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveFilter("discussion")}
+          className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+            activeFilter === "discussion" ? "bg-amber-600 text-white" : "bg-amber-50 text-amber-700 hover:bg-amber-100"
+          }`}
+        >
+          Discussion
+        </button>
+      </div>
+
       {/* Posts List */}
-      {posts.length > 0 ? (
+      {filteredPosts.length > 0 ? (
         <div className="space-y-4">
-          {posts.map((post) => (
+          {filteredPosts.map((post) => (
             <div key={post.id} id={`post-${post.id}`}>
               <PremiumPostCard post={post} />
             </div>
@@ -482,10 +555,12 @@ export function PremiumPostFeed({
           </div>
 
           <h3 className="mb-2 text-xl font-semibold text-gray-900">
-            No posts yet
+            {posts.length === 0 ? "No posts yet" : "No posts for this filter"}
           </h3>
           <p className="mx-auto mb-6 max-w-sm text-sm text-gray-600">
-            Be the first to share your thoughts and start a conversation with the community.
+            {posts.length === 0
+              ? "Be the first to share your thoughts and start a conversation with the community."
+              : "Try another filter to see different community activity."}
           </p>
 
           {/* Feature Highlights */}
