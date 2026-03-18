@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { MessageBubble } from "./MessageBubble";
 import { MessageInput } from "./MessageInput";
 import { getConversationMessages, markMessagesAsRead } from "@/app/actions/messages";
-import { Loader2, MoreVertical } from "lucide-react";
+import { ChevronLeft, Loader2, MoreVertical } from "lucide-react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 
 interface MessageThreadProps {
@@ -17,9 +17,11 @@ interface MessageThreadProps {
     username: string | null;
     image: string | null;
   };
+  onBack?: () => void;
+  showBackButton?: boolean;
 }
 
-export function MessageThread({ conversationId, otherUser }: MessageThreadProps) {
+export function MessageThread({ conversationId, otherUser, onBack, showBackButton = false }: MessageThreadProps) {
   const { user } = useCurrentUser();
   const [messages, setMessages] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -82,6 +84,17 @@ export function MessageThread({ conversationId, otherUser }: MessageThreadProps)
       <div className="border-b border-gray-200 bg-white p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
+            {showBackButton && (
+              <button
+                type="button"
+                onClick={onBack}
+                className="md:hidden p-2 -ml-2 rounded-lg hover:bg-gray-100 text-gray-600"
+                aria-label="Back to conversations"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+            )}
+
             {/* Avatar */}
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold">
               {otherUser.image ? (

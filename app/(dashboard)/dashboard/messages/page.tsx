@@ -25,12 +25,14 @@ export default function MessagesPage() {
 
   const [isComposerOpen, setIsComposerOpen] = useState(false);
   const [candidateQuery, setCandidateQuery] = useState("");
+  const [isMobileThreadOpen, setIsMobileThreadOpen] = useState(false);
   const [candidates, setCandidates] = useState<OtherUser[]>([]);
   const [isSearchingCandidates, setIsSearchingCandidates] = useState(false);
 
   const handleSelectConversation = (conversationId: string, otherUser: OtherUser) => {
     setActiveConversationId(conversationId);
     setActiveOtherUser(otherUser);
+    setIsMobileThreadOpen(true);
   };
 
   const handleNewMessage = () => {
@@ -39,18 +41,19 @@ export default function MessagesPage() {
 
   const handleStartConversation = async (user: OtherUser) => {
     const result = await getOrCreateConversation(user.id);
-    if (result.success && result.conversation) {
-      const otherUser =
-        result.conversation.participant1.id === user.id
-          ? result.conversation.participant1
-          : result.conversation.participant2;
+          if (result.success && result.conversation) {
+        const otherUser =
+          result.conversation.participant1.id === user.id
+            ? result.conversation.participant1
+            : result.conversation.participant2;
 
-      setActiveConversationId(result.conversation.id);
-      setActiveOtherUser(otherUser);
-      setIsComposerOpen(false);
-      setCandidateQuery("");
-      setCandidates([]);
-    }
+        setActiveConversationId(result.conversation.id);
+        setActiveOtherUser(otherUser);
+        setIsMobileThreadOpen(true);
+        setIsComposerOpen(false);
+        setCandidateQuery("");
+        setCandidates([]);
+      }
   };
 
   useEffect(() => {
@@ -71,6 +74,7 @@ export default function MessagesPage() {
 
         setActiveConversationId(result.conversation.id);
         setActiveOtherUser(otherUser);
+        setIsMobileThreadOpen(true);
       }
 
       setBootstrapping(false);
@@ -100,19 +104,32 @@ export default function MessagesPage() {
     return () => clearTimeout(timeout);
   }, [candidateQuery, isComposerOpen]);
 
+  const handleMobileBack = () => {
+    setIsMobileThreadOpen(false);
+  };
+
   return (
     <>
       <div className="h-[calc(100vh-4rem)] flex">
-        <ConversationList
-          activeConversationId={activeConversationId}
-          onSelectConversation={handleSelectConversation}
-          onNewMessage={handleNewMessage}
-          onUnreadTotalChange={setUnreadTotal}
-        />
+        <div className={`${isMobileThreadOpen ? "hidden" : "flex"} md:flex w-full md:w-auto`}>
+          <ConversationList
+            activeConversationId={activeConversationId}
+            onSelectConversation={handleSelectConversation}
+            onNewMessage={handleNewMessage}
+            onUnreadTotalChange={setUnreadTotal}
+          />
+        </div>
 
         {activeConversationId && activeOtherUser ? (
           <>
-            <MessageThread conversationId={activeConversationId} otherUser={activeOtherUser} />
+            <div className={`${isMobileThreadOpen ? "flex" : "hidden"} md:flex flex-1`}>
+              <MessageThread
+                conversationId={activeConversationId}
+                otherUser={activeOtherUser}
+                onBack={handleMobileBack}
+                showBackButton
+              />
+            </div>
 
             <aside className="hidden xl:flex w-80 border-l border-gray-200 bg-white p-5 flex-col gap-5">
               <div>
@@ -154,7 +171,7 @@ export default function MessagesPage() {
             </aside>
           </>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center bg-gray-50">
+          <div className="hidden md:flex flex-1 flex-col items-center justify-center bg-gray-50">
             <div className="text-center p-8">
               <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center mb-6">
                 <span className="text-5xl">💬</span>

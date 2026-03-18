@@ -97,7 +97,7 @@ export function ConversationList({
   );
 
   return (
-    <div className="w-80 border-r border-gray-200 flex flex-col bg-white">
+    <div className="w-full md:w-80 border-r border-gray-200 flex flex-col bg-white">
       {/* Header */}
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center justify-between mb-4">
