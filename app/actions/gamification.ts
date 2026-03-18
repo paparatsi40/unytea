@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { getUserAchievements as getCanonicalUserAchievements } from "./achievements";
 
 /**
  * Get leaderboard for a community
@@ -213,20 +214,7 @@ export async function getAchievements() {
  * Get user achievements
  */
 export async function getUserAchievements(userId: string) {
-  try {
-    const userAchievements = await prisma.userAchievement.findMany({
-      where: { userId },
-      include: {
-        achievement: true,
-      },
-      orderBy: { unlockedAt: "desc" },
-    });
-
-    return { success: true, achievements: userAchievements };
-  } catch (error) {
-    console.error("Error getting user achievements:", error);
-    return { success: false, error: "Failed to get achievements", achievements: [] };
-  }
+  return getCanonicalUserAchievements(userId);
 }
 
 /**
