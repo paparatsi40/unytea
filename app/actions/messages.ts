@@ -226,6 +226,8 @@ export async function sendMessage(
         receiverId,
         conversationId,
         attachments: attachments ? JSON.stringify(attachments) : undefined,
+        isRead: false,
+        readAt: null,
       },
       include: {
         sender: {
@@ -287,7 +289,7 @@ export async function markMessagesAsRead(conversationId: string) {
       where: {
         conversationId,
         receiverId: currentUserId,
-        isRead: false,
+        readAt: null,
       },
       data: {
         isRead: true,
@@ -362,7 +364,7 @@ export async function getUserConversations() {
             messages: {
               where: {
                 receiverId: currentUserId,
-                isRead: false,
+                readAt: null,
               },
             },
           },

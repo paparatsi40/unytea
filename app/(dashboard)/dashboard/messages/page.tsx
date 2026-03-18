@@ -30,6 +30,7 @@ export default function MessagesPage() {
   const [candidates, setCandidates] = useState<OtherUser[]>([]);
   const [isSearchingCandidates, setIsSearchingCandidates] = useState(false);
   const [composerError, setComposerError] = useState("");
+  const [inboxRefreshToken, setInboxRefreshToken] = useState(0);
   const { toast } = useToast();
 
   const handleSelectConversation = (conversationId: string, otherUser: OtherUser) => {
@@ -126,6 +127,10 @@ export default function MessagesPage() {
     setIsMobileThreadOpen(false);
   };
 
+  const handleConversationRead = () => {
+    setInboxRefreshToken((prev) => prev + 1);
+  };
+
   return (
     <>
       <div className="h-[calc(100vh-4rem)] flex">
@@ -135,6 +140,7 @@ export default function MessagesPage() {
             onSelectConversation={handleSelectConversation}
             onNewMessage={handleNewMessage}
             onUnreadTotalChange={setUnreadTotal}
+            refreshToken={inboxRefreshToken}
           />
         </div>
 
@@ -146,6 +152,7 @@ export default function MessagesPage() {
                 otherUser={activeOtherUser}
                 onBack={handleMobileBack}
                 showBackButton
+                onConversationRead={handleConversationRead}
               />
             </div>
 

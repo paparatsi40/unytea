@@ -11,6 +11,7 @@ interface ConversationListProps {
   onSelectConversation: (conversationId: string, otherUser: any) => void;
   onNewMessage: () => void;
   onUnreadTotalChange?: (count: number) => void;
+  refreshToken?: number;
 }
 
 export function ConversationList({ 
@@ -18,6 +19,7 @@ export function ConversationList({
   onSelectConversation,
   onNewMessage,
   onUnreadTotalChange,
+  refreshToken,
 }: ConversationListProps) {
   const { user } = useCurrentUser();
   const [conversations, setConversations] = useState<any[]>([]);
@@ -49,7 +51,7 @@ export function ConversationList({
     // Auto-refresh every 10 seconds
     const interval = setInterval(loadConversations, 10000);
     return () => clearInterval(interval);
-  }, []);
+  }, [refreshToken]);
 
   useEffect(() => {
     const query = searchQuery.trim().toLowerCase();

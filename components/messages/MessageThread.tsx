@@ -19,9 +19,10 @@ interface MessageThreadProps {
   };
   onBack?: () => void;
   showBackButton?: boolean;
+  onConversationRead?: () => void;
 }
 
-export function MessageThread({ conversationId, otherUser, onBack, showBackButton = false }: MessageThreadProps) {
+export function MessageThread({ conversationId, otherUser, onBack, showBackButton = false, onConversationRead }: MessageThreadProps) {
   const { user } = useCurrentUser();
   const [messages, setMessages] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -38,6 +39,7 @@ export function MessageThread({ conversationId, otherUser, onBack, showBackButto
       
       // Mark messages as read
       await markMessagesAsRead(conversationId);
+      onConversationRead?.();
     } else {
       setError(result.error || "Failed to load messages");
     }
