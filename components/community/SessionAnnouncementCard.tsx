@@ -3,9 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { format, isToday, isTomorrow } from "date-fns";
-import { Calendar, Clock, Radio, Video } from "lucide-react";
+import { Radio, Video } from "lucide-react";
 import { getSessionFeedState } from "@/app/actions/community-feed";
 
 type SessionAnnouncementAttachment = {
@@ -99,43 +98,33 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
   const sharedByLabel = post.author.name ? `${post.author.name} shared a session` : "Shared session";
   const contextLine = (sessionData.sessionDescription || post.content || "").trim();
 
+  const metaParts: string[] = [];
+  if (scheduledAt) {
+    metaParts.push(`${formatDate(scheduledAt)} · ${formatTime(scheduledAt)}`);
+  }
+  if (sessionData.duration) {
+    metaParts.push(`${sessionData.duration} min`);
+  }
+  if (sessionData.mentorName) {
+    metaParts.push(`with ${sessionData.mentorName}`);
+  }
+
   return (
     <article className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-      <div className="mb-2 flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-purple-100 text-purple-700">
-            {isLive ? <Radio className="h-3.5 w-3.5" /> : <Video className="h-3.5 w-3.5" />}
-          </div>
-          <p className="text-xs font-medium text-gray-600">{sharedByLabel}</p>
+      <div className="mb-2 flex items-center gap-2">
+        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-purple-100 text-purple-700">
+          {isLive ? <Radio className="h-3.5 w-3.5" /> : <Video className="h-3.5 w-3.5" />}
         </div>
-
-        <Badge className={`border-0 text-[10px] ${isLive ? "bg-red-600 text-white" : "bg-gray-100 text-gray-700"}`}>
-          {isLive ? "Live" : hasRecording ? "Recording" : isUpcoming ? "Upcoming" : "Session"}
-        </Badge>
+        <p className="text-xs font-medium text-gray-600">{sharedByLabel}</p>
       </div>
 
       <h3 className="text-sm font-semibold text-gray-900">{sessionData.sessionTitle || post.title || "Live session"}</h3>
 
-      {contextLine ? <p className="mt-1 text-xs text-gray-600 line-clamp-1">{contextLine}</p> : null}
+      {contextLine ? <p className="mt-1 text-xs text-gray-600 line-clamp-2">{contextLine}</p> : null}
 
-      <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-gray-600">
-        {scheduledAt && (
-          <span className="inline-flex items-center gap-1">
-            <Calendar className="h-3.5 w-3.5 text-gray-400" />
-            {formatDate(scheduledAt)}
-          </span>
-        )}
-
-        {scheduledAt && (
-          <span className="inline-flex items-center gap-1">
-            <Clock className="h-3.5 w-3.5 text-gray-400" />
-            {formatTime(scheduledAt)}
-          </span>
-        )}
-
-        {sessionData.duration ? <span>{sessionData.duration} min</span> : null}
-        {sessionData.mentorName ? <span>with {sessionData.mentorName}</span> : null}
-      </div>
+      {metaParts.length > 0 ? (
+        <p className="mt-2 text-xs text-gray-600">{metaParts.join(" · ")}</p>
+      ) : null}
 
       <div className="mt-3">
         {hasRecording && sessionState?.recordingUrl ? (
