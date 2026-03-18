@@ -114,9 +114,9 @@ export default function MessagesPage() {
           <>
             <MessageThread conversationId={activeConversationId} otherUser={activeOtherUser} />
 
-            <aside className="hidden xl:flex w-80 border-l border-white/10 bg-zinc-950/40 p-5 flex-col gap-5">
+            <aside className="hidden xl:flex w-80 border-l border-gray-200 bg-white p-5 flex-col gap-5">
               <div>
-                <p className="text-xs uppercase tracking-wide text-white/40">Contact</p>
+                <p className="text-xs uppercase tracking-wide text-gray-500">Contact</p>
                 <div className="mt-3 flex items-center gap-3">
                   <div className="h-11 w-11 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 overflow-hidden flex items-center justify-center text-white font-semibold">
                     {activeOtherUser.image ? (
@@ -130,20 +130,20 @@ export default function MessagesPage() {
                     )}
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-white">
+                    <p className="text-sm font-semibold text-gray-900">
                       {activeOtherUser.firstName || activeOtherUser.name || "User"}
                     </p>
                     {activeOtherUser.username && (
-                      <p className="text-xs text-white/50">@{activeOtherUser.username}</p>
+                      <p className="text-xs text-gray-500">@{activeOtherUser.username}</p>
                     )}
                   </div>
                 </div>
               </div>
 
-              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-                <p className="text-xs uppercase tracking-wide text-white/40">Context</p>
-                <p className="mt-2 text-sm text-white/80">Direct conversation</p>
-                <p className="mt-1 text-xs text-white/50">Started from inbox or community members.</p>
+              <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                <p className="text-xs uppercase tracking-wide text-gray-500">Context</p>
+                <p className="mt-2 text-sm text-gray-900">Direct conversation</p>
+                <p className="mt-1 text-xs text-gray-500">Started from inbox or community members.</p>
               </div>
 
               <div className="rounded-xl border border-purple-500/30 bg-purple-500/10 p-4">
@@ -154,13 +154,13 @@ export default function MessagesPage() {
             </aside>
           </>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center bg-zinc-950">
+          <div className="flex-1 flex flex-col items-center justify-center bg-gray-50">
             <div className="text-center p-8">
               <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center mb-6">
                 <span className="text-5xl">💬</span>
               </div>
-              <h2 className="text-2xl font-bold text-white mb-2">Your Messages</h2>
-              <p className="text-white/60 max-w-md mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Your Messages</h2>
+              <p className="text-gray-600 max-w-md mb-6">
                 Select a conversation from the left to start chatting, or click the + button to start a new conversation.
               </p>
               <button

@@ -51,7 +51,7 @@ export function MessageInput({ conversationId, onMessageSent }: MessageInputProp
   };
 
   return (
-    <div className="border-t border-white/10 bg-zinc-900/50 backdrop-blur-sm p-4">
+    <div className="border-t border-gray-200 bg-white p-4">
       <div className="flex items-end gap-3">
         {/* Textarea */}
         <div className="flex-1 relative">
@@ -62,7 +62,7 @@ export function MessageInput({ conversationId, onMessageSent }: MessageInputProp
             onKeyDown={handleKeyDown}
             placeholder="Type a message... (Shift+Enter for new line)"
             disabled={isSending}
-            className="w-full resize-none bg-white/5 border border-white/10 rounded-xl px-4 py-3 pr-24 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 disabled:opacity-50 transition-all"
+            className="w-full resize-none bg-white border border-gray-300 rounded-xl px-4 py-3 pr-24 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 disabled:opacity-50 transition-all"
             rows={1}
             style={{ minHeight: "48px", maxHeight: "150px" }}
           />
@@ -72,7 +72,7 @@ export function MessageInput({ conversationId, onMessageSent }: MessageInputProp
             {/* Emoji picker (placeholder) */}
             <button
               type="button"
-              className="p-2 rounded-lg hover:bg-white/10 text-white/60 hover:text-white/90 transition-colors"
+              className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-800 transition-colors"
               title="Add emoji"
             >
               <Smile className="w-4 h-4" />
@@ -81,7 +81,7 @@ export function MessageInput({ conversationId, onMessageSent }: MessageInputProp
             {/* File upload (placeholder) */}
             <button
               type="button"
-              className="p-2 rounded-lg hover:bg-white/10 text-white/60 hover:text-white/90 transition-colors"
+              className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-800 transition-colors"
               title="Attach file"
             >
               <Paperclip className="w-4 h-4" />
@@ -89,7 +89,7 @@ export function MessageInput({ conversationId, onMessageSent }: MessageInputProp
 
             {/* Character count */}
             {message.length > 0 && (
-              <span className="text-xs text-white/40 px-2">
+              <span className="text-xs text-gray-500 px-2">
                 {message.length}/2000
               </span>
             )}
@@ -111,7 +111,7 @@ export function MessageInput({ conversationId, onMessageSent }: MessageInputProp
       </div>
 
       {/* Hint */}
-      <p className="text-xs text-white/30 mt-2">
+      <p className="text-xs text-gray-500 mt-2">
         Press Enter to send, Shift+Enter for new line
       </p>
     </div>

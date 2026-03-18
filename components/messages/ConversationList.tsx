@@ -97,12 +97,12 @@ export function ConversationList({
   );
 
   return (
-    <div className="w-80 border-r border-white/10 flex flex-col bg-zinc-900/30">
+    <div className="w-80 border-r border-gray-200 flex flex-col bg-white">
       {/* Header */}
-      <div className="p-4 border-b border-white/10">
+      <div className="p-4 border-b border-gray-200">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-white">Messages</h1>
+            <h1 className="text-xl font-bold text-gray-900">Messages</h1>
             {unreadTotal > 0 && (
               <span className="rounded-full bg-purple-500 px-2 py-0.5 text-xs font-semibold text-white">
                 {unreadTotal > 99 ? "99+" : unreadTotal}
@@ -111,7 +111,7 @@ export function ConversationList({
           </div>
           <button
             onClick={onNewMessage}
-            className="p-2 rounded-lg hover:bg-white/10 text-white/60 hover:text-white/90 transition-colors"
+            className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-800 transition-colors"
             title="New message"
           >
             <MessageSquarePlus className="w-5 h-5" />
@@ -120,13 +120,13 @@ export function ConversationList({
 
         {/* Search */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             type="text"
             placeholder="Search by name or username..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white/5 border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50"
+            className="w-full bg-white border border-gray-300 rounded-lg pl-10 pr-4 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500"
           />
         </div>
 
@@ -137,7 +137,7 @@ export function ConversationList({
             className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
               filter === "all"
                 ? "bg-purple-600 text-white"
-                : "bg-white/5 text-white/70 hover:bg-white/10"
+                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
             }`}
           >
             All
@@ -148,7 +148,7 @@ export function ConversationList({
             className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
               filter === "unread"
                 ? "bg-purple-600 text-white"
-                : "bg-white/5 text-white/70 hover:bg-white/10"
+                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
             }`}
           >
             Unread {unreadTotal > 0 ? `(${unreadTotal > 99 ? "99+" : unreadTotal})` : ""}

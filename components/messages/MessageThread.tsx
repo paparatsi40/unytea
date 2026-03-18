@@ -79,7 +79,7 @@ export function MessageThread({ conversationId, otherUser }: MessageThreadProps)
   return (
     <div className="flex-1 flex flex-col h-full">
       {/* Header */}
-      <div className="border-b border-white/10 bg-zinc-900/50 backdrop-blur-sm p-4">
+      <div className="border-b border-gray-200 bg-white p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             {/* Avatar */}
@@ -97,15 +97,15 @@ export function MessageThread({ conversationId, otherUser }: MessageThreadProps)
 
             {/* Name */}
             <div>
-              <h2 className="text-lg font-semibold text-white">{displayName}</h2>
+              <h2 className="text-lg font-semibold text-gray-900">{displayName}</h2>
               {otherUser.username && (
-                <p className="text-sm text-white/60">@{otherUser.username}</p>
+                <p className="text-sm text-gray-500">@{otherUser.username}</p>
               )}
             </div>
           </div>
 
           {/* Actions */}
-          <button className="p-2 rounded-lg hover:bg-white/10 text-white/60 hover:text-white/90 transition-colors">
+          <button className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-800 transition-colors">
             <MoreVertical className="w-5 h-5" />
           </button>
         </div>
@@ -114,7 +114,7 @@ export function MessageThread({ conversationId, otherUser }: MessageThreadProps)
       {/* Messages */}
       <div 
         ref={containerRef}
-        className="flex-1 overflow-y-auto p-4 space-y-4 bg-zinc-950/30"
+        className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50"
       >
         {error && (
           <div className="text-center p-4">
@@ -127,10 +127,10 @@ export function MessageThread({ conversationId, otherUser }: MessageThreadProps)
             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center mb-4">
               <span className="text-3xl">💬</span>
             </div>
-            <h3 className="text-lg font-semibold text-white mb-2">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
               Start the conversation
             </h3>
-            <p className="text-white/60 max-w-sm">
+            <p className="text-gray-600 max-w-sm">
               Say hi to {displayName}! Send your first message below.
             </p>
           </div>
