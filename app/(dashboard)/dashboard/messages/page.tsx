@@ -175,13 +175,13 @@ export default function MessagesPage() {
       </div>
 
       {isComposerOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="w-full max-w-lg rounded-2xl border border-white/10 bg-zinc-900 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-white/10 p-4">
-              <h3 className="text-lg font-semibold text-white">Start new conversation</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
+          <div className="w-full max-w-lg rounded-2xl border border-gray-200 bg-white shadow-2xl">
+            <div className="flex items-center justify-between border-b border-gray-200 p-4">
+              <h3 className="text-lg font-semibold text-gray-900">Start new conversation</h3>
               <button
                 onClick={() => setIsComposerOpen(false)}
-                className="rounded-md p-1.5 text-white/60 hover:bg-white/10 hover:text-white"
+                className="rounded-md p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-800"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -189,22 +189,22 @@ export default function MessagesPage() {
 
             <div className="p-4">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input
                   value={candidateQuery}
                   onChange={(e) => setCandidateQuery(e.target.value)}
                   placeholder="Search member by name or username"
-                  className="w-full rounded-xl border border-white/10 bg-white/5 py-2.5 pl-10 pr-3 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                  className="w-full rounded-xl border border-gray-300 bg-white py-2.5 pl-10 pr-3 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500"
                 />
               </div>
 
               <div className="mt-4 max-h-80 overflow-y-auto space-y-2">
                 {isSearchingCandidates ? (
-                  <div className="flex items-center justify-center py-8 text-white/60">
+                  <div className="flex items-center justify-center py-8 text-gray-500">
                     <Loader2 className="h-5 w-5 animate-spin" />
                   </div>
                 ) : candidates.length === 0 ? (
-                  <p className="py-8 text-center text-sm text-white/50">Type to search members.</p>
+                  <p className="py-8 text-center text-sm text-gray-500">Type to search members.</p>
                 ) : (
                   candidates.map((candidate) => {
                     const displayName =
@@ -213,7 +213,7 @@ export default function MessagesPage() {
                       <button
                         key={candidate.id}
                         onClick={() => handleStartConversation(candidate)}
-                        className="w-full rounded-xl border border-white/10 bg-white/[0.03] p-3 text-left hover:bg-white/[0.06] transition-colors"
+                        className="w-full rounded-xl border border-gray-200 bg-gray-50 p-3 text-left hover:bg-gray-100 transition-colors"
                       >
                         <div className="flex items-center gap-3">
                           <div className="h-10 w-10 rounded-full overflow-hidden bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-sm font-semibold">
@@ -228,9 +228,9 @@ export default function MessagesPage() {
                             )}
                           </div>
                           <div className="min-w-0">
-                            <p className="truncate text-sm font-medium text-white">{displayName}</p>
+                            <p className="truncate text-sm font-medium text-gray-900">{displayName}</p>
                             {candidate.username && (
-                              <p className="truncate text-xs text-white/50">@{candidate.username}</p>
+                              <p className="truncate text-xs text-gray-500">@{candidate.username}</p>
                             )}
                           </div>
                         </div>
