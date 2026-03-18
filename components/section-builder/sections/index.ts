@@ -23,24 +23,43 @@ export const SECTIONS: Record<SectionType, SectionSchema> = {
   ownerBio: OwnerBioSchema,
   gallery: GallerySchema,
   
-  // Placeholders for future sections
   pricing: {
     type: "pricing",
     label: "Pricing",
-    description: "Pricing tiers (coming soon)",
+    description: "Link people to your plans",
     icon: "💰",
-    defaultProps: {},
-    fields: [],
-    Render: () => React.createElement('div', { className: "p-8 text-center text-gray-500" }, "Pricing section coming soon"),
+    defaultProps: {
+      title: "Choose the plan that fits you",
+      subtitle: "Compare options and start with the best plan for your goals.",
+      ctaText: "View plans",
+      ctaUrl: "/pricing",
+    },
+    fields: [
+      { key: "title", label: "Title", kind: "text", placeholder: "Choose the plan that fits you" },
+      { key: "subtitle", label: "Subtitle", kind: "textarea", placeholder: "Compare options and start..." },
+      { key: "ctaText", label: "Button label", kind: "text", placeholder: "View plans" },
+      { key: "ctaUrl", label: "Plans URL", kind: "url", placeholder: "/pricing" },
+    ],
+    Render: () => React.createElement('div', { className: "p-8 text-center text-gray-500" }, "Pricing section"),
   },
   video: {
     type: "video",
     label: "Video",
-    description: "Embed video (coming soon)",
+    description: "Embed your intro or sales video",
     icon: "🎥",
-    defaultProps: {},
-    fields: [],
-    Render: () => React.createElement('div', { className: "p-8 text-center text-gray-500" }, "Video section coming soon"),
+    defaultProps: {
+      title: "Watch the intro",
+      description: "Add your video URL to show it here.",
+      videoUrl: "",
+      thumbnailUrl: "",
+    },
+    fields: [
+      { key: "title", label: "Title", kind: "text", placeholder: "Watch the intro" },
+      { key: "description", label: "Description", kind: "textarea", placeholder: "Add context for this video" },
+      { key: "videoUrl", label: "Video URL", kind: "url", placeholder: "https://www.youtube.com/watch?v=..." },
+      { key: "thumbnailUrl", label: "Thumbnail URL", kind: "url", placeholder: "https://..." },
+    ],
+    Render: () => React.createElement('div', { className: "p-8 text-center text-gray-500" }, "Video section"),
   },
 };
 

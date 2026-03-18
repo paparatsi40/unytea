@@ -46,10 +46,57 @@ function renderSection(section: SectionInstance, t: ReturnType<typeof useTransla
       return <OwnerBioRender {...section.props} />;
     case "gallery":
       return <GalleryRender {...section.props} />;
-    case "pricing":
-      return <div className="p-8 text-center text-gray-500">{t("common.comingSoon")}</div>;
-    case "video":
-      return <div className="p-8 text-center text-gray-500">{t("common.comingSoon")}</div>;
+    case "pricing": {
+      const title = section.props.title || "Choose the plan that fits you";
+      const subtitle = section.props.subtitle || "Compare options and start with the best plan for your goals.";
+      const ctaText = section.props.ctaText || "View plans";
+      const ctaUrl = section.props.ctaUrl || "/pricing";
+
+      return (
+        <section className="rounded-2xl bg-white px-8 py-10 text-center shadow-sm">
+          <h3 className="text-2xl font-bold text-gray-900">{title}</h3>
+          <p className="mt-2 text-sm text-gray-600">{subtitle}</p>
+          <a
+            href={ctaUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-5 inline-flex items-center rounded-full bg-black px-5 py-2 text-sm font-semibold text-white"
+          >
+            {ctaText}
+          </a>
+        </section>
+      );
+    }
+    case "video": {
+      const title = section.props.title || "Watch the intro";
+      const description = section.props.description || "Add your video URL to show it here.";
+      const videoUrl = (section.props.videoUrl as string) || "";
+      const thumbnailUrl = (section.props.thumbnailUrl as string) || "";
+
+      return (
+        <section className="rounded-2xl bg-white px-8 py-10 shadow-sm">
+          <h3 className="text-2xl font-bold text-gray-900">{title}</h3>
+          <p className="mt-2 text-sm text-gray-600">{description}</p>
+          <div className="mt-5 overflow-hidden rounded-xl border border-gray-200 bg-gray-50">
+            {videoUrl ? (
+              <iframe
+                src={videoUrl}
+                title={title}
+                className="h-72 w-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            ) : thumbnailUrl ? (
+              <img src={thumbnailUrl} alt={title} className="h-72 w-full object-cover" />
+            ) : (
+              <div className="flex h-72 items-center justify-center text-sm text-gray-500">
+                Video will appear here once you add a video URL.
+              </div>
+            )}
+          </div>
+        </section>
+      );
+    }
     default:
       return <div className="p-8 text-center text-gray-500">{t("sectionBuilder.unknownSection")}</div>;
   }
