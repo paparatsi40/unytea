@@ -155,7 +155,7 @@ export function MessageThread({ conversationId, otherUser, subtitle = "Direct co
       {/* Messages */}
       <div 
         ref={containerRef}
-        className="flex-1 overflow-y-auto overflow-x-hidden p-4 bg-gray-50"
+        className="flex-1 overflow-y-auto overflow-x-hidden px-4 pt-2 pb-3 bg-gray-50"
       >
         {error && (
           <div className="text-center p-4">
@@ -176,7 +176,7 @@ export function MessageThread({ conversationId, otherUser, subtitle = "Direct co
             </p>
           </div>
         ) : (
-          <div className="min-h-full flex flex-col justify-end gap-3">
+          <div className="flex min-h-[56%] flex-col justify-end gap-3 pb-2">
             {messages.map((message, index) => {
               const currentDay = new Date(message.createdAt).toDateString();
               const previousDay = index > 0 ? new Date(messages[index - 1].createdAt).toDateString() : null;

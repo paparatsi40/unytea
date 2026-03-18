@@ -200,14 +200,18 @@ export default function MessagesPage() {
                   </div>
                 </div>
 
-                {activeOtherUser.username ? (
-                  <Link
-                    href={`/u/${activeOtherUser.username}`}
-                    className="mt-3 inline-flex rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
-                  >
-                    View profile
-                  </Link>
-                ) : null}
+                <Link
+                  href={activeOtherUser.username ? `/u/${activeOtherUser.username}` : "/dashboard/messages"}
+                  className={`mt-3 inline-flex rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
+                    activeOtherUser.username
+                      ? "border-gray-300 text-gray-700 hover:bg-gray-50"
+                      : "border-gray-200 text-gray-400 pointer-events-none"
+                  }`}
+                  aria-disabled={!activeOtherUser.username}
+                  title={activeOtherUser.username ? "View profile" : "Profile unavailable"}
+                >
+                  View profile
+                </Link>
               </div>
 
               <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">

@@ -145,7 +145,7 @@ export function MessageInput({ conversationId, onMessageSent }: MessageInputProp
   };
 
   return (
-    <div className="border-t border-gray-200 bg-white px-3 py-2.5 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+    <div className="border-t border-gray-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 px-4 md:px-5 py-3 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-[0_-4px_18px_rgba(15,23,42,0.06)]">
       {attachments.length > 0 && (
         <div className="mb-3 flex flex-wrap gap-2">
           {attachments.map((attachment) => (

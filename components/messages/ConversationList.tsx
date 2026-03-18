@@ -148,10 +148,11 @@ export function ConversationList({
           </div>
           <button
             onClick={onNewMessage}
-            className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-800 transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors"
             title="New message"
           >
-            <MessageSquarePlus className="w-5 h-5" />
+            <MessageSquarePlus className="w-4 h-4" />
+            <span>New</span>
           </button>
         </div>
 
@@ -225,7 +226,9 @@ export function ConversationList({
                   key={conversation.id}
                   onClick={() => onSelectConversation(conversation.id, otherUser)}
                   className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors ${
-                    isActive ? "bg-purple-50/70 border-r-2 border-purple-500" : ""
+                    isActive
+                      ? "bg-purple-50/80 border-r-2 border-purple-500 shadow-[inset_0_0_0_1px_rgba(168,85,247,0.15)]"
+                      : ""
                   }`}
                 >
                   <div className="flex items-start gap-3">
@@ -252,13 +255,15 @@ export function ConversationList({
                     {/* Content */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2 mb-0.5">
-                        <h3 className={`text-sm font-semibold truncate ${
+                        <h3 className={`text-sm font-semibold truncate leading-5 ${
                           unreadCount > 0 ? "text-gray-900" : "text-gray-800"
                         }`}>
                           {displayName}
                         </h3>
                         {lastMessage && (
-                          <span className="text-[11px] text-gray-500 flex-shrink-0 pt-0.5">
+                          <span className={`text-[11px] flex-shrink-0 pt-0.5 ${
+                            isActive ? "text-purple-700" : "text-gray-500"
+                          }`}>
                             {formatDistanceToNow(new Date(lastMessage.createdAt), {
                               addSuffix: false,
                             })}
@@ -267,7 +272,7 @@ export function ConversationList({
                       </div>
 
                       {lastMessage ? (
-                        <p className={`text-[13px] truncate ${
+                        <p className={`text-[13px] truncate leading-5 ${
                           unreadCount > 0 ? "text-gray-800 font-medium" : "text-gray-600"
                         }`}>
                           {lastMessage.sender.id === user?.id ? (
