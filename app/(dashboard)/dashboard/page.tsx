@@ -616,6 +616,48 @@ export default function DashboardPage() {
         </div>
 
         <Card className="border-zinc-200 bg-white">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base">Your communities</CardTitle>
+              <Link href="/dashboard/communities">
+                <Button variant="ghost" size="sm">View all</Button>
+              </Link>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {identity && identity.communities.length > 0 ? (
+              <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
+                {identity.communities.slice(0, 6).map((membership) => (
+                  <Link
+                    key={membership.membershipId}
+                    href={`/dashboard/c/${membership.community.slug}`}
+                    className="rounded-lg border border-zinc-200 p-3 hover:bg-zinc-50"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="font-medium text-zinc-900">{membership.community.name}</p>
+                      <Badge variant="outline">{membership.role}</Badge>
+                    </div>
+                    <p className="mt-1 text-xs text-zinc-500">
+                      {membership.community.membersCount} members
+                      {membership.community.nextSession
+                        ? ` · Next: ${formatDate(membership.community.nextSession.scheduledAt)} ${formatTime(membership.community.nextSession.scheduledAt)}`
+                        : " · No upcoming session"}
+                    </p>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div className="flex items-center justify-between rounded-lg border border-dashed border-zinc-300 p-4">
+                <p className="text-sm text-zinc-600">No communities visible yet.</p>
+                <Link href="/dashboard/communities/new">
+                  <Button size="sm">Create community</Button>
+                </Link>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="border-zinc-200 bg-white">
           <CardContent className="p-5">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div className="space-y-1">
