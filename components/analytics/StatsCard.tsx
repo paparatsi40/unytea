@@ -1,7 +1,4 @@
-"use client";
-
 import { LucideIcon } from "lucide-react";
-import { motion } from "framer-motion";
 
 interface StatsCardProps {
   title: string;
@@ -21,11 +18,7 @@ export function StatsCard({ title, value, change, icon: Icon, color = "blue" }: 
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="group relative overflow-hidden rounded-xl border border-border/50 bg-card/50 p-6 backdrop-blur-sm transition-all hover:border-border hover:shadow-lg"
-    >
+    <div className="group relative overflow-hidden rounded-xl border border-border/50 bg-card/50 p-6 backdrop-blur-sm transition-all hover:border-border hover:shadow-lg">
       {/* Background gradient */}
       <div className="absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent" />
@@ -44,6 +37,6 @@ export function StatsCard({ title, value, change, icon: Icon, color = "blue" }: 
           <Icon className="h-6 w-6" />
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
