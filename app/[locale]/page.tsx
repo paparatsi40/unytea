@@ -729,40 +729,40 @@ export default function Home() {
         </div>
       </section>
 
-      {/* COMMUNITY TEMPLATES */}
+      {/* WHAT YOU CAN RUN TODAY */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-10">
-            <Badge className="mb-4">Start Fast</Badge>
-            <h2 className="text-3xl font-bold mb-4">Start with proven templates</h2>
+            <Badge className="mb-4">Built In</Badge>
+            <h2 className="text-3xl font-bold mb-4">Run your community with features available today</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Launch your community in minutes with pre-built templates
+              No mock promises — these workflows are already live in the product.
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             <div className="bg-white p-6 rounded-xl border hover:shadow-lg transition-all text-center">
               <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Video className="w-7 h-7 text-blue-600" />
+                <LayoutDashboard className="w-7 h-7 text-blue-600" />
               </div>
-              <h3 className="font-semibold text-lg mb-2">Coaching Communities</h3>
-              <p className="text-sm text-muted-foreground mb-4">Group calls, 1-on-1 scheduling, progress tracking</p>
-              <div className="text-xs text-green-600 font-medium">✓ Ready in 2 minutes</div>
+              <h3 className="font-semibold text-lg mb-2">Customize Landing Page</h3>
+              <p className="text-sm text-muted-foreground mb-4">Use Appearance + Section Presets to shape your public community page.</p>
+              <div className="text-xs text-green-600 font-medium">✓ Available now</div>
             </div>
             <div className="bg-white p-6 rounded-xl border hover:shadow-lg transition-all text-center">
               <div className="w-14 h-14 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <BookOpen className="w-7 h-7 text-orange-600" />
+                <Video className="w-7 h-7 text-orange-600" />
               </div>
-              <h3 className="font-semibold text-lg mb-2">Course Communities</h3>
-              <p className="text-sm text-muted-foreground mb-4">Lessons, assignments, discussions, certificates</p>
-              <div className="text-xs text-green-600 font-medium">✓ Ready in 2 minutes</div>
+              <h3 className="font-semibold text-lg mb-2">Host Live Sessions</h3>
+              <p className="text-sm text-muted-foreground mb-4">Schedule sessions, track attendance, and manage reminders from one control center.</p>
+              <div className="text-xs text-green-600 font-medium">✓ Available now</div>
             </div>
             <div className="bg-white p-6 rounded-xl border hover:shadow-lg transition-all text-center">
               <div className="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Users className="w-7 h-7 text-purple-600" />
+                <CreditCard className="w-7 h-7 text-purple-600" />
               </div>
-              <h3 className="font-semibold text-lg mb-2">Membership Communities</h3>
-              <p className="text-sm text-muted-foreground mb-4">Exclusive content, member tiers, recurring revenue</p>
-              <div className="text-xs text-green-600 font-medium">✓ Ready in 2 minutes</div>
+              <h3 className="font-semibold text-lg mb-2">Monetize Access & Courses</h3>
+              <p className="text-sm text-muted-foreground mb-4">Set paid access, sell courses, and manage subscriptions with Stripe-powered payments.</p>
+              <div className="text-xs text-green-600 font-medium">✓ Available now</div>
             </div>
           </div>
         </div>
