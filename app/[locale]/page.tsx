@@ -550,40 +550,115 @@ export default function Home() {
       {/* 9️⃣ PRICING */}
       <section id="pricing" className="py-20">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
+          <div className="text-center mb-16 max-w-4xl mx-auto">
             <Badge className="mb-4">Pricing</Badge>
-            <h2 className="text-4xl font-bold mb-4">Simple, transparent pricing</h2>
-            <p className="text-xl text-muted-foreground">Start free, upgrade when you&apos;re ready</p>
+            <h2 className="text-4xl font-bold mb-4">Simple pricing for community businesses</h2>
+            <p className="text-lg text-muted-foreground mb-2">Hosts pay for the platform. Members join for free.</p>
+            <p className="text-base text-muted-foreground">
+              Build your community, run live sessions, sell access or courses, and scale with lower transaction fees as you grow.
+            </p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
             <PricingCard
               name="Start"
               price={0}
               description="Perfect for testing"
-              features={["1 community", "Up to 50 members", "Basic courses", "Community feed", "5% transaction fee"]}
-              cta="Get Started"
+              features={[
+                "1 community",
+                "Up to 50 members",
+                "Community feed",
+                "Simple live sessions",
+                "Basic library",
+                "Basic courses",
+                "Basic analytics",
+                "Unytea branding",
+                "8% transaction fee",
+              ]}
+              cta="Start free"
+              footnote="Best for validating your first community idea."
             />
             <PricingCard
               name="Creator"
               price={49}
-              description="Best for monetizing communities"
-              features={["1 community", "Unlimited members", "Live sessions", "Full courses", "3% transaction fee"]}
-              popular
-              cta="Start Free Trial"
+              description="Best for launching and monetizing one community"
+              features={[
+                "Everything in Start, plus",
+                "Unlimited members",
+                "Live sessions",
+                "Full courses",
+                "Paid community access",
+                "Paid course sales",
+                "Basic growth tools",
+                "5% transaction fee",
+              ]}
+              cta="Choose Creator"
+              footnote="For hosts ready to launch, sell, and grow one community."
             />
             <PricingCard
               name="Business"
               price={99}
-              description="For growing businesses"
-              features={["1 community", "Custom domain", "Advanced analytics", "5 admins", "1% transaction fee"]}
-              cta="Start Free Trial"
+              description="Best for growing community businesses"
+              features={[
+                "Everything in Creator, plus",
+                "Custom domain",
+                "Advanced analytics",
+                "Up to 5 admins",
+                "Attendance insights",
+                "Session performance tools",
+                "Lower transaction fee",
+                "2% transaction fee",
+              ]}
+              cta="Choose Business"
+              popular
+              popularLabel="Recommended"
+              footnote="For hosts running a serious community business with recurring sessions and deeper insights."
             />
             <PricingCard
               name="Pro"
               price={199}
-              description="For enterprises"
-              features={["Multiple communities", "White-label", "API access", "Unlimited admins", "0% transaction fee"]}
-              cta="Contact Sales"
+              description="Best for scaling operators"
+              features={[
+                "Everything in Business, plus",
+                "Up to 3 communities",
+                "White-label experience",
+                "API access",
+                "Unlimited admins",
+                "Multi-community operations",
+                "0% transaction fee",
+              ]}
+              cta="Choose Pro"
+              footnote="For brands, teams, and operators managing multiple communities at scale."
+            />
+          </div>
+
+          <div className="mt-10 rounded-2xl border bg-muted/20 p-6 max-w-6xl mx-auto">
+            <h3 className="text-lg font-semibold mb-2">Free for members. Built for hosts.</h3>
+            <p className="text-sm text-muted-foreground">
+              Anyone can create an account, explore communities, and join for free. Hosts pay for Unytea to run their business, and transaction fees only apply when they sell paid access or courses.
+            </p>
+          </div>
+
+          <div className="mt-8 grid md:grid-cols-2 gap-4 max-w-6xl mx-auto">
+            <FaqItem
+              q="Do members pay to use Unytea?"
+              a="No. Members can create an account, explore communities, and join for free. They only pay if a host charges for community access or sells a course."
+            />
+            <FaqItem
+              q="When do transaction fees apply?"
+              a="Transaction fees apply only when you sell paid community access or courses through Unytea."
+            />
+            <FaqItem
+              q="Can I start for free?"
+              a="Yes. The Start plan lets you launch one community, test demand, and validate your idea before upgrading."
+            />
+            <FaqItem
+              q="Can I change plans later?"
+              a="Yes. You can upgrade as your community grows and unlock lower transaction fees, more tools, and more operational control."
+            />
+            <FaqItem
+              q="Who is Pro for?"
+              a="Pro is for operators managing multiple communities, brands, or teams that need white-labeling, API access, and zero transaction fees."
             />
           </div>
         </div>
@@ -965,35 +1040,63 @@ function TestimonialCard({ quote, author, role, rating }: { quote: string; autho
   );
 }
 
-function PricingCard({ name, price, description, features, popular = false, cta }: { name: string; price: number; description: string; features: string[]; popular?: boolean; cta: string }) {
+function PricingCard({
+  name,
+  price,
+  description,
+  features,
+  popular = false,
+  popularLabel = "Recommended",
+  cta,
+  footnote,
+}: {
+  name: string;
+  price: number;
+  description: string;
+  features: string[];
+  popular?: boolean;
+  popularLabel?: string;
+  cta: string;
+  footnote?: string;
+}) {
   return (
-    <div className={`relative p-6 rounded-xl border ${popular ? 'border-primary ring-2 ring-primary/20 scale-105' : 'bg-white'}`}>
+    <div className={`relative p-6 rounded-xl border bg-white ${popular ? "border-primary ring-2 ring-primary/20" : "border-border"}`}>
       {popular && (
-        <Badge className="absolute -top-2 left-1/2 -translate-x-1/2 bg-primary text-white">
-          Most Popular
+        <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-white">
+          {popularLabel}
         </Badge>
       )}
       <div className="text-center mb-6">
         <h3 className="font-semibold text-lg">{name}</h3>
         <div className="mt-2">
           <span className="text-4xl font-bold">${price}</span>
-          {price > 0 && <span className="text-muted-foreground">/month</span>}
+          <span className="text-muted-foreground">/month</span>
         </div>
         <p className="text-sm text-muted-foreground mt-1">{description}</p>
       </div>
-      <ul className="space-y-3 mb-6">
+      <ul className="space-y-2.5 mb-6">
         {features.map((feature, i) => (
-          <li key={i} className="flex items-center gap-2 text-sm">
-            <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-            {feature}
+          <li key={i} className="flex items-start gap-2 text-sm">
+            <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+            <span>{feature}</span>
           </li>
         ))}
       </ul>
       <Link href="/auth/signup">
-        <Button className="w-full" variant={popular ? 'default' : 'outline'}>
+        <Button className="w-full" variant={popular ? "default" : "outline"}>
           {cta}
         </Button>
       </Link>
+      {footnote ? <p className="mt-4 text-xs text-muted-foreground">{footnote}</p> : null}
+    </div>
+  );
+}
+
+function FaqItem({ q, a }: { q: string; a: string }) {
+  return (
+    <div className="rounded-xl border bg-white p-4">
+      <h4 className="text-sm font-semibold mb-1.5">{q}</h4>
+      <p className="text-sm text-muted-foreground">{a}</p>
     </div>
   );
 }
