@@ -7,10 +7,11 @@ import {
   useLocalParticipant,
   useTracks,
 } from "@livekit/components-react";
-import { Track } from "livekit-client";
+import { Track, LocalTrack } from "livekit-client";
 import { Monitor, Video, Pencil, Headphones } from "lucide-react";
 import { SessionMode } from "./ModeSwitcher";
 import { SessionWhiteboard } from "./SessionWhiteboard";
+import { LocalVideo } from "./LocalVideo";
 import { cn } from "@/lib/utils";
 
 interface MainStageProps {
@@ -116,6 +117,7 @@ export function MainStage({
   // Access track states from localParticipant
   const isCameraEnabled = localParticipant.isCameraEnabled;
   const isMicrophoneEnabled = localParticipant.isMicrophoneEnabled;
+  const cameraTrack = localParticipant.getTrackPublication(Track.Source.Camera)?.track as LocalTrack | undefined;
   const cameraTracks = useTracks([Track.Source.Camera]);
   const screenTracks = useTracks([Track.Source.ScreenShare]);
 
@@ -188,6 +190,12 @@ export function MainStage({
               description="Share your screen to present slides, demos, or walkthroughs."
             />
           )
+        ) : isCameraEnabled && cameraTrack ? (
+          <LocalVideo
+            className="h-full w-full object-cover"
+            cameraTrack={cameraTrack}
+            isCameraEnabled={isCameraEnabled}
+          />
         ) : mainCameraTrack ? (
           <div className="h-full w-full bg-black">
             <VideoTrack
