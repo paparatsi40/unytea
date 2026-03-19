@@ -554,9 +554,7 @@ export default function Home() {
             <Badge className="mb-4">Pricing</Badge>
             <h2 className="text-4xl font-bold mb-4">Simple pricing for community businesses</h2>
             <p className="text-lg text-muted-foreground mb-2">Hosts pay for the platform. Members join for free.</p>
-            <p className="text-base text-muted-foreground">
-              Build your community, run live sessions, sell access or courses, and scale with lower transaction fees as you grow.
-            </p>
+            <p className="text-base text-muted-foreground">Run your community, live sessions, and courses in one place.</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
@@ -576,7 +574,7 @@ export default function Home() {
                 "8% transaction fee",
               ]}
               cta="Start free"
-              footnote="Best for validating your first community idea."
+              footnote="Validate your first community idea."
             />
             <PricingCard
               name="Creator"
@@ -593,12 +591,12 @@ export default function Home() {
                 "5% transaction fee",
               ]}
               cta="Choose Creator"
-              footnote="For hosts ready to launch, sell, and grow one community."
+              footnote="Launch, sell, and grow one community."
             />
             <PricingCard
               name="Business"
               price={99}
-              description="Best for growing community businesses"
+              description="Best for operators running one community business"
               features={[
                 "Everything in Creator, plus",
                 "Custom domain",
@@ -612,12 +610,12 @@ export default function Home() {
               cta="Choose Business"
               popular
               popularLabel="Recommended"
-              footnote="For hosts running a serious community business with recurring sessions and deeper insights."
+              footnote="Run a serious community business with deeper insights."
             />
             <PricingCard
               name="Pro"
               price={199}
-              description="Best for scaling operators"
+              description="Best for teams scaling multiple communities"
               features={[
                 "Everything in Business, plus",
                 "Up to 3 communities",
@@ -628,7 +626,7 @@ export default function Home() {
                 "0% transaction fee",
               ]}
               cta="Choose Pro"
-              footnote="For brands, teams, and operators managing multiple communities at scale."
+              footnote="Manage multiple communities at scale."
             />
           </div>
 
