@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   useLocalParticipant,
   useParticipants,
@@ -94,6 +94,7 @@ export function VideoRoomUI({
   const isCameraEnabled = localParticipantData.isCameraEnabled;
   const isMicrophoneEnabled = localParticipantData.isMicrophoneEnabled;
   const isScreenShareEnabled = localParticipantData.isScreenShareEnabled;
+  const preferredCameraCheckedRef = useRef(false);
 
   // Active panel (for mobile/responsive)
   const [activePanel, setActivePanel] = useState<PanelTab>("chat");
@@ -109,6 +110,8 @@ export function VideoRoomUI({
 
   // Reactions
   const [showReactions, setShowReactions] = useState(false);
+  const [videoInputs, setVideoInputs] = useState<MediaDeviceInfo[]>([]);
+  const [selectedCameraId, setSelectedCameraId] = useState<string>("");
 
   // Session duration
   const [elapsedTime, setElapsedTime] = useState("0:00");
@@ -125,6 +128,61 @@ export function VideoRoomUI({
     return () => clearInterval(interval);
   }, [sessionStartTime]);
 
+  const refreshVideoInputs = useCallback(async () => {
+    try {
+      if (!navigator.mediaDevices?.enumerateDevices) return;
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const inputs = devices.filter((d) => d.kind === "videoinput");
+      setVideoInputs(inputs);
+      if (!selectedCameraId && inputs[0]?.deviceId) {
+        setSelectedCameraId(inputs[0].deviceId);
+      }
+    } catch (e) {
+      console.warn("Could not enumerate video inputs:", e);
+    }
+  }, [selectedCameraId]);
+
+  const switchToPreferredExternalCamera = useCallback(async () => {
+    try {
+      if (!navigator.mediaDevices?.enumerateDevices) return;
+
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const inputs = devices.filter((d) => d.kind === "videoinput");
+      if (inputs.length <= 1) return;
+
+      const integratedPatterns = ["integrated", "built-in", "facetime", "internal"];
+      const external = inputs.find((d) => {
+        const label = d.label.toLowerCase();
+        return !integratedPatterns.some((p) => label.includes(p));
+      });
+
+      if (!external?.deviceId) return;
+
+      const room = localParticipant.room;
+      if (!room) return;
+
+      await room.switchActiveDevice("videoinput", external.deviceId);
+      setSelectedCameraId(external.deviceId);
+      await refreshVideoInputs();
+    } catch (e) {
+      console.warn("Could not switch to external camera:", e);
+    }
+  }, [localParticipant, refreshVideoInputs]);
+
+  const handleCameraDeviceChange = useCallback(
+    async (deviceId: string) => {
+      try {
+        const room = localParticipant.room;
+        if (!room) return;
+        await room.switchActiveDevice("videoinput", deviceId);
+        setSelectedCameraId(deviceId);
+      } catch (e) {
+        console.error("Failed to switch camera device:", e);
+      }
+    },
+    [localParticipant],
+  );
+
   // Toggle microphone
   const toggleMicrophone = useCallback(async () => {
     try {
@@ -137,11 +195,16 @@ export function VideoRoomUI({
   // Toggle camera
   const toggleCamera = useCallback(async () => {
     try {
-      await localParticipant.setCameraEnabled(!isCameraEnabled);
+      const willEnable = !isCameraEnabled;
+      await localParticipant.setCameraEnabled(willEnable);
+
+      if (willEnable) {
+        await switchToPreferredExternalCamera();
+      }
     } catch (e) {
       console.error("Failed to toggle camera:", e);
     }
-  }, [localParticipant, isCameraEnabled]);
+  }, [localParticipant, isCameraEnabled, switchToPreferredExternalCamera]);
 
   // Toggle screen share
   const toggleScreenShare = useCallback(async () => {
@@ -151,6 +214,26 @@ export function VideoRoomUI({
       console.error("Failed to toggle screen share:", e);
     }
   }, [localParticipant, isScreenShareEnabled]);
+
+  useEffect(() => {
+    void refreshVideoInputs();
+
+    const onDeviceChange = () => {
+      void refreshVideoInputs();
+    };
+
+    navigator.mediaDevices?.addEventListener?.("devicechange", onDeviceChange);
+    return () => {
+      navigator.mediaDevices?.removeEventListener?.("devicechange", onDeviceChange);
+    };
+  }, [refreshVideoInputs]);
+
+  useEffect(() => {
+    if (!isCameraEnabled || preferredCameraCheckedRef.current) return;
+
+    preferredCameraCheckedRef.current = true;
+    void switchToPreferredExternalCamera();
+  }, [isCameraEnabled, switchToPreferredExternalCamera]);
 
   // Raise hand
   const toggleRaiseHand = useCallback(() => {
@@ -559,21 +642,38 @@ export function VideoRoomUI({
 
           {/* Camera (video mode only) */}
           {!isAudioOnly && (
-            <button
-              onClick={toggleCamera}
-              className={cn(
-                "flex h-12 w-12 items-center justify-center rounded-full transition-all",
-                isCameraEnabled
-                  ? "bg-zinc-800 text-white hover:bg-zinc-700"
-                  : "bg-red-500/20 text-red-400 hover:bg-red-500/30"
+            <>
+              <button
+                onClick={toggleCamera}
+                className={cn(
+                  "flex h-12 w-12 items-center justify-center rounded-full transition-all",
+                  isCameraEnabled
+                    ? "bg-zinc-800 text-white hover:bg-zinc-700"
+                    : "bg-red-500/20 text-red-400 hover:bg-red-500/30"
+                )}
+              >
+                {isCameraEnabled ? (
+                  <Video className="h-5 w-5" />
+                ) : (
+                  <VideoOff className="h-5 w-5" />
+                )}
+              </button>
+
+              {videoInputs.length > 1 && (
+                <select
+                  value={selectedCameraId}
+                  onChange={(e) => void handleCameraDeviceChange(e.target.value)}
+                  className="h-10 max-w-[220px] rounded-lg border border-zinc-700 bg-zinc-900 px-3 text-xs text-zinc-200"
+                  title="Select camera"
+                >
+                  {videoInputs.map((device, index) => (
+                    <option key={device.deviceId || `${device.label}-${index}`} value={device.deviceId}>
+                      {device.label || `Camera ${index + 1}`}
+                    </option>
+                  ))}
+                </select>
               )}
-            >
-              {isCameraEnabled ? (
-                <Video className="h-5 w-5" />
-              ) : (
-                <VideoOff className="h-5 w-5" />
-              )}
-            </button>
+            </>
           )}
 
           {/* Screen Share */}
