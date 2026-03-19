@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import {
   useLocalParticipant,
   useParticipants,
+  useRoomContext,
 } from "@livekit/components-react";
 import { cn } from "@/lib/utils";
 import {
@@ -89,6 +90,7 @@ export function VideoRoomUI({
   
   // Room context
   const participants = useParticipants();
+  const room = useRoomContext();
   const localParticipantData = useLocalParticipant();
   const localParticipant = localParticipantData.localParticipant;
   const isCameraEnabled = localParticipantData.isCameraEnabled;
@@ -158,7 +160,6 @@ export function VideoRoomUI({
 
       if (!external?.deviceId) return;
 
-      const room = localParticipant.room;
       if (!room) return;
 
       await room.switchActiveDevice("videoinput", external.deviceId);
@@ -167,12 +168,11 @@ export function VideoRoomUI({
     } catch (e) {
       console.warn("Could not switch to external camera:", e);
     }
-  }, [localParticipant, refreshVideoInputs]);
+  }, [room, refreshVideoInputs]);
 
   const handleCameraDeviceChange = useCallback(
     async (deviceId: string) => {
       try {
-        const room = localParticipant.room;
         if (!room) return;
         await room.switchActiveDevice("videoinput", deviceId);
         setSelectedCameraId(deviceId);
@@ -180,7 +180,7 @@ export function VideoRoomUI({
         console.error("Failed to switch camera device:", e);
       }
     },
-    [localParticipant],
+    [room],
   );
 
   // Toggle microphone
