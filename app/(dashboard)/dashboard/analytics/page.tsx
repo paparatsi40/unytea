@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { getLiveCommunityHealthMetrics, getNorthStarDecisionSnapshot, getOverviewAnalytics, getRetentionCohorts } from "@/app/actions/analytics";
-import { BarChart3, TrendingUp, Users, MessageSquare, FileText } from "lucide-react";
+import { BarChart3, TrendingUp } from "lucide-react";
 import { StatsCard } from "@/components/analytics/StatsCard";
 import { CommunitySelector } from "@/components/analytics/CommunitySelector";
 
@@ -100,26 +100,26 @@ const session = await auth();
           title="Total Members"
           value={data.totalMembers}
           change={`+${data.newMembersThisMonth} this month`}
-          icon={Users}
+          iconName="users"
           color="blue"
         />
         <StatsCard
           title="Total Posts"
           value={data.totalPosts}
           change={`+${data.newPostsThisMonth} this month`}
-          icon={FileText}
+          iconName="posts"
           color="green"
         />
         <StatsCard
           title="Total Comments"
           value={data.totalComments}
-          icon={MessageSquare}
+          iconName="comments"
           color="purple"
         />
         <StatsCard
           title="Total Messages"
           value={data.totalMessages}
-          icon={MessageSquare}
+          iconName="messages"
           color="orange"
         />
       </div>

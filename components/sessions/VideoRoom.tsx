@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
   LiveKitRoom,
   RoomAudioRenderer,
+  StartAudio,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
 import { Loader2, AlertCircle } from "lucide-react";
@@ -127,6 +128,7 @@ export function VideoRoom({
           onEndSession={onEndSession}
         />
         <RoomAudioRenderer />
+        <StartAudio label="Enable audio" />
       </LiveKitRoom>
     </div>
   );

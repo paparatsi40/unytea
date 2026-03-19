@@ -1,14 +1,24 @@
-import { LucideIcon } from "lucide-react";
+import { FileText, MessageSquare, Users, LucideIcon } from "lucide-react";
+
+type StatsIconName = "users" | "posts" | "comments" | "messages";
 
 interface StatsCardProps {
   title: string;
   value: number | string;
   change?: string;
-  icon: LucideIcon;
+  iconName: StatsIconName;
   color?: "blue" | "green" | "purple" | "orange" | "red";
 }
 
-export function StatsCard({ title, value, change, icon: Icon, color = "blue" }: StatsCardProps) {
+const ICONS: Record<StatsIconName, LucideIcon> = {
+  users: Users,
+  posts: FileText,
+  comments: MessageSquare,
+  messages: MessageSquare,
+};
+
+export function StatsCard({ title, value, change, iconName, color = "blue" }: StatsCardProps) {
+  const Icon = ICONS[iconName];
   const colorClasses = {
     blue: "bg-blue-500/10 text-blue-500",
     green: "bg-green-500/10 text-green-500",
