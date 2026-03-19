@@ -768,40 +768,38 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SWITCH GUIDE */}
+      {/* OPERATIONAL ADVANTAGE */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-5xl mx-auto">
             <div className="text-center mb-10">
-              <Badge className="mb-4 bg-blue-100 text-blue-700 hover:bg-blue-100">Switch Guide</Badge>
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Move from Skool with a clear step-by-step process
-              </h2>
+              <Badge className="mb-4 bg-purple-100 text-purple-700 hover:bg-purple-100">Why operators choose Unytea</Badge>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Everything in one operating system</h2>
               <p className="text-lg text-muted-foreground">
-                We currently support a guided manual migration flow.
+                Run sessions, content, community, and monetization without stitching together extra tools.
               </p>
             </div>
             <div className="grid md:grid-cols-3 gap-6">
-              <div className="text-center p-6 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Users className="w-6 h-6 text-primary" />
+              <div className="p-6 rounded-xl border bg-gradient-to-br from-gray-50 to-gray-100">
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                  <Video className="w-6 h-6 text-blue-600" />
                 </div>
-                <h3 className="font-semibold mb-2">Export Members</h3>
-                <p className="text-sm text-muted-foreground">Bring your member list via CSV export/import and invite flow.</p>
+                <h3 className="font-semibold mb-2">Run live sessions with control</h3>
+                <p className="text-sm text-muted-foreground">Schedule upcoming sessions, track attendance, and manage reminders from one sessions hub.</p>
               </div>
-              <div className="text-center p-6 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <BookOpen className="w-6 h-6 text-primary" />
+              <div className="p-6 rounded-xl border bg-gradient-to-br from-gray-50 to-gray-100">
+                <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mb-4">
+                  <LayoutDashboard className="w-6 h-6 text-orange-600" />
                 </div>
-                <h3 className="font-semibold mb-2">Rebuild Courses</h3>
-                <p className="text-sm text-muted-foreground">Recreate your curriculum with modules, lessons, and resources in Unytea.</p>
+                <h3 className="font-semibold mb-2">Shape your landing fast</h3>
+                <p className="text-sm text-muted-foreground">Use Appearance and Section Presets to customize your public page without custom code.</p>
               </div>
-              <div className="text-center p-6 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Sparkles className="w-6 h-6 text-primary" />
+              <div className="p-6 rounded-xl border bg-gradient-to-br from-gray-50 to-gray-100">
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                  <TrendingUp className="w-6 h-6 text-green-600" />
                 </div>
-                <h3 className="font-semibold mb-2">Launch Cleanly</h3>
-                <p className="text-sm text-muted-foreground">Start with templates, then publish your first live session and announcements.</p>
+                <h3 className="font-semibold mb-2">Monetize and optimize</h3>
+                <p className="text-sm text-muted-foreground">Sell access and courses with Stripe while using analytics and achievements to improve retention.</p>
               </div>
             </div>
           </div>
