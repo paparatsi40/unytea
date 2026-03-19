@@ -139,11 +139,17 @@ export function MainStage({
     );
   }, [screenTracks, localParticipant.identity]);
 
+  const isShowingLocalMain = isCameraEnabled && !!cameraTrack;
+
+  const displayedMainIdentity = isShowingLocalMain
+    ? localParticipant.identity
+    : mainCameraTrack?.participant.identity;
+
   const speakerStripTracks = useMemo(() => {
     return cameraTracks
-      .filter((t) => t.participant.identity !== mainCameraTrack?.participant.identity)
+      .filter((t) => t.participant.identity !== displayedMainIdentity)
       .slice(0, 4);
-  }, [cameraTracks, mainCameraTrack]);
+  }, [cameraTracks, displayedMainIdentity]);
 
   // For audio-only sessions in "screen" mode, show audio stage
   if (isAudioOnly && mode !== "whiteboard" && mode !== "screen") {
