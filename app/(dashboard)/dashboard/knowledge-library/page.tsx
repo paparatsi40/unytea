@@ -482,7 +482,7 @@ export default function KnowledgeLibraryPage() {
               <p className="text-zinc-400 max-w-md mx-auto mb-6">
                 Complete live sessions with recordings will appear here, ready to be turned into courses.
               </p>
-              <Link href="/dashboard/sessions/create">
+              <Link href="/dashboard/sessions">
                 <Button className="bg-purple-600 hover:bg-purple-700">
                   <Plus className="mr-2 h-4 w-4" />
                   Host Your First Session
