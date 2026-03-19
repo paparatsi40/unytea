@@ -63,6 +63,9 @@ interface VideoRoomUIProps {
   isHost?: boolean;
   attendeeCount?: number;
   sessionStartTime?: Date;
+  isRecording?: boolean;
+  isRecordingBusy?: boolean;
+  onToggleRecording?: () => void;
   onLeave?: () => void;
   onEndSession?: () => void;
 }
@@ -76,6 +79,9 @@ export function VideoRoomUI({
   isHost = false,
   attendeeCount = 47,
   sessionStartTime = new Date(),
+  isRecording = false,
+  isRecordingBusy = false,
+  onToggleRecording,
   onLeave,
   onEndSession,
 }: VideoRoomUIProps) {
@@ -100,9 +106,6 @@ export function VideoRoomUI({
 
   // Pinned question
   const [pinnedQuestion, setPinnedQuestion] = useState<PinnedQuestion | null>(null);
-
-  // Recording
-  const isRecording = true;
 
   // Reactions
   const [showReactions, setShowReactions] = useState(false);
@@ -275,6 +278,21 @@ export function VideoRoomUI({
               >
                 <VolumeX className="h-4 w-4" />
                 <span className="hidden sm:inline">Mute All</span>
+              </button>
+
+              {/* Recording Control */}
+              <button
+                onClick={onToggleRecording}
+                disabled={isRecordingBusy}
+                className={cn(
+                  "flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60",
+                  isRecording
+                    ? "bg-amber-500/15 text-amber-400 hover:bg-amber-500/25"
+                    : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
+                )}
+              >
+                <Radio className={cn("h-4 w-4", isRecording && "animate-pulse")} />
+                <span>{isRecording ? "Pause recording" : "Start recording"}</span>
               </button>
 
               {/* End Session */}

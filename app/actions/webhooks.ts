@@ -23,6 +23,8 @@ const receiver = new WebhookReceiver(
   LIVEKIT_API_SECRET
 );
 
+const AUTO_START_RECORDING = process.env.AUTO_START_RECORDING === "true";
+
 export type LiveKitWebhookEvent =
   | "room_started"
   | "room_finished"
@@ -111,8 +113,12 @@ async function handleRoomStarted(event: any) {
     },
   });
 
-  // Auto-start recording
-  await autoStartRecording(sessionId);
+  // Auto-start recording (optional, disabled by default)
+  if (AUTO_START_RECORDING) {
+    await autoStartRecording(sessionId);
+  } else {
+    console.log(`[LiveKit] Auto recording is disabled for session ${sessionId}`);
+  }
 
   const session = await prisma.mentorSession.findUnique({
     where: { id: sessionId },

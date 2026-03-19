@@ -7,6 +7,11 @@ import { VideoRoom } from "@/components/sessions/VideoRoom";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
+import {
+  getRecordingStatus,
+  startCompositeRecording,
+  stopRecording,
+} from "@/app/actions/recording";
 
 export default function SessionRoomPage({
   params,
@@ -18,6 +23,8 @@ export default function SessionRoomPage({
   const [videoSession, setVideoSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isEnding, setIsEnding] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isRecordingBusy, setIsRecordingBusy] = useState(false);
 
   useEffect(() => {
     // Check auth
@@ -48,6 +55,13 @@ export default function SessionRoomPage({
       }
       
       setVideoSession(result.session);
+
+      const recordingStatus = await getRecordingStatus(params.sessionId);
+      if (recordingStatus.success && recordingStatus.recording) {
+        setIsRecording(recordingStatus.recording.status === "PROCESSING");
+      } else {
+        setIsRecording(false);
+      }
     } catch (error) {
       console.error("Failed to load session:", error);
       toast.error("Failed to load session");
@@ -85,6 +99,42 @@ export default function SessionRoomPage({
     router.push("/dashboard/sessions");
   }, [router]);
 
+  const handleToggleRecording = useCallback(async () => {
+    if (!videoSession?.id || !videoSession?.roomId || isRecordingBusy) return;
+
+    setIsRecordingBusy(true);
+    try {
+      if (isRecording) {
+        const result = await stopRecording(videoSession.id);
+        if (result.success) {
+          setIsRecording(false);
+          toast.success("Recording paused");
+        } else {
+          toast.error(result.error || "Failed to pause recording");
+        }
+      } else {
+        const result = await startCompositeRecording({
+          sessionId: videoSession.id,
+          roomName: videoSession.roomId,
+          layout: "grid",
+          audioOnly: (videoSession.mode || "video") === "AUDIO",
+        });
+
+        if (result.success) {
+          setIsRecording(true);
+          toast.success("Recording started");
+        } else {
+          toast.error(result.error || "Failed to start recording");
+        }
+      }
+    } catch (error) {
+      console.error("Error toggling recording:", error);
+      toast.error("Failed to update recording state");
+    } finally {
+      setIsRecordingBusy(false);
+    }
+  }, [videoSession, isRecording, isRecordingBusy]);
+
   if (isAuthLoading || loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-zinc-950">
@@ -111,6 +161,9 @@ export default function SessionRoomPage({
         sessionMode={videoSession.mode || "video"}
         sessionTitle={videoSession.title}
         isHost={isHost}
+        isRecording={isRecording}
+        isRecordingBusy={isRecordingBusy}
+        onToggleRecording={isHost ? handleToggleRecording : undefined}
         onLeave={handleLeave}
         onEndSession={isHost ? handleEndSession : undefined}
       />
