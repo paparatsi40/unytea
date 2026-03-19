@@ -191,19 +191,18 @@ export function MainStage({
               description="Share your screen to present slides, demos, or walkthroughs."
             />
           )
-        ) : isCameraEnabled ? (
-          <div className="h-full w-full bg-black relative" key={cameraTrack?.sid || 'no-camera'}>
-            <LocalVideo 
-              className="h-full w-full object-cover" 
-              cameraTrack={cameraTrack}
-              isCameraEnabled={isCameraEnabled}
+        ) : mainCameraTrack ? (
+          <div className="h-full w-full bg-black">
+            <VideoTrack
+              className="h-full w-full object-cover"
+              trackRef={mainCameraTrack}
             />
           </div>
         ) : (
           <EmptyStage
             icon={Video}
-            title="Camera is off"
-            description="Click the purple camera button below to start your video."
+            title="No camera video available"
+            description={isCameraEnabled ? "Waiting for video track…" : "Turn on your camera or wait for another participant's camera."}
           />
         )}
       </div>
