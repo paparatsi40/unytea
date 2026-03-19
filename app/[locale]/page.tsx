@@ -768,17 +768,17 @@ export default function Home() {
         </div>
       </section>
 
-      {/* MIGRATION FROM SKOOL */}
+      {/* SWITCH GUIDE */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-10">
-              <Badge className="mb-4 bg-green-100 text-green-700 hover:bg-green-100">Easy Migration</Badge>
+              <Badge className="mb-4 bg-blue-100 text-blue-700 hover:bg-blue-100">Switch Guide</Badge>
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Switch from Skool in minutes
+                Move from Skool with a clear step-by-step process
               </h2>
               <p className="text-lg text-muted-foreground">
-                We make it simple to bring your community to Unytea
+                We currently support a guided manual migration flow.
               </p>
             </div>
             <div className="grid md:grid-cols-3 gap-6">
@@ -786,22 +786,22 @@ export default function Home() {
                 <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Users className="w-6 h-6 text-primary" />
                 </div>
-                <h3 className="font-semibold mb-2">Import Members</h3>
-                <p className="text-sm text-muted-foreground">One-click CSV import of all your members and their data</p>
+                <h3 className="font-semibold mb-2">Export Members</h3>
+                <p className="text-sm text-muted-foreground">Bring your member list via CSV export/import and invite flow.</p>
               </div>
               <div className="text-center p-6 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100">
                 <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <BookOpen className="w-6 h-6 text-primary" />
                 </div>
-                <h3 className="font-semibold mb-2">Move Your Courses</h3>
-                <p className="text-sm text-muted-foreground">Transfer your course content seamlessly with our migration tool</p>
+                <h3 className="font-semibold mb-2">Rebuild Courses</h3>
+                <p className="text-sm text-muted-foreground">Recreate your curriculum with modules, lessons, and resources in Unytea.</p>
               </div>
               <div className="text-center p-6 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100">
                 <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Sparkles className="w-6 h-6 text-primary" />
                 </div>
-                <h3 className="font-semibold mb-2">Keep Your Community</h3>
-                <p className="text-sm text-muted-foreground">All posts, discussions, and engagement preserved</p>
+                <h3 className="font-semibold mb-2">Launch Cleanly</h3>
+                <p className="text-sm text-muted-foreground">Start with templates, then publish your first live session and announcements.</p>
               </div>
             </div>
           </div>
