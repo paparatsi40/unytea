@@ -123,6 +123,7 @@ export default function KnowledgeLibraryPage() {
 
   const hasConvertibleSessions = sessions.length > 0;
   const hasSuggestions = suggestions.length > 0;
+  const hasRecordedSessions = (stats?.completedSessions || 0) > 0;
 
   const bestSessions = [...sessions]
     .sort((a, b) => (b.engagementScore || 0) - (a.engagementScore || 0))
@@ -477,15 +478,17 @@ export default function KnowledgeLibraryPage() {
                 </div>
               </div>
               <h3 className="text-lg font-semibold text-white mb-2">
-                No sessions to convert yet
+                {hasRecordedSessions ? "No convertible recordings yet" : "No sessions to convert yet"}
               </h3>
               <p className="text-zinc-400 max-w-md mx-auto mb-6">
-                Complete live sessions with recordings will appear here, ready to be turned into courses.
+                {hasRecordedSessions
+                  ? "You already have completed sessions. Open Recordings to review status and convert those ready for courses."
+                  : "Complete live sessions with recordings will appear here, ready to be turned into courses."}
               </p>
-              <Link href="/dashboard/sessions">
+              <Link href={hasRecordedSessions ? "/dashboard/recordings" : "/dashboard/sessions"}>
                 <Button className="bg-purple-600 hover:bg-purple-700">
                   <Plus className="mr-2 h-4 w-4" />
-                  Host Your First Session
+                  {hasRecordedSessions ? "Open Recordings" : "Host Your First Session"}
                 </Button>
               </Link>
             </CardContent>
