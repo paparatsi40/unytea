@@ -428,7 +428,7 @@ export function CreateSessionDialog({
                       value={scheduledAt}
                       onChange={(e) => handleDateChange(e.target.value)}
                       required={mode === "scheduled"}
-                      className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-2.5 text-white focus:border-purple-500 focus:outline-none"
+                      className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-2.5 text-white focus:border-purple-500 focus:outline-none [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:opacity-90 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
                     />
                     {scheduledAt && (
                       <p className="mt-1 text-sm text-purple-400">
