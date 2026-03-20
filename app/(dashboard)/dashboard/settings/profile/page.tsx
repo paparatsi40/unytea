@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import Link from "next/link";
-import { Settings, User as UserIcon } from "lucide-react";
+import { User as UserIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getUserIdentitySnapshot } from "@/app/actions/dashboard";
@@ -145,13 +145,6 @@ export default function ProfilePage() {
           </div>
         )}
 
-        <div className="rounded-lg border border-primary/20 bg-primary/5 p-6 text-center">
-          <Settings className="mx-auto mb-4 h-12 w-12 text-primary" />
-          <h3 className="mb-2 text-lg font-semibold text-foreground">Full Profile Editing Coming Soon</h3>
-          <p className="text-sm text-muted-foreground">
-            Advanced profile editing and public creator profile controls are next in the rollout.
-          </p>
-        </div>
       </div>
     </div>
   );
