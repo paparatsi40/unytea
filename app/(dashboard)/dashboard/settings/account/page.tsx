@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Check, AlertTriangle } from "lucide-react";
+import { Check, AlertTriangle, Shield, KeyRound, LogOut } from "lucide-react";
 import { updateAccountSettings } from "@/app/actions/settings";
+import { signOut } from "next-auth/react";
 import { toast } from "react-hot-toast";
 
 export default function AccountPage() {
@@ -65,6 +66,50 @@ export default function AccountPage() {
             <Check className="h-4 w-4" />
             {loading ? "Saving..." : "Save Settings"}
           </button>
+        </div>
+      </div>
+
+      {/* Security & Access */}
+      <div className="rounded-xl border border-border bg-card p-6">
+        <div className="mb-4 flex items-center gap-2">
+          <Shield className="h-5 w-5 text-muted-foreground" />
+          <h2 className="text-xl font-bold text-foreground">Security & Access</h2>
+        </div>
+
+        <div className="space-y-4">
+          <div className="rounded-lg border border-border bg-background p-4">
+            <div className="mb-3 flex items-center gap-2">
+              <KeyRound className="h-4 w-4 text-muted-foreground" />
+              <h3 className="font-semibold text-foreground">Password & Sign-in</h3>
+            </div>
+            <p className="mb-3 text-sm text-muted-foreground">
+              Manage how you sign in and recover your account access.
+            </p>
+            <button
+              type="button"
+              onClick={() => toast("Password reset flow will be enabled next.")}
+              className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
+            >
+              Change password
+            </button>
+          </div>
+
+          <div className="rounded-lg border border-border bg-background p-4">
+            <div className="mb-3 flex items-center gap-2">
+              <LogOut className="h-4 w-4 text-muted-foreground" />
+              <h3 className="font-semibold text-foreground">Session</h3>
+            </div>
+            <p className="mb-3 text-sm text-muted-foreground">
+              Sign out from this device immediately.
+            </p>
+            <button
+              type="button"
+              onClick={() => signOut({ callbackUrl: "/" })}
+              className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
+            >
+              Log out now
+            </button>
+          </div>
         </div>
       </div>
 
