@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { User, Bell, Shield, CreditCard, Palette, Zap } from "lucide-react";
+import { User, Bell, CreditCard, Palette, Zap } from "lucide-react";
 import { Settings } from "lucide-react";
 
 const settingsNav = [
@@ -19,12 +19,7 @@ const settingsNav = [
     icon: Bell,
     description: "Configure notification preferences",
   },
-  {
-    name: "Security",
-    href: "/dashboard/settings/security",
-    icon: Shield,
-    description: "Password and authentication",
-  },
+
   {
     name: "Billing",
     href: "/dashboard/settings/billing",

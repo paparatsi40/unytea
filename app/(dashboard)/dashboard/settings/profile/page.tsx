@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import Link from "next/link";
-import { User as UserIcon } from "lucide-react";
+import { User as UserIcon, Shield } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getUserIdentitySnapshot } from "@/app/actions/dashboard";
@@ -144,6 +144,19 @@ export default function ProfilePage() {
             </div>
           </div>
         )}
+
+        <div className="rounded-lg border border-border bg-background p-4">
+          <div className="mb-2 flex items-center gap-2">
+            <Shield className="h-4 w-4 text-muted-foreground" />
+            <p className="text-sm font-medium text-foreground">Security</p>
+          </div>
+          <p className="mb-3 text-sm text-muted-foreground">
+            Manage password, authentication, and account safety options.
+          </p>
+          <Link href="/dashboard/settings/account">
+            <Button size="sm" variant="outline">Open security options</Button>
+          </Link>
+        </div>
 
       </div>
     </div>
