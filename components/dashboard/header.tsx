@@ -16,6 +16,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { NotificationCenter } from "@/components/notifications/NotificationCenter";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { useTranslations } from "next-intl";
 
 export function DashboardHeader() {
@@ -55,6 +56,7 @@ export function DashboardHeader() {
           </Link>
 
           <NotificationCenter />
+          <ThemeToggle />
           <LanguageSelector />
 
           <DropdownMenu>
