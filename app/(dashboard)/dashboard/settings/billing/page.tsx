@@ -10,49 +10,67 @@ import { toast } from "sonner";
 
 const plans = [
   {
-    name: "Free",
-    description: "For individuals getting started",
+    name: "Start",
+    description: "Perfect for testing",
     price: "$0",
     period: "/month",
     features: [
-      "Join up to 3 communities",
-      "Basic profile features",
-      "Community feed access",
-      "Direct messaging",
+      "1 community",
+      "Up to 50 members",
+      "Community feed",
+      "Simple live sessions",
+      "Basic analytics",
+      "8% transaction fee",
     ],
     cta: "Current Plan",
     popular: false,
   },
   {
-    name: "Professional",
-    description: "For community creators",
+    name: "Creator",
+    description: "Best for launching one community",
     price: "$49",
     period: "/month",
     features: [
-      "1 community",
+      "Everything in Start",
       "Unlimited members",
-      "All features",
-      "Priority support",
-      "Custom domain",
-      "Analytics dashboard",
+      "Paid community access",
+      "Paid course sales",
+      "Live sessions + courses",
+      "5% transaction fee",
     ],
-    cta: "Upgrade to Professional",
+    cta: "Upgrade to Creator",
+    popular: false,
+  },
+  {
+    name: "Business",
+    description: "Best for operators running one community",
+    price: "$99",
+    period: "/month",
+    features: [
+      "Everything in Creator",
+      "Custom domain",
+      "Advanced analytics",
+      "Up to 5 admins",
+      "Session performance tools",
+      "2% transaction fee",
+    ],
+    cta: "Upgrade to Business",
     popular: true,
   },
   {
-    name: "Premium",
-    description: "For power users",
-    price: "$149",
+    name: "Pro",
+    description: "Best for teams scaling multiple communities",
+    price: "$199",
     period: "/month",
     features: [
-      "3 communities",
-      "Unlimited everything",
-      "White-label options",
+      "Everything in Business",
+      "Up to 3 communities",
+      "White-label experience",
       "API access",
-      "Dedicated support",
-      "Advanced analytics",
+      "Unlimited admins",
+      "0% transaction fee",
     ],
-    cta: "Upgrade to Premium",
+    cta: "Upgrade to Pro",
     popular: false,
   },
 ];
@@ -124,7 +142,7 @@ export default function BillingPage() {
   };
 
   const getCurrentPlanName = () => {
-    if (!subscription) return "Free";
+    if (!subscription) return "Start";
     return subscription.plan.name;
   };
 

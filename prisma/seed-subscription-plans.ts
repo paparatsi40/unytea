@@ -9,53 +9,68 @@ const prisma = new PrismaClient();
 
 const plans = [
   {
-    name: "Free",
-    description: "For individuals getting started",
+    name: "Start",
+    description: "Perfect for testing",
     price: 0,
     interval: BillingInterval.MONTHLY,
     features: [
-      "Join up to 3 communities",
-      "Basic profile features",
-      "Community feed access",
-      "Direct messaging",
+      "1 community",
+      "Up to 50 members",
+      "Community feed",
+      "Simple live sessions",
+      "Basic analytics",
+      "8% transaction fee",
     ],
     stripePriceId: "", // Free plan doesn't need a Stripe price
-    communityId: "", // Will be set later or use a default community
+    communityId: "",
   },
   {
-    name: "Professional",
-    description: "For community creators - Best value",
-    price: 4900, // $49.00 in cents
+    name: "Creator",
+    description: "Best for launching one community",
+    price: 4900,
     interval: BillingInterval.MONTHLY,
     features: [
-      "1 community",
+      "Everything in Start",
       "Unlimited members",
-      "All features",
-      "Priority support",
+      "Paid community access",
+      "Paid course sales",
+      "Live sessions + courses",
+      "5% transaction fee",
+    ],
+    stripePriceId: process.env.NEXT_PUBLIC_STRIPE_CREATOR_PRICE_ID || "price_creator_placeholder",
+    communityId: "",
+  },
+  {
+    name: "Business",
+    description: "Best for operators running one community",
+    price: 9900,
+    interval: BillingInterval.MONTHLY,
+    features: [
+      "Everything in Creator",
       "Custom domain",
-      "Analytics dashboard",
-      "Video calls",
-      "AI assistance",
+      "Advanced analytics",
+      "Up to 5 admins",
+      "Session performance tools",
+      "2% transaction fee",
     ],
-    stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PROFESSIONAL_PRICE_ID || "price_professional_placeholder",
-    communityId: "", // Will be set later or use a default community
+    stripePriceId: process.env.NEXT_PUBLIC_STRIPE_BUSINESS_PRICE_ID || "price_business_placeholder",
+    communityId: "",
   },
   {
-    name: "Premium",
-    description: "For power users with multiple communities",
-    price: 14900, // $149.00 in cents
+    name: "Pro",
+    description: "Best for teams scaling multiple communities",
+    price: 19900,
     interval: BillingInterval.MONTHLY,
     features: [
-      "3 communities",
-      "Unlimited members",
-      "White-label options",
-      "Advanced analytics",
+      "Everything in Business",
+      "Up to 3 communities",
+      "White-label experience",
       "API access",
-      "Dedicated support",
-      "All Professional features",
+      "Unlimited admins",
+      "0% transaction fee",
     ],
-    stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID || "price_premium_placeholder",
-    communityId: "", // Will be set later or use a default community
+    stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || "price_pro_placeholder",
+    communityId: "",
   },
 ];
 
