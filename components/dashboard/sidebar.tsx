@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 import {
   Home,
   Users,
@@ -18,21 +19,22 @@ import {
 } from "lucide-react";
 
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: Home },
-  { name: "Communities", href: "/dashboard/communities", icon: Users },
-  { name: "Messages", href: "/dashboard/messages", icon: MessageSquare },
-  { name: "Sessions", href: "/dashboard/sessions", icon: Video },
-  { name: "Recordings", href: "/dashboard/recordings", icon: Library },
-  { name: "Knowledge Library", href: "/dashboard/knowledge-library", icon: BookOpen },
-  { name: "Courses", href: "/dashboard/courses", icon: BookOpen },
-  { name: "Analytics", href: "/dashboard/analytics", icon: TrendingUp },
-  { name: "Achievements", href: "/dashboard/achievements", icon: Award },
-  { name: "Notifications", href: "/dashboard/notifications", icon: Bell },
-  { name: "Settings", href: "/dashboard/settings", icon: Settings },
+  { key: "dashboard", href: "/dashboard", icon: Home },
+  { key: "communities", href: "/dashboard/communities", icon: Users },
+  { key: "messages", href: "/dashboard/messages", icon: MessageSquare },
+  { key: "sessions", href: "/dashboard/sessions", icon: Video },
+  { key: "recordings", href: "/dashboard/recordings", icon: Library },
+  { key: "knowledgeLibrary", href: "/dashboard/knowledge-library", icon: BookOpen },
+  { key: "courses", href: "/dashboard/courses", icon: BookOpen },
+  { key: "analytics", href: "/dashboard/analytics", icon: TrendingUp },
+  { key: "achievements", href: "/dashboard/achievements", icon: Award },
+  { key: "notifications", href: "/dashboard/notifications", icon: Bell },
+  { key: "settings", href: "/dashboard/settings", icon: Settings },
 ];
 
 export function DashboardSidebar() {
   const pathname = usePathname();
+  const t = useTranslations("sidebar");
 
   return (
     <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-card/50 backdrop-blur-xl">
@@ -58,7 +60,7 @@ export function DashboardSidebar() {
 
           return (
             <Link
-              key={item.name}
+              key={item.key}
               href={item.href}
               className={cn(
                 "flex items-center space-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
@@ -68,7 +70,7 @@ export function DashboardSidebar() {
               )}
             >
               <Icon className={cn("h-5 w-5", isActive && "text-primary")} />
-              <span>{item.name}</span>
+              <span>{t(`nav.${item.key}`)}</span>
             </Link>
           );
         })}
@@ -77,17 +79,13 @@ export function DashboardSidebar() {
       {/* Footer */}
       <div className="border-t border-border p-4">
         <div className="rounded-lg bg-gradient-to-br from-primary/10 to-purple-600/10 p-4">
-          <p className="text-sm font-semibold text-foreground">
-            Upgrade to Premium
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Unlock all features
-          </p>
+          <p className="text-sm font-semibold text-foreground">{t("upgrade.title")}</p>
+          <p className="mt-1 text-xs text-muted-foreground">{t("upgrade.subtitle")}</p>
           <Link
             href="/dashboard/settings/billing"
             className="mt-3 block w-full rounded-md bg-primary px-3 py-2 text-center text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
           >
-            Upgrade Now
+            {t("upgrade.cta")}
           </Link>
         </div>
       </div>

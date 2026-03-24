@@ -30,7 +30,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export default function Home() {
   const [showDemoModal, setShowDemoModal] = useState(false);
-  // const t = useTranslations("landing"); // TODO: Implementar traducciones para nueva landing
+  const t = useTranslations("landing");
   const authT = useTranslations("auth");
   const { data: session } = useSession();
   const params = useParams<{ locale: string }>();
@@ -54,16 +54,16 @@ export default function Home() {
           </div>
           <div className="hidden md:flex items-center gap-6">
             <Link href={`/${locale}/explore`} className="text-sm font-medium hover:text-primary transition-colors">
-              Explore communities
+              {t("nav.explore")}
             </Link>
             <Link href="#features" className="text-sm font-medium hover:text-primary transition-colors">
-              Features
+              {t("nav.features")}
             </Link>
             <Link href="#comparison" className="text-sm font-medium hover:text-primary transition-colors">
-              vs Skool
+              {t("nav.vsSkool")}
             </Link>
             <Link href="#pricing" className="text-sm font-medium hover:text-primary transition-colors">
-              Pricing
+              {t("nav.pricing")}
             </Link>
           </div>
           <div className="flex items-center gap-3">
@@ -74,7 +74,7 @@ export default function Home() {
                 className="btn-hover-lift px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium shadow-smooth flex items-center gap-2"
               >
                 <LayoutDashboard className="w-4 h-4" />
-                Go to Dashboard
+                {t("nav.goToDashboard")}
               </Link>
             ) : (
               <>
@@ -106,23 +106,23 @@ export default function Home() {
             <div className="text-center lg:text-left">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary mb-6">
                 <Star className="w-4 h-4" />
-                <span className="text-sm font-medium">Trusted by creators, coaches, and educators worldwide</span>
+                <span className="text-sm font-medium">{t("hero.badge")}</span>
               </div>
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-                Build a community that{" "}
+                {t("hero.titleStart")}{" "}
                 <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-                  learns live
+                  {t("hero.titleHighlight")}
                 </span>
               </h1>
               <p className="text-xl text-muted-foreground mb-8 max-w-xl">
-                Host live sessions, courses, and community discussions — all in one place.
+                {t("hero.description")}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Link
                   href="/auth/signup"
                   className="btn-hover-lift px-8 py-4 bg-primary text-primary-foreground rounded-xl font-semibold shadow-lg flex items-center justify-center gap-2"
                 >
-                  Create Your Community Free
+                  {t("hero.cta.primary")}
                   <ArrowRight className="w-5 h-5" />
                 </Link>
                 <Link
@@ -130,19 +130,17 @@ export default function Home() {
                   className="px-8 py-4 border-2 border-border rounded-xl font-semibold hover:border-primary transition-colors flex items-center justify-center gap-2"
                 >
                   <Users className="w-5 h-5" />
-                  Explore communities
+                  {t("hero.cta.explore")}
                 </Link>
                 <button
                   onClick={() => setShowDemoModal(true)}
                   className="px-8 py-4 border-2 border-border rounded-xl font-semibold hover:border-primary transition-colors flex items-center justify-center gap-2"
                 >
                   <Play className="w-5 h-5" />
-                  Watch Demo
+                  {t("hero.cta.secondary")}
                 </button>
               </div>
-              <p className="text-sm text-muted-foreground mt-4">
-                ✓ 14-day free trial &nbsp;•&nbsp; ✓ No credit card required &nbsp;•&nbsp; ✓ Launch in minutes
-              </p>
+              <p className="text-sm text-muted-foreground mt-4">{t("hero.guarantee")}</p>
             </div>
             {/* Mock del producto - lado derecho */}
             <div className="relative">
@@ -881,12 +879,10 @@ export default function Home() {
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
               <Play className="w-8 h-8 text-primary" />
             </div>
-            <h3 className="text-2xl font-bold mb-2">Demo Video Coming Soon</h3>
-            <p className="text-muted-foreground mb-6">
-              We&apos;re preparing an amazing demo video showcasing all Unytea features.
-            </p>
+            <h3 className="text-2xl font-bold mb-2">{t("demoModal.title")}</h3>
+            <p className="text-muted-foreground mb-6">{t("demoModal.description")}</p>
             <Button onClick={() => setShowDemoModal(false)} className="w-full">
-              Got it
+              {t("demoModal.close")}
             </Button>
           </div>
         </div>

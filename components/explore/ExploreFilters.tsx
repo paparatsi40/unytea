@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
+import { useTranslations } from "next-intl";
 
 type Props = {
   categories: string[];
@@ -31,6 +32,7 @@ function buildQuery(params: Record<string, string>) {
 export function ExploreFilters({ categories, languages, initial }: Props) {
   const router = useRouter();
   const pathname = usePathname() || "/";
+  const t = useTranslations("exploreFilters");
 
   const [q, setQ] = useState(initial.q);
   const [category, setCategory] = useState(initial.category);
@@ -67,7 +69,7 @@ export function ExploreFilters({ categories, languages, initial }: Props) {
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Search communities"
+          placeholder={t("searchPlaceholder")}
           className="h-11 rounded-lg border border-border bg-card px-4 text-sm lg:col-span-2"
         />
 
@@ -76,9 +78,9 @@ export function ExploreFilters({ categories, languages, initial }: Props) {
           onChange={(e) => setMonetization(e.target.value)}
           className="h-11 rounded-lg border border-border bg-card px-3 text-sm"
         >
-          <option value="all">Free + Paid</option>
-          <option value="free">Free</option>
-          <option value="paid">Paid</option>
+          <option value="all">{t("monetization.all")}</option>
+          <option value="free">{t("monetization.free")}</option>
+          <option value="paid">{t("monetization.paid")}</option>
         </select>
 
         <select
@@ -86,7 +88,7 @@ export function ExploreFilters({ categories, languages, initial }: Props) {
           onChange={(e) => setLanguage(e.target.value)}
           className="h-11 rounded-lg border border-border bg-card px-3 text-sm"
         >
-          <option value="all">All languages</option>
+          <option value="all">{t("languages.all")}</option>
           {languages.map((item) => (
             <option key={item} value={item}>
               {item}
@@ -99,8 +101,8 @@ export function ExploreFilters({ categories, languages, initial }: Props) {
           onChange={(e) => setSessionsWeek(e.target.value)}
           className="h-11 rounded-lg border border-border bg-card px-3 text-sm"
         >
-          <option value="all">Any schedule</option>
-          <option value="yes">Sessions this week</option>
+          <option value="all">{t("schedule.any")}</option>
+          <option value="yes">{t("schedule.thisWeek")}</option>
         </select>
 
         <select
@@ -117,7 +119,7 @@ export function ExploreFilters({ categories, languages, initial }: Props) {
       <div className="flex flex-wrap gap-2">
         <button type="button" onClick={() => setCategory("all")}>
           <Badge variant={category === "all" ? "default" : "secondary"} className="px-3 py-1">
-            All Categories
+            {t("categories.all")}
           </Badge>
         </button>
 
@@ -137,7 +139,7 @@ export function ExploreFilters({ categories, languages, initial }: Props) {
         href={nonQueryUrl ? `${pathname}?${nonQueryUrl}` : pathname}
         className="sr-only"
       >
-        filters fallback
+        {t("filtersFallback")}
       </a>
     </>
   );

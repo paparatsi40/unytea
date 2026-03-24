@@ -5,6 +5,7 @@ import { CommentForm } from "./CommentForm";
 import { CommentItem } from "./CommentItem";
 import { getPostComments } from "@/app/actions/comments";
 import { MessageCircle, Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 type Comment = {
   id: string;
@@ -32,6 +33,7 @@ export function CommentSection({ postId, initialComments = [], onCountChange }: 
   const [comments, setComments] = useState<Comment[]>(initialComments);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const t = useTranslations("comments");
 
   const loadComments = async () => {
     setIsLoading(true);
@@ -42,7 +44,7 @@ export function CommentSection({ postId, initialComments = [], onCountChange }: 
     if (result.success && result.comments) {
       setComments(result.comments);
     } else {
-      setError(result.error || "Failed to load comments");
+      setError(result.error || t("errors.loadFailed"));
     }
 
     setIsLoading(false);
@@ -75,7 +77,7 @@ export function CommentSection({ postId, initialComments = [], onCountChange }: 
         {/* Header */}
         <div className="flex items-center space-x-2 text-sm font-semibold text-gray-900">
           <MessageCircle className="h-4 w-4" />
-          <span>{comments.length} Comments</span>
+          <span>{comments.length} {t("commentsLabel")}</span>
         </div>
 
         {/* Loading State */}
@@ -110,8 +112,8 @@ export function CommentSection({ postId, initialComments = [], onCountChange }: 
         {!isLoading && !error && comments.length === 0 && (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <MessageCircle className="mb-3 h-12 w-12 text-gray-300" />
-            <p className="text-sm text-gray-500">No comments yet</p>
-            <p className="text-xs text-gray-400">Be the first to comment!</p>
+            <p className="text-sm text-gray-500">{t("empty.title")}</p>
+            <p className="text-xs text-gray-400">{t("empty.subtitle")}</p>
           </div>
         )}
       </div>

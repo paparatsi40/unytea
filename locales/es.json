@@ -44,16 +44,22 @@
       "pricing": "Precios",
       "faq": "FAQ",
       "dashboard": "Panel",
-      "goToDashboard": "Ir al Panel"
+      "goToDashboard": "Ir al Panel",
+      "explore": "Explorar comunidades",
+      "vsSkool": "vs Skool"
     },
     "hero": {
-      "badge": "Confiado por 10,000+ creadores",
+      "badge": "Confiado por creadores, coaches y educadores de todo el mundo",
       "title": "Construye tu Comunidad Soñada",
-      "description": "La plataforma todo-en-uno para creadores, coaches y educadores. Engage, enseña y monetiza—sin límites.",
+      "titleStart": "Construye una comunidad que",
+      "titleHighlight": "aprende en vivo",
+      "description": "Organiza sesiones en vivo, cursos y debates comunitarios — todo en un solo lugar.",
       "cta": {
-        "primary": "Comenzar Prueba Gratis",
-        "secondary": "Ver Demo"
+        "primary": "Crea tu comunidad gratis",
+        "secondary": "Ver Demo",
+        "explore": "Explorar comunidades"
       },
+      "guarantee": "✓ Prueba gratis de 14 días • ✓ Sin tarjeta de crédito • ✓ Lanza en minutos",
       "socialProof": {
         "members": "10,000+ miembros",
         "rating": "4.9/5 calificación"
@@ -377,6 +383,60 @@
       "title": "¡Todo listo! 🎉",
       "description": "Bienvenido a Unytea. Tu viaje comienza ahora.",
       "cta": "Ir al Dashboard"
+    }
+  },
+  "sidebar": {
+    "nav": {
+      "dashboard": "Panel",
+      "communities": "Comunidades",
+      "messages": "Mensajes",
+      "sessions": "Sesiones",
+      "recordings": "Grabaciones",
+      "knowledgeLibrary": "Biblioteca de conocimiento",
+      "courses": "Cursos",
+      "analytics": "Analíticas",
+      "achievements": "Logros",
+      "notifications": "Notificaciones",
+      "settings": "Configuración"
+    },
+    "upgrade": {
+      "title": "Subir a Premium",
+      "subtitle": "Desbloquea todas las funciones",
+      "cta": "Actualizar ahora"
+    }
+  },
+  "exploreFilters": {
+    "searchPlaceholder": "Buscar comunidades",
+    "monetization": {
+      "all": "Gratis + Pago",
+      "free": "Gratis",
+      "paid": "Pago"
+    },
+    "languages": {
+      "all": "Todos los idiomas"
+    },
+    "schedule": {
+      "any": "Cualquier horario",
+      "thisWeek": "Sesiones esta semana"
+    },
+    "sort": {
+      "trending": "Tendencias",
+      "members": "Más miembros",
+      "newest": "Más nuevas"
+    },
+    "categories": {
+      "all": "Todas las categorías"
+    },
+    "filtersFallback": "filtros alternativos"
+  },
+  "comments": {
+    "commentsLabel": "comentarios",
+    "errors": {
+      "loadFailed": "No se pudieron cargar los comentarios"
+    },
+    "empty": {
+      "title": "Aún no hay comentarios",
+      "subtitle": "¡Sé el primero en comentar!"
     }
   }
 }
