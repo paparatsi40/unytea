@@ -245,7 +245,7 @@ export function CreateSessionDialog({
   // Duration field JSX - reused for both modes
   const DurationField = (
     <div>
-      <label className="mb-1.5 block text-sm font-medium text-zinc-300">
+      <label className="mb-1.5 block text-sm font-medium text-foreground/80">
         <Clock className="mr-1 inline h-4 w-4" />
         Duration (minutes)
       </label>
@@ -256,7 +256,7 @@ export function CreateSessionDialog({
           onChange={(e) => setDuration(Math.max(5, parseInt(e.target.value) || 30))}
           min={5}
           step={5}
-          className="w-24 rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-2.5 text-center text-white focus:border-purple-500 focus:outline-none"
+          className="w-24 rounded-xl border border-border bg-background px-4 py-2.5 text-center text-foreground focus:border-purple-500 focus:outline-none"
         />
         <div className="flex flex-1 gap-1">
           {DURATION_PRESETS.map((preset) => (
@@ -267,7 +267,7 @@ export function CreateSessionDialog({
               className={`flex-1 rounded-lg text-xs font-medium transition-colors ${
                 duration === preset
                   ? "bg-purple-600 text-white"
-                  : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
+                  : "bg-muted text-muted-foreground hover:bg-accent"
               }`}
             >
               {preset}m
@@ -313,29 +313,29 @@ export function CreateSessionDialog({
           onClick={() => !isLoading && setIsOpen(false)}
         >
           <div
-            className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl border border-zinc-800 bg-zinc-950 p-6 shadow-2xl"
+            className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl border border-border bg-card p-6 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
             <div className="mb-6">
-              <h2 className="text-xl font-bold text-white">
+              <h2 className="text-xl font-bold text-foreground">
                 Create Live Session
               </h2>
-              <p className="text-sm text-zinc-400">
+              <p className="text-sm text-muted-foreground">
                 Start now or schedule for later
               </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Mode Selection: Now vs Scheduled */}
-              <div className="grid grid-cols-2 gap-2 rounded-xl border border-zinc-800 bg-zinc-900/50 p-1">
+              <div className="grid grid-cols-2 gap-2 rounded-xl border border-border bg-muted/40 p-1">
                 <button
                   type="button"
                   onClick={() => setMode("now")}
                   className={`flex items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
                     mode === "now"
                       ? "bg-purple-600 text-white"
-                      : "text-zinc-400 hover:text-zinc-200"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   <Radio className="h-4 w-4" />
@@ -347,7 +347,7 @@ export function CreateSessionDialog({
                   className={`flex items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
                     mode === "scheduled"
                       ? "bg-purple-600 text-white"
-                      : "text-zinc-400 hover:text-zinc-200"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   <Calendar className="h-4 w-4" />
@@ -363,7 +363,7 @@ export function CreateSessionDialog({
                   className={`flex flex-1 items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-all ${
                     sessionType === "video"
                       ? "border-purple-500 bg-purple-500/20 text-purple-400"
-                      : "border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-zinc-700"
+                      : "border-border bg-background text-muted-foreground hover:border-border/80"
                   }`}
                 >
                   <Video className="h-4 w-4" />
@@ -375,7 +375,7 @@ export function CreateSessionDialog({
                   className={`flex flex-1 items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-all ${
                     sessionType === "audio"
                       ? "border-purple-500 bg-purple-500/20 text-purple-400"
-                      : "border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-zinc-700"
+                      : "border-border bg-background text-muted-foreground hover:border-border/80"
                   }`}
                 >
                   <Mic className="h-4 w-4" />
@@ -385,7 +385,7 @@ export function CreateSessionDialog({
 
               {/* Title */}
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-zinc-300">
+                <label className="mb-1.5 block text-sm font-medium text-foreground/80">
                   Session Title
                 </label>
                 <input
@@ -393,21 +393,21 @@ export function CreateSessionDialog({
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   required
-                  className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-2.5 text-white placeholder:text-zinc-500 focus:border-purple-500 focus:outline-none"
+                  className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:border-purple-500 focus:outline-none"
                   placeholder="e.g., Weekly Coaching Call"
                 />
               </div>
 
               {/* Description */}
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-zinc-300">
+                <label className="mb-1.5 block text-sm font-medium text-foreground/80">
                   Description <span className="text-zinc-500">(optional)</span>
                 </label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={2}
-                  className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-2.5 text-white placeholder:text-zinc-500 focus:border-purple-500 focus:outline-none"
+                  className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:border-purple-500 focus:outline-none"
                   placeholder="What will this session cover?"
                 />
               </div>
@@ -419,7 +419,7 @@ export function CreateSessionDialog({
               {mode === "scheduled" && (
                 <>
                   <div>
-                    <label className="mb-1.5 block text-sm font-medium text-zinc-300">
+                    <label className="mb-1.5 block text-sm font-medium text-foreground/80">
                       <Calendar className="mr-1 inline h-4 w-4" />
                       Date & Time
                     </label>
@@ -428,7 +428,7 @@ export function CreateSessionDialog({
                       value={scheduledAt}
                       onChange={(e) => handleDateChange(e.target.value)}
                       required={mode === "scheduled"}
-                      className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-2.5 text-white focus:border-purple-500 focus:outline-none [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:opacity-90 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
+                      className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-foreground focus:border-purple-500 focus:outline-none [&::-webkit-calendar-picker-indicator]:opacity-90 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
                     />
                     {scheduledAt && (
                       <p className="mt-1 text-sm text-purple-400">
@@ -439,13 +439,13 @@ export function CreateSessionDialog({
 
                   {/* Timezone - Friendly names */}
                   <div>
-                    <label className="mb-1.5 block text-sm font-medium text-zinc-300">
+                    <label className="mb-1.5 block text-sm font-medium text-foreground/80">
                       Timezone
                     </label>
                     <select
                       value={timezone}
                       onChange={(e) => setTimezone(e.target.value)}
-                      className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-2.5 text-white focus:border-purple-500 focus:outline-none"
+                      className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-foreground focus:border-purple-500 focus:outline-none"
                     >
                       {TIMEZONES.map((tz) => (
                         <option key={tz.value} value={tz.value}>
@@ -485,7 +485,7 @@ export function CreateSessionDialog({
                           className={`flex-1 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all ${
                             recurrence === option.id
                               ? "border-purple-500 bg-purple-500/20 text-purple-400"
-                              : "border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-zinc-700 hover:text-zinc-300"
+                              : "border-border bg-background text-muted-foreground hover:border-border/80 hover:text-foreground"
                           }`}
                         >
                           {option.label}
@@ -496,15 +496,15 @@ export function CreateSessionDialog({
 
                   {/* Recurrence Options */}
                   {recurrence !== "once" && (
-                    <div className="space-y-4 rounded-xl border border-zinc-800 bg-zinc-900/50 p-4">
+                    <div className="space-y-4 rounded-xl border border-border bg-muted/40 p-4">
                       {/* Interval */}
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-zinc-400">Every</span>
+                        <span className="text-sm text-muted-foreground">Every</span>
                         <div className="flex items-center gap-2">
                           <select
                             value={interval}
                             onChange={(e) => setInterval(parseInt(e.target.value))}
-                            className="rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-sm text-white focus:border-purple-500 focus:outline-none"
+                            className="rounded-lg border border-border bg-background px-3 py-1.5 text-sm text-foreground focus:border-purple-500 focus:outline-none"
                           >
                             {[1, 2, 3, 4].map((n) => (
                               <option key={n} value={n}>
@@ -512,7 +512,7 @@ export function CreateSessionDialog({
                               </option>
                             ))}
                           </select>
-                          <span className="text-sm text-zinc-400">
+                          <span className="text-sm text-muted-foreground">
                             {recurrence === "weekly"
                               ? interval === 1 ? "week" : "weeks"
                               : interval === 1 ? "month" : "months"}
@@ -523,7 +523,7 @@ export function CreateSessionDialog({
                       {/* Day of Week (for weekly) */}
                       {recurrence === "weekly" && (
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-zinc-400">On</span>
+                          <span className="text-sm text-muted-foreground">On</span>
                           <div className="flex gap-1">
                             {WEEKDAYS.map((day) => (
                               <button
@@ -533,7 +533,7 @@ export function CreateSessionDialog({
                                 className={`h-8 w-8 rounded-lg text-xs font-medium transition-colors ${
                                   dayOfWeek === day.value
                                     ? "bg-purple-600 text-white"
-                                    : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
+                                    : "bg-muted text-muted-foreground hover:bg-accent"
                                 }`}
                               >
                                 {day.label}
@@ -545,22 +545,22 @@ export function CreateSessionDialog({
 
                       {/* Generate Count */}
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-zinc-400">Total sessions</span>
+                        <span className="text-sm text-muted-foreground">Total sessions</span>
                         <div className="flex items-center gap-2">
                           <button
                             type="button"
                             onClick={() => setGenerateCount(Math.max(2, generateCount - 1))}
-                            className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
+                            className="flex h-7 w-7 items-center justify-center rounded-lg bg-muted text-muted-foreground hover:bg-accent"
                           >
                             −
                           </button>
-                          <span className="w-8 text-center font-medium text-white">
+                          <span className="w-8 text-center font-medium text-foreground">
                             {generateCount}
                           </span>
                           <button
                             type="button"
                             onClick={() => setGenerateCount(Math.min(12, generateCount + 1))}
-                            className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
+                            className="flex h-7 w-7 items-center justify-center rounded-lg bg-muted text-muted-foreground hover:bg-accent"
                           >
                             +
                           </button>
@@ -571,7 +571,7 @@ export function CreateSessionDialog({
 
                   {/* Preview Dates */}
                   {previewDates.length > 0 && (
-                    <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-4">
+                    <div className="rounded-xl border border-border bg-muted/40 p-4">
                       <p className="mb-2 text-xs font-medium text-zinc-500 uppercase">
                         Upcoming sessions
                       </p>
@@ -579,13 +579,13 @@ export function CreateSessionDialog({
                         {previewDates.map((date, i) => (
                           <span
                             key={i}
-                            className="rounded-lg bg-zinc-800 px-2 py-1 text-xs text-zinc-300"
+                            className="rounded-lg bg-muted px-2 py-1 text-xs text-foreground/80"
                           >
                             {formatDate(date)}
                           </span>
                         ))}
                         {generateCount > 6 && (
-                          <span className="rounded-lg bg-zinc-800 px-2 py-1 text-xs text-zinc-500">
+                          <span className="rounded-lg bg-muted px-2 py-1 text-xs text-muted-foreground">
                             +{generateCount - 6} more
                           </span>
                         )}
@@ -597,8 +597,8 @@ export function CreateSessionDialog({
 
               {/* Auto Post Toggle */}
               {communityId && (
-                <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900/50 p-3">
-                  <div className="flex h-5 w-5 items-center justify-center rounded border border-zinc-600 bg-zinc-800">
+                <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-border bg-muted/40 p-3">
+                  <div className="flex h-5 w-5 items-center justify-center rounded border border-border bg-background">
                     {autoPostToFeed && <Check className="h-3 w-3 text-purple-400" />}
                   </div>
                   <input
@@ -608,10 +608,10 @@ export function CreateSessionDialog({
                     className="sr-only"
                   />
                   <div>
-                    <p className="text-sm font-medium text-white">
+                    <p className="text-sm font-medium text-foreground">
                       Auto-post in community feed
                     </p>
-                    <p className="text-xs text-zinc-500">
+                    <p className="text-xs text-muted-foreground">
                       Members will be notified about this session
                     </p>
                   </div>
@@ -620,7 +620,7 @@ export function CreateSessionDialog({
 
               {/* Summary for scheduled */}
               {mode === "scheduled" && recurrence !== "once" && scheduledAt && (
-                <p className="text-center text-xs text-zinc-500">
+                <p className="text-center text-xs text-muted-foreground">
                   {getRecurrenceSummary()}
                 </p>
               )}
@@ -631,7 +631,7 @@ export function CreateSessionDialog({
                   type="button"
                   onClick={() => setIsOpen(false)}
                   disabled={isLoading}
-                  className="flex-1 rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-2.5 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-800"
+                  className="flex-1 rounded-xl border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-accent"
                 >
                   Cancel
                 </button>
@@ -652,7 +652,7 @@ export function CreateSessionDialog({
 
               {/* Subtle count text */}
               {mode === "scheduled" && recurrence !== "once" && (
-                <p className="text-center text-xs text-zinc-600">
+                <p className="text-center text-xs text-muted-foreground">
                   {generateCount} sessions will be created
                 </p>
               )}

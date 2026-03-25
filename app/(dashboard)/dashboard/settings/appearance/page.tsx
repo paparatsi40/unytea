@@ -20,6 +20,11 @@ export default function AppearancePage() {
   const [selectedSlug, setSelectedSlug] = useState("");
 
   useEffect(() => {
+    const storedTheme = localStorage.getItem("theme") as "light" | "dark" | "system" | null;
+    if (storedTheme) {
+      setTheme(storedTheme);
+    }
+
     const loadCommunities = async () => {
       try {
         const response = await fetch("/api/communities");
@@ -40,6 +45,18 @@ export default function AppearancePage() {
 
   const handleSave = async () => {
     setLoading(true);
+
+    try {
+      localStorage.setItem("theme", theme);
+      const resolvedTheme =
+        theme === "system"
+          ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
+          : theme;
+      document.documentElement.classList.toggle("dark", resolvedTheme === "dark");
+    } catch {
+      // no-op
+    }
+
     const result = await updateAccountSettings({ theme });
 
     if (result.success) {

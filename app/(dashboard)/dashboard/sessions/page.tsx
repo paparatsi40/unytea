@@ -75,12 +75,12 @@ export default async function SessionsPage() {
       : null;
 
   return (
-    <div className="space-y-8 p-8">
+    <div className="space-y-8 p-8 text-foreground">
       {/* HEADER with Stats */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Live Sessions</h1>
-          <p className="mt-1 text-sm text-zinc-400">
+          <h1 className="text-2xl font-bold text-foreground">Live Sessions</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Run live coaching, classes, and workshops
           </p>
           {sessionsThisWeek > 0 && (
@@ -178,15 +178,15 @@ export default async function SessionsPage() {
         </div>
 
         {upcoming.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-zinc-700 bg-zinc-900 p-8">
+          <div className="rounded-2xl border border-dashed border-border bg-card p-8">
             <div className="flex flex-col items-center text-center">
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-purple-600/20">
                 <Video className="h-8 w-8 text-purple-400" />
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-white">
+              <h3 className="mt-4 text-lg font-semibold text-foreground">
                 Host your first live session
               </h3>
-              <p className="mt-2 max-w-sm text-sm text-zinc-400">
+              <p className="mt-2 max-w-sm text-sm text-muted-foreground">
                 Run coaching calls, workshops, or Q&A sessions. Engage your community in real-time.
               </p>
               <div className="mt-6 flex items-center gap-4">
@@ -194,9 +194,9 @@ export default async function SessionsPage() {
                   triggerText="Schedule Session"
                   className="inline-flex items-center gap-2 rounded-full bg-purple-600 px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-purple-700"
                 />
-                <span className="text-xs text-zinc-500">Takes 2 minutes</span>
+                <span className="text-xs text-muted-foreground">Takes 2 minutes</span>
               </div>
-              <p className="mt-4 text-xs text-zinc-500">
+              <p className="mt-4 text-xs text-muted-foreground">
                 Communities with weekly sessions grow 3x faster
               </p>
             </div>
