@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Loader2, Save, Trash2 } from "lucide-react";
+import { deleteCommunity } from "@/app/actions/communities";
 
 export default function GeneralSettingsPage() {
   const params = useParams();
@@ -13,6 +14,7 @@ export default function GeneralSettingsPage() {
   
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -64,6 +66,54 @@ export default function GeneralSettingsPage() {
       toast.error("Failed to save settings");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleDeleteCommunity = async () => {
+    if (!formData.name) {
+      toast.error("Community name is required for deletion confirmation");
+      return;
+    }
+
+    const confirmText = window.prompt(
+      `Type the community name exactly to confirm deletion:\n\n${formData.name}`
+    );
+
+    if (confirmText === null) return;
+
+    if (confirmText.trim() !== formData.name.trim()) {
+      toast.error("Confirmation text does not match community name");
+      return;
+    }
+
+    setDeleting(true);
+    try {
+      const response = await fetch(`/api/communities/${slug}`);
+      if (!response.ok) {
+        throw new Error("Could not load community before deletion");
+      }
+
+      const data = await response.json();
+      const communityId = data?.id || data?.community?.id;
+
+      if (!communityId) {
+        throw new Error("Community id not found");
+      }
+
+      const result = await deleteCommunity(communityId);
+
+      if (result.success) {
+        toast.success("Community deleted successfully");
+        router.push("/dashboard/communities");
+        router.refresh();
+      } else {
+        toast.error(result.error || "Failed to delete community");
+      }
+    } catch (error) {
+      console.error("Error deleting community:", error);
+      toast.error("Failed to delete community");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -188,9 +238,23 @@ export default function GeneralSettingsPage() {
         <p className="text-sm text-red-700 mb-4">
           Once you delete a community, there is no going back. Please be certain.
         </p>
-        <Button variant="outline" className="border-red-300 text-red-700 hover:bg-red-100">
-          <Trash2 className="h-4 w-4 mr-2" />
-          Delete Community
+        <Button
+          variant="outline"
+          className="border-red-300 text-red-700 hover:bg-red-100"
+          onClick={handleDeleteCommunity}
+          disabled={deleting}
+        >
+          {deleting ? (
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              Deleting...
+            </>
+          ) : (
+            <>
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete Community
+            </>
+          )}
         </Button>
       </div>
     </div>
