@@ -144,9 +144,9 @@ export default function Home() {
             </div>
             {/* Mock del producto - lado derecho */}
             <div className="relative">
-              <div className="relative bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 rounded-2xl shadow-2xl p-6 border border-slate-600/70 text-white overflow-hidden">
+              <div className="relative bg-white rounded-2xl shadow-2xl p-6 border border-slate-200 text-slate-900 overflow-hidden">
                 {/* Browser chrome */}
-                <div className="flex items-center gap-2 mb-4 pb-4 border-b border-slate-600/60">
+                <div className="flex items-center gap-2 mb-4 pb-4 border-b border-slate-200">
                   <div className="w-3 h-3 rounded-full bg-red-400" />
                   <div className="w-3 h-3 rounded-full bg-yellow-400" />
                   <div className="w-3 h-3 rounded-full bg-green-400" />
@@ -165,7 +165,7 @@ export default function Home() {
                       <div className="text-sm text-slate-200/90">How to Scale Your Coaching Business</div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-slate-200/90 font-medium">
+                  <div className="flex items-center gap-2 text-sm text-slate-700 font-medium">
                     <Users className="w-4 h-4" />
                     <span>247 attending</span>
                   </div>
@@ -202,19 +202,19 @@ export default function Home() {
                 </div>
                 
                 {/* Chat preview */}
-                <div className="bg-slate-900/80 ring-1 ring-white/10 rounded-xl p-3">
+                <div className="bg-slate-50 ring-1 ring-slate-200 rounded-xl p-3">
                   <div className="space-y-2 text-sm">
                     <div className="flex gap-2">
-                      <span className="text-slate-300/85 font-medium">Mike:</span>
-                      <span className="text-slate-100">This is exactly what I needed! 🔥</span>
+                      <span className="text-slate-500 font-medium">Mike:</span>
+                      <span className="text-slate-900">This is exactly what I needed! 🔥</span>
                     </div>
                     <div className="flex gap-2">
-                      <span className="text-slate-300/85 font-medium">Sarah:</span>
-                      <span className="text-slate-100">Great tips on pricing</span>
+                      <span className="text-slate-500 font-medium">Sarah:</span>
+                      <span className="text-slate-900">Great tips on pricing</span>
                     </div>
                     <div className="flex gap-2">
-                      <span className="text-gray-500">Lisa:</span>
-                      <span className="text-gray-300">Can you share the template?</span>
+                      <span className="text-slate-500 font-medium">Lisa:</span>
+                      <span className="text-slate-900">Can you share the template?</span>
                     </div>
                   </div>
                 </div>
