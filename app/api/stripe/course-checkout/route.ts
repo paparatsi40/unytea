@@ -123,8 +123,8 @@ export async function POST(req: Request) {
       userId,
     });
 
-    // Calculate platform fee (5%)
-    const platformFeePercent = 5;
+    // Calculate platform fee from owner's active plan
+    const platformFeePercent = await getPlatformFeePercentForOwner(course.community.ownerId);
 
     // Create Stripe checkout session
     const checkoutSession = await stripe.checkout.sessions.create({
