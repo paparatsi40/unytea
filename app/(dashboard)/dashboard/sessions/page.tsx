@@ -7,6 +7,7 @@ import { format, isToday, isTomorrow, isThisWeek, formatDistanceToNow } from "da
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import Image from "next/image";
 
 export const metadata = {
   title: "Live Sessions | Unytea",
@@ -179,26 +180,46 @@ export default async function SessionsPage() {
 
         {upcoming.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-border bg-card p-8">
-            <div className="flex flex-col items-center text-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-purple-600/20">
-                <Video className="h-8 w-8 text-purple-400" />
-              </div>
-              <h3 className="mt-4 text-lg font-semibold text-foreground">
-                Host your first live session
-              </h3>
-              <p className="mt-2 max-w-sm text-sm text-muted-foreground">
-                Run coaching calls, workshops, or Q&A sessions. Engage your community in real-time.
-              </p>
-              <div className="mt-6 flex items-center gap-4">
-                <CreateSessionDialog
-                  triggerText="Schedule Session"
-                  className="inline-flex items-center gap-2 rounded-full bg-purple-600 px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-purple-700"
+            <div className="grid items-center gap-6 lg:grid-cols-[1fr_auto_1fr]">
+              <div className="relative h-48 overflow-hidden rounded-xl border border-border bg-muted/30">
+                <Image
+                  src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=900&q=80"
+                  alt="Conventional classroom with students"
+                  fill
+                  className="object-cover"
                 />
-                <span className="text-xs text-muted-foreground">Takes 2 minutes</span>
               </div>
-              <p className="mt-4 text-xs text-muted-foreground">
-                Communities with weekly sessions grow 3x faster
-              </p>
+
+              <div className="flex flex-col items-center text-center">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-purple-600/20">
+                  <Video className="h-8 w-8 text-purple-400" />
+                </div>
+                <h3 className="mt-4 text-lg font-semibold text-foreground">
+                  Host your first live session
+                </h3>
+                <p className="mt-2 max-w-sm text-sm text-muted-foreground">
+                  Run coaching calls, workshops, or Q&A sessions. Engage your community in real-time.
+                </p>
+                <div className="mt-6 flex items-center gap-4">
+                  <CreateSessionDialog
+                    triggerText="Schedule Session"
+                    className="inline-flex items-center gap-2 rounded-full bg-purple-600 px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-purple-700"
+                  />
+                  <span className="text-xs text-muted-foreground">Takes 2 minutes</span>
+                </div>
+                <p className="mt-4 text-xs text-muted-foreground">
+                  Communities with weekly sessions grow 3x faster
+                </p>
+              </div>
+
+              <div className="relative h-48 overflow-hidden rounded-xl border border-border bg-muted/30">
+                <Image
+                  src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=900&q=80"
+                  alt="Yoga or pilates instructor with students practicing"
+                  fill
+                  className="object-cover"
+                />
+              </div>
             </div>
           </div>
         ) : (
