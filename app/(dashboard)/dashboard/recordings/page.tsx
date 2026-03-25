@@ -89,8 +89,8 @@ export default async function RecordingsLibraryPage() {
       {/* HEADER */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Recordings Library</h1>
-          <p className="mt-1 text-sm text-zinc-400">
+          <h1 className="text-2xl font-bold text-foreground">Recordings Library</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Your recorded live sessions, ready to reuse
           </p>
         </div>
@@ -110,8 +110,8 @@ export default async function RecordingsLibraryPage() {
           </p>
           <div className="mt-1 flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="text-lg font-semibold text-white">{nextLiveSession.title}</p>
-              <p className="text-sm text-zinc-300">
+              <p className="text-lg font-semibold text-foreground">{nextLiveSession.title}</p>
+              <p className="text-sm text-foreground/80">
                 {new Date(nextLiveSession.scheduledAt).toLocaleString()}
               </p>
             </div>
@@ -127,44 +127,44 @@ export default async function RecordingsLibraryPage() {
 
       {/* STATS */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-4">
+        <div className="rounded-xl border border-border bg-card p-4">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-500/10">
               <Library className="h-5 w-5 text-purple-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-white">{recordings.length}</p>
-              <p className="text-xs text-zinc-500">Total recordings</p>
+              <p className="text-2xl font-bold text-foreground">{recordings.length}</p>
+              <p className="text-xs text-muted-foreground">Total recordings</p>
             </div>
           </div>
         </div>
 
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-4">
+        <div className="rounded-xl border border-border bg-card p-4">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-500/10">
               <Clock className="h-5 w-5 text-green-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-white">
+              <p className="text-2xl font-bold text-foreground">
                 {Math.round(
                   recordings.reduce((acc, r) => acc + (r.duration || 0), 0) / 60
                 )}h
               </p>
-              <p className="text-xs text-zinc-500">Total content</p>
+              <p className="text-xs text-muted-foreground">Total content</p>
             </div>
           </div>
         </div>
 
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-4">
+        <div className="rounded-xl border border-border bg-card p-4">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-500/10">
               <Users className="h-5 w-5 text-blue-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-white">
+              <p className="text-2xl font-bold text-foreground">
                 {recordings.reduce((acc, r) => acc + (r.participations?.length || 0), 0)}
               </p>
-              <p className="text-xs text-zinc-500">Total participants</p>
+              <p className="text-xs text-muted-foreground">Total participants</p>
             </div>
           </div>
         </div>
@@ -172,14 +172,14 @@ export default async function RecordingsLibraryPage() {
 
       {/* RECORDINGS GRID */}
       {recordings.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-zinc-800 bg-zinc-900/30 p-12 text-center">
-          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800">
-            <Video className="h-8 w-8 text-zinc-500" />
+        <div className="rounded-2xl border border-dashed border-border bg-card/30 p-12 text-center">
+          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+            <Video className="h-8 w-8 text-muted-foreground" />
           </div>
-          <h3 className="mb-2 text-lg font-semibold text-white">
+          <h3 className="mb-2 text-lg font-semibold text-foreground">
             No recordings yet
           </h3>
-          <p className="mb-6 text-sm text-zinc-400">
+          <p className="mb-6 text-sm text-muted-foreground">
             Start a live session and record it to build your library
           </p>
           <Link
@@ -195,10 +195,10 @@ export default async function RecordingsLibraryPage() {
           {recordings.map((recording) => (
             <div
               key={recording.id}
-              className="group overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900 transition-all hover:border-zinc-700 hover:shadow-lg"
+              className="group overflow-hidden rounded-xl border border-border bg-card transition-all hover:border-border/80 hover:shadow-lg"
             >
               {/* Thumbnail */}
-              <div className="relative aspect-video bg-zinc-950">
+              <div className="relative aspect-video bg-background">
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="flex h-16 w-16 items-center justify-center rounded-full bg-purple-500/20 transition-all group-hover:scale-110 group-hover:bg-purple-500/30">
                     <Play className="h-8 w-8 text-purple-500" />
@@ -220,14 +220,14 @@ export default async function RecordingsLibraryPage() {
 
               {/* Info */}
               <div className="p-4">
-                <h3 className="font-semibold text-white line-clamp-1">
+                <h3 className="font-semibold text-foreground line-clamp-1">
                   {recording.title}
                 </h3>
-                <p className="mt-1 text-sm text-zinc-400 line-clamp-1">
+                <p className="mt-1 text-sm text-muted-foreground line-clamp-1">
                   {recording.description || "No description"}
                 </p>
 
-                <div className="mt-3 flex items-center gap-4 text-xs text-zinc-500">
+                <div className="mt-3 flex items-center gap-4 text-xs text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <Calendar className="h-3.5 w-3.5" />
                     {formatDistanceToNow(new Date(recording.scheduledAt), {
@@ -252,7 +252,7 @@ export default async function RecordingsLibraryPage() {
                     Watch
                   </a>
 
-                  <button className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm font-medium text-zinc-300 transition-all hover:bg-zinc-700">
+                  <button className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-border bg-muted px-3 py-2 text-sm font-medium text-foreground transition-all hover:bg-accent">
                     <Plus className="h-4 w-4" />
                     Add to Course
                   </button>
@@ -273,12 +273,12 @@ export default async function RecordingsLibraryPage() {
 
       {/* TIPS SECTION */}
       {recordings.length > 0 && (
-        <div className="rounded-xl border border-zinc-800 bg-gradient-to-r from-zinc-900 to-zinc-800 p-5">
-          <h3 className="mb-2 font-semibold text-white">💡 Pro tip</h3>
-          <p className="text-sm text-zinc-400">
+        <div className="rounded-xl border border-border bg-muted/40 p-5">
+          <h3 className="mb-2 font-semibold text-foreground">💡 Pro tip</h3>
+          <p className="text-sm text-muted-foreground">
             Recordings are automatically saved after each live session. Use them to:
           </p>
-          <ul className="mt-2 space-y-1 text-sm text-zinc-400">
+          <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
             <li>• Add to your courses as premium content</li>
             <li>• Share with members who missed the live session</li>
             <li>• Repurpose as short clips for social media</li>
