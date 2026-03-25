@@ -206,7 +206,7 @@ export default async function SessionsPage() {
             {upcoming.map((s) => (
               <div
                 key={s.id}
-                className="group relative overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 p-5 transition-all hover:border-zinc-700 hover:bg-zinc-900"
+                className="group relative overflow-hidden rounded-xl border border-border bg-card p-5 transition-all hover:border-border/80 hover:bg-accent/40"
               >
                 {/* Date Badge */}
                 <div className="mb-4 flex items-center justify-between">
@@ -268,9 +268,9 @@ export default async function SessionsPage() {
       {past.length > 0 && (
         <div className="space-y-4">
           <div className="flex items-center gap-3">
-            <Play className="h-5 w-5 text-zinc-400" />
-            <h2 className="text-lg font-semibold text-white">Past Sessions</h2>
-            <Badge variant="secondary" className="bg-zinc-800 text-zinc-300">
+            <Play className="h-5 w-5 text-muted-foreground" />
+            <h2 className="text-lg font-semibold text-foreground">Past Sessions</h2>
+            <Badge variant="secondary" className="bg-muted text-foreground/80">
               {past.length}
             </Badge>
           </div>
@@ -279,7 +279,7 @@ export default async function SessionsPage() {
             {past.slice(0, 6).map((s) => (
               <div
                 key={s.id}
-                className="group relative overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 p-5 transition-all hover:border-zinc-700 hover:bg-zinc-900"
+                className="group relative overflow-hidden rounded-xl border border-border bg-card p-5 transition-all hover:border-border/80 hover:bg-accent/40"
               >
                 {/* Recording Badge */}
                 {s.status === "COMPLETED" && (
@@ -292,18 +292,18 @@ export default async function SessionsPage() {
                 )}
 
                 {/* Date */}
-                <div className="mb-3 flex items-center gap-2 text-sm text-zinc-500">
+                <div className="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
                   <Calendar className="h-4 w-4" />
                   {formatDistanceToNow(new Date(s.scheduledAt), { addSuffix: true })}
                 </div>
 
                 {/* Title */}
-                <h3 className="font-medium text-white group-hover:text-zinc-200 transition-colors">
+                <h3 className="font-medium text-foreground group-hover:text-foreground transition-colors">
                   {s.title}
                 </h3>
 
                 {/* Duration */}
-                <div className="mt-2 flex items-center gap-1 text-xs text-zinc-500">
+                <div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
                   <Clock className="h-3 w-3" />
                   {s.duration} min
                 </div>
@@ -315,7 +315,7 @@ export default async function SessionsPage() {
                     <Button 
                       variant="outline" 
                       size="sm"
-                      className="w-full rounded-full border-zinc-700 bg-transparent text-xs text-zinc-300 hover:bg-zinc-800"
+                      className="w-full rounded-full border-border bg-background text-xs text-foreground hover:bg-accent"
                     >
                       Enter Room
                     </Button>
@@ -339,7 +339,7 @@ export default async function SessionsPage() {
 
           {past.length > 6 && (
             <div className="text-center">
-              <Button variant="ghost" className="text-zinc-400 hover:text-white">
+              <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
                 View all {past.length} past sessions
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
