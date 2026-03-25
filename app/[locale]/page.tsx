@@ -150,7 +150,7 @@ export default function Home() {
                   <div className="w-3 h-3 rounded-full bg-red-400" />
                   <div className="w-3 h-3 rounded-full bg-yellow-400" />
                   <div className="w-3 h-3 rounded-full bg-green-400" />
-                  <span className="ml-4 text-sm text-slate-200/90 font-medium tracking-wide">unytea.com/live/community-masterclass</span>
+                  <span className="ml-4 text-sm text-slate-700 font-semibold tracking-wide">unytea.com/live/community-masterclass</span>
                 </div>
                 
                 {/* Live session header */}
@@ -161,11 +161,11 @@ export default function Home() {
                       <div className="relative px-3 py-1 bg-red-500 rounded-full text-xs font-bold">LIVE</div>
                     </div>
                     <div>
-                      <div className="font-semibold text-white tracking-tight">Community Masterclass</div>
-                      <div className="text-sm text-slate-200/90">How to Scale Your Coaching Business</div>
+                      <div className="font-bold text-slate-900 tracking-tight">Community Masterclass</div>
+                      <div className="text-sm text-slate-700">How to Scale Your Coaching Business</div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-slate-700 font-medium">
+                  <div className="flex items-center gap-2 text-sm text-slate-800 font-semibold">
                     <Users className="w-4 h-4" />
                     <span>247 attending</span>
                   </div>
@@ -202,7 +202,7 @@ export default function Home() {
                 </div>
                 
                 {/* Chat preview */}
-                <div className="bg-slate-50 ring-1 ring-slate-200 rounded-xl p-3">
+                <div className="bg-white ring-1 ring-slate-300 rounded-xl p-3">
                   <div className="space-y-2 text-sm">
                     <div className="flex gap-2">
                       <span className="text-slate-500 font-medium">Mike:</span>
@@ -219,9 +219,9 @@ export default function Home() {
                   </div>
                 </div>
                 
-                {/* Glow effect */}
-                <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary/30 rounded-full blur-3xl" />
-                <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl" />
+                {/* Subtle light decoration */}
+                <div className="absolute -top-20 -right-20 w-40 h-40 bg-slate-100 rounded-full blur-3xl" />
+                <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-slate-100/80 rounded-full blur-3xl" />
               </div>
             </div>
           </div>
