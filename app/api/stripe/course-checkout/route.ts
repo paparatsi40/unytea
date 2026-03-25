@@ -4,6 +4,33 @@ import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
 import { getOrCreateStripeCustomer } from "@/lib/stripe";
 
+const PLATFORM_FEE_BY_PLAN: Record<string, number> = {
+  start: 8,
+  creator: 5,
+  business: 2,
+  pro: 0,
+};
+
+async function getPlatformFeePercentForOwner(ownerId: string): Promise<number> {
+  const ownerSubscription = await prisma.subscription.findFirst({
+    where: {
+      userId: ownerId,
+      status: { in: ["ACTIVE", "TRIALING"] },
+    },
+    include: {
+      plan: {
+        select: { name: true },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  const planName = ownerSubscription?.plan?.name?.toLowerCase()?.trim();
+  if (!planName) return 5;
+
+  return PLATFORM_FEE_BY_PLAN[planName] ?? 5;
+}
+
 export const dynamic = "force-dynamic";
 
 /**

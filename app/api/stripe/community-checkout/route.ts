@@ -4,6 +4,33 @@ import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
 import { getOrCreateStripeCustomer } from "@/lib/stripe";
 
+const PLATFORM_FEE_BY_PLAN: Record<string, number> = {
+  start: 8,
+  creator: 5,
+  business: 2,
+  pro: 0,
+};
+
+async function getPlatformFeePercentForOwner(ownerId: string): Promise<number> {
+  const ownerSubscription = await prisma.subscription.findFirst({
+    where: {
+      userId: ownerId,
+      status: { in: ["ACTIVE", "TRIALING"] },
+    },
+    include: {
+      plan: {
+        select: { name: true },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  const planName = ownerSubscription?.plan?.name?.toLowerCase()?.trim();
+  if (!planName) return 5;
+
+  return PLATFORM_FEE_BY_PLAN[planName] ?? 5;
+}
+
 export const dynamic = "force-dynamic";
 
 /**
@@ -89,8 +116,8 @@ export async function POST(req: Request) {
       );
     }
 
-    // Calculate platform fee (5%)
-    const platformFeePercent = 5;
+    // Calculate platform fee from owner's active plan
+    const platformFeePercent = await getPlatformFeePercentForOwner(community.ownerId);
 
     // Create checkout session with transfer to community owner
     const checkoutSession = await stripe.checkout.sessions.create({
@@ -116,10 +143,10 @@ export async function POST(req: Request) {
           ownerId: community.ownerId,
           type: "community_membership",
         },
-        // Transfer 95% to community owner (platform keeps 5%)
+        // Transfer net amount to community owner based on active plan fee
         transfer_data: {
           destination: community.owner.stripeConnectAccountId,
-          amount_percent: 95,
+          amount_percent: Math.max(0, 100 - platformFeePercent),
         },
         application_fee_percent: platformFeePercent,
       },

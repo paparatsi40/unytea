@@ -3,6 +3,33 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { stripe, getOrCreateStripeCustomer } from "@/lib/stripe";
 
+const PLATFORM_FEE_BY_PLAN: Record<string, number> = {
+  start: 8,
+  creator: 5,
+  business: 2,
+  pro: 0,
+};
+
+async function getPlatformFeePercentForOwner(ownerId: string): Promise<number> {
+  const ownerSubscription = await prisma.subscription.findFirst({
+    where: {
+      userId: ownerId,
+      status: { in: ["ACTIVE", "TRIALING"] },
+    },
+    include: {
+      plan: {
+        select: { name: true },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  const planName = ownerSubscription?.plan?.name?.toLowerCase()?.trim();
+  if (!planName) return 5;
+
+  return PLATFORM_FEE_BY_PLAN[planName] ?? 5;
+}
+
 export const dynamic = "force-dynamic";
 
 function getTierPriceId(pricing: unknown, tier: "free" | "pro" | "vip") {
@@ -61,6 +88,8 @@ export async function GET(req: Request) {
     name: session.user.name || undefined,
   });
 
+  const platformFeePercent = await getPlatformFeePercentForOwner(community.ownerId);
+
   const checkout = await stripe.checkout.sessions.create({
     customer: customer.id,
     line_items: [{ price: priceId, quantity: 1 }],
@@ -83,9 +112,9 @@ export async function GET(req: Request) {
       },
       transfer_data: {
         destination: community.owner.stripeConnectAccountId,
-        amount_percent: 95,
+        amount_percent: Math.max(0, 100 - platformFeePercent),
       },
-      application_fee_percent: 5,
+      application_fee_percent: platformFeePercent,
     },
   });
 
