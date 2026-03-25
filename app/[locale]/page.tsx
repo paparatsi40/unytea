@@ -144,13 +144,13 @@ export default function Home() {
             </div>
             {/* Mock del producto - lado derecho */}
             <div className="relative">
-              <div className="relative bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl shadow-2xl p-6 border border-gray-700 text-white overflow-hidden">
+              <div className="relative bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 rounded-2xl shadow-2xl p-6 border border-slate-600/70 text-white overflow-hidden">
                 {/* Browser chrome */}
-                <div className="flex items-center gap-2 mb-4 pb-4 border-b border-gray-700">
+                <div className="flex items-center gap-2 mb-4 pb-4 border-b border-slate-600/60">
                   <div className="w-3 h-3 rounded-full bg-red-400" />
                   <div className="w-3 h-3 rounded-full bg-yellow-400" />
                   <div className="w-3 h-3 rounded-full bg-green-400" />
-                  <span className="ml-4 text-sm text-gray-400">unytea.com/live/community-masterclass</span>
+                  <span className="ml-4 text-sm text-slate-200/90 font-medium tracking-wide">unytea.com/live/community-masterclass</span>
                 </div>
                 
                 {/* Live session header */}
@@ -161,11 +161,11 @@ export default function Home() {
                       <div className="relative px-3 py-1 bg-red-500 rounded-full text-xs font-bold">LIVE</div>
                     </div>
                     <div>
-                      <div className="font-semibold">Community Masterclass</div>
-                      <div className="text-sm text-gray-400">How to Scale Your Coaching Business</div>
+                      <div className="font-semibold text-white tracking-tight">Community Masterclass</div>
+                      <div className="text-sm text-slate-200/90">How to Scale Your Coaching Business</div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-400">
+                  <div className="flex items-center gap-2 text-sm text-slate-200/90 font-medium">
                     <Users className="w-4 h-4" />
                     <span>247 attending</span>
                   </div>
@@ -173,44 +173,44 @@ export default function Home() {
                 
                 {/* Video grid */}
                 <div className="grid grid-cols-2 gap-3 mb-4">
-                  <div className="bg-gray-700 rounded-xl aspect-video flex items-center justify-center relative overflow-hidden">
+                  <div className="bg-slate-700/80 ring-1 ring-white/10 rounded-xl aspect-video flex items-center justify-center relative overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-purple-500/20" />
                     <div className="relative w-16 h-16 bg-primary rounded-full flex items-center justify-center">
                       <Video className="w-8 h-8" />
                     </div>
-                    <div className="absolute bottom-2 left-2 px-2 py-1 bg-black/50 rounded text-xs">You (Host)</div>
+                    <div className="absolute bottom-2 left-2 px-2 py-1 bg-slate-900/85 border border-white/20 rounded text-xs font-semibold text-white">You (Host)</div>
                   </div>
-                  <div className="bg-gray-700 rounded-xl aspect-video flex items-center justify-center relative">
+                  <div className="bg-slate-700/80 ring-1 ring-white/10 rounded-xl aspect-video flex items-center justify-center relative">
                     <div className="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center">
                       <span className="text-lg">👩</span>
                     </div>
-                    <div className="absolute bottom-2 left-2 px-2 py-1 bg-black/50 rounded text-xs">Sarah M.</div>
+                    <div className="absolute bottom-2 left-2 px-2 py-1 bg-slate-900/85 border border-white/20 rounded text-xs font-semibold text-white">Sarah M.</div>
                   </div>
-                  <div className="bg-gray-700 rounded-xl aspect-video flex items-center justify-center relative">
+                  <div className="bg-slate-700/80 ring-1 ring-white/10 rounded-xl aspect-video flex items-center justify-center relative">
                     <div className="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center">
                       <span className="text-lg">👨</span>
                     </div>
-                    <div className="absolute bottom-2 left-2 px-2 py-1 bg-black/50 rounded text-xs">Mike R.</div>
+                    <div className="absolute bottom-2 left-2 px-2 py-1 bg-slate-900/85 border border-white/20 rounded text-xs font-semibold text-white">Mike R.</div>
                   </div>
-                  <div className="bg-gray-700 rounded-xl aspect-video flex items-center justify-center relative">
+                  <div className="bg-slate-700/80 ring-1 ring-white/10 rounded-xl aspect-video flex items-center justify-center relative">
                     <div className="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center">
                       <span className="text-lg">👩</span>
                     </div>
-                    <div className="absolute bottom-2 left-2 px-2 py-1 bg-black/50 rounded text-xs">Lisa K.</div>
-                    <div className="absolute bottom-2 right-2 px-2 py-1 bg-gray-800 rounded text-xs">+24 more</div>
+                    <div className="absolute bottom-2 left-2 px-2 py-1 bg-slate-900/85 border border-white/20 rounded text-xs font-semibold text-white">Lisa K.</div>
+                    <div className="absolute bottom-2 right-2 px-2 py-1 bg-slate-900/90 border border-white/20 rounded text-xs font-semibold text-white">+24 more</div>
                   </div>
                 </div>
                 
                 {/* Chat preview */}
-                <div className="bg-gray-800 rounded-xl p-3">
+                <div className="bg-slate-900/80 ring-1 ring-white/10 rounded-xl p-3">
                   <div className="space-y-2 text-sm">
                     <div className="flex gap-2">
-                      <span className="text-gray-500">Mike:</span>
-                      <span className="text-gray-300">This is exactly what I needed! 🔥</span>
+                      <span className="text-slate-300/85 font-medium">Mike:</span>
+                      <span className="text-slate-100">This is exactly what I needed! 🔥</span>
                     </div>
                     <div className="flex gap-2">
-                      <span className="text-gray-500">Sarah:</span>
-                      <span className="text-gray-300">Great tips on pricing</span>
+                      <span className="text-slate-300/85 font-medium">Sarah:</span>
+                      <span className="text-slate-100">Great tips on pricing</span>
                     </div>
                     <div className="flex gap-2">
                       <span className="text-gray-500">Lisa:</span>
