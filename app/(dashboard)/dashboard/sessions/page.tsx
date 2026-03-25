@@ -183,7 +183,7 @@ export default async function SessionsPage() {
             <div className="grid items-center gap-6 lg:grid-cols-[1fr_auto_1fr]">
               <div className="relative h-48 overflow-hidden rounded-xl border border-border bg-muted/30">
                 <Image
-                  src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=900&q=80"
+                  src="https://images.unsplash.com/photo-1513258496099-48168024aec0?auto=format&fit=crop&w=900&q=80"
                   alt="Conventional classroom with students"
                   fill
                   className="object-cover"
