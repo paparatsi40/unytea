@@ -17,7 +17,10 @@ const plans = [
       "Up to 50 members",
       "Community feed",
       "Simple live sessions",
+      "Basic library",
+      "Basic courses",
       "Basic analytics",
+      "Unytea branding",
       "8% transaction fee",
     ],
   },
@@ -32,7 +35,9 @@ const plans = [
       "Unlimited members",
       "Paid community access",
       "Paid course sales",
-      "Live sessions + courses",
+      "Live sessions",
+      "Full courses",
+      "Basic growth tools",
       "5% transaction fee",
     ],
   },
@@ -64,6 +69,7 @@ const plans = [
       "White-label experience",
       "API access",
       "Unlimited admins",
+      "Multi-community operations",
       "0% transaction fee",
     ],
   },
@@ -119,7 +125,7 @@ export default function UpgradePage() {
           Upgrade to Premium
         </h1>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          Choose the perfect plan for your community. No hidden fees, cancel anytime.
+          Hosts pay for the platform. Members join for free. Fees apply only when you sell paid access or courses.
         </p>
       </div>
 
@@ -200,12 +206,10 @@ export default function UpgradePage() {
       {/* FAQ Preview */}
       <div className="max-w-4xl mx-auto mt-16 p-8 rounded-2xl border border-border bg-card/50">
         <h2 className="text-2xl font-bold text-foreground mb-4 text-center">
-          Questions?
+          Billing clarity
         </h2>
         <p className="text-center text-muted-foreground">
-          All plans include 14-day free trial. No credit card required.
-          <br />
-          Payment integration coming soon!
+          Members can join free. Transaction fees are charged only on paid memberships and paid courses, based on your plan tier.
         </p>
       </div>
     </div>
