@@ -389,7 +389,6 @@ export async function getGamificationAnalytics(communityId?: string) {
             currentStreak: true,
             longestStreak: true,
             level: true,
-            xp: true,
           },
         },
       },
@@ -406,7 +405,6 @@ export async function getGamificationAnalytics(communityId?: string) {
       },
       points: m.points,
       level: m.user.level,
-      xp: m.user.xp,
       streak: m.user.currentStreak,
       longestStreak: m.user.longestStreak,
     }));

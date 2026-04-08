@@ -41,7 +41,6 @@ interface LeaderboardEntry {
   };
   points: number;
   level: number;
-  xp: number;
   streak: number;
   longestStreak: number;
 }
