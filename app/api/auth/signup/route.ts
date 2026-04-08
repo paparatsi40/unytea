@@ -1,7 +1,8 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 import { z } from "zod"
+import { rateLimiters, getIP } from "@/lib/rate-limit"
 
 const signUpSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -9,10 +10,20 @@ const signUpSchema = z.object({
   password: z.string().min(8, "Password must be at least 8 characters"),
 })
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
+    // Rate limit signup attempts
+    const ip = getIP(request)
+    const { success: rateLimitOk } = rateLimiters.auth.check(`signup:${ip}`)
+    if (!rateLimitOk) {
+      return NextResponse.json(
+        { error: "Too many attempts. Please try again later." },
+        { status: 429 }
+      )
+    }
+
     const body = await request.json()
-    
+
     // Validate input
     const validatedData = signUpSchema.parse(body)
     const { name, email, password } = validatedData
@@ -23,9 +34,10 @@ export async function POST(request: Request) {
     })
 
     if (existingUser) {
+      // Return generic success to prevent email enumeration
       return NextResponse.json(
-        { error: "Email already registered" },
-        { status: 400 }
+        { message: "If this email is available, an account has been created. Please check your email." },
+        { status: 201 }
       )
     }
 
@@ -33,24 +45,17 @@ export async function POST(request: Request) {
     const hashedPassword = await bcrypt.hash(password, 10)
 
     // Create user
-    const user = await prisma.user.create({
+    await prisma.user.create({
       data: {
         name,
         email,
         password: hashedPassword,
-        isOnboarded: false, // User needs to complete onboarding
+        isOnboarded: false,
       },
     })
 
     return NextResponse.json(
-      { 
-        message: "User created successfully",
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-        },
-      },
+      { message: "If this email is available, an account has been created. Please check your email." },
       { status: 201 }
     )
   } catch (error) {
@@ -61,7 +66,7 @@ export async function POST(request: Request) {
       )
     }
 
-    console.error("Signup error:", error)
+    console.error("[signup] Error:", error instanceof Error ? error.message : "Unknown error")
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

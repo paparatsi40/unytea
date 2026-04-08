@@ -14,9 +14,9 @@ import { runSessionJobs } from "@/app/actions/session-jobs";
 
 export async function GET(request: NextRequest) {
   try {
-    // Verify cron secret if provided (for security)
-    const cronSecret = request.headers.get("x-cron-secret") || 
-                       request.nextUrl.searchParams.get("secret");
+    // Verify cron secret from headers only (never from query params for security)
+    const cronSecret = request.headers.get("x-cron-secret") ||
+                       request.headers.get("authorization")?.replace("Bearer ", "");
     
     const expectedSecret = process.env.CRON_SECRET;
     

@@ -1,22 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUserId } from "@/lib/auth-utils";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { slug: string } }
 ) {
   try {
-    const searchParams = request.nextUrl.searchParams;
-    const userId = searchParams.get("userId");
+    // Get userId from session (not from query params for security)
+    const userId = await getCurrentUserId();
 
     if (!userId) {
       return NextResponse.json(
-        { error: "userId is required" },
-        { status: 400 }
+        { error: "Unauthorized - Please sign in" },
+        { status: 401 }
       );
     }
-
-    console.log("🔍 API: Fetching posts for community:", params.slug);
 
     // Get community
     const community = await prisma.community.findUnique({
@@ -31,25 +30,12 @@ export async function GET(
       );
     }
 
-    // Get user from DB
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { id: true },
-    });
-
-    if (!user) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      );
-    }
-
     // Check membership if private
     if (community.isPrivate) {
       const membership = await prisma.member.findUnique({
         where: {
           userId_communityId: {
-            userId: user.id,
+            userId,
             communityId: community.id,
           },
         },

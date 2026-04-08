@@ -75,7 +75,8 @@ model User {
   updatedAt          DateTime          @updatedAt
   lastActiveAt       DateTime?
   stripeConnectAccountId String?           // Stripe Connect account for community owners
-  
+  deletedAt          DateTime?
+
   // NextAuth Relations
   accounts           Account[]
   sessions           Session[]
@@ -165,6 +166,7 @@ model Community {
   
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
+  deletedAt         DateTime?
   ownerId           String
   channels          Channel[]
   owner             User               @relation("CommunityOwner", fields: [ownerId], references: [id], onDelete: Cascade)
@@ -248,6 +250,7 @@ model Post {
   publishedAt DateTime?
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
+  deletedAt   DateTime?
   authorId    String
   communityId String
   channelId   String?
@@ -262,6 +265,7 @@ model Post {
   @@index([channelId])
   @@index([createdAt])
   @@index([isPinned])
+  @@index([communityId, createdAt])
   @@map("posts")
 }
 
@@ -825,6 +829,7 @@ model BuddyCheckIn {
   id            String   @id @default(cuid())
   partnershipId String
   userId        String
+  // Valid range: 1-10. Application-level validation required.
   mood          Int      @default(5) // 1-10 scale
   notes         String?
   completedGoals String[] // Array of goal IDs
@@ -1139,11 +1144,13 @@ model Resource {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   publishedAt DateTime?
-  
+  deletedAt   DateTime?
+
   @@unique([communityId, slug])
   @@index([communityId, type])
   @@index([categoryId])
   @@index([status, publishedAt])
+  @@index([authorId])
   @@map("resources")
 }
 

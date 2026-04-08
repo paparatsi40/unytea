@@ -2,10 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { generateChatCompletion, AI_CONFIG, ChatMessage } from "@/lib/openai";
 import { prisma } from "@/lib/prisma";
+import { rateLimit, getIP } from "@/lib/rate-limit";
 export const dynamic = 'force-dynamic';
 
-
-
+// Strict rate limiter for AI endpoints (costs money per request)
+const aiRateLimiter = rateLimit({
+  interval: 60 * 60 * 1000, // 1 hour
+  uniqueTokenPerInterval: 30, // 30 AI requests per hour per user
+});
 
 
 
@@ -17,6 +21,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
+      );
+    }
+
+    // Rate limit AI requests (expensive - OpenAI costs per request)
+    const { success: rateLimitOk } = aiRateLimiter.check(`ai:${session.user.id}`);
+    if (!rateLimitOk) {
+      return NextResponse.json(
+        { error: "You've reached the AI chat limit. Please try again later." },
+        { status: 429 }
       );
     }
 

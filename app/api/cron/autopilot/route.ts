@@ -3,7 +3,9 @@ import { runAutopilotDueJobs } from "@/app/actions/autopilot";
 
 export async function GET(request: NextRequest) {
   try {
-    const cronSecret = request.headers.get("x-cron-secret") || request.nextUrl.searchParams.get("secret");
+    // Only accept secret from headers (never query params for security)
+    const cronSecret = request.headers.get("x-cron-secret") ||
+      request.headers.get("authorization")?.replace("Bearer ", "");
     const expectedSecret = process.env.CRON_SECRET;
 
     if (expectedSecret && cronSecret !== expectedSecret) {

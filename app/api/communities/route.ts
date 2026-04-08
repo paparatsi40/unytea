@@ -10,7 +10,6 @@ export async function POST(req: Request) {
     const userId = await getCurrentUserId();
     
     if (!userId) {
-      console.log("? No userId found - user not authenticated");
       return NextResponse.json(
         { error: "Unauthorized - Please sign in" },
         { status: 401 }
@@ -20,8 +19,6 @@ export async function POST(req: Request) {
     // Parse request body
     const body = await req.json();
     const { name, description, imageUrl, coverImageUrl, isPrivate, requireApproval } = body;
-
-    console.log("Creating community:", { name, userId });
 
     if (!name || name.length < 3) {
       return NextResponse.json(
@@ -40,8 +37,6 @@ export async function POST(req: Request) {
       slug = `${slug}-${Date.now()}`;
     }
 
-    console.log("? Creating with slug:", slug);
-
     // Create community
     const community = await prisma.community.create({
       data: {
@@ -56,8 +51,6 @@ export async function POST(req: Request) {
       },
     });
 
-    console.log("? Community created:", community.id);
-
     // Add creator as admin member
     await prisma.member.create({
       data: {
@@ -67,8 +60,6 @@ export async function POST(req: Request) {
         status: "ACTIVE", 
       },
     });
-
-    console.log("? Member created successfully");
 
     return NextResponse.json({ success: true, community }, { status: 201 });
   } catch (error) {
@@ -90,8 +81,6 @@ export async function GET() {
         { status: 400 }
       );
     }
-
-    console.log("📥 API: Fetching communities for user:", userId);
 
     // Get all communities where user is a member
     const memberships = await prisma.member.findMany({
@@ -123,8 +112,6 @@ export async function GET() {
         joinedAt: "desc",
       },
     });
-
-    console.log("✅ API: Found memberships:", memberships.length);
 
     const startOfWeek = new Date();
     const day = startOfWeek.getDay();
@@ -256,14 +243,12 @@ export async function GET() {
       take: 20,
     });
 
-    console.log("✅ API: Found explore communities:", exploreCommunities.length);
-
     return NextResponse.json({
       myCommunities,
       exploreCommunities,
     });
   } catch (error) {
-    console.error("❌ API Error:", error);
+    console.error("Error fetching communities:", error);
     return NextResponse.json(
       { error: "Failed to fetch communities" },
       { status: 500 }

@@ -3,8 +3,9 @@ import { sendSessionReminders } from "@/app/actions/session-jobs";
 
 export async function GET(request: NextRequest) {
   try {
+    // Only accept secret from headers (never query params for security)
     const cronSecret = request.headers.get("x-cron-secret") ||
-      request.nextUrl.searchParams.get("secret");
+      request.headers.get("authorization")?.replace("Bearer ", "");
 
     const expectedSecret = process.env.CRON_SECRET;
 
