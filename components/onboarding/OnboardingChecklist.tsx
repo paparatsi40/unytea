@@ -28,7 +28,6 @@ export function OnboardingChecklist({
   const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
 
   useEffect(() => {
-    // Auto-dismiss when all complete
     if (completed === total && total > 0) {
       const timer = setTimeout(() => setDismissed(true), 3000);
       return () => clearTimeout(timer);
@@ -39,42 +38,42 @@ export function OnboardingChecklist({
   if (dismissed) return null;
 
   return (
-    <div className="rounded-xl border border-purple-500/20 bg-gradient-to-r from-purple-950/30 to-indigo-950/30 overflow-hidden">
+    <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
       {/* Header */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex w-full items-center justify-between p-4"
+        className="flex w-full items-center justify-between px-5 py-4"
       >
         <div className="flex items-center gap-3">
-          <Sparkles className="h-5 w-5 text-purple-400" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100">
+            <Sparkles className="h-4 w-4 text-purple-600" />
+          </div>
           <div className="text-left">
-            <p className="text-sm font-medium text-white">
+            <p className="text-sm font-semibold text-gray-900">
               Getting Started
             </p>
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-gray-500">
               {completed}/{total} completed
             </p>
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <div className="h-1.5 w-24 overflow-hidden rounded-full bg-zinc-800">
+          <div className="h-2 w-28 overflow-hidden rounded-full bg-gray-100">
             <div
               className={`h-full rounded-full transition-all duration-700 ${
-                progress === 100
-                  ? "bg-emerald-500"
-                  : "bg-purple-500"
+                progress === 100 ? "bg-emerald-500" : "bg-purple-500"
               }`}
               style={{ width: `${progress}%` }}
             />
           </div>
-          <span className="text-xs text-zinc-500">{progress}%</span>
+          <span className="text-xs font-medium text-gray-500">{progress}%</span>
           <button
             onClick={(e) => {
               e.stopPropagation();
               setDismissed(true);
               onDismiss?.();
             }}
-            className="rounded p-1 text-zinc-600 hover:bg-zinc-800 hover:text-zinc-400"
+            className="rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
           >
             <X className="h-3.5 w-3.5" />
           </button>
@@ -83,39 +82,39 @@ export function OnboardingChecklist({
 
       {/* Items */}
       {isOpen && (
-        <div className="border-t border-zinc-800/50 px-4 pb-4">
-          <div className="mt-3 space-y-1">
+        <div className="border-t border-gray-100 px-5 pb-4">
+          <div className="mt-2 space-y-0.5">
             {items.map((item) => (
               <a
                 key={item.id}
                 href={item.href}
-                className={`flex items-center gap-3 rounded-lg p-2.5 transition-colors ${
+                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors ${
                   item.completed
-                    ? "opacity-60"
-                    : "hover:bg-zinc-800/50"
+                    ? "opacity-50"
+                    : "hover:bg-gray-50"
                 }`}
               >
                 {item.completed ? (
-                  <CheckCircle className="h-4 w-4 shrink-0 text-emerald-400" />
+                  <CheckCircle className="h-5 w-5 shrink-0 text-emerald-500" />
                 ) : (
-                  <Circle className="h-4 w-4 shrink-0 text-zinc-600" />
+                  <Circle className="h-5 w-5 shrink-0 text-gray-300" />
                 )}
                 <div className="min-w-0 flex-1">
                   <p
                     className={`text-sm ${
                       item.completed
-                        ? "text-zinc-500 line-through"
-                        : "text-white"
+                        ? "text-gray-400 line-through"
+                        : "font-medium text-gray-900"
                     }`}
                   >
                     {item.title}
                   </p>
                   {!item.completed && (
-                    <p className="text-xs text-zinc-500">{item.description}</p>
+                    <p className="text-xs text-gray-500">{item.description}</p>
                   )}
                 </div>
                 {!item.completed && (
-                  <ChevronRight className="h-4 w-4 shrink-0 text-zinc-600" />
+                  <ChevronRight className="h-4 w-4 shrink-0 text-gray-400" />
                 )}
               </a>
             ))}
