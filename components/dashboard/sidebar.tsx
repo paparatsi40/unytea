@@ -22,7 +22,6 @@ const navigation = [
   { key: "dashboard", href: "/dashboard", icon: Home },
   { key: "communities", href: "/dashboard/communities", icon: Users },
   { key: "messages", href: "/dashboard/messages", icon: MessageSquare },
-  { key: "sessions", href: "/dashboard/sessions", icon: Video },
   { key: "recordings", href: "/dashboard/recordings", icon: Library },
   { key: "knowledgeLibrary", href: "/dashboard/knowledge-library", icon: BookOpen },
   { key: "courses", href: "/dashboard/courses", icon: BookOpen },
