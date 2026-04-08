@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { generateChatCompletion, AI_CONFIG, ChatMessage } from "@/lib/openai";
 import { prisma } from "@/lib/prisma";
-import { rateLimit, getIP } from "@/lib/rate-limit";
+import { rateLimit } from "@/lib/rate-limit";
 export const dynamic = 'force-dynamic';
 
 // Strict rate limiter for AI endpoints (costs money per request)
