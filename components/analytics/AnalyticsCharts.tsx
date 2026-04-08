@@ -110,7 +110,7 @@ function MiniBarChart({
 
   return (
     <div className="flex items-end gap-[2px]" style={{ height }}>
-      {data.map((d, i) => {
+      {data.map((d) => {
         const val = (d[dataKey] as number) || 0;
         const h = (val / max) * 100;
         return (
