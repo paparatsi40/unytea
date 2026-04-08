@@ -30,7 +30,6 @@ import {
   getCourse,
   updateCourse,
   createModule,
-  updateModule,
   deleteModule,
   createLesson,
   updateLesson,
