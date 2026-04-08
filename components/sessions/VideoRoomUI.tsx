@@ -206,9 +206,12 @@ export function VideoRoomUI({
   // Toggle microphone
   const toggleMicrophone = useCallback(async () => {
     try {
+      console.log("[LiveKit] Toggling mic. Currently enabled:", isMicrophoneEnabled, "| Will enable:", !isMicrophoneEnabled);
+      console.log("[LiveKit] Local participant permissions:", localParticipant.permissions);
       await localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled);
+      console.log("[LiveKit] Mic toggled successfully");
     } catch (e) {
-      console.error("Failed to toggle microphone:", e);
+      console.error("[LiveKit] Failed to toggle microphone:", e);
     }
   }, [localParticipant, isMicrophoneEnabled]);
 

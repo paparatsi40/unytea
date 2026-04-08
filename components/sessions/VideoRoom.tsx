@@ -105,14 +105,17 @@ export function VideoRoom({
         video={sessionMode === "video"}
         audio={true}
         onConnected={() => {
-          console.log("Connected to LiveKit room");
+          console.log("[LiveKit] Connected to room. Mode:", sessionMode, "| video:", sessionMode === "video", "| audio: true");
         }}
         onDisconnected={(reason) => {
-          console.log("Disconnected from LiveKit room", reason);
+          console.log("[LiveKit] Disconnected from room", reason);
           onLeave?.();
         }}
         onError={(err) => {
-          console.error("LiveKit error:", err);
+          console.error("[LiveKit] Error:", err);
+        }}
+        onMediaDeviceFailure={(failure) => {
+          console.error("[LiveKit] Media device failure:", failure);
         }}
         className="h-full flex flex-col"
       >

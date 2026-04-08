@@ -146,19 +146,25 @@ export default function SessionRoomPage({
     );
   }
 
-  if (!videoSession?.roomId) {
+  // Use videoRoomName (LiveKit) first, fall back to roomId
+  const roomName = videoSession?.videoRoomName || videoSession?.roomId;
+
+  if (!roomName) {
     router.replace("/dashboard/sessions");
     return null;
   }
 
   const isHost = user?.id === videoSession.mentorId;
 
+  // Normalize mode to lowercase (Prisma enum is "VIDEO"/"AUDIO", LiveKit expects "video"/"audio")
+  const normalizedMode = (videoSession.mode || "VIDEO").toLowerCase() as "video" | "audio";
+
   return (
     <div className="h-screen bg-zinc-950">
       <VideoRoom
-        roomName={videoSession.roomId}
+        roomName={roomName}
         sessionId={videoSession.id}
-        sessionMode={videoSession.mode || "video"}
+        sessionMode={normalizedMode}
         sessionTitle={videoSession.title}
         isHost={isHost}
         isRecording={isRecording}
