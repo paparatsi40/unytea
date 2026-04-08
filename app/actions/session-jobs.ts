@@ -274,6 +274,7 @@ export async function sendSessionReminders() {
           status: "SCHEDULED",
         },
         include: {
+          community: { select: { name: true } },
           participations: {
             where: {
               OR: [
