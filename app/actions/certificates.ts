@@ -52,13 +52,18 @@ export async function issueCertificate(enrollmentId: string) {
             },
           },
         },
-        user: { select: { name: true } },
       },
     });
 
     if (!enrollment) return { success: false, error: "Enrollment not found" };
     if (enrollment.userId !== userId)
       return { success: false, error: "Not your enrollment" };
+
+    // Fetch user name
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { name: true },
+    });
 
     // Verify completion (progress === 100)
     if (enrollment.progress < 100) {
@@ -90,7 +95,7 @@ export async function issueCertificate(enrollmentId: string) {
         userId,
         enrollmentId,
         courseName: enrollment.course.title,
-        userName: enrollment.user.name || "Student",
+        userName: user?.name || "Student",
         communityName: enrollment.course.community?.name,
         completionDate: enrollment.completedAt || new Date(),
         score: averageScore,
