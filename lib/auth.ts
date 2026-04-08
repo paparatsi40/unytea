@@ -174,13 +174,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     async signIn({ user }) {
       // Update last active timestamp
-      await prisma.user.update({
-        where: { id: user.id },
-        data: { 
-          lastActiveAt: new Date(),
-          // Don't mark as onboarded here - let the onboarding page do it
-        },
-      })
+      try {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            lastActiveAt: new Date(),
+          },
+        })
+      } catch (err) {
+        console.error("[auth] signIn event error:", err)
+      }
     },
   },
   trustHost: true, // Required for Vercel deployment
