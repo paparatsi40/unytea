@@ -9,7 +9,6 @@ import {
   Home,
   Users,
   MessageSquare,
-  Video,
   BookOpen,
   Settings,
   TrendingUp,
