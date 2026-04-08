@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/auth-utils";
 
 export async function GET(
-  request: NextRequest,
+  _request: Request,
   { params }: { params: { slug: string } }
 ) {
   try {
