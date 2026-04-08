@@ -5,6 +5,11 @@
     "previous": "Previous",
     "back": "Back",
     "cancel": "Cancel",
+    "error": "Something went wrong",
+    "comingSoon": "Coming Soon",
+    "featureInDevelopment": "Feature in Development",
+    "needHelp": "Need help?",
+    "contactSupport": "Contact us at support@unytea.com",
     "save": "Save",
     "create": "Create",
     "delete": "Delete",
@@ -35,7 +40,9 @@
     "passwordsDoNotMatch": "Passwords do not match",
     "invalidCredentials": "Invalid email or password",
     "signInError": "Error signing in",
-    "accountCreated": "Account created successfully!"
+    "accountCreated": "Account created successfully!",
+    "resetPassword": "Reset Password",
+    "passwordResetComingSoon": "Password reset is coming soon. In the meantime, please contact support."
   },
   "landing": {
     "nav": {
@@ -298,7 +305,8 @@
   "navigation": {
     "messages": "Messages",
     "profile": "Profile",
-    "logout": "Log out"
+    "logout": "Log out",
+    "back": "Back"
   },
   "onboarding": {
     "title": "Welcome to Unytea!",

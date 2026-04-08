@@ -80,7 +80,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             where: { email },
           })
 
-          if (!user || !user.password) {
+          if (!user) {
+            console.warn("[auth] Login failed: user not found for email:", email)
+            return null
+          }
+
+          if (!user.password) {
+            console.warn("[auth] Login failed: user has no password (OAuth-only account):", email)
             return null
           }
 
@@ -88,20 +94,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           const isValidPassword = await bcrypt.compare(password, user.password)
 
           if (!isValidPassword) {
+            console.warn("[auth] Login failed: invalid password for:", email)
             return null
           }
 
           return {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        image: user.image,
-        username: user.username,
-        isOnboarded: user.isOnboarded,
-        firstName: user.firstName,
-        lastName: user.lastName,
-      }
-        } catch {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            image: user.image,
+            username: user.username,
+            isOnboarded: user.isOnboarded,
+            firstName: user.firstName,
+            lastName: user.lastName,
+          }
+        } catch (error) {
+          console.error("[auth] Login error:", error instanceof Error ? error.message : error)
           return null
         }
       },

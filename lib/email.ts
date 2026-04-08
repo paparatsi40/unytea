@@ -246,6 +246,30 @@ export async function sendSessionRecapEmail(
   });
 }
 
+// ── Template: Password Reset ─────────────────────────────────────────
+export async function sendPasswordResetEmail(
+  to: string,
+  data: { userName: string; resetLink: string }
+) {
+  return sendEmail({
+    to,
+    subject: "Reset your Unytea password",
+    html: emailLayout(`
+      <h1 style="color: #f4f4f5; font-size: 22px; font-weight: 700; margin: 0 0 12px 0;">
+        Reset Your Password
+      </h1>
+      <p style="color: #a1a1aa; font-size: 15px; line-height: 1.6; margin: 0 0 24px 0;">
+        Hi ${data.userName}, we received a request to reset your password. Click the button below to choose a new one. This link expires in 1 hour.
+      </p>
+      ${ctaButton("Reset Password", data.resetLink)}
+      <p style="color: #71717a; font-size: 13px; line-height: 1.5; margin: 24px 0 0 0;">
+        If you didn't request this, you can safely ignore this email. Your password won't change.
+      </p>
+    `),
+    text: `Hi ${data.userName}, reset your password here: ${data.resetLink} (expires in 1 hour). If you didn't request this, ignore this email.`,
+  });
+}
+
 // ── Shared Layout ─────────────────────────────────────────────────────
 function emailLayout(content: string): string {
   return `
