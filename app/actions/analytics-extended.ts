@@ -2,7 +2,7 @@
 
 import { getCurrentUserId } from "@/lib/auth-utils";
 import { prisma } from "@/lib/prisma";
-import { subDays, format, startOfDay } from "date-fns";
+import { subDays, format } from "date-fns";
 
 // ── Session Analytics ────────────────────────────────────────────────
 export async function getSessionAnalytics(communityId?: string) {
