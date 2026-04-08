@@ -124,9 +124,6 @@ export async function GET(
 
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
-
-    console.log(`✓ API: Found ${posts.length} posts`);
-
     return NextResponse.json(prioritizedPosts);
   } catch (error) {
     console.error("❌ API Error:", error);
@@ -136,3 +133,4 @@ export async function GET(
     );
   }
 }
+
