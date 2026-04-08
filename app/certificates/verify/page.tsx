@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { Search, ShieldCheck, ShieldX, Loader2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { verifyCertificate } from "@/app/actions/certificates";
 import { CertificateView } from "@/components/courses/CertificateView";
 
-export default function VerifyCertificatePage() {
+function VerifyCertificateContent() {
   const searchParams = useSearchParams();
   const initialCode = searchParams.get("code") || "";
 
@@ -128,5 +128,19 @@ export default function VerifyCertificatePage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function VerifyCertificatePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-zinc-950">
+          <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
+        </div>
+      }
+    >
+      <VerifyCertificateContent />
+    </Suspense>
   );
 }
