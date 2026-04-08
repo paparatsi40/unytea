@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   LiveKitRoom,
   RoomAudioRenderer,
+  useLocalParticipant,
+  useRoomContext,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
-import { Loader2, AlertCircle, Mic } from "lucide-react";
+import { Loader2, AlertCircle } from "lucide-react";
 import { VideoRoomUI } from "./VideoRoomUI";
 
 interface VideoRoomProps {
@@ -23,75 +25,71 @@ interface VideoRoomProps {
 }
 
 /**
- * AudioContextResumer - Shows an overlay button when the browser blocks AudioContext.
- * The user must click to allow audio. After click, resumes AudioContext and hides.
+ * AudioUnlocker - Resumes suspended AudioContexts on the first user interaction.
+ * Also monitors and logs mic/audio track state for debugging.
  */
-function AudioContextResumer() {
-  const [needsInteraction, setNeedsInteraction] = useState(false);
+function AudioUnlocker() {
+  const room = useRoomContext();
+  const { localParticipant } = useLocalParticipant();
+  const hasUnlocked = useRef(false);
 
   useEffect(() => {
-    // Check if any AudioContext is suspended
-    const checkAudioContext = () => {
-      // @ts-expect-error webkitAudioContext is not in types
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return;
+    const resumeAudio = async () => {
+      if (hasUnlocked.current) return;
+      hasUnlocked.current = true;
 
-      // Try creating a test context to see if it auto-suspends
-      const testCtx = new AudioCtx();
-      if (testCtx.state === "suspended") {
-        setNeedsInteraction(true);
+      try {
+        // @ts-expect-error webkitAudioContext is not in types
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx) {
+          const ctx = new AudioCtx();
+          if (ctx.state === "suspended") {
+            await ctx.resume();
+            console.log("[LiveKit] AudioContext resumed via user gesture");
+          }
+        }
+      } catch (e) {
+        console.error("[LiveKit] Failed to resume AudioContext:", e);
       }
-      // Don't close - it might be used elsewhere
     };
 
-    // Small delay to let LiveKit create its AudioContext first
-    const timer = setTimeout(checkAudioContext, 500);
+    // Listen for ANY user interaction to unlock audio
+    const events = ["click", "touchstart", "keydown"] as const;
+    events.forEach((evt) => document.addEventListener(evt, resumeAudio, { once: true }));
+
+    return () => {
+      events.forEach((evt) => document.removeEventListener(evt, resumeAudio));
+    };
+  }, []);
+
+  // Log mic/track state after connection for debugging
+  useEffect(() => {
+    if (!localParticipant) return;
+
+    const timer = setTimeout(() => {
+      const audioTracks = localParticipant.audioTrackPublications;
+      const videoTracks = localParticipant.videoTrackPublications;
+
+      console.log("[LiveKit] === Track State Debug ===");
+      console.log("[LiveKit] Participant identity:", localParticipant.identity);
+      console.log("[LiveKit] Permissions:", JSON.stringify(localParticipant.permissions));
+      console.log("[LiveKit] Audio tracks:", audioTracks.size);
+      audioTracks.forEach((pub, sid) => {
+        console.log(`[LiveKit]   Audio track ${sid}: subscribed=${pub.isSubscribed}, muted=${pub.isMuted}, enabled=${pub.isEnabled}, source=${pub.source}`);
+      });
+      console.log("[LiveKit] Video tracks:", videoTracks.size);
+      videoTracks.forEach((pub, sid) => {
+        console.log(`[LiveKit]   Video track ${sid}: subscribed=${pub.isSubscribed}, muted=${pub.isMuted}, enabled=${pub.isEnabled}, source=${pub.source}`);
+      });
+      console.log("[LiveKit] Mic enabled:", localParticipant.isMicrophoneEnabled);
+      console.log("[LiveKit] Camera enabled:", localParticipant.isCameraEnabled);
+      console.log("[LiveKit] === End Debug ===");
+    }, 3000);
+
     return () => clearTimeout(timer);
-  }, []);
+  }, [localParticipant]);
 
-  const handleClick = useCallback(async () => {
-    try {
-      // Resume all AudioContexts on the page
-      // @ts-expect-error webkitAudioContext is not in types
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (AudioCtx) {
-        // Create and resume a context to "unlock" audio
-        const ctx = new AudioCtx();
-        await ctx.resume();
-        console.log("[LiveKit] AudioContext resumed via user gesture");
-      }
-
-      // Also try to resume any existing contexts
-      // LiveKit stores its context internally; the user gesture propagates
-      setNeedsInteraction(false);
-    } catch (e) {
-      console.error("[LiveKit] Failed to resume AudioContext:", e);
-      setNeedsInteraction(false);
-    }
-  }, []);
-
-  if (!needsInteraction) return null;
-
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm">
-      <div className="text-center">
-        <button
-          onClick={handleClick}
-          className="group flex flex-col items-center gap-4 rounded-2xl bg-purple-600 px-12 py-8 text-white shadow-2xl transition-all hover:bg-purple-500 hover:scale-105 active:scale-95"
-        >
-          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/20 transition-colors group-hover:bg-white/30">
-            <Mic className="h-10 w-10" />
-          </div>
-          <div>
-            <p className="text-xl font-bold">Tap to Enable Audio</p>
-            <p className="mt-1 text-sm text-purple-200">
-              Your browser requires a click to activate microphone and speakers
-            </p>
-          </div>
-        </button>
-      </div>
-    </div>
-  );
+  return null;
 }
 
 export function VideoRoom({
@@ -202,7 +200,7 @@ export function VideoRoom({
           onEndSession={onEndSession}
         />
         <RoomAudioRenderer />
-        <AudioContextResumer />
+        <AudioUnlocker />
       </LiveKitRoom>
     </div>
   );
