@@ -625,6 +625,7 @@ model Lesson {
   updatedAt   DateTime          @updatedAt
   moduleId    String
   progress    LessonProgress[]
+  quizzes     Quiz[]
   module      Module            @relation(fields: [moduleId], references: [id], onDelete: Cascade)
 
   @@index([moduleId])
@@ -642,6 +643,7 @@ model Enrollment {
   courseId       String
   course         Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
   lessonProgress LessonProgress[]
+  certificate    Certificate?
 
   @@unique([userId, courseId])
   @@index([userId])
@@ -682,6 +684,92 @@ model LessonProgress {
   @@index([enrollmentId])
   @@index([lessonId])
   @@map("lesson_progress")
+}
+
+// ============================================
+// QUIZZES & CERTIFICATES
+// ============================================
+
+model Quiz {
+  id              String        @id @default(cuid())
+  title           String
+  description     String?
+  passingScore    Int           @default(70)    // Percentage needed to pass
+  maxAttempts     Int?                          // null = unlimited
+  timeLimit       Int?                          // Time limit in seconds, null = no limit
+  shuffleQuestions Boolean      @default(false)
+  showResults     Boolean       @default(true)  // Show correct answers after attempt
+  position        Int           @default(0)
+  lessonId        String
+  lesson          Lesson        @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  questions       QuizQuestion[]
+  attempts        QuizAttempt[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([lessonId])
+  @@map("quizzes")
+}
+
+model QuizQuestion {
+  id              String        @id @default(cuid())
+  question        String
+  type            QuizQuestionType @default(MULTIPLE_CHOICE)
+  options         Json          // Array of { id, text, isCorrect }
+  explanation     String?       // Shown after answering
+  points          Int           @default(1)
+  position        Int           @default(0)
+  quizId          String
+  quiz            Quiz          @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([quizId])
+  @@map("quiz_questions")
+}
+
+model QuizAttempt {
+  id              String        @id @default(cuid())
+  userId          String
+  quizId          String
+  quiz            Quiz          @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  answers         Json          // Array of { questionId, selectedOptionId, isCorrect }
+  score           Float         // Percentage score (0-100)
+  passed          Boolean       @default(false)
+  pointsEarned    Int           @default(0)
+  totalPoints     Int           @default(0)
+  timeSpent       Int?          // Seconds spent on quiz
+  startedAt       DateTime      @default(now())
+  completedAt     DateTime?
+
+  @@index([userId, quizId])
+  @@index([quizId])
+  @@map("quiz_attempts")
+}
+
+model Certificate {
+  id              String     @id @default(cuid())
+  certificateNumber String   @unique          // e.g. "UNY-2026-XXXX"
+  userId          String
+  enrollmentId    String     @unique
+  enrollment      Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  courseName      String                      // Snapshot at time of issue
+  userName        String                      // Snapshot at time of issue
+  communityName   String?                     // Snapshot
+  completionDate  DateTime
+  score           Float?                      // Average quiz score if applicable
+  issuedAt        DateTime   @default(now())
+  metadata        Json?                       // Extra data for template rendering
+
+  @@index([userId])
+  @@index([certificateNumber])
+  @@map("certificates")
+}
+
+enum QuizQuestionType {
+  MULTIPLE_CHOICE     // Single correct answer
+  MULTI_SELECT        // Multiple correct answers
+  TRUE_FALSE          // True or False
 }
 
 model SubscriptionPlan {
