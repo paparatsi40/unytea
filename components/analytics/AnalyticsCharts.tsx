@@ -134,7 +134,7 @@ function MiniBarChart({
 function ProgressBar({
   value,
   max = 100,
-  color = "bg-purple-600",
+  color = "bg-purple-500",
 }: {
   value: number;
   max?: number;
@@ -142,7 +142,7 @@ function ProgressBar({
 }) {
   const pct = Math.min((value / max) * 100, 100);
   return (
-    <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-800">
+    <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100">
       <div
         className={`h-full rounded-full ${color} transition-all`}
         style={{ width: `${pct}%` }}
@@ -157,7 +157,7 @@ function StatBox({
   label,
   value,
   sub,
-  color = "text-purple-400",
+  color = "text-purple-600",
 }: {
   icon: React.ElementType;
   label: string;
@@ -166,13 +166,13 @@ function StatBox({
   color?: string;
 }) {
   return (
-    <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-4">
+    <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
       <div className="mb-2 flex items-center gap-2">
         <Icon className={`h-4 w-4 ${color}`} />
-        <span className="text-xs text-zinc-500">{label}</span>
+        <span className="text-xs font-medium text-gray-500">{label}</span>
       </div>
-      <p className="text-2xl font-bold text-white">{value}</p>
-      {sub && <p className="mt-0.5 text-xs text-zinc-500">{sub}</p>}
+      <p className="text-2xl font-bold text-gray-900">{value}</p>
+      {sub && <p className="mt-0.5 text-xs text-gray-500">{sub}</p>}
     </div>
   );
 }
@@ -194,9 +194,9 @@ export function AnalyticsCharts({
   ];
 
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900/50">
+    <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
       {/* Tab Bar */}
-      <div className="flex border-b border-zinc-800">
+      <div className="flex border-b border-gray-200">
         {tabs.map((t) => {
           const Icon = t.icon;
           return (
@@ -205,8 +205,8 @@ export function AnalyticsCharts({
               onClick={() => setTab(t.id)}
               className={`flex flex-1 items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
                 tab === t.id
-                  ? "border-b-2 border-purple-500 text-white"
-                  : "text-zinc-500 hover:text-zinc-300"
+                  ? "border-b-2 border-purple-500 text-purple-600"
+                  : "text-gray-400 hover:text-gray-600"
               }`}
             >
               <Icon className="h-4 w-4" />
@@ -223,37 +223,37 @@ export function AnalyticsCharts({
             {sessions ? (
               <div className="space-y-6">
                 <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-                  <StatBox icon={PlayCircle} label="Total Sessions" value={sessions.total} color="text-blue-400" />
-                  <StatBox icon={Users} label="Avg Attendance" value={sessions.avgAttendance} color="text-emerald-400" />
+                  <StatBox icon={PlayCircle} label="Total Sessions" value={sessions.total} color="text-blue-500" />
+                  <StatBox icon={Users} label="Avg Attendance" value={sessions.avgAttendance} color="text-emerald-500" />
                   <StatBox
                     icon={Star}
                     label="Avg Rating"
                     value={sessions.avgRating ? `${sessions.avgRating}/5` : "N/A"}
                     sub={`${sessions.totalFeedback} reviews`}
-                    color="text-amber-400"
+                    color="text-amber-500"
                   />
                   <StatBox
                     icon={BarChart3}
                     label="Status"
                     value={sessions.completed}
                     sub={`${sessions.scheduled} scheduled · ${sessions.live} live`}
-                    color="text-purple-400"
+                    color="text-purple-500"
                   />
                 </div>
 
                 {/* Sessions chart */}
                 <div>
-                  <h4 className="mb-3 text-sm font-medium text-zinc-400">
+                  <h4 className="mb-3 text-sm font-medium text-gray-500">
                     Sessions & Attendance (Last 30 days)
                   </h4>
-                  <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-4">
+                  <div className="rounded-xl border border-gray-100 bg-gray-50 p-4">
                     <MiniBarChart
                       data={sessions.dailyChart}
                       dataKey="attendees"
-                      color="bg-purple-500"
+                      color="bg-purple-400"
                       height={140}
                     />
-                    <div className="mt-2 flex justify-between text-[10px] text-zinc-600">
+                    <div className="mt-2 flex justify-between text-[10px] text-gray-400">
                       <span>{sessions.dailyChart[0]?.label}</span>
                       <span>
                         {sessions.dailyChart[sessions.dailyChart.length - 1]?.label}
@@ -274,31 +274,31 @@ export function AnalyticsCharts({
             {courses ? (
               <div className="space-y-6">
                 <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-                  <StatBox icon={BookOpen} label="Total Courses" value={courses.totalCourses} color="text-blue-400" />
-                  <StatBox icon={Users} label="Enrollments" value={courses.totalEnrollments} color="text-emerald-400" />
+                  <StatBox icon={BookOpen} label="Total Courses" value={courses.totalCourses} color="text-blue-500" />
+                  <StatBox icon={Users} label="Enrollments" value={courses.totalEnrollments} color="text-emerald-500" />
                   <StatBox
                     icon={TrendingUp}
                     label="Completion Rate"
                     value={`${courses.completionRate}%`}
                     sub={`${courses.completedEnrollments} completed`}
-                    color="text-purple-400"
+                    color="text-purple-500"
                   />
-                  <StatBox icon={Award} label="Certificates" value={courses.certificateCount} color="text-amber-400" />
+                  <StatBox icon={Award} label="Certificates" value={courses.certificateCount} color="text-amber-500" />
                 </div>
 
                 {/* Enrollments chart */}
                 <div>
-                  <h4 className="mb-3 text-sm font-medium text-zinc-400">
+                  <h4 className="mb-3 text-sm font-medium text-gray-500">
                     New Enrollments (Last 30 days)
                   </h4>
-                  <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-4">
+                  <div className="rounded-xl border border-gray-100 bg-gray-50 p-4">
                     <MiniBarChart
                       data={courses.enrollmentChart}
                       dataKey="enrollments"
-                      color="bg-emerald-500"
+                      color="bg-emerald-400"
                       height={120}
                     />
-                    <div className="mt-2 flex justify-between text-[10px] text-zinc-600">
+                    <div className="mt-2 flex justify-between text-[10px] text-gray-400">
                       <span>{courses.enrollmentChart[0]?.label}</span>
                       <span>
                         {courses.enrollmentChart[courses.enrollmentChart.length - 1]?.label}
@@ -310,20 +310,20 @@ export function AnalyticsCharts({
                 {/* Course breakdown table */}
                 {courses.courseBreakdown.length > 0 && (
                   <div>
-                    <h4 className="mb-3 text-sm font-medium text-zinc-400">
+                    <h4 className="mb-3 text-sm font-medium text-gray-500">
                       Course Performance
                     </h4>
                     <div className="space-y-2">
                       {courses.courseBreakdown.map((c) => (
                         <div
                           key={c.id}
-                          className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-3"
+                          className="rounded-xl border border-gray-100 bg-gray-50 p-3"
                         >
                           <div className="mb-2 flex items-center justify-between">
-                            <span className="text-sm font-medium text-white">
+                            <span className="text-sm font-medium text-gray-900">
                               {c.title}
                             </span>
-                            <span className="text-xs text-zinc-500">
+                            <span className="text-xs text-gray-500">
                               {c.enrollments} enrolled
                             </span>
                           </div>
@@ -331,14 +331,14 @@ export function AnalyticsCharts({
                             <div className="flex-1">
                               <ProgressBar
                                 value={c.avgProgress}
-                                color="bg-purple-600"
+                                color="bg-purple-500"
                               />
                             </div>
-                            <span className="w-12 text-right text-xs text-zinc-400">
+                            <span className="w-12 text-right text-xs text-gray-500">
                               {c.avgProgress}%
                             </span>
                           </div>
-                          <p className="mt-1 text-[10px] text-zinc-600">
+                          <p className="mt-1 text-[10px] text-gray-400">
                             {c.completionRate}% completion · {c.modules} modules
                           </p>
                         </div>
@@ -363,42 +363,42 @@ export function AnalyticsCharts({
                     icon={DollarSign}
                     label="Total Revenue"
                     value={`$${revenue.totalRevenue.toLocaleString()}`}
-                    color="text-emerald-400"
+                    color="text-emerald-500"
                   />
                   <StatBox
                     icon={BookOpen}
                     label="Course Revenue"
                     value={`$${revenue.courseRevenue.toLocaleString()}`}
-                    color="text-blue-400"
+                    color="text-blue-500"
                   />
                   <StatBox
                     icon={Users}
                     label="Membership Revenue"
                     value={`$${revenue.membershipRevenue.toLocaleString()}`}
                     sub={`${revenue.paidMembers} paid members`}
-                    color="text-purple-400"
+                    color="text-purple-500"
                   />
                 </div>
 
                 {/* Course revenue breakdown */}
                 {revenue.courseBreakdown.length > 0 && (
                   <div>
-                    <h4 className="mb-3 text-sm font-medium text-zinc-400">
+                    <h4 className="mb-3 text-sm font-medium text-gray-500">
                       Revenue by Course
                     </h4>
                     <div className="space-y-2">
                       {revenue.courseBreakdown.map((c, i) => (
                         <div
                           key={i}
-                          className="flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-900/40 p-3"
+                          className="flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50 p-3"
                         >
                           <div>
-                            <p className="text-sm text-white">{c.title}</p>
-                            <p className="text-xs text-zinc-500">
+                            <p className="text-sm font-medium text-gray-900">{c.title}</p>
+                            <p className="text-xs text-gray-500">
                               ${c.price} × {c.enrollments} enrollments
                             </p>
                           </div>
-                          <span className="text-sm font-bold text-emerald-400">
+                          <span className="text-sm font-bold text-emerald-600">
                             ${c.revenue.toLocaleString()}
                           </span>
                         </div>
@@ -408,9 +408,9 @@ export function AnalyticsCharts({
                 )}
 
                 {revenue.totalRevenue === 0 && (
-                  <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-6 text-center">
-                    <DollarSign className="mx-auto mb-2 h-8 w-8 text-zinc-600" />
-                    <p className="text-sm text-zinc-500">
+                  <div className="rounded-xl border border-gray-100 bg-gray-50 p-6 text-center">
+                    <DollarSign className="mx-auto mb-2 h-8 w-8 text-gray-300" />
+                    <p className="text-sm text-gray-500">
                       Start monetizing by setting prices on your courses and communities
                     </p>
                   </div>
@@ -432,27 +432,27 @@ export function AnalyticsCharts({
                     icon={Flame}
                     label="Avg Streak"
                     value={`${gamification.avgStreak} days`}
-                    color="text-orange-400"
+                    color="text-orange-500"
                   />
                   <StatBox
                     icon={Trophy}
                     label="Achievements"
                     value={gamification.totalAchievements}
                     sub="total unlocked"
-                    color="text-amber-400"
+                    color="text-amber-500"
                   />
                   <StatBox
                     icon={Users}
                     label="Leaderboard"
                     value={gamification.leaderboard.length}
                     sub="ranked members"
-                    color="text-purple-400"
+                    color="text-purple-500"
                   />
                 </div>
 
                 {/* Streak distribution */}
                 <div>
-                  <h4 className="mb-3 text-sm font-medium text-zinc-400">
+                  <h4 className="mb-3 text-sm font-medium text-gray-500">
                     Streak Distribution
                   </h4>
                   <div className="flex gap-2">
@@ -464,17 +464,17 @@ export function AnalyticsCharts({
                       const pct = total > 0 ? (s.count / total) * 100 : 0;
                       return (
                         <div key={s.range} className="flex-1 text-center">
-                          <div className="mx-auto mb-1 h-20 w-full overflow-hidden rounded-lg bg-zinc-800">
+                          <div className="mx-auto mb-1 h-20 w-full overflow-hidden rounded-lg bg-gray-100">
                             <div
-                              className="mt-auto h-full rounded-lg bg-gradient-to-t from-orange-500 to-amber-400 transition-all"
+                              className="mt-auto h-full rounded-lg bg-gradient-to-t from-orange-400 to-amber-300 transition-all"
                               style={{
                                 height: `${Math.max(pct, 5)}%`,
                                 marginTop: `${100 - Math.max(pct, 5)}%`,
                               }}
                             />
                           </div>
-                          <p className="text-xs font-medium text-white">{s.count}</p>
-                          <p className="text-[10px] text-zinc-600">{s.range}</p>
+                          <p className="text-xs font-medium text-gray-900">{s.count}</p>
+                          <p className="text-[10px] text-gray-400">{s.range}</p>
                         </div>
                       );
                     })}
@@ -484,29 +484,29 @@ export function AnalyticsCharts({
                 {/* Leaderboard */}
                 {gamification.leaderboard.length > 0 && (
                   <div>
-                    <h4 className="mb-3 text-sm font-medium text-zinc-400">
+                    <h4 className="mb-3 text-sm font-medium text-gray-500">
                       Top Members
                     </h4>
                     <div className="space-y-1.5">
                       {gamification.leaderboard.map((entry, i) => (
                         <div
                           key={entry.user.id}
-                          className="flex items-center gap-3 rounded-lg border border-zinc-800 bg-zinc-900/40 p-3"
+                          className="flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 p-3"
                         >
                           <span
                             className={`w-6 text-center text-sm font-bold ${
                               i === 0
-                                ? "text-amber-400"
+                                ? "text-amber-500"
                                 : i === 1
-                                  ? "text-zinc-300"
+                                  ? "text-gray-400"
                                   : i === 2
-                                    ? "text-amber-600"
-                                    : "text-zinc-600"
+                                    ? "text-amber-700"
+                                    : "text-gray-300"
                             }`}
                           >
                             {i + 1}
                           </span>
-                          <div className="h-8 w-8 overflow-hidden rounded-full bg-zinc-800">
+                          <div className="h-8 w-8 overflow-hidden rounded-full bg-gray-200">
                             {entry.user.image ? (
                               <img
                                 src={entry.user.image}
@@ -514,20 +514,20 @@ export function AnalyticsCharts({
                                 className="h-full w-full object-cover"
                               />
                             ) : (
-                              <div className="flex h-full w-full items-center justify-center text-xs text-zinc-500">
+                              <div className="flex h-full w-full items-center justify-center text-xs text-gray-500">
                                 {(entry.user.name || "?")[0]}
                               </div>
                             )}
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm text-white">
+                            <p className="truncate text-sm font-medium text-gray-900">
                               {entry.user.name || entry.user.username}
                             </p>
-                            <p className="text-xs text-zinc-500">
+                            <p className="text-xs text-gray-500">
                               Lvl {entry.level} · {entry.streak}d streak
                             </p>
                           </div>
-                          <span className="text-sm font-bold text-purple-400">
+                          <span className="text-sm font-bold text-purple-600">
                             {entry.points.toLocaleString()} pts
                           </span>
                         </div>
@@ -549,7 +549,7 @@ export function AnalyticsCharts({
 function EmptyState({ text }: { text: string }) {
   return (
     <div className="flex h-40 items-center justify-center">
-      <p className="text-sm text-zinc-500">{text}</p>
+      <p className="text-sm text-gray-400">{text}</p>
     </div>
   );
 }
