@@ -71,6 +71,9 @@ model User {
   isOnboarded        Boolean           @default(false)
   points             Int               @default(0)
   level              Int               @default(1)
+  currentStreak      Int               @default(0)
+  longestStreak      Int               @default(0)
+  lastStreakDate     DateTime?                        // Last date the streak was updated
   createdAt          DateTime          @default(now())
   updatedAt          DateTime          @updatedAt
   lastActiveAt       DateTime?
@@ -110,6 +113,9 @@ model User {
   resources          Resource[]          @relation("ResourceAuthor")
   resourceProgress   ResourceProgress[]
   resourceLikes      ResourceLike[]
+
+  // Gamification
+  dailyActivities    DailyActivity[]
 
   @@index([email])
   @@index([username])
@@ -1202,7 +1208,40 @@ model ResourceLike {
   userId     String
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt  DateTime @default(now())
-  
+
   @@unique([resourceId, userId])
   @@map("resource_likes")
+}
+
+// ============================================
+// GAMIFICATION - DAILY ACTIVITY & STREAKS
+// ============================================
+
+model DailyActivity {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date        DateTime @db.Date          // Date only (no time), one record per day
+
+  // Activity counts for the day
+  posts       Int      @default(0)
+  comments    Int      @default(0)
+  messages    Int      @default(0)
+  reactions   Int      @default(0)
+  sessions    Int      @default(0)       // Live sessions attended
+  resources   Int      @default(0)       // Resources viewed/completed
+
+  // Points earned this day
+  pointsEarned Int     @default(0)
+
+  // Whether this day counted toward a streak
+  streakDay   Boolean  @default(true)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, date])
+  @@index([userId, date])
+  @@index([date])
+  @@map("daily_activities")
 }

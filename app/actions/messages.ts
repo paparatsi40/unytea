@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { getCurrentUserId } from "@/lib/auth-utils";
 import { checkAndUnlockAchievements } from "./achievements";
+import { recordActivity } from "@/lib/streaks";
 import Pusher from "pusher";
 
 const pusher = new Pusher({
@@ -285,7 +286,8 @@ export async function sendMessage(
       console.error("Pusher trigger failed for direct message:", pusherError);
     }
 
-    // Check for achievements (don't await)
+    // Track activity & achievements (non-blocking)
+    recordActivity(currentUserId, "message", 1).catch(console.error);
     checkAndUnlockAchievements(currentUserId).catch(console.error);
 
     revalidatePath("/dashboard/messages");
