@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { getCurrentUserId } from "@/lib/auth-utils";
 import { recordActivity } from "@/lib/streaks";
 
@@ -75,7 +76,7 @@ export async function addQuizQuestion(data: {
       data: {
         question: data.question,
         type: data.type || "MULTIPLE_CHOICE",
-        options: data.options as unknown as Record<string, unknown>[],
+        options: data.options as unknown as Prisma.InputJsonValue,
         explanation: data.explanation,
         points: data.points ?? 1,
         position: (lastQuestion?.position ?? -1) + 1,
