@@ -29,7 +29,7 @@ export async function POST(request: Request) {
       );
     }
 
-    console.log(`🔔 Webhook received: ${event.type}`);
+    console.log(`Webhook received: ${event.type}`);
 
     // Handle the event
     switch (event.type) {
@@ -86,11 +86,11 @@ export async function POST(request: Request) {
               data: { enrollmentCount: { increment: 1 } },
             });
 
-            console.log(`✅ Course purchase completed for user ${userId}, course ${courseId}`);
+            console.log(`Course purchase completed for user ${userId}, course ${courseId}`);
           }
         }
 
-        console.log(`✅ Checkout completed for user ${userId}, customer ${customerId}, type: ${type || 'platform'}`);
+        console.log(`Checkout completed for user ${userId}, customer ${customerId}, type: ${type || 'platform'}`);
         break;
       }
 
@@ -144,7 +144,7 @@ export async function POST(request: Request) {
             });
           }
 
-          console.log(`✅ Community membership created for user ${userId} in community ${communityId}`);
+          console.log(`Community membership created for user ${userId} in community ${communityId}`);
         } else {
           // Handle platform subscription (existing logic)
           // Find existing subscription by stripeCustomerId to get userId
@@ -195,7 +195,7 @@ export async function POST(request: Request) {
             },
           });
 
-          console.log(`✅ Platform subscription ${subscriptionId} updated for user ${platformUserId}`);
+          console.log(`Platform subscription ${subscriptionId} updated for user ${platformUserId}`);
         }
         break;
       }
@@ -211,7 +211,7 @@ export async function POST(request: Request) {
           });
         }
 
-        console.log(`⚠️ Payment failed for subscription ${subscriptionId}`);
+        console.log(`Payment failed for subscription ${subscriptionId}`);
         break;
       }
 
@@ -232,7 +232,7 @@ export async function POST(request: Request) {
           },
         });
 
-        console.log(`✅ Subscription ${subscriptionId} updated`);
+        console.log(`Subscription ${subscriptionId} updated`);
         break;
       }
 
@@ -248,7 +248,7 @@ export async function POST(request: Request) {
           },
         });
 
-        console.log(`❌ Subscription ${subscriptionId} canceled`);
+        console.log(`Subscription ${subscriptionId} canceled`);
         break;
       }
 

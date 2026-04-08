@@ -88,6 +88,12 @@ export const rateLimiters = {
     uniqueTokenPerInterval: 5, // 5 attempts per 15 min
   }),
 
+  // AI endpoints - very strict (costs money per request)
+  ai: rateLimit({
+    interval: 60 * 60 * 1000, // 1 hour
+    uniqueTokenPerInterval: 30, // 30 AI requests per hour
+  }),
+
   // API endpoints - moderate
   api: rateLimit({
     interval: 60 * 1000, // 1 minute
