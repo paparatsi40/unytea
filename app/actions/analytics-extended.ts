@@ -312,13 +312,26 @@ export async function getRevenueAnalytics(communityId?: string) {
       },
       select: {
         name: true,
-        price: true,
+        pricing: true,
         _count: { select: { members: true } },
       },
     });
 
+    // Extract numeric price from Json pricing field
+    const extractPrice = (pricing: unknown): number => {
+      if (!pricing) return 0;
+      if (typeof pricing === "number") return pricing;
+      if (typeof pricing === "object" && pricing !== null) {
+        const p = pricing as Record<string, unknown>;
+        if (typeof p.price === "number") return p.price;
+        if (typeof p.amount === "number") return p.amount;
+        if (typeof p.monthly === "number") return p.monthly;
+      }
+      return 0;
+    };
+
     const membershipRevenue = paidCommunities.reduce(
-      (sum, c) => sum + (c.price || 0) * c._count.members,
+      (sum, c) => sum + extractPrice(c.pricing) * c._count.members,
       0
     );
 
@@ -332,9 +345,9 @@ export async function getRevenueAnalytics(communityId?: string) {
         courseBreakdown: courseRevenue,
         communityBreakdown: paidCommunities.map((c) => ({
           name: c.name,
-          price: c.price || 0,
+          price: extractPrice(c.pricing),
           members: c._count.members,
-          revenue: (c.price || 0) * c._count.members,
+          revenue: extractPrice(c.pricing) * c._count.members,
         })),
       },
     };
