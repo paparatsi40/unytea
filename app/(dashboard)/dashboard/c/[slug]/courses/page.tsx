@@ -36,7 +36,7 @@ interface Course {
   currency: string | null;
   isPublished: boolean;
   enrollmentCount: number;
-  createdAt: string;
+  createdAt: string | Date;
   _count: {
     modules: number;
     enrollments: number;
@@ -79,7 +79,7 @@ export default function CommunityCoursesPage() {
 
       const result = await getCommunityCourses(community.id);
       if (result.success && result.courses) {
-        setCourses(result.courses as Course[]);
+        setCourses(result.courses as unknown as Course[]);
       } else {
         toast.error(result.error || "Failed to load courses");
       }
