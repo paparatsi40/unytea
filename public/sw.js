@@ -15,7 +15,14 @@ const PRECACHE_ASSETS = [
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(PRECACHE_ASSETS);
+      // Use individual cache.add() calls so one failure doesn't block others
+      return Promise.allSettled(
+        PRECACHE_ASSETS.map((url) =>
+          cache.add(url).catch((err) => {
+            console.warn("[SW] Failed to precache:", url, err.message);
+          })
+        )
+      );
     })
   );
   // Activate immediately
