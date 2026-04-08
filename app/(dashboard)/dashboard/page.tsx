@@ -37,6 +37,8 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import Link from "next/link";
 import { getDashboardSnapshot } from "@/app/actions/dashboard";
+import { getOnboardingProgress, type OnboardingProgress } from "@/app/actions/onboarding";
+import { OnboardingChecklist } from "@/components/onboarding/OnboardingChecklist";
 import { toast } from "sonner";
 
 // Types
@@ -366,6 +368,8 @@ export default function DashboardPage() {
   const [activation, setActivation] = useState<ActivationSnapshot | null>(null);
   const [, setIsLoading] = useState(true);
   const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [onboardingProgress, setOnboardingProgress] = useState<OnboardingProgress | null>(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   // Load dashboard data
   useEffect(() => {
@@ -467,6 +471,12 @@ export default function DashboardPage() {
 
       if (activationRes.success && activationRes.activation) {
         setActivation(activationRes.activation as ActivationSnapshot);
+      }
+      // Load onboarding progress
+      const obResult = await getOnboardingProgress();
+      if (obResult.success && obResult.showChecklist && obResult.progress) {
+        setOnboardingProgress(obResult.progress);
+        setShowOnboarding(true);
       }
     } catch (error) {
       console.error("Error loading dashboard:", error);
@@ -614,6 +624,57 @@ export default function DashboardPage() {
             </Link>
           </div>
         </div>
+
+        {/* Onboarding Checklist */}
+        {showOnboarding && onboardingProgress && (
+          <OnboardingChecklist
+            items={[
+              {
+                id: "profile",
+                title: "Complete your profile",
+                description: "Add your bio, interests, and a photo",
+                href: "/dashboard/settings",
+                completed: onboardingProgress.hasProfile,
+              },
+              {
+                id: "community",
+                title: "Join a community",
+                description: "Find and join your first community",
+                href: "/dashboard/communities/explore",
+                completed: onboardingProgress.hasJoinedCommunity,
+              },
+              {
+                id: "post",
+                title: "Create your first post",
+                description: "Introduce yourself to the community",
+                href: "/dashboard/communities",
+                completed: onboardingProgress.hasCreatedPost,
+              },
+              {
+                id: "session",
+                title: "Attend a live session",
+                description: "Join a session to learn and connect",
+                href: "/dashboard/sessions",
+                completed: onboardingProgress.hasAttendedSession,
+              },
+              {
+                id: "lesson",
+                title: "Complete a lesson",
+                description: "Start learning from a course",
+                href: "/dashboard/courses",
+                completed: onboardingProgress.hasCompletedLesson,
+              },
+              {
+                id: "buddy",
+                title: "Find an accountability buddy",
+                description: "Get paired with someone to grow together",
+                href: "/dashboard/communities",
+                completed: onboardingProgress.hasBuddy,
+              },
+            ]}
+            onDismiss={() => setShowOnboarding(false)}
+          />
+        )}
 
         <Card className="border-zinc-200 bg-white">
           <CardHeader className="pb-3">

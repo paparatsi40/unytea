@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useCurrentUser } from "@/hooks/use-current-user";
-import { Check, User, Briefcase, Target, Sparkles, Zap, Crown } from "lucide-react";
+import { Check, User, Briefcase, Target, Sparkles, Zap, Crown, Heart } from "lucide-react";
+import { InterestSelector } from "@/components/onboarding/InterestSelector";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -72,6 +73,7 @@ export default function OnboardingPage() {
     fullName: "",
     role: "",
     goals: "",
+    interests: [] as string[],
     selectedPlan: "free",
   });
 
@@ -162,6 +164,19 @@ export default function OnboardingPage() {
     },
     {
       number: 4,
+      title: "What are you interested in?",
+      description: "Select your interests to get better community and buddy matches",
+      icon: Heart,
+      fields: (
+        <InterestSelector
+          selected={formData.interests}
+          onChange={(interests) => setFormData({ ...formData, interests })}
+          maxSelections={8}
+        />
+      ),
+    },
+    {
+      number: 5,
       title: "Choose Your Plan",
       description: "Select the plan that fits your needs (you can change later)",
       icon: Sparkles,
@@ -264,6 +279,7 @@ export default function OnboardingPage() {
           fullName: formData.fullName,
           role: formData.role,
           goals: formData.goals,
+          interests: formData.interests,
           selectedPlan: formData.selectedPlan,
         }),
       });
@@ -309,6 +325,8 @@ export default function OnboardingPage() {
       case 3:
         return formData.goals.trim().length > 0;
       case 4:
+        return formData.interests.length >= 1;
+      case 5:
         return formData.selectedPlan.length > 0;
       default:
         return false;

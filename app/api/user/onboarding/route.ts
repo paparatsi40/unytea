@@ -20,13 +20,17 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { fullName } = body
+    const { fullName, role, goals, interests, skills } = body
 
-    // Update user
+    // Update user with onboarding data
     await prisma.user.update({
       where: { id: userId },
       data: {
-        name: fullName,
+        name: fullName || undefined,
+        role: role || undefined,
+        bio: goals || undefined,
+        interests: interests || [],
+        skills: skills || [],
         isOnboarded: true,
       },
     })
