@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import {
@@ -29,6 +29,8 @@ import {
   ChevronUp,
   UserPlus,
   VolumeX,
+  BarChart3,
+  Megaphone,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -36,17 +38,11 @@ import { MainStage } from "./MainStage";
 import { SessionChat } from "./SessionChat";
 import { SessionNotesEditor } from "./SessionNotesEditor";
 import { ReactionsBar } from "./ReactionsBar";
+import { LivePoll, PollCreator } from "@/components/live-session/LivePoll";
+import { useSessionDataChannel } from "@/hooks/useSessionDataChannel";
 
 // Types
 type PanelTab = "notes" | "chat" | "participants";
-
-interface RaiseHandRequest {
-  id: string;
-  identity: string;
-  name: string;
-  avatar?: string;
-  timestamp: number;
-}
 
 interface PinnedQuestion {
   id: string;
@@ -87,7 +83,7 @@ export function VideoRoomUI({
   onEndSession,
 }: VideoRoomUIProps) {
   const isAudioOnly = sessionMode === "audio";
-  
+
   // Room context
   const participants = useParticipants();
   const room = useRoomContext();
@@ -98,14 +94,31 @@ export function VideoRoomUI({
   const isScreenShareEnabled = localParticipantData.isScreenShareEnabled;
   const preferredCameraCheckedRef = useRef(false);
 
+  // ── Data Channel (hand raise, polls, moderation) ────────────────────
+  const {
+    raisedHands,
+    hasRaisedHand,
+    toggleRaiseHand,
+    inviteSpeaker,
+    dismissHand,
+    activePolls,
+    createPoll,
+    votePoll,
+    closePoll,
+    muteAll,
+    muteAllSignal,
+    invitedToSpeak,
+    clearSpeakerInvite,
+  } = useSessionDataChannel();
+
   // Active panel (for mobile/responsive)
   const [activePanel, setActivePanel] = useState<PanelTab>("chat");
   const [showAllPanels, setShowAllPanels] = useState(true);
 
-  // Raise hand system
-  const [raisedHands, setRaisedHands] = useState<RaiseHandRequest[]>([]);
-  const [hasRaisedHand, setHasRaisedHand] = useState(false);
+  // UI toggles
   const [showHandQueue, setShowHandQueue] = useState(false);
+  const [showPollCreator, setShowPollCreator] = useState(false);
+  const [showActivePoll, setShowActivePoll] = useState(true);
 
   // Pinned question
   const [pinnedQuestion, setPinnedQuestion] = useState<PinnedQuestion | null>(null);
@@ -117,6 +130,13 @@ export function VideoRoomUI({
 
   // Session duration
   const [elapsedTime, setElapsedTime] = useState("0:00");
+
+  // ── Mute-all listener ───────────────────────────────────────────────
+  useEffect(() => {
+    if (muteAllSignal === 0) return;
+    // When host sends mute_all, mute our mic
+    localParticipant.setMicrophoneEnabled(false).catch(console.error);
+  }, [muteAllSignal, localParticipant]);
 
   // Calculate elapsed time
   useEffect(() => {
@@ -235,38 +255,6 @@ export function VideoRoomUI({
     void switchToPreferredExternalCamera();
   }, [isCameraEnabled, switchToPreferredExternalCamera]);
 
-  // Raise hand
-  const toggleRaiseHand = useCallback(() => {
-    if (hasRaisedHand) {
-      // Lower hand
-      setRaisedHands(prev => prev.filter(h => h.identity !== localParticipant.identity));
-      setHasRaisedHand(false);
-    } else {
-      // Raise hand
-      const newRequest: RaiseHandRequest = {
-        id: Math.random().toString(36).substring(7),
-        identity: localParticipant.identity,
-        name: localParticipant.name || "Anonymous",
-        timestamp: Date.now(),
-      };
-      setRaisedHands(prev => [...prev, newRequest]);
-      setHasRaisedHand(true);
-    }
-  }, [hasRaisedHand, localParticipant]);
-
-  // Invite speaker (host only)
-  const inviteSpeaker = useCallback((request: RaiseHandRequest) => {
-    // TODO: Implement actual speaker invite via LiveKit
-    console.log("Inviting speaker:", request);
-    setRaisedHands(prev => prev.filter(h => h.id !== request.id));
-  }, []);
-
-  // Mute all (host only)
-  const muteAll = useCallback(() => {
-    // TODO: Implement mute all
-    console.log("Mute all participants");
-  }, []);
-
   // Pin question
   const pinQuestion = useCallback((author: string, content: string) => {
     setPinnedQuestion({
@@ -291,6 +279,10 @@ export function VideoRoomUI({
     const hours = Math.floor(minutes / 60);
     return `${hours}h ago`;
   };
+
+  // Get current active poll (most recent active one)
+  const currentPoll = activePolls.filter((p) => p.isActive).slice(-1)[0] ||
+    activePolls.slice(-1)[0];
 
   return (
     <div className="flex h-screen flex-col bg-zinc-950">
@@ -354,6 +346,20 @@ export function VideoRoomUI({
                 </button>
               )}
 
+              {/* Create Poll */}
+              <button
+                onClick={() => setShowPollCreator(!showPollCreator)}
+                className={cn(
+                  "flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
+                  showPollCreator
+                    ? "bg-purple-500/20 text-purple-400"
+                    : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
+                )}
+              >
+                <BarChart3 className="h-4 w-4" />
+                <span className="hidden sm:inline">Poll</span>
+              </button>
+
               {/* Mute All */}
               <button
                 onClick={muteAll}
@@ -416,6 +422,35 @@ export function VideoRoomUI({
         </div>
       </header>
 
+      {/* ==================== SPEAKER INVITE BANNER ==================== */}
+      {invitedToSpeak && (
+        <div className="flex items-center justify-between border-b border-emerald-800 bg-emerald-500/10 px-4 py-3">
+          <div className="flex items-center gap-3">
+            <Megaphone className="h-5 w-5 text-emerald-400" />
+            <p className="text-sm font-medium text-emerald-200">
+              You&apos;ve been invited to speak! Enable your microphone to join the conversation.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                localParticipant.setMicrophoneEnabled(true).catch(console.error);
+                clearSpeakerInvite();
+              }}
+              className="rounded-full bg-emerald-500 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-emerald-600"
+            >
+              Enable Mic
+            </button>
+            <button
+              onClick={clearSpeakerInvite}
+              className="text-zinc-400 hover:text-zinc-200"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* ==================== MAIN CONTENT ==================== */}
       <div className="flex flex-1 overflow-hidden">
         {/* LEFT: Notes Panel */}
@@ -459,6 +494,25 @@ export function VideoRoomUI({
                   <X className="h-4 w-4" />
                 </button>
               )}
+            </div>
+          )}
+
+          {/* Active Poll Banner (inline, above stage) */}
+          {currentPoll && showActivePoll && (
+            <div className="border-b border-zinc-800 bg-purple-500/5 px-4 py-3">
+              <div className="mx-auto max-w-xl">
+                <LivePoll
+                  poll={currentPoll}
+                  currentUserId={localParticipant.identity}
+                  onVote={(pollId, optionId) => votePoll(pollId, optionId)}
+                  onClose={() => {
+                    if (isHost && currentPoll.isActive) {
+                      closePoll(currentPoll.id);
+                    }
+                    setShowActivePoll(false);
+                  }}
+                />
+              </div>
             </div>
           )}
 
@@ -527,11 +581,53 @@ export function VideoRoomUI({
               </div>
             </div>
 
+            {/* Raised Hands Section (visible to everyone when there are raised hands) */}
+            {raisedHands.length > 0 && (
+              <div className="mb-4">
+                <p className="mb-2 px-2 text-xs font-medium uppercase text-amber-400">
+                  <Hand className="mr-1 inline h-3 w-3" />
+                  Raised Hands ({raisedHands.length})
+                </p>
+                {raisedHands.map((hand) => (
+                  <div
+                    key={hand.id}
+                    className="flex items-center gap-3 rounded-lg bg-amber-500/10 px-3 py-2 mb-1"
+                  >
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500/30 text-sm font-medium text-amber-200">
+                      {hand.name.charAt(0)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-amber-200 truncate">{hand.name}</p>
+                      <p className="text-xs text-zinc-500">{formatTimeAgo(hand.timestamp)}</p>
+                    </div>
+                    {isHost && (
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => inviteSpeaker(hand.identity)}
+                          className="rounded-lg bg-blue-500/20 p-1.5 text-blue-400 transition-colors hover:bg-blue-500/30"
+                          title="Invite to speak"
+                        >
+                          <UserPlus className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          onClick={() => dismissHand(hand.identity)}
+                          className="rounded-lg bg-zinc-700/50 p-1.5 text-zinc-400 transition-colors hover:bg-zinc-700"
+                          title="Dismiss"
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
             {/* Speakers Section */}
             <div className="mb-4">
               <p className="mb-2 px-2 text-xs font-medium uppercase text-zinc-500">Speakers</p>
               {participants
-                .filter(p => p.identity !== localParticipant.identity) // Local participants who are speakers
+                .filter(p => p.identity !== localParticipant.identity)
                 .map(p => (
                   <div
                     key={p.identity}
@@ -541,6 +637,9 @@ export function VideoRoomUI({
                       {p.name?.charAt(0) || "?"}
                     </div>
                     <span className="text-sm text-zinc-300">{p.name || "Unknown"}</span>
+                    {raisedHands.some(h => h.identity === p.identity) && (
+                      <Hand className="ml-auto h-3.5 w-3.5 text-amber-400 animate-bounce" />
+                    )}
                     {p.isMicrophoneEnabled && (
                       <div className="ml-auto flex items-center gap-1">
                         <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-400" />
@@ -607,15 +706,39 @@ export function VideoRoomUI({
                     <p className="text-xs text-zinc-500">{formatTimeAgo(request.timestamp)}</p>
                   </div>
                 </div>
-                <button
-                  onClick={() => inviteSpeaker(request)}
-                  className="rounded-lg bg-blue-500/20 px-2 py-1 text-xs font-medium text-blue-400 transition-colors hover:bg-blue-500/30"
-                >
-                  <UserPlus className="h-4 w-4" />
-                </button>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => inviteSpeaker(request.identity)}
+                    className="rounded-lg bg-blue-500/20 px-2 py-1 text-xs font-medium text-blue-400 transition-colors hover:bg-blue-500/30"
+                    title="Invite to speak"
+                  >
+                    <UserPlus className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => dismissHand(request.identity)}
+                    className="rounded-lg bg-zinc-700/50 px-2 py-1 text-xs font-medium text-zinc-400 transition-colors hover:bg-zinc-700"
+                    title="Dismiss"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* ==================== POLL CREATOR (Host Overlay) ==================== */}
+      {isHost && showPollCreator && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <PollCreator
+            onCreatePoll={(question, options, duration, isQuiz, correctAnswer) => {
+              createPoll(question, options, duration, isQuiz, correctAnswer);
+              setShowPollCreator(false);
+              setShowActivePoll(true);
+            }}
+            onClose={() => setShowPollCreator(false)}
+          />
         </div>
       )}
 
@@ -689,20 +812,31 @@ export function VideoRoomUI({
             <Monitor className="h-5 w-5" />
           </button>
 
-                      {/* Reactions */}
-            <div className="relative">
-              <button
-                onClick={() => setShowReactions(!showReactions)}
-                className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-800 text-white transition-all hover:bg-zinc-700"
-              >
-                <Smile className="h-5 w-5" />
-              </button>
-              {showReactions && (
-                <div className="absolute bottom-full left-1/2 mb-2 -translate-x-1/2">
-                  <ReactionsBar />
-                </div>
-              )}
-            </div>
+          {/* Reactions */}
+          <div className="relative">
+            <button
+              onClick={() => setShowReactions(!showReactions)}
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-800 text-white transition-all hover:bg-zinc-700"
+            >
+              <Smile className="h-5 w-5" />
+            </button>
+            {showReactions && (
+              <div className="absolute bottom-full left-1/2 mb-2 -translate-x-1/2">
+                <ReactionsBar />
+              </div>
+            )}
+          </div>
+
+          {/* Poll indicator (for non-hosts, show when a poll is active) */}
+          {!isHost && currentPoll && currentPoll.isActive && !showActivePoll && (
+            <button
+              onClick={() => setShowActivePoll(true)}
+              className="flex h-12 items-center gap-2 rounded-full bg-purple-500/20 px-4 text-purple-400 transition-all hover:bg-purple-500/30"
+            >
+              <BarChart3 className="h-5 w-5" />
+              <span className="text-sm font-medium">Active Poll</span>
+            </button>
+          )}
         </div>
 
         {/* Center: Session Info (mobile only) */}
