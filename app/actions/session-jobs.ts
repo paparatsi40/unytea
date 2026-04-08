@@ -7,6 +7,7 @@ import { PostContentType } from "@prisma/client";
 import { generateUpcomingSessions } from "../actions/sessions";
 import { runAutopilotDueJobs } from "./autopilot";
 import { sendSessionReminderEmail } from "@/lib/email";
+import { sendPushToUser, pushTemplates } from "@/lib/push";
 
 /**
  * Session Jobs - Background tasks for recurring sessions
@@ -332,6 +333,18 @@ export async function sendSessionReminders() {
                 userId,
               },
             });
+
+            // Send push notification (non-blocking)
+            sendPushToUser(
+              userId,
+              pushTemplates.sessionStarting(
+                session.title,
+                session.community?.name || "your community",
+                session.id
+              )
+            ).catch((pushErr) =>
+              console.warn(`[sendSessionReminders] Push failed for ${userId}:`, pushErr)
+            );
 
             // Send email reminder (non-blocking)
             try {

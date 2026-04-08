@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { ACHIEVEMENTS, AchievementType } from "@/lib/achievements-data";
 import { revalidatePath } from "next/cache";
+import { sendPushToUser, pushTemplates } from "@/lib/push";
 
 const APPROXIMATED_CRITERIA = new Set([
   "post_streak",
@@ -311,6 +312,12 @@ export async function unlockAchievement(
         points: { increment: achievementDef.points },
       },
     });
+
+    // Send push notification for achievement
+    sendPushToUser(
+      userId,
+      pushTemplates.achievementUnlocked(`${achievementDef.name} — ${achievementDef.description}`)
+    ).catch(console.error);
 
     await prisma.notification.create({
       data: {
