@@ -85,11 +85,17 @@ self.addEventListener("fetch", (event) => {
           }
           return response;
         })
-        .catch(() => {
-          // Offline: try cache, then fallback
-          return caches.match(request).then((cached) => {
-            return cached || caches.match(OFFLINE_URL);
-          });
+        .catch(async () => {
+          // Offline: try cache, then fallback, then a basic HTML response
+          const cached = await caches.match(request);
+          if (cached) return cached;
+          const offlinePage = await caches.match(OFFLINE_URL);
+          if (offlinePage) return offlinePage;
+          // Last resort: return a basic offline response
+          return new Response(
+            "<html><body><h1>Offline</h1><p>Please check your connection.</p></body></html>",
+            { status: 503, headers: { "Content-Type": "text/html" } }
+          );
         })
     );
     return;
@@ -133,7 +139,10 @@ self.addEventListener("fetch", (event) => {
         }
         return response;
       })
-      .catch(() => caches.match(request))
+      .catch(async () => {
+        const cached = await caches.match(request);
+        return cached || new Response("", { status: 503 });
+      })
   );
 });
 

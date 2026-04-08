@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { getSession } from "@/app/actions/sessions";
 import { endSession } from "@/app/actions/session-jobs";
 import { VideoRoom } from "@/components/sessions/VideoRoom";
@@ -25,6 +25,7 @@ export default function SessionRoomPage({
   const [isEnding, setIsEnding] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isRecordingBusy, setIsRecordingBusy] = useState(false);
+  const hasLoadedRef = useRef(false);
 
   useEffect(() => {
     // Check auth
@@ -33,11 +34,12 @@ export default function SessionRoomPage({
       return;
     }
 
-    if (!isAuthLoading && user) {
-      // Get session data
+    // Only load session once
+    if (!isAuthLoading && user && !hasLoadedRef.current) {
+      hasLoadedRef.current = true;
       loadSession();
     }
-  }, [params.sessionId, user, isAuthLoading, router]);
+  }, [params.sessionId, user, isAuthLoading]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadSession = async () => {
     try {
@@ -47,13 +49,13 @@ export default function SessionRoomPage({
         router.push("/dashboard/sessions");
         return;
       }
-      
+
       // Check if session is already ended
       if (result.session.status === "COMPLETED" || result.session.status === "CANCELLED") {
         router.push(`/dashboard/sessions/${params.sessionId}`);
         return;
       }
-      
+
       setVideoSession(result.session);
 
       const recordingStatus = await getRecordingStatus(params.sessionId);
@@ -100,7 +102,10 @@ export default function SessionRoomPage({
   }, [router]);
 
   const handleToggleRecording = useCallback(async () => {
-    if (!videoSession?.id || !videoSession?.roomId || isRecordingBusy) return;
+    if (!videoSession?.id || isRecordingBusy) return;
+
+    const roomId = videoSession.videoRoomName || videoSession.roomId;
+    if (!roomId) return;
 
     setIsRecordingBusy(true);
     try {
@@ -115,9 +120,9 @@ export default function SessionRoomPage({
       } else {
         const result = await startCompositeRecording({
           sessionId: videoSession.id,
-          roomName: videoSession.roomId,
+          roomName: roomId,
           layout: "grid",
-          audioOnly: (videoSession.mode || "video") === "AUDIO",
+          audioOnly: (videoSession.mode || "VIDEO").toUpperCase() === "AUDIO",
         });
 
         if (result.success) {
@@ -173,7 +178,7 @@ export default function SessionRoomPage({
         onLeave={handleLeave}
         onEndSession={isHost ? handleEndSession : undefined}
       />
-      
+
       {isEnding && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
           <div className="text-center">
