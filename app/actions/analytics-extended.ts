@@ -34,7 +34,7 @@ export async function getSessionAnalytics(communityId?: string) {
         where: { communityId: { in: communityIds }, status: "SCHEDULED" },
       }),
       prisma.mentorSession.count({
-        where: { communityId: { in: communityIds }, status: "LIVE" },
+        where: { communityId: { in: communityIds }, status: "IN_PROGRESS" },
       }),
     ]);
 
