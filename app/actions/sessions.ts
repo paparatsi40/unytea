@@ -132,11 +132,25 @@ export async function getUserSessions() {
       return { success: false, error: "Not authenticated" };
     }
 
+    // Get community IDs where the user is an active member
+    const userMemberships = await prisma.member.findMany({
+      where: {
+        userId,
+        status: "ACTIVE",
+      },
+      select: { communityId: true },
+    });
+    const memberCommunityIds = userMemberships.map((m) => m.communityId);
+
     const sessions = await prisma.mentorSession.findMany({
       where: {
         OR: [
           { mentorId: userId },
           { menteeId: userId },
+          // Include community sessions where user is an active member
+          ...(memberCommunityIds.length > 0
+            ? [{ communityId: { in: memberCommunityIds } }]
+            : []),
         ],
       },
       select: {
