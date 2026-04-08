@@ -39,6 +39,9 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
     title: "Unytea",
   },
+  other: {
+    "mobile-web-app-capable": "yes",
+  },
   formatDetection: {
     telephone: false,
   },

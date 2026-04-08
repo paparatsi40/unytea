@@ -71,7 +71,7 @@ export default auth((req) => {
 
 export const config = {
   matcher: [
-    // Excluye Next.js internals, assets estáticos e API
-    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"
+    // Excluye Next.js internals, assets estáticos, API y PWA files
+    "/((?!api|_next/static|_next/image|favicon.ico|manifest\\.json|sw\\.js|icons/|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"
   ]
 }
