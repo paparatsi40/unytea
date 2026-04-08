@@ -1,9 +1,11 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { getLiveCommunityHealthMetrics, getNorthStarDecisionSnapshot, getOverviewAnalytics, getRetentionCohorts } from "@/app/actions/analytics";
+import { getSessionAnalytics, getCourseAnalytics, getRevenueAnalytics, getGamificationAnalytics } from "@/app/actions/analytics-extended";
 import { BarChart3, TrendingUp } from "lucide-react";
 import { StatsCard } from "@/components/analytics/StatsCard";
 import { CommunitySelector } from "@/components/analytics/CommunitySelector";
+import { AnalyticsCharts } from "@/components/analytics/AnalyticsCharts";
 
 export const metadata = {
   title: "Analytics | Unytea",
@@ -23,11 +25,15 @@ const session = await auth();
   const resolvedSearchParams = await searchParams;
   const selectedCommunityId = resolvedSearchParams?.communityId;
 
-  const [result, retentionResult, healthResult, northStarResult] = await Promise.all([
+  const [result, retentionResult, healthResult, northStarResult, sessionResult, courseResult, revenueResult, gamificationResult] = await Promise.all([
     getOverviewAnalytics(),
     getRetentionCohorts(selectedCommunityId),
     getLiveCommunityHealthMetrics(selectedCommunityId),
     getNorthStarDecisionSnapshot(selectedCommunityId),
+    getSessionAnalytics(selectedCommunityId),
+    getCourseAnalytics(selectedCommunityId),
+    getRevenueAnalytics(selectedCommunityId),
+    getGamificationAnalytics(selectedCommunityId),
   ]);
 
   if (!result.success || !result.data) {
@@ -123,6 +129,14 @@ const session = await auth();
           color="orange"
         />
       </div>
+
+      {/* Deep Analytics (Sessions, Courses, Revenue, Gamification) */}
+      <AnalyticsCharts
+        sessions={sessionResult.success ? sessionResult.data ?? null : null}
+        courses={courseResult.success ? courseResult.data ?? null : null}
+        revenue={revenueResult.success ? revenueResult.data ?? null : null}
+        gamification={gamificationResult.success ? gamificationResult.data ?? null : null}
+      />
 
       {/* Growth Chart Section */}
       <div className="rounded-xl border border-border/50 bg-card/50 p-6">
