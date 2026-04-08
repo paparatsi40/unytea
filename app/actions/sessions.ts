@@ -72,7 +72,7 @@ export async function createSession(data: {
         // Create a special post announcing the session
         await prisma.post.create({
           data: {
-            title: `📅 New live session: ${data.title}`,
+            title: `ðŸ“… New live session: ${data.title}`,
             content: `A new live session has been scheduled in this community.`,
             contentType: "SESSION_ANNOUNCEMENT",
             authorId: userId,
@@ -235,7 +235,22 @@ export async function getSession(sessionId: string) {
     }
 
     // Check if user is participant
-    if (session.mentorId !== userId && session.menteeId !== userId) {
+    // Check if user is participant or community member
+    let isAuthorized = session.mentorId === userId || session.menteeId === userId;
+
+    // Also allow community members to access community sessions
+    if (!isAuthorized && (session as any).communityId) {
+      const membership = await prisma.member.findFirst({
+        where: {
+          userId,
+          communityId: (session as any).communityId,
+          status: "ACTIVE",
+        },
+      });
+      isAuthorized = !!membership;
+    }
+
+    if (!isAuthorized) {
       return { success: false, error: "Not authorized to view this session" };
     }
 
@@ -1330,7 +1345,7 @@ async function createSessionFeedPost(
 
     await prisma.post.create({
       data: {
-        title: `📅 New live session: ${data.title}`,
+        title: `ðŸ“… New live session: ${data.title}`,
         content: `A new live session has been scheduled in this community.`,
         contentType: "SESSION_ANNOUNCEMENT",
         authorId: session.mentorId,
