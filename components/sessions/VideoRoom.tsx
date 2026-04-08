@@ -5,7 +5,6 @@ import {
   LiveKitRoom,
   RoomAudioRenderer,
   useLocalParticipant,
-  useRoomContext,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
 import { Loader2, AlertCircle } from "lucide-react";
@@ -29,7 +28,6 @@ interface VideoRoomProps {
  * Also monitors and logs mic/audio track state for debugging.
  */
 function AudioUnlocker() {
-  const room = useRoomContext();
   const { localParticipant } = useLocalParticipant();
   const hasUnlocked = useRef(false);
 
