@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AccessToken } from "livekit-server-sdk";
 import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
@@ -69,6 +70,22 @@ export async function POST(request: NextRequest) {
     });
 
     const jwt = await token.toJwt();
+
+    // Register participation for session tracking
+    const sessionRecord = await prisma.mentorSession.findFirst({
+      where: { OR: [{ videoRoomName: roomName }, { roomId: roomName }] },
+    });
+    if (sessionRecord) {
+      await prisma.sessionParticipation.upsert({
+        where: { sessionId_userId: { sessionId: sessionRecord.id, userId: identity } },
+        create: { sessionId: sessionRecord.id, userId: identity, role: sessionRecord.mentorId === identity ? "host" : "listener", joinedAt: new Date(), livekitIdentity: identity },
+        update: { joinedAt: new Date(), leftAt: null },
+      });
+      await prisma.mentorSession.update({
+        where: { id: sessionRecord.id },
+        data: { attendeeCount: { increment: 1 } },
+      });
+    }
 
     return NextResponse.json({
       token: jwt,
