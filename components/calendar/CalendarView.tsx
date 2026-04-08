@@ -17,7 +17,6 @@ import {
 import {
   ChevronLeft,
   ChevronRight,
-  Video,
   Clock,
   Users,
   Calendar as CalendarIcon,
