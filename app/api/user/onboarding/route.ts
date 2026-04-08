@@ -27,8 +27,7 @@ export async function POST(request: Request) {
       where: { id: userId },
       data: {
         name: fullName || undefined,
-        role: role || undefined,
-        bio: goals || undefined,
+        bio: role ? `${role}${goals ? " — " + goals : ""}` : (goals || undefined),
         interests: interests || [],
         skills: skills || [],
         isOnboarded: true,
