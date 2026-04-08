@@ -249,7 +249,7 @@ export async function submitQuizAttempt(data: {
       data: {
         userId,
         quizId: data.quizId,
-        answers: gradedAnswers as unknown as Record<string, unknown>[],
+        answers: gradedAnswers as unknown as Prisma.InputJsonValue,
         score,
         passed,
         pointsEarned: earnedPoints,
