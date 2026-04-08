@@ -1,9 +1,19 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { SessionProvider } from "next-auth/react";
 import { Toaster } from "react-hot-toast";
+import { ServiceWorkerRegistrar } from "@/components/pwa/ServiceWorkerRegistrar";
+import { PWAInstallPrompt } from "@/components/pwa/PWAInstallPrompt";
 import "./globals.css";
+
+export const viewport: Viewport = {
+  themeColor: "#7c3aed",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: "cover",
+};
 
 export const metadata: Metadata = {
   title: {
@@ -23,6 +33,15 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Unytea Team" }],
   creator: "Unytea",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Unytea",
+  },
+  formatDetection: {
+    telephone: false,
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -40,9 +59,15 @@ export const metadata: Metadata = {
     creator: "@unytea",
   },
   icons: {
-    icon: "/unytea-logo.png",
+    icon: [
+      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512x512.png", sizes: "512x512", type: "image/png" },
+    ],
     shortcut: "/unytea-logo.png",
-    apple: "/unytea-logo.png",
+    apple: [
+      { url: "/icons/icon-152x152.png", sizes: "152x152" },
+      { url: "/icons/icon-192x192.png", sizes: "192x192" },
+    ],
   },
   robots: {
     index: true,
@@ -79,8 +104,10 @@ export default async function RootLayout({
 })();`,
           }}
         />
+        <ServiceWorkerRegistrar />
         <SessionProvider>
           {children}
+          <PWAInstallPrompt />
           <Toaster
             position="top-right"
             toastOptions={{
