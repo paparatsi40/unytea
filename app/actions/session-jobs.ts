@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { PostContentType } from "@prisma/client";
 import { generateUpcomingSessions } from "../actions/sessions";
 import { runAutopilotDueJobs } from "./autopilot";
+import { sendSessionReminderEmail } from "@/lib/email";
 
 /**
  * Session Jobs - Background tasks for recurring sessions
@@ -281,7 +282,7 @@ export async function sendSessionReminders() {
               ],
             },
             include: {
-              user: { select: { id: true, name: true } },
+              user: { select: { id: true, name: true, email: true } },
             },
           },
         },
@@ -331,6 +332,37 @@ export async function sendSessionReminders() {
                 userId,
               },
             });
+
+            // Send email reminder (non-blocking)
+            try {
+              const user = await prisma.user.findUnique({
+                where: { id: userId },
+                select: { email: true, name: true },
+              });
+
+              if (user?.email) {
+                const appUrl = process.env.NEXTAUTH_URL || "https://unytea.com";
+                await sendSessionReminderEmail(user.email, {
+                  userName: user.name || "there",
+                  sessionTitle: session.title,
+                  sessionDate: session.scheduledAt.toLocaleDateString("en-US", {
+                    weekday: "long",
+                    month: "long",
+                    day: "numeric",
+                  }),
+                  sessionTime: session.scheduledAt.toLocaleTimeString("en-US", {
+                    hour: "numeric",
+                    minute: "2-digit",
+                  }),
+                  reminderType: window.key as "24h" | "1h" | "10m",
+                  joinLink: `${appUrl}${reminderLink}`,
+                  hostName: undefined, // Could fetch host name if needed
+                });
+              }
+            } catch (emailError) {
+              console.warn(`[sendSessionReminders] Email failed for ${userId}:`, emailError);
+              // Don't fail the whole job if email fails
+            }
 
             results.remindersSent += 1;
           }

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 import { z } from "zod"
 import { rateLimiters, getIP } from "@/lib/rate-limit"
+import { sendWelcomeEmail } from "@/lib/email"
 
 const signUpSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -52,6 +53,11 @@ export async function POST(request: NextRequest) {
         password: hashedPassword,
         isOnboarded: false,
       },
+    })
+
+    // Send welcome email (non-blocking)
+    sendWelcomeEmail(email, { userName: name }).catch((err) => {
+      console.warn("[signup] Welcome email failed:", err)
     })
 
     return NextResponse.json(
