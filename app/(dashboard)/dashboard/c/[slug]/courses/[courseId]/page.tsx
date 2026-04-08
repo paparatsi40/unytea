@@ -82,7 +82,7 @@ export default function CourseBuilderPage() {
 
   const [course, setCourse] = useState<CourseData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isOwner, setIsOwner] = useState(false);
+  const [, setIsOwner] = useState(false);
 
   // Edit course details
   const [editingDetails, setEditingDetails] = useState(false);
