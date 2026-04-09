@@ -6,12 +6,12 @@ import { Search, Users, TrendingUp, Filter, Sparkles, Dumbbell, Briefcase, Code,
 import { Button } from "@/components/ui/button";
 
 const discoveryCategories = [
-  { name: "Spiritual", icon: Sparkles, color: "from-purple-500/30 to-pink-500/30" },
-  { name: "Fitness", icon: Dumbbell, color: "from-green-500/30 to-emerald-500/30" },
-  { name: "Business", icon: Briefcase, color: "from-blue-500/30 to-cyan-500/30" },
-  { name: "Technology", icon: Code, color: "from-indigo-500/30 to-purple-500/30" },
-  { name: "Education", icon: BookOpen, color: "from-orange-500/30 to-red-500/30" },
-  { name: "Creative", icon: Palette, color: "from-pink-500/30 to-rose-500/30" },
+  { name: "Spiritual", icon: Sparkles, color: "from-purple-500/30 to-pink-500/30", desc: "Meditation, mindfulness & inner growth" },
+  { name: "Fitness", icon: Dumbbell, color: "from-green-500/30 to-emerald-500/30", desc: "Workouts, nutrition & accountability" },
+  { name: "Business", icon: Briefcase, color: "from-blue-500/30 to-cyan-500/30", desc: "Startups, marketing & leadership" },
+  { name: "Technology", icon: Code, color: "from-indigo-500/30 to-purple-500/30", desc: "Dev, AI, open source & product building" },
+  { name: "Education", icon: BookOpen, color: "from-orange-500/30 to-red-500/30", desc: "Teaching, tutoring & skill sharing" },
+  { name: "Creative", icon: Palette, color: "from-pink-500/30 to-rose-500/30", desc: "Art, design, music & storytelling" },
 ];
 
 async function getPublicCommunities(userId?: string) {
@@ -100,7 +100,7 @@ export default async function ExplorePage() {
                     <Icon className="h-4 w-4" />
                     <span className="font-medium">{category.name}</span>
                   </div>
-                  <p className="mt-2 text-xs text-white/80">Discover active communities in {category.name.toLowerCase()}.</p>
+                  <p className="mt-2 text-xs text-white/80">{category.desc}</p>
                 </div>
               );
             })}
@@ -124,8 +124,8 @@ export default async function ExplorePage() {
         </Button>
       </div>
 
-      {/* Stats */}
-      <div className="grid gap-6 sm:grid-cols-3">
+      {/* Stats - only show when there are enough communities */}
+      {communities.length >= 5 && <div className="grid gap-6 sm:grid-cols-3">
         <div className="rounded-xl border border-border bg-gradient-to-br from-card to-card/50 p-6">
           <div className="flex items-center space-x-3">
             <div className="rounded-lg bg-primary/10 p-2">
@@ -173,7 +173,7 @@ export default async function ExplorePage() {
             </div>
           </div>
         </div>
-      </div>
+      </div>}
 
       {/* Communities Grid */}
       {communities.length > 0 ? (
@@ -225,8 +225,8 @@ export default async function ExplorePage() {
                     </p>
                   )}
 
-                  {/* Stats */}
-                  <div className="mb-4 flex items-center space-x-4 text-sm text-muted-foreground">
+      {/* Stats - only show when there are enough communities */}
+      {communities.length >= 5 && <div className="grid gap-6 sm:grid-cols-3">
                     <div className="flex items-center space-x-1">
                       <Users className="h-4 w-4" />
                       <span>{community._count.members} members</span>
