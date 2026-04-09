@@ -139,16 +139,6 @@ export async function getReports(
       where: {
         ...(status && { status: status as ReportStatus }),
       },
-      include: {
-        reporter: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            image: true,
-          },
-        },
-      },
       orderBy: {
         createdAt: 'desc',
       },
@@ -236,16 +226,6 @@ export async function getReportById(reportId: string) {
 
     const report = await prisma.report.findUnique({
       where: { id: reportId },
-      include: {
-        reporter: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            image: true,
-          },
-        },
-      },
     });
 
     if (!report) {
