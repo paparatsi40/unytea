@@ -7,33 +7,33 @@ describe('Rate Limiter', () => {
     beforeEach(() => {
       limiter = rateLimit({ interval: 1000, uniqueTokenPerInterval: 3 })
     })
-    it('should allow requests under the limit', () => {
-      const result = limiter.check('test-token')
+    it('should allow requests under the limit', async () => {
+      const result = await limiter.check('test-token')
       expect(result.success).toBe(true)
       expect(result.remaining).toBe(2)
     })
-    it('should track remaining requests correctly', () => {
-      expect(limiter.check('u1').remaining).toBe(2)
-      expect(limiter.check('u1').remaining).toBe(1)
-      expect(limiter.check('u1').remaining).toBe(0)
+    it('should track remaining requests correctly', async () => {
+      expect((await limiter.check('u1')).remaining).toBe(2)
+      expect((await limiter.check('u1')).remaining).toBe(1)
+      expect((await limiter.check('u1')).remaining).toBe(0)
     })
-    it('should block requests over the limit', () => {
-      limiter.check('u2'); limiter.check('u2'); limiter.check('u2')
-      expect(limiter.check('u2').success).toBe(false)
+    it('should block requests over the limit', async () => {
+      await limiter.check('u2'); await limiter.check('u2'); await limiter.check('u2')
+      expect((await limiter.check('u2')).success).toBe(false)
     })
-    it('should track different tokens independently', () => {
-      limiter.check('a'); limiter.check('a'); limiter.check('a')
-      expect(limiter.check('a').success).toBe(false)
-      expect(limiter.check('b').success).toBe(true)
+    it('should track different tokens independently', async () => {
+      await limiter.check('a'); await limiter.check('a'); await limiter.check('a')
+      expect((await limiter.check('a')).success).toBe(false)
+      expect((await limiter.check('b')).success).toBe(true)
     })
     it('should reset after the interval expires', async () => {
-      limiter.check('u3'); limiter.check('u3'); limiter.check('u3')
-      expect(limiter.check('u3').success).toBe(false)
+      await limiter.check('u3'); await limiter.check('u3'); await limiter.check('u3')
+      expect((await limiter.check('u3')).success).toBe(false)
       await new Promise((resolve) => setTimeout(resolve, 1100))
-      expect(limiter.check('u3').success).toBe(true)
+      expect((await limiter.check('u3')).success).toBe(true)
     })
-    it('should return resetTime in the future', () => {
-      expect(limiter.check('u4').resetTime).toBeGreaterThan(Date.now())
+    it('should return resetTime in the future', async () => {
+      expect((await limiter.check('u4')).resetTime).toBeGreaterThan(Date.now())
     })
   })
   describe('getIP', () => {

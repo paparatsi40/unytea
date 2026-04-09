@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
   try {
     // Rate limit
     const ip = getIP(request)
-    const { success: rateLimitOk } = rateLimiters.auth.check(`forgot:${ip}`)
+    const { success: rateLimitOk } = await rateLimiters.auth.check(`forgot:${ip}`)
     if (!rateLimitOk) {
       return NextResponse.json(
         { error: "Too many attempts. Please try again later." },

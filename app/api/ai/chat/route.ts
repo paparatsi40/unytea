@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Rate limit AI requests (expensive - OpenAI costs per request)
-    const { success: rateLimitOk } = aiRateLimiter.check(`ai:${session.user.id}`);
+    const { success: rateLimitOk } = await aiRateLimiter.check(`ai:${session.user.id}`);
     if (!rateLimitOk) {
       return NextResponse.json(
         { error: "You've reached the AI chat limit. Please try again later." },

@@ -1364,3 +1364,66 @@ model PushSubscription {
   @@index([userId])
   @@map("push_subscriptions")
 }
+
+// ============================================
+// CONTENT REPORTS - User-submitted reports
+// ============================================
+
+model Report {
+  id          String       @id @default(cuid())
+  reason      ReportReason
+  description String?      @db.Text
+  status      ReportStatus @default(PENDING)
+
+  // What is being reported
+  targetType  ReportTargetType
+  postId      String?
+  commentId   String?
+  userId      String?      @map("reportedUserId")  // The user being reported
+  messageId   String?
+
+  // Who reported it
+  reporterId  String
+
+  // Resolution
+  resolvedAt  DateTime?
+  resolvedBy  String?
+  resolution  String?      @db.Text
+
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([status])
+  @@index([targetType])
+  @@index([reporterId])
+  @@index([postId])
+  @@index([commentId])
+  @@index([createdAt])
+  @@map("reports")
+}
+
+enum ReportReason {
+  SPAM
+  HARASSMENT
+  HATE_SPEECH
+  MISINFORMATION
+  INAPPROPRIATE_CONTENT
+  SELF_HARM
+  VIOLENCE
+  COPYRIGHT
+  OTHER
+}
+
+enum ReportStatus {
+  PENDING
+  REVIEWING
+  RESOLVED
+  DISMISSED
+}
+
+enum ReportTargetType {
+  POST
+  COMMENT
+  USER
+  MESSAGE
+}
