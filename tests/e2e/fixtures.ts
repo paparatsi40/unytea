@@ -1,4 +1,4 @@
-import { test as base } from '@playwright/test';
+import { test as base, type Page } from '@playwright/test';
 
 export const test = base.extend({});
 
@@ -37,15 +37,15 @@ export const selectors = {
 };
 
 // Helper functions
-export async function navigateTo(page, path: string) {
+export async function navigateTo(page: Page, path: string) {
   await page.goto(path);
 }
 
-export async function expectToBeOnPage(page, path: string) {
+export async function expectToBeOnPage(page: Page, path: string) {
   await page.waitForURL(path);
 }
 
-export async function fillForm(page, fields: Record<string, string>) {
+export async function fillForm(page: Page, fields: Record<string, string>) {
   for (const [selector, value] of Object.entries(fields)) {
     await page.fill(selector, value);
   }
