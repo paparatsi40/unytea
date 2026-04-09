@@ -118,7 +118,7 @@ export async function createReport(data: CreateReportInput) {
  */
 export async function getReports(
   status?: ReportStatus | string,
-  communityId?: string
+  _communityId?: string
 ) {
   try {
     const userId = await getCurrentUserId();
