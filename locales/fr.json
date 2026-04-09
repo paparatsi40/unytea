@@ -227,6 +227,7 @@
     "welcome": "Bienvenue",
     "stats": {
       "communities": "Communautés",
+      "explore": "Explorer",
       "sessions": "Sessions",
       "courses": "Cours",
       "messages": "Messages"
@@ -361,6 +362,7 @@
       "dashboard": "Tableau de Bord",
       "communities": "Communautés",
       "messages": "Messages",
+      "explore": "Explorer",
       "sessions": "Sessions",
       "recordings": "Enregistrements",
       "knowledgeLibrary": "Bibliothèque de connaissances",

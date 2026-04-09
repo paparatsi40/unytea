@@ -263,6 +263,7 @@
     "welcome": "Welcome back",
     "stats": {
       "communities": "Communities",
+      "explore": "Explore",
       "sessions": "Sessions",
       "courses": "Courses",
       "messages": "Messages"
@@ -398,6 +399,7 @@
       "dashboard": "Dashboard",
       "communities": "Communities",
       "messages": "Messages",
+      "explore": "Explore",
       "sessions": "Sessions",
       "recordings": "Recordings",
       "knowledgeLibrary": "Knowledge Library",

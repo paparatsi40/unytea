@@ -15,11 +15,13 @@ import {
   Award,
   Bell,
   Library,
+  Compass,
 } from "lucide-react";
 
 const navigation = [
   { key: "dashboard", href: "/dashboard", icon: Home },
   { key: "communities", href: "/dashboard/communities", icon: Users },
+  { key: "explore", href: "/dashboard/communities/explore", icon: Compass },
   { key: "messages", href: "/dashboard/messages", icon: MessageSquare },
   { key: "recordings", href: "/dashboard/recordings", icon: Library },
   { key: "knowledgeLibrary", href: "/dashboard/knowledge-library", icon: BookOpen },

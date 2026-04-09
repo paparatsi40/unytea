@@ -256,6 +256,7 @@
     "welcome": "Bienvenido de vuelta",
     "stats": {
       "communities": "Comunidades",
+      "explore": "Explorar",
       "sessions": "Sesiones",
       "courses": "Cursos",
       "messages": "Mensajes"
@@ -390,6 +391,7 @@
       "dashboard": "Panel",
       "communities": "Comunidades",
       "messages": "Mensajes",
+      "explore": "Explorar",
       "sessions": "Sesiones",
       "recordings": "Grabaciones",
       "knowledgeLibrary": "Biblioteca de conocimiento",
