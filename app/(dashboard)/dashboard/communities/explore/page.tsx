@@ -6,12 +6,12 @@ import { Search, Users, TrendingUp, Filter, Sparkles, Dumbbell, Briefcase, Code,
 import { Button } from "@/components/ui/button";
 
 const discoveryCategories = [
-  { name: "Spiritual", icon: Sparkles, color: "from-purple-500/30 to-pink-500/30" },
-  { name: "Fitness", icon: Dumbbell, color: "from-green-500/30 to-emerald-500/30" },
-  { name: "Business", icon: Briefcase, color: "from-blue-500/30 to-cyan-500/30" },
-  { name: "Technology", icon: Code, color: "from-indigo-500/30 to-purple-500/30" },
-  { name: "Education", icon: BookOpen, color: "from-orange-500/30 to-red-500/30" },
-  { name: "Creative", icon: Palette, color: "from-pink-500/30 to-rose-500/30" },
+  { name: "Spiritual", icon: Sparkles, color: "from-purple-500/30 to-pink-500/30", desc: "Meditation, mindfulness & inner growth" },
+  { name: "Fitness", icon: Dumbbell, color: "from-green-500/30 to-emerald-500/30", desc: "Workouts, nutrition & accountability" },
+  { name: "Business", icon: Briefcase, color: "from-blue-500/30 to-cyan-500/30", desc: "Startups, marketing & leadership" },
+  { name: "Technology", icon: Code, color: "from-indigo-500/30 to-purple-500/30", desc: "Dev, AI, open source & product building" },
+  { name: "Education", icon: BookOpen, color: "from-orange-500/30 to-red-500/30", desc: "Teaching, tutoring & skill sharing" },
+  { name: "Creative", icon: Palette, color: "from-pink-500/30 to-rose-500/30", desc: "Art, design, music & storytelling" },
 ];
 
 async function getPublicCommunities(userId?: string) {
@@ -100,7 +100,7 @@ export default async function ExplorePage() {
                     <Icon className="h-4 w-4" />
                     <span className="font-medium">{category.name}</span>
                   </div>
-                  <p className="mt-2 text-xs text-white/80">Discover active communities in {category.name.toLowerCase()}.</p>
+                  <p className="mt-2 text-xs text-white/80">{category.desc}</p>
                 </div>
               );
             })}
