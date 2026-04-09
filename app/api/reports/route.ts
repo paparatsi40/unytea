@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { rateLimiters, getIP } from '@/lib/rate-limit';
+import { rateLimiters } from '@/lib/rate-limit';
 import { z } from 'zod';
 import {
   ReportReason,
@@ -182,16 +182,6 @@ export async function GET(request: NextRequest) {
     const reports = await prisma.report.findMany({
       where: {
         ...(status && { status: status as ReportStatus }),
-      },
-      include: {
-        reporter: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            image: true,
-          },
-        },
       },
       orderBy: {
         createdAt: 'desc',
