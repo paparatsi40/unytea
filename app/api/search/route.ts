@@ -242,7 +242,7 @@ export async function GET(request: NextRequest) {
       response.members = users.map((user) => ({
         id: user.id,
         title: user.name || user.username || "User",
-        name: user.name || user.username,
+        name: user.name || user.username || undefined,
         description: user.bio || undefined,
         snippet: user.bio?.substring(0, 150),
         type: "member" as const,
