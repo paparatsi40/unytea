@@ -860,9 +860,9 @@ export default function Home() {
             <div>
               <h4 className="font-semibold mb-4">Legal</h4>
               <ul className="space-y-2 text-sm">
-                <li><Link href="#" className="text-muted-foreground hover:text-foreground">Privacy</Link></li>
-                <li><Link href="#" className="text-muted-foreground hover:text-foreground">Terms</Link></li>
-                <li><Link href="#" className="text-muted-foreground hover:text-foreground">Cookies</Link></li>
+                <li><Link href={`/${locale}/privacy`} className="text-muted-foreground hover:text-foreground">Privacy</Link></li>
+                <li><Link href={`/${locale}/terms`} className="text-muted-foreground hover:text-foreground">Terms</Link></li>
+                <li><Link href={`/${locale}/cookies`} className="text-muted-foreground hover:text-foreground">Cookies</Link></li>
               </ul>
             </div>
           </div>
