@@ -249,18 +249,46 @@ export default function TermsPage({
 
           <article>
             <h2 className="text-2xl font-semibold mb-3">
-              13. Governing Law
+              13. Data Protection and GDPR
             </h2>
+            <p className="text-muted-foreground mb-2">
+              If you are located in the European Economic Area (EEA), your use
+              of the platform is also governed by our Privacy Policy, which
+              details how we collect, process, and protect your personal data in
+              compliance with the General Data Protection Regulation (GDPR).
+            </p>
             <p className="text-muted-foreground">
-              These Terms are governed by applicable law. Any disputes arising
-              from these Terms or the use of the platform shall be resolved
-              through binding arbitration or in the courts of competent
-              jurisdiction, as determined by the applicable laws of your region.
+              You have the right to access, rectify, erase, restrict, port, and
+              object to the processing of your personal data. You also have the
+              right to lodge a complaint with your local data protection
+              supervisory authority. For data protection inquiries, contact our
+              Data Protection Officer at{" "}
+              <a
+                href="mailto:dpo@unytea.com"
+                className="text-primary hover:underline"
+              >
+                dpo@unytea.com
+              </a>
+              .
             </p>
           </article>
 
           <article>
-            <h2 className="text-2xl font-semibold mb-3">14. Contact</h2>
+            <h2 className="text-2xl font-semibold mb-3">
+              14. Governing Law
+            </h2>
+            <p className="text-muted-foreground">
+              These Terms are governed by applicable law. For users in the EEA,
+              nothing in these Terms affects your statutory rights under
+              applicable consumer protection and data protection legislation.
+              Any disputes arising from these Terms shall be resolved through
+              binding arbitration or in the courts of competent jurisdiction, as
+              determined by the applicable laws of your region.
+            </p>
+          </article>
+
+          <article>
+            <h2 className="text-2xl font-semibold mb-3">15. Contact</h2>
             <p className="text-muted-foreground">
               For questions about these Terms, contact{" "}
               <a
