@@ -4,19 +4,22 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAllPosts, getPostBySlug } from "../posts";
 
+type RouteParams = {
+  locale: string;
+  slug: string;
+};
+
 type Props = {
-  params: {
-    locale: string;
-    slug: string;
-  };
+  params: Promise<RouteParams>;
 };
 
 export function generateStaticParams() {
   return getAllPosts().map((post) => ({ slug: post.slug }));
 }
 
-export function generateMetadata({ params }: Props): Metadata {
-  const post = getPostBySlug(params.slug);
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale, slug } = await params;
+  const post = getPostBySlug(slug);
 
   if (!post) {
     return {
@@ -25,7 +28,7 @@ export function generateMetadata({ params }: Props): Metadata {
   }
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://unytea.com";
-  const canonicalUrl = `${appUrl}/${params.locale}/blog/${post.slug}`;
+  const canonicalUrl = `${appUrl}/${locale}/blog/${post.slug}`;
 
   return {
     title: `${post.title} | Unytea Blog`,
@@ -56,8 +59,8 @@ export function generateMetadata({ params }: Props): Metadata {
   };
 }
 
-export default function BlogPostPage({ params }: Props) {
-  const { locale, slug } = params;
+export default async function BlogPostPage({ params }: Props) {
+  const { locale, slug } = await params;
   const post = getPostBySlug(slug);
 
   if (!post) {
