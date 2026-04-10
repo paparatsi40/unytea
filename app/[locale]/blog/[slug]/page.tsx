@@ -13,6 +13,22 @@ type Props = {
   params: Promise<RouteParams>;
 };
 
+function getSafeBaseUrl() {
+  const raw = process.env.NEXT_PUBLIC_APP_URL?.trim();
+
+  if (!raw) {
+    return "https://unytea.com";
+  }
+
+  try {
+    const normalized = raw.startsWith("http") ? raw : `https://${raw}`;
+    const parsed = new URL(normalized);
+    return parsed.origin;
+  } catch {
+    return "https://unytea.com";
+  }
+}
+
 export function generateStaticParams() {
   return getAllPosts().map((post) => ({ slug: post.slug }));
 }
@@ -27,8 +43,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://unytea.com";
-  const canonicalUrl = `${appUrl}/${locale}/blog/${post.slug}`;
+  const baseUrl = getSafeBaseUrl();
+  const canonicalUrl = `${baseUrl}/${locale}/blog/${post.slug}`;
 
   return {
     title: `${post.title} | Unytea Blog`,
@@ -67,8 +83,8 @@ export default async function BlogPostPage({ params }: Props) {
     notFound();
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://unytea.com";
-  const articleUrl = `${appUrl}/${locale}/blog/${post.slug}`;
+  const baseUrl = getSafeBaseUrl();
+  const articleUrl = `${baseUrl}/${locale}/blog/${post.slug}`;
 
   const jsonLd = {
     "@context": "https://schema.org",
