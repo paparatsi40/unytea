@@ -1,22 +1,9 @@
 import Link from "next/link";
-
-const posts = [
-  {
-    title: "How to Launch a Community That Converts",
-    excerpt: "A practical framework to go from first members to repeat revenue.",
-  },
-  {
-    title: "Live Sessions Playbook for Higher Attendance",
-    excerpt: "Simple structure and reminders that improve participation consistently.",
-  },
-  {
-    title: "Pricing Paid Access Without Killing Growth",
-    excerpt: "How to balance conversion, retention, and long-term trust.",
-  },
-];
+import { getAllPosts } from "./posts";
 
 export default function BlogPage({ params }: { params: { locale: string } }) {
   const { locale } = params;
+  const posts = getAllPosts();
 
   return (
     <main className="min-h-screen bg-background">
@@ -33,9 +20,18 @@ export default function BlogPage({ params }: { params: { locale: string } }) {
       <section className="container mx-auto px-4 py-10">
         <div className="max-w-4xl space-y-4">
           {posts.map((post) => (
-            <article key={post.title} className="rounded-xl border bg-card p-6">
+            <article key={post.slug} className="rounded-xl border bg-card p-6">
+              <p className="text-xs text-muted-foreground mb-2">
+                {post.date} · {post.readTime} · {post.author}
+              </p>
               <h2 className="text-xl font-semibold mb-2">{post.title}</h2>
-              <p className="text-muted-foreground">{post.excerpt}</p>
+              <p className="text-muted-foreground mb-4">{post.excerpt}</p>
+              <Link
+                href={`/${locale}/blog/${post.slug}`}
+                className="text-sm font-medium text-primary hover:underline"
+              >
+                Read article →
+              </Link>
             </article>
           ))}
         </div>
