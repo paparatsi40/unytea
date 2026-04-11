@@ -151,9 +151,7 @@ Important Instructions:
     ];
 
     // Generate AI response
-    console.log("Calling OpenAI API...");
     const aiResponse = await generateChatCompletion({ messages });
-    console.log("OpenAI API response received");
 
     // Return response
     return NextResponse.json({
