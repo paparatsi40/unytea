@@ -43,13 +43,24 @@ export async function createSession(data: {
       menteeId: userId,
     };
     
-    // Only add communityId if provided
+    // Assign communityId — fall back to user's first community if not provided
     if (data.communityId) {
       sessionData.communityId = data.communityId;
+    } else {
+      const fallbackCommunity = await prisma.community.findFirst({
+        where: {
+          OR: [
+            { ownerId: userId },
+            { members: { some: { userId, status: "ACTIVE" } } },
+          ],
+        },
+        select: { id: true },
+        orderBy: { createdAt: "asc" },
+      });
+      if (fallbackCommunity) {
+        sessionData.communityId = fallbackCommunity.id;
+      }
     }
-    //     console.log("Note: communityId field not yet in database");
-    //   }
-    // }
 
     // Create the session
     const session = await prisma.mentorSession.create({
@@ -621,6 +632,20 @@ async function createSingleSession(data: CreateSessionOrSeriesInput & { mentorId
 
   if (data.communityId) {
     sessionData.communityId = data.communityId;
+  } else {
+    const fallbackCommunity = await prisma.community.findFirst({
+      where: {
+        OR: [
+          { ownerId: data.mentorId },
+          { members: { some: { userId: data.mentorId, status: "ACTIVE" } } },
+        ],
+      },
+      select: { id: true },
+      orderBy: { createdAt: "asc" },
+    });
+    if (fallbackCommunity) {
+      sessionData.communityId = fallbackCommunity.id;
+    }
   }
 
   const session = await prisma.mentorSession.create({
