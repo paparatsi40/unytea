@@ -5,6 +5,11 @@ import { X, Image as ImageIcon, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 
+// Tell Excalidraw to load vendor chunks from our public folder instead of unpkg
+if (typeof window !== "undefined") {
+  (window as any).EXCALIDRAW_ASSET_PATH = "/excalidraw-assets/";
+}
+
 const Excalidraw = dynamic(
   async () => (await import("@excalidraw/excalidraw")).Excalidraw,
   {

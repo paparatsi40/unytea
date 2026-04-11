@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "cp -r node_modules/@excalidraw/excalidraw/dist/excalidraw-assets public/excalidraw-assets 2>/dev/null; next build",
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
