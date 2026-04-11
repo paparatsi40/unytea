@@ -3,8 +3,8 @@
 # dependencies
 /node_modules
 
-# excalidraw assets (copied at build time)
-/public/excalidraw-assets
+# excalidraw locales (not needed)
+/public/excalidraw-assets/locales
 /.pnp
 .pnp.js
 .yarn/install-state.gz
