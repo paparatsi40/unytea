@@ -7,7 +7,7 @@ import dynamic from "next/dynamic";
 
 // Tell Excalidraw to load vendor chunks from our public folder instead of unpkg
 if (typeof window !== "undefined") {
-  (window as any).EXCALIDRAW_ASSET_PATH = "/excalidraw-assets/";
+  (window as any).EXCALIDRAW_ASSET_PATH = "/";
 }
 
 const Excalidraw = dynamic(
