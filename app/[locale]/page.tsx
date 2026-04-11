@@ -453,12 +453,14 @@ export default function Home() {
             </div>
             <ComparisonRow feature="Community Feed" skool="✓" unytea="✓" />
             <ComparisonRow feature="Courses" skool="✓" unytea="✓" />
-            <ComparisonRow feature="Live Sessions" skool="✗" unytea="✓" highlighted />
-            <ComparisonRow feature="Whiteboard" skool="✗" unytea="✓" highlighted />
+            <ComparisonRow feature="Live Video Sessions" skool="✓" unytea="✓" />
+            <ComparisonRow feature="Collaborative Whiteboard" skool="✗" unytea="✓" highlighted />
             <ComparisonRow feature="Screen Sharing" skool="✗" unytea="✓" highlighted />
             <ComparisonRow feature="AI Assistant" skool="✗" unytea="✓" highlighted />
-            <ComparisonRow feature="Live Video Sessions" skool="✗" unytea="✓" highlighted />
-            <ComparisonRow feature="Custom Domain" skool="✗" unytea="✓" />
+            <ComparisonRow feature="Certificates" skool="✗" unytea="✓" highlighted />
+            <ComparisonRow feature="Multi-language (i18n)" skool="✗" unytea="✓" highlighted />
+            <ComparisonRow feature="Custom Domain" skool="✗" unytea="✓" highlighted />
+            <ComparisonRow feature="Quizzes &amp; Assessments" skool="✗" unytea="✓" highlighted />
             <ComparisonRow feature="Transaction Fee" skool="10%" unytea="3-5%" highlighted />
           </div>
           <p className="text-center text-muted-foreground mt-6 text-sm">
@@ -539,7 +541,7 @@ export default function Home() {
               rating={5}
             />
             <TestimonialCard
-              quote="Finally switched from Skool and never looked back. The video features alone justify the move."
+              quote="The whiteboard, screen sharing, and AI assistant during live sessions changed how I run workshops. Nothing else offers this."
               author="Emma Williams"
               role="Community Founder"
               rating={5}
