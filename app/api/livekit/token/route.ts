@@ -77,10 +77,10 @@ export async function POST(request: NextRequest) {
         where: { OR: [{ videoRoomName: roomName }, { roomId: roomName }] },
       });
       if (sessionRecord) {
-        // Clear any stale participation record for this user with the same
-        // livekitIdentity (from a previous session) to prevent P2002
+        // Clear ALL participation records that hold this livekitIdentity
+        // to prevent P2002 unique constraint violation on upsert
         await prisma.sessionParticipation.updateMany({
-          where: { livekitIdentity: identity, NOT: { sessionId: sessionRecord.id } },
+          where: { livekitIdentity: identity },
           data: { livekitIdentity: null },
         });
 
