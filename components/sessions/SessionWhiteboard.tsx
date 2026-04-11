@@ -92,7 +92,6 @@ export function SessionWhiteboard({ onClose, sessionId, embedded = false }: Sess
                 changeViewBackgroundColor: true,
                 clearCanvas: false,
                 export: false,
-                loadScene: false,
                 saveToActiveFile: false,
                 saveAsImage: false,
                 toggleTheme: false,
