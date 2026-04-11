@@ -348,7 +348,7 @@ export default function Home() {
             {/* Live Sessions - Hero Feature (larger card) */}
             <div className="md:col-span-2 lg:col-span-1 lg:row-span-2">
               <FeatureCard
-                image="https://images.unsplash.com/photo-1609220136736-443140cffec6?auto=format&fit=crop&w=600&q=80"
+                image="https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b?auto=format&fit=crop&w=600&q=80"
                 title="🎥 Live Sessions"
                 description="Interactive video calls with whiteboard, screen sharing, and recordings. Our most loved feature."
                 highlighted
