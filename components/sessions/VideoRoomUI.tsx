@@ -31,10 +31,12 @@ import {
   VolumeX,
   BarChart3,
   Megaphone,
+  Pencil,
 } from "lucide-react";
 import Link from "next/link";
 
 import { MainStage } from "./MainStage";
+import { SessionMode } from "./ModeSwitcher";
 import { SessionChat } from "./SessionChat";
 import { SessionNotesEditor } from "./SessionNotesEditor";
 import { ReactionsBar } from "./ReactionsBar";
@@ -119,6 +121,9 @@ export function VideoRoomUI({
   const [showHandQueue, setShowHandQueue] = useState(false);
   const [showPollCreator, setShowPollCreator] = useState(false);
   const [showActivePoll, setShowActivePoll] = useState(true);
+
+  // Stage mode (video / screen / whiteboard)
+  const [stageMode, setStageMode] = useState<SessionMode>("video");
 
   // Pinned question
   const [pinnedQuestion, setPinnedQuestion] = useState<PinnedQuestion | null>(null);
@@ -522,7 +527,7 @@ export function VideoRoomUI({
           {/* Stage */}
           <div className="flex-1 min-h-0 p-4">
             <MainStage
-            mode={isScreenShareEnabled ? "screen" : "video"}
+            mode={isScreenShareEnabled ? "screen" : stageMode}
             sessionMode={sessionMode}
             sessionId={sessionId}
           />
@@ -813,6 +818,20 @@ export function VideoRoomUI({
             )}
           >
             <Monitor className="h-5 w-5" />
+          </button>
+
+          {/* Whiteboard */}
+          <button
+            onClick={() => setStageMode(stageMode === "whiteboard" ? "video" : "whiteboard")}
+            className={cn(
+              "flex h-12 w-12 items-center justify-center rounded-full transition-all",
+              stageMode === "whiteboard"
+                ? "bg-purple-500/20 text-purple-400 hover:bg-purple-500/30"
+                : "bg-zinc-800 text-white hover:bg-zinc-700"
+            )}
+            title="Whiteboard"
+          >
+            <Pencil className="h-5 w-5" />
           </button>
 
           {/* Reactions */}
