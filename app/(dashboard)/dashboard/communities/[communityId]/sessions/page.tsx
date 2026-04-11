@@ -171,7 +171,7 @@ mentor: {
       (s) => s.status === "SCHEDULED" && new Date(s.scheduledAt) >= now
     );
     const past = allSessions.filter(
-      (s) => s.status === "COMPLETED" || (s.status === "SCHEDULED" && new Date(s.scheduledAt) < now)
+      (s) => s.status !== "IN_PROGRESS" && !(s.status === "SCHEDULED" && new Date(s.scheduledAt) >= now)
     );
     const pastSorted = [...past].sort(
       (a, b) => new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime()
