@@ -77,10 +77,6 @@ export async function POST(request: NextRequest) {
         where: { OR: [{ videoRoomName: roomName }, { roomId: roomName }] },
       });
       if (sessionRecord) {
-        // Use a session-scoped identity to avoid unique constraint collision
-        // when the same user joins different sessions
-        const scopedIdentity = `${sessionRecord.id}:${identity}`;
-
         // Clear any stale participation record for this user with the same
         // livekitIdentity (from a previous session) to prevent P2002
         await prisma.sessionParticipation.updateMany({
