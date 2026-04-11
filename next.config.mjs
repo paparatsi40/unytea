@@ -41,6 +41,10 @@ const nextConfig = {
     minimumCacheTTL: 60 * 60 * 24 * 365,
   },
 
+  env: {
+    NEXT_PUBLIC_EXCALIDRAW_ASSET_PATH: "/",
+  },
+
   experimental: {
     optimizePackageImports: ["lucide-react", "@radix-ui/react-icons"],
   },
