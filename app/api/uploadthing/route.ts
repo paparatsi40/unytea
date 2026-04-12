@@ -11,13 +11,14 @@ const handlers = createRouteHandler({
 
 export async function GET(req: NextRequest) {
   try {
-    console.log("[UploadThing Route] GET request:", req.url);
-    console.log("[UploadThing Route] UPLOADTHING_SECRET exists:", !!process.env.UPLOADTHING_SECRET);
-    console.log("[UploadThing Route] UPLOADTHING_SECRET prefix:", process.env.UPLOADTHING_SECRET?.substring(0, 6));
-    console.log("[UploadThing Route] UPLOADTHING_APP_ID exists:", !!process.env.UPLOADTHING_APP_ID);
-    return await handlers.GET(req);
+    const res = await handlers.GET(req);
+    if (!res.ok) {
+      const body = await res.clone().text();
+      console.error("[UploadThing] GET non-ok response:", res.status, body);
+    }
+    return res;
   } catch (error) {
-    console.error("[UploadThing Route] GET error:", error);
+    console.error("[UploadThing] GET error:", error);
     return new Response(
       JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
       { status: 500, headers: { "Content-Type": "application/json" } }
@@ -27,15 +28,17 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    console.log("[UploadThing Route] POST request:", req.url);
-    console.log("[UploadThing Route] UPLOADTHING_SECRET exists:", !!process.env.UPLOADTHING_SECRET);
-    console.log("[UploadThing Route] UPLOADTHING_SECRET prefix:", process.env.UPLOADTHING_SECRET?.substring(0, 6));
-    console.log("[UploadThing Route] UPLOADTHING_APP_ID exists:", !!process.env.UPLOADTHING_APP_ID);
-    return await handlers.POST(req);
+    console.log("[UploadThing] POST start - slug:", req.nextUrl.searchParams.get("slug"));
+    const res = await handlers.POST(req);
+    if (!res.ok) {
+      const body = await res.clone().text();
+      console.error("[UploadThing] POST non-ok response:", res.status, body);
+    }
+    return res;
   } catch (error) {
-    console.error("[UploadThing Route] POST error:", error);
+    console.error("[UploadThing] POST error:", error);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
+      JSON.stringify({ error: error instanceof Error ? error.message : String(error) }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
