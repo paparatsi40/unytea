@@ -1,6 +1,6 @@
 import { createRouteHandler } from "uploadthing/next";
 import { ourFileRouter } from "./core";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -11,35 +11,39 @@ const handlers = createRouteHandler({
 
 export async function GET(req: NextRequest) {
   try {
-    const res = await handlers.GET(req);
-    if (!res.ok) {
-      const body = await res.clone().text();
-      console.error("[UploadThing] GET non-ok response:", res.status, body);
-    }
-    return res;
-  } catch (error) {
-    console.error("[UploadThing] GET error:", error);
-    return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    return await handlers.GET(req);
+  } catch (error: any) {
+    console.error("[UploadThing GET] Full error:", JSON.stringify({
+      message: error?.message,
+      name: error?.name,
+      cause: error?.cause ? String(error.cause) : undefined,
+      stack: error?.stack?.split("\n").slice(0, 5),
+    }));
+    return NextResponse.json({
+      error: error?.message || "Unknown",
+      name: error?.name,
+      cause: error?.cause ? String(error.cause) : undefined,
+    }, { status: 500 });
   }
 }
 
 export async function POST(req: NextRequest) {
   try {
-    console.log("[UploadThing] POST start - slug:", req.nextUrl.searchParams.get("slug"));
-    const res = await handlers.POST(req);
-    if (!res.ok) {
-      const body = await res.clone().text();
-      console.error("[UploadThing] POST non-ok response:", res.status, body);
-    }
-    return res;
-  } catch (error) {
-    console.error("[UploadThing] POST error:", error);
-    return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : String(error) }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    return await handlers.POST(req);
+  } catch (error: any) {
+    // Log everything we can about this error
+    const errorInfo = {
+      message: error?.message,
+      name: error?.name,
+      cause: error?.cause ? String(error.cause) : undefined,
+      stack: error?.stack?.split("\n").slice(0, 8),
+      keys: error ? Object.keys(error) : [],
+      raw: String(error),
+    };
+    console.error("[UploadThing POST] Full error:", JSON.stringify(errorInfo, null, 2));
+
+    return NextResponse.json({
+      uploadthingError: errorInfo,
+    }, { status: 500 });
   }
 }
