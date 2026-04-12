@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -64,6 +65,7 @@ export function CategorySidebar({
   canManage = false,
   totalResources = 0,
 }: CategorySidebarProps) {
+  const t = useTranslations("library.categories");
   const totalInCategories = categories.reduce(
     (acc, cat) => acc + (cat._count?.resources || 0),
     0
@@ -75,7 +77,7 @@ export function CategorySidebar({
       {/* Header */}
       <div className="flex items-center justify-between">
         <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wider">
-          Categorías
+          {t("title")}
         </h3>
         {canManage && (
           <Button
@@ -85,7 +87,7 @@ export function CategorySidebar({
             onClick={onCreateCategory}
           >
             <Plus className="w-4 h-4 mr-1" />
-            Nueva
+            {t("new")}
           </Button>
         )}
       </div>
@@ -107,7 +109,7 @@ export function CategorySidebar({
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white">
             <FolderOpen className="w-4 h-4" />
           </div>
-          <span className="font-medium">Todos los recursos</span>
+          <span className="font-medium">{t("allResources")}</span>
         </div>
         <span className="text-sm text-muted-foreground">{totalResources}</span>
       </motion.button>
@@ -116,9 +118,9 @@ export function CategorySidebar({
       <div className="space-y-1">
         {categories.length === 0 ? (
           <div className="text-center py-6 text-sm text-muted-foreground">
-            <p>No hay categorías aún</p>
+            <p>{t("noCategories")}</p>
             {canManage && (
-              <p className="mt-1">Crea la primera para organizar tus recursos</p>
+              <p className="mt-1">{t("createFirst")}</p>
             )}
           </div>
         ) : (
@@ -179,13 +181,13 @@ export function CategorySidebar({
                         onClick={() => onEditCategory?.(category)}
                       >
                         <Settings className="w-4 h-4 mr-2" />
-                        Editar
+                        {t("edit")}
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         className="text-red-600"
                         onClick={() => onDeleteCategory?.(category.id)}
                       >
-                        Eliminar
+                        {t("deleteLabel")}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -214,7 +216,7 @@ export function CategorySidebar({
               <FolderOpen className="w-4 h-4" />
             </div>
             <span className="font-medium text-muted-foreground">
-              Sin categoría
+              {t("uncategorized")}
             </span>
           </div>
           <span className="text-sm text-muted-foreground">

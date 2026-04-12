@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { ResourceGrid } from "@/components/library/ResourceGrid";
 import { CategorySidebar } from "@/components/library/CategorySidebar";
@@ -43,6 +44,7 @@ import type { ResourceType } from "@prisma/client";
 export default function LibraryPage() {
   const params = useParams();
   const communitySlug = params?.slug as string | undefined;
+  const t = useTranslations("library");
 
   // State - MUST declare all hooks before any early returns
   const [resources, setResources] = useState<any[]>([]);
@@ -66,7 +68,7 @@ export default function LibraryPage() {
     hasMore: false,
     total: 0,
   });
-  
+
   // Upload modal state
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [uploadForm, setUploadForm] = useState({
@@ -95,7 +97,6 @@ export default function LibraryPage() {
 
   // Fetch initial data
   const fetchData = useCallback(async () => {
-    console.log("[DEBUG] fetchData called");
     setIsLoading(true);
     try {
       const [resourcesResult, categoriesResult, popularResult, continueResult] =
@@ -112,19 +113,13 @@ export default function LibraryPage() {
           getContinueWatching(communitySlug, 5),
         ]);
 
-      console.log("[DEBUG] getResources result:", resourcesResult);
-
       if (resourcesResult.success) {
-        console.log("[DEBUG] Resources count:", resourcesResult.data.resources.length);
-        console.log("[DEBUG] First resource title:", resourcesResult.data.resources[0]?.title);
         setResources(resourcesResult.data.resources);
         setPagination({
           page: 1,
           hasMore: resourcesResult.data.hasMore,
           total: resourcesResult.data.total,
         });
-      } else {
-        console.error("[DEBUG] getResources failed:", resourcesResult.error);
       }
 
       if (categoriesResult.success) {
@@ -140,11 +135,11 @@ export default function LibraryPage() {
       }
     } catch (error) {
       console.error("Error fetching library data:", error);
-      toast.error("Error al cargar la biblioteca");
+      toast.error(t("loadError"));
     } finally {
       setIsLoading(false);
     }
-  }, [communitySlug, filters, selectedCategory]);
+  }, [communitySlug, filters, selectedCategory, t]);
 
   useEffect(() => {
     fetchData();
@@ -195,8 +190,7 @@ export default function LibraryPage() {
   const handleLike = useCallback(async (resourceId: string) => {
     const result = await toggleResourceLike({ resourceId });
     if (result.success) {
-      toast.success(result.data.liked ? "¡Te gusta este recurso!" : "Like removido");
-      // Update local state
+      toast.success(result.data.liked ? t("like.liked") : t("like.unliked"));
       setResources((prev) =>
         prev.map((r) =>
           r.id === resourceId
@@ -209,21 +203,21 @@ export default function LibraryPage() {
         )
       );
     }
-  }, []);
+  }, [t]);
 
   const handleDelete = useCallback(async (resourceId: string) => {
-    if (!confirm("¿Estás seguro de que quieres eliminar este recurso?")) {
+    if (!confirm(t("delete.confirm"))) {
       return;
     }
 
     const result = await deleteResource(resourceId);
     if (result.success) {
-      toast.success("Recurso eliminado");
+      toast.success(t("delete.success"));
       setResources((prev) => prev.filter((r) => r.id !== resourceId));
     } else {
       toast.error(result.error);
     }
-  }, []);
+  }, [t]);
 
   // Filter resources based on active tab
   const getFilteredResources = () => {
@@ -253,9 +247,9 @@ export default function LibraryPage() {
                   <Library className="w-6 h-6" />
                 </div>
                 <div>
-                  <h1 className="text-3xl font-bold">Biblioteca</h1>
+                  <h1 className="text-3xl font-bold">{t("title")}</h1>
                   <p className="text-muted-foreground">
-                    Explora todos los recursos de la comunidad
+                    {t("subtitle")}
                   </p>
                 </div>
               </motion.div>
@@ -264,14 +258,14 @@ export default function LibraryPage() {
             <div className="flex items-center gap-3">
               <Button variant="outline" className="gap-2">
                 <BookOpen className="w-4 h-4" />
-                Mis favoritos
+                {t("myFavorites")}
               </Button>
-              <Button 
+              <Button
                 className="gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
                 onClick={() => setIsUploadModalOpen(true)}
               >
                 <Upload className="w-4 h-4" />
-                Subir recurso
+                {t("uploadResource")}
               </Button>
             </div>
           </div>
@@ -285,15 +279,15 @@ export default function LibraryPage() {
             <TabsList className="bg-muted/50">
               <TabsTrigger value="all" className="gap-2">
                 <BookOpen className="w-4 h-4" />
-                Todos
+                {t("tabs.all")}
               </TabsTrigger>
               <TabsTrigger value="popular" className="gap-2">
                 <TrendingUp className="w-4 h-4" />
-                Populares
+                {t("tabs.popular")}
               </TabsTrigger>
               <TabsTrigger value="continue" className="gap-2">
                 <Clock className="w-4 h-4" />
-                Continuar viendo
+                {t("tabs.continueWatching")}
                 {continueWatching.length > 0 && (
                   <span className="ml-1 text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full">
                     {continueWatching.length}
@@ -302,7 +296,7 @@ export default function LibraryPage() {
               </TabsTrigger>
               <TabsTrigger value="new" className="gap-2">
                 <Sparkles className="w-4 h-4" />
-                Nuevos
+                {t("tabs.new")}
               </TabsTrigger>
             </TabsList>
           </Tabs>
@@ -353,10 +347,10 @@ export default function LibraryPage() {
               <div>
                 <h2 className="text-xl font-semibold flex items-center gap-2">
                   <Upload className="w-5 h-5" />
-                  Subir nuevo recurso
+                  {t("upload.title")}
                 </h2>
                 <p className="text-sm text-gray-500 mt-1">
-                  Completa la información y sube tu archivo a la biblioteca
+                  {t("upload.subtitle")}
                 </p>
               </div>
               <button
@@ -371,21 +365,17 @@ export default function LibraryPage() {
               onSubmit={async (e: React.FormEvent) => {
                 e.preventDefault();
                 if (!communitySlug) return;
-                
-                console.log("[DEBUG] Submitting form with uploadedFiles:", uploadedFiles);
-                console.log("[DEBUG] uploadForm.fileUrl:", uploadForm.fileUrl);
-                
+
                 setIsSubmitting(true);
-                
+
                 const fileUrl = uploadedFiles[0]?.url || uploadForm.fileUrl;
-                console.log("[DEBUG] Final fileUrl:", fileUrl);
-                
+
                 if (!fileUrl) {
-                  toast.error("No se ha subido ningún archivo");
+                  toast.error(t("upload.noFileError"));
                   setIsSubmitting(false);
                   return;
                 }
-                
+
                 const result = await createResource(communitySlug, {
                   title: uploadForm.title,
                   description: uploadForm.description,
@@ -397,11 +387,9 @@ export default function LibraryPage() {
                   isPublic: false,
                   status: "PUBLISHED",
                 });
-                
-                console.log("[DEBUG] createResource result:", result);
-                
+
                 if (result.success) {
-                  toast.success("Recurso subido exitosamente");
+                  toast.success(t("upload.success"));
                   setIsUploadModalOpen(false);
                   setUploadForm({
                     title: "",
@@ -411,36 +399,36 @@ export default function LibraryPage() {
                     fileUrl: "",
                   });
                   setUploadedFiles([]);
-                  fetchData(); // Refresh the list
+                  fetchData();
                 } else {
-                  console.error("[DEBUG] createResource failed:", result.error, result.code);
-                  toast.error(result.error || "Error al subir el recurso");
+                  console.error("createResource failed:", result.error, result.code);
+                  toast.error(result.error || t("upload.error"));
                 }
-                
+
                 setIsSubmitting(false);
               }}
               className="p-6 space-y-6"
             >
               {/* Title */}
               <div className="space-y-2">
-                <Label htmlFor="title">Título *</Label>
+                <Label htmlFor="title">{t("upload.titleLabel")}</Label>
                 <Input
                   id="title"
                   value={uploadForm.title}
                   onChange={(e) => setUploadForm({ ...uploadForm, title: e.target.value })}
-                  placeholder="Ej: Introducción al curso"
+                  placeholder={t("upload.titlePlaceholder")}
                   required
                 />
               </div>
 
               {/* Description */}
               <div className="space-y-2">
-                <Label htmlFor="description">Descripción</Label>
+                <Label htmlFor="description">{t("upload.descriptionLabel")}</Label>
                 <textarea
                   id="description"
                   value={uploadForm.description}
                   onChange={(e) => setUploadForm({ ...uploadForm, description: e.target.value })}
-                  placeholder="Describe el contenido de este recurso..."
+                  placeholder={t("upload.descriptionPlaceholder")}
                   rows={3}
                   className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
@@ -448,20 +436,20 @@ export default function LibraryPage() {
 
               {/* Type */}
               <div className="space-y-2">
-                <Label htmlFor="type">Tipo de recurso *</Label>
+                <Label htmlFor="type">{t("upload.typeLabel")}</Label>
                 <Select
                   value={uploadForm.type}
                   onValueChange={(value: string) => setUploadForm({ ...uploadForm, type: value as ResourceType })}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Selecciona el tipo" />
+                    <SelectValue placeholder={t("upload.typePlaceholder")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="DOCUMENT">Documento (PDF, Word, etc.)</SelectItem>
-                    <SelectItem value="VIDEO">Video</SelectItem>
-                    <SelectItem value="AUDIO">Audio</SelectItem>
-                    <SelectItem value="IMAGE">Imagen</SelectItem>
-                    <SelectItem value="LINK">Link externo</SelectItem>
+                    <SelectItem value="DOCUMENT">{t("upload.typeDocument")}</SelectItem>
+                    <SelectItem value="VIDEO">{t("upload.typeVideo")}</SelectItem>
+                    <SelectItem value="AUDIO">{t("upload.typeAudio")}</SelectItem>
+                    <SelectItem value="IMAGE">{t("upload.typeImage")}</SelectItem>
+                    <SelectItem value="LINK">{t("upload.typeLink")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -469,7 +457,7 @@ export default function LibraryPage() {
               {/* Category */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="category">Categoría</Label>
+                  <Label htmlFor="category">{t("upload.categoryLabel")}</Label>
                   {!isCreatingCategory && (
                     <button
                       type="button"
@@ -477,15 +465,15 @@ export default function LibraryPage() {
                       className="text-xs text-purple-600 hover:text-purple-700 flex items-center gap-1"
                     >
                       <Plus className="w-3 h-3" />
-                      Nueva
+                      {t("upload.categoryNew")}
                     </button>
                   )}
                 </div>
-                
+
                 {isCreatingCategory ? (
                   <div className="flex gap-2">
                     <Input
-                      placeholder="Nombre de categoría..."
+                      placeholder={t("upload.categoryPlaceholder")}
                       value={newCategoryName}
                       onChange={(e) => setNewCategoryName(e.target.value)}
                       className="flex-1"
@@ -496,7 +484,7 @@ export default function LibraryPage() {
                       size="sm"
                       onClick={async () => {
                         if (!newCategoryName.trim() || !communitySlug) return;
-                        
+
                         setIsCreatingCategorySubmitting(true);
                         const result = await createResourceCategory(communitySlug, {
                           name: newCategoryName.trim(),
@@ -506,22 +494,22 @@ export default function LibraryPage() {
                           color: null,
                           position: 0,
                         });
-                        
+
                         if (result.success && result.data) {
-                          toast.success("Categoría creada");
+                          toast.success(t("upload.categoryCreated"));
                           setCategories([...categories, result.data]);
                           setUploadForm({ ...uploadForm, categoryId: result.data.id });
                           setNewCategoryName("");
                           setIsCreatingCategory(false);
                         } else if (!result.success) {
-                          toast.error(result.error || "Error al crear categoría");
+                          toast.error(result.error || t("upload.categoryError"));
                         }
                         setIsCreatingCategorySubmitting(false);
                       }}
                       disabled={!newCategoryName.trim() || isCreatingCategorySubmitting}
                       className="bg-gradient-to-r from-purple-600 to-pink-600"
                     >
-                      {isCreatingCategorySubmitting ? "..." : "Crear"}
+                      {isCreatingCategorySubmitting ? "..." : t("upload.categoryNew")}
                     </Button>
                     <Button
                       type="button"
@@ -541,10 +529,10 @@ export default function LibraryPage() {
                     onValueChange={(value: string) => setUploadForm({ ...uploadForm, categoryId: value === "none" ? "" : value })}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Selecciona una categoría (opcional)" />
+                      <SelectValue placeholder={t("upload.categorySelectPlaceholder")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="none">Sin categoría</SelectItem>
+                      <SelectItem value="none">{t("upload.categoryNone")}</SelectItem>
                       {categories.length > 0 ? (
                         categories.map((cat) => (
                           <SelectItem key={cat.id} value={cat.id}>
@@ -553,7 +541,7 @@ export default function LibraryPage() {
                         ))
                       ) : (
                         <div className="px-2 py-3 text-sm text-gray-400 italic">
-                          No hay categorías disponibles
+                          {t("upload.categoryEmpty")}
                         </div>
                       )}
                     </SelectContent>
@@ -563,7 +551,7 @@ export default function LibraryPage() {
 
               {/* File Upload */}
               <div className="space-y-2">
-                <Label>Archivo *</Label>
+                <Label>{t("upload.fileLabel")}</Label>
                 <FileUpload
                   endpoint={uploadForm.type === "DOCUMENT" ? "documentUploader" : uploadForm.type === "VIDEO" || uploadForm.type === "AUDIO" ? "mediaUploader" : "imageUploader"}
                   onUploadComplete={(files) => setUploadedFiles(files)}
@@ -583,7 +571,7 @@ export default function LibraryPage() {
                   disabled={isSubmitting}
                 >
                   <X className="w-4 h-4 mr-2" />
-                  Cancelar
+                  {t("upload.cancel")}
                 </Button>
                 <Button
                   type="submit"
@@ -593,12 +581,12 @@ export default function LibraryPage() {
                   {isSubmitting ? (
                     <>
                       <span className="animate-spin mr-2">⏳</span>
-                      Subiendo...
+                      {t("upload.uploading")}
                     </>
                   ) : (
                     <>
                       <Upload className="w-4 h-4 mr-2" />
-                      Subir recurso
+                      {t("upload.submit")}
                     </>
                   )}
                 </Button>
