@@ -13,20 +13,10 @@
       }
     ],
     "react/no-unescaped-entities": "off",
-
-    "//": "Reglas degradadas a warn temporalmente para no bloquear builds.",
-    "//1": "Hay deuda real bajo cada una; tracked para fix posterior.",
-    "//2": "TODO: arreglar hooks llamados condicionalmente (rules-of-hooks)",
     "react-hooks/rules-of-hooks": "warn",
     "react-hooks/exhaustive-deps": "warn",
-
-    "//3": "TODO: refactorizar reasignaciones de module global (no-assign-module-variable)",
     "@next/next/no-assign-module-variable": "warn",
-
-    "//4": "TODO: convertir interfaces vacías a type aliases (no-empty-object-type)",
     "@typescript-eslint/no-empty-object-type": "warn",
-
-    "//5": "Otras reglas comunes que suelen tener deuda histórica:",
     "@typescript-eslint/no-empty-interface": "warn",
     "@typescript-eslint/ban-ts-comment": "warn",
     "@next/next/no-img-element": "warn",

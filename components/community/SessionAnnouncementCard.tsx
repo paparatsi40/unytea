@@ -42,31 +42,14 @@ interface SessionAnnouncementCardProps {
 
 export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) {
   const sessionData = Array.isArray(post.attachments) ? null : post.attachments;
+
+  // IMPORTANT: All hooks must be called BEFORE any early return (Rules of Hooks).
   const [sessionState, setSessionState] = useState<{
     status: string;
     hasRecording: boolean;
     recordingUrl: string | null;
     discussionCount: number;
   } | null>(null);
-
-  if (!sessionData?.sessionId) {
-    return null;
-  }
-
-  const scheduledAt = sessionData.scheduledAt ? new Date(sessionData.scheduledAt) : null;
-
-  const formatDate = (date: Date) => {
-    if (isToday(date)) return "Today";
-    if (isTomorrow(date)) return "Tomorrow";
-    return format(date, "EEE, MMM d");
-  };
-
-  const formatTime = (date: Date) => format(date, "h:mm a");
-
-  const isUpcoming = scheduledAt ? scheduledAt > new Date() : false;
-  const effectiveStatus = sessionState?.status || (isUpcoming ? "SCHEDULED" : "COMPLETED");
-  const isLive = effectiveStatus === "IN_PROGRESS";
-  const hasRecording = !!sessionState?.hasRecording;
 
   useEffect(() => {
     let mounted = true;
@@ -86,6 +69,26 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
       mounted = false;
     };
   }, [sessionData?.sessionId]);
+
+  // Early return must come AFTER all hooks above.
+  if (!sessionData?.sessionId) {
+    return null;
+  }
+
+  const scheduledAt = sessionData.scheduledAt ? new Date(sessionData.scheduledAt) : null;
+
+  const formatDate = (date: Date) => {
+    if (isToday(date)) return "Today";
+    if (isTomorrow(date)) return "Tomorrow";
+    return format(date, "EEE, MMM d");
+  };
+
+  const formatTime = (date: Date) => format(date, "h:mm a");
+
+  const isUpcoming = scheduledAt ? scheduledAt > new Date() : false;
+  const effectiveStatus = sessionState?.status || (isUpcoming ? "SCHEDULED" : "COMPLETED");
+  const isLive = effectiveStatus === "IN_PROGRESS";
+  const hasRecording = !!sessionState?.hasRecording;
 
   const ctaHref = isLive
     ? `/dashboard/sessions/${sessionData.sessionId}/room?src=feed_session_card_live`
