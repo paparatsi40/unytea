@@ -80,21 +80,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             where: { email },
           })
 
-          if (!user) {
-            console.warn("[auth] Login failed: user not found for email:", email)
-            return null
-          }
+          // Constant-time check to mitigate user enumeration via timing attacks.
+          // Si el user no existe o no tiene password (cuenta OAuth-only), aún corremos
+          // bcrypt.compare contra un hash dummy para que el tiempo de respuesta no delate
+          // la existencia o no del email.
+          const FAKE_BCRYPT_HASH = "$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy"
+          const hashToCheck = user?.password ?? FAKE_BCRYPT_HASH
+          const isValidPassword = await bcrypt.compare(password, hashToCheck)
 
-          if (!user.password) {
-            console.warn("[auth] Login failed: user has no password (OAuth-only account):", email)
-            return null
-          }
-
-          // Verify password
-          const isValidPassword = await bcrypt.compare(password, user.password)
-
-          if (!isValidPassword) {
-            console.warn("[auth] Login failed: invalid password for:", email)
+          if (!user || !user.password || !isValidPassword) {
+            // No logueamos el email (PII / GDPR). Solo registramos el evento con userId si existe.
+            console.warn("[auth] login_failed", {
+              userId: user?.id ?? null,
+              reason: !user ? "user_not_found" : !user.password ? "oauth_only_account" : "invalid_password",
+            })
             return null
           }
 
@@ -109,7 +108,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             lastName: user.lastName,
           }
         } catch (error) {
-          console.error("[auth] Login error:", error instanceof Error ? error.message : error)
+          console.error("[auth] login_error", {
+            message: error instanceof Error ? error.message : "unknown",
+          })
           return null
         }
       },
@@ -169,8 +170,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   events: {
     async createUser({ user }) {
-      // Log user creation
-      console.log(`✅ New user created: ${user.email}`)
+      // Log sin email (PII). Solo userId.
+      console.log("[auth] user_created", { userId: user.id })
     },
     async signIn({ user }) {
       // Update last active timestamp
@@ -182,7 +183,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           },
         })
       } catch (err) {
-        console.error("[auth] signIn event error:", err)
+        console.error("[auth] signin_event_error", {
+          userId: user.id,
+          message: err instanceof Error ? err.message : "unknown",
+        })
       }
     },
   },

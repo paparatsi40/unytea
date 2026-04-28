@@ -461,9 +461,14 @@ export default function Home() {
             <ComparisonRow feature="Multi-language (i18n)" skool="✗" unytea="✓" highlighted />
             <ComparisonRow feature="Custom Domain" skool="✗" unytea="✓" highlighted />
             <ComparisonRow feature="Quizzes &amp; Assessments" skool="✗" unytea="✓" highlighted />
-            <ComparisonRow feature="Transaction Fee" skool="10%" unytea="3-5%" highlighted />
+            {/* Skool: Hobby plan ($9/mo) charges 10% per transaction; Pro plan ($99/mo) charges 2.9-3.9%.
+                Unytea: 5% flat across all plans. Stripe processing extra in both. */}
+            <ComparisonRow feature="Platform Fee" skool="2.9–10%*" unytea="5% flat" highlighted />
           </div>
           <p className="text-center text-muted-foreground mt-6 text-sm">
+            * Skool fee depends on plan: 10% on Hobby ($9/mo), 2.9% on Pro ($99/mo). Stripe processing extra in both.
+          </p>
+          <p className="text-center text-muted-foreground mt-2 text-sm">
             Used by creators switching from Skool, Circle, Mighty Networks, and Facebook Groups
           </p>
         </div>
@@ -485,7 +490,7 @@ export default function Home() {
                 <MonetizationItem icon={Users} title="Paid Memberships" description="Charge monthly or annual access fees" />
                 <MonetizationItem icon={BookOpen} title="Courses" description="Sell one-time or drip courses" />
                 <MonetizationItem icon={Video} title="Workshops" description="Host paid live sessions and events" />
-                <MonetizationItem icon={CreditCard} title="Low Fees" description="Just 3-5% platform fee + Stripe processing" />
+                <MonetizationItem icon={CreditCard} title="Flat Platform Fee" description="One simple 5% on all plans, plus Stripe processing" />
               </div>
             </div>
             <div className="bg-gradient-to-br from-purple-100 to-pink-100 p-8 rounded-2xl">
@@ -849,7 +854,7 @@ export default function Home() {
                 <a href="https://twitter.com/unytea" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors" aria-label="Twitter">
                   <Twitter className="w-4 h-4" />
                 </a>
-                <a href="https://github.com/unytea" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors" aria-label="GitHub">
+                <a href="https://github.com/paparatsi40/unytea" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors" aria-label="GitHub">
                   <Github className="w-4 h-4" />
                 </a>
                 <a href="https://linkedin.com/company/unytea" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors" aria-label="LinkedIn">
