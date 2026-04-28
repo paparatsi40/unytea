@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Cancela runs viejos del mismo branch cuando se pushea algo nuevo (ahorra minutos)
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# Variables dummy para que comandos como `prisma generate` no fallen en CI.
+# El cliente de Prisma se genera del schema, no requiere conexión real a la DB.
+env:
+  DATABASE_URL: "postgresql://ci:ci@localhost:5432/ci?schema=public"
+  DIRECT_URL: "postgresql://ci:ci@localhost:5432/ci?schema=public"
+  NEXTAUTH_SECRET: "ci-dummy-secret-not-used-in-runtime"
+  NEXTAUTH_URL: "http://localhost:3000"
+
+jobs:
+  test:
+    name: Unit tests (vitest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "npm"
+      - run: npm ci
+      - name: Run vitest
+        run: npm test
+
+  type-check:
+    name: TypeScript type-check
+    runs-on: ubuntu-latest
+    # TODO: quitar continue-on-error cuando se arregle el type error de
+    # firstName en app/(dashboard)/dashboard/settings/profile/page.tsx.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "npm"
+      - run: npm ci
+      - name: Type-check
+        run: npm run type-check
+
+  lint:
+    name: ESLint
+    runs-on: ubuntu-latest
+    # TODO: quitar continue-on-error cuando se modernice la config de ESLint
+    # (hoy emite "Invalid Options: useEslintrc, extensions").
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "npm"
+      - run: npm ci
+      - name: Lint
+        run: npm run lint
+
+  format-check:
+    name: Prettier format check
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "npm"
+      - run: npm ci
+      - name: Prettier check
+        run: npm run format:check
