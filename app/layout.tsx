@@ -12,28 +12,37 @@ export const viewport: Viewport = {
   themeColor: "#7c3aed",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
+  // maximumScale removed: bloquea zoom en mobile y falla WCAG 1.4.4 (a11y).
   viewportFit: "cover",
 };
 
 export const metadata: Metadata = {
+  // metadataBase resuelve URLs relativas (og:image, etc.) a absolutas en producción.
+  metadataBase: new URL("https://www.unytea.com"),
   title: {
-    default: "Unytea - Where Communities Unite",
+    default: "Unytea — Where Communities Unite",
     template: "%s | Unytea",
   },
   description:
-    "Build and grow thriving communities with features that bring people together. Video calls, courses, gamification, and more - all in one warm, human platform.",
+    "Un perfil, todas tus comunidades. Sesiones en vivo, cursos, gamificación y monetización en una sola plataforma multiidioma. Alternativa moderna a Skool, Circle y Mighty Networks.",
   keywords: [
+    "plataforma de comunidades",
+    "alternativa a skool",
+    "skool alternative",
+    "comunidad online",
     "community platform",
     "online communities",
     "community building",
-    "video calls",
-    "courses",
+    "live sessions",
+    "online courses",
     "gamification",
+    "creators",
+    "coaching communities",
     "buddy system",
   ],
   authors: [{ name: "Unytea Team" }],
   creator: "Unytea",
+  publisher: "Unytea",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -46,21 +55,42 @@ export const metadata: Metadata = {
   formatDetection: {
     telephone: false,
   },
+  alternates: {
+    canonical: "/",
+    languages: {
+      en: "/en",
+      es: "/es",
+      fr: "/fr",
+      "x-default": "/",
+    },
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://unytea.com",
-    title: "Unytea - Where Communities Unite",
+    alternateLocale: ["es_ES", "fr_FR"],
+    url: "https://www.unytea.com",
+    title: "Unytea — Where Communities Unite",
     description:
-      "The community platform with soul. Better features, better design, better price than Skool.",
+      "The community platform for creators with more than one audience. Live sessions, courses, gamification, monetization. Multilingual from day one.",
     siteName: "Unytea",
+    images: [
+      {
+        url: "/og",
+        width: 1200,
+        height: 630,
+        alt: "Unytea — Where Communities Unite",
+        type: "image/png",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Unytea - Where Communities Unite",
+    title: "Unytea — Where Communities Unite",
     description:
-      "The community platform with soul. Better features, better design, better price than Skool.",
+      "The community platform for creators with more than one audience.",
     creator: "@unytea",
+    site: "@unytea",
+    images: ["/og"],
   },
   icons: {
     icon: [

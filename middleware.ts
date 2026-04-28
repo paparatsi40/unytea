@@ -71,7 +71,6 @@ export default auth((req) => {
 
 export const config = {
   matcher: [
-    // Excluye Next.js internals, assets estáticos, API, PWA files y excalidraw
-    "/((?!api|_next/static|_next/image|favicon.ico|manifest\\.json|sw\\.js|icons/|excalidraw-assets/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|woff2?)$).*)"
+
   ]
 }
