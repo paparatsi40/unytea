@@ -29,6 +29,14 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# build/test artifacts (stale outputs no van al repo)
+build-*.txt
+build-*.log
+/temp-push/
+
+# scratch / drafts personales (no commitear)
+*.draft.md
+
 # local env files
 .env
 .env*.local

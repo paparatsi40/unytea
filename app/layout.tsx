@@ -116,6 +116,56 @@ export const metadata: Metadata = {
   },
 };
 
+// JSON-LD structured data — ayuda a Google a renderizar rich snippets
+// (sitelinks search box, knowledge panel, breadcrumbs).
+const JSON_LD_ORGANIZATION = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Unytea",
+  url: "https://www.unytea.com",
+  logo: "https://www.unytea.com/icons/icon-512x512.png",
+  description:
+    "Community platform for creators with multiple audiences. Live sessions, courses, gamification and monetization in one multilingual app.",
+  sameAs: [
+    "https://twitter.com/unytea",
+    "https://linkedin.com/company/unytea",
+    "https://github.com/paparatsi40/unytea",
+  ],
+};
+
+const JSON_LD_WEBSITE = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Unytea",
+  url: "https://www.unytea.com",
+  inLanguage: ["en", "es", "fr"],
+  potentialAction: {
+    "@type": "SearchAction",
+    target: {
+      "@type": "EntryPoint",
+      urlTemplate: "https://www.unytea.com/en/explore?q={search_term_string}",
+    },
+    "query-input": "required name=search_term_string",
+  },
+};
+
+const JSON_LD_SOFTWARE = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "Unytea",
+  applicationCategory: "SocialNetworkingApplication",
+  operatingSystem: "Web, iOS, Android",
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+    description: "Free to start, paid plans available for monetization features.",
+  },
+  description:
+    "Build and grow online communities with live sessions, courses, gamification, and monetization tools.",
+  url: "https://www.unytea.com",
+};
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -126,6 +176,19 @@ export default async function RootLayout({
       <body
         className={`${GeistSans.variable} ${GeistMono.variable} font-sans antialiased`}
       >
+        {/* JSON-LD structured data para SEO / rich snippets en Google */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD_ORGANIZATION) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD_WEBSITE) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD_SOFTWARE) }}
+        />
         <script
           dangerouslySetInnerHTML={{
             __html: `(() => {
