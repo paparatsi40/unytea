@@ -2,6 +2,9 @@
 
 # dependencies
 /node_modules
+
+# excalidraw locales (not needed)
+/public/excalidraw-assets/locales
 /.pnp
 .pnp.js
 .yarn/install-state.gz

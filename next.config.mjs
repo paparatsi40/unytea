@@ -41,6 +41,10 @@ const nextConfig = {
     minimumCacheTTL: 60 * 60 * 24 * 365,
   },
 
+  env: {
+    NEXT_PUBLIC_EXCALIDRAW_ASSET_PATH: "/",
+  },
+
   experimental: {
     optimizePackageImports: ["lucide-react", "@radix-ui/react-icons"],
   },
@@ -61,7 +65,7 @@ const nextConfig = {
       "frame-ancestors 'self'",
       "object-src 'none'",
       "worker-src 'self' blob:",
-      "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live https://*.vercel.app https://*.livekit.cloud https://*.livekit.io",
+      "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live https://*.vercel.app https://*.livekit.cloud https://*.livekit.io https://unpkg.com",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https:",
       "media-src 'self' blob: https:",

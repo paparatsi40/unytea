@@ -31,10 +31,12 @@ import {
   VolumeX,
   BarChart3,
   Megaphone,
+  Pencil,
 } from "lucide-react";
 import Link from "next/link";
 
 import { MainStage } from "./MainStage";
+import { SessionMode } from "./ModeSwitcher";
 import { SessionChat } from "./SessionChat";
 import { SessionNotesEditor } from "./SessionNotesEditor";
 import { ReactionsBar } from "./ReactionsBar";
@@ -119,6 +121,9 @@ export function VideoRoomUI({
   const [showHandQueue, setShowHandQueue] = useState(false);
   const [showPollCreator, setShowPollCreator] = useState(false);
   const [showActivePoll, setShowActivePoll] = useState(true);
+
+  // Stage mode (video / screen / whiteboard)
+  const [stageMode, setStageMode] = useState<SessionMode>("video");
 
   // Pinned question
   const [pinnedQuestion, setPinnedQuestion] = useState<PinnedQuestion | null>(null);
@@ -522,7 +527,7 @@ export function VideoRoomUI({
           {/* Stage */}
           <div className="flex-1 min-h-0 p-4">
             <MainStage
-            mode={isScreenShareEnabled ? "screen" : "video"}
+            mode={isScreenShareEnabled ? "screen" : stageMode}
             sessionMode={sessionMode}
             sessionId={sessionId}
           />
@@ -752,6 +757,7 @@ export function VideoRoomUI({
           {/* Mic */}
           <button
             onClick={toggleMicrophone}
+            title={isMicrophoneEnabled ? "Mute microphone" : "Unmute microphone"}
             className={cn(
               "flex h-12 w-12 items-center justify-center rounded-full transition-all",
               isMicrophoneEnabled
@@ -771,6 +777,7 @@ export function VideoRoomUI({
             <>
               <button
                 onClick={toggleCamera}
+                title={isCameraEnabled ? "Turn off camera" : "Turn on camera"}
                 className={cn(
                   "flex h-12 w-12 items-center justify-center rounded-full transition-all",
                   isCameraEnabled
@@ -805,6 +812,7 @@ export function VideoRoomUI({
           {/* Screen Share */}
           <button
             onClick={toggleScreenShare}
+            title={isScreenShareEnabled ? "Stop sharing screen" : "Share screen"}
             className={cn(
               "flex h-12 w-12 items-center justify-center rounded-full transition-all",
               isScreenShareEnabled
@@ -815,10 +823,25 @@ export function VideoRoomUI({
             <Monitor className="h-5 w-5" />
           </button>
 
+          {/* Whiteboard */}
+          <button
+            onClick={() => setStageMode(stageMode === "whiteboard" ? "video" : "whiteboard")}
+            className={cn(
+              "flex h-12 w-12 items-center justify-center rounded-full transition-all",
+              stageMode === "whiteboard"
+                ? "bg-purple-500/20 text-purple-400 hover:bg-purple-500/30"
+                : "bg-zinc-800 text-white hover:bg-zinc-700"
+            )}
+            title="Whiteboard"
+          >
+            <Pencil className="h-5 w-5" />
+          </button>
+
           {/* Reactions */}
           <div className="relative">
             <button
               onClick={() => setShowReactions(!showReactions)}
+              title="Reactions"
               className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-800 text-white transition-all hover:bg-zinc-700"
             >
               <Smile className="h-5 w-5" />
@@ -858,6 +881,7 @@ export function VideoRoomUI({
                   setActivePanel(tab);
                   setShowAllPanels(false);
                 }}
+                title={tab.charAt(0).toUpperCase() + tab.slice(1)}
                 className={cn(
                   "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
                   activePanel === tab
@@ -875,6 +899,7 @@ export function VideoRoomUI({
           {/* Toggle All Panels (desktop) */}
           <button
             onClick={() => setShowAllPanels(!showAllPanels)}
+            title={showAllPanels ? "Hide panels" : "Show panels"}
             className="hidden h-12 w-12 items-center justify-center rounded-full bg-zinc-800 text-white transition-all hover:bg-zinc-700 md:flex"
           >
             {showAllPanels ? <ChevronDown className="h-5 w-5" /> : <ChevronUp className="h-5 w-5" />}
@@ -884,6 +909,7 @@ export function VideoRoomUI({
           {isHost ? (
             <button
               onClick={onEndSession}
+              title="End session"
               className="flex h-12 items-center gap-2 rounded-full bg-red-500 px-4 font-medium text-white transition-colors hover:bg-red-600"
             >
               <Radio className="h-5 w-5" />
@@ -892,6 +918,7 @@ export function VideoRoomUI({
           ) : (
             <button
               onClick={onLeave}
+              title="Leave session"
               className="flex h-12 items-center gap-2 rounded-full bg-red-500 px-4 font-medium text-white transition-colors hover:bg-red-600"
             >
               <LogOut className="h-5 w-5" />

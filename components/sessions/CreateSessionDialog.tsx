@@ -162,7 +162,8 @@ export function CreateSessionDialog({
           setIsOpen(false);
           resetForm();
           onSuccess?.();
-          
+          router.refresh();
+
           // Redirect to room immediately
           if (successResult.session?.id) {
             router.push(`/dashboard/sessions/${successResult.session.id}/room`);

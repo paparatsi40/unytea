@@ -439,6 +439,87 @@
     },
     "filtersFallback": "filters fallback"
   },
+  "library": {
+    "title": "Library",
+    "subtitle": "Explore all community resources",
+    "myFavorites": "My favorites",
+    "uploadResource": "Upload resource",
+    "tabs": {
+      "all": "All",
+      "popular": "Popular",
+      "continueWatching": "Continue watching",
+      "new": "New"
+    },
+    "upload": {
+      "title": "Upload new resource",
+      "subtitle": "Complete the information and upload your file to the library",
+      "titleLabel": "Title *",
+      "titlePlaceholder": "E.g.: Introduction to the course",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Describe the content of this resource...",
+      "typeLabel": "Resource type *",
+      "typePlaceholder": "Select type",
+      "typeDocument": "Document (PDF, Word, etc.)",
+      "typeVideo": "Video",
+      "typeAudio": "Audio",
+      "typeImage": "Image",
+      "typeLink": "External link",
+      "categoryLabel": "Category",
+      "categoryNew": "New",
+      "categoryPlaceholder": "Category name...",
+      "categorySelectPlaceholder": "Select a category (optional)",
+      "categoryNone": "No category",
+      "categoryEmpty": "No categories available",
+      "categoryCreated": "Category created",
+      "categoryError": "Error creating category",
+      "fileLabel": "File *",
+      "noFileError": "No file has been uploaded",
+      "uploading": "Uploading...",
+      "cancel": "Cancel",
+      "submit": "Upload resource",
+      "success": "Resource uploaded successfully",
+      "error": "Error uploading resource"
+    },
+    "like": {
+      "liked": "You like this resource!",
+      "unliked": "Like removed"
+    },
+    "delete": {
+      "confirm": "Are you sure you want to delete this resource?",
+      "success": "Resource deleted"
+    },
+    "loadError": "Error loading library",
+    "categories": {
+      "title": "Categories",
+      "new": "New",
+      "allResources": "All resources",
+      "noCategories": "No categories yet",
+      "createFirst": "Create the first one to organize your resources",
+      "uncategorized": "Uncategorized",
+      "edit": "Edit",
+      "deleteLabel": "Delete"
+    },
+    "grid": {
+      "searchPlaceholder": "Search resources...",
+      "sortNewest": "Most recent",
+      "sortUpdated": "Recently updated",
+      "sortViews": "Most viewed",
+      "sortTitle": "Title (A-Z)",
+      "filterAll": "All",
+      "filterAudio": "Audio",
+      "filterVideo": "Video",
+      "filterDocuments": "Documents",
+      "filterLinks": "Links",
+      "resource": "resource",
+      "resources": "resources",
+      "of": "of",
+      "noResults": "No resources found",
+      "noResultsSearch": "No resources match your search. Try different terms.",
+      "noResultsEmpty": "This community has no resources yet. Be the first to share something!",
+      "loading": "Loading...",
+      "loadMore": "Load more"
+    }
+  },
   "comments": {
     "commentsLabel": "Comments",
     "errors": {

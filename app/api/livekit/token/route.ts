@@ -72,19 +72,37 @@ export async function POST(request: NextRequest) {
     const jwt = await token.toJwt();
 
     // Register participation for session tracking
-    const sessionRecord = await prisma.mentorSession.findFirst({
-      where: { OR: [{ videoRoomName: roomName }, { roomId: roomName }] },
-    });
-    if (sessionRecord) {
-      await prisma.sessionParticipation.upsert({
-        where: { sessionId_userId: { sessionId: sessionRecord.id, userId: identity } },
-        create: { sessionId: sessionRecord.id, userId: identity, role: sessionRecord.mentorId === identity ? "host" : "listener", joinedAt: new Date(), livekitIdentity: identity },
-        update: { joinedAt: new Date(), leftAt: null },
+    try {
+      const sessionRecord = await prisma.mentorSession.findFirst({
+        where: { OR: [{ videoRoomName: roomName }, { roomId: roomName }] },
       });
-      await prisma.mentorSession.update({
-        where: { id: sessionRecord.id },
-        data: { attendeeCount: { increment: 1 } },
-      });
+      if (sessionRecord) {
+        // Clear ALL participation records that hold this livekitIdentity
+        // to prevent P2002 unique constraint violation on upsert
+        await prisma.sessionParticipation.updateMany({
+          where: { livekitIdentity: identity },
+          data: { livekitIdentity: null },
+        });
+
+        await prisma.sessionParticipation.upsert({
+          where: { sessionId_userId: { sessionId: sessionRecord.id, userId: identity } },
+          create: {
+            sessionId: sessionRecord.id,
+            userId: identity,
+            role: sessionRecord.mentorId === identity ? "host" : "listener",
+            joinedAt: new Date(),
+            livekitIdentity: identity,
+          },
+          update: { joinedAt: new Date(), leftAt: null, livekitIdentity: identity },
+        });
+        await prisma.mentorSession.update({
+          where: { id: sessionRecord.id },
+          data: { attendeeCount: { increment: 1 } },
+        });
+      }
+    } catch (participationError) {
+      // Don't fail the token generation if participation tracking fails
+      console.error("Session participation tracking error:", participationError);
     }
 
     return NextResponse.json({

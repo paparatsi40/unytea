@@ -431,6 +431,87 @@
     },
     "filtersFallback": "filtros alternativos"
   },
+  "library": {
+    "title": "Biblioteca",
+    "subtitle": "Explora todos los recursos de la comunidad",
+    "myFavorites": "Mis favoritos",
+    "uploadResource": "Subir recurso",
+    "tabs": {
+      "all": "Todos",
+      "popular": "Populares",
+      "continueWatching": "Continuar viendo",
+      "new": "Nuevos"
+    },
+    "upload": {
+      "title": "Subir nuevo recurso",
+      "subtitle": "Completa la información y sube tu archivo a la biblioteca",
+      "titleLabel": "Título *",
+      "titlePlaceholder": "Ej: Introducción al curso",
+      "descriptionLabel": "Descripción",
+      "descriptionPlaceholder": "Describe el contenido de este recurso...",
+      "typeLabel": "Tipo de recurso *",
+      "typePlaceholder": "Selecciona el tipo",
+      "typeDocument": "Documento (PDF, Word, etc.)",
+      "typeVideo": "Video",
+      "typeAudio": "Audio",
+      "typeImage": "Imagen",
+      "typeLink": "Link externo",
+      "categoryLabel": "Categoría",
+      "categoryNew": "Nueva",
+      "categoryPlaceholder": "Nombre de categoría...",
+      "categorySelectPlaceholder": "Selecciona una categoría (opcional)",
+      "categoryNone": "Sin categoría",
+      "categoryEmpty": "No hay categorías disponibles",
+      "categoryCreated": "Categoría creada",
+      "categoryError": "Error al crear categoría",
+      "fileLabel": "Archivo *",
+      "noFileError": "No se ha subido ningún archivo",
+      "uploading": "Subiendo...",
+      "cancel": "Cancelar",
+      "submit": "Subir recurso",
+      "success": "Recurso subido exitosamente",
+      "error": "Error al subir el recurso"
+    },
+    "like": {
+      "liked": "¡Te gusta este recurso!",
+      "unliked": "Like removido"
+    },
+    "delete": {
+      "confirm": "¿Estás seguro de que quieres eliminar este recurso?",
+      "success": "Recurso eliminado"
+    },
+    "loadError": "Error al cargar la biblioteca",
+    "categories": {
+      "title": "Categorías",
+      "new": "Nueva",
+      "allResources": "Todos los recursos",
+      "noCategories": "No hay categorías aún",
+      "createFirst": "Crea la primera para organizar tus recursos",
+      "uncategorized": "Sin categoría",
+      "edit": "Editar",
+      "deleteLabel": "Eliminar"
+    },
+    "grid": {
+      "searchPlaceholder": "Buscar recursos...",
+      "sortNewest": "Más recientes",
+      "sortUpdated": "Actualizados recientemente",
+      "sortViews": "Más vistos",
+      "sortTitle": "Título (A-Z)",
+      "filterAll": "Todos",
+      "filterAudio": "Audio",
+      "filterVideo": "Video",
+      "filterDocuments": "Documentos",
+      "filterLinks": "Links",
+      "resource": "recurso",
+      "resources": "recursos",
+      "of": "de",
+      "noResults": "No se encontraron recursos",
+      "noResultsSearch": "No hay recursos que coincidan con tu búsqueda. Intenta con otros términos.",
+      "noResultsEmpty": "Esta comunidad aún no tiene recursos. ¡Sé el primero en compartir algo!",
+      "loading": "Cargando...",
+      "loadMore": "Cargar más"
+    }
+  },
   "comments": {
     "commentsLabel": "comentarios",
     "errors": {

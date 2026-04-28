@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { ResourceCard } from "./ResourceCard";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -45,21 +46,6 @@ interface ResourceGridProps {
   totalCount?: number;
 }
 
-const typeFilters = [
-  { value: "ALL", label: "Todos", icon: Grid3X3 },
-  { value: "AUDIO", label: "Audio", icon: Headphones },
-  { value: "VIDEO", label: "Video", icon: Video },
-  { value: "DOCUMENT", label: "Documentos", icon: FileText },
-  { value: "LINK", label: "Links", icon: ExternalLink },
-];
-
-const sortOptions = [
-  { value: "createdAt", label: "Más recientes" },
-  { value: "updatedAt", label: "Actualizados recientemente" },
-  { value: "viewCount", label: "Más vistos" },
-  { value: "title", label: "Título (A-Z)" },
-];
-
 export function ResourceGrid({
   resources,
   communitySlug,
@@ -73,11 +59,27 @@ export function ResourceGrid({
   onDelete,
   totalCount,
 }: ResourceGridProps) {
+  const t = useTranslations("library.grid");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState<ResourceType | "ALL">("ALL");
   const [sortBy, setSortBy] = useState<"createdAt" | "updatedAt" | "viewCount" | "title">("createdAt");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+
+  const typeFilters = [
+    { value: "ALL", label: t("filterAll"), icon: Grid3X3 },
+    { value: "AUDIO", label: t("filterAudio"), icon: Headphones },
+    { value: "VIDEO", label: t("filterVideo"), icon: Video },
+    { value: "DOCUMENT", label: t("filterDocuments"), icon: FileText },
+    { value: "LINK", label: t("filterLinks"), icon: ExternalLink },
+  ];
+
+  const sortOptions = [
+    { value: "createdAt", label: t("sortNewest") },
+    { value: "updatedAt", label: t("sortUpdated") },
+    { value: "viewCount", label: t("sortViews") },
+    { value: "title", label: t("sortTitle") },
+  ];
 
   const handleSearch = useCallback(
     (value: string) => {
@@ -143,7 +145,7 @@ export function ResourceGrid({
         <div className="flex-1 w-full lg:max-w-md relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Buscar recursos..."
+            placeholder={t("searchPlaceholder")}
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
             className="pl-10 h-11 bg-background/50"
@@ -241,9 +243,9 @@ export function ResourceGrid({
       {/* Results Count */}
       <div className="flex items-center justify-between text-sm text-muted-foreground">
         <p>
-          {resources.length} {resources.length === 1 ? "recurso" : "recursos"}
+          {resources.length} {resources.length === 1 ? t("resource") : t("resources")}
           {totalCount !== undefined && totalCount > resources.length && (
-            <span> de {totalCount}</span>
+            <span> {t("of")} {totalCount}</span>
           )}
         </p>
       </div>
@@ -289,11 +291,11 @@ export function ResourceGrid({
             <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
               <Search className="w-10 h-10 text-muted-foreground" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">No se encontraron recursos</h3>
+            <h3 className="text-xl font-semibold mb-2">{t("noResults")}</h3>
             <p className="text-muted-foreground max-w-md mx-auto">
               {searchQuery
-                ? "No hay recursos que coincidan con tu búsqueda. Intenta con otros términos."
-                : "Esta comunidad aún no tiene recursos. ¡Sé el primero en compartir algo!"}
+                ? t("noResultsSearch")
+                : t("noResultsEmpty")}
             </p>
           </motion.div>
         )}
@@ -309,7 +311,7 @@ export function ResourceGrid({
             disabled={isLoading}
             className="min-w-[200px]"
           >
-            {isLoading ? "Cargando..." : "Cargar más"}
+            {isLoading ? t("loading") : t("loadMore")}
           </Button>
         </div>
       )}

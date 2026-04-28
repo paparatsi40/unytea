@@ -524,7 +524,13 @@ export default function DashboardPage() {
   };
 
   const hasCommunity = metrics && metrics.communities > 0;
-  const hasSessions = upcomingSessions.length > 0;
+  const hasUpcomingSessions = upcomingSessions.length > 0;
+  const hasSessionsThisWeek = (metrics?.sessionsThisWeek || 0) > 0;
+  const hasSessions = hasUpcomingSessions || hasSessionsThisWeek;
+  const hasHostedSessions = (hostAnalytics?.sessionsHosted || 0) >= 1;
+  const scheduleCtaLabel = hasHostedSessions
+    ? "Schedule your next session"
+    : "Schedule your first session";
 
   const sessionToday = nextSession
     ? (() => {
@@ -542,14 +548,18 @@ export default function DashboardPage() {
     : false;
 
   const heroState: "no_sessions" | "today" | "upcoming" | "healthy" =
-    !hasSessions ? "no_sessions" : sessionToday ? "today" : sessionSoon ? "upcoming" : "healthy";
+    !hasUpcomingSessions ? "no_sessions" : sessionToday ? "today" : sessionSoon ? "upcoming" : "healthy";
 
   const heroContent =
     heroState === "no_sessions"
       ? {
-          title: "🚨 You have no sessions this week",
-          description: "Your community is at risk of losing momentum.",
-          cta: "Schedule your first session",
+          title: hasSessionsThisWeek
+            ? "🗓️ No upcoming sessions scheduled"
+            : "🚨 You have no sessions this week",
+          description: hasSessionsThisWeek
+            ? `You've hosted ${metrics?.sessionsThisWeek || 0} session${(metrics?.sessionsThisWeek || 0) === 1 ? "" : "s"} this week. Keep the momentum going.`
+            : "Your community is at risk of losing momentum.",
+          cta: scheduleCtaLabel,
           href: "/dashboard/sessions/create",
         }
       : heroState === "today"
@@ -1751,7 +1761,7 @@ export default function DashboardPage() {
                         size="sm"
                         className="mt-3"
                       >
-                        Schedule your first session
+                        {scheduleCtaLabel}
                       </Button>
                     </Link>
                   </div>

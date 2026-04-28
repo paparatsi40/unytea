@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
@@ -57,7 +57,7 @@
     "@trpc/next": "^11.0.0-rc.628",
     "@trpc/react-query": "^11.0.0-rc.628",
     "@trpc/server": "^11.0.0-rc.628",
-    "@uploadthing/react": "^6.6.0",
+    "@uploadthing/react": "^7.3.3",
     "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
@@ -90,7 +90,7 @@
     "svix": "^1.82.0",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
-    "uploadthing": "^6.12.0",
+    "uploadthing": "^7.7.4",
     "web-push": "^3.6.7",
     "zod": "^3.23.8",
     "zustand": "^5.0.1"

@@ -71,8 +71,6 @@ export default auth((req) => {
 
 export const config = {
   matcher: [
-    // Excluye Next.js internals, assets estáticos, API, PWA files y archivos SEO (sitemap.xml, robots.txt).
-    // Sin sitemap.xml/robots.txt en la lista negra, intlMiddleware redirigía /sitemap.xml -> /en/sitemap.xml -> 404.
-    "/((?!api|_next/static|_next/image|favicon.ico|manifest\\.json|sw\\.js|sitemap\\.xml|robots\\.txt|icons/|excalidraw-assets/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|woff2?|xml|txt)$).*)"
+
   ]
 }

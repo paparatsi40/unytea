@@ -5,6 +5,7 @@ import { SessionProvider } from "next-auth/react";
 import { Toaster } from "react-hot-toast";
 import { ServiceWorkerRegistrar } from "@/components/pwa/ServiceWorkerRegistrar";
 import { PWAInstallPrompt } from "@/components/pwa/PWAInstallPrompt";
+import { CookieConsent } from "@/components/gdpr/CookieConsent";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -141,6 +142,7 @@ export default async function RootLayout({
         <SessionProvider>
           {children}
           <PWAInstallPrompt />
+          <CookieConsent />
           <Toaster
             position="top-right"
             toastOptions={{

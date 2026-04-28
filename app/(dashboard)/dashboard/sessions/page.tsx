@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { getUserSessions } from "@/app/actions/sessions";
+import { prisma } from "@/lib/prisma";
 import { Video, Calendar, Clock, Play, Radio, Users, ArrowRight, VideoIcon, Sparkles, BellRing } from "lucide-react";
 import { CreateSessionDialog } from "@/components/sessions/CreateSessionDialog";
 import { format, isToday, isTomorrow, isThisWeek, formatDistanceToNow } from "date-fns";
@@ -29,6 +30,18 @@ export default async function SessionsPage() {
   if (!session?.user?.id) {
     redirect("/auth/signin");
   }
+
+  // Get user's primary community to associate new sessions
+  const userCommunity = await prisma.community.findFirst({
+    where: {
+      OR: [
+        { ownerId: session.user.id },
+        { members: { some: { userId: session.user.id, status: "ACTIVE" } } },
+      ],
+    },
+    select: { id: true },
+    orderBy: { createdAt: "asc" },
+  });
 
   const result = await getUserSessions();
 
@@ -93,6 +106,7 @@ export default async function SessionsPage() {
         </div>
         <CreateSessionDialog
           triggerText="Schedule Session"
+          communityId={userCommunity?.id}
           className="inline-flex items-center gap-2 rounded-full bg-purple-600 px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-purple-700"
         />
       </div>
@@ -203,6 +217,7 @@ export default async function SessionsPage() {
                 <div className="mt-6 flex items-center gap-4">
                   <CreateSessionDialog
                     triggerText="Schedule Session"
+                    communityId={userCommunity?.id}
                     className="inline-flex items-center gap-2 rounded-full bg-purple-600 px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-purple-700"
                   />
                   <span className="text-xs text-muted-foreground">Takes 2 minutes</span>
@@ -276,6 +291,7 @@ export default async function SessionsPage() {
                   </Link>
                   <CreateSessionDialog
                     triggerText="Edit"
+                    communityId={userCommunity?.id}
                     className="inline-flex items-center justify-center rounded-full border border-zinc-700 bg-transparent px-3 py-1.5 text-xs text-zinc-400 transition-all hover:bg-zinc-800 hover:text-zinc-200"
                   />
                 </div>

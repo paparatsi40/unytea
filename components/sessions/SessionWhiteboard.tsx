@@ -5,6 +5,7 @@ import { X, Image as ImageIcon, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 
+
 const Excalidraw = dynamic(
   async () => (await import("@excalidraw/excalidraw")).Excalidraw,
   {
@@ -92,7 +93,6 @@ export function SessionWhiteboard({ onClose, sessionId, embedded = false }: Sess
                 changeViewBackgroundColor: true,
                 clearCanvas: false,
                 export: false,
-                loadScene: false,
                 saveToActiveFile: false,
                 saveAsImage: false,
                 toggleTheme: false,

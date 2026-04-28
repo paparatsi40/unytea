@@ -23,6 +23,9 @@ import {
   TrendingUp,
   X,
   CreditCard,
+  Twitter,
+  Github,
+  Linkedin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -345,7 +348,7 @@ export default function Home() {
             {/* Live Sessions - Hero Feature (larger card) */}
             <div className="md:col-span-2 lg:col-span-1 lg:row-span-2">
               <FeatureCard
-                image="https://images.unsplash.com/photo-1609220136736-443140cffec6?auto=format&fit=crop&w=600&q=80"
+                image="https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b?auto=format&fit=crop&w=600&q=80"
                 title="🎥 Live Sessions"
                 description="Interactive video calls with whiteboard, screen sharing, and recordings. Our most loved feature."
                 highlighted
@@ -450,12 +453,14 @@ export default function Home() {
             </div>
             <ComparisonRow feature="Community Feed" skool="✓" unytea="✓" />
             <ComparisonRow feature="Courses" skool="✓" unytea="✓" />
-            <ComparisonRow feature="Live Sessions" skool="✗" unytea="✓" highlighted />
-            <ComparisonRow feature="Whiteboard" skool="✗" unytea="✓" highlighted />
+            <ComparisonRow feature="Live Video Sessions" skool="✓" unytea="✓" />
+            <ComparisonRow feature="Collaborative Whiteboard" skool="✗" unytea="✓" highlighted />
             <ComparisonRow feature="Screen Sharing" skool="✗" unytea="✓" highlighted />
             <ComparisonRow feature="AI Assistant" skool="✗" unytea="✓" highlighted />
-            <ComparisonRow feature="Live Video Sessions" skool="✗" unytea="✓" highlighted />
-            <ComparisonRow feature="Custom Domain" skool="✗" unytea="✓" />
+            <ComparisonRow feature="Certificates" skool="✗" unytea="✓" highlighted />
+            <ComparisonRow feature="Multi-language (i18n)" skool="✗" unytea="✓" highlighted />
+            <ComparisonRow feature="Custom Domain" skool="✗" unytea="✓" highlighted />
+            <ComparisonRow feature="Quizzes &amp; Assessments" skool="✗" unytea="✓" highlighted />
             <ComparisonRow feature="Transaction Fee" skool="10%" unytea="3-5%" highlighted />
           </div>
           <p className="text-center text-muted-foreground mt-6 text-sm">
@@ -536,7 +541,7 @@ export default function Home() {
               rating={5}
             />
             <TestimonialCard
-              quote="Finally switched from Skool and never looked back. The video features alone justify the move."
+              quote="The whiteboard, screen sharing, and AI assistant during live sessions changed how I run workshops. Nothing else offers this."
               author="Emma Williams"
               role="Community Founder"
               rating={5}
@@ -829,45 +834,56 @@ export default function Home() {
       {/* FOOTER */}
       <footer className="py-12 border-t bg-muted/30">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
+          <div className="grid md:grid-cols-5 gap-8 mb-8">
+            <div className="md:col-span-2">
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-8 h-8 bg-gradient-to-br from-primary to-purple-600 rounded-lg flex items-center justify-center">
                   <Sparkles className="w-5 h-5 text-white" />
                 </div>
                 <span className="text-xl font-bold">Unytea</span>
               </div>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground mb-4">
                 The live platform for community-based learning.
               </p>
+              <div className="flex items-center gap-3">
+                <a href="https://twitter.com/unytea" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors" aria-label="Twitter">
+                  <Twitter className="w-4 h-4" />
+                </a>
+                <a href="https://github.com/unytea" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors" aria-label="GitHub">
+                  <Github className="w-4 h-4" />
+                </a>
+                <a href="https://linkedin.com/company/unytea" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors" aria-label="LinkedIn">
+                  <Linkedin className="w-4 h-4" />
+                </a>
+              </div>
             </div>
             <div>
               <h4 className="font-semibold mb-4">Product</h4>
               <ul className="space-y-2 text-sm">
-                <li><Link href="#features" className="text-muted-foreground hover:text-foreground">Features</Link></li>
-                <li><Link href="#pricing" className="text-muted-foreground hover:text-foreground">Pricing</Link></li>
-                <li><Link href="#" className="text-muted-foreground hover:text-foreground">Changelog</Link></li>
+                <li><Link href="#features" className="text-muted-foreground hover:text-foreground transition-colors">Features</Link></li>
+                <li><Link href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors">Pricing</Link></li>
+                <li><Link href={`/${locale}/changelog`} className="text-muted-foreground hover:text-foreground transition-colors">Changelog</Link></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4">Resources</h4>
               <ul className="space-y-2 text-sm">
-                <li><Link href={`/${locale}/documentation`} className="text-muted-foreground hover:text-foreground">Documentation</Link></li>
-                <li><Link href={`/${locale}/explore`} className="text-muted-foreground hover:text-foreground">Community</Link></li>
-                <li><Link href={`/${locale}/blog`} className="text-muted-foreground hover:text-foreground">Blog</Link></li>
+                <li><Link href={`/${locale}/documentation`} className="text-muted-foreground hover:text-foreground transition-colors">Documentation</Link></li>
+                <li><Link href={`/${locale}/explore`} className="text-muted-foreground hover:text-foreground transition-colors">Community</Link></li>
+                <li><Link href={`/${locale}/blog`} className="text-muted-foreground hover:text-foreground transition-colors">Blog</Link></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4">Legal</h4>
               <ul className="space-y-2 text-sm">
-                <li><Link href={`/${locale}/privacy`} className="text-muted-foreground hover:text-foreground">Privacy</Link></li>
-                <li><Link href={`/${locale}/terms`} className="text-muted-foreground hover:text-foreground">Terms</Link></li>
-                <li><Link href={`/${locale}/cookies`} className="text-muted-foreground hover:text-foreground">Cookies</Link></li>
+                <li><Link href={`/${locale}/privacy`} className="text-muted-foreground hover:text-foreground transition-colors">Privacy</Link></li>
+                <li><Link href={`/${locale}/terms`} className="text-muted-foreground hover:text-foreground transition-colors">Terms</Link></li>
+                <li><Link href={`/${locale}/cookies`} className="text-muted-foreground hover:text-foreground transition-colors">Cookies</Link></li>
               </ul>
             </div>
           </div>
           <div className="pt-8 border-t text-center text-sm text-muted-foreground">
-            © 2025 Unytea. All rights reserved.
+            &copy; {new Date().getFullYear()} Unytea. All rights reserved.
           </div>
         </div>
       </footer>
