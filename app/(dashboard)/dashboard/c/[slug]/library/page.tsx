@@ -91,6 +91,9 @@ export default function LibraryPage() {
 
   // Fetch initial data
   const fetchData = useCallback(async () => {
+    // Guard: communitySlug puede ser undefined (early return abajo lo maneja en render).
+    // Salimos temprano aquí para que TypeScript narrow correctamente.
+    if (!communitySlug) return;
     setIsLoading(true);
     try {
       const [resourcesResult, categoriesResult, popularResult, continueResult] =
@@ -163,6 +166,7 @@ export default function LibraryPage() {
   );
 
   const handleLoadMore = useCallback(async () => {
+    if (!communitySlug) return;
     const nextPage = pagination.page + 1;
     const result = await getResources({
       communitySlug,
