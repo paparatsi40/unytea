@@ -1,4 +1,21 @@
 {
+  "common": {
+    "search": "Rechercher",
+    "continue": "Continuer",
+    "previous": "Précédent",
+    "back": "Retour",
+    "cancel": "Annuler",
+    "error": "Une erreur s'est produite",
+    "comingSoon": "Bientôt disponible",
+    "featureInDevelopment": "Fonctionnalité en développement",
+    "needHelp": "Besoin d'aide ?",
+    "contactSupport": "Contactez-nous à support@unytea.com",
+    "save": "Enregistrer",
+    "create": "Créer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "close": "Fermer"
+  },
   "sectionBuilder": {
     "sections": "Sections",
     "properties": "Propriétés",
@@ -23,7 +40,9 @@
     "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
     "invalidCredentials": "Email ou mot de passe invalide",
     "signInError": "Erreur de connexion",
-    "accountCreated": "Compte créé avec succès !"
+    "accountCreated": "Compte créé avec succès !",
+    "resetPassword": "Réinitialiser le mot de passe",
+    "passwordResetComingSoon": "La réinitialisation du mot de passe arrive bientôt. En attendant, contactez le support."
   },
   "landing": {
     "nav": {
@@ -222,6 +241,22 @@
       "close": "Fermer"
     }
   },
+  "communities": {
+    "stepBasicInfo": "Informations de Base",
+    "stepBasicInfoDesc": "Commencez avec l'essentiel",
+    "stepAppearance": "Apparence",
+    "stepAppearanceDesc": "Personnalisez l'apparence de votre communauté",
+    "stepLayout": "Mise en Page",
+    "stepLayoutDesc": "Choisissez la structure de votre communauté",
+    "stepSettings": "Paramètres",
+    "stepSettingsDesc": "Configurez l'accès et la confidentialité",
+    "stepPreview": "Aperçu",
+    "stepPreviewDesc": "Vérifiez avant de publier",
+    "descriptionPlaceholder": "Décrivez votre communauté, ce que les membres apprendront et pourquoi ils devraient la rejoindre...",
+    "backToCommunities": "Retour aux Communautés",
+    "communityName": "Nom de la Communauté",
+    "continue": "Continuer"
+  },
   "dashboard": {
     "title": "Tableau de Bord",
     "welcome": "Bienvenue",
@@ -270,7 +305,8 @@
   "navigation": {
     "messages": "Messages",
     "profile": "Profil",
-    "logout": "Se déconnecter"
+    "logout": "Se déconnecter",
+    "back": "Retour"
   },
   "onboarding": {
     "title": "Bienvenue sur Unytea !",

@@ -5,6 +5,11 @@
     "previous": "Anterior",
     "back": "Volver",
     "cancel": "Cancelar",
+    "error": "Algo salió mal",
+    "comingSoon": "Próximamente",
+    "featureInDevelopment": "Función en desarrollo",
+    "needHelp": "¿Necesitas ayuda?",
+    "contactSupport": "Contáctanos en support@unytea.com",
     "save": "Guardar",
     "create": "Crear",
     "delete": "Eliminar",
@@ -35,7 +40,9 @@
     "passwordsDoNotMatch": "Las contraseñas no coinciden",
     "invalidCredentials": "Correo o contraseña inválidos",
     "signInError": "Error al iniciar sesión",
-    "accountCreated": "¡Cuenta creada exitosamente!"
+    "accountCreated": "¡Cuenta creada exitosamente!",
+    "resetPassword": "Restablecer contraseña",
+    "passwordResetComingSoon": "El restablecimiento de contraseña llega pronto. Mientras tanto, contacta a soporte."
   },
   "landing": {
     "nav": {
@@ -299,7 +306,8 @@
   "navigation": {
     "messages": "Mensajes",
     "profile": "Perfil",
-    "logout": "Cerrar sesión"
+    "logout": "Cerrar sesión",
+    "back": "Atrás"
   },
   "onboarding": {
     "title": "¡Bienvenido a Unytea!",
