@@ -86,14 +86,8 @@ export default function LibraryPage() {
   const [newCategoryName, setNewCategoryName] = useState("");
   const [isCreatingCategorySubmitting, setIsCreatingCategorySubmitting] = useState(false);
 
-  // Early return after all hooks are declared
-  if (!communitySlug) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p>Community not found</p>
-      </div>
-    );
-  }
+  // NOTE: All hooks (useCallback, useEffect) must be called before any early return
+  // (Rules of Hooks). The "Community not found" guard moved further down.
 
   // Fetch initial data
   const fetchData = useCallback(async () => {
@@ -218,6 +212,15 @@ export default function LibraryPage() {
       toast.error(result.error);
     }
   }, [t]);
+
+  // Early return after ALL hooks are declared (Rules of Hooks).
+  if (!communitySlug) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p>Community not found</p>
+      </div>
+    );
+  }
 
   // Filter resources based on active tab
   const getFilteredResources = () => {

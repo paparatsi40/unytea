@@ -48,12 +48,8 @@ type Post = {
 
 export function PremiumPostCard({ post, canModeratePost = false }: { post: Post; canModeratePost?: boolean }) {
   const { user } = useCurrentUser();
-  
-  // If this is a session announcement, render the special card
-  if (post.contentType === "SESSION_ANNOUNCEMENT") {
-    return <SessionAnnouncementCard post={post} />;
-  }
-  
+
+  // IMPORTANT: All hooks must be called BEFORE any early return (Rules of Hooks).
   const [showMenu, setShowMenu] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -67,7 +63,13 @@ export function PremiumPostCard({ post, canModeratePost = false }: { post: Post;
   const [isPinned, setIsPinned] = useState(Boolean(post.isPinned));
   const [isPinToggling, setIsPinToggling] = useState(false);
   const [commentCount, setCommentCount] = useState(post._count?.comments ?? 0);
-  
+
+  // If this is a session announcement, render the special card.
+  // Early return must come AFTER all hooks above.
+  if (post.contentType === "SESSION_ANNOUNCEMENT") {
+    return <SessionAnnouncementCard post={post} />;
+  }
+
   const authorName = post.author.name || "Anonymous";
   const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
   const isAuthor = user?.id === post.author.id;

@@ -1,0 +1,527 @@
+
+> unytea-web@0.1.0 lint
+> next lint
+
+
+./app/(dashboard)/dashboard/layout.tsx
+10:32  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/(dashboard)/dashboard/c/[slug]/buddy/page.tsx
+16:6  Warning: React Hook useEffect has a missing dependency: 'loadCommunity'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/(dashboard)/dashboard/c/[slug]/chat/page.tsx
+30:6  Warning: React Hook useEffect has a missing dependency: 'loadChannels'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/(dashboard)/dashboard/c/[slug]/leaderboard/page.tsx
+17:6  Warning: React Hook useEffect has a missing dependency: 'loadCommunity'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/(dashboard)/dashboard/c/[slug]/members/page.tsx
+16:6  Warning: React Hook useEffect has a missing dependency: 'loadCommunity'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/(dashboard)/dashboard/c/[slug]/settings/landing/page.tsx
+23:6  Warning: React Hook useEffect has a missing dependency: 'fetchCommunityData'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/(dashboard)/dashboard/c/[slug]/settings/payments/page.tsx
+107:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+164:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/(dashboard)/dashboard/c/[slug]/library/[resourceId]/page.tsx
+63:44  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+95:26  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/(dashboard)/dashboard/c/[slug]/library/page.tsx
+50:46  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+51:48  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+52:60  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+53:60  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+99:21  Warning: React Hook "useCallback" is called conditionally. React Hooks must be called in the exact same order in every component render.  react-hooks/rules-of-hooks
+144:3  Warning: React Hook "useEffect" is called conditionally. React Hooks must be called in the exact same order in every component render.  react-hooks/rules-of-hooks
+149:24  Warning: React Hook "useCallback" is called conditionally. React Hooks must be called in the exact same order in every component render.  react-hooks/rules-of-hooks
+154:30  Warning: React Hook "useCallback" is called conditionally. React Hooks must be called in the exact same order in every component render.  react-hooks/rules-of-hooks
+171:26  Warning: React Hook "useCallback" is called conditionally. React Hooks must be called in the exact same order in every component render.  react-hooks/rules-of-hooks
+190:22  Warning: React Hook "useCallback" is called conditionally. React Hooks must be called in the exact same order in every component render.  react-hooks/rules-of-hooks
+208:24  Warning: React Hook "useCallback" is called conditionally. React Hooks must be called in the exact same order in every component render.  react-hooks/rules-of-hooks
+
+./app/(dashboard)/dashboard/c/[slug]/about/page.tsx
+38:6  Warning: React Hook useEffect has a missing dependency: 'loadCommunity'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+91:11  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+165:15  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./app/(dashboard)/dashboard/c/[slug]/feed/page.tsx
+145:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/(dashboard)/dashboard/c/[slug]/courses/[courseId]/page.tsx
+188:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+213:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+256:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+293:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/(dashboard)/dashboard/c/[slug]/courses/page.tsx
+366:19  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./app/(dashboard)/dashboard/communities/explore/page.tsx
+193:21  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+207:25  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./app/(dashboard)/dashboard/communities/new/page.tsx
+467:25  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+476:29  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+707:25  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+718:27  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./app/(dashboard)/dashboard/communities/[communityId]/sessions/page.tsx
+46:50  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+114:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/(dashboard)/dashboard/courses/[courseId]/page.tsx
+60:6  Warning: React Hook useEffect has a missing dependency: 'loadCourseData'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+106:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/(dashboard)/dashboard/messages/page.tsx
+201:23  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+369:31  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./app/(dashboard)/dashboard/sessions/[sessionId]/room/page.tsx
+23:52  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/(dashboard)/dashboard/sessions/[sessionId]/video/page.tsx
+54:6  Warning: React Hook useEffect has missing dependencies: 'checkFeedbackStatus' and 'fetchSession'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/(dashboard)/dashboard/sessions/[sessionId]/page.tsx
+46:42  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+67:6  Warning: React Hook useEffect has a missing dependency: 'loadSession'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+115:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/(dashboard)/dashboard/settings/privacy/page.tsx
+49:56  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+70:52  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/(dashboard)/dashboard/settings/profile/page.tsx
+72:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./app/(dashboard)/dashboard/agenda/page.tsx
+128:25  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./app/(dashboard)/dashboard/knowledge-library/page.tsx
+45:13  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/(dashboard)/dashboard/page.tsx
+441:78  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/actions/community-builder.ts
+108:13  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+111:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+143:28  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+173:15  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+175:16  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/actions/resources.ts
+48:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+48:38  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+111:24  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+148:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+211:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+251:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+400:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+421:20  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+505:38  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+520:18  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+621:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+695:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+836:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+887:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/actions/communities.ts
+75:43  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/actions/public-sessions.ts
+17:52  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+220:43  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+266:12  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/actions/session-course.ts
+90:5  Warning: Do not assign to the variable `module`. See: https://nextjs.org/docs/messages/no-assign-module-variable  @next/next/no-assign-module-variable
+311:5  Warning: Do not assign to the variable `module`. See: https://nextjs.org/docs/messages/no-assign-module-variable  @next/next/no-assign-module-variable
+
+./app/actions/knowledge-library.ts
+19:24  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+76:44  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+133:63  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+134:64  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+137:50  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+153:41  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+154:44  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+194:45  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+221:46  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+227:41  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+249:24  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+412:5  Warning: Do not assign to the variable `module`. See: https://nextjs.org/docs/messages/no-assign-module-variable  @next/next/no-assign-module-variable
+
+./app/actions/public-content.ts
+70:34  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+158:33  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+238:43  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+249:37  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/actions/community-feed.ts
+207:38  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/actions/livekit.ts
+362:38  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/actions/webhooks.ts
+100:41  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+155:42  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+225:47  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+275:45  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+318:43  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+354:43  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+383:41  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+523:12  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+528:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/actions/session-ai.ts
+51:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+63:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/actions/autopilot.ts
+30:51  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+31:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+170:53  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+170:72  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+271:16  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+308:16  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+346:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+386:16  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+423:32  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+439:31  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/actions/posts.ts
+58:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/actions/achievements.ts
+295:44  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+297:16  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/actions/courses.ts
+264:5  Warning: Do not assign to the variable `module`. See: https://nextjs.org/docs/messages/no-assign-module-variable  @next/next/no-assign-module-variable
+301:5  Warning: Do not assign to the variable `module`. See: https://nextjs.org/docs/messages/no-assign-module-variable  @next/next/no-assign-module-variable
+
+./app/actions/dashboard.ts
+801:55  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+911:55  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+1273:55  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2055:38  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/actions/sessions.ts
+34:24  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+117:18  Warning: 'e' is defined but never used.  @typescript-eslint/no-unused-vars
+253:38  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+257:36  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+459:32  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+471:35  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+619:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+1098:50  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+1365:12  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/communities/[slug]/posts/route.ts
+90:46  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+107:47  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/stripe/webhook/route.ts
+24:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+37:46  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+98:46  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+204:46  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+219:51  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+240:51  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/stripe/course-checkout/route.ts
+184:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/courses/[courseId]/purchase-status/route.ts
+83:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/courses/[courseId]/route.ts
+61:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/courses/progress/route.ts
+82:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/feed/posts/route.ts
+90:49  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+118:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/events/upcoming/route.ts
+85:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/achievements/recent/route.ts
+54:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/[locale]/page.tsx
+280:19  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+297:19  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+314:19  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+928:11  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+967:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+1020:71  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/analytics/CommunitySelector.tsx
+7:50  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/analytics/AnalyticsCharts.tsx
+511:31  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/auditorium/AuditoriumSpace.tsx
+38:6  Warning: React Hook useEffect has a missing dependency: 'loadOnlineMembers'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./components/buddy/BuddyDashboard.tsx
+170:25  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+312:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+611:27  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/community/CommentItem.tsx
+75:15  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/community/layouts/AcademyLayout.tsx
+31:13  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+32:17  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+290:11  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/community/layouts/ClassicForumLayout.tsx
+27:11  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+28:13  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+29:17  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+273:9  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/community/layouts/DashboardLayout.tsx
+31:11  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+32:13  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+342:9  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+386:9  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/community/layouts/MinimalistLayout.tsx
+30:11  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+31:13  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+32:13  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/community/layouts/ModernGridLayout.tsx
+33:11  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+34:13  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+35:13  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/community/CommentSection.tsx
+58:6  Warning: React Hook useEffect has missing dependencies: 'initialComments.length' and 'loadComments'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
+
+./components/community/PostCard.tsx
+88:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/community/PostFeed.tsx
+67:34  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+116:19  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/community/PostReactions.tsx
+35:6  Warning: React Hook useEffect has a missing dependency: 'loadReactions'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./components/community/PremiumPostCard.tsx
+57:35  Warning: React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render.  react-hooks/rules-of-hooks
+58:43  Warning: React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render.  react-hooks/rules-of-hooks
+59:37  Warning: React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render.  react-hooks/rules-of-hooks
+60:37  Warning: React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render.  react-hooks/rules-of-hooks
+61:41  Warning: React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?  react-hooks/rules-of-hooks
+62:39  Warning: React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?  react-hooks/rules-of-hooks
+63:35  Warning: React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?  react-hooks/rules-of-hooks
+64:37  Warning: React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?  react-hooks/rules-of-hooks
+65:43  Warning: React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?  react-hooks/rules-of-hooks
+66:45  Warning: React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?  react-hooks/rules-of-hooks
+67:35  Warning: React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?  react-hooks/rules-of-hooks
+68:45  Warning: React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?  react-hooks/rules-of-hooks
+69:43  Warning: React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?  react-hooks/rules-of-hooks
+179:15  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+318:50  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+329:23  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/community/PremiumPostFeed.tsx
+122:6  Warning: React Hook useEffect has a missing dependency: 'title'. Either include it or remove the dependency array. You can also do a functional update 'setTitle(t => ...)' if you only need 'title' in the 'setTitle' call.  react-hooks/exhaustive-deps
+475:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/community/SessionAnnouncementCard.tsx
+71:3  Warning: React Hook "useEffect" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?  react-hooks/rules-of-hooks
+
+./components/community/PremiumCommunityHeader.tsx
+40:11  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+54:15  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/courses/CourseCard.tsx
+8:11  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/gamification/Leaderboard.tsx
+31:6  Warning: React Hook useEffect has a missing dependency: 'loadLeaderboard'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+125:21  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/live-session/SegmentedChat.tsx
+280:11  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/members/MemberCard.tsx
+61:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/members/MemberDirectory.tsx
+13:42  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+14:58  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+22:6  Warning: React Hook useEffect has a missing dependency: 'loadMembers'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+26:6  Warning: React Hook useEffect has a missing dependency: 'applyFilters'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+87:56  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/messages/ConversationList.tsx
+12:61  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+26:54  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+27:70  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+35:39  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+41:41  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+45:41  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+57:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+63:45  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+71:45  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+102:6  Warning: React Hook useEffect has a missing dependency: 'loadConversations'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+129:6  Warning: React Hook useEffect has a missing dependency: 'getOtherUser'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+242:27  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/messages/MessageBubble.tsx
+87:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+106:19  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/messages/MessageThread.tsx
+52:44  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+141:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/notifications/NotificationCenter.tsx
+17:10  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+41:48  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/notifications/NotificationDropdown.tsx
+13:54  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/notifications/NotificationItem.tsx
+26:12  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+111:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+111:13  Warning: img elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+
+./components/notifications/NotificationList.tsx
+13:10  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/section-builder/types.ts
+31:32  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+32:34  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+38:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/section-builder/sections/CTA.tsx
+6:49  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/section-builder/sections/FAQ.tsx
+7:49  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/section-builder/sections/Features.tsx
+6:54  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/section-builder/sections/Gallery.tsx
+6:53  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+22:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/section-builder/sections/Hero.tsx
+6:50  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+33:15  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/section-builder/sections/OwnerBio.tsx
+6:54  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+29:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/section-builder/sections/Stats.tsx
+6:51  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/section-builder/sections/Testimonials.tsx
+6:58  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/section-builder/SectionBuilder.tsx
+90:15  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+193:72  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/sessions/SessionCard.tsx
+13:12  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/sessions/SessionNotesEditor.tsx
+87:6  Warning: React Hook useEffect has a missing dependency: 'handleAutoSave'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./components/sessions/PublicSessionPage.tsx
+223:6  Warning: React Hook useEffect has a missing dependency: 'nextSession'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./components/sessions/AddToCourseDialog.tsx
+77:6  Warning: React Hook useEffect has a missing dependency: 'fetchCourses'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+88:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+119:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+152:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./components/sessions/VideoRoomUI.tsx
+576:21  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/ui/error-boundary.tsx
+27:46  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/ui/image-uploader.tsx
+64:9  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/ui/input.tsx
+5:18  Warning: An interface declaring no members is equivalent to its supertype.  @typescript-eslint/no-empty-object-type
+5:18  Warning: An interface declaring no members is equivalent to its supertype.  @typescript-eslint/no-empty-interface
+
+./components/ui/textarea.tsx
+5:18  Warning: An interface declaring no members is equivalent to its supertype.  @typescript-eslint/no-empty-object-type
+5:18  Warning: An interface declaring no members is equivalent to its supertype.  @typescript-eslint/no-empty-interface
+
+./components/upload/ImageGallery.tsx
+35:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+64:11  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/upload/FileUpload.tsx
+27:38  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+28:42  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+139:21  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/video-call/EnhancedVideoCall.tsx
+165:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+166:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+202:6  Warning: React Hook useEffect has a missing dependency: 'handleVoteReceived'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+272:48  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/visual-builder/VisualBuilder.tsx
+193:15  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/library/ResourceGrid.tsx
+32:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/knowledge-library/CreateCourseFromSessionsDialog.tsx
+144:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./components/public-content/CreateSocialClipDialog.tsx
+93:6  Warning: React Hook useEffect has a missing dependency: 'loadMoments'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+109:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+133:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+264:25  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/pwa/PushNotificationManager.tsx
+37:6  Warning: React Hook useEffect has a missing dependency: 'checkSubscription'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./lib/api/communities.ts
+130:13  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./lib/audit-log.ts
+29:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+96:57  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+102:60  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./lib/openai.ts
+102:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./lib/auth.ts
+37:37  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules

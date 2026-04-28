@@ -261,7 +261,7 @@ export async function createModule(data: {
       return { success: false, error: "Unauthorized" };
     }
 
-    const module = await prisma.module.create({
+    const courseModule = await prisma.module.create({
       data: {
         title: data.title,
         description: data.description,
@@ -271,7 +271,7 @@ export async function createModule(data: {
     });
 
     revalidatePath(`/dashboard/courses/${data.courseId}`);
-    return { success: true, module };
+    return { success: true, module: courseModule };
   } catch (error) {
     console.error("Error creating module:", error);
     return { success: false, error: "Failed to create module" };
@@ -298,7 +298,7 @@ export async function createLesson(data: {
       return { success: false, error: "Not authenticated" };
     }
 
-    const module = await prisma.module.findUnique({
+    const courseModule = await prisma.module.findUnique({
       where: { id: data.moduleId },
       include: {
         course: {
@@ -307,7 +307,7 @@ export async function createLesson(data: {
       },
     });
 
-    if (!module || module.course.community.ownerId !== userId) {
+    if (!courseModule || courseModule.course.community.ownerId !== userId) {
       return { success: false, error: "Unauthorized" };
     }
 
@@ -325,7 +325,7 @@ export async function createLesson(data: {
       },
     });
 
-    revalidatePath(`/dashboard/courses/${module.courseId}`);
+    revalidatePath(`/dashboard/courses/${courseModule.courseId}`);
     return { success: true, lesson };
   } catch (error) {
     console.error("Error creating lesson:", error);

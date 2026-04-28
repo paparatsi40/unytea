@@ -87,7 +87,7 @@ export async function addSessionToCourse(
 
     // Determine which module to use
     let moduleId = options?.moduleId;
-    let module;
+    let courseModule;
 
     if (!moduleId) {
       // Look for existing "Live Sessions" or "Session Recordings" module
@@ -97,14 +97,14 @@ export async function addSessionToCourse(
 
       if (liveSessionsModule) {
         moduleId = liveSessionsModule.id;
-        module = liveSessionsModule;
+        courseModule = liveSessionsModule;
       } else {
         // Create a new "Live Sessions" module
-        const lastPosition = course.modules.length > 0 
-          ? Math.max(...course.modules.map(m => m.position)) 
+        const lastPosition = course.modules.length > 0
+          ? Math.max(...course.modules.map(m => m.position))
           : 0;
 
-        module = await prisma.module.create({
+        courseModule = await prisma.module.create({
           data: {
             title: "Live Sessions",
             description: "Recorded live sessions from the community",
@@ -112,14 +112,14 @@ export async function addSessionToCourse(
             courseId: courseId,
           },
         });
-        moduleId = module.id;
+        moduleId = courseModule.id;
       }
     } else {
       // Verify module belongs to course
-      module = await prisma.module.findFirst({
+      courseModule = await prisma.module.findFirst({
         where: { id: moduleId, courseId: courseId },
       });
-      if (!module) {
+      if (!courseModule) {
         return { success: false, error: "Module not found in this course" };
       }
     }
@@ -308,7 +308,7 @@ export async function createCourseFromSession(
     });
 
     // Create initial module
-    const module = await prisma.module.create({
+    const courseModule = await prisma.module.create({
       data: {
         title: "Session Recording",
         description: "Recorded live session",
@@ -331,7 +331,7 @@ export async function createCourseFromSession(
         videoUrl: session.recordingUrl || session.recording?.url || "",
         duration: session.duration,
         position: 1,
-        moduleId: module.id,
+        moduleId: courseModule.id,
         isFree: !options?.isPaid,
         isPublished: true,
       },

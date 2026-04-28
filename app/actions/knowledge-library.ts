@@ -409,7 +409,7 @@ export async function createCourseFromSessions(
     });
 
     // Create module for the sessions
-    const module = await prisma.module.create({
+    const courseModule = await prisma.module.create({
       data: {
         title: "Live Sessions",
         description: "Recorded live sessions from the community",
@@ -423,7 +423,7 @@ export async function createCourseFromSessions(
     for (let i = 0; i < sessions.length; i++) {
       const session = sessions[i];
       const recordingUrl = session.recordingUrl || session.recording?.url || "";
-      
+
       // Build content from notes
       let content = "";
       if (session.notes?.content) {
@@ -439,7 +439,7 @@ export async function createCourseFromSessions(
           videoUrl: recordingUrl,
           duration: session.duration,
           position: i + 1,
-          moduleId: module.id,
+          moduleId: courseModule.id,
           isFree: i === 0 && sessions.length > 1, // First lesson free as preview if multiple
           isPublished: true,
         },
