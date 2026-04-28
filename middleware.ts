@@ -8,7 +8,11 @@ const defaultLocale = "en"
 const intlMiddleware = createIntlMiddleware({
   locales: [...locales],
   defaultLocale,
-  localePrefix: "always"
+  localePrefix: "always",
+  // Desactivamos NEXT_LOCALE cookie. Como localePrefix: "always", la URL siempre
+  // tiene el locale (/en, /es, /fr), no necesitamos el cookie para persistir.
+  // Esto elimina Set-Cookie en marketing pages y permite cache CDN.
+  localeCookie: false,
 })
 
 /**
