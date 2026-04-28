@@ -161,16 +161,16 @@ export default function Home() {
                   <div className="flex items-center gap-3">
                     <div className="relative">
                       <div className="absolute -inset-1 bg-red-500 rounded-full animate-pulse" />
-                      <div className="relative px-3 py-1 bg-red-500 rounded-full text-xs font-bold">LIVE</div>
+                      <div className="relative px-3 py-1 bg-red-500 rounded-full text-xs font-bold">{t("hero.demo.live")}</div>
                     </div>
                     <div>
-                      <div className="font-bold text-slate-900 tracking-tight">Community Masterclass</div>
-                      <div className="text-sm text-slate-700">How to Scale Your Coaching Business</div>
+                      <div className="font-bold text-slate-900 tracking-tight">{t("hero.demo.sessionTitle")}</div>
+                      <div className="text-sm text-slate-700">{t("hero.demo.sessionSubtitle")}</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-slate-800 font-semibold">
                     <Users className="w-4 h-4" />
-                    <span>247 attending</span>
+                    <span>{t("hero.demo.attending", { count: 247 })}</span>
                   </div>
                 </div>
                 
@@ -181,7 +181,7 @@ export default function Home() {
                     <div className="relative w-16 h-16 bg-primary rounded-full flex items-center justify-center">
                       <Video className="w-8 h-8" />
                     </div>
-                    <div className="absolute bottom-2 left-2 px-2 py-1 bg-slate-900/85 border border-white/20 rounded text-xs font-semibold text-white">You (Host)</div>
+                    <div className="absolute bottom-2 left-2 px-2 py-1 bg-slate-900/85 border border-white/20 rounded text-xs font-semibold text-white">{t("hero.demo.youHost")}</div>
                   </div>
                   <div className="bg-slate-700/80 ring-1 ring-white/10 rounded-xl aspect-video flex items-center justify-center relative">
                     <div className="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center">
@@ -200,7 +200,7 @@ export default function Home() {
                       <span className="text-lg">👩</span>
                     </div>
                     <div className="absolute bottom-2 left-2 px-2 py-1 bg-slate-900/85 border border-white/20 rounded text-xs font-semibold text-white">Lisa K.</div>
-                    <div className="absolute bottom-2 right-2 px-2 py-1 bg-slate-900/90 border border-white/20 rounded text-xs font-semibold text-white">+24 more</div>
+                    <div className="absolute bottom-2 right-2 px-2 py-1 bg-slate-900/90 border border-white/20 rounded text-xs font-semibold text-white">{t("hero.demo.moreAttendees", { count: 24 })}</div>
                   </div>
                 </div>
                 
@@ -209,15 +209,15 @@ export default function Home() {
                   <div className="space-y-2 text-sm">
                     <div className="flex gap-2">
                       <span className="text-slate-500 font-medium">Mike:</span>
-                      <span className="text-slate-900">This is exactly what I needed! 🔥</span>
+                      <span className="text-slate-900">{t("hero.demo.chatMessage1")}</span>
                     </div>
                     <div className="flex gap-2">
                       <span className="text-slate-500 font-medium">Sarah:</span>
-                      <span className="text-slate-900">Great tips on pricing</span>
+                      <span className="text-slate-900">{t("hero.demo.chatMessage2")}</span>
                     </div>
                     <div className="flex gap-2">
                       <span className="text-slate-500 font-medium">Lisa:</span>
-                      <span className="text-slate-900">Can you share the template?</span>
+                      <span className="text-slate-900">{t("hero.demo.chatMessage3")}</span>
                     </div>
                   </div>
                 </div>
