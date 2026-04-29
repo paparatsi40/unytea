@@ -1428,3 +1428,15 @@ enum ReportTargetType {
   USER
   MESSAGE
 }
+
+// Tracks Stripe webhook events we've already processed.
+// Prevents double-processing if Stripe retries delivery (which it does on timeouts).
+// The Stripe event ID is the primary key — atomic INSERT acts as the idempotency check.
+model ProcessedStripeEvent {
+  id          String   @id // Stripe event id, e.g. "evt_1ABC..."
+  type        String
+  processedAt DateTime @default(now())
+
+  @@index([processedAt]) // for cleanup queries (delete events older than X days)
+  @@map("processed_stripe_events")
+}
