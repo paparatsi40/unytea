@@ -88,6 +88,35 @@ const authMiddleware = auth((req) => {
     return intlMiddleware(req)
   }
 
+  // For /auth/* (no locale prefix), prefer the locale of the page the visitor
+  // came from (Referer) over next-intl's Accept-Language fallback. Otherwise a
+  // visitor who was on /es/* and clicks "Sign in" lands on /en/auth/signin
+  // because their browser's Accept-Language is English. Bookmarks and external
+  // links still fall through to the default detection below.
+  if (pathname.startsWith("/auth")) {
+    const referer = req.headers.get("referer")
+    if (referer) {
+      try {
+        const refererFirstSeg = new URL(referer).pathname
+          .split("/")
+          .filter(Boolean)[0]
+        if (
+          refererFirstSeg &&
+          (locales as readonly string[]).includes(refererFirstSeg)
+        ) {
+          return NextResponse.redirect(
+            new URL(
+              `/${refererFirstSeg}${pathname}${req.nextUrl.search}`,
+              req.url
+            )
+          )
+        }
+      } catch {
+        // Malformed Referer header — ignore and fall through.
+      }
+    }
+  }
+
   // Rutas públicas sin locale (como /auth/*): aplicar intlMiddleware para redirigir a /{locale}/*
   const intlResponse = intlMiddleware(req)
   if (intlResponse.status === 307 || intlResponse.status === 308) {

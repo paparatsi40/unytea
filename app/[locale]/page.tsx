@@ -82,14 +82,14 @@ export default function Home() {
             ) : (
               <>
                 <Link
-                  href="/auth/signin"
+                  href={`/${locale}/auth/signin`}
                   className="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors"
                 >
                   <LogIn className="w-4 h-4" />
                   {authT("signIn")}
                 </Link>
                 <Link
-                  href="/auth/signup"
+                  href={`/${locale}/auth/signup`}
                   className="btn-hover-lift px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium shadow-smooth flex items-center gap-2"
                 >
                   <UserPlus className="w-4 h-4" />
@@ -122,7 +122,7 @@ export default function Home() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Link
-                  href="/auth/signup"
+                  href={`/${locale}/auth/signup`}
                   className="btn-hover-lift px-8 py-4 bg-primary text-primary-foreground rounded-xl font-semibold shadow-lg flex items-center justify-center gap-2"
                 >
                   {t("hero.cta.primary")}
@@ -428,7 +428,7 @@ export default function Home() {
             <StepCard number={5} title="Monetize" description="Set up pricing, subscriptions, and start earning revenue." />
           </div>
           <div className="text-center mt-12">
-            <Link href="/auth/signup">
+            <Link href={`/${locale}/auth/signup`}>
               <Button size="lg" className="px-8">
                 Start Building Free <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
@@ -583,6 +583,7 @@ export default function Home() {
               ]}
               cta="Start free"
               footnote="Validate your first community idea."
+              locale={locale}
             />
             <PricingCard
               name="Creator"
@@ -600,6 +601,7 @@ export default function Home() {
               ]}
               cta="Choose Creator"
               footnote="Launch, sell, and grow one community."
+              locale={locale}
             />
             <PricingCard
               name="Business"
@@ -619,6 +621,7 @@ export default function Home() {
               popular
               popularLabel="Recommended"
               footnote="Run a serious community business with deeper insights."
+              locale={locale}
             />
             <PricingCard
               name="Pro"
@@ -635,6 +638,7 @@ export default function Home() {
               ]}
               cta="Choose Pro"
               footnote="Manage multiple communities at scale."
+              locale={locale}
             />
           </div>
 
@@ -824,7 +828,7 @@ export default function Home() {
             Create your community, invite members, and host your first live session — all in less than 5 minutes.
           </p>
           <Link
-            href="/auth/signup"
+            href={`/${locale}/auth/signup`}
             className="inline-flex items-center gap-2 px-8 py-4 bg-white text-primary rounded-xl font-bold text-lg hover:bg-white/90 transition-colors"
           >
             Create Your Community Free
@@ -1062,6 +1066,7 @@ function PricingCard({
   popularLabel = "Recommended",
   cta,
   footnote,
+  locale,
 }: {
   name: string;
   price: number;
@@ -1071,6 +1076,7 @@ function PricingCard({
   popularLabel?: string;
   cta: string;
   footnote?: string;
+  locale: string;
 }) {
   return (
     <div className={`relative p-6 rounded-xl border bg-white ${popular ? "border-primary ring-2 ring-primary/20" : "border-border"}`}>
@@ -1095,7 +1101,7 @@ function PricingCard({
           </li>
         ))}
       </ul>
-      <Link href="/auth/signup">
+      <Link href={`/${locale}/auth/signup`}>
         <Button className="w-full" variant={popular ? "default" : "outline"}>
           {cta}
         </Button>
