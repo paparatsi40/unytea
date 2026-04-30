@@ -2,7 +2,6 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { Clock, Flame } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ExploreFilters } from "@/components/explore/ExploreFilters";
 import { ExploreInfiniteFeed } from "@/components/explore/ExploreInfiniteFeed";
