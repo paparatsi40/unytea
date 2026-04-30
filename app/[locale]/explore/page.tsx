@@ -193,6 +193,9 @@ export default async function ExploreCommunitiesPage({
       coverImageUrl: true,
       primaryColor: true,
       secondaryColor: true,
+      heroSubtitle: true,
+      welcomeMessage: true,
+      pricing: true,
       settings: true,
       isPaid: true,
       createdAt: true,
@@ -641,9 +644,36 @@ export default async function ExploreCommunitiesPage({
                     {/* Body */}
                     <div className="flex flex-grow flex-col p-5 pt-8">
                       <h3 className="text-lg font-semibold text-foreground">{community.name}</h3>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        {community.description?.trim() || "Learn with live sessions and community."}
-                      </p>
+
+                      {/* Description (only if owner set one) */}
+                      {community.description?.trim() ? (
+                        <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
+                          {community.description}
+                        </p>
+                      ) : (
+                        <p className="mt-1 text-sm italic text-muted-foreground/60">
+                          No description yet
+                        </p>
+                      )}
+
+                      {/* Tagline (heroSubtitle as value prop, if set) */}
+                      {community.heroSubtitle && (
+                        <p className="mt-2 line-clamp-2 text-xs italic text-foreground/70">
+                          “{community.heroSubtitle}”
+                        </p>
+                      )}
+
+                      {/* Category + language badges */}
+                      <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                        <Badge variant="secondary" className="text-xs font-normal">
+                          {community.category}
+                        </Badge>
+                        {community.language && community.language !== "Any" && (
+                          <Badge variant="secondary" className="text-xs font-normal">
+                            🌍 {community.language}
+                          </Badge>
+                        )}
+                      </div>
 
                       {/* Host with avatar */}
                       <div className="mt-3 flex items-center gap-2">
@@ -665,10 +695,28 @@ export default async function ExploreCommunitiesPage({
                         </div>
                       </div>
 
+                      {/* Session schedule */}
                       <p className="mt-3 text-sm font-medium text-foreground">🟢 {nextSessionText}</p>
                       {seriesIdentity && <p className="text-xs text-muted-foreground">{seriesIdentity}</p>}
-                      <p className="text-sm text-muted-foreground">🔥 {socialProof}</p>
-                      <p className="mt-2 text-xs text-muted-foreground">💬 “{community.previewPost}”</p>
+
+                      {/* Activity signals (only if there's recent activity) */}
+                      {(community.recentPostCount > 0 || community.newMembersLast7d > 0) ? (
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          📈 {[
+                            community.recentPostCount > 0 ? `${community.recentPostCount} post${community.recentPostCount === 1 ? "" : "s"} this week` : null,
+                            community.newMembersLast7d > 0 ? `+${community.newMembersLast7d} new member${community.newMembersLast7d === 1 ? "" : "s"}` : null,
+                          ].filter(Boolean).join(" · ")}
+                        </p>
+                      ) : (
+                        <p className="mt-1 text-xs text-muted-foreground">🔥 {socialProof}</p>
+                      )}
+
+                      {/* Preview post (only if community has any content) */}
+                      {community.previewPost && (
+                        <p className="mt-2 line-clamp-1 text-xs text-muted-foreground">
+                          💬 “{community.previewPost}”
+                        </p>
+                      )}
 
                       <div className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary">
                         View community <ArrowRight className="h-4 w-4" />
