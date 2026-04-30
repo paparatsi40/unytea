@@ -88,6 +88,35 @@ const authMiddleware = auth((req) => {
     return intlMiddleware(req)
   }
 
+  // For /auth/* (no locale prefix), prefer the locale of the page the visitor
+  // came from (Referer) over next-intl's Accept-Language fallback. Otherwise a
+  // visitor who was on /es/* and clicks "Sign in" lands on /en/auth/signin
+  // because their browser's Accept-Language is English. Bookmarks and external
+  // links still fall through to the default detection below.
+  if (pathname.startsWith("/auth")) {
+    const referer = req.headers.get("referer")
+    if (referer) {
+      try {
+        const refererFirstSeg = new URL(referer).pathname
+          .split("/")
+          .filter(Boolean)[0]
+        if (
+          refererFirstSeg &&
+          (locales as readonly string[]).includes(refererFirstSeg)
+        ) {
+          return NextResponse.redirect(
+            new URL(
+              `/${refererFirstSeg}${pathname}${req.nextUrl.search}`,
+              req.url
+            )
+          )
+        }
+      } catch {
+        // Malformed Referer header — ignore and fall through.
+      }
+    }
+  }
+
   // Rutas públicas sin locale (como /auth/*): aplicar intlMiddleware para redirigir a /{locale}/*
   const intlResponse = intlMiddleware(req)
   if (intlResponse.status === 307 || intlResponse.status === 308) {
@@ -114,10 +143,17 @@ const authMiddleware = auth((req) => {
 /**
  * Append "Accept-Encoding" to whatever Vary header the framework already set.
  *
- * We tried doing this in next.config.mjs `headers()`, but Next.js overwrites
- * Vary with its own RSC-routing values after the config runs. Doing it here
- * (after the framework's processing) is the only path that actually sticks
- * on the response. Idempotent: skips if Accept-Encoding is already present.
+ * History: REDbot flagged that gzip-compressed responses were missing an
+ * Accept-Encoding entry in Vary. We tried setting it in next.config.mjs
+ * `headers()` (overwritten by Next.js) and then here in middleware (this
+ * code path). On Vercel production, the edge layer ALSO overrides Vary
+ * after the middleware runs — verified with X-Vercel-Cache: MISS, Age: 0
+ * responses still missing Accept-Encoding.
+ *
+ * We're keeping this code because: (a) it's idempotent and harmless,
+ * (b) it works on non-Vercel deploys, (c) if Vercel changes the override
+ * behavior in the future, the fix activates automatically. Practical risk
+ * of the missing header is near-zero since every modern client supports gzip.
  */
 function appendAcceptEncodingVary(response: Response): Response {
   const existing = response.headers.get("vary")
