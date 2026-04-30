@@ -8,7 +8,13 @@ const defaultLocale = "en"
 const intlMiddleware = createIntlMiddleware({
   locales: [...locales],
   defaultLocale,
-  localePrefix: "always"
+  localePrefix: "always",
+  // Disable next-intl's NEXT_LOCALE cookie. Without this, every cached response
+  // from the CDN ships the same Set-Cookie to every visitor — overwriting a
+  // visitor's stored language preference whenever they land on a page in a
+  // different locale. The locale is already in the URL prefix, so the cookie
+  // adds no behavior we need; auth/layout.tsx falls back to 'en' when absent.
+  localeCookie: false
 })
 
 /**
