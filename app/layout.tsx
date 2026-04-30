@@ -3,6 +3,7 @@ import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { SessionProvider } from "next-auth/react";
 import { Toaster } from "react-hot-toast";
+import { Toaster as SonnerToaster } from "sonner";
 import { ServiceWorkerRegistrar } from "@/components/pwa/ServiceWorkerRegistrar";
 import { PWAInstallPrompt } from "@/components/pwa/PWAInstallPrompt";
 import { CookieConsent } from "@/components/gdpr/CookieConsent";
@@ -223,6 +224,12 @@ export default async function RootLayout({
               },
             }}
           />
+          {/*
+           * 26 files in this app call toast() from "sonner". Without this
+           * Toaster mounted, every one of those calls fires silently. We keep
+           * react-hot-toast above for the 15 files that already use it.
+           */}
+          <SonnerToaster position="top-right" richColors closeButton />
         </SessionProvider>
       </body>
     </html>
