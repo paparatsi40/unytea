@@ -111,18 +111,35 @@ const authMiddleware = auth((req) => {
   return NextResponse.next()
 })
 
-// Dispatcher: decide si la request necesita auth() o solo intl.
-export default function middleware(req: NextRequest) {
-  if (routeNeedsAuth(req.nextUrl.pathname)) {
-    // El cast es seguro: auth() acepta NextRequest y construye NextAuthRequest internamente.
-    return (
-      authMiddleware as unknown as (
-        r: NextRequest
-      ) => Response | Promise<Response>
-    )(req)
+/**
+ * Append "Accept-Encoding" to whatever Vary header the framework already set.
+ *
+ * We tried doing this in next.config.mjs `headers()`, but Next.js overwrites
+ * Vary with its own RSC-routing values after the config runs. Doing it here
+ * (after the framework's processing) is the only path that actually sticks
+ * on the response. Idempotent: skips if Accept-Encoding is already present.
+ */
+function appendAcceptEncodingVary(response: Response): Response {
+  const existing = response.headers.get("vary")
+  if (existing && /\bAccept-Encoding\b/i.test(existing)) {
+    return response
   }
-  // Marketing/public routes: solo intl, sin auth() → sin cookies de NextAuth en respuestas anónimas.
-  return intlMiddleware(req)
+  const next = existing ? `${existing}, Accept-Encoding` : "Accept-Encoding"
+  response.headers.set("vary", next)
+  return response
+}
+
+// Dispatcher: decide si la request necesita auth() o solo intl.
+export default async function middleware(req: NextRequest) {
+  const response: Response = routeNeedsAuth(req.nextUrl.pathname)
+    ? // El cast es seguro: auth() acepta NextRequest y construye NextAuthRequest internamente.
+      await (authMiddleware as unknown as (
+        r: NextRequest
+      ) => Response | Promise<Response>)(req)
+    : // Marketing/public routes: solo intl, sin auth() → sin cookies de NextAuth en respuestas anónimas.
+      await intlMiddleware(req)
+
+  return appendAcceptEncodingVary(response)
 }
 
 export const config = {
