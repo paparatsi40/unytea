@@ -189,6 +189,10 @@ export default async function ExploreCommunitiesPage({
       slug: true,
       name: true,
       description: true,
+      imageUrl: true,
+      coverImageUrl: true,
+      primaryColor: true,
+      secondaryColor: true,
       settings: true,
       isPaid: true,
       createdAt: true,
@@ -197,6 +201,7 @@ export default async function ExploreCommunitiesPage({
           name: true,
           firstName: true,
           lastName: true,
+          image: true,
         },
       },
       _count: {
@@ -583,32 +588,74 @@ export default async function ExploreCommunitiesPage({
 
                 const badge = community.isNew ? "🆕 New" : "🔥 Trending";
 
+                const coverGradient = `linear-gradient(135deg, ${community.primaryColor || "#8B5CF6"} 0%, ${community.secondaryColor || "#EC4899"} 100%)`;
+                const initial = community.name.charAt(0).toUpperCase();
+
                 return (
                   <Link
                     key={community.id}
                     href={`/${locale}/community/${community.slug}?src=explore_trending&rank=${index + 1}&sort=trending`}
-                    className="group rounded-xl border border-border bg-card p-5 transition hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-lg"
+                    className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card transition hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-lg"
                   >
-                    <div className="mb-3 flex items-center justify-between">
-                      <Badge>{badge}</Badge>
-                      <Badge variant="outline">{community.isPaid ? "Paid access" : "Free access"}</Badge>
+                    {/* Cover banner with overlapping logo */}
+                    <div className="relative h-28 w-full" style={{ background: coverGradient }}>
+                      {community.coverImageUrl && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={community.coverImageUrl}
+                          alt=""
+                          className="h-full w-full object-cover"
+                        />
+                      )}
+
+                      {/* Top-row badges overlay */}
+                      <div className="absolute left-3 top-3">
+                        <Badge className="shadow-sm">{badge}</Badge>
+                      </div>
+                      <div className="absolute right-3 top-3">
+                        <Badge variant="outline" className="bg-card/95 shadow-sm">
+                          {community.isPaid ? "Paid access" : "Free access"}
+                        </Badge>
+                      </div>
+
+                      {/* Community logo (overlapping bottom-left) */}
+                      <div className="absolute -bottom-6 left-4">
+                        {community.imageUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={community.imageUrl}
+                            alt={community.name}
+                            className="h-12 w-12 rounded-lg border-2 border-card object-cover shadow-md"
+                          />
+                        ) : (
+                          <div
+                            className="flex h-12 w-12 items-center justify-center rounded-lg border-2 border-card text-lg font-bold text-white shadow-md"
+                            style={{ background: coverGradient }}
+                          >
+                            {initial}
+                          </div>
+                        )}
+                      </div>
                     </div>
 
-                    <h3 className="text-lg font-semibold text-foreground">{community.name}</h3>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {community.description?.trim() || "Learn with live sessions and community."}
-                    </p>
+                    {/* Body */}
+                    <div className="flex flex-grow flex-col p-5 pt-8">
+                      <h3 className="text-lg font-semibold text-foreground">{community.name}</h3>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {community.description?.trim() || "Learn with live sessions and community."}
+                      </p>
 
-                    <p className="mt-3 text-sm text-muted-foreground">👤 {hostName(community.owner)} (Host)</p>
-                    <p className="text-sm text-muted-foreground">👥 {community._count.members} members</p>
+                      <p className="mt-3 text-sm text-muted-foreground">👤 {hostName(community.owner)} (Host)</p>
+                      <p className="text-sm text-muted-foreground">👥 {community._count.members} members</p>
 
-                    <p className="mt-3 text-sm font-medium text-foreground">🟢 {nextSessionText}</p>
-                    {seriesIdentity && <p className="text-xs text-muted-foreground">{seriesIdentity}</p>}
-                    <p className="text-sm text-muted-foreground">🔥 {socialProof}</p>
-                    <p className="mt-2 text-xs text-muted-foreground">💬 “{community.previewPost}”</p>
+                      <p className="mt-3 text-sm font-medium text-foreground">🟢 {nextSessionText}</p>
+                      {seriesIdentity && <p className="text-xs text-muted-foreground">{seriesIdentity}</p>}
+                      <p className="text-sm text-muted-foreground">🔥 {socialProof}</p>
+                      <p className="mt-2 text-xs text-muted-foreground">💬 “{community.previewPost}”</p>
 
-                    <div className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary">
-                      View community <ArrowRight className="h-4 w-4" />
+                      <div className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary">
+                        View community <ArrowRight className="h-4 w-4" />
+                      </div>
                     </div>
                   </Link>
                 );
