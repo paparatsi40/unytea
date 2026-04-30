@@ -1,22 +1,14 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
-import { ArrowRight, Clock, Flame } from "lucide-react";
+import { Clock, Flame } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ExploreFilters } from "@/components/explore/ExploreFilters";
 import { ExploreInfiniteFeed } from "@/components/explore/ExploreInfiniteFeed";
+import { CommunityCard } from "@/components/explore/CommunityCard";
 
 const DEFAULT_CATEGORIES = ["AI", "Startups", "Fitness", "Marketing"];
-
-function hostName(owner: {
-  name: string | null;
-  firstName: string | null;
-  lastName: string | null;
-}) {
-  const fullName = [owner.firstName, owner.lastName].filter(Boolean).join(" ").trim();
-  return fullName || owner.name || "Unytea Host";
-}
 
 function communityCategory(settings: unknown): string {
   if (!settings || typeof settings !== "object") return "General";
@@ -34,14 +26,6 @@ function communityLanguage(settings: unknown): string {
     return candidate.trim();
   }
   return "Any";
-}
-
-function formatSessionSlot(date: Date) {
-  return date.toLocaleString("en-US", {
-    weekday: "short",
-    hour: "numeric",
-    minute: "2-digit",
-  });
 }
 
 function truncate(text: string, max = 90) {
@@ -78,32 +62,6 @@ function getSessionUrgencyLabel(date: Date): string {
   if (hoursUntil <= 24) return "🟢 Today";
   if (hoursUntil <= 72) return "🟢 This week";
   return "🟢 Upcoming";
-}
-
-function dayNameFromIndex(dayOfWeek: number | null | undefined) {
-  if (dayOfWeek === null || dayOfWeek === undefined) return null;
-  const names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  return names[dayOfWeek] || null;
-}
-
-function everySeriesLabel(series: {
-  frequency?: string | null;
-  dayOfWeek?: number | null;
-  startTime?: string | null;
-} | null | undefined) {
-  if (!series || series.frequency !== "WEEKLY") return null;
-  const day = dayNameFromIndex(series.dayOfWeek);
-  if (!day) return null;
-  if (!series.startTime) return `Every ${day}`;
-
-  const [h, m] = series.startTime.split(":");
-  const hour = Number(h);
-  const minute = Number(m || "0");
-  if (!Number.isFinite(hour) || !Number.isFinite(minute)) return `Every ${day}`;
-
-  const sample = new Date();
-  sample.setHours(hour, minute, 0, 0);
-  return `Every ${day} · ${sample.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}`;
 }
 
 function getBoostScore(settings: unknown): number {
@@ -575,156 +533,16 @@ export default async function ExploreCommunitiesPage({
             </div>
           ) : (
             <div className="grid gap-4 md:grid-cols-3">
-              {trendingCommunities.map((community, index) => {
-                const nextSessionText = community.nextSession
-                  ? `Next: ${formatSessionSlot(community.nextSession.scheduledAt)}`
-                  : "Weekly live sessions";
-                const seriesIdentity = everySeriesLabel(community.nextSession?.series);
-
-                const socialProof = community.nextSessionAttending > 0
-                  ? `${community.nextSessionAttending} attending`
-                  : community.sessionsThisWeek > 0
-                    ? "Weekly sessions"
-                    : community.isNew
-                      ? "Be one of the first members"
-                      : "Growing community";
-
-                const badge = community.isNew ? "🆕 New" : "🔥 Trending";
-
-                const coverGradient = `linear-gradient(135deg, ${community.primaryColor || "#8B5CF6"} 0%, ${community.secondaryColor || "#EC4899"} 100%)`;
-                const initial = community.name.charAt(0).toUpperCase();
-
-                return (
-                  <Link
-                    key={community.id}
-                    href={`/${locale}/community/${community.slug}?src=explore_trending&rank=${index + 1}&sort=trending`}
-                    className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card transition hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-lg"
-                  >
-                    {/* Cover banner with overlapping logo */}
-                    <div className="relative h-28 w-full" style={{ background: coverGradient }}>
-                      {community.coverImageUrl && (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={community.coverImageUrl}
-                          alt=""
-                          className="h-full w-full object-cover"
-                        />
-                      )}
-
-                      {/* Top-row badges overlay */}
-                      <div className="absolute left-3 top-3">
-                        <Badge className="shadow-sm">{badge}</Badge>
-                      </div>
-                      <div className="absolute right-3 top-3">
-                        <Badge variant="outline" className="bg-card/95 shadow-sm">
-                          {community.isPaid ? "Paid access" : "Free access"}
-                        </Badge>
-                      </div>
-
-                      {/* Community logo (overlapping bottom-left) */}
-                      <div className="absolute -bottom-6 left-4">
-                        {community.imageUrl ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={community.imageUrl}
-                            alt={community.name}
-                            className="h-12 w-12 rounded-lg border-2 border-card object-cover shadow-md"
-                          />
-                        ) : (
-                          <div
-                            className="flex h-12 w-12 items-center justify-center rounded-lg border-2 border-card text-lg font-bold text-white shadow-md"
-                            style={{ background: coverGradient }}
-                          >
-                            {initial}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Body */}
-                    <div className="flex flex-grow flex-col p-5 pt-8">
-                      <h3 className="text-lg font-semibold text-foreground">{community.name}</h3>
-
-                      {/* Description (only if owner set one) */}
-                      {community.description?.trim() ? (
-                        <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
-                          {community.description}
-                        </p>
-                      ) : (
-                        <p className="mt-1 text-sm italic text-muted-foreground/60">
-                          No description yet
-                        </p>
-                      )}
-
-                      {/* Tagline (heroSubtitle as value prop, if set) */}
-                      {community.heroSubtitle && (
-                        <p className="mt-2 line-clamp-2 text-xs italic text-foreground/70">
-                          “{community.heroSubtitle}”
-                        </p>
-                      )}
-
-                      {/* Category + language badges */}
-                      <div className="mt-3 flex flex-wrap items-center gap-1.5">
-                        <Badge variant="secondary" className="text-xs font-normal">
-                          {community.category}
-                        </Badge>
-                        {community.language && community.language !== "Any" && (
-                          <Badge variant="secondary" className="text-xs font-normal">
-                            🌍 {community.language}
-                          </Badge>
-                        )}
-                      </div>
-
-                      {/* Host with avatar */}
-                      <div className="mt-3 flex items-center gap-2">
-                        {community.owner.image ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={community.owner.image}
-                            alt={hostName(community.owner)}
-                            className="h-8 w-8 rounded-full object-cover ring-2 ring-card"
-                          />
-                        ) : (
-                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary ring-2 ring-card">
-                            {hostName(community.owner).charAt(0).toUpperCase()}
-                          </div>
-                        )}
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-medium text-foreground">{hostName(community.owner)}</p>
-                          <p className="text-xs text-muted-foreground">Host · {community._count.members} {community._count.members === 1 ? "member" : "members"}</p>
-                        </div>
-                      </div>
-
-                      {/* Session schedule */}
-                      <p className="mt-3 text-sm font-medium text-foreground">🟢 {nextSessionText}</p>
-                      {seriesIdentity && <p className="text-xs text-muted-foreground">{seriesIdentity}</p>}
-
-                      {/* Activity signals (only if there's recent activity) */}
-                      {(community.recentPostCount > 0 || community.newMembersLast7d > 0) ? (
-                        <p className="mt-1 text-xs text-muted-foreground">
-                          📈 {[
-                            community.recentPostCount > 0 ? `${community.recentPostCount} post${community.recentPostCount === 1 ? "" : "s"} this week` : null,
-                            community.newMembersLast7d > 0 ? `+${community.newMembersLast7d} new member${community.newMembersLast7d === 1 ? "" : "s"}` : null,
-                          ].filter(Boolean).join(" · ")}
-                        </p>
-                      ) : (
-                        <p className="mt-1 text-xs text-muted-foreground">🔥 {socialProof}</p>
-                      )}
-
-                      {/* Preview post (only if community has any content) */}
-                      {community.previewPost && (
-                        <p className="mt-2 line-clamp-1 text-xs text-muted-foreground">
-                          💬 “{community.previewPost}”
-                        </p>
-                      )}
-
-                      <div className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary">
-                        View community <ArrowRight className="h-4 w-4" />
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
+              {trendingCommunities.map((community, index) => (
+                <CommunityCard
+                  key={community.id}
+                  community={community}
+                  locale={locale}
+                  linkSrc="explore_trending"
+                  rank={index + 1}
+                  sort="trending"
+                />
+              ))}
             </div>
           )}
         </section>
@@ -738,16 +556,15 @@ export default async function ExploreCommunitiesPage({
             <p className="text-sm text-muted-foreground">
               Join a community to attend the next live session.
             </p>
-            <div className="grid gap-3 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-3">
               {suggestedWhenEmpty.map((community, index) => (
-                <Link
+                <CommunityCard
                   key={community.id}
-                  href={`/${locale}/community/${community.slug}?src=explore_happening_empty&rank=${index + 1}`}
-                  className="rounded-lg border border-border bg-background p-3 transition hover:border-primary/50"
-                >
-                  <p className="text-sm font-semibold text-foreground">{community.name}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">{community._count.members} members</p>
-                </Link>
+                  community={community}
+                  locale={locale}
+                  linkSrc="explore_happening_empty"
+                  rank={index + 1}
+                />
               ))}
             </div>
           </section>
@@ -756,16 +573,15 @@ export default async function ExploreCommunitiesPage({
         {!hasHappening && newCommunities.length > 0 && (
           <section className="space-y-3">
             <h2 className="text-xl font-semibold">New communities</h2>
-            <div className="grid gap-3 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-3">
               {newCommunities.map((community, index) => (
-                <Link
+                <CommunityCard
                   key={community.id}
-                  href={`/${locale}/community/${community.slug}?src=explore_new_communities&rank=${index + 1}`}
-                  className="rounded-lg border border-border bg-card p-4 transition hover:border-primary/50"
-                >
-                  <p className="text-sm font-semibold text-foreground">{community.name}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">{community.description?.trim() || "New community with live sessions."}</p>
-                </Link>
+                  community={community}
+                  locale={locale}
+                  linkSrc="explore_new_communities"
+                  rank={index + 1}
+                />
               ))}
             </div>
           </section>
