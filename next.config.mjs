@@ -139,6 +139,16 @@ const nextConfig = {
             key: "Content-Security-Policy",
             value: contentSecurityPolicy,
           },
+          {
+            // Tells caches that the response body changes based on
+            // Accept-Encoding (we serve gzip-compressed HTML when the
+            // client accepts it, raw HTML otherwise). Without this,
+            // a misbehaving proxy could cache a gzipped response and
+            // hand it to a client that can't decode it. Combines with
+            // the Vary entries Next.js sets for RSC routing.
+            key: "Vary",
+            value: "Accept-Encoding",
+          },
         ],
       },
     ];
