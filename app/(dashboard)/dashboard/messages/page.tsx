@@ -81,8 +81,8 @@ export default function MessagesPage() {
   };
 
   useEffect(() => {
-    const userId = searchParams.get("user");
-    const communityId = searchParams.get("community");
+    const userId = searchParams?.get("user");
+    const communityId = searchParams?.get("community");
 
     if (!userId || activeConversationId || bootstrapping) return;
 

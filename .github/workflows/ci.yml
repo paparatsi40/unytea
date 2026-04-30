@@ -36,9 +36,11 @@ jobs:
   type-check:
     name: TypeScript type-check
     runs-on: ubuntu-latest
-    # TODO: quitar continue-on-error cuando se arregle el type error de
-    # firstName en app/(dashboard)/dashboard/settings/profile/page.tsx.
-    continue-on-error: true
+    # The previous TODO that justified continue-on-error was the firstName
+    # type error, which has since been fixed. The 40+ test type errors that
+    # also slipped in during that window were cleaned up in the same pass.
+    # Type errors should now block PRs; if they re-emerge, fix them — don't
+    # re-add this flag.
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

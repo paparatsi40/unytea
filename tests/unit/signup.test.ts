@@ -7,7 +7,7 @@ vi.mock('bcryptjs', () => ({
 
 const mockRateLimitCheck = vi.fn().mockReturnValue({ success: true, remaining: 4, resetTime: Date.now() + 900000 })
 vi.mock('@/lib/rate-limit', () => ({
-  rateLimiters: { auth: { check: (...args) => mockRateLimitCheck(...args) } },
+  rateLimiters: { auth: { check: (...args: unknown[]) => mockRateLimitCheck(...args) } },
   getIP: vi.fn().mockReturnValue('127.0.0.1'),
 }))
 vi.mock('@/lib/email', () => ({ sendWelcomeEmail: vi.fn().mockResolvedValue(undefined) }))
@@ -15,14 +15,14 @@ vi.mock('@/lib/email', () => ({ sendWelcomeEmail: vi.fn().mockResolvedValue(unde
 import { prisma } from '@/lib/prisma'
 
 describe('POST /api/auth/signup', () => {
-  let POST
+  let POST: (req: NextRequest) => Promise<Response>
   beforeEach(async () => {
     vi.clearAllMocks()
     mockRateLimitCheck.mockReturnValue({ success: true, remaining: 4, resetTime: Date.now() + 900000 })
     const mod = await import('@/app/api/auth/signup/route')
     POST = mod.POST
   })
-  function makeRequest(body) {
+  function makeRequest(body: Record<string, unknown>) {
     return new NextRequest('http://localhost:3000/api/auth/signup', {
       method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' },
     })
@@ -41,7 +41,9 @@ describe('POST /api/auth/signup', () => {
     expect(res.status).toBe(400)
   })
   it('should return generic 201 for existing user (no email enumeration)', async () => {
-    vi.mocked(prisma.user.findUnique).mockResolvedValue({ id: 'existing-user', email: 'existing@example.com' })
+    // Partial User stub — mockResolvedValue's typed signature wants the full
+    // User shape but the route only reads `id`/`email`, so cast to satisfy TS.
+    vi.mocked(prisma.user.findUnique).mockResolvedValue({ id: 'existing-user', email: 'existing@example.com' } as never)
     const res = await POST(makeRequest({ name: 'Test', email: 'existing@example.com', password: 'password123' }))
     expect(res.status).toBe(201)
     const data = await res.json()
@@ -50,7 +52,7 @@ describe('POST /api/auth/signup', () => {
   })
   it('should return 201 for new user with generic message', async () => {
     vi.mocked(prisma.user.findUnique).mockResolvedValue(null)
-    vi.mocked(prisma.user.create).mockResolvedValue({ id: 'new', email: 'new@example.com', name: 'Test' })
+    vi.mocked(prisma.user.create).mockResolvedValue({ id: 'new', email: 'new@example.com', name: 'Test' } as never)
     const res = await POST(makeRequest({ name: 'Test', email: 'new@example.com', password: 'password123' }))
     expect(res.status).toBe(201)
     const data = await res.json()
@@ -60,16 +62,16 @@ describe('POST /api/auth/signup', () => {
   it('should hash the password before storing', async () => {
     const bcrypt = await import('bcryptjs')
     vi.mocked(prisma.user.findUnique).mockResolvedValue(null)
-    vi.mocked(prisma.user.create).mockResolvedValue({})
+    vi.mocked(prisma.user.create).mockResolvedValue({} as never)
     await POST(makeRequest({ name: 'Test', email: 'new@example.com', password: 'mypassword123' }))
     expect(bcrypt.default.hash).toHaveBeenCalledWith('mypassword123', 10)
   })
   it('should return identical responses for existing and new users', async () => {
-    vi.mocked(prisma.user.findUnique).mockResolvedValue({ id: 'x' })
+    vi.mocked(prisma.user.findUnique).mockResolvedValue({ id: 'x' } as never)
     const r1 = await POST(makeRequest({ name: 'A', email: 'a@test.com', password: 'password123' }))
     const d1 = await r1.json()
     vi.mocked(prisma.user.findUnique).mockResolvedValue(null)
-    vi.mocked(prisma.user.create).mockResolvedValue({})
+    vi.mocked(prisma.user.create).mockResolvedValue({} as never)
     const r2 = await POST(makeRequest({ name: 'B', email: 'b@test.com', password: 'password123' }))
     const d2 = await r2.json()
     expect(r1.status).toBe(r2.status)

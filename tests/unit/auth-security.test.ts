@@ -3,7 +3,7 @@ import fs from 'fs'
 import path from 'path'
 
 describe('Auth Security Checks', () => {
-  let authFileContent
+  let authFileContent: string
   beforeAll(() => { authFileContent = fs.readFileSync(path.resolve(__dirname, '../../lib/auth.ts'), 'utf-8') })
   it('should NOT have allowDangerousEmailAccountLinking', () => { expect(authFileContent).not.toContain('allowDangerousEmailAccountLinking') })
   it('should use JWT session strategy', () => { expect(authFileContent).toContain('strategy: "jwt"') })
@@ -19,7 +19,7 @@ describe('Auth Security Checks', () => {
 })
 
 describe('Next.js Config Security', () => {
-  let configContent
+  let configContent: string
   beforeAll(() => { configContent = fs.readFileSync(path.resolve(__dirname, '../../next.config.mjs'), 'utf-8') })
   it('should NOT have wildcard image domains', () => { expect(configContent).not.toContain('hostname: "**"') })
   it('should have reactStrictMode enabled', () => { expect(configContent).toContain('reactStrictMode: true') })
@@ -49,7 +49,7 @@ describe('Cron Routes - No Query Param Secrets', () => {
 })
 
 describe('Signup Route - No Email Enumeration', () => {
-  let content
+  let content: string
   beforeAll(() => { content = fs.readFileSync(path.resolve(__dirname, '../../app/api/auth/signup/route.ts'), 'utf-8') })
   it('should not return Email already registered', () => { expect(content).not.toContain('already registered') })
   it('should have rate limiting', () => { expect(content).toContain('rateLimiters'); expect(content).toContain('rateLimitOk') })
