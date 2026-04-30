@@ -18,7 +18,7 @@ describe('Cron Route Security', () => {
   afterEach(() => { process.env = originalEnv })
 
   describe('GET /api/cron/sessions', () => {
-    let GET
+    let GET: (req: NextRequest) => Promise<Response>
     beforeEach(async () => {
       const mod = await import('@/app/api/cron/sessions/route')
       GET = mod.GET

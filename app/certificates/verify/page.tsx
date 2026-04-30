@@ -8,7 +8,7 @@ import { CertificateView } from "@/components/courses/CertificateView";
 
 function VerifyCertificateContent() {
   const searchParams = useSearchParams();
-  const initialCode = searchParams.get("code") || "";
+  const initialCode = searchParams?.get("code") || "";
 
   const [code, setCode] = useState(initialCode);
   const [loading, setLoading] = useState(false);

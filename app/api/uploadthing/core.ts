@@ -13,8 +13,11 @@ export const ourFileRouter = {
     })
     .onUploadComplete(async ({ metadata, file }) => {
       console.log("Upload complete for userId:", metadata.userId);
-      console.log("File URL:", file.ufsUrl || file.url);
-      return { uploadedBy: metadata.userId, url: file.ufsUrl || file.url };
+      // uploadthing v7+ returns `ufsUrl` (and keeps `url` for backwards-compat);
+      // the installed types don't expose `ufsUrl` yet, hence the narrowed cast.
+      const url = (file as typeof file & { ufsUrl?: string }).ufsUrl ?? file.url;
+      console.log("File URL:", url);
+      return { uploadedBy: metadata.userId, url };
     }),
 
   // Community branding uploader (logos & covers)
@@ -31,8 +34,11 @@ export const ourFileRouter = {
     })
     .onUploadComplete(async ({ metadata, file }) => {
       console.log("Community branding upload complete for userId:", metadata.userId);
-      console.log("File URL:", file.ufsUrl || file.url);
-      return { uploadedBy: metadata.userId, url: file.ufsUrl || file.url };
+      // uploadthing v7+ returns `ufsUrl` (and keeps `url` for backwards-compat);
+      // the installed types don't expose `ufsUrl` yet, hence the narrowed cast.
+      const url = (file as typeof file & { ufsUrl?: string }).ufsUrl ?? file.url;
+      console.log("File URL:", url);
+      return { uploadedBy: metadata.userId, url };
     }),
 
   // Document uploader for resources, attachments
@@ -47,8 +53,11 @@ export const ourFileRouter = {
     })
     .onUploadComplete(async ({ metadata, file }) => {
       console.log("Document upload complete for userId:", metadata.userId);
-      console.log("File URL:", file.ufsUrl || file.url);
-      return { uploadedBy: metadata.userId, url: file.ufsUrl || file.url };
+      // uploadthing v7+ returns `ufsUrl` (and keeps `url` for backwards-compat);
+      // the installed types don't expose `ufsUrl` yet, hence the narrowed cast.
+      const url = (file as typeof file & { ufsUrl?: string }).ufsUrl ?? file.url;
+      console.log("File URL:", url);
+      return { uploadedBy: metadata.userId, url };
     }),
 
   // Media uploader for videos, audio
@@ -63,8 +72,11 @@ export const ourFileRouter = {
     })
     .onUploadComplete(async ({ metadata, file }) => {
       console.log("Media upload complete for userId:", metadata.userId);
-      console.log("File URL:", file.ufsUrl || file.url);
-      return { uploadedBy: metadata.userId, url: file.ufsUrl || file.url };
+      // uploadthing v7+ returns `ufsUrl` (and keeps `url` for backwards-compat);
+      // the installed types don't expose `ufsUrl` yet, hence the narrowed cast.
+      const url = (file as typeof file & { ufsUrl?: string }).ufsUrl ?? file.url;
+      console.log("File URL:", url);
+      return { uploadedBy: metadata.userId, url };
     }),
 } satisfies FileRouter;
 
