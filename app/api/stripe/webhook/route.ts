@@ -29,6 +29,28 @@ export async function POST(request: Request) {
       );
     }
 
+    // Idempotency check (atomic).
+    // Stripe retries webhooks on timeout/error, which means the same event.id can arrive
+    // multiple times. We INSERT a record at the start; if it fails on unique constraint,
+    // we know we've already processed this event.
+    try {
+      await prisma.processedStripeEvent.create({
+        data: { id: event.id, type: event.type },
+      });
+    } catch (err: any) {
+      // P2002 = unique constraint violation in Prisma → duplicate event.
+      if (err?.code === "P2002") {
+        console.log(`[stripe-webhook] event ${event.id} already processed, skipping`);
+        return NextResponse.json({ received: true, duplicate: true });
+      }
+      // Otherwise, real DB error — bubble up so Stripe retries.
+      console.error(`[stripe-webhook] DB error recording event:`, err);
+      return NextResponse.json(
+        { error: "Failed to record event" },
+        { status: 500 }
+      );
+    }
+
     console.log(`Webhook received: ${event.type}`);
 
     // Handle the event
