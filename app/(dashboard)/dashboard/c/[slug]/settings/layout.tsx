@@ -30,7 +30,7 @@ export default function CommunitySettingsLayout({
 
     {
       name: "Members",
-      href: `/dashboard/c/${slug}/members`,
+      href: `/dashboard/c/${slug}/settings/members`,
       icon: Users,
       description: "Manage roles and permissions",
     },

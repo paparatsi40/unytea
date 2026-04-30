@@ -20,6 +20,8 @@ export default function GeneralSettingsPage() {
     description: "",
     isPrivate: false,
     requireApproval: false,
+    category: "",
+    language: "",
   });
 
   useEffect(() => {
@@ -29,11 +31,25 @@ export default function GeneralSettingsPage() {
         const response = await fetch(`/api/communities/${slug}`);
         if (response.ok) {
           const data = await response.json();
+          // The GET endpoint returns the full record under `community`, plus
+          // a few flat fields (id, name, slug) at the top for backward compat.
+          // Pull everything from `community` so toggles/description hydrate too.
+          const community = data?.community ?? {};
+          const settings =
+            community.settings && typeof community.settings === "object"
+              ? (community.settings as Record<string, unknown>)
+              : {};
+          const category =
+            typeof settings.category === "string" ? settings.category : "";
+          const language =
+            typeof settings.language === "string" ? settings.language : "";
           setFormData({
-            name: data.name,
-            description: data.description || "",
-            isPrivate: data.isPrivate,
-            requireApproval: data.requireApproval,
+            name: community.name ?? data.name ?? "",
+            description: community.description ?? "",
+            isPrivate: Boolean(community.isPrivate),
+            requireApproval: Boolean(community.requireApproval),
+            category,
+            language,
           });
         }
       } catch (error) {
@@ -163,6 +179,65 @@ export default function GeneralSettingsPage() {
             className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
             placeholder="Tell people what your community is about..."
           />
+          <p className="mt-1 text-xs text-gray-500">
+            Shown on the public Explore page and on your community card.
+          </p>
+        </div>
+
+        {/* Category + Language */}
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Category
+            </label>
+            <select
+              value={formData.category}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+            >
+              <option value="">Select a category…</option>
+              <option value="AI">AI</option>
+              <option value="Startups">Startups</option>
+              <option value="Marketing">Marketing</option>
+              <option value="Business">Business</option>
+              <option value="Tech">Tech</option>
+              <option value="Programming">Programming</option>
+              <option value="Fitness">Fitness</option>
+              <option value="Health">Health</option>
+              <option value="Wellness">Wellness</option>
+              <option value="Personal Development">Personal Development</option>
+              <option value="Education">Education</option>
+              <option value="Creativity">Creativity</option>
+              <option value="Finance">Finance</option>
+              <option value="Other">Other</option>
+            </select>
+            <p className="mt-1 text-xs text-gray-500">
+              Helps people find your community in Explore.
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Primary language
+            </label>
+            <select
+              value={formData.language}
+              onChange={(e) => setFormData({ ...formData, language: e.target.value })}
+              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+            >
+              <option value="">Any</option>
+              <option value="English">English</option>
+              <option value="Spanish">Spanish</option>
+              <option value="French">French</option>
+              <option value="Portuguese">Portuguese</option>
+              <option value="German">German</option>
+              <option value="Italian">Italian</option>
+              <option value="Other">Other</option>
+            </select>
+            <p className="mt-1 text-xs text-gray-500">
+              The language most conversations and sessions happen in.
+            </p>
+          </div>
         </div>
 
         {/* Privacy Settings */}
