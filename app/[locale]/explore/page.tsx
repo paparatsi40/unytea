@@ -388,26 +388,38 @@ export default async function ExploreCommunitiesPage({
   );
   const languages = Array.from(new Set(normalized.map((c) => c.language))).filter(Boolean);
 
+  // Shape mirrors CommunityCardData so the InfiniteFeed can render the same
+  // rich card as the server-rendered sections above. Dates are serialized to
+  // ISO strings because this object is hydrated into a client component.
   const initialFeedItems = sorted.slice(0, 12).map((community) => ({
     id: community.id,
     slug: community.slug,
     name: community.name,
     description: community.description,
     isPaid: community.isPaid,
+    isNew: community.isNew,
+    imageUrl: community.imageUrl,
+    coverImageUrl: community.coverImageUrl,
+    primaryColor: community.primaryColor,
+    secondaryColor: community.secondaryColor,
+    heroSubtitle: community.heroSubtitle,
+    category: community.category,
+    language: community.language,
     owner: community.owner,
-    membersCount: community._count.members,
+    _count: { members: community._count.members },
     nextSession: community.nextSession
       ? {
           id: community.nextSession.id,
           title: community.nextSession.title,
           scheduledAt: community.nextSession.scheduledAt.toISOString(),
+          series: community.nextSession.series ?? null,
         }
       : null,
     nextSessionAttending: community.nextSessionAttending,
     sessionsThisWeek: community.sessionsThisWeek,
-    postsLast7d: community.recentPostCount,
+    recentPostCount: community.recentPostCount,
     newMembersLast7d: community.newMembersLast7d,
-    isNew: community.isNew,
+    previewPost: community.previewPost,
     rankingScore: community.rankingScore,
   }));
 

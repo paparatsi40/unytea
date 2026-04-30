@@ -26,7 +26,12 @@ type SessionSeries = {
 } | null | undefined;
 
 type NextSession = {
-  scheduledAt: Date;
+  /**
+   * Server-rendered sections pass real Date objects; the infinite feed
+   * client gets ISO strings back from the API. Accept both so the same
+   * card component can be used on both sides without converting.
+   */
+  scheduledAt: Date | string;
   series?: SessionSeries;
 } | null;
 
@@ -70,7 +75,8 @@ function hostName(owner: Owner) {
   return fullName || owner.name || "Unytea Host";
 }
 
-function formatSessionSlot(date: Date) {
+function formatSessionSlot(dateLike: Date | string) {
+  const date = typeof dateLike === "string" ? new Date(dateLike) : dateLike;
   return date.toLocaleString("en-US", {
     weekday: "short",
     hour: "numeric",

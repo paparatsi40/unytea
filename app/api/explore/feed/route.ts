@@ -33,6 +33,20 @@ function getBoostScore(settings: unknown): number {
   return 0;
 }
 
+function truncate(text: string, max = 90) {
+  if (text.length <= max) return text;
+  return `${text.slice(0, max - 1)}…`;
+}
+
+function cleanPreviewText(text: string) {
+  const raw = text.trim();
+  if (!raw) return "Start meaningful conversations and learn together.";
+  if (/session recap|testing|debug|lorem ipsum/i.test(raw)) {
+    return "Members ask focused questions, share wins, and help each other execute.";
+  }
+  return raw;
+}
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -73,8 +87,14 @@ export async function GET(request: Request) {
         settings: true,
         isPaid: true,
         createdAt: true,
+        // Branding fields needed by the rich CommunityCard.
+        imageUrl: true,
+        coverImageUrl: true,
+        primaryColor: true,
+        secondaryColor: true,
+        heroSubtitle: true,
         owner: {
-          select: { name: true, firstName: true, lastName: true },
+          select: { name: true, firstName: true, lastName: true, image: true },
         },
         _count: {
           select: { members: true },
@@ -83,7 +103,15 @@ export async function GET(request: Request) {
           where: { status: "SCHEDULED", scheduledAt: { gt: now } },
           orderBy: { scheduledAt: "asc" },
           take: 4,
-          select: { id: true, title: true, scheduledAt: true },
+          select: {
+            id: true,
+            title: true,
+            scheduledAt: true,
+            // series powers the "Every Tuesday · 7:00 PM" identity line.
+            series: {
+              select: { frequency: true, dayOfWeek: true, startTime: true },
+            },
+          },
         },
         posts: {
           where: { isPublished: true },
@@ -156,22 +184,44 @@ export async function GET(request: Request) {
           (isNew ? 1 : 0) +
           getBoostScore(community.settings);
 
+        // Pre-compute previewPost the same way page.tsx does so the card
+        // looks identical between server-rendered sections and the feed.
+        const previewSource =
+          community.posts[0]?.title ||
+          community.posts[0]?.content ||
+          "Start meaningful conversations and learn together.";
+
         return {
           id: community.id,
           slug: community.slug,
           name: community.name,
           description: community.description,
           isPaid: community.isPaid,
-          owner: community.owner,
-          membersCount: community._count.members,
+          isNew,
+          imageUrl: community.imageUrl,
+          coverImageUrl: community.coverImageUrl,
+          primaryColor: community.primaryColor,
+          secondaryColor: community.secondaryColor,
+          heroSubtitle: community.heroSubtitle,
           category: computedCategory,
           language: computedLanguage,
-          nextSession,
+          owner: community.owner,
+          _count: { members: community._count.members },
+          nextSession: nextSession
+            ? {
+                id: nextSession.id,
+                title: nextSession.title,
+                // Serialize Date to ISO string — JSON has no Date type and
+                // CommunityCard accepts string|Date.
+                scheduledAt: nextSession.scheduledAt.toISOString(),
+                series: nextSession.series ?? null,
+              }
+            : null,
           nextSessionAttending,
           sessionsThisWeek: sessionsThisWeekList.length,
-          postsLast7d,
+          recentPostCount: postsLast7d,
           newMembersLast7d,
-          isNew,
+          previewPost: truncate(cleanPreviewText(previewSource), 78),
           rankingScore,
         };
       })
@@ -182,7 +232,7 @@ export async function GET(request: Request) {
         return categoryMatch && languageMatch && sessionsWeekMatch;
       })
       .sort((a, b) => {
-        if (sort === "members") return b.membersCount - a.membersCount;
+        if (sort === "members") return b._count.members - a._count.members;
         if (sort === "newest") return b.isNew === a.isNew ? 0 : b.isNew ? 1 : -1;
         return b.rankingScore - a.rankingScore;
       });
