@@ -645,8 +645,25 @@ export default async function ExploreCommunitiesPage({
                         {community.description?.trim() || "Learn with live sessions and community."}
                       </p>
 
-                      <p className="mt-3 text-sm text-muted-foreground">👤 {hostName(community.owner)} (Host)</p>
-                      <p className="text-sm text-muted-foreground">👥 {community._count.members} members</p>
+                      {/* Host with avatar */}
+                      <div className="mt-3 flex items-center gap-2">
+                        {community.owner.image ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={community.owner.image}
+                            alt={hostName(community.owner)}
+                            className="h-8 w-8 rounded-full object-cover ring-2 ring-card"
+                          />
+                        ) : (
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary ring-2 ring-card">
+                            {hostName(community.owner).charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-medium text-foreground">{hostName(community.owner)}</p>
+                          <p className="text-xs text-muted-foreground">Host · {community._count.members} {community._count.members === 1 ? "member" : "members"}</p>
+                        </div>
+                      </div>
 
                       <p className="mt-3 text-sm font-medium text-foreground">🟢 {nextSessionText}</p>
                       {seriesIdentity && <p className="text-xs text-muted-foreground">{seriesIdentity}</p>}
