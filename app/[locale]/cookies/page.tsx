@@ -1,16 +1,28 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { localizedAlternates } from "@/lib/seo/locale-metadata";
 
-export const metadata: Metadata = {
+const META = {
   title: "Cookie Policy | Unytea",
   description:
     "Understand how Unytea uses cookies and similar technologies across our platform.",
-  openGraph: {
-    title: "Cookie Policy | Unytea",
-    description:
-      "Understand how Unytea uses cookies and similar technologies across our platform.",
-  },
 };
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { locale: string };
+}): Promise<Metadata> {
+  return {
+    title: META.title,
+    description: META.description,
+    openGraph: {
+      title: META.title,
+      description: META.description,
+    },
+    ...localizedAlternates({ path: "/cookies", locale: params.locale }),
+  };
+}
 
 export default function CookiesPage({
   params,

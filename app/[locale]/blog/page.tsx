@@ -2,21 +2,34 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { getAllPosts } from "./posts";
+import { localizedAlternates } from "@/lib/seo/locale-metadata";
 
-export const metadata: Metadata = {
+const META = {
   title: "Blog | Unytea",
   description: "Insights and tactical guides for creators and community operators.",
-  openGraph: {
-    title: "Blog | Unytea",
-    description: "Insights and tactical guides for creators and community operators.",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Blog | Unytea",
-    description: "Insights and tactical guides for creators and community operators.",
-  },
 };
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { locale: string };
+}): Promise<Metadata> {
+  return {
+    title: META.title,
+    description: META.description,
+    openGraph: {
+      title: META.title,
+      description: META.description,
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: META.title,
+      description: META.description,
+    },
+    ...localizedAlternates({ path: "/blog", locale: params.locale }),
+  };
+}
 
 export default function BlogPage({ params }: { params: { locale: string } }) {
   const { locale } = params;
