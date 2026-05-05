@@ -56,27 +56,6 @@ const nextConfig = {
   productionBrowserSourceMaps: false,
   poweredByHeader: false,
 
-  /**
-   * URLs Google has discovered (via external links or convention guesses)
-   * that don't exist as their own pages. We redirect to the in-page anchor
-   * on the homepage so any inbound link equity is preserved instead of 404'd.
-   * 301 = permanent so Google replaces /pricing with the canonical URL.
-   */
-  async redirects() {
-    return [
-      {
-        source: "/:locale(en|es|fr)/pricing",
-        destination: "/:locale#pricing",
-        permanent: true,
-      },
-      {
-        source: "/pricing",
-        destination: "/en#pricing",
-        permanent: true,
-      },
-    ];
-  },
-
   async headers() {
     // Simplified CSP that allows WebRTC and LiveKit
     const contentSecurityPolicy = [
