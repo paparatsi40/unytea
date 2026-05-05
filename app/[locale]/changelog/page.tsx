@@ -1,17 +1,29 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Rocket, Shield, Zap, Paintbrush, Bug } from "lucide-react";
+import { localizedAlternates } from "@/lib/seo/locale-metadata";
 
-export const metadata: Metadata = {
+const META = {
   title: "Changelog | Unytea",
   description:
     "See what's new on Unytea — recent updates, features, improvements, and fixes.",
-  openGraph: {
-    title: "Changelog | Unytea",
-    description:
-      "See what's new on Unytea — recent updates, features, improvements, and fixes.",
-  },
 };
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { locale: string };
+}): Promise<Metadata> {
+  return {
+    title: META.title,
+    description: META.description,
+    openGraph: {
+      title: META.title,
+      description: META.description,
+    },
+    ...localizedAlternates({ path: "/changelog", locale: params.locale }),
+  };
+}
 
 type ChangeType = "feature" | "improvement" | "fix" | "security" | "design";
 

@@ -1,16 +1,28 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { localizedAlternates } from "@/lib/seo/locale-metadata";
 
-export const metadata: Metadata = {
+const META = {
   title: "Privacy Policy | Unytea",
   description:
     "Learn how Unytea collects, uses, and protects your personal data in compliance with GDPR and international privacy regulations.",
-  openGraph: {
-    title: "Privacy Policy | Unytea",
-    description:
-      "Learn how Unytea collects, uses, and protects your personal data in compliance with GDPR and international privacy regulations.",
-  },
 };
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { locale: string };
+}): Promise<Metadata> {
+  return {
+    title: META.title,
+    description: META.description,
+    openGraph: {
+      title: META.title,
+      description: META.description,
+    },
+    ...localizedAlternates({ path: "/privacy", locale: params.locale }),
+  };
+}
 
 export default function PrivacyPage({
   params,

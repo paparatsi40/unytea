@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { localizedAlternates } from "@/lib/seo/locale-metadata";
 import {
   BookOpen,
   CreditCard,
@@ -15,16 +16,27 @@ import {
   Zap,
 } from "lucide-react";
 
-export const metadata: Metadata = {
+const META = {
   title: "Documentation | Unytea",
   description:
     "Guides and references for launching, growing, and operating your community on Unytea.",
-  openGraph: {
-    title: "Documentation | Unytea",
-    description:
-      "Guides and references for launching, growing, and operating your community on Unytea.",
-  },
 };
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { locale: string };
+}): Promise<Metadata> {
+  return {
+    title: META.title,
+    description: META.description,
+    openGraph: {
+      title: META.title,
+      description: META.description,
+    },
+    ...localizedAlternates({ path: "/documentation", locale: params.locale }),
+  };
+}
 
 type DocSection = {
   icon: typeof BookOpen;

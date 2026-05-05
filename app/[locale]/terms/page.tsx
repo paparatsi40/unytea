@@ -1,16 +1,28 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { localizedAlternates } from "@/lib/seo/locale-metadata";
 
-export const metadata: Metadata = {
+const META = {
   title: "Terms of Service | Unytea",
   description:
     "Read the terms that govern your use of the Unytea community-based learning platform.",
-  openGraph: {
-    title: "Terms of Service | Unytea",
-    description:
-      "Read the terms that govern your use of the Unytea community-based learning platform.",
-  },
 };
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { locale: string };
+}): Promise<Metadata> {
+  return {
+    title: META.title,
+    description: META.description,
+    openGraph: {
+      title: META.title,
+      description: META.description,
+    },
+    ...localizedAlternates({ path: "/terms", locale: params.locale }),
+  };
+}
 
 export default function TermsPage({
   params,

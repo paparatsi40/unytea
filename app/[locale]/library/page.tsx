@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
+import { localizedAlternates } from "@/lib/seo/locale-metadata";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BookOpen, PlayCircle, Sparkles, TrendingUp } from "lucide-react";
@@ -51,7 +52,7 @@ export async function generateMetadata({
   return {
     title,
     description,
-    alternates: { canonical },
+    ...localizedAlternates({ path: "/library", locale: params.locale }),
     openGraph: {
       title,
       description,
