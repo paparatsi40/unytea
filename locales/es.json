@@ -220,6 +220,12 @@
       "secondary": "Ver Demo",
       "guarantee": "No requiere tarjeta de crédito • Prueba de 14 días • Cancela cuando quieras"
     },
+    "blogSection": {
+      "eyebrow": "Desde el blog",
+      "title": "Lecturas prácticas para creadores de comunidades",
+      "subtitle": "Guías tácticas para lanzar, hacer crecer y monetizar comunidades.",
+      "readMore": "Ver todas las entradas"
+    },
     "footer": {
       "description": "La plataforma moderna para que los creadores construyan, interactúen y monetizen sus comunidades.",
       "product": "Producto",

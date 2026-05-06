@@ -30,6 +30,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { getLatestPosts } from "./blog/posts";
 
 export default function Home() {
   const [showDemoModal, setShowDemoModal] = useState(false);
@@ -814,6 +815,71 @@ export default function Home() {
                 <p className="text-sm text-muted-foreground">Sell access and courses with Stripe while using analytics and achievements to improve retention.</p>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 9️⃣.5 LATEST FROM THE BLOG — internal links to surface fresh content for crawlers */}
+      <section className="py-20 bg-muted/20">
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl mx-auto text-center mb-12">
+            <p className="text-sm font-medium text-primary mb-2">
+              {t("blogSection.eyebrow")}
+            </p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              {t("blogSection.title")}
+            </h2>
+            <p className="text-base text-muted-foreground">
+              {t("blogSection.subtitle")}
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {getLatestPosts(3).map((post) => (
+              <Link
+                key={post.slug}
+                href={`/${locale}/blog/${post.slug}`}
+                className="group flex flex-col rounded-xl border bg-white overflow-hidden hover:shadow-lg transition-all hover:-translate-y-0.5"
+              >
+                <div className="relative h-40 w-full overflow-hidden bg-gradient-to-br from-primary/10 to-purple-100">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={post.featuredImage}
+                    alt={post.title}
+                    className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                    loading="lazy"
+                  />
+                </div>
+                <div className="flex flex-grow flex-col p-5">
+                  <h3 className="font-semibold text-base mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+                    {post.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
+                    {post.excerpt}
+                  </p>
+                  <div className="mt-auto flex items-center justify-between text-xs text-muted-foreground">
+                    <span>{post.readTime}</span>
+                    <span>
+                      {new Date(post.date).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          <div className="text-center mt-10">
+            <Link
+              href={`/${locale}/blog`}
+              className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
+            >
+              {t("blogSection.readMore")}
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
         </div>
       </section>

@@ -220,6 +220,12 @@
       "secondary": "Voir la Démo",
       "guarantee": "Aucune carte de crédit requise • Essai de 14 jours • Annulez quand vous voulez"
     },
+    "blogSection": {
+      "eyebrow": "Depuis le blog",
+      "title": "Lectures pratiques pour bâtisseurs de communautés",
+      "subtitle": "Guides tactiques pour lancer, faire croître et monétiser des communautés.",
+      "readMore": "Voir tous les articles"
+    },
     "footer": {
       "description": "La plateforme moderne pour que les créateurs construisent, engagent et monétisent leurs communautés.",
       "product": "Produit",
