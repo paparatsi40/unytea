@@ -137,7 +137,18 @@ export default async function BlogPostPage({ params }: Props) {
           ))}
         </div>
 
-        <div className="pt-10 flex gap-4">
+        <div className="mt-12 rounded-2xl bg-primary/5 border border-primary/20 p-8 text-center">
+          <h2 className="text-2xl font-bold mb-2">Ready to build your virtual studio?</h2>
+          <p className="text-muted-foreground mb-6">Start free — no credit card required.</p>
+          <a
+            href="https://www.unytea.com/en#pricing"
+            className="inline-block bg-primary text-primary-foreground font-semibold px-8 py-3 rounded-full hover:opacity-90 transition-opacity"
+          >
+            Start Free
+          </a>
+        </div>
+
+        <div className="pt-8 flex gap-4">
           <Link href={`/${locale}/blog`} className="text-sm font-medium text-primary hover:underline">
             ← Back to Blog
           </Link>
