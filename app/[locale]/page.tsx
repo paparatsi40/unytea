@@ -1,20 +1,13 @@
-"use client";
-
-import { useState } from "react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { useParams } from "next/navigation";
-import { useTranslations } from "next-intl";
-import { useSession } from "next-auth/react";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import {
   Sparkles,
   LayoutDashboard,
-  LogIn,
-  UserPlus,
   ArrowRight,
   ArrowDown,
-  Play,
   Star,
   CheckCircle,
   Users,
@@ -31,15 +24,66 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { getLatestPosts } from "./blog/posts";
+import { localizedAlternates } from "@/lib/seo/locale-metadata";
+import { HeaderAuthCTA } from "./_home/HeaderAuthCTA";
+import { DemoVideoTrigger } from "./_home/DemoVideoTrigger";
+import { FeatureCard } from "./_home/FeatureCard";
+import { UseCaseCard } from "./_home/UseCaseCard";
 
-export default function Home() {
-  const [showDemoModal, setShowDemoModal] = useState(false);
-  const t = useTranslations("landing");
-  const authT = useTranslations("auth");
-  const { data: session } = useSession();
-  const params = useParams<{ locale: string }>();
-  const locale = params?.locale || "en";
-  const isLoggedIn = !!session?.user;
+const META = {
+  en: {
+    title: "Unytea — One platform for every audience you serve",
+    description:
+      "Unytea is the live platform for creators running multiple communities. Live sessions, courses, gamification — for every audience you serve.",
+  },
+  es: {
+    title: "Unytea — Una plataforma para cada audiencia",
+    description:
+      "Unytea es la plataforma para creadores que gestionan varias comunidades. Sesiones en vivo, cursos, gamificación — para cada audiencia que sirves.",
+  },
+  fr: {
+    title: "Unytea — Une plateforme pour chaque audience",
+    description:
+      "Unytea est la plateforme pour les créateurs qui gèrent plusieurs communautés. Sessions en direct, cours, gamification — pour chaque audience que vous servez.",
+  },
+} as const;
+
+type SupportedLocale = keyof typeof META;
+
+function resolveLocale(value: string): SupportedLocale {
+  return (Object.keys(META) as SupportedLocale[]).includes(value as SupportedLocale)
+    ? (value as SupportedLocale)
+    : "en";
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { locale: string };
+}): Promise<Metadata> {
+  const locale = resolveLocale(params.locale);
+  const m = META[locale];
+  return {
+    title: m.title,
+    description: m.description,
+    openGraph: {
+      title: m.title,
+      description: m.description,
+      type: "website",
+    },
+    ...localizedAlternates({ path: "", locale }),
+  };
+}
+
+export default async function Home({
+  params,
+}: {
+  params: { locale: string };
+}) {
+  const locale = resolveLocale(params.locale);
+  setRequestLocale(locale);
+
+  const t = await getTranslations("landing");
 
   return (
     <div className="min-h-screen bg-background">
@@ -72,32 +116,7 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-3">
             <LanguageSelector />
-            {isLoggedIn ? (
-              <Link
-                href="/dashboard"
-                className="btn-hover-lift px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium shadow-smooth flex items-center gap-2"
-              >
-                <LayoutDashboard className="w-4 h-4" />
-                {t("nav.goToDashboard")}
-              </Link>
-            ) : (
-              <>
-                <Link
-                  href={`/${locale}/auth/signin`}
-                  className="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors"
-                >
-                  <LogIn className="w-4 h-4" />
-                  {authT("signIn")}
-                </Link>
-                <Link
-                  href={`/${locale}/auth/signup`}
-                  className="btn-hover-lift px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium shadow-smooth flex items-center gap-2"
-                >
-                  <UserPlus className="w-4 h-4" />
-                  {authT("signUp")}
-                </Link>
-              </>
-            )}
+            <HeaderAuthCTA locale={locale} />
           </div>
         </div>
       </nav>
@@ -136,13 +155,7 @@ export default function Home() {
                   <Users className="w-5 h-5" />
                   {t("hero.cta.explore")}
                 </Link>
-                <button
-                  onClick={() => setShowDemoModal(true)}
-                  className="px-8 py-4 border-2 border-border rounded-xl font-semibold hover:border-primary transition-colors flex items-center justify-center gap-2"
-                >
-                  <Play className="w-5 h-5" />
-                  {t("hero.cta.secondary")}
-                </button>
+                <DemoVideoTrigger />
               </div>
               <p className="text-sm text-muted-foreground mt-4">{t("hero.guarantee")}</p>
             </div>
@@ -969,101 +982,6 @@ export default function Home() {
         </div>
       </footer>
 
-      {/* DEMO MODAL */}
-      {showDemoModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="bg-white rounded-2xl p-8 max-w-md w-full text-center">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Play className="w-8 h-8 text-primary" />
-            </div>
-            <h3 className="text-2xl font-bold mb-2">{t("demoModal.title")}</h3>
-            <p className="text-muted-foreground mb-6">{t("demoModal.description")}</p>
-            <Button onClick={() => setShowDemoModal(false)} className="w-full">
-              {t("demoModal.close")}
-            </Button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// COMPONENTES AUXILIARES
-
-function FeatureCard({ image, title, description, highlighted = false, large = false }: { image: string; title: string; description: string; highlighted?: boolean; large?: boolean }) {
-  const [imgError, setImgError] = useState(false);
-  
-  return (
-    <div className={`group relative p-6 rounded-xl border transition-all duration-300 hover:shadow-xl hover:scale-[1.02] overflow-hidden ${highlighted ? 'border-primary bg-gradient-to-br from-primary/10 to-purple-100' : 'bg-gradient-to-br from-white to-gray-50'} ${large ? 'h-full flex flex-col' : ''}`}>
-      {/* Background decoration */}
-      <div className={`absolute top-0 right-0 w-32 h-32 opacity-10 rounded-full -translate-y-1/2 translate-x-1/2 transition-transform group-hover:scale-150 ${highlighted ? 'bg-primary' : 'bg-gray-400'}`} />
-      
-      {/* Image container with gradient fallback */}
-      <div className={`relative w-full rounded-xl mb-4 overflow-hidden shadow-md ${large ? 'h-48' : 'h-32'} ${imgError ? 'bg-gradient-to-br from-gray-200 to-gray-300' : ''}`}>
-        {!imgError && (
-          <img 
-            src={image} 
-            alt={title}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-            onError={() => setImgError(true)}
-          />
-        )}
-        {imgError && (
-          <div className="w-full h-full flex items-center justify-center">
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${highlighted ? 'bg-primary/20' : 'bg-gray-300'}`}>
-              <Sparkles className={`w-6 h-6 ${highlighted ? 'text-primary' : 'text-gray-500'}`} />
-            </div>
-          </div>
-        )}
-        {highlighted && !imgError && (
-          <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent" />
-        )}
-      </div>
-      <h3 className={`relative font-semibold mb-2 ${large ? 'text-xl' : 'text-lg'}`}>{title}</h3>
-      <p className={`relative text-muted-foreground ${large ? 'text-base flex-grow' : 'text-sm'}`}>{description}</p>
-    </div>
-  );
-}
-
-function UseCaseCard({ image, title, features }: { image: string; title: string; features: string[] }) {
-  const [imgError, setImgError] = useState(false);
-  
-  return (
-    <div className="group relative bg-gradient-to-br from-white to-gray-50 p-6 rounded-xl border hover:shadow-xl hover:scale-[1.02] transition-all duration-300 overflow-hidden">
-      {/* Gradient overlay on hover */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-purple-100 opacity-0 group-hover:opacity-100 transition-opacity" />
-      
-      {/* Decorative circle */}
-      <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/5 rounded-full group-hover:scale-150 transition-transform duration-500" />
-      
-      <div className="relative">
-        {/* Image with fallback */}
-        <div className={`w-full h-40 rounded-xl overflow-hidden mb-4 shadow-sm ${imgError ? 'bg-gradient-to-br from-gray-200 to-gray-300' : ''}`}>
-          {!imgError ? (
-            <img 
-              src={image} 
-              alt={title}
-              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-              onError={() => setImgError(true)}
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center">
-                <Users className="w-8 h-8 text-primary/60" />
-              </div>
-            </div>
-          )}
-        </div>
-        <h3 className="font-semibold text-lg mb-4">{title}</h3>
-        <ul className="space-y-2">
-          {features.map((feature, i) => (
-            <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
-              <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-              {feature}
-            </li>
-          ))}
-        </ul>
-      </div>
     </div>
   );
 }
