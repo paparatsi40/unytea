@@ -182,7 +182,8 @@ export const config = {
   matcher: [
     // Excluye Next.js internals, assets estáticos, API, PWA files, archivos SEO y excalidraw.
     // Las exclusiones de sitemap.xml/robots.txt/.xml/.txt evitan que intlMiddleware redirija
-    // /sitemap.xml -> /en/sitemap.xml -> 404.
-    "/((?!api|_next/static|_next/image|favicon.ico|manifest\\.json|sw\\.js|sitemap\\.xml|robots\\.txt|icons/|excalidraw-assets/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|woff2?|xml|txt)$).*)"
+    // /sitemap.xml -> /en/sitemap.xml -> 404. Lo mismo para /og (la dynamic OG image route
+    // vive en app/og/, no bajo [locale]).
+    "/((?!api|_next/static|_next/image|favicon.ico|manifest\\.json|sw\\.js|sitemap\\.xml|robots\\.txt|og$|icons/|excalidraw-assets/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|woff2?|xml|txt)$).*)"
   ]
 }
