@@ -101,6 +101,28 @@ export const BLOG_POSTS: BlogPost[] = [
     ],
   },
   {
+    slug: "turn-live-session-into-week-of-content",
+    title: "How to Turn One Live Session Into a Week of Content",
+    excerpt:
+      "Every session you run is already five pieces of content. Here's how to extract all of it without extra work.",
+    seoDescription:
+      "Learn how coaches, teachers, and creators can repurpose a single live session into social clips, library resources, course modules, and community posts.",
+    date: "2026-05-06",
+    author: "Unytea Team",
+    readTime: "6 min read",
+    featuredImage:
+      "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?auto=format&fit=crop&w=1400&q=80",
+    content: [
+      "Most coaches and teachers think of a live session as a single event — something that happens, then disappears. They spend hours preparing, deliver real value, and then watch it evaporate the moment the call ends. This is one of the most expensive habits in online education, and it's entirely avoidable.",
+      "Every live session you run is already five pieces of content waiting to be extracted: a replay for your library, a recap post for your community feed, short clips for social media, a module for your course, and a set of structured notes capturing key takeaways and action items. The session doesn't end when you click 'End Session' — it enters a second life as asynchronous content that keeps working for you.",
+      "Start with the recording. The moment your session ends, publish the replay to your knowledge library. Members in different time zones, members who couldn't make it live, and members who want to revisit specific moments will all access it. A library with consistent recordings becomes one of your most powerful retention tools — it's the reason people stay subscribed even in months when they miss sessions.",
+      "Next, write a session recap and post it to your community feed. This doesn't need to be long — three to five bullet points covering what was covered, what the key decision was, and what members should do before the next session. This post serves two functions: it gives attendees a reference they'll actually use, and it shows non-attendees what they missed, creating genuine FOMO that drives attendance at your next session.",
+      "For social media, the most valuable clips are rarely the moments you'd expect. Skip the intro and the outro. Look for the 30 to 90 second moment where you said something that surprised people, challenged a common assumption, or gave a specific tactic they could use immediately. That's your clip. Post it with a caption that frames the insight without giving everything away, and end with a question or a call to follow for more.",
+      "If the session covered a topic that fits into a structured curriculum, add the recording or the notes to a course module. This is how your course library grows without you recording new content from scratch. Over time, a year of weekly sessions becomes a comprehensive course — one that you built in real time, with real members, and refined through live interaction.",
+      "The final piece is your session notes. If you captured key takeaways, action items, and follow-up questions during the session, those notes are already a standalone resource. Export them, clean them up slightly, and publish them as a document in your library. Members who prefer reading over watching will thank you, and search engines will index the text — giving you an unexpected SEO benefit from content you already created.",
+    ],
+  },
+  {
     slug: "seo-for-community-platforms",
     title: "SEO Strategy for Community Platforms",
     excerpt:
