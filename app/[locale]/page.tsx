@@ -860,7 +860,13 @@ export default function Home() {
                   <div className="mt-auto flex items-center justify-between text-xs text-muted-foreground">
                     <span>{post.readTime}</span>
                     <span>
-                      {new Date(post.date).toLocaleDateString("en-US", {
+                      {/*
+                        Append T12:00:00 so the date isn't parsed as UTC
+                        midnight (which retrocedes a day in negative-offset
+                        timezones like America/Mexico). Noon local time is
+                        safe across every IANA zone.
+                      */}
+                      {new Date(post.date + "T12:00:00").toLocaleDateString("en-US", {
                         month: "short",
                         day: "numeric",
                         year: "numeric",
