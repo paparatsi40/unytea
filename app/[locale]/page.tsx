@@ -29,6 +29,7 @@ import { HeaderAuthCTA } from "./_home/HeaderAuthCTA";
 import { DemoVideoTrigger } from "./_home/DemoVideoTrigger";
 import { FeatureCard } from "./_home/FeatureCard";
 import { UseCaseCard } from "./_home/UseCaseCard";
+import { ProblemImage } from "./_home/ProblemImage";
 
 const META = {
   en: {
@@ -291,11 +292,9 @@ export default async function Home({
             <div className="grid md:grid-cols-3 gap-6">
               <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                 <div className="w-full h-40 rounded-xl overflow-hidden mb-4 bg-gradient-to-br from-gray-100 to-gray-200 relative group">
-                  <img 
-                    src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=400&q=80" 
+                  <ProblemImage
+                    src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=400&q=80"
                     alt="Boring meeting"
-                    className="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity"
-                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center shadow-lg">
@@ -308,11 +307,9 @@ export default async function Home({
               </div>
               <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                 <div className="w-full h-40 rounded-xl overflow-hidden mb-4 bg-gradient-to-br from-gray-100 to-gray-200 relative group">
-                  <img 
-                    src="https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?auto=format&fit=crop&w=400&q=80" 
+                  <ProblemImage
+                    src="https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?auto=format&fit=crop&w=400&q=80"
                     alt="Disorganized materials"
-                    className="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity"
-                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center shadow-lg">
@@ -325,11 +322,9 @@ export default async function Home({
               </div>
               <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                 <div className="w-full h-40 rounded-xl overflow-hidden mb-4 bg-gradient-to-br from-gray-100 to-gray-200 relative group">
-                  <img 
-                    src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=400&q=80" 
+                  <ProblemImage
+                    src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=400&q=80"
                     alt="Complex payments"
-                    className="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity"
-                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center shadow-lg">
