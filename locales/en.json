@@ -220,6 +220,12 @@
       "secondary": "Watch Demo",
       "guarantee": "No credit card required • 14-day free trial • Cancel anytime"
     },
+    "blogSection": {
+      "eyebrow": "From the blog",
+      "title": "Tactical reads for community builders",
+      "subtitle": "Practical playbooks on launching, growing, and monetizing communities.",
+      "readMore": "Read all posts"
+    },
     "footer": {
       "description": "The modern platform for creators to build, engage, and monetize their communities.",
       "product": "Product",

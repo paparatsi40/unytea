@@ -153,3 +153,15 @@ export function getAllPosts() {
 export function getPostBySlug(slug: string) {
   return BLOG_POSTS.find((post) => post.slug === slug);
 }
+
+/**
+ * Returns the N most recent posts sorted by date desc.
+ * Used by the homepage to surface fresh content — gives blog posts a direct
+ * link from the most-visited page, which Google reads as a strong signal that
+ * those posts matter (helps move them out of "Discovered - currently not indexed").
+ */
+export function getLatestPosts(n: number) {
+  return [...BLOG_POSTS]
+    .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0))
+    .slice(0, n);
+}
