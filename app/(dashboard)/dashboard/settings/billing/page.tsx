@@ -20,7 +20,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 
@@ -119,7 +118,6 @@ type Subscription = {
 };
 
 export default function BillingPage() {
-  const t = useTranslations();
   const [platformPlan, setPlatformPlan] = useState<string>("START");
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [isLoadingData, setIsLoadingData] = useState(true);
@@ -200,11 +198,9 @@ export default function BillingPage() {
     <div className="space-y-8">
       {/* Header */}
       <div className="flex flex-col gap-2">
-        <h2 className="text-3xl font-bold tracking-tight">
-          {t("settings.billing.title")}
-        </h2>
+        <h2 className="text-3xl font-bold tracking-tight">Facturación</h2>
         <p className="text-muted-foreground">
-          {t("settings.billing.description")}
+          Administra tu plan y suscripción de Unytea
         </p>
       </div>
 
@@ -270,7 +266,7 @@ export default function BillingPage() {
       </Card>
 
       {/* Pricing Grid */}
-      <div className="grid gap-6 lg:grid-cols-4">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
         {plans.map((plan) => {
           const state = getButtonState(plan);
           return (
