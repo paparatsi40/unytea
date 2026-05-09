@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { Button } from "@/components/ui/button";
-import { createCommunity } from "@/app/actions/communities";
+import { createCommunity, checkCommunityPlanLimit } from "@/app/actions/communities";
 import {
   ArrowLeft,
   ArrowRight,
@@ -13,6 +13,8 @@ import {
   Palette,
   Settings as SettingsIcon,
   Sparkles,
+  Lock,
+  Zap,
 } from "lucide-react";
 import { useUploadThing } from "@/lib/uploadthing";
 import { toast } from "sonner";
@@ -61,6 +63,16 @@ export default function NewCommunityPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
+  const [planCheck, setPlanCheck] = useState<{
+    canCreate: boolean;
+    plan: string;
+    current: number;
+    max: number;
+  } | null>(null);
+
+  useEffect(() => {
+    checkCommunityPlanLimit().then(setPlanCheck);
+  }, []);
   const [logoInputType, setLogoInputType] = useState<"upload" | "url">("upload");
   const [coverInputType, setCoverInputType] = useState<"upload" | "url">("upload");
   const [formData, setFormData] = useState({
@@ -191,12 +203,23 @@ export default function NewCommunityPage() {
         const redirectUrl = `/dashboard/communities/${result.community.id}/sessions?quickStart=1`;
         console.log("✅ Community created! Redirecting to quick schedule:", redirectUrl);
         console.log("✅ Membership ID:", result.membership?.id);
-        
+
         // Route host straight to first-session activation flow
         window.location.href = redirectUrl;
       } else {
         console.error("❌ Failed to create community:", result.error);
-        alert(result.error || t("communities.createFailed"));
+        if ((result as any).code === "PLAN_LIMIT_COMMUNITIES") {
+          toast.error(result.error ?? t("communities.createFailed"), {
+            duration: 6000,
+            action: {
+              label: "Upgrade",
+              onClick: () => router.push("/dashboard/settings/billing"),
+            },
+          });
+          setPlanCheck((prev) => prev ? { ...prev, canCreate: false } : prev);
+        } else {
+          toast.error(result.error || t("communities.createFailed"));
+        }
         setIsSubmitting(false);
       }
     } catch (error) {
@@ -207,6 +230,85 @@ export default function NewCommunityPage() {
   };
 
   const step = steps[currentStep];
+
+  // ── PLAN GATE: upgrade wall shown before the wizard ──────────────────
+  if (planCheck !== null && !planCheck.canCreate) {
+    const planLabels: Record<string, string> = {
+      START: "Start (Gratis)",
+      CREATOR: "Creator",
+      BUSINESS: "Business",
+      PRO: "Pro",
+    };
+    return (
+      <div className="mx-auto max-w-2xl space-y-6">
+        <Button
+          variant="ghost"
+          onClick={() => router.back()}
+          className="flex items-center space-x-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          <span>{t("communities.backToCommunities")}</span>
+        </Button>
+
+        <div className="rounded-2xl border border-border bg-card p-10 shadow-lg text-center space-y-6">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+            <Lock className="h-8 w-8 text-primary" />
+          </div>
+
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold text-foreground">
+              Límite de comunidades alcanzado
+            </h2>
+            <p className="text-muted-foreground">
+              Tu plan <span className="font-semibold text-foreground">{planLabels[planCheck.plan] ?? planCheck.plan}</span> permite{" "}
+              {planCheck.max === 1 ? "1 comunidad" : `${planCheck.max} comunidades`}. Ya tienes{" "}
+              {planCheck.current} activa{planCheck.current !== 1 ? "s" : ""}.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 text-left">
+            {[
+              { plan: "CREATOR", price: "$49/mes", communities: "1 comunidad", highlight: false },
+              { plan: "BUSINESS", price: "$99/mes", communities: "1 comunidad", highlight: false },
+              { plan: "PRO", price: "$199/mes", communities: "3 comunidades", highlight: true },
+            ].map((p) => (
+              <div
+                key={p.plan}
+                className={`rounded-xl border p-4 space-y-1 ${
+                  p.highlight
+                    ? "border-primary bg-primary/5 ring-2 ring-primary"
+                    : "border-border bg-background"
+                }`}
+              >
+                {p.highlight && (
+                  <span className="text-xs font-semibold text-primary uppercase tracking-wide">
+                    Recomendado
+                  </span>
+                )}
+                <p className="font-bold text-foreground">{p.plan}</p>
+                <p className="text-sm text-muted-foreground">{p.communities}</p>
+                <p className="text-lg font-semibold text-foreground">{p.price}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+            <Button
+              onClick={() => router.push("/dashboard/settings/billing")}
+              className="flex items-center gap-2"
+            >
+              <Zap className="h-4 w-4" />
+              Ver planes y actualizar
+            </Button>
+            <Button variant="outline" onClick={() => router.back()}>
+              Volver
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  // ─────────────────────────────────────────────────────────────────────
   const Icon = step.icon;
 
   const isStepValid = () => {

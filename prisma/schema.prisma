@@ -91,6 +91,7 @@ model User {
   lastActiveAt       DateTime?
   stripeConnectAccountId String?           // Stripe Connect account for community owners
   deletedAt          DateTime?
+  platformPlan       PlatformPlan      @default(START)
 
   // NextAuth Relations
   accounts           Account[]
@@ -1037,6 +1038,13 @@ model SessionFeedback {
   @@index([userId])
   @@index([rating])
   @@map("session_feedback")
+}
+
+enum PlatformPlan {
+  START
+  CREATOR
+  BUSINESS
+  PRO
 }
 
 enum MemberRole {
