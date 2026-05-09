@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getCurrentUserId } from "@/lib/auth-utils";
 import { prisma } from "@/lib/prisma";
+import { getLimitsForPlan } from "@/lib/plans";
 
 /**
  * Create a new course
@@ -34,6 +35,23 @@ export async function createCourse(data: {
     if (!community) {
       return { success: false, error: "Community not found or unauthorized" };
     }
+
+    // ── PLAN GATE: paidCourses ────────────────────────────────────────────
+    if (data.isPaid) {
+      const owner = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { platformPlan: true },
+      });
+      const limits = getLimitsForPlan(owner?.platformPlan);
+      if (!limits.paidCourses) {
+        return {
+          success: false,
+          error: "Tu plan no permite cursos de pago. Actualiza a Creator o superior.",
+          code: "PLAN_LIMIT_PAID_COURSES",
+        };
+      }
+    }
+    // ─────────────────────────────────────────────────────────────────────
 
     // Check if slug exists
     const existingCourse = await prisma.course.findFirst({
@@ -186,6 +204,23 @@ export async function updateCourse(
     if (course.community.ownerId !== userId) {
       return { success: false, error: "Unauthorized" };
     }
+
+    // ── PLAN GATE: paidCourses (on update) ───────────────────────────────
+    if (data.isPaid) {
+      const owner = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { platformPlan: true },
+      });
+      const limits = getLimitsForPlan(owner?.platformPlan);
+      if (!limits.paidCourses) {
+        return {
+          success: false,
+          error: "Tu plan no permite cursos de pago. Actualiza a Creator o superior.",
+          code: "PLAN_LIMIT_PAID_COURSES",
+        };
+      }
+    }
+    // ─────────────────────────────────────────────────────────────────────
 
     const updatedCourse = await prisma.course.update({
       where: { id: courseId },

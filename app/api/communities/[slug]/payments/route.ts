@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/auth-utils";
+import { getLimitsForPlan } from "@/lib/plans";
 
 export const dynamic = "force-dynamic";
 
@@ -214,6 +215,25 @@ export async function PUT(req: Request, context: RouteContext) {
     if (community.ownerId !== userId && !membership) {
       return NextResponse.json({ error: "Not authorized" }, { status: 403 });
     }
+
+    // ── PLAN GATE: paidCommunity ──────────────────────────────────────────
+    if (isPaid) {
+      const owner = await prisma.user.findUnique({
+        where: { id: community.ownerId },
+        select: { platformPlan: true },
+      });
+      const limits = getLimitsForPlan(owner?.platformPlan);
+      if (!limits.paidCommunity) {
+        return NextResponse.json(
+          {
+            error: "Tu plan no permite comunidades de pago. Actualiza a Creator o superior.",
+            code: "PLAN_LIMIT_PAID_COMMUNITY",
+          },
+          { status: 403 }
+        );
+      }
+    }
+    // ─────────────────────────────────────────────────────────────────────
 
     const updated = await prisma.community.update({
       where: { id: community.id },

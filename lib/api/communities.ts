@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/utils";
+import { getLimitsForPlan } from "@/lib/plans";
 
 /**
  * Create a new community
@@ -192,6 +193,45 @@ export async function updateMemberRole(
   memberId: string,
   role: "OWNER" | "ADMIN" | "MODERATOR" | "MENTOR" | "MEMBER"
 ) {
+  // ── PLAN GATE: maxAdmins ──────────────────────────────────────────────
+  if (role === "ADMIN") {
+    const member = await prisma.member.findUnique({
+      where: { id: memberId },
+      select: { communityId: true },
+    });
+
+    if (member) {
+      const community = await prisma.community.findUnique({
+        where: { id: member.communityId },
+        select: { ownerId: true },
+      });
+
+      if (community) {
+        const owner = await prisma.user.findUnique({
+          where: { id: community.ownerId },
+          select: { platformPlan: true },
+        });
+        const limits = getLimitsForPlan(owner?.platformPlan);
+
+        if (limits.maxAdmins !== Infinity) {
+          const currentAdminCount = await prisma.member.count({
+            where: {
+              communityId: member.communityId,
+              role: "ADMIN",
+            },
+          });
+
+          if (currentAdminCount >= limits.maxAdmins) {
+            throw new Error(
+              `Tu plan solo permite ${limits.maxAdmins} admin${limits.maxAdmins === 1 ? "" : "s"} por comunidad. Actualiza tu plan para agregar más.`
+            );
+          }
+        }
+      }
+    }
+  }
+  // ─────────────────────────────────────────────────────────────────────
+
   return await prisma.member.update({
     where: { id: memberId },
     data: { role },
