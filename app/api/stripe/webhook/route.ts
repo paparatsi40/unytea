@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
+import { getPlanFromPriceId } from "@/lib/plans";
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
@@ -29,21 +30,15 @@ export async function POST(request: Request) {
       );
     }
 
-    // Idempotency check (atomic).
-    // Stripe retries webhooks on timeout/error, which means the same event.id can arrive
-    // multiple times. We INSERT a record at the start; if it fails on unique constraint,
-    // we know we've already processed this event.
     try {
       await prisma.processedStripeEvent.create({
         data: { id: event.id, type: event.type },
       });
     } catch (err: any) {
-      // P2002 = unique constraint violation in Prisma → duplicate event.
       if (err?.code === "P2002") {
         console.log(`[stripe-webhook] event ${event.id} already processed, skipping`);
         return NextResponse.json({ received: true, duplicate: true });
       }
-      // Otherwise, real DB error — bubble up so Stripe retries.
       console.error(`[stripe-webhook] DB error recording event:`, err);
       return NextResponse.json(
         { error: "Failed to record event" },
@@ -53,56 +48,33 @@ export async function POST(request: Request) {
 
     console.log(`Webhook received: ${event.type}`);
 
-    // Handle the event
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object as any;
-        
-        // Get user ID from metadata
         const userId = session.metadata?.userId;
         const customerId = session.customer;
         const type = session.metadata?.type;
-        
+
         if (!userId) {
           console.error("No userId found in session metadata");
           break;
         }
 
-        // Handle course purchase
         if (type === "course_purchase") {
           const courseId = session.metadata?.courseId;
-          
+
           if (courseId) {
-            // Update purchase status to completed
             await prisma.coursePurchase.updateMany({
-              where: {
-                userId,
-                courseId,
-                stripeSessionId: session.id,
-              },
-              data: {
-                status: "completed",
-              },
+              where: { userId, courseId, stripeSessionId: session.id },
+              data: { status: "completed" },
             });
 
-            // Create enrollment for the course
             await prisma.enrollment.upsert({
-              where: {
-                userId_courseId: {
-                  userId,
-                  courseId,
-                },
-              },
+              where: { userId_courseId: { userId, courseId } },
               update: {},
-              create: {
-                userId,
-                courseId,
-                progress: 0,
-                enrolledAt: new Date(),
-              },
+              create: { userId, courseId, progress: 0, enrolledAt: new Date() },
             });
 
-            // Increment enrollment count
             await prisma.course.update({
               where: { id: courseId },
               data: { enrollmentCount: { increment: 1 } },
@@ -112,7 +84,7 @@ export async function POST(request: Request) {
           }
         }
 
-        console.log(`Checkout completed for user ${userId}, customer ${customerId}, type: ${type || 'platform'}`);
+        console.log(`Checkout completed for user ${userId}, customer ${customerId}, type: ${type || "platform"}`);
         break;
       }
 
@@ -120,46 +92,28 @@ export async function POST(request: Request) {
         const invoice = event.data.object as any;
         const subscriptionId = invoice.subscription;
         const customerId = invoice.customer;
-        
-        // Get subscription details from Stripe to check metadata
+
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
         const priceId = subscription.items.data[0]?.price.id;
-        
-        // Check if this is a community membership
+
         const type = subscription.metadata?.type;
         const communityId = subscription.metadata?.communityId;
         const userId = subscription.metadata?.userId;
-        
+
         if (type === "community_membership" && communityId && userId) {
-          // Handle community membership
-          // Check if user is already a member
           const existingMember = await prisma.member.findFirst({
-            where: {
-              userId: userId,
-              communityId: communityId,
-            },
+            where: { userId, communityId },
           });
 
           if (existingMember) {
-            // Update existing member to ACTIVE
             await prisma.member.update({
               where: { id: existingMember.id },
-              data: { 
-                status: "ACTIVE",
-              },
+              data: { status: "ACTIVE" },
             });
           } else {
-            // Create new member
             await prisma.member.create({
-              data: {
-                userId: userId,
-                communityId: communityId,
-                role: "MEMBER",
-                status: "ACTIVE",
-              },
+              data: { userId, communityId, role: "MEMBER", status: "ACTIVE" },
             });
-            
-            // Increment member count
             await prisma.community.update({
               where: { id: communityId },
               data: { memberCount: { increment: 1 } },
@@ -168,23 +122,45 @@ export async function POST(request: Request) {
 
           console.log(`Community membership created for user ${userId} in community ${communityId}`);
         } else {
-          // Handle platform subscription (existing logic)
-          // Find existing subscription by stripeCustomerId to get userId
+          // ── PLATFORM PLAN CHECK (Creator / Business / Pro) ──────────────
+          const platformPlan = getPlanFromPriceId(priceId ?? "");
+
+          if (platformPlan) {
+            const resolvedUserId =
+              userId ??
+              (
+                await prisma.subscription.findFirst({
+                  where: { stripeCustomerId: customerId },
+                  orderBy: { createdAt: "desc" },
+                  select: { userId: true },
+                })
+              )?.userId;
+
+            if (resolvedUserId) {
+              await prisma.user.update({
+                where: { id: resolvedUserId },
+                data: { platformPlan },
+              });
+              console.log(`[stripe-webhook] Platform plan updated: user ${resolvedUserId} → ${platformPlan}`);
+            } else {
+              console.error(`[stripe-webhook] Cannot resolve userId for platform plan. Customer: ${customerId}`);
+            }
+            break;
+          }
+          // ────────────────────────────────────────────────────────────────
+
           const existingSubscription = await prisma.subscription.findFirst({
             where: { stripeCustomerId: customerId },
-            orderBy: { createdAt: 'desc' },
+            orderBy: { createdAt: "desc" },
           });
 
-          // If no existing subscription, we need to get userId from checkout session
-          // This should be handled by the checkout.session.completed event first
           if (!existingSubscription) {
-            console.error(`No existing subscription found for customer: ${customerId}. User may not have completed checkout yet.`);
+            console.error(`No existing subscription found for customer: ${customerId}.`);
             break;
           }
 
           const platformUserId = existingSubscription.userId;
 
-          // Find subscription plan by stripePriceId
           const plan = await prisma.subscriptionPlan.findFirst({
             where: { stripePriceId: priceId },
           });
@@ -194,11 +170,8 @@ export async function POST(request: Request) {
             break;
           }
 
-          // Update or create subscription in database
           await prisma.subscription.upsert({
-            where: {
-              stripeSubscriptionId: subscriptionId,
-            },
+            where: { stripeSubscriptionId: subscriptionId },
             create: {
               userId: platformUserId,
               planId: plan.id,
@@ -225,7 +198,7 @@ export async function POST(request: Request) {
       case "invoice.payment_failed": {
         const invoice = event.data.object as any;
         const subscriptionId = invoice.subscription;
-        
+
         if (subscriptionId) {
           await prisma.subscription.updateMany({
             where: { stripeSubscriptionId: subscriptionId },
@@ -240,7 +213,7 @@ export async function POST(request: Request) {
       case "customer.subscription.updated": {
         const subscription = event.data.object as any;
         const subscriptionId = subscription.id;
-        
+
         await prisma.subscription.updateMany({
           where: { stripeSubscriptionId: subscriptionId },
           data: {
@@ -248,8 +221,8 @@ export async function POST(request: Request) {
             currentPeriodStart: new Date(subscription.current_period_start * 1000),
             currentPeriodEnd: new Date(subscription.current_period_end * 1000),
             cancelAtPeriodEnd: subscription.cancel_at_period_end,
-            canceledAt: subscription.canceled_at 
-              ? new Date(subscription.canceled_at * 1000) 
+            canceledAt: subscription.canceled_at
+              ? new Date(subscription.canceled_at * 1000)
               : null,
           },
         });
@@ -261,14 +234,30 @@ export async function POST(request: Request) {
       case "customer.subscription.deleted": {
         const subscription = event.data.object as any;
         const subscriptionId = subscription.id;
-        
+
         await prisma.subscription.updateMany({
           where: { stripeSubscriptionId: subscriptionId },
-          data: { 
-            status: "CANCELED",
-            cancelAtPeriodEnd: true,
-          },
+          data: { status: "CANCELED", cancelAtPeriodEnd: true },
         });
+
+        // ── PLATFORM PLAN: reset to START on cancellation ───────────────
+        const cancelledPriceId = subscription.items?.data?.[0]?.price?.id;
+        const cancelledPlatformPlan = getPlanFromPriceId(cancelledPriceId ?? "");
+
+        if (cancelledPlatformPlan) {
+          const subRecord = await prisma.subscription.findFirst({
+            where: { stripeSubscriptionId: subscriptionId },
+            select: { userId: true },
+          });
+          if (subRecord?.userId) {
+            await prisma.user.update({
+              where: { id: subRecord.userId },
+              data: { platformPlan: "START" },
+            });
+            console.log(`[stripe-webhook] Plan cancelled, user ${subRecord.userId} → START`);
+          }
+        }
+        // ────────────────────────────────────────────────────────────────
 
         console.log(`Subscription ${subscriptionId} canceled`);
         break;

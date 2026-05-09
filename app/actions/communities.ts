@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { getCurrentUserId } from "@/lib/auth-utils";
 import { checkAndUnlockAchievements } from "./achievements";
+import { getLimitsForPlan } from "@/lib/plans";
 
 /**
  * Create a new community
@@ -35,18 +36,32 @@ export async function createCommunity(data: {
     // DEBUG: Verify user exists in database
     const userExists = await prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, email: true },
+      select: { id: true, email: true, platformPlan: true },
     });
 
     if (!userExists) {
       console.error("User not found in database:", userId);
-      return { 
-        success: false, 
-        error: "User account not found. Please sign in again." 
+      return {
+        success: false,
+        error: "User account not found. Please sign in again."
       };
     }
 
     console.log("Creating community for user:", userExists.email);
+
+    // ── PLAN GATE: community limit ────────────────────────────────────────
+    const planLimits = getLimitsForPlan(userExists.platformPlan);
+    const ownedCount = await prisma.community.count({
+      where: { ownerId: userId },
+    });
+    if (ownedCount >= planLimits.maxCommunities) {
+      return {
+        success: false,
+        error: `Tu plan ${userExists.platformPlan ?? "START"} solo permite ${planLimits.maxCommunities} comunidad${planLimits.maxCommunities === 1 ? "" : "es"}. Actualiza tu plan para crear más.`,
+        code: "PLAN_LIMIT_COMMUNITIES",
+      };
+    }
+    // ─────────────────────────────────────────────────────────────────────
 
     // Check if slug is already taken
     const existingCommunity = await prisma.community.findUnique({
@@ -215,6 +230,21 @@ export async function joinCommunity(communityId: string) {
         code: "PAYMENT_REQUIRED",
       };
     }
+
+    // ── PLAN GATE: member limit (based on owner's plan) ──────────────────
+    const owner = await prisma.user.findUnique({
+      where: { id: community.ownerId },
+      select: { platformPlan: true },
+    });
+    const ownerLimits = getLimitsForPlan(owner?.platformPlan);
+    if (ownerLimits.maxMembers !== Infinity && community.memberCount >= ownerLimits.maxMembers) {
+      return {
+        success: false,
+        error: "Esta comunidad ha alcanzado su límite de miembros.",
+        code: "PLAN_LIMIT_MEMBERS",
+      };
+    }
+    // ─────────────────────────────────────────────────────────────────────
 
     // Create membership
     const member = await prisma.member.create({
@@ -508,5 +538,37 @@ export async function getUserCommunities() {
   } catch (error) {
     console.error("Error getting communities:", error);
     return { success: false, error: "Failed to get communities" };
+  }
+}
+
+/**
+ * Check if the current user can create another community based on their plan
+ */
+export async function checkCommunityPlanLimit() {
+  try {
+    const userId = await getCurrentUserId();
+    if (!userId) {
+      return { canCreate: false, plan: "START", current: 0, max: 1 };
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { platformPlan: true },
+    });
+
+    const planLimits = getLimitsForPlan(user?.platformPlan);
+    const current = await prisma.community.count({
+      where: { ownerId: userId },
+    });
+
+    return {
+      canCreate: current < planLimits.maxCommunities,
+      plan: (user?.platformPlan ?? "START") as string,
+      current,
+      max: planLimits.maxCommunities,
+    };
+  } catch {
+    // On error, allow creation (server action will enforce the real limit)
+    return { canCreate: true, plan: "START", current: 0, max: 1 };
   }
 }
