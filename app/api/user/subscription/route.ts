@@ -37,8 +37,17 @@ export async function GET() {
       },
     });
 
+    // Always include platformPlan from the user record
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { platformPlan: true },
+    });
+
     if (!subscription) {
-      return NextResponse.json({ subscription: null });
+      return NextResponse.json({
+        subscription: null,
+        platformPlan: user?.platformPlan ?? "START",
+      });
     }
 
     return NextResponse.json({
@@ -49,6 +58,7 @@ export async function GET() {
         currentPeriodEnd: subscription.currentPeriodEnd,
         cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
       },
+      platformPlan: user?.platformPlan ?? "START",
     });
   } catch (error) {
     console.error("Error fetching subscription:", error);
