@@ -1,11 +1,39 @@
+/**
+ * Server-side authorization primitives for unytea.
+ *
+ * This module provides primitives that THROW on failure — designed for use
+ * in Server Actions where error handling is explicit and a thrown Error
+ * propagates as a failed action.
+ *
+ * For redirect-based auth (pages, Server Components), see lib/auth-utils.ts.
+ *
+ * Primitives:
+ * - requireUserId() — assert auth, return userId
+ * - requireCommunityMember(userId, communityId) — assert active membership
+ * - requireCommunityRole(userId, communityId, roles) — assert role
+ * - requireCommunityAdmin/Moderator/Owner — role shortcuts
+ * - requireResourceOwner(userId, resourceId, type) — assert ownership
+ * - canEditPost / canDeletePost / canAccessCommunity / canSendMessage —
+ *   composite checks that return boolean
+ * - Permissions — declarative permission map (returns boolean)
+ *
+ * NOTE: As of 2026-05-12, this module has zero external callers. It's
+ * scaffolding intended for use in API route protection (Phase 2c) and
+ * Server Actions where RBAC is needed.
+ */
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { MemberRole } from "@prisma/client";
 
 /**
- * Check if user is authenticated
+ * Server-side: Require authenticated user, return userId.
+ *
+ * Throws Error("Unauthorized - Please sign in") if not authenticated.
+ *
+ * Use in Server Actions where you want explicit error handling.
+ * For Server Components / pages, use auth-utils.requireAuth() which redirects.
  */
-export async function requireAuth() {
+export async function requireUserId() {
   const session = await auth();
   if (!session?.user?.id) {
     throw new Error("Unauthorized - Please sign in");
@@ -227,6 +255,11 @@ export async function canSendMessage(
  */
 export const Permissions = {
   // Community permissions
+  // TODO(2026-05-12): This implementation contradicts auth-utils.canCreateCommunity
+  //   which enforces plan limits ("free plan: max 1 community"). Both are currently
+  //   dead code (zero callers). Before wiring either into routes, resolve the
+  //   business rule: is community creation gated by plan, or always allowed?
+  //   Audit reference: docs/audit/2026-05-11/03_auth.md
   canCreateCommunity: async (_userId: string) => {
     // Anyone can create a community
     return true;

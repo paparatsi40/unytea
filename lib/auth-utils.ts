@@ -1,3 +1,30 @@
+/**
+ * Server-side auth helpers for unytea pages and Server Components.
+ *
+ * This module provides helpers that REDIRECT on failure — designed for use
+ * in Server Components and pages where an unauthenticated user should be
+ * sent to /auth/signin automatically.
+ *
+ * For throw-based auth (Server Actions, RBAC), see lib/authorization.ts.
+ *
+ * Active helpers (40 callers across the codebase):
+ * - getCurrentUserId() — return userId or null (most-used)
+ *
+ * Lower-usage helpers (kept for future wiring in Phase 2c):
+ * - getCurrentUser() — return session.user or null
+ * - isAuthenticated() — boolean check
+ * - getFullUser() — with relations
+ * - requireAuth() — assert auth via redirect, return session
+ * - requireOnboarded() — assert auth + onboarded
+ *
+ * Subscription / community helpers:
+ * - hasActiveSubscription / getUserSubscription / canCreateCommunity
+ * - isMemberOfCommunity / isOwnerOfCommunity / getUserRoleInCommunity
+ *
+ * NOTE: Several of these helpers have RBAC counterparts in lib/authorization.ts.
+ * Phase 2c (route audit) will determine which to wire up. Until then, both
+ * libraries are kept intact.
+ */
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
@@ -129,6 +156,10 @@ export async function getUserSubscription(userId?: string | null) {
   return subscription;
 }
 
+// TODO(2026-05-12): This implementation contradicts lib/authorization.ts's
+//   Permissions.canCreateCommunity which returns true unconditionally. Both
+//   are currently dead code (zero callers). Before wiring either, resolve
+//   the business rule. Audit ref: docs/audit/2026-05-11/03_auth.md
 /**
  * Server-side: Check if user can create more communities based on plan
  */
