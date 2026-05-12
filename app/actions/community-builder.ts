@@ -1,8 +1,38 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 import { getCurrentUserId } from "@/lib/auth-utils";
 import { prisma } from "@/lib/prisma";
+import { sanitizeHTML } from "@/lib/sanitize";
+
+/**
+ * Zod schema for updateCommunityTheme input.
+ *
+ * Validates field shapes + length limits. Note: customCSS is intentionally
+ * NOT included — it has no rendering consumer in the codebase (verified by
+ * grep in Phase 2c.5 recon), so we reject it at the input gate rather than
+ * accepting and storing dead data. When customCSS becomes a real feature
+ * with product requirements, design proper CSS sanitization at that time.
+ */
+const themeUpdateSchema = z.object({
+  primaryColor: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Invalid hex color").optional(),
+  secondaryColor: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Invalid hex color").optional(),
+  accentColor: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Invalid hex color").optional(),
+  fontFamily: z.string().max(100).optional(),
+  heroTitle: z.string().max(200).optional(),
+  heroSubtitle: z.string().max(500).optional(),
+  heroCTA: z.string().max(50).optional(),
+  heroCTALink: z.union([
+    z.string().url(),
+    z.string().regex(/^\/[^\s]*$/, "Must be a relative path starting with /"),
+    z.literal(""),
+  ]).optional(),
+  aboutSection: z.string().max(50000).optional(),
+  showStats: z.boolean().optional(),
+  showMembers: z.boolean().optional(),
+  showCourses: z.boolean().optional(),
+});
 
 /**
  * Update community theme (colors, fonts, hero)
@@ -20,7 +50,7 @@ export async function updateCommunityTheme(communityId: string, data: {
   showStats?: boolean;
   showMembers?: boolean;
   showCourses?: boolean;
-  customCSS?: string;
+  // customCSS removed in Phase 2c.5 — see schema docstring above
 }) {
   try {
     const userId = await getCurrentUserId();
@@ -42,10 +72,27 @@ export async function updateCommunityTheme(communityId: string, data: {
       return { success: false, error: "Not authorized to edit community" };
     }
 
-    // Update community
+    // Validate input shape and lengths
+    const parsed = themeUpdateSchema.safeParse(data);
+    if (!parsed.success) {
+      return {
+        success: false,
+        error: "Validation failed",
+        details: parsed.error.flatten(),
+      };
+    }
+
+    // Sanitize HTML in aboutSection (Tiptap WYSIWYG output → DOMPurify allowlist)
+    const sanitized = {
+      ...parsed.data,
+      aboutSection: parsed.data.aboutSection !== undefined
+        ? sanitizeHTML(parsed.data.aboutSection)
+        : undefined,
+    };
+
     const community = await prisma.community.update({
       where: { id: communityId },
-      data,
+      data: sanitized,
     });
 
     revalidatePath(`/dashboard/c/${community.slug}`);
