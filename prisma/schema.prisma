@@ -63,75 +63,75 @@ model PasswordResetToken {
 
 // Application User Model
 model User {
-  id                 String            @id @default(cuid())
-  name               String?
-  email              String            @unique
-  emailVerified      DateTime?
-  password           String?
-  image              String?
-  username           String?           @unique
-  firstName          String?
-  lastName           String?
-  bio                String?
-  tagline            String?           // Short one-liner
-  skills             String[]          @default([])
-  interests          String[]          @default([])
-  website            String?
-  location           String?
-  timezone           String?           @default("UTC")
-  availabilityStatus String?           @default("AVAILABLE") // AVAILABLE, BUSY, DO_NOT_DISTURB, MENTORING
-  isOnboarded        Boolean           @default(false)
-  points             Int               @default(0)
-  level              Int               @default(1)
-  currentStreak      Int               @default(0)
-  longestStreak      Int               @default(0)
-  lastStreakDate     DateTime?                        // Last date the streak was updated
-  createdAt          DateTime          @default(now())
-  updatedAt          DateTime          @updatedAt
-  lastActiveAt       DateTime?
-  stripeConnectAccountId String?           // Stripe Connect account for community owners
-  deletedAt          DateTime?
-  platformPlan       PlatformPlan      @default(START)
+  id                     String       @id @default(cuid())
+  name                   String?
+  email                  String       @unique
+  emailVerified          DateTime?
+  password               String?
+  image                  String?
+  username               String?      @unique
+  firstName              String?
+  lastName               String?
+  bio                    String?
+  tagline                String? // Short one-liner
+  skills                 String[]     @default([])
+  interests              String[]     @default([])
+  website                String?
+  location               String?
+  timezone               String?      @default("UTC")
+  availabilityStatus     String?      @default("AVAILABLE") // AVAILABLE, BUSY, DO_NOT_DISTURB, MENTORING
+  isOnboarded            Boolean      @default(false)
+  points                 Int          @default(0)
+  level                  Int          @default(1)
+  currentStreak          Int          @default(0)
+  longestStreak          Int          @default(0)
+  lastStreakDate         DateTime? // Last date the streak was updated
+  createdAt              DateTime     @default(now())
+  updatedAt              DateTime     @updatedAt
+  lastActiveAt           DateTime?
+  stripeConnectAccountId String? // Stripe Connect account for community owners
+  deletedAt              DateTime?
+  platformPlan           PlatformPlan @default(START)
 
   // NextAuth Relations
-  accounts           Account[]
-  sessions           Session[]
-  
+  accounts Account[]
+  sessions Session[]
+
   // Application Relations
-  mentorAvailability Availability[]
-  comments           Comment[]
-  ownedCommunities   Community[]       @relation("CommunityOwner")
-  conversationsAsParticipant1 Conversation[] @relation("ConversationParticipant1")
-  conversationsAsParticipant2 Conversation[] @relation("ConversationParticipant2")
-  receivedMessages   DirectMessage[]   @relation("MessageReceiver")
-  sentMessages       DirectMessage[]   @relation("MessageSender")
-  memberships        Member[]
-  notifications      Notification[]
-  posts              Post[]
-  reactions          Reaction[]
-  menteeSessions     MentorSession[]   @relation("MenteeSessions")
-  mentorSessions     MentorSession[]   @relation("MentorSessions")
-  sessionSeries      SessionSeries[]   // Host of recurring session series
-  achievements       UserAchievement[]
-  channelMessages    ChannelMessage[]
-  channelMembers     ChannelMember[]
-  buddyPartnerships1 BuddyPartnership[] @relation("BuddyUser1")
-  buddyPartnerships2 BuddyPartnership[] @relation("BuddyUser2")
-  buddyCheckIns      BuddyCheckIn[]
-  sessionParticipations SessionParticipation[]
-  sessionResources     SessionResource[]  // Resources created by user
-  sessionFeedbacks   SessionFeedback[]
-  
+  mentorAvailability          Availability[]
+  comments                    Comment[]
+  ownedCommunities            Community[]            @relation("CommunityOwner")
+  conversationsAsParticipant1 Conversation[]         @relation("ConversationParticipant1")
+  conversationsAsParticipant2 Conversation[]         @relation("ConversationParticipant2")
+  receivedMessages            DirectMessage[]        @relation("MessageReceiver")
+  sentMessages                DirectMessage[]        @relation("MessageSender")
+  memberships                 Member[]
+  notifications               Notification[]
+  posts                       Post[]
+  reactions                   Reaction[]
+  menteeSessions              MentorSession[]        @relation("MenteeSessions")
+  mentorSessions              MentorSession[]        @relation("MentorSessions")
+  sessionSeries               SessionSeries[] // Host of recurring session series
+  achievements                UserAchievement[]
+  channelMessages             ChannelMessage[]
+  channelMembers              ChannelMember[]
+  buddyPartnerships1          BuddyPartnership[]     @relation("BuddyUser1")
+  buddyPartnerships2          BuddyPartnership[]     @relation("BuddyUser2")
+  buddyCheckIns               BuddyCheckIn[]
+  sessionParticipations       SessionParticipation[]
+  sessionResources            SessionResource[] // Resources created by user
+  sessionFeedbacks            SessionFeedback[]
+
   // Resource Library Relations
-  resources          Resource[]          @relation("ResourceAuthor")
-  resourceProgress   ResourceProgress[]
-  resourceLikes      ResourceLike[]
+  resources        Resource[]         @relation("ResourceAuthor")
+  resourceProgress ResourceProgress[]
+  resourceLikes    ResourceLike[]
 
   // Gamification
-  dailyActivities    DailyActivity[]
+  dailyActivities DailyActivity[]
 
   // Push Notifications
-  pushSubscriptions  PushSubscription[]
+  pushSubscriptions PushSubscription[]
 
   @@index([email])
   @@index([username])
@@ -139,53 +139,54 @@ model User {
 }
 
 model Community {
-  id                String             @id @default(cuid())
-  name              String
-  slug              String             @unique
-  description       String?
-  imageUrl          String?
-  coverImageUrl     String?
-  theme             Json?
-  customDomain      String?            @unique
-  subdomain         String?            @unique
-  isPaid            Boolean            @default(false)
-  pricing           Json?
-  stripeAccountId   String?
-  isPrivate         Boolean            @default(false)
-  requireApproval   Boolean            @default(false)
-  settings          Json?
-  metaTitle         String?
-  metaDescription   String?
-  memberCount       Int                @default(0)
-  postCount         Int                @default(0)
-  
+  id              String  @id @default(cuid())
+  name            String
+  slug            String  @unique
+  description     String?
+  imageUrl        String?
+  coverImageUrl   String?
+  theme           Json?
+  customDomain    String? @unique
+  subdomain       String? @unique
+  isPaid          Boolean @default(false)
+  pricing         Json?
+  stripeAccountId String?
+  isPrivate       Boolean @default(false)
+  requireApproval Boolean @default(false)
+  settings        Json?
+  metaTitle       String?
+  metaDescription String?
+  memberCount     Int     @default(0)
+  postCount       Int     @default(0)
+
   // 🎨 PAGE BUILDER FIELDS (NEW)
-  layoutType        CommunityLayoutType @default(MODERN_GRID)
-  primaryColor      String?            @default("#8B5CF6") // Purple
-  secondaryColor    String?            @default("#EC4899") // Pink
-  accentColor       String?            @default("#F59E0B") // Amber
-  fontFamily        String?            @default("Inter")
-  heroTitle         String?
-  heroSubtitle      String?
-  heroCTA           String?
-  heroCTALink       String?
-  aboutSection      String?            @db.Text
-  showStats         Boolean            @default(true)
-  showMembers       Boolean            @default(true)
-  showCourses       Boolean            @default(true)
-  customCSS         String?            @db.Text
-  sectionOrder      String[]           @default([]) // Array of section IDs
-  
+  layoutType     CommunityLayoutType @default(MODERN_GRID)
+  primaryColor   String?             @default("#8B5CF6") // Purple
+  secondaryColor String?             @default("#EC4899") // Pink
+  accentColor    String?             @default("#F59E0B") // Amber
+  fontFamily     String?             @default("Inter")
+  heroTitle      String?
+  heroSubtitle   String?
+  heroCTA        String?
+  heroCTALink    String?
+  aboutSection   String?             @db.Text
+  showStats      Boolean             @default(true)
+  showMembers    Boolean             @default(true)
+  showCourses    Boolean             @default(true)
+  customCSS      String?             @db.Text
+  sectionOrder   String[]            @default([]) // Array of section IDs
+
   // 👤 OWNER BIO & CUSTOM CONTENT
-  ownerBio          String?            @db.Text
-  ownerTitle        String?            // e.g., "Founder", "Lead Instructor"
-  ownerLinks        Json?              // Social links, website, etc.
-  customImages      Json?              // Array of custom image URLs with titles/descriptions
-  welcomeMessage    String?            @db.Text
-  
+  ownerBio           String? @db.Text
+  ownerTitle         String? // e.g., "Founder", "Lead Instructor"
+  ownerLinks         Json? // Social links, website, etc.
+  customImages       Json? // Array of custom image URLs with titles/descriptions
+  welcomeMessage     String? @db.Text
+  showWelcomeMessage Boolean @default(true)
+
   // SECTION BUILDER (NEW - replaces Visual Builder)
-  landingLayout     Json?              // Array of SectionInstance objects from Section Builder
-  
+  landingLayout Json? // Array of SectionInstance objects from Section Builder
+
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   deletedAt         DateTime?
@@ -198,12 +199,12 @@ model Community {
   subscriptionPlans SubscriptionPlan[]
   buddyPartnerships BuddyPartnership[]
   sections          CommunitySection[] // Drag & drop sections
-  sessions          MentorSession[]    // Community live sessions
-  sessionSeries     SessionSeries[]    // Recurring session series
-  sessionEvents     SessionEvent[]     // Audit events
-  
+  sessions          MentorSession[] // Community live sessions
+  sessionSeries     SessionSeries[] // Recurring session series
+  sessionEvents     SessionEvent[] // Audit events
+
   // Resource Library Relations
-  resources         Resource[]
+  resources          Resource[]
   resourceCategories ResourceCategory[]
 
   @@index([slug])
@@ -214,22 +215,23 @@ model Community {
 }
 
 model Member {
-  id          String       @id @default(cuid())
-  role        MemberRole   @default(MEMBER)
-  
+  id   String     @id @default(cuid())
+  role MemberRole @default(MEMBER)
+
   // 🔐 ENHANCED PERMISSIONS (NEW)
-  customRole  String?      // Custom role name (e.g., "Content Manager", "Lead Instructor")
-  permissions Json?        // Granular permissions object
-  
-  points      Int          @default(0)
-  level       Int          @default(1)
-  status      MemberStatus @default(ACTIVE)
-  joinedAt    DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  userId      String
-  communityId String
-  community   Community    @relation(fields: [communityId], references: [id], onDelete: Cascade)
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  customRole  String? // Custom role name (e.g., "Content Manager", "Lead Instructor")
+  permissions Json? // Granular permissions object
+
+  points             Int          @default(0)
+  level              Int          @default(1)
+  status             MemberStatus @default(ACTIVE)
+  joinedAt           DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  userId             String
+  communityId        String
+  welcomeMessageSeen Boolean      @default(false)
+  community          Community    @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  user               User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, communityId])
   @@index([userId])
@@ -239,17 +241,17 @@ model Member {
 }
 
 model Channel {
-  id          String          @id @default(cuid())
+  id          String           @id @default(cuid())
   name        String
   slug        String
   description String?
   emoji       String?
-  position    Int             @default(0)
-  isPrivate   Boolean         @default(false)
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
+  position    Int              @default(0)
+  isPrivate   Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
   communityId String
-  community   Community       @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  community   Community        @relation(fields: [communityId], references: [id], onDelete: Cascade)
   posts       Post[]
   messages    ChannelMessage[]
   members     ChannelMember[]
@@ -354,17 +356,17 @@ model DirectMessage {
 }
 
 model Conversation {
-  id               String          @id @default(cuid())
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
-  lastMessageAt    DateTime        @default(now())
-  participant1Id   String
-  participant2Id   String
-  isBlocked        Boolean         @default(false)
-  blockedBy        String?
-  participant1     User            @relation("ConversationParticipant1", fields: [participant1Id], references: [id], onDelete: Cascade)
-  participant2     User            @relation("ConversationParticipant2", fields: [participant2Id], references: [id], onDelete: Cascade)
-  messages         DirectMessage[]
+  id             String          @id @default(cuid())
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  lastMessageAt  DateTime        @default(now())
+  participant1Id String
+  participant2Id String
+  isBlocked      Boolean         @default(false)
+  blockedBy      String?
+  participant1   User            @relation("ConversationParticipant1", fields: [participant1Id], references: [id], onDelete: Cascade)
+  participant2   User            @relation("ConversationParticipant2", fields: [participant2Id], references: [id], onDelete: Cascade)
+  messages       DirectMessage[]
 
   @@unique([participant1Id, participant2Id])
   @@index([participant1Id])
@@ -374,7 +376,7 @@ model Conversation {
 }
 
 model MentorSession {
-  id            String        @id @default(cuid())
+  id            String            @id @default(cuid())
   title         String
   description   String?
   scheduledAt   DateTime
@@ -383,40 +385,40 @@ model MentorSession {
   meetingUrl    String?
   roomId        String?
   recordingUrl  String?
-  videoRoomName String?       // LiveKit room name (e.g., "session-cm123456")
+  videoRoomName String? // LiveKit room name (e.g., "session-cm123456")
   status        SessionStatus     @default(SCHEDULED)
-  mode          SessionMode       @default(VIDEO)  // VIDEO | AUDIO
+  mode          SessionMode       @default(VIDEO) // VIDEO | AUDIO
   visibility    SessionVisibility @default(community) // community | public | unlisted
   mentorNotes   String?
   menteeNotes   String?
-  
+
   // Public URL fields
-  slug          String?       @unique  // For public session pages /s/[slug]
-  
+  slug String? @unique // For public session pages /s/[slug]
+
   // Recurring session fields
-  seriesId      String?       // null = one-time session
-  isException   Boolean       @default(false)
-  exceptionData Json?         // store what changed for this exception
-  feedPostId    String?       // linked feed post for this session
-  attendeeCount Int           @default(0)
-  
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  startedAt     DateTime?
-  endedAt       DateTime?
-  mentorId      String
-  menteeId      String
-  communityId   String?       // Optional for now, for backward compatibility
-  community     Community?    @relation(fields: [communityId], references: [id], onDelete: SetNull)
-  mentee        User          @relation("MenteeSessions", fields: [menteeId], references: [id], onDelete: Cascade)
-  mentor        User          @relation("MentorSessions", fields: [mentorId], references: [id], onDelete: Cascade)
-  series        SessionSeries? @relation(fields: [seriesId], references: [id], onDelete: SetNull)
+  seriesId      String? // null = one-time session
+  isException   Boolean @default(false)
+  exceptionData Json? // store what changed for this exception
+  feedPostId    String? // linked feed post for this session
+  attendeeCount Int     @default(0)
+
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+  startedAt      DateTime?
+  endedAt        DateTime?
+  mentorId       String
+  menteeId       String
+  communityId    String? // Optional for now, for backward compatibility
+  community      Community?             @relation(fields: [communityId], references: [id], onDelete: SetNull)
+  mentee         User                   @relation("MenteeSessions", fields: [menteeId], references: [id], onDelete: Cascade)
+  mentor         User                   @relation("MentorSessions", fields: [mentorId], references: [id], onDelete: Cascade)
+  series         SessionSeries?         @relation(fields: [seriesId], references: [id], onDelete: SetNull)
   participations SessionParticipation[]
-  feedbacks     SessionFeedback[]
-  notes         SessionNote?
-  recording     Recording?
-  events        SessionEvent[]
-  resources     SessionResource[]
+  feedbacks      SessionFeedback[]
+  notes          SessionNote?
+  recording      Recording?
+  events         SessionEvent[]
+  resources      SessionResource[]
 
   @@index([mentorId])
   @@index([menteeId])
@@ -433,38 +435,38 @@ model MentorSession {
 // ============================================
 
 model SessionSeries {
-  id              String    @id @default(cuid())
-  communityId     String?
-  hostId          String
-  title           String
-  description     String?
-  
+  id          String  @id @default(cuid())
+  communityId String?
+  hostId      String
+  title       String
+  description String?
+
   // Recurrence rules
-  frequency       SessionFrequency @default(WEEKLY)  // weekly | monthly
-  interval        Int       @default(1)            // every 1 week, every 2 weeks, etc.
-  dayOfWeek       Int?      // 0-6 (Sunday-Saturday) for weekly
-  dayOfMonth      Int?      // 1-31 for monthly
-  startTime       String    // "10:00" format
-  durationMinutes Int       @default(60)
-  timezone        String    @default("UTC")
-  mode            SessionMode @default(VIDEO)  // VIDEO | AUDIO for all instances
-  
+  frequency       SessionFrequency @default(WEEKLY) // weekly | monthly
+  interval        Int              @default(1) // every 1 week, every 2 weeks, etc.
+  dayOfWeek       Int? // 0-6 (Sunday-Saturday) for weekly
+  dayOfMonth      Int? // 1-31 for monthly
+  startTime       String // "10:00" format
+  durationMinutes Int              @default(60)
+  timezone        String           @default("UTC")
+  mode            SessionMode      @default(VIDEO) // VIDEO | AUDIO for all instances
+
   // Series lifecycle
-  startsAt        DateTime
-  endsAt          DateTime? // optional end date
-  isActive        Boolean   @default(true)
-  
+  startsAt DateTime
+  endsAt   DateTime? // optional end date
+  isActive Boolean   @default(true)
+
   // Automation settings
-  autoPostToFeed  Boolean   @default(true)
-  
+  autoPostToFeed Boolean @default(true)
+
   // Relations
-  community       Community? @relation(fields: [communityId], references: [id], onDelete: SetNull)
-  host            User       @relation(fields: [hostId], references: [id], onDelete: Cascade)
-  instances       MentorSession[]
-  
+  community Community?      @relation(fields: [communityId], references: [id], onDelete: SetNull)
+  host      User            @relation(fields: [hostId], references: [id], onDelete: Cascade)
+  instances MentorSession[]
+
   // Timestamps
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([communityId])
   @@index([hostId])
@@ -474,17 +476,17 @@ model SessionSeries {
 }
 
 model SessionNote {
-  id          String   @id @default(cuid())
-  content     String   @db.Text  // Rich text content (JSON/HTML)
-  summary     String?  @db.Text  // Auto-generated summary
-  keyInsights String?  @db.Text  // Array of key insights (JSON)
-  resources   String?  @db.Text  // Array of links/resources (JSON)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  sessionId   String   @unique  // One note per session
-  session     MentorSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  lastEditedBy String?        // User ID who last edited
-  
+  id           String        @id @default(cuid())
+  content      String        @db.Text // Rich text content (JSON/HTML)
+  summary      String?       @db.Text // Auto-generated summary
+  keyInsights  String?       @db.Text // Array of key insights (JSON)
+  resources    String?       @db.Text // Array of links/resources (JSON)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  sessionId    String        @unique // One note per session
+  session      MentorSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  lastEditedBy String? // User ID who last edited
+
   @@index([sessionId])
   @@map("session_notes")
 }
@@ -494,20 +496,20 @@ model SessionNote {
 // ============================================
 
 model SessionResource {
-  id          String            @id @default(cuid())
+  id          String              @id @default(cuid())
   sessionId   String
   type        SessionResourceType
   title       String
   url         String
   description String?
-  
+
   createdById String
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
-  
-  session     MentorSession     @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  createdBy   User              @relation(fields: [createdById], references: [id], onDelete: Cascade)
-  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  session   MentorSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  createdBy User          @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
   @@index([sessionId])
   @@index([type])
   @@index([createdById])
@@ -519,29 +521,29 @@ model SessionResource {
 // ============================================
 
 model Recording {
-  id              String          @id @default(cuid())
-  sessionId       String          @unique
+  id        String @id @default(cuid())
+  sessionId String @unique
 
   status          RecordingStatus @default(PROCESSING)
   url             String?
   durationSeconds Int?
 
   // LiveKit Egress fields
-  egressId        String?         @unique  // LiveKit Egress ID
-  fileSize        Int?                     // File size in bytes
-  storageProvider String?         @default("s3")  // s3, r2, gcs
-  storageBucket   String?                  // Bucket name
-  storageKey      String?                  // Object key/path
-  
+  egressId        String? @unique // LiveKit Egress ID
+  fileSize        Int? // File size in bytes
+  storageProvider String? @default("s3") // s3, r2, gcs
+  storageBucket   String? // Bucket name
+  storageKey      String? // Object key/path
+
   // Processing metadata
   processingStartedAt DateTime?
   processingEndedAt   DateTime?
-  errorMessage    String?
+  errorMessage        String?
 
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  session         MentorSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  session MentorSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@index([status])
   @@index([egressId])
@@ -553,18 +555,18 @@ model Recording {
 // ============================================
 
 model SessionEvent {
-  id            String           @id @default(cuid())
-  sessionId     String
-  communityId   String?
-  
-  type          SessionEventType
-  payload       Json?            // Flexible JSON for event details
-  
-  createdAt     DateTime         @default(now())
-  
-  session       MentorSession    @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  community     Community?       @relation(fields: [communityId], references: [id], onDelete: SetNull)
-  
+  id          String  @id @default(cuid())
+  sessionId   String
+  communityId String?
+
+  type    SessionEventType
+  payload Json? // Flexible JSON for event details
+
+  createdAt DateTime @default(now())
+
+  session   MentorSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  community Community?    @relation(fields: [communityId], references: [id], onDelete: SetNull)
+
   @@index([sessionId, createdAt])
   @@index([communityId, createdAt])
   @@index([type, createdAt])
@@ -707,56 +709,56 @@ model LessonProgress {
 // ============================================
 
 model Quiz {
-  id              String        @id @default(cuid())
-  title           String
-  description     String?
-  passingScore    Int           @default(70)    // Percentage needed to pass
-  maxAttempts     Int?                          // null = unlimited
-  timeLimit       Int?                          // Time limit in seconds, null = no limit
-  shuffleQuestions Boolean      @default(false)
-  showResults     Boolean       @default(true)  // Show correct answers after attempt
-  position        Int           @default(0)
-  lessonId        String
-  lesson          Lesson        @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-  questions       QuizQuestion[]
-  attempts        QuizAttempt[]
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  id               String         @id @default(cuid())
+  title            String
+  description      String?
+  passingScore     Int            @default(70) // Percentage needed to pass
+  maxAttempts      Int? // null = unlimited
+  timeLimit        Int? // Time limit in seconds, null = no limit
+  shuffleQuestions Boolean        @default(false)
+  showResults      Boolean        @default(true) // Show correct answers after attempt
+  position         Int            @default(0)
+  lessonId         String
+  lesson           Lesson         @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  questions        QuizQuestion[]
+  attempts         QuizAttempt[]
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
 
   @@index([lessonId])
   @@map("quizzes")
 }
 
 model QuizQuestion {
-  id              String        @id @default(cuid())
-  question        String
-  type            QuizQuestionType @default(MULTIPLE_CHOICE)
-  options         Json          // Array of { id, text, isCorrect }
-  explanation     String?       // Shown after answering
-  points          Int           @default(1)
-  position        Int           @default(0)
-  quizId          String
-  quiz            Quiz          @relation(fields: [quizId], references: [id], onDelete: Cascade)
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  id          String           @id @default(cuid())
+  question    String
+  type        QuizQuestionType @default(MULTIPLE_CHOICE)
+  options     Json // Array of { id, text, isCorrect }
+  explanation String? // Shown after answering
+  points      Int              @default(1)
+  position    Int              @default(0)
+  quizId      String
+  quiz        Quiz             @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
 
   @@index([quizId])
   @@map("quiz_questions")
 }
 
 model QuizAttempt {
-  id              String        @id @default(cuid())
-  userId          String
-  quizId          String
-  quiz            Quiz          @relation(fields: [quizId], references: [id], onDelete: Cascade)
-  answers         Json          // Array of { questionId, selectedOptionId, isCorrect }
-  score           Float         // Percentage score (0-100)
-  passed          Boolean       @default(false)
-  pointsEarned    Int           @default(0)
-  totalPoints     Int           @default(0)
-  timeSpent       Int?          // Seconds spent on quiz
-  startedAt       DateTime      @default(now())
-  completedAt     DateTime?
+  id           String    @id @default(cuid())
+  userId       String
+  quizId       String
+  quiz         Quiz      @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  answers      Json // Array of { questionId, selectedOptionId, isCorrect }
+  score        Float // Percentage score (0-100)
+  passed       Boolean   @default(false)
+  pointsEarned Int       @default(0)
+  totalPoints  Int       @default(0)
+  timeSpent    Int? // Seconds spent on quiz
+  startedAt    DateTime  @default(now())
+  completedAt  DateTime?
 
   @@index([userId, quizId])
   @@index([quizId])
@@ -764,18 +766,18 @@ model QuizAttempt {
 }
 
 model Certificate {
-  id              String     @id @default(cuid())
-  certificateNumber String   @unique          // e.g. "UNY-2026-XXXX"
-  userId          String
-  enrollmentId    String     @unique
-  enrollment      Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
-  courseName      String                      // Snapshot at time of issue
-  userName        String                      // Snapshot at time of issue
-  communityName   String?                     // Snapshot
-  completionDate  DateTime
-  score           Float?                      // Average quiz score if applicable
-  issuedAt        DateTime   @default(now())
-  metadata        Json?                       // Extra data for template rendering
+  id                String     @id @default(cuid())
+  certificateNumber String     @unique // e.g. "UNY-2026-XXXX"
+  userId            String
+  enrollmentId      String     @unique
+  enrollment        Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  courseName        String // Snapshot at time of issue
+  userName          String // Snapshot at time of issue
+  communityName     String? // Snapshot
+  completionDate    DateTime
+  score             Float? // Average quiz score if applicable
+  issuedAt          DateTime   @default(now())
+  metadata          Json? // Extra data for template rendering
 
   @@index([userId])
   @@index([certificateNumber])
@@ -783,9 +785,9 @@ model Certificate {
 }
 
 enum QuizQuestionType {
-  MULTIPLE_CHOICE     // Single correct answer
-  MULTI_SELECT        // Multiple correct answers
-  TRUE_FALSE          // True or False
+  MULTIPLE_CHOICE // Single correct answer
+  MULTI_SELECT // Multiple correct answers
+  TRUE_FALSE // True or False
 }
 
 model SubscriptionPlan {
@@ -876,15 +878,15 @@ model Notification {
 }
 
 model ChannelMessage {
-  id          String    @id @default(cuid())
+  id          String   @id @default(cuid())
   content     String
   attachments Json?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   authorId    String
   channelId   String
-  author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  channel     Channel   @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  channel     Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
 
   @@index([authorId])
   @@index([channelId])
@@ -893,16 +895,16 @@ model ChannelMessage {
 }
 
 model ChannelMember {
-  id            String    @id @default(cuid())
-  isOnline      Boolean   @default(false)
-  isTyping      Boolean   @default(false)
-  lastSeenAt    DateTime  @default(now())
-  lastTypingAt  DateTime?
-  joinedAt      DateTime  @default(now())
-  userId        String
-  channelId     String
-  channel       Channel   @relation(fields: [channelId], references: [id], onDelete: Cascade)
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String    @id @default(cuid())
+  isOnline     Boolean   @default(false)
+  isTyping     Boolean   @default(false)
+  lastSeenAt   DateTime  @default(now())
+  lastTypingAt DateTime?
+  joinedAt     DateTime  @default(now())
+  userId       String
+  channelId    String
+  channel      Channel   @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, channelId])
   @@index([userId])
@@ -912,19 +914,19 @@ model ChannelMember {
 }
 
 model BuddyPartnership {
-  id          String   @id @default(cuid())
+  id          String      @id @default(cuid())
   user1Id     String
   user2Id     String
   communityId String
   status      BuddyStatus @default(ACTIVE)
-  matchedAt   DateTime @default(now())
+  matchedAt   DateTime    @default(now())
   endedAt     DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 
-  user1     User      @relation("BuddyUser1", fields: [user1Id], references: [id], onDelete: Cascade)
-  user2     User      @relation("BuddyUser2", fields: [user2Id], references: [id], onDelete: Cascade)
-  community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  user1     User           @relation("BuddyUser1", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2     User           @relation("BuddyUser2", fields: [user2Id], references: [id], onDelete: Cascade)
+  community Community      @relation(fields: [communityId], references: [id], onDelete: Cascade)
   checkIns  BuddyCheckIn[]
   goals     BuddyGoal[]
 
@@ -936,14 +938,14 @@ model BuddyPartnership {
 }
 
 model BuddyCheckIn {
-  id            String   @id @default(cuid())
-  partnershipId String
-  userId        String
+  id             String   @id @default(cuid())
+  partnershipId  String
+  userId         String
   // Valid range: 1-10. Application-level validation required.
-  mood          Int      @default(5) // 1-10 scale
-  notes         String?
+  mood           Int      @default(5) // 1-10 scale
+  notes          String?
   completedGoals String[] // Array of goal IDs
-  createdAt     DateTime @default(now())
+  createdAt      DateTime @default(now())
 
   partnership BuddyPartnership @relation(fields: [partnershipId], references: [id], onDelete: Cascade)
   user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -954,15 +956,15 @@ model BuddyCheckIn {
 }
 
 model BuddyGoal {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   partnershipId String
   title         String
   description   String?
   targetDate    DateTime?
-  completed     Boolean  @default(false)
+  completed     Boolean   @default(false)
   completedAt   DateTime?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   partnership BuddyPartnership @relation(fields: [partnershipId], references: [id], onDelete: Cascade)
 
@@ -974,10 +976,10 @@ model CommunitySection {
   id          String               @id @default(cuid())
   type        CommunitySectionType
   title       String?
-  content     Json?                // Flexible content storage
+  content     Json? // Flexible content storage
   position    Int                  @default(0)
   isVisible   Boolean              @default(true)
-  settings    Json?                // Section-specific settings
+  settings    Json? // Section-specific settings
   createdAt   DateTime             @default(now())
   updatedAt   DateTime             @updatedAt
   communityId String
@@ -995,19 +997,19 @@ model SessionParticipation {
   role            ParticipationRole @default(listener)
   joinedAt        DateTime          @default(now())
   leftAt          DateTime?
-  durationSeconds Int?              // Calculated when session ends
+  durationSeconds Int? // Calculated when session ends
   pointsEarned    Int               @default(0)
-  eventsData      Json?              // Track specific events: questions_asked, answers_given, etc.
-  
+  eventsData      Json? // Track specific events: questions_asked, answers_given, etc.
+
   // LiveKit integration fields
-  livekitIdentity String?  @unique  // Maps to LiveKit participant identity
-  messagesCount   Int      @default(0)  // Chat messages sent
-  reactionsCount  Int      @default(0)  // Reactions sent
-  handRaisedCount Int      @default(0)  // Times raised hand
-  wasInvited      Boolean  @default(false)  // Was invited to speak
-  
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  livekitIdentity String? @unique // Maps to LiveKit participant identity
+  messagesCount   Int     @default(0) // Chat messages sent
+  reactionsCount  Int     @default(0) // Reactions sent
+  handRaisedCount Int     @default(0) // Times raised hand
+  wasInvited      Boolean @default(false) // Was invited to speak
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   session MentorSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   user    User          @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -1022,13 +1024,13 @@ model SessionParticipation {
 }
 
 model SessionFeedback {
-  id          String   @id @default(cuid())
-  sessionId   String
-  userId      String
-  rating      Int      // 1-5 stars
-  comment     String?  @db.Text
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  sessionId String
+  userId    String
+  rating    Int // 1-5 stars
+  comment   String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   session MentorSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   user    User          @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -1067,7 +1069,7 @@ enum PostContentType {
   QUESTION
   ANNOUNCEMENT
   RESOURCE
-  SESSION_ANNOUNCEMENT  // Auto-posted when session is created
+  SESSION_ANNOUNCEMENT // Auto-posted when session is created
 }
 
 enum SessionStatus {
@@ -1182,25 +1184,25 @@ enum BuddyStatus {
 }
 
 enum CommunityLayoutType {
-  MODERN_GRID       // Pinterest-style, visual-first
-  CLASSIC_FORUM     // Traditional forum layout
-  ACADEMY           // Course-focused educational
-  DASHBOARD         // Analytics and data-visible
-  MINIMALIST        // Clean, Notion-like
+  MODERN_GRID // Pinterest-style, visual-first
+  CLASSIC_FORUM // Traditional forum layout
+  ACADEMY // Course-focused educational
+  DASHBOARD // Analytics and data-visible
+  MINIMALIST // Clean, Notion-like
 }
 
 enum CommunitySectionType {
-  HERO              // Hero banner with CTA
-  ABOUT             // About section with rich text
-  STATS             // Member/post/course statistics
-  FEATURED_POSTS    // Highlighted content
-  FEATURED_COURSES  // Course showcase
-  MEMBER_GRID       // Active members display
-  TESTIMONIALS      // Member testimonials
-  CTA               // Call to action block
-  CUSTOM_HTML       // Custom content block
-  EVENTS            // Upcoming events
-  LEADERBOARD       // Top contributors
+  HERO // Hero banner with CTA
+  ABOUT // About section with rich text
+  STATS // Member/post/course statistics
+  FEATURED_POSTS // Highlighted content
+  FEATURED_COURSES // Course showcase
+  MEMBER_GRID // Active members display
+  TESTIMONIALS // Member testimonials
+  CTA // Call to action block
+  CUSTOM_HTML // Custom content block
+  EVENTS // Upcoming events
+  LEADERBOARD // Top contributors
 }
 
 // ============================================
@@ -1221,45 +1223,45 @@ enum ResourceStatus {
 }
 
 model Resource {
-  id          String        @id @default(cuid())
+  id          String         @id @default(cuid())
   title       String
   slug        String
   description String?
   type        ResourceType
   status      ResourceStatus @default(DRAFT)
-  
+
   // Content fields
-  fileUrl     String?       // Para uploads (Uploadthing)
-  externalUrl String?       // Para links externos
+  fileUrl      String? // Para uploads (Uploadthing)
+  externalUrl  String? // Para links externos
   thumbnailUrl String?
-  duration    Int?          // En segundos (para audio/video)
-  fileSize    Int?          // En bytes
-  mimeType    String?
-  
+  duration     Int? // En segundos (para audio/video)
+  fileSize     Int? // En bytes
+  mimeType     String?
+
   // Metadata
-  tags        String[]      @default([])
-  categoryId  String?
-  category    ResourceCategory? @relation(fields: [categoryId], references: [id])
-  
+  tags       String[]          @default([])
+  categoryId String?
+  category   ResourceCategory? @relation(fields: [categoryId], references: [id])
+
   // Access control
-  isPublic    Boolean       @default(false)
-  requiredLevel Int?        // Nivel mínimo para acceder
-  
+  isPublic      Boolean @default(false)
+  requiredLevel Int? // Nivel mínimo para acceder
+
   // Relations
   communityId String
-  community   Community     @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
   authorId    String
-  author      User          @relation("ResourceAuthor", fields: [authorId], references: [id], onDelete: Cascade)
-  
+  author      User      @relation("ResourceAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+
   // Tracking
-  viewCount   Int           @default(0)
-  downloadCount Int         @default(0)
-  likes       ResourceLike[]
-  progress    ResourceProgress[]
-  
+  viewCount     Int                @default(0)
+  downloadCount Int                @default(0)
+  likes         ResourceLike[]
+  progress      ResourceProgress[]
+
   // Timestamps
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   publishedAt DateTime?
   deletedAt   DateTime?
 
@@ -1272,41 +1274,41 @@ model Resource {
 }
 
 model ResourceCategory {
-  id          String     @id @default(cuid())
+  id          String  @id @default(cuid())
   name        String
   slug        String
   description String?
-  icon        String?    // Emoji o icon name
-  position    Int        @default(0)
-  color       String?    // Color de la categoría
-  
+  icon        String? // Emoji o icon name
+  position    Int     @default(0)
+  color       String? // Color de la categoría
+
   communityId String
   community   Community  @relation(fields: [communityId], references: [id], onDelete: Cascade)
   resources   Resource[]
-  
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@unique([communityId, slug])
   @@index([communityId, position])
   @@map("resource_categories")
 }
 
 model ResourceProgress {
-  id          String   @id @default(cuid())
-  progress    Float    @default(0)  // 0-100
-  currentTime Int?     // En segundos (para resume playback)
-  completed   Boolean  @default(false)
+  id          String    @id @default(cuid())
+  progress    Float     @default(0) // 0-100
+  currentTime Int? // En segundos (para resume playback)
+  completed   Boolean   @default(false)
   completedAt DateTime?
-  
-  resourceId  String
-  resource    Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  updatedAt   DateTime @updatedAt
-  createdAt   DateTime @default(now())
-  
+
+  resourceId String
+  resource   Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
   @@unique([resourceId, userId])
   @@index([userId, updatedAt])
   @@map("resource_progress")
@@ -1329,27 +1331,27 @@ model ResourceLike {
 // ============================================
 
 model DailyActivity {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  date        DateTime @db.Date          // Date only (no time), one record per day
+  id     String   @id @default(cuid())
+  userId String
+  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date   DateTime @db.Date // Date only (no time), one record per day
 
   // Activity counts for the day
-  posts       Int      @default(0)
-  comments    Int      @default(0)
-  messages    Int      @default(0)
-  reactions   Int      @default(0)
-  sessions    Int      @default(0)       // Live sessions attended
-  resources   Int      @default(0)       // Resources viewed/completed
+  posts     Int @default(0)
+  comments  Int @default(0)
+  messages  Int @default(0)
+  reactions Int @default(0)
+  sessions  Int @default(0) // Live sessions attended
+  resources Int @default(0) // Resources viewed/completed
 
   // Points earned this day
-  pointsEarned Int     @default(0)
+  pointsEarned Int @default(0)
 
   // Whether this day counted toward a streak
-  streakDay   Boolean  @default(true)
+  streakDay Boolean @default(true)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([userId, date])
   @@index([userId, date])
@@ -1359,16 +1361,16 @@ model DailyActivity {
 
 // ── Push Notification Subscriptions ──────────────────────────────────
 model PushSubscription {
-  id         String   @id @default(cuid())
-  userId     String
-  endpoint   String   @unique
-  p256dh     String   // Public key
-  auth       String   // Auth secret
-  userAgent  String?  // Browser/device info
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String   @unique
+  p256dh    String // Public key
+  auth      String // Auth secret
+  userAgent String? // Browser/device info
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@map("push_subscriptions")
@@ -1385,22 +1387,22 @@ model Report {
   status      ReportStatus @default(PENDING)
 
   // What is being reported
-  targetType  ReportTargetType
-  postId      String?
-  commentId   String?
-  userId      String?      @map("reportedUserId")  // The user being reported
-  messageId   String?
+  targetType ReportTargetType
+  postId     String?
+  commentId  String?
+  userId     String?          @map("reportedUserId") // The user being reported
+  messageId  String?
 
   // Who reported it
-  reporterId  String
+  reporterId String
 
   // Resolution
-  resolvedAt  DateTime?
-  resolvedBy  String?
-  resolution  String?      @db.Text
+  resolvedAt DateTime?
+  resolvedBy String?
+  resolution String?   @db.Text
 
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([status])
   @@index([targetType])
