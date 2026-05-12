@@ -258,14 +258,13 @@ export async function canSendMessage(
  */
 export const Permissions = {
   // Community permissions
-  // TODO(2026-05-12): This implementation contradicts auth-utils.canCreateCommunity
-  //   which enforces plan limits ("free plan: max 1 community"). Both are currently
-  //   dead code (zero callers). Before wiring either into routes, resolve the
-  //   business rule: is community creation gated by plan, or always allowed?
-  //   Audit reference: docs/audit/2026-05-11/03_auth.md
-  canCreateCommunity: async (_userId: string) => {
-    // Anyone can create a community
-    return true;
+  canCreateCommunity: async (userId: string) => {
+    // Delegates to auth-utils — single source of truth for plan limits.
+    // Resolves the contradiction flagged in the Phase 2b TODO.
+    // Dynamic import keeps the dependency direction clean (auth-utils doesn't
+    // import authorization).
+    const { canCreateCommunity: planCheck } = await import("@/lib/auth-utils");
+    return planCheck(userId);
   },
 
   canUpdateCommunity: async (userId: string, communityId: string) => {

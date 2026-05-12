@@ -1,80 +1,109 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUserId } from "@/lib/auth-utils";
-export const dynamic = 'force-dynamic';
+import { getCurrentUserId, canCreateCommunity } from "@/lib/auth-utils";
+import { rateLimiters } from "@/lib/rate-limit";
+import { handleApiError } from "@/lib/api-error-handler";
+import {
+  UnauthorizedError,
+  ForbiddenError,
+} from "@/lib/authorization";
+import { z } from "zod";
 
+export const dynamic = "force-dynamic";
 
+const createCommunitySchema = z.object({
+  name: z.string().trim().min(3).max(100),
+  description: z.string().max(500).optional().nullable(),
+  imageUrl: z.string().url().max(2048).optional().nullable(),
+  coverImageUrl: z.string().url().max(2048).optional().nullable(),
+  isPrivate: z.boolean().optional(),
+  requireApproval: z.boolean().optional(),
+});
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
+    // 1. Auth
     const userId = await getCurrentUserId();
-    
     if (!userId) {
+      throw new UnauthorizedError();
+    }
+
+    // 2. Rate limit (10 creations per minute per user)
+    const rateLimit = await rateLimiters.create.check(`create-community:${userId}`);
+    if (!rateLimit.success) {
       return NextResponse.json(
-        { error: "Unauthorized - Please sign in" },
-        { status: 401 }
+        {
+          error: "Too many requests. Please try again later.",
+          resetTime: rateLimit.resetTime,
+        },
+        { status: 429 }
       );
     }
 
-    // Parse request body
+    // 3. Validate input
     const body = await req.json();
-    const { name, description, imageUrl, coverImageUrl, isPrivate, requireApproval } = body;
+    const data = createCommunitySchema.parse(body);
 
-    if (!name || name.length < 3) {
-      return NextResponse.json(
-        { error: "Name must be at least 3 characters" },
-        { status: 400 }
+    // 4. Plan limit (delegates to auth-utils — single source of truth)
+    const allowedByPlan = await canCreateCommunity(userId);
+    if (!allowedByPlan) {
+      throw new ForbiddenError(
+        "Plan limit reached: upgrade to create more communities"
       );
     }
 
-    // Generate unique slug
-    let slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    // 5. Generate unique slug from name (collision-safe)
+    let slug = data.name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
     const existingCommunity = await prisma.community.findUnique({
       where: { slug },
     });
-
     if (existingCommunity) {
       slug = `${slug}-${Date.now()}`;
     }
 
-    // Create community
+    // 6. Create community
     const community = await prisma.community.create({
       data: {
-        name,
+        name: data.name,
         slug,
-        description: description || null,
+        description: data.description ?? null,
         ownerId: userId,
-        imageUrl: imageUrl || null,
-        coverImageUrl: coverImageUrl || null,
-        isPrivate: isPrivate || false,
-        requireApproval: requireApproval || false,
+        imageUrl: data.imageUrl ?? null,
+        coverImageUrl: data.coverImageUrl ?? null,
+        isPrivate: data.isPrivate ?? false,
+        requireApproval: data.requireApproval ?? false,
       },
     });
 
-    // Add creator as admin member
+    // 7. Add creator as OWNER member
     await prisma.member.create({
       data: {
-        userId: userId,
+        userId,
         communityId: community.id,
         role: "OWNER",
-        status: "ACTIVE", 
+        status: "ACTIVE",
       },
     });
 
     return NextResponse.json({ success: true, community }, { status: 201 });
   } catch (error) {
-    console.error("Error creating community:", error);
-    return NextResponse.json(
-      { error: "Internal server error", details: error instanceof Error ? error.message : "Unknown error" },
-      { status: 500 }
-    );
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: "Validation failed", details: error.flatten() },
+        { status: 400 }
+      );
+    }
+    return handleApiError(error);
   }
 }
 
 export async function GET() {
   try {
     const userId = await getCurrentUserId();
-    
+
     if (!userId) {
       return NextResponse.json(
         { error: "userId is required" },
