@@ -57,11 +57,12 @@ function resolveLocale(value: string): SupportedLocale {
     : "en";
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { locale: string };
-}): Promise<Metadata> {
+export async function generateMetadata(
+  props: {
+    params: Promise<{ locale: string }>;
+  }
+): Promise<Metadata> {
+  const params = await props.params;
   const locale = resolveLocale(params.locale);
   const m = META[locale];
   return {
@@ -76,11 +77,12 @@ export async function generateMetadata({
   };
 }
 
-export default async function Home({
-  params,
-}: {
-  params: { locale: string };
-}) {
+export default async function Home(
+  props: {
+    params: Promise<{ locale: string }>;
+  }
+) {
+  const params = await props.params;
   const locale = resolveLocale(params.locale);
   setRequestLocale(locale);
 

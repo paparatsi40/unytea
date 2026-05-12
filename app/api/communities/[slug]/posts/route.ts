@@ -17,10 +17,8 @@ function parseLimit(value: string | null): number {
   return Math.min(parsed, MAX_LIMIT);
 }
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { slug: string } }
-) {
+export async function GET(request: NextRequest, props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
   try {
     // Get userId from session (not from query params for security)
     const userId = await getCurrentUserId();

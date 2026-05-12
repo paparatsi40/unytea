@@ -166,7 +166,7 @@ function appendAcceptEncodingVary(response: Response): Response {
 }
 
 // Dispatcher: decide si la request necesita auth() o solo intl.
-export default async function middleware(req: NextRequest) {
+export default async function proxy(req: NextRequest) {
   const response: Response = routeNeedsAuth(req.nextUrl.pathname)
     ? // El cast es seguro: auth() acepta NextRequest y construye NextAuthRequest internamente.
       await (authMiddleware as unknown as (

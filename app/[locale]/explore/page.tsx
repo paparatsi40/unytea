@@ -70,11 +70,12 @@ function getBoostScore(settings: unknown): number {
   return 0;
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { locale: string };
-}): Promise<Metadata> {
+export async function generateMetadata(
+  props: {
+    params: Promise<{ locale: string }>;
+  }
+): Promise<Metadata> {
+  const params = await props.params;
   const canonical = `https://www.unytea.com/${params.locale}/explore`;
   const title = "Explore Communities | Unytea";
   const description =
@@ -102,20 +103,21 @@ export async function generateMetadata({
   };
 }
 
-export default async function ExploreCommunitiesPage({
-  params,
-  searchParams,
-}: {
-  params: { locale: string };
-  searchParams?: {
-    q?: string;
-    category?: string;
-    monetization?: "all" | "free" | "paid";
-    language?: string;
-    sessionsWeek?: "all" | "yes";
-    sort?: "trending" | "members" | "newest";
-  };
-}) {
+export default async function ExploreCommunitiesPage(
+  props: {
+    params: Promise<{ locale: string }>;
+    searchParams?: Promise<{
+      q?: string;
+      category?: string;
+      monetization?: "all" | "free" | "paid";
+      language?: string;
+      sessionsWeek?: "all" | "yes";
+      sort?: "trending" | "members" | "newest";
+    }>;
+  }
+) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const query = searchParams?.q?.trim() || "";
   const selectedCategory = searchParams?.category?.trim() || "all";
   const selectedMonetization = searchParams?.monetization?.trim() || "all";

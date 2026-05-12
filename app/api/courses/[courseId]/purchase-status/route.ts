@@ -8,10 +8,8 @@ export const dynamic = "force-dynamic";
  * Check if user has purchased a course
  * GET /api/courses/[courseId]/purchase-status
  */
-export async function GET(
-  _req: Request,
-  { params }: { params: { courseId: string } }
-) {
+export async function GET(_req: Request, props: { params: Promise<{ courseId: string }> }) {
+  const params = await props.params;
   try {
     const session = await auth();
 

@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { SectionSchema } from "../types";
 
 export const TestimonialsRender = (props: Record<string, any>) => {
