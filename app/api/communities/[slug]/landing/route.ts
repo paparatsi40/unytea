@@ -52,10 +52,8 @@ const landingPatchSchema = z.object({
   landingLayout: z.array(sectionInstanceSchema).max(50),
 });
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: { slug: string } }
-) {
+export async function GET(_request: NextRequest, props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
   try {
     const community = await prisma.community.findUnique({
       where: { slug: params.slug },
@@ -87,10 +85,8 @@ export async function GET(
   }
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { slug: string } }
-) {
+export async function PATCH(request: NextRequest, props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
   try {
     const userId = await getCurrentUserId();
 

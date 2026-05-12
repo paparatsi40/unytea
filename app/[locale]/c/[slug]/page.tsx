@@ -68,11 +68,12 @@ function renderSection(section: SectionInstance, index: number) {
   }
 }
 
-export default async function PublicCommunityPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
+export default async function PublicCommunityPage(
+  props: {
+    params: Promise<{ slug: string }>;
+  }
+) {
+  const params = await props.params;
   const community = await getCommunity(params.slug);
 
   if (!community) {
@@ -114,12 +115,11 @@ export default async function PublicCommunityPage({
           )}
         </div>
       </div>
-
       {/* Main Content */}
       <main className="container mx-auto px-4 py-12">
         {sections.length === 0 ? (
           // Empty State
-          <div className="mx-auto max-w-3xl rounded-2xl border-2 border-dashed border-border bg-white p-16 text-center">
+          (<div className="mx-auto max-w-3xl rounded-2xl border-2 border-dashed border-border bg-white p-16 text-center">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-purple-100">
               <svg
                 className="h-8 w-8 text-purple-600"
@@ -148,12 +148,11 @@ export default async function PublicCommunityPage({
                 <Button>Build Landing Page</Button>
               </Link>
             )}
-          </div>
+          </div>)
         ) : (
           // Render Sections
-          <div className="mx-auto max-w-6xl space-y-12">
+          (<div className="mx-auto max-w-6xl space-y-12">
             {sections.map((section, index) => renderSection(section, index))}
-
             {/* Footer CTA if owner */}
             {isOwner && (
               <div className="mt-16 rounded-lg border border-blue-200 bg-blue-50 p-6 text-center">
@@ -167,10 +166,9 @@ export default async function PublicCommunityPage({
                 </Link>
               </div>
             )}
-          </div>
+          </div>)
         )}
       </main>
-
       {/* Footer */}
       <footer className="mt-24 border-t border-border bg-white py-12">
         <div className="container mx-auto px-4 text-center">

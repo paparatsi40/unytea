@@ -1,5 +1,7 @@
 /** ========== Section Builder Types ========== */
 
+import type { JSX } from "react";
+
 export type SectionType =
   | "hero"
   | "features"

@@ -1,1 +1,2 @@
-export { default } from "@/app/auth/forgot-password/page";
+export { /* @next-codemod-error `default` export is re-exported. Check if this component uses `params` or `searchParams`*/
+default } from "@/app/auth/forgot-password/page";

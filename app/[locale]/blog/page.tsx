@@ -9,11 +9,12 @@ const META = {
   description: "Insights and tactical guides for creators and community operators.",
 };
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { locale: string };
-}): Promise<Metadata> {
+export async function generateMetadata(
+  props: {
+    params: Promise<{ locale: string }>;
+  }
+): Promise<Metadata> {
+  const params = await props.params;
   return {
     title: META.title,
     description: META.description,
@@ -31,7 +32,8 @@ export async function generateMetadata({
   };
 }
 
-export default function BlogPage({ params }: { params: { locale: string } }) {
+export default async function BlogPage(props: { params: Promise<{ locale: string }> }) {
+  const params = await props.params;
   const { locale } = params;
   const posts = getAllPosts();
 

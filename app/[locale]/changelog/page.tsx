@@ -9,11 +9,12 @@ const META = {
     "See what's new on Unytea — recent updates, features, improvements, and fixes.",
 };
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { locale: string };
-}): Promise<Metadata> {
+export async function generateMetadata(
+  props: {
+    params: Promise<{ locale: string }>;
+  }
+): Promise<Metadata> {
+  const params = await props.params;
   return {
     title: META.title,
     description: META.description,
@@ -229,11 +230,12 @@ const RELEASES: ReleaseEntry[] = [
   },
 ];
 
-export default function ChangelogPage({
-  params,
-}: {
-  params: { locale: string };
-}) {
+export default async function ChangelogPage(
+  props: {
+    params: Promise<{ locale: string }>;
+  }
+) {
+  const params = await props.params;
   const { locale } = params;
 
   return (

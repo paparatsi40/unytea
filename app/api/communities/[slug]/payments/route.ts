@@ -6,7 +6,7 @@ import { getLimitsForPlan } from "@/lib/plans";
 export const dynamic = "force-dynamic";
 
 type RouteContext = {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 };
 
 type TierPricing = {
@@ -92,7 +92,7 @@ export async function GET(_req: Request, context: RouteContext) {
     }
 
     const community = await prisma.community.findUnique({
-      where: { slug: context.params.slug },
+      where: { slug: (await context.params).slug },
       select: {
         id: true,
         ownerId: true,
@@ -191,7 +191,7 @@ export async function PUT(req: Request, context: RouteContext) {
     }
 
     const community = await prisma.community.findUnique({
-      where: { slug: context.params.slug },
+      where: { slug: (await context.params).slug },
       select: {
         id: true,
         ownerId: true,

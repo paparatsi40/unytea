@@ -8,9 +8,9 @@ import Link from "next/link";
 import { Lock, ArrowLeft } from "lucide-react";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 import { Community } from "@prisma/client";
@@ -63,11 +63,12 @@ function JoinCommunityView({ community, stats }: { community: Community; stats?:
   );
 }
 
-export default async function CommunityPage({ params }: PageProps) {
+export default async function CommunityPage(props: PageProps) {
+  const params = await props.params;
   const { slug } = params;
-  
+
   const session = await auth();
-  
+
   if (!session?.user?.id) {
     // For non-logged in users, show public landing page
     const result = await getCommunityWithSections(slug);

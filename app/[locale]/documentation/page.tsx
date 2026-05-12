@@ -22,11 +22,12 @@ const META = {
     "Guides and references for launching, growing, and operating your community on Unytea.",
 };
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { locale: string };
-}): Promise<Metadata> {
+export async function generateMetadata(
+  props: {
+    params: Promise<{ locale: string }>;
+  }
+): Promise<Metadata> {
+  const params = await props.params;
   return {
     title: META.title,
     description: META.description,
@@ -192,11 +193,12 @@ const sections: DocSection[] = [
   },
 ];
 
-export default function DocumentationPage({
-  params,
-}: {
-  params: { locale: string };
-}) {
+export default async function DocumentationPage(
+  props: {
+    params: Promise<{ locale: string }>;
+  }
+) {
+  const params = await props.params;
   const { locale } = params;
 
   return (

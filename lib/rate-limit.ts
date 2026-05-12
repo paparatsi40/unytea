@@ -148,8 +148,13 @@ export function rateLimit(config: RateLimitConfig) {
 // ── Helper: get IP from request ─────────────────────────────────────
 
 export function getIP(request: NextRequest): string {
+  // Next 16 removed NextRequest.ip — derive from x-forwarded-for (Vercel and
+  // most reverse proxies set this) with fallback to x-real-ip.
   const xff = request.headers.get("x-forwarded-for");
-  return xff ? xff.split(",")[0] : request.ip || "unknown";
+  if (xff) return xff.split(",")[0].trim();
+  const xRealIp = request.headers.get("x-real-ip");
+  if (xRealIp) return xRealIp.trim();
+  return "unknown";
 }
 
 // ── Helper: get user identifier ─────────────────────────────────────

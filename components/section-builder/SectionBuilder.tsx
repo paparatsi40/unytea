@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useMemo, useState, useEffect } from "react";
+import { useCallback, useMemo, useState, useEffect } from "react";
 import { ChevronUp, ChevronDown, Trash2, Copy, Save, Eye, X, Sparkles } from "lucide-react";
 import { SectionInstance, SectionType, FieldDef } from "./types";
 import { SECTIONS, SECTION_ORDER } from "./sections";

@@ -14,11 +14,12 @@ type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
  * redirects get a chance to run, so the config redirect was being silently
  * ignored. Putting the redirect inside the routing system itself fixes that.
  */
-export default function PricingRedirect({
-  params,
-}: {
-  params: { locale: string };
-}) {
+export default async function PricingRedirect(
+  props: {
+    params: Promise<{ locale: string }>;
+  }
+) {
+  const params = await props.params;
   const locale = (SUPPORTED_LOCALES as readonly string[]).includes(params.locale)
     ? (params.locale as SupportedLocale)
     : "en";

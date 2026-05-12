@@ -5,7 +5,7 @@ import { PremiumCommunityHeader } from "@/components/community/PremiumCommunityH
 
 interface LayoutProps {
   children: React.ReactNode;
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 async function getCommunity(slug: string) {
@@ -33,10 +33,13 @@ async function getMembership(communityId: string, userId: string) {
   return membership;
 }
 
-export default async function CommunityLayout({
-  children,
-  params,
-}: LayoutProps) {
+export default async function CommunityLayout(props: LayoutProps) {
+  const params = await props.params;
+
+  const {
+    children
+  } = props;
+
   const session = await auth();
   const community = await getCommunity(params.slug);
 

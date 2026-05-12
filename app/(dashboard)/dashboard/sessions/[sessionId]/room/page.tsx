@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, use } from "react";
 import { getSession } from "@/app/actions/sessions";
 import { endSession } from "@/app/actions/session-jobs";
 import { VideoRoom } from "@/components/sessions/VideoRoom";
@@ -13,11 +13,12 @@ import {
   stopRecording,
 } from "@/app/actions/recording";
 
-export default function SessionRoomPage({
-  params,
-}: {
-  params: { sessionId: string };
-}) {
+export default function SessionRoomPage(
+  props: {
+    params: Promise<{ sessionId: string }>;
+  }
+) {
+  const params = use(props.params);
   const router = useRouter();
   const { user, isLoading: isAuthLoading } = useCurrentUser();
   const [videoSession, setVideoSession] = useState<any>(null);

@@ -39,11 +39,12 @@ function trackPublicLibraryEvent(params: {
   });
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { locale: string };
-}): Promise<Metadata> {
+export async function generateMetadata(
+  props: {
+    params: Promise<{ locale: string }>;
+  }
+): Promise<Metadata> {
+  const params = await props.params;
   const canonical = `https://www.unytea.com/${params.locale}/library`;
   const title = "Knowledge Library | Unytea";
   const description =
@@ -71,16 +72,17 @@ export async function generateMetadata({
   };
 }
 
-export default async function PublicLibraryPage({
-  params,
-  searchParams,
-}: {
-  params: { locale: string };
-  searchParams?: { src?: string };
-}) {
+export default async function PublicLibraryPage(
+  props: {
+    params: Promise<{ locale: string }>;
+    searchParams?: Promise<{ src?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const locale = params.locale || "en";
   const source = searchParams?.src || "direct";
-  const headerBag = headers();
+  const headerBag = await headers();
 
   const sessions = await prisma.mentorSession.findMany({
     where: {

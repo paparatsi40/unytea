@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { 
@@ -37,10 +37,11 @@ import { shareSessionRecap } from "@/app/actions/session-jobs";
 import { createResourceFromSession } from "@/app/actions/session-course";
 
 interface SessionPageProps {
-  params: { sessionId: string };
+  params: Promise<{ sessionId: string }>;
 }
 
-export default function SessionDetailPage({ params }: SessionPageProps) {
+export default function SessionDetailPage(props: SessionPageProps) {
+  const params = use(props.params);
   const router = useRouter();
   const { user, isLoading: isAuthLoading } = useCurrentUser();
   const [session, setSession] = useState<any>(null);

@@ -9,12 +9,13 @@ import {
 import { PublicSessionPage } from "@/components/sessions/PublicSessionPage";
 
 interface PublicSessionRouteProps {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
-export async function generateMetadata({ params }: PublicSessionRouteProps): Promise<Metadata> {
+export async function generateMetadata(props: PublicSessionRouteProps): Promise<Metadata> {
+  const params = await props.params;
   const result = await getPublicSession(params.slug);
-  
+
   if (!result.success || !result.session) {
     return {
       title: "Session Not Found | Unytea",
@@ -25,7 +26,7 @@ export async function generateMetadata({ params }: PublicSessionRouteProps): Pro
   const session = result.session;
   const hostName = session.host.name || "Host";
   const communityName = session.community.name;
-  
+
   const title = `${session.title} | ${hostName} | ${communityName}`;
   const description = session.description || 
     `Watch this session from ${communityName} hosted by ${hostName}. Join the community to access more live sessions and recordings.`;
@@ -74,15 +75,16 @@ export async function generateMetadata({ params }: PublicSessionRouteProps): Pro
   };
 }
 
-export default async function PublicSessionRoute({ params }: PublicSessionRouteProps) {
+export default async function PublicSessionRoute(props: PublicSessionRouteProps) {
+  const params = await props.params;
   const sessionResult = await getPublicSession(params.slug);
-  
+
   if (!sessionResult.success || !sessionResult.session) {
     notFound();
   }
 
   const session = sessionResult.session;
-  
+
   const relatedResult = await getRelatedSessions(
     session.community.id,
     session.id,

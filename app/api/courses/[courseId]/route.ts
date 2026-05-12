@@ -8,10 +8,8 @@ export const dynamic = "force-dynamic";
  * Get course details
  * GET /api/courses/[courseId]
  */
-export async function GET(
-  _req: Request,
-  { params }: { params: { courseId: string } }
-) {
+export async function GET(_req: Request, props: { params: Promise<{ courseId: string }> }) {
+  const params = await props.params;
   try {
     const session = await auth();
 

@@ -12,7 +12,7 @@ export default async function AuthLayout({
   // /auth/* → /{locale}/auth/* before this code runs. The real locale
   // detection for auth pages happens in middleware.ts (referer + accept-language)
   // and the rendered page lives under [locale]/auth/*.
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const locale = cookieStore.get('NEXT_LOCALE')?.value || 'en';
 
   const messages = await getMessages({ locale });

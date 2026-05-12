@@ -8,11 +8,12 @@ const META = {
     "Understand how Unytea uses cookies and similar technologies across our platform.",
 };
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { locale: string };
-}): Promise<Metadata> {
+export async function generateMetadata(
+  props: {
+    params: Promise<{ locale: string }>;
+  }
+): Promise<Metadata> {
+  const params = await props.params;
   return {
     title: META.title,
     description: META.description,
@@ -24,11 +25,12 @@ export async function generateMetadata({
   };
 }
 
-export default function CookiesPage({
-  params,
-}: {
-  params: { locale: string };
-}) {
+export default async function CookiesPage(
+  props: {
+    params: Promise<{ locale: string }>;
+  }
+) {
+  const params = await props.params;
   const { locale } = params;
 
   return (

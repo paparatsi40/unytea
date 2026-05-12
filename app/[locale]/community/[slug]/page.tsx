@@ -86,11 +86,12 @@ function trackPublicCommunityEvent(params: {
   });
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { locale: string; slug: string };
-}): Promise<Metadata> {
+export async function generateMetadata(
+  props: {
+    params: Promise<{ locale: string; slug: string }>;
+  }
+): Promise<Metadata> {
+  const params = await props.params;
   const community = await prisma.community.findUnique({
     where: { slug: params.slug },
     select: {
@@ -139,13 +140,14 @@ export async function generateMetadata({
   };
 }
 
-export default async function CommunityPublicPreviewPage({
-  params,
-  searchParams,
-}: {
-  params: { locale: string; slug: string };
-  searchParams?: { src?: string; rank?: string; sort?: string; paywall?: string; paid?: string; error?: string };
-}) {
+export default async function CommunityPublicPreviewPage(
+  props: {
+    params: Promise<{ locale: string; slug: string }>;
+    searchParams?: Promise<{ src?: string; rank?: string; sort?: string; paywall?: string; paid?: string; error?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const { slug, locale } = params;
   const source = searchParams?.src || "direct";
 
@@ -224,7 +226,7 @@ export default async function CommunityPublicPreviewPage({
   const userId = session?.user?.id;
   let membershipStatus: "ACTIVE" | "PENDING" | null = null;
 
-  const headerBag = headers();
+  const headerBag = await headers();
   const userAgent = headerBag.get("user-agent") || "unknown";
 
   trackPublicCommunityEvent({
