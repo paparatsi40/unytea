@@ -9,6 +9,7 @@
  *
  * Primitives:
  * - requireUserId() — assert auth, return userId
+ * - requireAdmin() — assert authenticated + platform ADMIN role
  * - requireCommunityMember(userId, communityId) — assert active membership
  * - requireCommunityRole(userId, communityId, roles) — assert role
  * - requireCommunityAdmin/Moderator/Owner — role shortcuts
@@ -17,9 +18,11 @@
  *   composite checks that return boolean
  * - Permissions — declarative permission map (returns boolean)
  *
- * NOTE: As of 2026-05-12, this module has zero external callers. It's
- * scaffolding intended for use in API route protection (Phase 2c) and
- * Server Actions where RBAC is needed.
+ * Typed errors:
+ * - UnauthorizedError (caught → HTTP 401)
+ * - ForbiddenError (caught → HTTP 403)
+ *
+ * Map these to HTTP responses with lib/api-error-handler.ts.
  */
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -36,7 +39,7 @@ import { MemberRole } from "@prisma/client";
 export async function requireUserId() {
   const session = await auth();
   if (!session?.user?.id) {
-    throw new Error("Unauthorized - Please sign in");
+    throw new UnauthorizedError("Unauthorized - Please sign in");
   }
   return session.user.id;
 }
@@ -55,7 +58,7 @@ export async function requireCommunityMember(userId: string, communityId: string
   });
 
   if (!member || member.status !== "ACTIVE") {
-    throw new Error("Not a member of this community");
+    throw new ForbiddenError("Not a member of this community");
   }
 
   return member;
@@ -72,7 +75,7 @@ export async function requireCommunityRole(
   const member = await requireCommunityMember(userId, communityId);
 
   if (!allowedRoles.includes(member.role)) {
-    throw new Error("Insufficient permissions");
+    throw new ForbiddenError("Insufficient permissions");
   }
 
   return member;
@@ -138,7 +141,7 @@ export async function requireResourceOwner(
   }
 
   if (resource.authorId !== userId) {
-    throw new Error("Not authorized to access this resource");
+    throw new ForbiddenError("Not authorized to access this resource");
   }
 
   return true;
@@ -353,3 +356,54 @@ export const Permissions = {
     return canSendMessage(userId, recipientId);
   },
 };
+
+// ═══════════════════════════════════════════════════════════════
+// Typed errors for HTTP status mapping
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Thrown when a request has no authenticated user.
+ * API route handlers should catch this and return HTTP 401.
+ * See: lib/api-error-handler.ts
+ */
+export class UnauthorizedError extends Error {
+  constructor(message = "Unauthorized - Please sign in") {
+    super(message);
+    this.name = "UnauthorizedError";
+  }
+}
+
+/**
+ * Thrown when an authenticated user lacks the required permissions.
+ * API route handlers should catch this and return HTTP 403.
+ * See: lib/api-error-handler.ts
+ */
+export class ForbiddenError extends Error {
+  constructor(message = "Forbidden - Insufficient permissions") {
+    super(message);
+    this.name = "ForbiddenError";
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Platform-level role checks
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Server-side: Require authenticated user with platform-level ADMIN role.
+ *
+ * Throws UnauthorizedError if no session.
+ * Throws ForbiddenError if session exists but user.role is not ADMIN.
+ *
+ * Returns the userId on success.
+ */
+export async function requireAdmin(): Promise<string> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    throw new UnauthorizedError();
+  }
+  if (session.user.role !== "ADMIN") {
+    throw new ForbiddenError("Forbidden - Admin access required");
+  }
+  return session.user.id;
+}

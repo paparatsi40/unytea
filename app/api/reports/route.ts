@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { rateLimiters } from '@/lib/rate-limit';
+import { requireAdmin } from '@/lib/authorization';
+import { handleApiError } from '@/lib/api-error-handler';
 import { z } from 'zod';
 import {
   ReportReason,
@@ -154,25 +156,9 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    // Get session/auth
-    const session = await auth();
-
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized - you must be logged in' },
-        { status: 401 }
-      );
-    }
-
-    // TODO: Add permission check to ensure user is admin/moderator
-    // You may want to add logic like:
-    // const user = await prisma.user.findUnique({
-    //   where: { id: session.user.id },
-    //   include: { memberships: true },
-    // });
-    // if (!user?.isAdmin) {
-    //   return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    // }
+    // Platform-level admin gate. Throws UnauthorizedError (→401) if no session,
+    // ForbiddenError (→403) if the user is not ADMIN. Maps via handleApiError.
+    await requireAdmin();
 
     // Get query parameters
     const url = new URL(request.url);
@@ -197,10 +183,6 @@ export async function GET(request: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error('[GET /api/reports] Error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

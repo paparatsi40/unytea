@@ -3,12 +3,14 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/auth-utils";
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { slug: string } }
 ) {
   try {
-    const searchParams = request.nextUrl.searchParams;
-    const userId = searchParams.get("userId");
+    // SECURITY: derive userId from session, never from query string.
+    // Previously this route trusted `?userId=` from the URL, allowing any
+    // caller to probe membership of any user in any community (IDOR).
+    const sessionUserId = await getCurrentUserId();
 
     // Get community
     const community = await prisma.community.findUnique({
@@ -38,6 +40,37 @@ export async function GET(
       );
     }
 
+    // Membership lookup uses session-derived userId only.
+    let membership = null;
+    if (sessionUserId) {
+      membership = await prisma.member.findUnique({
+        where: {
+          userId_communityId: {
+            userId: sessionUserId,
+            communityId: community.id,
+          },
+        },
+        select: {
+          role: true,
+          status: true,
+        },
+      });
+    }
+
+    // Private community gate: only owner or ACTIVE member sees the resource.
+    // Return 404 (not 403) so the existence of a private community is not
+    // disclosed to unauthorized callers.
+    if (community.isPrivate) {
+      const isActiveMember = membership?.status === "ACTIVE";
+      const isOwner = sessionUserId !== null && community.ownerId === sessionUserId;
+      if (!isActiveMember && !isOwner) {
+        return NextResponse.json(
+          { error: "Community not found" },
+          { status: 404 }
+        );
+      }
+    }
+
     // Transform to match expected format
     const communityData = {
       ...community,
@@ -50,25 +83,8 @@ export async function GET(
       },
     };
 
-    // If userId provided, check membership
-    let membership = null;
-    if (userId) {
-      membership = await prisma.member.findUnique({
-        where: {
-          userId_communityId: {
-            userId,
-            communityId: community.id,
-          },
-        },
-        select: {
-          role: true,
-          status: true,
-        },
-      });
-    }
-
-    return NextResponse.json({ 
-      community: communityData, 
+    return NextResponse.json({
+      community: communityData,
       membership,
       // Also return just the data for simple queries
       id: community.id,
