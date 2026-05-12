@@ -1,9 +1,24 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/auth-utils";
 
+// Hard cap to prevent DoS via unbounded post fetches.
+// Phase 2c.7: not cursor-based pagination because the in-memory
+// SESSION_ANNOUNCEMENT priority sort (LIVE > Upcoming > Recent) is
+// incompatible with cross-page cursors. Clients may pass ?limit=N
+// to fetch fewer rows; the cap protects communities with many posts.
+const DEFAULT_LIMIT = 50;
+const MAX_LIMIT = 100;
+
+function parseLimit(value: string | null): number {
+  if (!value) return DEFAULT_LIMIT;
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isFinite(parsed) || parsed <= 0) return DEFAULT_LIMIT;
+  return Math.min(parsed, MAX_LIMIT);
+}
+
 export async function GET(
-  _request: Request,
+  request: NextRequest,
   { params }: { params: { slug: string } }
 ) {
   try {
@@ -16,6 +31,8 @@ export async function GET(
         { status: 401 }
       );
     }
+
+    const limit = parseLimit(request.nextUrl.searchParams.get("limit"));
 
     // Get community
     const community = await prisma.community.findUnique({
@@ -50,7 +67,7 @@ export async function GET(
       }
     }
 
-    // Fetch posts
+    // Fetch posts (hard-capped)
     const posts = await prisma.post.findMany({
       where: {
         communityId: community.id,
@@ -80,6 +97,7 @@ export async function GET(
       orderBy: {
         createdAt: "desc",
       },
+      take: limit,
     });
 
     // Prioritize session announcements (LIVE first, then upcoming) to increase attendance
