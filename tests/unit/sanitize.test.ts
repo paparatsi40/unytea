@@ -84,6 +84,20 @@ describe("sanitizeHTML", () => {
       const input = '<a href="mailto:test@example.com">email</a>';
       expect(sanitizeHTML(input)).toContain("mailto:test@example.com");
     });
+
+    it("forces rel='noopener noreferrer' on links with target attribute", () => {
+      const input = '<a href="https://example.com" target="_blank">link</a>';
+      const output = sanitizeHTML(input);
+      expect(output).toContain('target="_blank"');
+      expect(output).toContain('rel="noopener noreferrer"');
+    });
+
+    it("does not add rel on links without target attribute", () => {
+      const input = '<a href="https://example.com">link</a>';
+      const output = sanitizeHTML(input);
+      expect(output).toContain('href="https://example.com"');
+      expect(output).not.toContain("rel=");
+    });
   });
 
   describe("Edge cases", () => {

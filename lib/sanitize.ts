@@ -1,6 +1,22 @@
 import DOMPurify from "isomorphic-dompurify";
 
 /**
+ * Hook: force rel="noopener noreferrer" on <a target="_blank"> (and any other
+ * target) links.
+ *
+ * Prevents tab-nabbing where a malicious external page uses window.opener to
+ * redirect the parent tab. Without this hook, Tiptap editors that opt into
+ * target="_blank" links would create that vulnerability.
+ *
+ * Registered at module load (DOMPurify hooks are idempotent across imports).
+ */
+DOMPurify.addHook("afterSanitizeAttributes", (node) => {
+  if (node.nodeName === "A" && node.hasAttribute("target")) {
+    node.setAttribute("rel", "noopener noreferrer");
+  }
+});
+
+/**
  * Allowlist of HTML tags safe to render via dangerouslySetInnerHTML.
  *
  * Aligned with Tiptap's default output (the WYSIWYG editor used in the
@@ -51,9 +67,6 @@ const ALLOWED_ATTR = [
  *
  *   sanitizeHTML('<a href="javascript:alert(1)">click</a>')
  *   // => '<a>click</a>'
- *
- * TODO Phase 2c.6+: Add afterSanitizeAttributes hook to force
- * rel="noopener noreferrer" on <a target="_blank"> links (clickjacking hardening).
  */
 export function sanitizeHTML(dirty: string): string {
   if (!dirty) return "";

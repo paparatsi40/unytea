@@ -6,6 +6,7 @@ import { handleApiError } from "@/lib/api-error-handler";
 import {
   UnauthorizedError,
   ForbiddenError,
+  requireUserId,
 } from "@/lib/authorization";
 import { z } from "zod";
 
@@ -102,14 +103,10 @@ export async function POST(req: NextRequest) {
 
 export async function GET() {
   try {
-    const userId = await getCurrentUserId();
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: "userId is required" },
-        { status: 400 }
-      );
-    }
+    // requireUserId throws UnauthorizedError (mapped to 401 by handleApiError)
+    // when there's no session. Phase 2c.6 corrected the previous behavior which
+    // returned 400 "userId is required" — semantically wrong HTTP status.
+    const userId = await requireUserId();
 
     // Get all communities where user is a member
     const memberships = await prisma.member.findMany({
@@ -277,10 +274,6 @@ export async function GET() {
       exploreCommunities,
     });
   } catch (error) {
-    console.error("Error fetching communities:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch communities" },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
