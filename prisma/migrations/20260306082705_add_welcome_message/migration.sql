@@ -1,2 +1,2 @@
 -- AlterTable
-ALTER TABLE "Community" ADD COLUMN "welcomeMessage" TEXT;
+ALTER TABLE "communities" ADD COLUMN "welcomeMessage" TEXT;
