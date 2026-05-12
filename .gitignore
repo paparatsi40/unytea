@@ -60,3 +60,6 @@ build-*.log
 
 # OS
 Thumbs.db
+
+# Vercel env pulls (contain production credentials)
+.env.production
