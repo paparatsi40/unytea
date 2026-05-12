@@ -6,6 +6,7 @@ import Credentials from "next-auth/providers/credentials"
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 import { z } from "zod"
+import type { UserRole } from "@prisma/client"
 
 // Extend the built-in session types
 declare module "next-auth" {
@@ -16,6 +17,7 @@ declare module "next-auth" {
       isOnboarded: boolean
       firstName?: string | null
       lastName?: string | null
+      role: UserRole
     } & DefaultSession["user"]
   }
 
@@ -24,6 +26,18 @@ declare module "next-auth" {
     isOnboarded: boolean
     firstName?: string | null
     lastName?: string | null
+    role?: UserRole
+  }
+}
+
+declare module "@auth/core/jwt" {
+  interface JWT {
+    id?: string
+    username?: string | null
+    isOnboarded?: boolean
+    firstName?: string | null
+    lastName?: string | null
+    role?: UserRole
   }
 }
 
@@ -105,6 +119,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             isOnboarded: user.isOnboarded,
             firstName: user.firstName,
             lastName: user.lastName,
+            role: user.role,
           }
         } catch (error) {
           console.error("[auth] login_error", {
@@ -146,6 +161,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.isOnboarded = user.isOnboarded
         token.firstName = user.firstName
         token.lastName = user.lastName
+        token.role = user.role
       }
 
       // Update token on session update
@@ -162,6 +178,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.isOnboarded = token.isOnboarded as boolean
         session.user.firstName = token.firstName as string | null
         session.user.lastName = token.lastName as string | null
+        session.user.role = (token.role ?? "USER") as UserRole
       }
 
       return session

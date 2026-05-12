@@ -92,6 +92,7 @@ model User {
   stripeConnectAccountId String? // Stripe Connect account for community owners
   deletedAt              DateTime?
   platformPlan           PlatformPlan @default(START)
+  role                   UserRole     @default(USER)
 
   // NextAuth Relations
   accounts Account[]
@@ -1047,6 +1048,11 @@ enum PlatformPlan {
   CREATOR
   BUSINESS
   PRO
+}
+
+enum UserRole {
+  USER
+  ADMIN
 }
 
 enum MemberRole {
