@@ -14,7 +14,6 @@ declare module "next-auth" {
       id: string
       username?: string | null
       isOnboarded: boolean
-      role?: string
       firstName?: string | null
       lastName?: string | null
     } & DefaultSession["user"]
