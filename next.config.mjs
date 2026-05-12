@@ -50,9 +50,7 @@ const nextConfig = {
   },
 
   reactStrictMode: true,
-  swcMinify: true,
   compress: true,
-  optimizeFonts: true,
   productionBrowserSourceMaps: false,
   poweredByHeader: false,
 
