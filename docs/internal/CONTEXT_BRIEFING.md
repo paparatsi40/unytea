@@ -1,6 +1,6 @@
 # unytea — Context Briefing for New Claude Sessions
 
-**Status**: living document. Last updated 2026-05-13 after Phase 4a completion at commit `65dd8880`.
+**Status**: living document. Last updated 2026-05-13 after Hotfix Series Bugs 1-4 (ERR_REQUIRE_ESM) closed at commit `c28f3d68`.
 
 If you're a Claude instance picking up unytea work, read this completely before asking the user for context. This document is the source of truth for project state, established patterns, and working agreements.
 
@@ -33,7 +33,8 @@ If you're a Claude instance picking up unytea work, read this completely before 
 
 ## 2. Current state
 
-- **main HEAD**: `65dd8880` (Phase 4a — unpkg.com removed from script-src)
+- **main HEAD**: `c28f3d68` (Hotfix Series Bug 4 definitive fix — replace isomorphic-dompurify with sanitize-html)
+- **Production**: stable. `/dashboard/c/[slug]` loading clean post-hotfix.
 - **Sprint 1**: closed 2026-05-12 — see `docs/internal/SPRINT_1_CLOSURE.md` for full retro.
 - **Sprint 2**: in progress.
 
@@ -44,11 +45,17 @@ If you're a Claude instance picking up unytea work, read this completely before 
 ✅ Phase 3d — effect@>=3.20.0 override (CVE-2026-32887)       c9b4af71
 ✅ Phase 3e — Cleanup (next.config, eslint flat, React Compiler→warn)   0fe35241..b7297968
 ✅ Phase 4a — CSP audit + unpkg.com elimination                65dd8880
-⏳ Phase 4b — CSP rewrite Report-Only (tighten directives, ammo in Section 9)
+🧪 Phase 4b — CSP Report-Only deployed, monitoring period       fc06264b..051ba24f
+   Hotfix Series Bugs 1-4 ESM/CJS (May 13)                   479abe56..c28f3d68
 ⏳ Phase 4c — CSP switch to enforce (post-violations monitoring)
+⏳ Phase 4d — Nonces for script-src 'unsafe-inline' removal
 ```
 
 Phase 3e note: Step 3 (Zustand migration) was NO-OP — dep declared in `package.json` but **0 imports** in code. `npm uninstall zustand` queued in Phase 5+ backlog.
+
+**Overrides (final)**: only `"effect": ">=3.20.0"` remains (Phase 3d CVE-2026-32887). Defensive overrides for jsdom chain (html-encoding-sniffer, whatwg-url, jsdom) removed in `c28f3d68` — no longer needed once jsdom is out of the dep tree.
+
+**Sanitization**: `sanitize-html ^2.17.4` (replaced `isomorphic-dompurify` in `c28f3d68`). Pure JS parser, no DOM environment. Eliminates entire jsdom chain.
 
 **Vulnerabilities**: 11 → 2 (8 HIGH closed during Sprint 2). The 2 remaining are MODERATE residuals in `next` 16.x and transitive `postcss` — both require Next 17 (when released) to fully clear.
 
@@ -93,7 +100,7 @@ export async function GET(request: NextRequest) {
 
 ### 3.2 HTML sanitization
 
-`lib/sanitize.ts` exports `sanitizeHTML()` using `isomorphic-dompurify`. The allowlist matches Tiptap WYSIWYG output (the editor used in `community-builder`). A registered hook forces `rel="noopener noreferrer"` on any `<a>` tag with a `target` attribute.
+`lib/sanitize.ts` exports `sanitizeHTML()` using `sanitize-html` (pure JS parser, no DOM environment needed — replaced `isomorphic-dompurify` in `c28f3d68` to eliminate the jsdom ESM/CJS chain). The allowlist matches Tiptap WYSIWYG output (the editor used in `community-builder`). A `transformTags` hook forces `rel="noopener noreferrer"` on any `<a>` tag with a `target` attribute.
 
 **Apply when**: persisting any user-provided HTML to DB, especially from rich-text editors.
 
@@ -196,6 +203,24 @@ The site has a Progressive Web App manifest + Service Worker (via `web-push`). B
 - `.env.local.backup-*` — manual backups Carlos has made
 
 Don't include these in any commit unless explicitly asked.
+
+### 5.6 Validation gate for prod readiness (added 2026-05-13)
+
+**Lesson from Hotfix Series Bugs 1-4**: `npm run dev` is **INSUFFICIENT** for validating phase completion. Turbopack dev mode and Turbopack prod build resolve external modules differently. Bugs latent in CJS↔ESM interop only surface in prod build / SSR runtime. Phase 3c (Next 14→16 upgrade) closed clean in dev validation, then leaked 4 ERR_REQUIRE_ESM bugs into prod over the following weeks.
+
+**MANDATORY for closing any future phase** (4c, 4d, Sprint 3+):
+
+1. `npx next build` — local prod build (catches type errors + most module resolution issues)
+2. `npm run start` — local prod server (catches SSR runtime errors that build alone misses)
+3. **Navigate critical routes manually** with browser open:
+   - `/dashboard/c/[slug]` (community detail — historical landmine for SSR module resolution)
+   - `/dashboard/sessions/[id]/room` (LiveKit + Excalidraw lazy load)
+   - `/dashboard/feed` (Tiptap server-side render path)
+   - Any API route changed in the phase
+4. **Check Vercel runtime logs** on first production deploy for runtime errors (not just build-time)
+5. **Smoke test in production deploy URL** before marking phase done — `npm run dev` validation alone is no longer sufficient sign-off
+
+This gate is **retroactive**: applies to Phase 4b reopening also if anything surfaces during its monitoring period.
 
 ---
 
@@ -334,13 +359,63 @@ connect-src 'self' https: ws: wss:
 - Tiptap stack instalado: starter-kit, react, image, link, placeholder (sin Mention/Suggestion que sí lo necesitarían)
 - DnD libs (`@dnd-kit/*`, `@hello-pangea/dnd`), `lottie-react`, `react-day-picker`, `html-to-image`
 
+### Hotfix Series Bugs 1-4 ESM/CJS (May 13, 2026) — ✅ CLOSED (`479abe56..c28f3d68`)
+
+Pre-existing latent bug from Phase 3c (Next 14→16 upgrade) surfaced when `/dashboard/c/[slug]` was navigated in production for the first time post-upgrade. Phase 3c validation used `npm run dev` (Turbopack dev mode resolves modules differently than prod build), missing 4 ERR_REQUIRE_ESM bugs in jsdom's dep chain.
+
+**Bugs discovered (in order)**:
+- **Bug 1**: `html-encoding-sniffer@5+` requires `@exodus/bytes` (ESM-only)
+- **Bug 2**: `whatwg-url@16+` requires `@exodus/bytes` (different chain, same dep)
+- **Bug 3**: `jsdom@28+` itself requires `@exodus/bytes` directly (root cause)
+- **Bug 4**: `cssstyle` / `@asamuzakjp/css-color` requires `@csstools/css-calc` (different ESM module entirely)
+
+**Approach evolution**:
+- *Attempts 1-3*: defensive npm overrides (`479abe56`, `4d92581d`). Whack-a-mole — each fix surfaced the next bug.
+- *Attempt 4*: switch production build to `--webpack` (`cd7002d6`). Failed — stack trace changed from Turbopack runtime to Node native runtime, same `ERR_REQUIRE_ESM`. Confirmed the constraint is at Node level (CJS cannot `require()` ESM), not bundler-level. No bundler can resolve this.
+- *Definitive fix* (`c28f3d68`): **replace `isomorphic-dompurify` with `sanitize-html`**. Eliminates jsdom entirely from dep tree. Single file change to `lib/sanitize.ts`, ports allowlist + `rel="noopener noreferrer"` hook faithfully. Removed defensive overrides (h-e-s, whatwg-url, jsdom) — no longer needed without jsdom.
+
+**Validation**:
+- `npm ls jsdom` → empty
+- `npm ls @exodus/bytes` → empty
+- `npm ls @asamuzakjp/css-color` → empty
+- `npm ls @csstools/css-calc` → empty
+- 71/71 tests passing (was 70/71 with obsolete `getIP` test, fixed in same commit)
+- `npx next build` → clean, Turbopack default restored
+- Production validated: `/dashboard/c/unytea-2912` loads cleanly
+
 ### Phase 5+ CRÍTICO — Whiteboard broken since Phase 3c (React 18→19 upgrade)
 
-Excalidraw o dep dependiente accede a `React.ReactCurrentOwner` que fue eliminado en React 19. Manifestación: navegar a `/dashboard/sessions/[id]/room` y abrir whiteboard tira `'Cannot read properties of undefined (reading ReactCurrentOwner)'`. Stack trace via `next/dynamic` + `loadableGenerated.modules`. Detectado durante Phase 4b manual testing en localhost prod build.
+Excalidraw o dep dependiente accede a `React.ReactCurrentOwner` que fue eliminado en React 19. Manifestación: navegar a `/dashboard/sessions/[id]/room` y abrir whiteboard tira `'Cannot read properties of undefined (reading ReactCurrentOwner)'`. Stack trace via `next/dynamic` + `loadableGenerated.modules`.
 
-Fix path: identificar la dep culpable (probable `@excalidraw/excalidraw <0.18` o `react-error-boundary` viejo via grep en `node_modules` por `ReactCurrentOwner`), bumpear a versión React 19-compatible. Si no hay compatible, considerar lazy-load alternative o eliminar feature.
+**Status**: **Reproduced in production May 13 17:05**. Stack trace from prod:
+```
+Uncaught TypeError: Cannot read properties of undefined (reading 'ReactCurrentOwner')
+  at 6094 (0ir7c5bwkff1a.js:1:81458) ...
+```
+URL: `/dashboard/sessions/[id]/room`. Result: Chrome shows "This page couldn't load" (React tree fully crashed, no error boundary).
+
+Independent of the May 13 ESM/CJS hotfix series. Pre-existing since Phase 3c (React 19 removed `ReactCurrentOwner` internal API that Excalidraw <0.18 relies on).
+
+**Action items**:
+- `grep -rn ReactCurrentOwner node_modules/` to identify the specific dep using the removed internal API
+- Options: bump dep (probable `@excalidraw/excalidraw` >=0.18) / polyfill workaround / replace feature
+- Estimate: 2-4 hours
+- **Currently NOT urgent**: no real users on whiteboard feature yet (confirmed May 13)
+- **Recommendation**: schedule as dedicated mini-sprint after Sprint 3 product decisions land
 
 **Pre-requisito antes de cualquier sprint que toque sesiones/whiteboards.**
+
+### Phase 5+ — Prisma SessionEventType enum drift
+
+**Symptom**: `'Invalid value for argument type. Expected SessionEventType.'` in Vercel runtime logs.
+
+**Cause**: webhook handler in `app/api/webhooks/livekit/route.ts` (or similar session-event-emitting handler) passes string literal `'PARTICIPANT_LEFT'` to `prisma.sessionEvent.create()` — value not in `SessionEventType` enum in `prisma/schema.prisma`.
+
+**Severity**: non-blocking. Audit/event logging only, not UX. Failed webhooks logged to Vercel runtime but session functionality unaffected.
+
+**Action**: audit all `SessionEventType` values used in webhook handler code vs schema enum, add missing values, `prisma migrate`.
+
+**Recommendation**: bundle with whiteboard sprint since both touch session/room code.
 
 ### Phase 5+ — React Compiler audit + Type hygiene (post Phase 3e)
 Surfaced when ESLint flat config (Phase 3e Step 4) re-enabled lint enforcement after `next lint` removal in Next 16. All currently downgraded to `warn` — backlog to actually fix.
