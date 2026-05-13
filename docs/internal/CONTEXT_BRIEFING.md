@@ -1,6 +1,6 @@
 # unytea — Context Briefing for New Claude Sessions
 
-**Status**: living document. Last updated 2026-05-12 after Phase 3e completion at commit `b7297968`.
+**Status**: living document. Last updated 2026-05-13 after Phase 4a completion at commit `65dd8880`.
 
 If you're a Claude instance picking up unytea work, read this completely before asking the user for context. This document is the source of truth for project state, established patterns, and working agreements.
 
@@ -33,7 +33,7 @@ If you're a Claude instance picking up unytea work, read this completely before 
 
 ## 2. Current state
 
-- **main HEAD**: `b7297968` (ESLint flat config migration with React Compiler rules as warn)
+- **main HEAD**: `65dd8880` (Phase 4a — unpkg.com removed from script-src)
 - **Sprint 1**: closed 2026-05-12 — see `docs/internal/SPRINT_1_CLOSURE.md` for full retro.
 - **Sprint 2**: in progress.
 
@@ -43,7 +43,9 @@ If you're a Claude instance picking up unytea work, read this completely before 
 ✅ Phase 3c — Next 14 → 16 + React 18 → 19                    2001abed (merged from feature branch)
 ✅ Phase 3d — effect@>=3.20.0 override (CVE-2026-32887)       c9b4af71
 ✅ Phase 3e — Cleanup (next.config, eslint flat, React Compiler→warn)   0fe35241..b7297968
-⏳ Phase 4  — CSP rewrite (unsafe-eval removal, connect-src restriction, unpkg.com elimination)
+✅ Phase 4a — CSP audit + unpkg.com elimination                65dd8880
+⏳ Phase 4b — CSP rewrite Report-Only (tighten directives, ammo in Section 9)
+⏳ Phase 4c — CSP switch to enforce (post-violations monitoring)
 ```
 
 Phase 3e note: Step 3 (Zustand migration) was NO-OP — dep declared in `package.json` but **0 imports** in code. `npm uninstall zustand` queued in Phase 5+ backlog.
@@ -254,10 +256,59 @@ Items accumulated during Sprint 1 + 2, organized by destination phase.
 - ~~`web-push` PWA sanity check~~ inspected (Step 5), 3 findings queued in Phase 5+ Env/dev
 
 ### Phase 4 — CSP rewrite
-- Eliminate `unsafe-eval` from CSP
-- Restrict `connect-src` to known hosts (currently permissive)
-- Eliminate `unpkg.com` external load (replace with npm-installed local equivalent)
-- Deploy CSP in report-only mode first, monitor violations, then switch to enforce
+
+- ✅ **Phase 4a — Audit + unpkg.com elimination** (commit `65dd8880`)
+  - `unpkg.com` removido del `script-src` — era dead permission (solo `@auth/core` lo invoca para Passkey/WebAuthn provider, no configurado en `lib/auth.ts`)
+  - Audit completo en `next.config.mjs:57-74` — CSP única, estática, en `async headers()`
+  - No code-level uses of `eval()` / `new Function()` (0 hits en `.ts`/`.tsx`)
+  - WASM: solo Excalidraw vendor bundle (`public/excalidraw-assets/vendor-*.js`) → necesita `'wasm-unsafe-eval'` específicamente
+- ⏳ **Phase 4b — CSP rewrite Report-Only** (diseñar CSP nueva con findings de 4a)
+- ⏳ **Phase 4c — Switch to enforce** (después de capturar violations en prod)
+
+#### Phase 4b inputs (compilados en 4a)
+
+**CSP actual está laxa, no rota.** 4b consiste en apretarla: eliminar `https:` wildcards en img/media/font/connect, eliminar `unsafe-eval` donde sea posible, mitigar `unsafe-inline` en `script-src` vía nonces o hashes (Tailwind requiere `unsafe-inline` en `style-src` — eso queda).
+
+**CSP actual (texto completo)**:
+```
+default-src 'self'
+base-uri 'self'
+form-action 'self'
+frame-ancestors 'self'
+object-src 'none'
+worker-src 'self' blob:
+script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live https://*.vercel.app https://*.livekit.cloud https://*.livekit.io
+style-src 'self' 'unsafe-inline'
+img-src 'self' data: blob: https:
+media-src 'self' blob: https:
+font-src 'self' data: https:
+frame-src 'self' https://vercel.live
+connect-src 'self' https: ws: wss:
+```
+
+**Dominios externos categorizados por directiva CSP**:
+
+- `script-src`: `js.stripe.com` (Stripe.js), `*.livekit.cloud`/`*.livekit.io` (LiveKit), `vercel.live` (dev/preview only), `vitals.vercel-insights.com` (si Vercel Analytics activado)
+- `connect-src`: `api.stripe.com`, `wss://*.livekit.cloud`, `wss://*.pusher.com`, `wss://ws-*.pusher.com`, `utfs.io` (UploadThing endpoint)
+- `frame-src`: `js.stripe.com` (Stripe Checkout iframe), `vercel.live`
+- `img-src`: `utfs.io`, `uploadthing.com`, `lh3.googleusercontent.com`, `avatars.githubusercontent.com`, `images.unsplash.com` — orphans a remover: `img.clerk.com` (Clerk legacy), `cdn.discordapp.com` (no Discord OAuth)
+- `media-src`: `utfs.io` (videos/audio uploaded), eventual `cdn.livekit.cloud` si recording egress activado
+- `font-src`: `'self'` + `data:` — sin Google Fonts CDN (proyecto usa Geist via `next/font`)
+
+**Deps que requieren `unsafe-eval`** (o equivalente):
+- `@excalidraw/excalidraw@^0.17.6` — usa WebAssembly + math expressions internas → recomendar `'wasm-unsafe-eval'` específicamente (CSP3 keyword, Chrome 97+/Firefox 110+/Safari 16+)
+- `recharts@^2.13.3` — media sospecha (animation paths via `react-smooth`)
+- `framer-motion@^11.18.2` — media sospecha (path transforms; v11 mayormente sin Function constructor, verificar en prod)
+
+**Deps que NO requieren eval** (confirmadas):
+- Tiptap stack instalado: starter-kit, react, image, link, placeholder (sin Mention/Suggestion que sí lo necesitarían)
+- DnD libs (`@dnd-kit/*`, `@hello-pangea/dnd`), `lottie-react`, `react-day-picker`, `html-to-image`
+
+**Strategy 4b**:
+- Drop `'unsafe-eval'` de prod CSP (Next prod build no lo necesita; HMR es dev-only)
+- Reemplazar con `'wasm-unsafe-eval'` para Excalidraw WASM
+- Eliminar `https:` wildcards → whitelist explícita por directiva (ver listas arriba)
+- Deploy en `Content-Security-Policy-Report-Only` mode primero, monitorear violations en `report-uri`/`report-to`, switchear a enforce cuando violations llegan a 0
 
 ### Phase 5+ — React Compiler audit + Type hygiene (post Phase 3e)
 Surfaced when ESLint flat config (Phase 3e Step 4) re-enabled lint enforcement after `next lint` removal in Next 16. All currently downgraded to `warn` — backlog to actually fix.
@@ -275,6 +326,7 @@ Surfaced when ESLint flat config (Phase 3e Step 4) re-enabled lint enforcement a
 
 ### Phase 5+ — Env / dev cleanup
 - `npm uninstall zustand` — declared in `package.json` ^5.0.1 but 0 imports in code (post Phase 3e Step 3 finding)
+- **If Passkey/WebAuthn provider is activated in NextAuth**: decide between (a) pre-bundling `@simplewebauthn/browser` locally — requires fork or monkey-patch of `@auth/core` because the unpkg URL is hardcoded in its bundle; or (b) re-adding `unpkg.com` to `script-src` with strict subpath: `https://unpkg.com/@simplewebauthn/browser@*/dist/bundle/index.umd.min.js`. Surfaced when Phase 4a removed unpkg from CSP.
 - Stale Clerk keys in `.env` (legacy auth, replaced by NextAuth in earlier work)
 - `.env.local` vs `.env.production` reconciliation
 - `AUTH_TRUST_HOST=true` for Vercel preview deploys to work (see Section 5.2)
