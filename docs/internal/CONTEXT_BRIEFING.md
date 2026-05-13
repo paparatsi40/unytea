@@ -257,13 +257,29 @@ Items accumulated during Sprint 1 + 2, organized by destination phase.
 
 ### Phase 4 — CSP rewrite
 
-- ✅ **Phase 4a — Audit + unpkg.com elimination** (commit `65dd8880`)
+- ✅ **Phase 4a — CSP audit + unpkg.com elimination** (`65dd8880..1eb584ab`)
   - `unpkg.com` removido del `script-src` — era dead permission (solo `@auth/core` lo invoca para Passkey/WebAuthn provider, no configurado en `lib/auth.ts`)
   - Audit completo en `next.config.mjs:57-74` — CSP única, estática, en `async headers()`
   - No code-level uses of `eval()` / `new Function()` (0 hits en `.ts`/`.tsx`)
   - WASM: solo Excalidraw vendor bundle (`public/excalidraw-assets/vendor-*.js`) → necesita `'wasm-unsafe-eval'` específicamente
-- ⏳ **Phase 4b — CSP rewrite Report-Only** (diseñar CSP nueva con findings de 4a)
-- ⏳ **Phase 4c — Switch to enforce** (después de capturar violations en prod)
+  - `scripts/external-domains.cjs` añadido como utility para recon de dominios externos
+
+- ⏳ **Phase 4b — CSP tightening "fácil" (Report-Only deploy)**:
+  - `script-src 'unsafe-eval'` → `'wasm-unsafe-eval'` (CSP3 subset, solo WASM para Excalidraw)
+  - Eliminar wildcards: `img-src`/`media-src`/`font-src`/`connect-src` pasan de `https:` a whitelist explícita (lista compilada en "Phase 4b inputs" abajo)
+  - Eliminar orphans: `img.clerk.com`, `cdn.discordapp.com` de `img-src`
+  - Mantener `'unsafe-inline'` en `script-src` Y `style-src` (diferido a 4d)
+  - Deploy como `Content-Security-Policy-Report-Only` header paralelo al `Content-Security-Policy` actual
+
+- ⏳ **Phase 4c — Switch to enforce**:
+  - Después de ~3-7 días de Report-Only en prod sin violations relevantes
+  - Mover Report-Only a enforce, eliminar CSP vieja
+
+- ⏳ **Phase 4d — Nonces para eliminar `'unsafe-inline'` de `script-src`**:
+  - Middleware genera nonce per-request
+  - Inline scripts (incluyendo los inyectados por Next.js: `__NEXT_DATA__`, etc.) heredan el nonce
+  - Tailwind `'unsafe-inline'` en `style-src` se queda (requerimiento del runtime, no removible sin perder JIT classes)
+  - Backlog detallado para sprint dedicado, no en mismo push que 4b/4c
 
 #### Phase 4b inputs (compilados en 4a)
 
@@ -303,12 +319,6 @@ connect-src 'self' https: ws: wss:
 **Deps que NO requieren eval** (confirmadas):
 - Tiptap stack instalado: starter-kit, react, image, link, placeholder (sin Mention/Suggestion que sí lo necesitarían)
 - DnD libs (`@dnd-kit/*`, `@hello-pangea/dnd`), `lottie-react`, `react-day-picker`, `html-to-image`
-
-**Strategy 4b**:
-- Drop `'unsafe-eval'` de prod CSP (Next prod build no lo necesita; HMR es dev-only)
-- Reemplazar con `'wasm-unsafe-eval'` para Excalidraw WASM
-- Eliminar `https:` wildcards → whitelist explícita por directiva (ver listas arriba)
-- Deploy en `Content-Security-Policy-Report-Only` mode primero, monitorear violations en `report-uri`/`report-to`, switchear a enforce cuando violations llegan a 0
 
 ### Phase 5+ — React Compiler audit + Type hygiene (post Phase 3e)
 Surfaced when ESLint flat config (Phase 3e Step 4) re-enabled lint enforcement after `next lint` removal in Next 16. All currently downgraded to `warn` — backlog to actually fix.
