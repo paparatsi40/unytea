@@ -5,6 +5,11 @@ import { X, Image as ImageIcon, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 
+// Excalidraw 0.18+ ships CSS as a separate export (breaking change vs 0.17 which
+// auto-injected styles). Without this import the component mounts but the toolbar,
+// color panel, and library button render unstyled (effectively invisible).
+import "@excalidraw/excalidraw/index.css";
+
 
 const Excalidraw = dynamic(
   async () => (await import("@excalidraw/excalidraw")).Excalidraw,
