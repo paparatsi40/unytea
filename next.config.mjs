@@ -55,8 +55,11 @@ const nextConfig = {
   poweredByHeader: false,
 
   async headers() {
-    // Simplified CSP that allows WebRTC and LiveKit
-    const contentSecurityPolicy = [
+    // Current enforced CSP — intentionally laxa (wildcards in img/media/font/connect,
+    // 'unsafe-eval' for legacy compatibility). Tightening is rolled out via the
+    // Report-Only header below; once that monitoring period is clean (Phase 4c),
+    // this enforced CSP will be replaced with the tightened version.
+    const currentCsp = [
       "default-src 'self'",
       "base-uri 'self'",
       "form-action 'self'",
@@ -71,6 +74,30 @@ const nextConfig = {
       "frame-src 'self' https://vercel.live",
       // Allow all connections for WebRTC/LiveKit - simplified
       "connect-src 'self' https: ws: wss:",
+    ].join("; ");
+
+    // Phase 4b — Report-Only CSP with tightened directives.
+    // - 'unsafe-eval' → 'wasm-unsafe-eval' (Excalidraw WASM only)
+    // - https: wildcards in img/media/font/connect → explicit allowlists
+    // - Orphans removed: img.clerk.com (legacy Clerk auth), cdn.discordapp.com (no Discord OAuth)
+    // - 'unsafe-inline' kept in script-src (deferred to Phase 4d via nonces) and
+    //   style-src (Tailwind JIT requires it).
+    // Browser reports violations to console without blocking; promote to enforced
+    // CSP in Phase 4c after monitoring period (3-7 days) shows no relevant violations.
+    const reportOnlyCsp = [
+      "default-src 'self'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "frame-ancestors 'self'",
+      "object-src 'none'",
+      "worker-src 'self' blob:",
+      "script-src 'self' 'wasm-unsafe-eval' 'unsafe-inline' https://js.stripe.com https://vercel.live https://*.vercel.app https://*.livekit.cloud https://*.livekit.io",
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data: blob: https://utfs.io https://*.uploadthing.com https://lh3.googleusercontent.com https://avatars.githubusercontent.com https://images.unsplash.com",
+      "media-src 'self' blob: https://utfs.io https://*.livekit.cloud",
+      "font-src 'self' data:",
+      "frame-src 'self' https://js.stripe.com https://vercel.live",
+      "connect-src 'self' https://api.stripe.com https://*.uploadthing.com https://utfs.io https://*.livekit.cloud wss://*.livekit.cloud https://*.pusher.com wss://*.pusher.com wss://ws-*.pusher.com wss://sockjs-*.pusher.com",
     ].join("; ");
 
     return [
@@ -126,7 +153,14 @@ const nextConfig = {
           },
           {
             key: "Content-Security-Policy",
-            value: contentSecurityPolicy,
+            value: currentCsp,
+          },
+          {
+            // Phase 4b: parallel Report-Only header. Browser reports violations
+            // to console (and to report-uri if added later) without blocking.
+            // Monitor for ~3-7 days, then promote to enforced CSP in Phase 4c.
+            key: "Content-Security-Policy-Report-Only",
+            value: reportOnlyCsp,
           },
           // Note on Vary: Accept-Encoding — we tried setting it here but
           // Next.js' framework overwrites the Vary header with its own
