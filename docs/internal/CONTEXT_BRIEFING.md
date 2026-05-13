@@ -1,6 +1,6 @@
 # unytea — Context Briefing for New Claude Sessions
 
-**Status**: living document. Last updated 2026-05-13 after Phase 5+ Whiteboard ReactCurrentOwner fix merged at commit `77e6c0b7`.
+**Status**: living document. Last updated 2026-05-13 after Phase 5+ Whiteboard CSS import follow-up merged at commit `11c9f241`.
 
 If you're a Claude instance picking up unytea work, read this completely before asking the user for context. This document is the source of truth for project state, established patterns, and working agreements.
 
@@ -47,7 +47,7 @@ If you're a Claude instance picking up unytea work, read this completely before 
 ✅ Phase 4a — CSP audit + unpkg.com elimination                65dd8880
 🧪 Phase 4b — CSP Report-Only deployed, monitoring period       fc06264b..051ba24f
    Hotfix Series Bugs 1-4 ESM/CJS (May 13)                   479abe56..c28f3d68
-✅ Phase 5+ Whiteboard ReactCurrentOwner — Excalidraw 0.18.1   c78b883e..77e6c0b7 (merged May 13)
+✅ Phase 5+ Whiteboard ReactCurrentOwner — Excalidraw 0.18.1   c78b883e..11c9f241 (merged May 13)
 ⏳ Phase 4c — CSP switch to enforce (post-violations monitoring)
 ⏳ Phase 4d — Nonces for script-src 'unsafe-inline' removal
 ```
@@ -222,6 +222,7 @@ Don't include these in any commit unless explicitly asked.
    - Any API route changed in the phase
 4. **Check Vercel runtime logs** on first production deploy for runtime errors (not just build-time)
 5. **Smoke test in production deploy URL** before marking phase done — `npm run dev` validation alone is no longer sufficient sign-off
+6. **For UI library upgrades**: validate visual rendering (not just mount/load) — toolbars, panels, modals, popovers, and any UI surface depending on CSS-only styling. Modern ESM-first libraries (Excalidraw 0.18, future bumps) often separate CSS as side-effect exports requiring explicit import; missing imports fail silently (no console error, component just renders unstyled). Added 2026-05-13 after Excalidraw 0.18 toolbar regression (commit `11c9f241`).
 
 This gate is **retroactive**: applies to Phase 4b reopening also if anything surfaces during its monitoring period.
 
@@ -386,7 +387,7 @@ Pre-existing latent bug from Phase 3c (Next 14→16 upgrade) surfaced when `/das
 - `npx next build` → clean, Turbopack default restored
 - Production validated: `/dashboard/c/unytea-2912` loads cleanly
 
-### Phase 5+ — Whiteboard ReactCurrentOwner — ✅ CLOSED (May 13 2026, `c78b883e..77e6c0b7`)
+### Phase 5+ — Whiteboard ReactCurrentOwner — ✅ CLOSED (May 13 2026, `c78b883e..11c9f241`)
 
 **Original symptom** (pre-fix): Excalidraw 0.17.6 read `React.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentOwner` at module-load time. React 19 (introduced in Phase 3c, May 12) removed that internal API. Result: navigating to `/dashboard/sessions/[id]/room` and opening whiteboard crashed with `Cannot read properties of undefined (reading 'ReactCurrentOwner')`. Chrome showed "This page couldn't load" (React tree fully crashed, no error boundary).
 
@@ -404,6 +405,10 @@ Pre-existing latent bug from Phase 3c (Next 14→16 upgrade) surfaced when `/das
 - Production validation: see Phase 4b monitoring period continues alongside this fix
 
 **Note**: Excalidraw 0.18.1 bundles nested `@radix-ui` packages with older peer declarations (`react ^16.8 || ^17 || ^18`) that npm flags as "invalid" under React 19. These are pure-JS ref/context utilities without secret-internals access; `--legacy-peer-deps` accepts them and they run clean under React 19.
+
+**Validation gap discovered post-merge** (commit `11c9f241`, May 13): Excalidraw 0.18 mounted without crash but the toolbar, color/stroke panel, and library button rendered invisible. Root cause: Excalidraw 0.18 changed its CSS distribution model — CSS was separated from the JS bundle into a standalone `./index.css` export (0.17 auto-injected styles as a side-effect of importing the JS module). Required explicit `import '@excalidraw/excalidraw/index.css'` in `components/sessions/SessionWhiteboard.tsx` (the single user-code caller).
+
+**Lesson learned**: when bumping libraries across a major version, validate UI/functional state — not just "mounts without crash". Modern ESM-first libraries often separate CSS as side-effect exports requiring explicit import, and the absence of styles can be invisible to console/logs (no error fires, the component just renders unstyled). Added as item #6 to the Section 5.6 validation gate.
 
 ### Phase 5+ — LiveKit webhook handlers audit
 
