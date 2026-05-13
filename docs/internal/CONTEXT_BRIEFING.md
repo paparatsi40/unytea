@@ -1,6 +1,6 @@
 # unytea — Context Briefing for New Claude Sessions
 
-**Status**: living document. Last updated 2026-05-13 after Hotfix Series Bugs 1-4 (ERR_REQUIRE_ESM) closed at commit `c28f3d68`.
+**Status**: living document. Last updated 2026-05-13 after Phase 5+ Whiteboard ReactCurrentOwner fix merged at commit `77e6c0b7`.
 
 If you're a Claude instance picking up unytea work, read this completely before asking the user for context. This document is the source of truth for project state, established patterns, and working agreements.
 
@@ -33,8 +33,8 @@ If you're a Claude instance picking up unytea work, read this completely before 
 
 ## 2. Current state
 
-- **main HEAD**: `c28f3d68` (Hotfix Series Bug 4 definitive fix — replace isomorphic-dompurify with sanitize-html)
-- **Production**: stable. `/dashboard/c/[slug]` loading clean post-hotfix.
+- **main HEAD**: `77e6c0b7` (Merge phase-5-whiteboard-react19-fix — Excalidraw 0.17.6 → 0.18.1)
+- **Production**: stable. `/dashboard/c/[slug]` loading clean. `/dashboard/sessions/[id]/room` whiteboard mounts clean (Phase 5+ Whiteboard CLOSED).
 - **Sprint 1**: closed 2026-05-12 — see `docs/internal/SPRINT_1_CLOSURE.md` for full retro.
 - **Sprint 2**: in progress.
 
@@ -47,9 +47,12 @@ If you're a Claude instance picking up unytea work, read this completely before 
 ✅ Phase 4a — CSP audit + unpkg.com elimination                65dd8880
 🧪 Phase 4b — CSP Report-Only deployed, monitoring period       fc06264b..051ba24f
    Hotfix Series Bugs 1-4 ESM/CJS (May 13)                   479abe56..c28f3d68
+✅ Phase 5+ Whiteboard ReactCurrentOwner — Excalidraw 0.18.1   c78b883e..77e6c0b7 (merged May 13)
 ⏳ Phase 4c — CSP switch to enforce (post-violations monitoring)
 ⏳ Phase 4d — Nonces for script-src 'unsafe-inline' removal
 ```
+
+**Phase 5+ CRÍTICOs**: **0 active**. Whiteboard regression closed May 13. Remaining Phase 5+ items are non-critical backlog (React Compiler audit, type hygiene, webhook handler audit, env cleanup).
 
 Phase 3e note: Step 3 (Zustand migration) was NO-OP — dep declared in `package.json` but **0 imports** in code. `npm uninstall zustand` queued in Phase 5+ backlog.
 
@@ -383,39 +386,42 @@ Pre-existing latent bug from Phase 3c (Next 14→16 upgrade) surfaced when `/das
 - `npx next build` → clean, Turbopack default restored
 - Production validated: `/dashboard/c/unytea-2912` loads cleanly
 
-### Phase 5+ CRÍTICO — Whiteboard broken since Phase 3c (React 18→19 upgrade)
+### Phase 5+ — Whiteboard ReactCurrentOwner — ✅ CLOSED (May 13 2026, `c78b883e..77e6c0b7`)
 
-Excalidraw o dep dependiente accede a `React.ReactCurrentOwner` que fue eliminado en React 19. Manifestación: navegar a `/dashboard/sessions/[id]/room` y abrir whiteboard tira `'Cannot read properties of undefined (reading ReactCurrentOwner)'`. Stack trace via `next/dynamic` + `loadableGenerated.modules`.
+**Original symptom** (pre-fix): Excalidraw 0.17.6 read `React.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentOwner` at module-load time. React 19 (introduced in Phase 3c, May 12) removed that internal API. Result: navigating to `/dashboard/sessions/[id]/room` and opening whiteboard crashed with `Cannot read properties of undefined (reading 'ReactCurrentOwner')`. Chrome showed "This page couldn't load" (React tree fully crashed, no error boundary).
 
-**Status**: **Reproduced in production May 13 17:05**. Stack trace from prod:
-```
-Uncaught TypeError: Cannot read properties of undefined (reading 'ReactCurrentOwner')
-  at 6094 (0ir7c5bwkff1a.js:1:81458) ...
-```
-URL: `/dashboard/sessions/[id]/room`. Result: Chrome shows "This page couldn't load" (React tree fully crashed, no error boundary).
+**Diagnose** (Phase A, May 13): grep `node_modules/` for `ReactCurrentOwner` found 4 candidate packages. After analysis:
+- `@excalidraw/excalidraw@0.17.6` — peer dep `react ^17 || ^18` (no 19). **Root cause.**
+- `framer-motion@11` — declares `react ^18 || ^19`, code path guarded. Not a culprit.
+- `@effect/platform` — match was inside a JS string (vendored swagger-ui-bundle source), not executed.
+- `prisma/build/public/assets/vendor.js` — Prisma Studio bundle, not in app runtime.
 
-Independent of the May 13 ESM/CJS hotfix series. Pre-existing since Phase 3c (React 19 removed `ReactCurrentOwner` internal API that Excalidraw <0.18 relies on).
+**Fix** (Phase B, May 13, commit `c78b883e`): bump `@excalidraw/excalidraw` 0.17.6 → 0.18.1. The 0.18 release explicitly declares `peerDependencies: { react: '^17 || ^18 || ^19' }` and dropped the secret-internals reference (`grep ReactCurrentOwner` in 0.18.1 bundle = 0 matches). 0.18 went through 7 RCs before stable. Single user-code caller (`components/sessions/SessionWhiteboard.tsx`) — APIs used were stable cross-versions, **0 caller changes needed**.
 
-**Action items**:
-- `grep -rn ReactCurrentOwner node_modules/` to identify the specific dep using the removed internal API
-- Options: bump dep (probable `@excalidraw/excalidraw` >=0.18) / polyfill workaround / replace feature
-- Estimate: 2-4 hours
-- **Currently NOT urgent**: no real users on whiteboard feature yet (confirmed May 13)
-- **Recommendation**: schedule as dedicated mini-sprint after Sprint 3 product decisions land
+**Validation**:
+- Feature branch preview deploy verified green by Carlos (whiteboard mounts, console clean)
+- Merged to main `77e6c0b7`
+- Production validation: see Phase 4b monitoring period continues alongside this fix
 
-**Pre-requisito antes de cualquier sprint que toque sesiones/whiteboards.**
+**Note**: Excalidraw 0.18.1 bundles nested `@radix-ui` packages with older peer declarations (`react ^16.8 || ^17 || ^18`) that npm flags as "invalid" under React 19. These are pure-JS ref/context utilities without secret-internals access; `--legacy-peer-deps` accepts them and they run clean under React 19.
 
-### Phase 5+ — Prisma SessionEventType enum drift
+### Phase 5+ — LiveKit webhook handlers audit
 
-**Symptom**: `'Invalid value for argument type. Expected SessionEventType.'` in Vercel runtime logs.
+Multiple Prisma-related errors surface in Vercel runtime logs from `app/api/webhooks/livekit/route.ts` (or the session-event-emitting helpers it calls). Non-blocking for UX (audit/event logging only), but pollutes logs and indicates handler↔schema drift.
 
-**Cause**: webhook handler in `app/api/webhooks/livekit/route.ts` (or similar session-event-emitting handler) passes string literal `'PARTICIPANT_LEFT'` to `prisma.sessionEvent.create()` — value not in `SessionEventType` enum in `prisma/schema.prisma`.
+**Known symptoms**:
 
-**Severity**: non-blocking. Audit/event logging only, not UX. Failed webhooks logged to Vercel runtime but session functionality unaffected.
+1. **P2025 on `room_started` / `room_finished`** — `MentorSession not found`. Handler attempts to update a session record that doesn't exist (probable: stale LiveKit room sending events after session was deleted, or wrong room→session ID mapping).
+2. **Enum drift `SessionEventType` on `participant_left`** — handler passes string literal `'PARTICIPANT_LEFT'` to `prisma.sessionEvent.create()` but that value is not in `SessionEventType` enum in `prisma/schema.prisma`. Error: `Invalid value for argument type. Expected SessionEventType.`
+3. **P2002 unique constraint on `participant_joined`** — `livekitIdentity` unique violation on upsert. Race condition: two webhook deliveries for the same participant land concurrently and both try to insert a new `SessionParticipation` row.
 
-**Action**: audit all `SessionEventType` values used in webhook handler code vs schema enum, add missing values, `prisma migrate`.
+**Severity**: non-blocking. Session functionality (video, audio, chat) unaffected. Audit log is incomplete.
 
-**Recommendation**: bundle with whiteboard sprint since both touch session/room code.
+**Recommendation**: dedicated mini-sprint. All 3 in one PR. Steps:
+- Audit all `SessionEventType` values used in handler code vs schema enum; add missing values, `prisma migrate`
+- Wrap `room_started`/`room_finished` lookups with existence guard; log+skip if session missing instead of throw
+- Convert `participant_joined` insert to true upsert with `onConflict` handling (or use Prisma `upsert` with `where: { livekitIdentity }`)
+- Bundle with whiteboard touches since both areas exercise `/sessions/[id]/room` code paths.
 
 ### Phase 5+ — React Compiler audit + Type hygiene (post Phase 3e)
 Surfaced when ESLint flat config (Phase 3e Step 4) re-enabled lint enforcement after `next lint` removal in Next 16. All currently downgraded to `warn` — backlog to actually fix.
