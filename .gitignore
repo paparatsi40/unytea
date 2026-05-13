@@ -33,6 +33,7 @@ yarn-error.log*
 build-*.txt
 build-*.log
 /temp-push/
+scripts/lint-output.txt
 
 # scratch / drafts personales (no commitear)
 *.draft.md
