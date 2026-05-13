@@ -1,6 +1,6 @@
 # unytea — Context Briefing for New Claude Sessions
 
-**Status**: living document. Last updated 2026-05-12 after Phase 3d completion at commit `c9b4af71`.
+**Status**: living document. Last updated 2026-05-12 after Phase 3e completion at commit `b7297968`.
 
 If you're a Claude instance picking up unytea work, read this completely before asking the user for context. This document is the source of truth for project state, established patterns, and working agreements.
 
@@ -33,7 +33,7 @@ If you're a Claude instance picking up unytea work, read this completely before 
 
 ## 2. Current state
 
-- **main HEAD**: `c9b4af71` (effect override patching CVE-2026-32887)
+- **main HEAD**: `b7297968` (ESLint flat config migration with React Compiler rules as warn)
 - **Sprint 1**: closed 2026-05-12 — see `docs/internal/SPRINT_1_CLOSURE.md` for full retro.
 - **Sprint 2**: in progress.
 
@@ -42,9 +42,11 @@ If you're a Claude instance picking up unytea work, read this completely before 
 ✅ Phase 3b — npm audit safe + next-auth beta.30 → beta.31    1a4d85a6
 ✅ Phase 3c — Next 14 → 16 + React 18 → 19                    2001abed (merged from feature branch)
 ✅ Phase 3d — effect@>=3.20.0 override (CVE-2026-32887)       c9b4af71
-⏳ Phase 3e — Cleanup followups (next.config, zustand, eslint)
+✅ Phase 3e — Cleanup (next.config, eslint flat, React Compiler→warn)   0fe35241..b7297968
 ⏳ Phase 4  — CSP rewrite (unsafe-eval removal, connect-src restriction, unpkg.com elimination)
 ```
+
+Phase 3e note: Step 3 (Zustand migration) was NO-OP — dep declared in `package.json` but **0 imports** in code. `npm uninstall zustand` queued in Phase 5+ backlog.
 
 **Vulnerabilities**: 11 → 2 (8 HIGH closed during Sprint 2). The 2 remaining are MODERATE residuals in `next` 16.x and transitive `postcss` — both require Next 17 (when released) to fully clear.
 
@@ -220,6 +222,7 @@ Before any product feature work (Sprint 3+), Carlos needs to write `docs/PRODUCT
 - Anti-features (what unytea explicitly will NOT do)
 - Success metrics
 - Autopilot activation strategy
+- **PWA `start_url`**: `/dashboard` (current) vs `/`. Trade-off: `/dashboard` assumes user is authenticated when opening the PWA (common if already logged in); `/` is more welcoming for users who install before logging in. Decision should align with the target user persona for v1.
 
 **This is product work, not code work** — don't try to execute it as a Claude Code prompt. It requires Carlos to think and write himself. You can help by asking clarifying questions or critiquing drafts.
 
@@ -243,12 +246,12 @@ Activation is a Sprint 3+ decision dependent on `PRODUCT_DECISIONS_V1.md`.
 
 Items accumulated during Sprint 1 + 2, organized by destination phase.
 
-### Phase 3e — Cleanup (~30 min)
-- Remove `swcMinify` and `optimizeFonts` from `next.config.mjs` (deprecated in Next 16, currently produce warnings)
-- Custom Cache-Control header warning on `/_next/static/:path*` (Next 16 surfaced)
-- Zustand: migrate from default export to named `import { create } from 'zustand'`
-- ESLint flat config decision: ESLint cascaded 8 → 10 via `eslint-config-next` 16. Either commit to flat config migration or stay on classic with potential warnings.
-- `web-push` PWA sanity check (Service Worker noise during dev)
+### Phase 3e — Cleanup — ✅ DONE (commits 0fe35241..b7297968)
+- ~~Remove `swcMinify` and `optimizeFonts` from `next.config.mjs`~~ done in `0fe35241`
+- ~~Custom Cache-Control header warning on `/_next/static/:path*`~~ done in `8764eef0`
+- ~~Zustand migration~~ NO-OP (0 imports in code; uninstall queued in Phase 5+)
+- ~~ESLint flat config decision~~ done in `b7297968` — migrated to flat config, native eslint-config-next imports, React Compiler rules as warn
+- ~~`web-push` PWA sanity check~~ inspected (Step 5), 3 findings queued in Phase 5+ Env/dev
 
 ### Phase 4 — CSP rewrite
 - Eliminate `unsafe-eval` from CSP
@@ -256,7 +259,22 @@ Items accumulated during Sprint 1 + 2, organized by destination phase.
 - Eliminate `unpkg.com` external load (replace with npm-installed local equivalent)
 - Deploy CSP in report-only mode first, monitor violations, then switch to enforce
 
+### Phase 5+ — React Compiler audit + Type hygiene (post Phase 3e)
+Surfaced when ESLint flat config (Phase 3e Step 4) re-enabled lint enforcement after `next lint` removal in Next 16. All currently downgraded to `warn` — backlog to actually fix.
+- 185 `@typescript-eslint/no-explicit-any` — typing pass (server actions + API routes + components con Prisma JSON fields)
+- 159 try/catch wrapping JSX → reemplazar con `<ErrorBoundary>` components (**BUGS LATENTES, alto-ROI** — React no catches rendering errors via try/catch)
+- 76 immutability / mixed state mutation
+- 44 `@next/next/no-img-element` → migrar a `next/image`
+- 29 TDZ patterns (Cannot access variable before declared — reordenar declarations)
+- 28 `setState` synchronously in effect → mover a event handlers o computed values
+- 24 `react-hooks/exhaustive-deps` review
+- 14 `@typescript-eslint/no-unused-vars` cleanup
+- 12 impure function during render → side effects fuera de render path
+- 10 `@next/next/no-html-link-for-pages` → migrar a `<Link>`
+- **Pre-requisito** antes de activar `experimental.reactCompiler` en `next.config.mjs`
+
 ### Phase 5+ — Env / dev cleanup
+- `npm uninstall zustand` — declared in `package.json` ^5.0.1 but 0 imports in code (post Phase 3e Step 3 finding)
 - Stale Clerk keys in `.env` (legacy auth, replaced by NextAuth in earlier work)
 - `.env.local` vs `.env.production` reconciliation
 - `AUTH_TRUST_HOST=true` for Vercel preview deploys to work (see Section 5.2)
@@ -265,6 +283,9 @@ Items accumulated during Sprint 1 + 2, organized by destination phase.
 - Excalidraw peer dep: installed with `--legacy-peer-deps` for React 19, validate runtime or bump to React 19-compatible version
 - `aboutSection @db.Text` is unbounded at DB level (zod caps at 50k chars but DB allows more)
 - `SectionInstance.props` typed shapes refactor (currently `Record<string, any>`, blocked the strict discriminated union zod for landing PATCH in 2c.4)
+- **PWA update banner**: the SW activates new version on next reload via `skipWaiting`+`clients.claim`, but no UI banner notifies the user. Implement toast "Nueva versión disponible — refresh" when `ServiceWorkerRegistrar` detects `updatefound`. Impact: users with PWA installed or active cache don't see changes until manual reload.
+- **PWA manifest `screenshots: []` empty** (`public/manifest.json`). Add 2-3 screenshots (mobile + desktop). Improves install prompt on Chrome/Edge mobile. Cosmetic, low priority.
+- **SW cache name versioning**: `CACHE_NAME` in `public/sw.js` is hardcoded to `"unytea-v1"`. When precache list or cache strategy changes, version it with a build hash or env var to force refresh of stale caches. Prevention, not urgent.
 
 ### Product backlog (post-gate)
 - `customCSS` feature design + CSS sanitization (currently rejected from action input — see Sprint 1 closure §5.5)
