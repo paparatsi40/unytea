@@ -264,12 +264,26 @@ Items accumulated during Sprint 1 + 2, organized by destination phase.
   - WASM: solo Excalidraw vendor bundle (`public/excalidraw-assets/vendor-*.js`) → necesita `'wasm-unsafe-eval'` específicamente
   - `scripts/external-domains.cjs` añadido como utility para recon de dominios externos
 
-- ⏳ **Phase 4b — CSP tightening "fácil" (Report-Only deploy)**:
+- 🧪 **Phase 4b — CSP tightening "fácil" (Report-Only deploy)** — dual-CSP deployed en commit `fc06264b` (feature branch `phase-4b-csp-report-only`):
   - `script-src 'unsafe-eval'` → `'wasm-unsafe-eval'` (CSP3 subset, solo WASM para Excalidraw)
-  - Eliminar wildcards: `img-src`/`media-src`/`font-src`/`connect-src` pasan de `https:` a whitelist explícita (lista compilada en "Phase 4b inputs" abajo)
-  - Eliminar orphans: `img.clerk.com`, `cdn.discordapp.com` de `img-src`
-  - Mantener `'unsafe-inline'` en `script-src` Y `style-src` (diferido a 4d)
-  - Deploy como `Content-Security-Policy-Report-Only` header paralelo al `Content-Security-Policy` actual
+  - Wildcards `https:` en `img-src`/`media-src`/`font-src`/`connect-src` → whitelist explícita
+  - Orphans removidos: `img.clerk.com`, `cdn.discordapp.com`
+  - `'unsafe-inline'` mantenido en `script-src` Y `style-src` (diferido a 4d)
+  - `Content-Security-Policy-Report-Only` header paralelo al `Content-Security-Policy` actual
+
+  **Phase 4b status — manual testing findings**:
+
+  Manual testing en localhost (prod build, `npx next build && npm run start`) ejercitó: home pública (`/en`), login con Credentials provider, dashboard, community feed, session room con LiveKit (audio+video activos, sin whiteboard).
+
+  **Resultado: 0 violations `[Report Only]` reales en consola durante uso normal.**
+
+  Hallazgos no accionables:
+  - Chrome Issues tab muestra `eval blocked` advisory con Source location vacía. Confirmado falso positivo (no aparece log `[Report Only]` real de `eval` en consola). Probable origen: Web Worker de LiveKit para audio processing.
+  - 12 warnings `invalid source <URL>` en `connect-src` son cosméticos del parser de Chrome (LiveKit conectó OK, Pusher se asume OK por mismo patrón de wildcards). Encoding del `next.config.mjs` verificado limpio (solo em-dash UTF-8 en comment, irrelevante). Considerar consolidar wildcards Pusher (`wss://*.pusher.com` cubre `ws-*` y `sockjs-*`) en Phase 4c.
+  - `apps.rokt.com` font-src violation = injection externa (extensión Chrome del developer o Vercel SSO page de preview deploys). NO agregar a CSP — ruido no controlable.
+  - Google OAuth login fails en localhost (Error 401 `invalid_client`) — out-of-scope para Phase 4b. Workaround: Credentials provider con email/password admin. Backlog: revisar `AUTH_GOOGLE_ID` en `.env.local` vs Google Cloud Console.
+
+  Pending: merge a main → empezar monitoring period (3-7 días en prod) → Phase 4c switch a enforce.
 
 - ⏳ **Phase 4c — Switch to enforce**:
   - Después de ~3-7 días de Report-Only en prod sin violations relevantes
@@ -319,6 +333,14 @@ connect-src 'self' https: ws: wss:
 **Deps que NO requieren eval** (confirmadas):
 - Tiptap stack instalado: starter-kit, react, image, link, placeholder (sin Mention/Suggestion que sí lo necesitarían)
 - DnD libs (`@dnd-kit/*`, `@hello-pangea/dnd`), `lottie-react`, `react-day-picker`, `html-to-image`
+
+### Phase 5+ CRÍTICO — Whiteboard broken since Phase 3c (React 18→19 upgrade)
+
+Excalidraw o dep dependiente accede a `React.ReactCurrentOwner` que fue eliminado en React 19. Manifestación: navegar a `/dashboard/sessions/[id]/room` y abrir whiteboard tira `'Cannot read properties of undefined (reading ReactCurrentOwner)'`. Stack trace via `next/dynamic` + `loadableGenerated.modules`. Detectado durante Phase 4b manual testing en localhost prod build.
+
+Fix path: identificar la dep culpable (probable `@excalidraw/excalidraw <0.18` o `react-error-boundary` viejo via grep en `node_modules` por `ReactCurrentOwner`), bumpear a versión React 19-compatible. Si no hay compatible, considerar lazy-load alternative o eliminar feature.
+
+**Pre-requisito antes de cualquier sprint que toque sesiones/whiteboards.**
 
 ### Phase 5+ — React Compiler audit + Type hygiene (post Phase 3e)
 Surfaced when ESLint flat config (Phase 3e Step 4) re-enabled lint enforcement after `next lint` removal in Next 16. All currently downgraded to `warn` — backlog to actually fix.
