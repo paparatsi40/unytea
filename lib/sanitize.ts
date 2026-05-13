@@ -1,20 +1,4 @@
-import DOMPurify from "isomorphic-dompurify";
-
-/**
- * Hook: force rel="noopener noreferrer" on <a target="_blank"> (and any other
- * target) links.
- *
- * Prevents tab-nabbing where a malicious external page uses window.opener to
- * redirect the parent tab. Without this hook, Tiptap editors that opt into
- * target="_blank" links would create that vulnerability.
- *
- * Registered at module load (DOMPurify hooks are idempotent across imports).
- */
-DOMPurify.addHook("afterSanitizeAttributes", (node) => {
-  if (node.nodeName === "A" && node.hasAttribute("target")) {
-    node.setAttribute("rel", "noopener noreferrer");
-  }
-});
+import sanitizeHtml from "sanitize-html";
 
 /**
  * Allowlist of HTML tags safe to render via dangerouslySetInnerHTML.
@@ -39,24 +23,29 @@ const ALLOWED_TAGS = [
 ];
 
 /**
- * Allowlist of HTML attributes. DOMPurify's default URI scheme regexp
- * blocks javascript:, vbscript:, and similar dangerous schemes — we
- * trust that default rather than overriding (the default is well-vetted).
+ * Per-tag attribute allowlist. sanitize-html requires attributes scoped
+ * per tag (unlike DOMPurify's flat list). javascript:/vbscript:/data: URIs
+ * are blocked automatically via sanitize-html's allowedSchemes default
+ * (['http', 'https', 'ftp', 'mailto']).
  */
-const ALLOWED_ATTR = [
-  "href", "src", "alt", "title", "target", "rel",
-];
+const ALLOWED_ATTRIBUTES: sanitizeHtml.IOptions["allowedAttributes"] = {
+  a: ["href", "target", "rel", "title"],
+  img: ["src", "alt", "title"],
+};
 
 /**
  * Sanitizes user-provided HTML for safe rendering via dangerouslySetInnerHTML.
  *
- * Removes script tags, event handlers (onclick, onload, etc.), javascript:
- * and vbscript: URIs, iframe/object/embed tags, and any tag or attribute
- * not in the allowlists above.
+ * Replaces isomorphic-dompurify (jsdom-based) with sanitize-html (pure JS
+ * parser, no DOM environment needed). Eliminates the jsdom dependency tree
+ * which was causing ERR_REQUIRE_ESM crashes in production SSR.
  *
- * Designed for HTML produced by the Tiptap WYSIWYG editor. If used on HTML
- * from other sources (e.g., user paste with custom formatting), the output
- * may strip more than expected — that is the intended conservative behavior.
+ * Removes script tags (and their contents), event handlers (onclick, etc.),
+ * javascript:/vbscript:/data: URIs, iframe/object/embed tags, and any tag
+ * or attribute not in the allowlists above.
+ *
+ * The transformTags hook on <a> forces rel="noopener noreferrer" when
+ * the target attribute is present (prevents tab-nabbing via window.opener).
  *
  * @param dirty - Untrusted HTML string from user input
  * @returns Sanitized HTML safe to render via dangerouslySetInnerHTML
@@ -71,8 +60,18 @@ const ALLOWED_ATTR = [
 export function sanitizeHTML(dirty: string): string {
   if (!dirty) return "";
 
-  return DOMPurify.sanitize(dirty, {
-    ALLOWED_TAGS,
-    ALLOWED_ATTR,
+  return sanitizeHtml(dirty, {
+    allowedTags: ALLOWED_TAGS,
+    allowedAttributes: ALLOWED_ATTRIBUTES,
+    // sanitize-html defaults already block javascript:, vbscript:, data:
+    // and other dangerous schemes via allowedSchemes / allowedSchemesAppliedToAttributes.
+    transformTags: {
+      a: (tagName, attribs) => {
+        if (attribs.target) {
+          attribs.rel = "noopener noreferrer";
+        }
+        return { tagName, attribs };
+      },
+    },
   });
 }

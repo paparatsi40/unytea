@@ -38,15 +38,15 @@ describe('Rate Limiter', () => {
   })
   describe('getIP', () => {
     it('should extract IP from x-forwarded-for', () => {
-      const req = { headers: new Headers({ 'x-forwarded-for': '192.168.1.1, 10.0.0.1' }), ip: undefined } as any
+      const req = { headers: new Headers({ 'x-forwarded-for': '192.168.1.1, 10.0.0.1' }) } as any
       expect(getIP(req)).toBe('192.168.1.1')
     })
-    it('should fallback to request.ip', () => {
-      const req = { headers: new Headers({}), ip: '127.0.0.1' } as any
+    it('should fallback to x-real-ip when x-forwarded-for absent', () => {
+      const req = { headers: new Headers({ 'x-real-ip': '127.0.0.1' }) } as any
       expect(getIP(req)).toBe('127.0.0.1')
     })
-    it('should return unknown when no IP', () => {
-      const req = { headers: new Headers({}), ip: undefined } as any
+    it('should return unknown when no headers', () => {
+      const req = { headers: new Headers({}) } as any
       expect(getIP(req)).toBe('unknown')
     })
   })
