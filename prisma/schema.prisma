@@ -1114,6 +1114,15 @@ enum SessionEventType {
   SESSION_NOTES_UPDATED
   SESSION_SHARED_TO_FEED
   SESSION_ADDED_TO_COURSE
+  // LiveKit webhook lifecycle events (Phase 5+ — additive, backwards-compat with existing rows)
+  ROOM_STARTED
+  ROOM_FINISHED
+  PARTICIPANT_JOINED
+  PARTICIPANT_LEFT
+  EGRESS_STARTED
+  EGRESS_UPDATED
+  EGRESS_ENDED
+  POST_PROCESSING_TRIGGERED
 }
 
 enum SessionVisibility {

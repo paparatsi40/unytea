@@ -7,7 +7,7 @@ import { autoStartRecording } from "./recording";
 import { createNotification } from "./notifications";
 import { generateAISessionSummary } from "./session-ai";
 import { generateSessionRecap } from "./session-jobs";
-import { PostContentType, Prisma } from "@prisma/client";
+import { PostContentType, Prisma, SessionEventType } from "@prisma/client";
 import { markAutopilotStep } from "./autopilot";
 
 // LiveKit configuration
@@ -104,9 +104,21 @@ async function handleRoomStarted(event: any) {
   // Extract session ID from room name (format: "session-{id}")
   const sessionId = roomName.replace("session-", "");
 
+  const session = await prisma.mentorSession.findUnique({
+    where: { id: sessionId },
+    select: { id: true, communityId: true },
+  });
+
+  if (!session) {
+    console.warn(
+      `[livekit-webhook] room_started for unknown sessionId=${sessionId} (room=${roomName}). Ack & skip.`
+    );
+    return;
+  }
+
   // Update session status
   await prisma.mentorSession.update({
-    where: { id: sessionId },
+    where: { id: session.id },
     data: {
       status: "IN_PROGRESS",
       startedAt: new Date(),
@@ -120,11 +132,6 @@ async function handleRoomStarted(event: any) {
     console.log(`[LiveKit] Auto recording is disabled for session ${sessionId}`);
   }
 
-  const session = await prisma.mentorSession.findUnique({
-    where: { id: sessionId },
-    select: { communityId: true },
-  });
-
   // Feed lifecycle posts
   await ensureSessionLifecyclePost(sessionId, "pre_session", {
     titlePrefix: "🧵 Pre-session thread",
@@ -137,7 +144,7 @@ async function handleRoomStarted(event: any) {
   });
 
   // Log event
-  await logSessionEvent(sessionId, "ROOM_STARTED", {
+  await logSessionEvent(sessionId, SessionEventType.ROOM_STARTED, {
     roomSid: event.room?.sid,
     roomName,
   });
@@ -158,9 +165,21 @@ async function handleRoomFinished(event: any) {
 
   const sessionId = roomName.replace("session-", "");
 
+  const finishedSession = await prisma.mentorSession.findUnique({
+    where: { id: sessionId },
+    select: { id: true, communityId: true },
+  });
+
+  if (!finishedSession) {
+    console.warn(
+      `[livekit-webhook] room_finished for unknown sessionId=${sessionId} (room=${roomName}). Ack & skip.`
+    );
+    return;
+  }
+
   // Update session status
   await prisma.mentorSession.update({
-    where: { id: sessionId },
+    where: { id: finishedSession.id },
     data: {
       status: "COMPLETED",
       endedAt: new Date(),
@@ -197,15 +216,10 @@ async function handleRoomFinished(event: any) {
   });
 
   // Log event
-  await logSessionEvent(sessionId, "ROOM_FINISHED", {
+  await logSessionEvent(sessionId, SessionEventType.ROOM_FINISHED, {
     roomSid: event.room?.sid,
     duration: event.room?.duration,
     numParticipants: event.room?.numParticipants,
-  });
-
-  const finishedSession = await prisma.mentorSession.findUnique({
-    where: { id: sessionId },
-    select: { communityId: true },
   });
 
   await markAutopilotStep(sessionId, finishedSession?.communityId, "captured", {
@@ -232,25 +246,43 @@ async function handleParticipantJoined(event: any) {
   // Extract user ID from identity (format: "{userId}-{timestamp}")
   const userId = identity.split("-")[0];
 
-  // Update or create participation
-  await prisma.sessionParticipation.upsert({
-    where: {
-      sessionId_userId: {
+  // Update or create participation.
+  // Wrapped in try/catch for P2002: two concurrent webhook deliveries for the
+  // same participant can both decide the row is missing, both insert, and the
+  // second hits the unique(livekitIdentity) constraint (not the composite one
+  // used in the where clause). Treat as idempotent — second writer's data is
+  // identical anyway.
+  try {
+    await prisma.sessionParticipation.upsert({
+      where: {
+        sessionId_userId: {
+          sessionId,
+          userId,
+        },
+      },
+      create: {
         sessionId,
         userId,
+        livekitIdentity: identity,
+        joinedAt: new Date(),
       },
-    },
-    create: {
-      sessionId,
-      userId,
-      livekitIdentity: identity,
-      joinedAt: new Date(),
-    },
-    update: {
-      livekitIdentity: identity,
-      leftAt: null, // Rejoining
-    },
-  });
+      update: {
+        livekitIdentity: identity,
+        leftAt: null, // Rejoining
+      },
+    });
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      console.info(
+        `[livekit-webhook] participant_joined duplicate race ignored: session=${sessionId} user=${userId} identity=${identity}`
+      );
+      return;
+    }
+    throw error;
+  }
 
   // Update attendee count
   await prisma.mentorSession.update({
@@ -262,7 +294,7 @@ async function handleParticipantJoined(event: any) {
     },
   });
 
-  await logSessionEvent(sessionId, "PARTICIPANT_JOINED", {
+  await logSessionEvent(sessionId, SessionEventType.PARTICIPANT_JOINED, {
     userId,
     identity,
     metadata: event.participant?.metadata,
@@ -305,7 +337,7 @@ async function handleParticipantLeft(event: any) {
     });
   }
 
-  await logSessionEvent(sessionId, "PARTICIPANT_LEFT", {
+  await logSessionEvent(sessionId, SessionEventType.PARTICIPANT_LEFT, {
     userId,
     identity,
     duration: event.participant?.duration,
@@ -339,7 +371,7 @@ async function handleEgressStarted(event: any) {
     },
   });
 
-  await logSessionEvent(sessionId, "EGRESS_STARTED", {
+  await logSessionEvent(sessionId, SessionEventType.EGRESS_STARTED, {
     egressId: egressInfo.egressId,
     roomName,
     startedAt: egressInfo.startedAt,
@@ -371,7 +403,7 @@ async function handleEgressUpdated(event: any) {
     });
   }
 
-  await logSessionEvent(recording.sessionId, "EGRESS_UPDATED", {
+  await logSessionEvent(recording.sessionId, SessionEventType.EGRESS_UPDATED, {
     egressId: egressInfo.egressId,
     status: egressInfo.status,
   });
@@ -487,7 +519,7 @@ async function handleEgressEnded(event: any) {
     });
   }
 
-  await logSessionEvent(sessionId, "EGRESS_ENDED", {
+  await logSessionEvent(sessionId, SessionEventType.EGRESS_ENDED, {
     egressId: egressInfo.egressId,
     status: egressInfo.status,
     fileResults,
@@ -519,13 +551,13 @@ function mapEgressStatus(egressStatus: string): "PROCESSING" | "READY" | "FAILED
  */
 async function logSessionEvent(
   sessionId: string,
-  type: string,
+  type: SessionEventType,
   payload: any
 ) {
   await prisma.sessionEvent.create({
     data: {
       sessionId,
-      type: type as any,
+      type,
       payload,
     },
   });
@@ -653,7 +685,7 @@ async function triggerPostProcessing(sessionId: string, recordingId: string) {
     source: "recording_ready",
   });
 
-  await logSessionEvent(sessionId, "POST_PROCESSING_TRIGGERED", {
+  await logSessionEvent(sessionId, SessionEventType.POST_PROCESSING_TRIGGERED, {
     recordingId,
     jobs: ["transcript", "summary", "recording_ready", "recap", "course_suggestion"],
     summaryGenerated: summaryResult.success,
