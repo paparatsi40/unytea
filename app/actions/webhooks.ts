@@ -40,19 +40,48 @@ export type LiveKitWebhookEvent =
  * Handle incoming LiveKit webhook
  * This should be called from an API route (app/api/webhooks/livekit/route.ts)
  */
+export type WebhookResult =
+  | { success: true; message: string }
+  | {
+      success: false;
+      reason: "config" | "signature" | "processing";
+      message: string;
+    };
+
 export async function handleLiveKitWebhook(
   body: string,
   authorizationHeader: string
-): Promise<{ success: boolean; message: string }> {
+): Promise<WebhookResult> {
+  // Config check — server-side misconfiguration, not a client error.
+  if (!LIVEKIT_API_KEY || !LIVEKIT_API_SECRET) {
+    console.error(
+      "[LiveKit Webhook] Server config missing: LIVEKIT_API_KEY or LIVEKIT_API_SECRET not set"
+    );
+    return {
+      success: false,
+      reason: "config",
+      message: "Webhook secret not configured",
+    };
+  }
+
+  // Signature verification — own try/catch. WebhookReceiver.receive() throws
+  // when the auth header doesn't validate against the configured key/secret.
+  // Routed to HTTP 401 by the caller; deliberately NO logging here — context
+  // about the request (user-agent, etc.) lives in the route handler.
+  let event: Awaited<ReturnType<typeof receiver.receive>>;
   try {
-    // Verify webhook signature
-    if (!LIVEKIT_API_KEY || !LIVEKIT_API_SECRET) {
-      return { success: false, message: "Webhook secret not configured" };
-    }
+    event = await receiver.receive(body, authorizationHeader);
+  } catch {
+    return {
+      success: false,
+      reason: "signature",
+      message: "Signature verification failed",
+    };
+  }
 
-    // Parse and verify the webhook event
-    const event = await receiver.receive(body, authorizationHeader);
-
+  // Processing — own try/catch. Any failure here (DB errors, handler bugs,
+  // network) is transient/retryable; routed to HTTP 500 by the caller.
+  try {
     console.log(`[LiveKit Webhook] ${event.event}:`, {
       room: event.room?.name,
       roomSid: event.room?.sid,
@@ -60,7 +89,6 @@ export async function handleLiveKitWebhook(
       egressId: event.egressInfo?.egressId,
     });
 
-    // Route to specific handler based on event type
     switch (event.event) {
       case "room_started":
         await handleRoomStarted(event);
@@ -89,8 +117,12 @@ export async function handleLiveKitWebhook(
 
     return { success: true, message: `Processed ${event.event}` };
   } catch (error) {
-    console.error("[LiveKit Webhook] Error processing webhook:", error);
-    return { success: false, message: "Webhook processing failed" };
+    console.error("[LiveKit Webhook] Processing failed:", error);
+    return {
+      success: false,
+      reason: "processing",
+      message: "Webhook processing failed",
+    };
   }
 }
 
