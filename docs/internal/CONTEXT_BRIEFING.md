@@ -1,6 +1,6 @@
 # unytea — Context Briefing for New Claude Sessions
 
-**Status**: living document. Last updated 2026-05-13 after Phase 5+ Whiteboard CSS import follow-up merged at commit `11c9f241`.
+**Status**: living document. Last updated 2026-05-14 after zustand uninstall housekeeping.
 
 If you're a Claude instance picking up unytea work, read this completely before asking the user for context. This document is the source of truth for project state, established patterns, and working agreements.
 
@@ -33,7 +33,7 @@ If you're a Claude instance picking up unytea work, read this completely before 
 
 ## 2. Current state
 
-- **main HEAD**: `77e6c0b7` (Merge phase-5-whiteboard-react19-fix — Excalidraw 0.17.6 → 0.18.1)
+- **main HEAD**: `f9dd8843` (docs(briefing): capture Excalidraw 0.18 CSS import lesson — pre-housekeeping baseline; this commit + zustand uninstall pushes new HEAD)
 - **Production**: stable. `/dashboard/c/[slug]` loading clean. `/dashboard/sessions/[id]/room` whiteboard mounts clean (Phase 5+ Whiteboard CLOSED).
 - **Sprint 1**: closed 2026-05-12 — see `docs/internal/SPRINT_1_CLOSURE.md` for full retro.
 - **Sprint 2**: in progress.
@@ -45,22 +45,28 @@ If you're a Claude instance picking up unytea work, read this completely before 
 ✅ Phase 3d — effect@>=3.20.0 override (CVE-2026-32887)       c9b4af71
 ✅ Phase 3e — Cleanup (next.config, eslint flat, React Compiler→warn)   0fe35241..b7297968
 ✅ Phase 4a — CSP audit + unpkg.com elimination                65dd8880
-🧪 Phase 4b — CSP Report-Only deployed, monitoring period       fc06264b..051ba24f
+✅ Phase 4b — CSP Report-Only deployed, monitoring period      fc06264b..051ba24f
    Hotfix Series Bugs 1-4 ESM/CJS (May 13)                   479abe56..c28f3d68
 ✅ Phase 5+ Whiteboard ReactCurrentOwner — Excalidraw 0.18.1   c78b883e..11c9f241 (merged May 13)
-⏳ Phase 4c — CSP switch to enforce (post-violations monitoring)
-⏳ Phase 4d — Nonces for script-src 'unsafe-inline' removal
+⏳ Phase 4c — CSP switch to enforce (post-monitoring period, 3-7 días desde 4b deploy 2026-05-12)
+⏳ Phase 4d — Nonces for script-src 'unsafe-inline' removal (sprint propio)
+⏳ Pre-Sprint-3 gate — Carlos escribe `docs/PRODUCT_DECISIONS_V1.md` (ver Section 7)
 ```
 
 **Phase 5+ CRÍTICOs**: **0 active**. Whiteboard regression closed May 13. Remaining Phase 5+ items are non-critical backlog (React Compiler audit, type hygiene, webhook handler audit, env cleanup).
 
-Phase 3e note: Step 3 (Zustand migration) was NO-OP — dep declared in `package.json` but **0 imports** in code. `npm uninstall zustand` queued in Phase 5+ backlog.
+Phase 3e note: Step 3 (Zustand migration) was NO-OP — dep declared in `package.json` but **0 imports** in code. `npm uninstall zustand` ejecutado 2026-05-14 (housekeeping post Phase 5). Transitive `zustand@4.5.7` permanece bajo `@excalidraw/excalidraw → tunnel-rat` (no es controlable, no afecta).
 
 **Overrides (final)**: only `"effect": ">=3.20.0"` remains (Phase 3d CVE-2026-32887). Defensive overrides for jsdom chain (html-encoding-sniffer, whatwg-url, jsdom) removed in `c28f3d68` — no longer needed once jsdom is out of the dep tree.
 
 **Sanitization**: `sanitize-html ^2.17.4` (replaced `isomorphic-dompurify` in `c28f3d68`). Pure JS parser, no DOM environment. Eliminates entire jsdom chain.
 
-**Vulnerabilities**: 11 → 2 (8 HIGH closed during Sprint 2). The 2 remaining are MODERATE residuals in `next` 16.x and transitive `postcss` — both require Next 17 (when released) to fully clear.
+**Vulnerabilities** (snapshot 2026-05-14, post zustand uninstall): 11 (10 MODERATE, 1 HIGH). 8 HIGH closed during Sprint 2 deps phase. Remaining chains:
+- `postcss` <8.5.10 (MODERATE) transitive under `next` — requires Next 17 to clear, no advisory in app code path.
+- `nanoid` <5.0.9 (MODERATE) transitive under `@excalidraw/excalidraw@0.18.1` + `@excalidraw/mermaid-to-excalidraw`.
+- `lodash-es` <=4.17.23 (HIGH, Prototype Pollution) transitive under `@excalidraw/excalidraw@0.18.1 → @excalidraw/mermaid-to-excalidraw → @mermaid-js/parser → langium → chevrotain → lodash-es`. **New since 0.17.6 → 0.18.1 bump**; surface only reachable if mermaid-to-excalidraw runs on attacker-controlled mermaid source. Backlog: monitor Excalidraw releases for upstream lodash fix.
+
+`npm audit` exact output kept in audit folder for traceability.
 
 ---
 
