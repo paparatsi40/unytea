@@ -465,7 +465,7 @@ Surfaced when ESLint flat config (Phase 3e Step 4) re-enabled lint enforcement a
 ### Phase 5+ — Env / dev cleanup
 - ~~`npm uninstall zustand`~~ done in `cf6b6886` (2026-05-14); transitive `zustand@4.5.7` remains under Excalidraw → tunnel-rat (not controllable, no impact).
 - **If Passkey/WebAuthn provider is activated in NextAuth**: decide between (a) pre-bundling `@simplewebauthn/browser` locally — requires fork or monkey-patch of `@auth/core` because the unpkg URL is hardcoded in its bundle; or (b) re-adding `unpkg.com` to `script-src` with strict subpath: `https://unpkg.com/@simplewebauthn/browser@*/dist/bundle/index.umd.min.js`. Surfaced when Phase 4a removed unpkg from CSP.
-- Stale Clerk keys in `.env` (legacy auth, replaced by NextAuth in earlier work)
+- ~~Stale Clerk keys in `.env` (legacy auth, replaced by NextAuth in earlier work)~~ — **in-repo audit clean** (2026-05-15): 0 code imports, 0 deps, 0 `.env.example` lines, no `/api/webhooks/clerk/` route, `img.clerk.com` removed from `next.config.mjs:images.remotePatterns`. Defensive test in `tests/unit/auth-security.test.ts` asserts no `CLERK_` keys leak into env files. **Pending Carlos manual cleanup outside repo**: any `CLERK_*` env vars in Vercel dashboard + `.env.local` on his machine.
 - `.env.local` vs `.env.production` reconciliation
 - ~~`AUTH_TRUST_HOST=true` for Vercel preview deploys to work~~ — moot: `lib/auth.ts` has `trustHost: true` hardcoded since pre-Sprint-2 (see §5.2 for full story).
 - `docs/internal/DEV_SETUP.md` for onboarding (corporate WiFi workaround, Node version, etc.)
