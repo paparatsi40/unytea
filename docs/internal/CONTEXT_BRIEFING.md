@@ -200,8 +200,14 @@ Workflow issues that have caused confusion before. Awareness saves debug cycles.
 ### 5.1 Corporate WiFi blocks port 5432
 Carlos's corporate network blocks outbound Postgres traffic. Symptom: `Can't reach database server at ep-purple-surf-...neon.tech:5432` when running `npm run dev`, `npx prisma migrate`, or any Prisma command locally. **First instinct when seeing DB connection errors locally: ask whether on corporate WiFi.** Workaround: switch to mobile hotspot.
 
-### 5.2 Vercel preview deploys break auth flows
-The Vercel project has `AUTH_URL` set project-wide to `https://www.unytea.com`. Preview deploys live on `*.vercel.app` subdomains, causing cross-origin redirects that fail with CORS preflight errors. **Workaround**: test locally instead of on preview deploys for any auth-related verification. **Backlog item to fix properly**: add `AUTH_TRUST_HOST=true` env var so NextAuth uses request host dynamically.
+### 5.2 Vercel preview deploys and auth flows — ✅ RESOLVED
+The Vercel project has `AUTH_URL` set project-wide to `https://www.unytea.com`. Preview deploys live on `*.vercel.app` subdomains, which historically caused NextAuth to reject the request because the actual Host header didn't match `AUTH_URL`.
+
+**Fix (already in code)**: `lib/auth.ts` has `trustHost: true` hardcoded in the NextAuth config (see the explained comment around the relevant line). This tells NextAuth to trust the `X-Forwarded-Host` header from Vercel's edge instead of validating against `AUTH_URL`. Preview deploys now sign in cleanly.
+
+**Historical note**: an `AUTH_TRUST_HOST=true` env var was briefly set in Vercel Preview on 2026-05-14 under the assumption it was the missing fix. It was a no-op — `trustHost: true` in the config takes precedence over the env. The env var was removed on 2026-05-15 for cleanliness.
+
+The official NextAuth recommendation lists either approach (code config or env var) as valid; we keep the code-based config so it's visible in PRs and reviewable.
 
 ### 5.3 PowerShell `[slug]` paths
 PowerShell interprets square brackets as glob wildcards. Reading files at paths like `app/api/communities/[slug]/route.ts` requires `Get-Content -LiteralPath "..."` (not just `Get-Content "..."`, which fails silently with "path does not exist").
@@ -461,7 +467,7 @@ Surfaced when ESLint flat config (Phase 3e Step 4) re-enabled lint enforcement a
 - **If Passkey/WebAuthn provider is activated in NextAuth**: decide between (a) pre-bundling `@simplewebauthn/browser` locally — requires fork or monkey-patch of `@auth/core` because the unpkg URL is hardcoded in its bundle; or (b) re-adding `unpkg.com` to `script-src` with strict subpath: `https://unpkg.com/@simplewebauthn/browser@*/dist/bundle/index.umd.min.js`. Surfaced when Phase 4a removed unpkg from CSP.
 - Stale Clerk keys in `.env` (legacy auth, replaced by NextAuth in earlier work)
 - `.env.local` vs `.env.production` reconciliation
-- `AUTH_TRUST_HOST=true` for Vercel preview deploys to work (see Section 5.2)
+- ~~`AUTH_TRUST_HOST=true` for Vercel preview deploys to work~~ — moot: `lib/auth.ts` has `trustHost: true` hardcoded since pre-Sprint-2 (see §5.2 for full story).
 - `docs/internal/DEV_SETUP.md` for onboarding (corporate WiFi workaround, Node version, etc.)
 - `docs/internal/HISTORY.md` for Supabase → Neon migration historical context
 - Excalidraw peer dep: installed with `--legacy-peer-deps` for React 19, validate runtime or bump to React 19-compatible version
