@@ -1,6 +1,6 @@
 # unytea — Context Briefing for New Claude Sessions
 
-**Status**: living document. Last updated 2026-05-15 after PRODUCT_DECISIONS_V1.md landing + Phase 4c-pre (CSP violation reporting endpoint).
+**Status**: living document. Last updated 2026-05-15 after SECTION_5_AUDIT.md discovery (delta between PD V1 §5 and implementation).
 
 If you're a Claude instance picking up unytea work, read this completely before asking the user for context. This document is the source of truth for project state, established patterns, and working agreements.
 
@@ -57,6 +57,14 @@ If you're a Claude instance picking up unytea work, read this completely before 
 ```
 
 **Phase 5+ CRÍTICOs**: **0 active**. Whiteboard regression closed May 13. Remaining Phase 5+ items are non-critical backlog (React Compiler audit, type hygiene, webhook handler audit, env cleanup).
+
+**Discovery crítico de cierre (2026-05-15)**: `docs/internal/SECTION_5_AUDIT.md` ejecutado tras el landing de PRODUCT_DECISIONS_V1.md. La implementación actual contiene ~15 archivos + 4 modelos Prisma con surface de gamification (Cat A: User/Member points+level+streaks, Achievement+UserAchievement models, `/dashboard/c/[slug]/leaderboard`, `/dashboard/achievements`, presence indicators con `isOnline` flag, GamificationWidget, streak UI con 🔥 + copy "keep the streak") plus un `/explore` page con sort default `"trending"` (Cat E: marketplace cannibalization) que **conflictúan directamente con anti-features locked en PD V1 §5 esta tarde**.
+
+Adicional: surface a evaluar estratégicamente en Cat B (DirectMessage system, ya gated por `canUsersDirectMessage`) y Cat F (AIChatWidget renderizado a cada miembro de cada community — positioning ambiguo).
+
+Confirmed clean: Cat C affiliates/referrals, Cat D tips/super-chats/pay-per-session, Cat F sentiment/churn/impersonation, Cat H tracking pixels/WhatsApp/Telegram bots.
+
+**Sprint 3 NO puede ser solo "build features"** — debe incluir de-featurization estratégica en al menos Cat A + Cat E, plus calls explícitos sobre Cat B + Cat F, O bien revisión de PD V1 §5 (la revisión debe documentarse en PD V1 mismo, no en branch code). Decisiones pendientes por categoría documentadas en SECTION_5_AUDIT.md.
 
 Phase 3e note: Step 3 (Zustand migration) was NO-OP — dep declared in `package.json` but **0 imports** in code. `npm uninstall zustand` ejecutado 2026-05-14 (housekeeping post Phase 5). Transitive `zustand@4.5.7` permanece bajo `@excalidraw/excalidraw → tunnel-rat` (no es controlable, no afecta).
 
@@ -488,6 +496,7 @@ Surfaced when ESLint flat config (Phase 3e Step 4) re-enabled lint enforcement a
 ## 10. Reference documents in repo
 
 - `docs/internal/PRODUCT_DECISIONS_V1.md` — **canonical product decisions v1** (locked 2026-05-15). All Sprint 3+ feature work should anchor here. 7 sections: identity, target user, v1 features, revenue, anti-features, success metrics, autopilot strategy.
+- `docs/internal/SECTION_5_AUDIT.md` — codebase delta against PRODUCT_DECISIONS_V1.md §5 anti-features (2026-05-15). **CRITICAL input for Sprint 3 planning.** Identifies major conflict surface in Cat A (engagement extraction: ~15 files + 4 Prisma models) and Cat E (marketplace cannibalization: `/explore` with trending default), plus strategic calls needed on Cat B (member DMs) and Cat F (AI widget). Confirmed alignments documented per category.
 - `docs/internal/SPRINT_1_CLOSURE.md` — Sprint 1 full retrospective (cleanup + auth/security/perf hardening, 20 commits, 6 architectural decisions)
 - `docs/internal/SPRINT_2_PLAN.md` — Sprint 2 preliminary plan (created mid-execution, may be slightly outdated relative to actual progress recorded in this doc)
 - `docs/internal/CONTEXT_BRIEFING.md` — this doc
