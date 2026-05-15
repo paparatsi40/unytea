@@ -74,6 +74,9 @@ const nextConfig = {
       "frame-src 'self' https://vercel.live",
       // Allow all connections for WebRTC/LiveKit - simplified
       "connect-src 'self' https: ws: wss:",
+      // Phase 4c-pre: capture real-user violations against the enforced CSP.
+      // Persisted to the csp_violations table by app/api/csp-report.
+      "report-uri /api/csp-report",
     ].join("; ");
 
     // Phase 4b — Report-Only CSP with tightened directives.
@@ -98,6 +101,9 @@ const nextConfig = {
       "font-src 'self' data:",
       "frame-src 'self' https://js.stripe.com https://vercel.live",
       "connect-src 'self' https://api.stripe.com https://*.uploadthing.com https://utfs.io https://*.livekit.cloud wss://*.livekit.cloud https://*.pusher.com wss://*.pusher.com wss://ws-*.pusher.com wss://sockjs-*.pusher.com",
+      // Phase 4c-pre: capture real-user violations against the tightened CSP.
+      // Persisted to the csp_violations table by app/api/csp-report.
+      "report-uri /api/csp-report",
     ].join("; ");
 
     return [

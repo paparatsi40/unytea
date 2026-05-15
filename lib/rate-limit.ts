@@ -206,4 +206,12 @@ export const rateLimiters = {
     interval: 60 * 1000, // 1 minute
     uniqueTokenPerInterval: 100, // 100 requests per minute
   }),
+
+  // CSP violation reports - per-IP cap. Browser extensions (ad blockers, password
+  // managers, Grammarly, etc.) can fire dozens of violations per page load — we
+  // want the data but not a single misbehaving extension flooding the table.
+  cspReport: rateLimit({
+    interval: 60 * 1000, // 1 minute
+    uniqueTokenPerInterval: 10, // 10 reports/min per IP
+  }),
 };

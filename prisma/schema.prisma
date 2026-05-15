@@ -1466,3 +1466,27 @@ model ProcessedStripeEvent {
   @@index([processedAt]) // for cleanup queries (delete events older than X days)
   @@map("processed_stripe_events")
 }
+
+// Persisted CSP violation reports. Captures real-user violations of both the
+// enforced and Report-Only policies declared in next.config.mjs, enabling the
+// "monitoring window" that Phase 4c needs before promoting Report-Only directives.
+model CspViolation {
+  id           String   @id @default(cuid())
+
+  directive    String   // e.g. "script-src", "connect-src"
+  blockedUri   String   // The blocked resource URL (truncated to 2000 chars upstream)
+  documentUri  String?  // Page where the violation occurred
+  sourceFile   String?  // Source file of the violating script (if available)
+  lineNumber   Int?
+  columnNumber Int?
+
+  userAgent    String?  // Request user-agent (truncated to 500 chars upstream)
+  mode         String   // "report-only" | "enforce" — derived from CSP disposition
+
+  createdAt    DateTime @default(now())
+
+  @@index([directive, createdAt])
+  @@index([blockedUri])
+  @@index([createdAt])
+  @@map("csp_violations")
+}
