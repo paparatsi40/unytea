@@ -1,6 +1,6 @@
 # unytea — Context Briefing for New Claude Sessions
 
-**Status**: living document. Last updated 2026-05-14 after zustand uninstall housekeeping.
+**Status**: living document. Last updated 2026-05-15 after PRODUCT_DECISIONS_V1.md landing + Phase 4c-pre (CSP violation reporting endpoint).
 
 If you're a Claude instance picking up unytea work, read this completely before asking the user for context. This document is the source of truth for project state, established patterns, and working agreements.
 
@@ -33,7 +33,7 @@ If you're a Claude instance picking up unytea work, read this completely before 
 
 ## 2. Current state
 
-- **main HEAD**: `f9dd8843` (docs(briefing): capture Excalidraw 0.18 CSS import lesson — pre-housekeeping baseline; this commit + zustand uninstall pushes new HEAD)
+- **main HEAD**: `85f67231` (Phase 4c-pre — CSP violation reporting endpoint + Prisma `CspViolation` model)
 - **Production**: stable. `/dashboard/c/[slug]` loading clean. `/dashboard/sessions/[id]/room` whiteboard mounts clean (Phase 5+ Whiteboard CLOSED).
 - **Sprint 1**: closed 2026-05-12 — see `docs/internal/SPRINT_1_CLOSURE.md` for full retro.
 - **Sprint 2**: in progress.
@@ -45,12 +45,15 @@ If you're a Claude instance picking up unytea work, read this completely before 
 ✅ Phase 3d — effect@>=3.20.0 override (CVE-2026-32887)       c9b4af71
 ✅ Phase 3e — Cleanup (next.config, eslint flat, React Compiler→warn)   0fe35241..b7297968
 ✅ Phase 4a — CSP audit + unpkg.com elimination                65dd8880
-✅ Phase 4b — CSP Report-Only deployed, monitoring period      fc06264b..051ba24f
+✅ Phase 4b — CSP Report-Only deployed                         fc06264b..051ba24f (2026-05-12)
    Hotfix Series Bugs 1-4 ESM/CJS (May 13)                   479abe56..c28f3d68
 ✅ Phase 5+ Whiteboard ReactCurrentOwner — Excalidraw 0.18.1   c78b883e..11c9f241 (merged May 13)
-⏳ Phase 4c — CSP switch to enforce (post-monitoring period, 3-7 días desde 4b deploy 2026-05-12)
+✅ Phase 5+ LiveKit webhook reliability arc                   5b3fac95..c30fa4da (2026-05-14)
+   (P2025 unknown session + P2002 race + 8-value enum drift migration + signature 400→401)
+✅ Phase 4c-pre — CSP violation reporting endpoint + csp_violations table   85f67231 (2026-05-15)
+✅ Pre-Sprint-3 gate — PRODUCT_DECISIONS_V1.md (ver Section 7)              2026-05-15
+⏳ Phase 4c — CSP switch to enforce (espera 3-7 días desde 4c-pre deploy 2026-05-15 con violation data real)
 ⏳ Phase 4d — Nonces for script-src 'unsafe-inline' removal (sprint propio)
-⏳ Pre-Sprint-3 gate — Carlos escribe `docs/PRODUCT_DECISIONS_V1.md` (ver Section 7)
 ```
 
 **Phase 5+ CRÍTICOs**: **0 active**. Whiteboard regression closed May 13. Remaining Phase 5+ items are non-critical backlog (React Compiler audit, type hygiene, webhook handler audit, env cleanup).
@@ -250,18 +253,22 @@ These shape interaction style.
 
 ## 7. Pre-Sprint-3 gate
 
-Before any product feature work (Sprint 3+), Carlos needs to write `docs/PRODUCT_DECISIONS_V1.md`. Required topics:
+**Status**: ✅ DONE (2026-05-15)
 
-- Canonical product identity (one paragraph)
-- Target user (specific persona, not "everyone")
-- Core v1 features (the minimum lovable product)
-- Revenue model
-- Anti-features (what unytea explicitly will NOT do)
-- Success metrics
-- Autopilot activation strategy
-- **PWA `start_url`**: `/dashboard` (current) vs `/`. Trade-off: `/dashboard` assumes user is authenticated when opening the PWA (common if already logged in); `/` is more welcoming for users who install before logging in. Decision should align with the target user persona for v1.
+`docs/internal/PRODUCT_DECISIONS_V1.md` v1 was completed on 2026-05-15. See that doc for the canonical decisions.
 
-**This is product work, not code work** — don't try to execute it as a Claude Code prompt. It requires Carlos to think and write himself. You can help by asking clarifying questions or critiquing drafts.
+The document encodes 7 sections of locked decisions:
+1. **Canonical Identity** — "comunidad de membresía live-first para creadores con audiencia propia"; live as architectural choice, not feature; library as memory layer; anti-Skool positioning.
+2. **Target User** — unified persona "Host Independiente" (online + offline creators with established audience); not everyone, not pure beginners.
+3. **v1 Features** — Minimum Lovable Product with 5 layers + integrations Tier 1+2.
+4. **Revenue Model** — 3 tiers + add-ons + Stripe Connect Express for creator payouts.
+5. **Anti-features** — categories A-H of explicit non-goals (including anti-integrations).
+6. **Success Metrics** — Healthy MRR as North Star.
+7. **Autopilot Activation Strategy** — phased rollout gated on quality metrics (Section 8 of this briefing references this).
+
+Any future product decision should reference this doc. If a decision conflicts with it, the doc wins unless explicitly revised first.
+
+The decision on **PWA `start_url`** (previously listed here as open) should now anchor against the target user persona defined in Section 2 of `PRODUCT_DECISIONS_V1.md` — re-evaluate when first Sprint 3 PWA-touching feature lands.
 
 ---
 
@@ -416,23 +423,24 @@ Pre-existing latent bug from Phase 3c (Next 14→16 upgrade) surfaced when `/das
 
 **Lesson learned**: when bumping libraries across a major version, validate UI/functional state — not just "mounts without crash". Modern ESM-first libraries often separate CSS as side-effect exports requiring explicit import, and the absence of styles can be invisible to console/logs (no error fires, the component just renders unstyled). Added as item #6 to the Section 5.6 validation gate.
 
-### Phase 5+ — LiveKit webhook handlers audit
+### Phase 5+ — LiveKit webhook handlers audit — ✅ CLOSED (`5b3fac95..c30fa4da`, 2026-05-14)
 
-Multiple Prisma-related errors surface in Vercel runtime logs from `app/api/webhooks/livekit/route.ts` (or the session-event-emitting helpers it calls). Non-blocking for UX (audit/event logging only), but pollutes logs and indicates handler↔schema drift.
+Original symptoms (Prisma errors flooding Vercel runtime logs from `app/api/webhooks/livekit/route.ts` and `app/actions/webhooks.ts`):
 
-**Known symptoms**:
+1. **P2025 on `room_started` / `room_finished`** — handler updated MentorSession by id extracted from roomName; threw P2025 when room mapped to no DB session.
+2. **Enum drift `SessionEventType`** — turned out to be 8 missing values (not 1 as the original symptom report suggested): `ROOM_STARTED`, `ROOM_FINISHED`, `PARTICIPANT_JOINED`, `PARTICIPANT_LEFT`, `EGRESS_STARTED`, `EGRESS_UPDATED`, `EGRESS_ENDED`, `POST_PROCESSING_TRIGGERED`. Masked by `type: type as any` in the local `logSessionEvent` helper in webhooks.ts (separate from the well-typed `logSessionEvent` in session-core.ts which was clean).
+3. **P2002 race on `participant_joined`** — `livekitIdentity @unique` constraint hit during concurrent webhook delivery; both calls decided "row missing" and both inserted with the same identity.
 
-1. **P2025 on `room_started` / `room_finished`** — `MentorSession not found`. Handler attempts to update a session record that doesn't exist (probable: stale LiveKit room sending events after session was deleted, or wrong room→session ID mapping).
-2. **Enum drift `SessionEventType` on `participant_left`** — handler passes string literal `'PARTICIPANT_LEFT'` to `prisma.sessionEvent.create()` but that value is not in `SessionEventType` enum in `prisma/schema.prisma`. Error: `Invalid value for argument type. Expected SessionEventType.`
-3. **P2002 unique constraint on `participant_joined`** — `livekitIdentity` unique violation on upsert. Race condition: two webhook deliveries for the same participant land concurrently and both try to insert a new `SessionParticipation` row.
+**Fixes (`5b3fac95`)**:
+- Additive migration `20260514154625_add_livekit_event_types_to_session_event_type` adding 8 enum values (`ALTER TYPE ADD VALUE × 8`).
+- `findUnique → log+ack-200` pattern in `handleRoomStarted` / `handleRoomFinished` (idempotent ack to LiveKit, no retry storm).
+- `try/catch P2002 → log+ack-200` around the participant_joined upsert.
+- Removed `as any` from local `logSessionEvent`; typed `type: SessionEventType`; replaced 8 string-literal callsites with `SessionEventType.XXX` references.
 
-**Severity**: non-blocking. Session functionality (video, audio, chat) unaffected. Audit log is incomplete.
+**Follow-up (`c30fa4da`)**: 400→401 signature distinction. `handleLiveKitWebhook` now returns a discriminated union with `reason: "config" | "signature" | "processing"`; route handler maps signature → 401 (Unauthorized, no retry), config + processing → 500. Eliminates LiveKit retry-storms on signature failures and logs non-sensitive request metadata (user-agent, content-length) for security forensics.
 
-**Recommendation**: dedicated mini-sprint. All 3 in one PR. Steps:
-- Audit all `SessionEventType` values used in handler code vs schema enum; add missing values, `prisma migrate`
-- Wrap `room_started`/`room_finished` lookups with existence guard; log+skip if session missing instead of throw
-- Convert `participant_joined` insert to true upsert with `onConflict` handling (or use Prisma `upsert` with `where: { livekitIdentity }`)
-- Bundle with whiteboard touches since both areas exercise `/sessions/[id]/room` code paths.
+Audit notes (out-of-scope of the fix, kept here for future awareness):
+- `app/actions/session-core.ts` has its own exported `logSessionEvent` with different signature (`(params: {...})`). 12 callsites, all using `SessionEventType.XXX` correctly — clean, not affected by the webhooks bug.
 
 ### Phase 5+ — React Compiler audit + Type hygiene (post Phase 3e)
 Surfaced when ESLint flat config (Phase 3e Step 4) re-enabled lint enforcement after `next lint` removal in Next 16. All currently downgraded to `warn` — backlog to actually fix.
@@ -449,7 +457,7 @@ Surfaced when ESLint flat config (Phase 3e Step 4) re-enabled lint enforcement a
 - **Pre-requisito** antes de activar `experimental.reactCompiler` en `next.config.mjs`
 
 ### Phase 5+ — Env / dev cleanup
-- `npm uninstall zustand` — declared in `package.json` ^5.0.1 but 0 imports in code (post Phase 3e Step 3 finding)
+- ~~`npm uninstall zustand`~~ done in `cf6b6886` (2026-05-14); transitive `zustand@4.5.7` remains under Excalidraw → tunnel-rat (not controllable, no impact).
 - **If Passkey/WebAuthn provider is activated in NextAuth**: decide between (a) pre-bundling `@simplewebauthn/browser` locally — requires fork or monkey-patch of `@auth/core` because the unpkg URL is hardcoded in its bundle; or (b) re-adding `unpkg.com` to `script-src` with strict subpath: `https://unpkg.com/@simplewebauthn/browser@*/dist/bundle/index.umd.min.js`. Surfaced when Phase 4a removed unpkg from CSP.
 - Stale Clerk keys in `.env` (legacy auth, replaced by NextAuth in earlier work)
 - `.env.local` vs `.env.production` reconciliation
@@ -473,6 +481,7 @@ Surfaced when ESLint flat config (Phase 3e Step 4) re-enabled lint enforcement a
 
 ## 10. Reference documents in repo
 
+- `docs/internal/PRODUCT_DECISIONS_V1.md` — **canonical product decisions v1** (locked 2026-05-15). All Sprint 3+ feature work should anchor here. 7 sections: identity, target user, v1 features, revenue, anti-features, success metrics, autopilot strategy.
 - `docs/internal/SPRINT_1_CLOSURE.md` — Sprint 1 full retrospective (cleanup + auth/security/perf hardening, 20 commits, 6 architectural decisions)
 - `docs/internal/SPRINT_2_PLAN.md` — Sprint 2 preliminary plan (created mid-execution, may be slightly outdated relative to actual progress recorded in this doc)
 - `docs/internal/CONTEXT_BRIEFING.md` — this doc
