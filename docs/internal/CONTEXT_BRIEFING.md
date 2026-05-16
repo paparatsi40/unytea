@@ -1,6 +1,6 @@
 # unytea — Context Briefing for New Claude Sessions
 
-**Status**: living document. Last updated 2026-05-15 after SECTION_5_AUDIT.md discovery (delta between PD V1 §5 and implementation).
+**Status**: living document. Last updated 2026-05-16. Sprint 3 active — Section 5 alignment decisions captured in SPRINT_3_PLAN.md.
 
 If you're a Claude instance picking up unytea work, read this completely before asking the user for context. This document is the source of truth for project state, established patterns, and working agreements.
 
@@ -36,7 +36,8 @@ If you're a Claude instance picking up unytea work, read this completely before 
 - **main HEAD**: `85f67231` (Phase 4c-pre — CSP violation reporting endpoint + Prisma `CspViolation` model)
 - **Production**: stable. `/dashboard/c/[slug]` loading clean. `/dashboard/sessions/[id]/room` whiteboard mounts clean (Phase 5+ Whiteboard CLOSED).
 - **Sprint 1**: closed 2026-05-12 — see `docs/internal/SPRINT_1_CLOSURE.md` for full retro.
-- **Sprint 2**: in progress.
+- **Sprint 2**: closed `e251eb11` (2026-05-15) — closing discovery in `docs/internal/SECTION_5_AUDIT.md`.
+- **Sprint 3**: ACTIVE from 2026-05-16 — plan in `docs/internal/SPRINT_3_PLAN.md`. Phase 3.0 quick wins ready to start Mon 05-18.
 
 ```
 ✅ Phase 3a — Audit recon (read-only)
@@ -497,6 +498,7 @@ Surfaced when ESLint flat config (Phase 3e Step 4) re-enabled lint enforcement a
 
 - `docs/internal/PRODUCT_DECISIONS_V1.md` — **canonical product decisions v1** (locked 2026-05-15). All Sprint 3+ feature work should anchor here. 7 sections: identity, target user, v1 features, revenue, anti-features, success metrics, autopilot strategy.
 - `docs/internal/SECTION_5_AUDIT.md` — codebase delta against PRODUCT_DECISIONS_V1.md §5 anti-features (2026-05-15). **CRITICAL input for Sprint 3 planning.** Identifies major conflict surface in Cat A (engagement extraction: ~15 files + 4 Prisma models) and Cat E (marketplace cannibalization: `/explore` with trending default), plus strategic calls needed on Cat B (member DMs) and Cat F (AI widget). Confirmed alignments documented per category.
+- `docs/internal/SPRINT_3_PLAN.md` — active sprint plan (2026-05-16). Captures Section 5 alignment decisions (A1/E1/B1/F1 all full-removal), implementation order, Phase 4c/4d operational items, and Sprint 3 quality gates.
 - `docs/internal/SPRINT_1_CLOSURE.md` — Sprint 1 full retrospective (cleanup + auth/security/perf hardening, 20 commits, 6 architectural decisions)
 - `docs/internal/SPRINT_2_PLAN.md` — Sprint 2 preliminary plan (created mid-execution, may be slightly outdated relative to actual progress recorded in this doc)
 - `docs/internal/CONTEXT_BRIEFING.md` — this doc
