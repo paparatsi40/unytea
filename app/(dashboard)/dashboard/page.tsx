@@ -647,13 +647,6 @@ export default function DashboardPage() {
                 completed: onboardingProgress.hasProfile,
               },
               {
-                id: "community",
-                title: "Join a community",
-                description: "Find and join your first community",
-                href: "/dashboard/communities/explore",
-                completed: onboardingProgress.hasJoinedCommunity,
-              },
-              {
                 id: "post",
                 title: "Create your first post",
                 description: "Introduce yourself to the community",
@@ -903,9 +896,6 @@ export default function DashboardPage() {
               ) : (
                 <div className="rounded-lg border border-zinc-200 bg-white p-4">
                   <p className="text-sm text-zinc-700">No upcoming sessions in your communities yet.</p>
-                  <Link href="/en/explore" className="mt-2 inline-flex">
-                    <Button size="sm">Find a live session this week</Button>
-                  </Link>
                 </div>
               )}
 

@@ -52,7 +52,6 @@
       "faq": "FAQ",
       "dashboard": "Panel",
       "goToDashboard": "Ir al Panel",
-      "explore": "Explorar comunidades",
       "vsSkool": "vs Skool"
     },
     "hero": {
@@ -64,7 +63,7 @@
       "cta": {
         "primary": "Crea tu comunidad gratis",
         "secondary": "Ver Demo",
-        "explore": "Explorar comunidades"
+        "start_trial": "Comenzá tu prueba gratuita"
       },
       "guarantee": "✓ Prueba gratis de 14 días • ✓ Sin tarjeta de crédito • ✓ Lanza en minutos",
       "socialProof": {
@@ -280,7 +279,6 @@
     "welcome": "Bienvenido de vuelta",
     "stats": {
       "communities": "Comunidades",
-      "explore": "Explorar",
       "sessions": "Sesiones",
       "courses": "Cursos",
       "messages": "Mensajes"
@@ -416,7 +414,6 @@
       "dashboard": "Panel",
       "communities": "Comunidades",
       "messages": "Mensajes",
-      "explore": "Explorar",
       "sessions": "Sesiones",
       "recordings": "Grabaciones",
       "knowledgeLibrary": "Biblioteca de conocimiento",

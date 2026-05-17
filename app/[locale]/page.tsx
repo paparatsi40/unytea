@@ -104,9 +104,6 @@ export default async function Home(
             <span className="text-xl font-bold">Unytea</span>
           </div>
           <div className="hidden md:flex items-center gap-6">
-            <Link href={`/${locale}/explore`} className="text-sm font-medium hover:text-primary transition-colors">
-              {t("nav.explore")}
-            </Link>
             <Link href="#features" className="text-sm font-medium hover:text-primary transition-colors">
               {t("nav.features")}
             </Link>
@@ -152,11 +149,11 @@ export default async function Home(
                   <ArrowRight className="w-5 h-5" />
                 </Link>
                 <Link
-                  href={`/${locale}/explore`}
+                  href={`/${locale}/auth/signup`}
                   className="px-8 py-4 border-2 border-border rounded-xl font-semibold hover:border-primary transition-colors flex items-center justify-center gap-2"
                 >
                   <Users className="w-5 h-5" />
-                  {t("hero.cta.explore")}
+                  {t("hero.cta.start_trial")}
                 </Link>
                 <DemoVideoTrigger />
               </div>
@@ -960,7 +957,6 @@ export default async function Home(
               <h4 className="font-semibold mb-4">Resources</h4>
               <ul className="space-y-2 text-sm">
                 <li><Link href={`/${locale}/documentation`} className="text-muted-foreground hover:text-foreground transition-colors">Documentation</Link></li>
-                <li><Link href={`/${locale}/explore`} className="text-muted-foreground hover:text-foreground transition-colors">Community</Link></li>
                 <li><Link href={`/${locale}/blog`} className="text-muted-foreground hover:text-foreground transition-colors">Blog</Link></li>
               </ul>
             </div>

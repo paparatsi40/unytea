@@ -9,7 +9,6 @@ const DEFAULT_LOCALE = "en";
 // Rutas estáticas indexables que existen bajo /[locale]
 const STATIC_PATHS: { path: string; changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"]; priority: number }[] = [
   { path: "", changeFrequency: "daily", priority: 1.0 },
-  { path: "/explore", changeFrequency: "daily", priority: 0.9 },
   { path: "/blog", changeFrequency: "weekly", priority: 0.8 },
   { path: "/changelog", changeFrequency: "weekly", priority: 0.5 },
   { path: "/documentation", changeFrequency: "weekly", priority: 0.6 },

@@ -53,7 +53,7 @@ export async function GET(req: Request) {
   const tier = (searchParams.get("tier") || "pro") as "free" | "pro" | "vip";
 
   if (!communityId || !slug) {
-    return NextResponse.redirect(new URL(`/${locale}/explore`, req.url));
+    return NextResponse.redirect(new URL(`/${locale}/pricing`, req.url));
   }
 
   const community = await prisma.community.findUnique({

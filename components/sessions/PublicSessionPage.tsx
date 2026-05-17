@@ -763,7 +763,7 @@ const roomParams = new URLSearchParams();
                 <Button
                   variant="outline"
                   className="w-full border-zinc-700 text-zinc-300 hover:bg-zinc-800"
-                  onClick={() => router.push(`/${locale}/explore`)}
+                  onClick={() => router.push(`/${locale}/`)}
                 >
                   Explore Communities
                 </Button>

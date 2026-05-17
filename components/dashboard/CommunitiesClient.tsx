@@ -441,9 +441,6 @@ export function CommunitiesClient() {
               Create community
             </Button>
           </Link>
-          <Link href="/dashboard/communities/explore">
-            <Button variant="outline">Explore communities</Button>
-          </Link>
         </div>
       </div>
     );

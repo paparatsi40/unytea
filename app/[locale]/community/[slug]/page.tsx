@@ -540,9 +540,6 @@ export default async function CommunityPublicPreviewPage(
                 <Button type="submit">{userId ? "Suscribirme" : "Iniciar sesión para suscribirme"}</Button>
               </form>
             )}
-            <Link href={`/${locale}/explore`}>
-              <Button variant="outline">Volver a explorar</Button>
-            </Link>
           </div>
         </section>
       </main>

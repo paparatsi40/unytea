@@ -279,7 +279,6 @@ async function executeAutopilotJob(sessionId: string, jobType: AutopilotJobType)
     });
 
     revalidatePath(`/dashboard/c/${session.community?.slug}/feed`);
-    revalidatePath(`/en/explore`);
     return;
   }
 

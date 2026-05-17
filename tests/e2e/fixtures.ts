@@ -25,14 +25,12 @@ export const selectors = {
   mainNav: '[data-testid="main-nav"]',
   navHomeLink: 'a[href="/"]',
   navDashboardLink: 'a[href="/dashboard"]',
-  navExploreLink: 'a[href="/explore"]',
 
   // Dashboard
   dashboardContainer: '[data-testid="dashboard-container"]',
   communityCard: '[data-testid="community-card"]',
 
   // Community
-  communityExplore: '[data-testid="community-explore"]',
   communitySection: '[data-testid="community-section"]',
 };
 

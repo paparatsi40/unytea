@@ -4,7 +4,6 @@ import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { localizedAlternates } from "@/lib/seo/locale-metadata";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { BookOpen, PlayCircle, Sparkles, TrendingUp } from "lucide-react";
 
 function formatDate(date: Date) {
@@ -166,9 +165,6 @@ export default async function PublicLibraryPage(
               Best session replays and key topics from the Unytea network.
             </p>
           </div>
-          <Button asChild variant="outline">
-            <Link href={`/${locale}/explore`}>Explore Communities</Link>
-          </Button>
         </div>
 
         {keyTopics.length > 0 && (

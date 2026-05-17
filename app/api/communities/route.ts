@@ -280,42 +280,8 @@ export async function GET() {
       };
     });
 
-    // Get IDs of communities user is already a member of
-    const myCommunityIds = myCommunities.map((c) => c.id);
-
-    // Get public communities where user is NOT a member (for exploration)
-    const exploreCommunities = await prisma.community.findMany({
-      where: {
-        isPrivate: false,
-        id: {
-          notIn: myCommunityIds.length > 0 ? myCommunityIds : [""],
-        },
-      },
-      include: {
-        owner: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            image: true,
-          },
-        },
-        _count: {
-          select: {
-            members: true,
-            posts: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-      take: 20,
-    });
-
     return NextResponse.json({
       myCommunities,
-      exploreCommunities,
     });
   } catch (error) {
     return handleApiError(error);

@@ -52,7 +52,6 @@
       "faq": "FAQ",
       "dashboard": "Tableau de Bord",
       "goToDashboard": "Aller au Tableau de Bord",
-      "explore": "Explorer les communautés",
       "vsSkool": "vs Skool"
     },
     "hero": {
@@ -64,7 +63,7 @@
       "cta": {
         "primary": "Créer votre communauté gratuitement",
         "secondary": "Voir la Démo",
-        "explore": "Explorer les communautés"
+        "start_trial": "Commencer votre essai gratuit"
       },
       "guarantee": "✓ Essai gratuit de 14 jours • ✓ Sans carte bancaire • ✓ Lancez en quelques minutes",
       "socialProof": {
@@ -279,7 +278,6 @@
     "welcome": "Bienvenue",
     "stats": {
       "communities": "Communautés",
-      "explore": "Explorer",
       "sessions": "Sessions",
       "courses": "Cours",
       "messages": "Messages"
@@ -415,7 +413,6 @@
       "dashboard": "Tableau de Bord",
       "communities": "Communautés",
       "messages": "Messages",
-      "explore": "Explorer",
       "sessions": "Sessions",
       "recordings": "Enregistrements",
       "knowledgeLibrary": "Bibliothèque de connaissances",

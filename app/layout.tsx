@@ -140,14 +140,6 @@ const JSON_LD_WEBSITE = {
   name: "Unytea",
   url: "https://www.unytea.com",
   inLanguage: ["en", "es", "fr"],
-  potentialAction: {
-    "@type": "SearchAction",
-    target: {
-      "@type": "EntryPoint",
-      urlTemplate: "https://www.unytea.com/en/explore?q={search_term_string}",
-    },
-    "query-input": "required name=search_term_string",
-  },
 };
 
 const JSON_LD_SOFTWARE = {
