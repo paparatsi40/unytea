@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { PremiumCommunityHeader } from "@/components/community/PremiumCommunityHeader";
 import { useCurrentUser } from "@/hooks/use-current-user";
-import { AIChatWidget } from "@/components/ai/AIChatWidget";
 
 type Community = {
   id: string;
@@ -113,9 +112,6 @@ export function CommunityLayoutClient({
       <div className="min-h-screen bg-gray-50">
         {children}
       </div>
-
-      {/* AI Assistant with community context */}
-      {isMember && <AIChatWidget communitySlug={slug} />}
     </>
   );
 }

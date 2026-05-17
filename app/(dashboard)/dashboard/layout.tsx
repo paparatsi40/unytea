@@ -2,7 +2,6 @@
 
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
 import { DashboardHeader } from "@/components/dashboard/header";
-import { AIWidgetProvider } from "@/components/ai/AIWidgetProvider";
 import { NextIntlClientProvider } from "next-intl";
 import { useEffect, useState } from "react";
 
@@ -157,8 +156,6 @@ export default function DashboardLayout({
             {children}
           </div>
         </main>
-
-        <AIWidgetProvider />
       </div>
     </NextIntlClientProvider>
   );
