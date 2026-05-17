@@ -22,18 +22,20 @@ If you're a Claude instance picking up unytea work, read this completely before 
 
 ## 1. Project basics
 
-- **What**: unytea — a Skool.com competitor positioned at $49/mo ("Skool killer con alma"). Mentor-led communities + cohort-based learning + live sessions (LiveKit), with planned autopilot orchestration for engagement.
+- **What**: unytea — comunidad de membresía live-first para creadores con audiencia propia (canonical identity per PRODUCT_DECISIONS_V1.md §1). Convierte cada sesión en vivo en conocimiento accesible y pertenencia que perdura — tanto para los miembros que asistieron como para los que llegan después vía library. Target: hosts con audiencia propia (1k-30k reachable), Spanish-speaking LATAM primario, verticales knowledge/coaching/wellness.
+- **Revenue model** (PD V1 §4): 3 tiers Founder $99 / Practice $199 / Studio $399 + add-ons modulares + Stripe Connect Express (host es merchant of record). 14-day trial sin CC. Annual 20% off.
 - **Stack**: Next.js 16.2.6 + React 19.2.6 + Prisma 5.22 + Neon Postgres + Vercel + NextAuth v5 beta + Tailwind + Tiptap WYSIWYG + tRPC 11 + LiveKit + Pusher + Stripe + UploadThing.
 - **Repo**: https://github.com/paparatsi40/unytea (public)
 - **Working dir**: `C:\unytea` (Windows + PowerShell)
 - **Production URL**: https://unytea.com
-- **Developer**: Carlos, solo (no team).
+- **Lead developer**: Carlos (alfaroc@live.com), solo (no team).
+- **State**: pre-launch, 0 real users (test users only).
 
 ---
 
 ## 2. Current state
 
-- **main HEAD**: `85f67231` (Phase 4c-pre — CSP violation reporting endpoint + Prisma `CspViolation` model)
+- **main HEAD**: `dd79bcf1` (workspace hygiene + Sprint 3 active — gitignore tightened, stale Sprint 2 plan removed)
 - **Production**: stable. `/dashboard/c/[slug]` loading clean. `/dashboard/sessions/[id]/room` whiteboard mounts clean (Phase 5+ Whiteboard CLOSED).
 - **Sprint 1**: closed 2026-05-12 — see `docs/internal/SPRINT_1_CLOSURE.md` for full retro.
 - **Sprint 2**: closed `e251eb11` (2026-05-15) — closing discovery in `docs/internal/SECTION_5_AUDIT.md`.
