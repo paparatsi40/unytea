@@ -165,14 +165,20 @@ export function MemberCard({ member }: { member: Member }) {
           </button>
         </div>
 
-        {/* View Profile Link */}
-        <Link
-          href={`/profile/${member.user.id}`}
-          className="mt-3 flex items-center justify-center space-x-1 text-xs font-medium text-purple-600 transition-colors hover:text-purple-700"
+        {/* TODO Sprint 4: profile page at /profile/[userId] */}
+        {/* Investigation 2026-05-16 confirmed route missing. */}
+        {/* Disabled until Phase 3.4 schema migration completes */}
+        {/* (gamification columns get dropped, profile page built on clean schema). */}
+        <button
+          disabled
+          type="button"
+          className="mt-3 flex items-center justify-center space-x-1 text-xs font-medium text-purple-600 opacity-50 cursor-not-allowed"
+          aria-label="Profile page coming soon"
+          title="Profile page coming in Sprint 4"
         >
           <Sparkles className="h-3 w-3" />
           <span>View Full Profile</span>
-        </Link>
+        </button>
       </div>
     </div>
   );
