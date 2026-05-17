@@ -15,59 +15,53 @@ const pusher = new Pusher({
   useTLS: true,
 });
 
+/**
+ * PD V1 §5 Cat B — Interpretation B (bidirectional within host↔member pair).
+ *
+ * Returns true IFF:
+ *   - exactly one of (sender, recipient) is OWNER of communityId (XOR pattern)
+ *   - both are ACTIVE members of communityId
+ *   - not a self-DM
+ *
+ * Blocked:
+ *   - member ↔ member (any direction)
+ *   - DM across communities (communityId required, no cross-community DMs)
+ *   - self-DM
+ */
 async function canUsersDirectMessage(
-  currentUserId: string,
-  otherUserId: string,
-  communityId?: string
-) {
-  const currentMemberships = await prisma.member.findMany({
+  senderId: string,
+  recipientId: string,
+  communityId: string
+): Promise<boolean> {
+  if (senderId === recipientId) return false;
+
+  const memberships = await prisma.member.findMany({
     where: {
-      userId: currentUserId,
+      userId: { in: [senderId, recipientId] },
+      communityId,
       status: "ACTIVE",
     },
-    select: { communityId: true },
+    select: { userId: true, role: true },
   });
 
-  const currentCommunityIds = currentMemberships.map((membership) => membership.communityId);
-  if (currentCommunityIds.length === 0) {
-    return false;
-  }
+  if (memberships.length !== 2) return false;
 
-  if (communityId) {
-    if (!currentCommunityIds.includes(communityId)) {
-      return false;
-    }
+  const senderMembership = memberships.find((m) => m.userId === senderId);
+  const recipientMembership = memberships.find((m) => m.userId === recipientId);
 
-    const otherInCommunity = await prisma.member.findFirst({
-      where: {
-        userId: otherUserId,
-        communityId,
-        status: "ACTIVE",
-      },
-      select: { id: true },
-    });
+  if (!senderMembership || !recipientMembership) return false;
 
-    return Boolean(otherInCommunity);
-  }
+  const senderIsOwner = senderMembership.role === "OWNER";
+  const recipientIsOwner = recipientMembership.role === "OWNER";
 
-  const sharedMembership = await prisma.member.findFirst({
-    where: {
-      userId: otherUserId,
-      status: "ACTIVE",
-      communityId: {
-        in: currentCommunityIds,
-      },
-    },
-    select: { id: true },
-  });
-
-  return Boolean(sharedMembership);
+  // XOR: exactly one of the pair must be OWNER
+  return senderIsOwner !== recipientIsOwner;
 }
 
 /**
  * Get or create a conversation between two users
  */
-export async function getOrCreateConversation(otherUserId: string, communityId?: string) {
+export async function getOrCreateConversation(otherUserId: string, communityId: string) {
   try {
     const currentUserId = await getCurrentUserId();
     if (!currentUserId) {
@@ -82,7 +76,7 @@ export async function getOrCreateConversation(otherUserId: string, communityId?:
     if (!canMessage) {
       return {
         success: false,
-        error: "You can only message members who share an active community with you.",
+        error: "Direct messages are only allowed between a community host and its members.",
       };
     }
 
@@ -398,7 +392,53 @@ export async function getUserConversations() {
       },
     });
 
-    return { success: true, conversations };
+    // PD V1 §5 Cat B defense-in-depth: hide legacy member↔member conversations
+    // from the inbox. Auth gate prevents creation post-Phase 3.3, but any
+    // pre-existing pair where neither participant is OWNER of a shared
+    // community is filtered out here too. Pre-launch (0 real users) makes
+    // the cost of in-memory filter negligible.
+    const otherUserIds = conversations.map((c) =>
+      c.participant1Id === currentUserId ? c.participant2Id : c.participant1Id
+    );
+
+    if (otherUserIds.length === 0) {
+      return { success: true, conversations };
+    }
+
+    const [myMemberships, otherMemberships] = await Promise.all([
+      prisma.member.findMany({
+        where: { userId: currentUserId, status: "ACTIVE" },
+        select: { communityId: true, role: true },
+      }),
+      prisma.member.findMany({
+        where: { userId: { in: otherUserIds }, status: "ACTIVE" },
+        select: { userId: true, communityId: true, role: true },
+      }),
+    ]);
+
+    const myRoleByCommunity = new Map(myMemberships.map((m) => [m.communityId, m.role]));
+    const otherMembershipsByUser = new Map<
+      string,
+      Array<{ communityId: string; role: string }>
+    >();
+    for (const om of otherMemberships) {
+      const list = otherMembershipsByUser.get(om.userId) ?? [];
+      list.push({ communityId: om.communityId, role: om.role });
+      otherMembershipsByUser.set(om.userId, list);
+    }
+
+    const filteredConversations = conversations.filter((c) => {
+      const otherUserId =
+        c.participant1Id === currentUserId ? c.participant2Id : c.participant1Id;
+      const others = otherMembershipsByUser.get(otherUserId) ?? [];
+      return others.some((om) => {
+        const myRole = myRoleByCommunity.get(om.communityId);
+        if (!myRole) return false;
+        return (myRole === "OWNER") !== (om.role === "OWNER");
+      });
+    });
+
+    return { success: true, conversations: filteredConversations };
   } catch (error) {
     console.error("Error getting conversations:", error);
     return { success: false, error: "Failed to get conversations" };

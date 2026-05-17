@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Search, MessageSquarePlus, Loader2 } from "lucide-react";
+import { Search, Loader2 } from "lucide-react";
 import { getUserConversations } from "@/app/actions/messages";
 import { formatDistanceToNow } from "date-fns";
 import { useCurrentUser } from "@/hooks/use-current-user";
@@ -10,7 +10,6 @@ import { useToast } from "@/hooks/use-toast";
 interface ConversationListProps {
   activeConversationId?: string;
   onSelectConversation: (conversationId: string, otherUser: any) => void;
-  onNewMessage: () => void;
   onUnreadTotalChange?: (count: number) => void;
   refreshToken?: number;
 }
@@ -18,7 +17,6 @@ interface ConversationListProps {
 export function ConversationList({
   activeConversationId,
   onSelectConversation,
-  onNewMessage,
   onUnreadTotalChange,
   refreshToken,
 }: ConversationListProps) {
@@ -148,15 +146,6 @@ export function ConversationList({
               </span>
             )}
           </div>
-
-          <button
-            onClick={onNewMessage}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-purple-200 bg-purple-50 px-3 py-2 text-xs font-semibold text-purple-700 transition-colors hover:border-purple-300 hover:bg-purple-100"
-            title="New message"
-          >
-            <MessageSquarePlus className="h-4 w-4" />
-            <span>New</span>
-          </button>
         </div>
 
         <div className="relative">

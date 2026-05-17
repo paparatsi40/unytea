@@ -55,3 +55,23 @@ describe('Signup Route - No Email Enumeration', () => {
   it('should have rate limiting', () => { expect(content).toContain('rateLimiters'); expect(content).toContain('rateLimitOk') })
   it('should not expose user data in response', () => { expect(content).not.toMatch(/user:\s*\{[^}]*id:/) })
 })
+
+describe('canUsersDirectMessage — PD V1 §5 Cat B Interpretation B', () => {
+  let messagesFileContent: string
+  beforeAll(() => { messagesFileContent = fs.readFileSync(path.resolve(__dirname, '../../app/actions/messages.ts'), 'utf-8') })
+  it('requires communityId param (non-optional)', () => {
+    expect(messagesFileContent).toMatch(/canUsersDirectMessage\([\s\S]*?communityId:\s*string\s*\)/)
+  })
+  it('checks Member.role for OWNER per Cat B canonical pattern', () => {
+    expect(messagesFileContent).toMatch(/role\s*===\s*["']OWNER["']/)
+  })
+  it('implements XOR pattern (exactly one party is OWNER)', () => {
+    expect(messagesFileContent).toMatch(/senderIsOwner\s*!==\s*recipientIsOwner/)
+  })
+  it('rejects self-DM', () => {
+    expect(messagesFileContent).toMatch(/senderId\s*===\s*recipientId/)
+  })
+  it('references PD V1 Cat B in doc comment', () => {
+    expect(messagesFileContent).toContain('Cat B')
+  })
+})
