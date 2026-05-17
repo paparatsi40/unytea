@@ -321,7 +321,7 @@ export async function sendSessionReminders() {
               data: {
                 type: "SESSION_REMINDER",
                 title: window.title,
-                message: `${session.title} starts at ${session.scheduledAt.toLocaleTimeString()} · Join now so you don't miss it`,
+                message: `${session.title} starts at ${session.scheduledAt.toLocaleTimeString()}.`,
                 data: {
                   notificationKey: reminderKey,
                   sessionId: session.id,

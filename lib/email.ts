@@ -162,7 +162,7 @@ export async function sendSessionReminderEmail(
         ${data.communityName ? ` · ${data.communityName}` : ""}
       </p>
       <p style="color: #d4d4d8; font-size: 16px; line-height: 1.6; margin: 0 0 32px 0;">
-        Hey ${data.userName}, don't miss this session! Click below to join when it starts.
+        Hi ${data.userName}, your session is starting soon. Click below to join.
       </p>
       ${ctaButton("Join Session", data.joinLink)}
     `),
