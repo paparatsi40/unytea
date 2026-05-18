@@ -173,30 +173,6 @@ interface CommunityOSSnapshot {
   };
 }
 
-interface HostScoreSystem {
-  hostScore: number;
-  level: "Elite" | "Strong" | "Growing" | "At risk";
-  summary: {
-    completedSessions: number;
-    rsvpToAttendanceRate: number;
-    engagementEvents: number;
-    upcomingSessions: number;
-    contentUnits: number;
-  };
-  components: Array<{
-    key: string;
-    label: string;
-    score: number;
-    href: string;
-  }>;
-  actions: Array<{
-    title: string;
-    description: string;
-    href: string;
-    cta: string;
-  }>;
-}
-
 interface AIPlaybookRecommendation {
   id: string;
   priority: "critical" | "high" | "medium" | "low";
@@ -320,7 +296,6 @@ export default function DashboardPage() {
   const [nextAction, setNextAction] = useState<NextRecommendedAction | null>(null);
   const [hostAlerts, setHostAlerts] = useState<HostAlert[]>([]);
   const [communityOS, setCommunityOS] = useState<CommunityOSSnapshot | null>(null);
-  const [hostScoreSystem, setHostScoreSystem] = useState<HostScoreSystem | null>(null);
   const [aiPlaybook, setAiPlaybook] = useState<AIPlaybookSystem | null>(null);
   const [autopilot, setAutopilot] = useState<AutopilotDashboard | null>(null);
   const [identity, setIdentity] = useState<UserIdentitySnapshot | null>(null);
@@ -355,7 +330,6 @@ export default function DashboardPage() {
         nextActionRes,
         hostAlertsRes,
         communityOSRes,
-        hostScoreRes,
         aiPlaybookRes,
         autopilotRes,
         identityRes,
@@ -372,25 +346,6 @@ export default function DashboardPage() {
       if (nextActionRes.success) setNextAction(nextActionRes.recommendation || null);
       if (hostAlertsRes.success) setHostAlerts(hostAlertsRes.alerts || []);
       if (communityOSRes.success) setCommunityOS(communityOSRes.snapshot || null);
-      if (
-        hostScoreRes.success &&
-        typeof hostScoreRes.hostScore === "number" &&
-        hostScoreRes.level &&
-        hostScoreRes.summary
-      ) {
-        const allowedLevels = ["Elite", "Strong", "Growing", "At risk"] as const;
-        const normalizedLevel = allowedLevels.includes(hostScoreRes.level as any)
-          ? (hostScoreRes.level as HostScoreSystem["level"])
-          : "Growing";
-
-        setHostScoreSystem({
-          hostScore: hostScoreRes.hostScore,
-          level: normalizedLevel,
-          summary: hostScoreRes.summary,
-          components: hostScoreRes.components || [],
-          actions: hostScoreRes.actions || [],
-        });
-      }
 
       if (aiPlaybookRes.success && aiPlaybookRes.signals) {
         setAiPlaybook({
@@ -926,50 +881,6 @@ export default function DashboardPage() {
                     ))}
                   </div>
                 </div>
-              )}
-            </CardContent>
-          </Card>
-        )}
-
-        {hostScoreSystem && (
-          <Card className="border-zinc-200 bg-white">
-            <CardContent className="p-5 space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Host OS</p>
-                  {hostScoreSystem ? (
-                    <h3 className="text-lg font-semibold text-zinc-900">{hostScoreSystem.hostScore}/100 · {hostScoreSystem.level}</h3>
-                  ) : (
-                    <h3 className="text-lg font-semibold text-zinc-900">Grow your weekly consistency</h3>
-                  )}
-                </div>
-                <Badge variant="outline">Community OS Brain</Badge>
-              </div>
-
-              {hostScoreSystem && (
-                <>
-                  <div className="grid gap-3 md:grid-cols-5">
-                    {hostScoreSystem.components.map((component) => (
-                      <div key={component.key} className="rounded-lg bg-zinc-50 p-3">
-                        <p className="text-xs text-zinc-500">{component.label}</p>
-                        <p className="mt-1 text-xl font-bold text-zinc-900">{component.score}</p>
-                        <Progress value={component.score} className="mt-2 h-1.5" />
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="grid gap-3 md:grid-cols-2">
-                    {hostScoreSystem.actions.slice(0, 2).map((action, idx) => (
-                      <div key={`${action.title}-${idx}`} className="rounded-lg border border-zinc-200 p-3">
-                        <p className="font-medium text-zinc-900">{action.title}</p>
-                        <p className="mt-1 text-sm text-zinc-600">{action.description}</p>
-                        <Link href={action.href} className="mt-2 inline-flex">
-                          <Button size="sm" variant="outline">{action.cta}</Button>
-                        </Link>
-                      </div>
-                    ))}
-                  </div>
-                </>
               )}
             </CardContent>
           </Card>
