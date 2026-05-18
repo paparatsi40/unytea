@@ -6,8 +6,8 @@ import { subDays } from "date-fns";
 
 // ── Compatibility Score ──────────────────────────────────────────────
 function computeCompatibility(
-  userA: { skills: string[]; interests: string[]; level: number },
-  userB: { skills: string[]; interests: string[]; level: number }
+  userA: { skills: string[]; interests: string[] },
+  userB: { skills: string[]; interests: string[] }
 ): number {
   let score = 0;
 
@@ -25,11 +25,7 @@ function computeCompatibility(
     userA.skills.length + userB.skills.length - sharedSkills * 2;
   score += Math.min(uniqueSkills * 5, 20) + Math.min(sharedSkills * 5, 10);
 
-  // Level proximity (0-30 pts) — similar levels work better
-  const levelDiff = Math.abs(userA.level - userB.level);
-  score += Math.max(30 - levelDiff * 3, 0);
-
-  return Math.min(score, 100);
+  return Math.min(score, 70);
 }
 
 // ── Smart Buddy Matching ─────────────────────────────────────────────
@@ -51,7 +47,7 @@ export async function findSmartBuddyMatch(communityId: string) {
     // Get current user profile
     const currentUser = await prisma.user.findUnique({
       where: { id: userId },
-      select: { level: true, skills: true, interests: true },
+      select: { skills: true, interests: true },
     });
     if (!currentUser) return { success: false, error: "User not found" };
 
@@ -69,10 +65,8 @@ export async function findSmartBuddyMatch(communityId: string) {
             name: true,
             username: true,
             image: true,
-            level: true,
             skills: true,
             interests: true,
-            currentStreak: true,
           },
         },
       },
@@ -101,12 +95,10 @@ export async function findSmartBuddyMatch(communityId: string) {
         {
           skills: currentUser.skills as string[],
           interests: currentUser.interests as string[],
-          level: currentUser.level,
         },
         {
           skills: m.user.skills as string[],
           interests: m.user.interests as string[],
-          level: m.user.level,
         }
       ),
     }));
@@ -119,8 +111,6 @@ export async function findSmartBuddyMatch(communityId: string) {
       name: s.member.user.name,
       username: s.member.user.username,
       image: s.member.user.image,
-      level: s.member.user.level,
-      streak: s.member.user.currentStreak,
       skills: (s.member.user.skills as string[]).slice(0, 4),
       interests: (s.member.user.interests as string[]).slice(0, 4),
       compatibility: s.compatibility,

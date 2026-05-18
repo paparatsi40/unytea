@@ -1,13 +1,11 @@
 "use client";
 
-import { User, Award, TrendingUp } from "lucide-react";
+import { User } from "lucide-react";
 import Image from "next/image";
 
 interface Member {
   id: string;
   role: string;
-  points: number;
-  level?: number;
   user: {
     id: string;
     name: string | null;
@@ -18,7 +16,6 @@ interface Member {
 interface MemberGridSectionProps {
   title?: string;
   members: Member[];
-  showStats?: boolean;
   theme?: {
     primaryColor: string;
     secondaryColor: string;
@@ -29,7 +26,6 @@ interface MemberGridSectionProps {
 export function MemberGridSection({
   title = "Community Members",
   members,
-  showStats = true,
   theme,
 }: MemberGridSectionProps) {
   const primaryColor = theme?.primaryColor || "#0ea5e9";
@@ -99,21 +95,6 @@ export function MemberGridSection({
               </div>
             )}
 
-            {/* Stats */}
-            {showStats && (
-              <div className="flex items-center justify-center gap-3 text-xs text-gray-500 mt-2">
-                {member.level && (
-                  <div className="flex items-center gap-1">
-                    <Award className="h-3 w-3" />
-                    <span>L{member.level}</span>
-                  </div>
-                )}
-                <div className="flex items-center gap-1">
-                  <TrendingUp className="h-3 w-3" />
-                  <span>{member.points}</span>
-                </div>
-              </div>
-            )}
           </div>
         ))}
       </div>

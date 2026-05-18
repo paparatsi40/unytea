@@ -13,7 +13,7 @@ export function MemberDirectory({ communityId }: Props) {
   const [members, setMembers] = useState<any[]>([]);
   const [filteredMembers, setFilteredMembers] = useState<any[]>([]);
   const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState<"recent" | "points" | "level" | "name">("recent");
+  const [sortBy, setSortBy] = useState<"recent" | "name">("recent");
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -88,8 +88,6 @@ export function MemberDirectory({ communityId }: Props) {
           className="rounded-lg border border-gray-300 px-3 py-2 text-xs md:text-sm focus:border-purple-500 focus:outline-none"
         >
           <option value="recent">Recently Joined</option>
-          <option value="points">Most Points</option>
-          <option value="level">Highest Level</option>
           <option value="name">Name (A-Z)</option>
         </select>
 

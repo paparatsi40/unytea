@@ -270,12 +270,6 @@ export function ModernGridLayout({
               <h3 className="mb-1 text-lg font-bold text-gray-900">
                 {member.user?.name}
               </h3>
-              <div className="mb-2 text-sm text-gray-500">
-                Level {member.level}
-              </div>
-              <div className="text-sm font-semibold" style={{ color: accentColor }}>
-                {member.points} points
-              </div>
             </motion.div>
           ))}
         </div>

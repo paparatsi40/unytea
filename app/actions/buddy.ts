@@ -40,7 +40,6 @@ export async function findBuddyMatch(communityId: string) {
             id: true,
             name: true,
             image: true,
-            level: true,
             skills: true,
             interests: true,
           },
@@ -76,7 +75,6 @@ export async function findBuddyMatch(communityId: string) {
         id: randomMatch.userId,
         name: randomMatch.user.name,
         image: randomMatch.user.image,
-        level: randomMatch.user.level,
         skills: randomMatch.user.skills,
         interests: randomMatch.user.interests,
       }

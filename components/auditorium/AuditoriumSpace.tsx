@@ -11,7 +11,6 @@ type OnlineMember = {
     id: string;
     name: string | null;
     image: string | null;
-    level: number;
   };
   isTyping: boolean;
 };
@@ -141,11 +140,6 @@ export function AuditoriumSpace({ channelId, communitySlug: _communitySlug }: Pr
                       
                       {/* Online indicator */}
                       <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white" />
-                      
-                      {/* Level badge */}
-                      <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-indigo-500 rounded-full border-2 border-white flex items-center justify-center">
-                        <span className="text-xs font-bold">{member.user.level}</span>
-                      </div>
                     </div>
                   </div>
 
@@ -158,7 +152,6 @@ export function AuditoriumSpace({ channelId, communitySlug: _communitySlug }: Pr
                   {isHovered && (
                     <div className="absolute -top-16 bg-gray-900 text-white px-4 py-2 rounded-lg shadow-lg z-10">
                       <p className="text-sm font-semibold">{member.user.name}</p>
-                      <p className="text-xs text-purple-300">Level {member.user.level}</p>
                     </div>
                   )}
                 </div>

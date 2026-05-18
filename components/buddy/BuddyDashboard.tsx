@@ -8,7 +8,6 @@ import {
   Heart,
   TrendingUp,
   Plus,
-  Flame,
   Zap,
   X,
   Loader2,
@@ -37,8 +36,6 @@ interface BuddyMatch {
   name: string | null;
   username: string | null;
   image: string | null;
-  level: number;
-  streak: number;
   skills: string[];
   interests: string[];
   compatibility: number;
@@ -189,15 +186,6 @@ export function BuddyDashboard({ communityId, communitySlug: _communitySlug }: P
                       <p className="font-semibold text-white">
                         {m.name || m.username}
                       </p>
-                      <span className="rounded bg-purple-500/20 px-1.5 py-0.5 text-[10px] font-medium text-purple-300">
-                        Lvl {m.level}
-                      </span>
-                      {m.streak > 0 && (
-                        <span className="flex items-center gap-0.5 text-[10px] text-orange-400">
-                          <Flame className="h-3 w-3" />
-                          {m.streak}d
-                        </span>
-                      )}
                     </div>
 
                     {/* Compatibility bar */}
@@ -323,8 +311,7 @@ export function BuddyDashboard({ communityId, communitySlug: _communitySlug }: P
                 Your Buddy: {buddy?.name}
               </h2>
               <p className="text-sm text-zinc-400">
-                Level {buddy?.level} · Partners for{" "}
-                {stats?.ageInDays || 0} days
+                Partners for {stats?.ageInDays || 0} days
               </p>
             </div>
           </div>

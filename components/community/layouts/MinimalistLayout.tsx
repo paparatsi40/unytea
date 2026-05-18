@@ -293,9 +293,6 @@ export function MinimalistLayout({
                     <div className="truncate font-medium text-gray-900">
                       {member.user?.name}
                     </div>
-                    <div className="text-sm text-gray-500">
-                      Level {member.level} · {member.points} pts
-                    </div>
                   </div>
                 </div>
               ))}

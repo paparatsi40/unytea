@@ -2,7 +2,7 @@
 
 import { 
   BarChart3, TrendingUp, Users, MessageSquare, BookOpen, 
-  Award, Activity, ArrowUp, ArrowDown, Eye, Heart 
+  Activity, ArrowUp, ArrowDown, Eye, Heart
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -29,7 +29,6 @@ interface DashboardLayoutProps {
     };
   };
   posts?: any[];
-  members?: any[];
   analytics?: {
     memberGrowth?: number;
     postGrowth?: number;
@@ -41,7 +40,6 @@ interface DashboardLayoutProps {
 export function DashboardLayout({
   community,
   posts = [],
-  members = [],
   analytics = {},
 }: DashboardLayoutProps) {
   const primaryColor = community.primaryColor || "#8B5CF6";
@@ -57,7 +55,6 @@ export function DashboardLayout({
   };
 
   const topPosts = posts.slice(0, 5);
-  const topMembers = members.slice(0, 6);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -252,44 +249,6 @@ export function DashboardLayout({
               </div>
             </div>
 
-            {/* Top Contributors */}
-            <div className="rounded-xl border border-gray-200 bg-white p-6">
-              <h3 className="mb-4 text-lg font-bold text-gray-900">Top Contributors</h3>
-              <div className="space-y-3">
-                {topMembers.map((member, index) => (
-                  <div key={member.id} className="flex items-center gap-3">
-                    {member.user?.image ? (
-                      <Image
-                        src={member.user.image}
-                        alt={member.user.name || "User"}
-                        width={40}
-                        height={40}
-                        className="rounded-full"
-                      />
-                    ) : (
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200">
-                        <Users className="h-5 w-5 text-gray-500" />
-                      </div>
-                    )}
-                    <div className="flex-1">
-                      <div className="text-sm font-semibold text-gray-900">
-                        {member.user?.name}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {member.points} points • Level {member.level}
-                      </div>
-                    </div>
-                    {index < 3 && (
-                      <Award
-                        className="h-5 w-5"
-                        style={{ color: index === 0 ? '#F59E0B' : index === 1 ? '#94A3B8' : '#CD7F32' }}
-                      />
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-
             {/* Recent Activity */}
             <div className="rounded-xl border border-gray-200 bg-white p-6">
               <h3 className="mb-4 text-lg font-bold text-gray-900">Recent Activity</h3>
@@ -311,12 +270,6 @@ export function DashboardLayout({
                   text="Course completed"
                   time="2h ago"
                   color={accentColor}
-                />
-                <ActivityItem
-                  icon={Award}
-                  text="Achievement unlocked"
-                  time="3h ago"
-                  color="#10B981"
                 />
               </div>
             </div>

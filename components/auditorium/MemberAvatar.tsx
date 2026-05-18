@@ -6,7 +6,6 @@ type Member = {
     id: string;
     name: string | null;
     image: string | null;
-    level: number;
   };
   isTyping?: boolean;
 };
@@ -17,15 +16,7 @@ type Props = {
   isHovered: boolean;
 };
 
-const getLevelColor = (level: number) => {
-  if (level >= 20) return "#06b6d4"; // cyan (diamond)
-  if (level >= 10) return "#eab308"; // yellow (gold)
-  if (level >= 5) return "#6b7280"; // gray (silver)
-  return "#f97316"; // orange (bronze)
-};
-
 export function MemberAvatar({ member, isCurrentUser, isHovered }: Props) {
-  const levelColor = getLevelColor(member.user.level);
   const initial = member.user.name?.charAt(0).toUpperCase() || "?";
 
   return (
@@ -75,20 +66,6 @@ export function MemberAvatar({ member, isCurrentUser, isHovered }: Props) {
           {initial}
         </text>
       )}
-
-      {/* Level badge */}
-      <circle cx="18" cy="18" r="10" fill={levelColor} stroke="white" strokeWidth="2" />
-      <text
-        x="18"
-        y="18"
-        textAnchor="middle"
-        dominantBaseline="central"
-        fill="white"
-        fontSize="8"
-        fontWeight="bold"
-      >
-        {member.user.level}
-      </text>
 
       {/* Typing indicator */}
       {member.isTyping && (

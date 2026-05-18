@@ -9,8 +9,6 @@ import type { MemberStatus, Prisma } from "@prisma/client";
 const memberSelect = {
   id: true,
   role: true,
-  points: true,
-  level: true,
   status: true,
   joinedAt: true,
   user: {
@@ -26,8 +24,6 @@ const memberSelect = {
       interests: true,
       availabilityStatus: true,
       location: true,
-      level: true,
-      points: true,
       lastActiveAt: true,
     },
   },
@@ -40,9 +36,8 @@ export async function getCommunityMembers(
   communityId: string,
   filters?: {
     search?: string;
-    minLevel?: number;
     status?: string;
-    sortBy?: "recent" | "points" | "level" | "name";
+    sortBy?: "recent" | "name";
   }
 ) {
   try {
@@ -57,10 +52,6 @@ export async function getCommunityMembers(
       select: memberSelect,
       orderBy: filters?.sortBy === "recent"
         ? { joinedAt: "desc" }
-        : filters?.sortBy === "points"
-        ? { points: "desc" }
-        : filters?.sortBy === "level"
-        ? { level: "desc" }
         : { user: { name: "asc" } },
     });
 
@@ -76,10 +67,6 @@ export async function getCommunityMembers(
         m.user.skills?.some(s => s.toLowerCase().includes(searchLower)) ||
         m.user.interests?.some(i => i.toLowerCase().includes(searchLower))
       );
-    }
-
-    if (filters?.minLevel) {
-      filteredMembers = filteredMembers.filter(m => m.user.level >= filters.minLevel!);
     }
 
     if (filters?.status) {
