@@ -3,7 +3,6 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { getCurrentUserId } from "@/lib/auth-utils";
-import { checkAndUnlockAchievements } from "./achievements";
 import { getLimitsForPlan } from "@/lib/plans";
 
 /**
@@ -115,9 +114,6 @@ export async function createCommunity(data: {
     });
 
     console.log("✅ Transaction completed successfully");
-
-    // Check for achievements (don't await)
-    checkAndUnlockAchievements(userId).catch(console.error);
 
     // Revalidate paths BEFORE returning
     revalidatePath("/dashboard/communities");

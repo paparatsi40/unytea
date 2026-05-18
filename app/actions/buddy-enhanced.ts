@@ -2,7 +2,6 @@
 
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/auth-utils";
-import { recordActivity } from "@/lib/streaks";
 import { subDays } from "date-fns";
 
 // ── Compatibility Score ──────────────────────────────────────────────
@@ -243,9 +242,6 @@ export async function buddyCheckInWithStreak(
         completedGoals: wins || [],
       },
     });
-
-    // Record activity for streak
-    recordActivity(userId, "session", 5).catch(console.error);
 
     return { success: true, checkIn };
   } catch (error) {

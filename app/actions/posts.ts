@@ -3,8 +3,6 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { getCurrentUserId } from "@/lib/auth-utils";
-import { checkAndUnlockAchievements } from "./achievements";
-import { recordActivity } from "@/lib/streaks";
 
 /**
  * Create a new post
@@ -69,10 +67,6 @@ export async function createPost(formData: FormData) {
         },
       },
     });
-
-    // Track activity & achievements (non-blocking)
-    recordActivity(userId, "post", 5).catch(console.error);
-    checkAndUnlockAchievements(userId).catch(console.error);
 
     revalidatePath(`/c/[slug]`);
     return { success: true, post };

@@ -71,7 +71,6 @@ export async function updateNotificationPreferences(data: {
   notifyOnReaction?: boolean;
   notifyOnNewPost?: boolean;
   notifyOnBuddyRequest?: boolean;
-  notifyOnAchievement?: boolean;
   emailDigest?: "daily" | "weekly" | "never";
 }) {
   try {
@@ -118,7 +117,6 @@ export async function updatePrivacySettings(data: {
   showLocation?: boolean;
   allowMessages?: "everyone" | "members" | "none";
   showActivity?: boolean;
-  showAchievements?: boolean;
 }) {
   try {
     const userId = await getCurrentUserId();

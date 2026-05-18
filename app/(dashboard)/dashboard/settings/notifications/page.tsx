@@ -14,7 +14,6 @@ export default function NotificationsPage() {
     notifyOnReaction: true,
     notifyOnNewPost: false,
     notifyOnBuddyRequest: true,
-    notifyOnAchievement: true,
     emailDigest: "weekly" as "daily" | "weekly" | "never",
   });
 

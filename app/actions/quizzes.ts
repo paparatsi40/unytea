@@ -3,7 +3,6 @@
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { getCurrentUserId } from "@/lib/auth-utils";
-import { recordActivity } from "@/lib/streaks";
 
 // ── Types ─────────────────────────────────────────────────────────────
 export interface QuizQuestionOption {
@@ -258,10 +257,6 @@ export async function submitQuizAttempt(data: {
         completedAt: new Date(),
       },
     });
-
-    // Award XP for completing a quiz (non-blocking)
-    const xpEarned = passed ? 25 : 10;
-    recordActivity(userId, "resource", xpEarned).catch(console.error);
 
     return {
       success: true,

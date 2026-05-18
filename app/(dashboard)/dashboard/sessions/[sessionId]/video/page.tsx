@@ -6,9 +6,6 @@ import { EnhancedVideoCall } from "@/components/video-call/EnhancedVideoCall";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Video, Clock, User, Calendar } from "lucide-react";
 import { Loader2 } from "lucide-react";
-import { PointsNotification, usePointsNotifications } from "@/components/live-session/PointsNotification";
-import { trackSessionJoin, trackSessionLeave } from "@/app/actions/live-gamification";
-import { formatPointsNotification } from "@/lib/live-gamification";
 import { FeedbackModal } from "@/components/live-session/FeedbackModal";
 import { submitSessionFeedback, hasSubmittedFeedback } from "@/app/actions/session-feedback";
 
@@ -44,9 +41,6 @@ export default function SessionVideoPage() {
   const [inCall, setInCall] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [alreadyHasFeedback, setAlreadyHasFeedback] = useState(false);
-  
-  // Gamification
-  const { currentNotification, addNotification, clearCurrent } = usePointsNotifications();
 
   useEffect(() => {
     fetchSession();
@@ -87,22 +81,6 @@ export default function SessionVideoPage() {
   async function handleJoinCall() {
     if (!sessionId) return;
     setInCall(true);
-    
-    // Track session join and award points
-    try {
-      const result = await trackSessionJoin(sessionId);
-      if (result.success && !result.alreadyTracked && result.pointsEarned != null) {
-        const notification = formatPointsNotification("JOIN_SESSION", result.pointsEarned);
-        addNotification(
-          result.pointsEarned,
-          notification.title,
-          notification.message,
-          notification.emoji
-        );
-      }
-    } catch (error) {
-      console.error("Error tracking session join:", error);
-    }
   }
 
   async function handleLeaveCall() {
@@ -111,36 +89,9 @@ export default function SessionVideoPage() {
       router.push("/dashboard/sessions");
       return;
     }
-    
-    // Track session leave and award bonus points if stayed full duration
-    try {
-      const result = await trackSessionLeave(sessionId);
-      if (result.success && result.bonusPoints != null && result.bonusPoints > 0) {
-        const notification = formatPointsNotification("STAY_FULL_SESSION", result.bonusPoints);
-        addNotification(
-          result.bonusPoints,
-          notification.title,
-          notification.message,
-          notification.emoji
-        );
-        
-        // Wait for notification to show, then show feedback modal
-        setTimeout(() => {
-          setInCall(false);
-          if (!alreadyHasFeedback) {
-            setShowFeedbackModal(true);
-          } else {
-            router.push("/dashboard/sessions");
-          }
-        }, 3000);
-        return;
-      }
-    } catch (error) {
-      console.error("Error tracking session leave:", error);
-    }
-    
+
     setInCall(false);
-    
+
     // Show feedback modal if user hasn't submitted feedback yet
     if (!alreadyHasFeedback) {
       setShowFeedbackModal(true);
@@ -240,18 +191,6 @@ export default function SessionVideoPage() {
   if (inCall) {
     return (
       <>
-        {/* Points Notification */}
-        {currentNotification && (
-          <PointsNotification
-            points={currentNotification.points}
-            title={currentNotification.title}
-            message={currentNotification.message}
-            emoji={currentNotification.emoji}
-            show={true}
-            onComplete={clearCurrent}
-          />
-        )}
-
         <div className="space-y-6 h-screen flex flex-col">
           {/* Header */}
           <div className="flex items-center justify-between px-6 pt-6">

@@ -3,8 +3,6 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { getCurrentUserId } from "@/lib/auth-utils";
-import { checkAndUnlockAchievements } from "./achievements";
-import { recordActivity } from "@/lib/streaks";
 
 export async function createComment(postId: string, content: string, parentId?: string) {
   try {
@@ -41,10 +39,6 @@ export async function createComment(postId: string, content: string, parentId?: 
         },
       },
     });
-
-    // Track activity & achievements (non-blocking)
-    recordActivity(userId, "comment", 3).catch(console.error);
-    checkAndUnlockAchievements(userId).catch(console.error);
 
     revalidatePath(`/c/[slug]`);
 

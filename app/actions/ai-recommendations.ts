@@ -18,17 +18,6 @@ export interface RecommendedPost {
   relevanceScore: number;
 }
 
-export interface RecommendedMember {
-  id: string;
-  user: {
-    name: string | null;
-    image: string | null;
-  };
-  role: string;
-  points: number;
-  matchReason: string;
-}
-
 /**
  * Get recommended posts for a user in a community
  */
@@ -116,109 +105,15 @@ export async function getRecommendedPosts(
 }
 
 /**
- * Get recommended members to connect with
- */
-export async function getRecommendedMembers(
-  communitySlug: string,
-  limit: number = 5
-): Promise<RecommendedMember[]> {
-  try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      throw new Error("Not authenticated");
-    }
-
-    // Get current user's member record
-    const currentMember = await prisma.member.findFirst({
-      where: {
-        userId,
-        community: { slug: communitySlug },
-      },
-      select: {
-        points: true,
-        level: true,
-        role: true,
-      },
-    });
-
-    if (!currentMember) {
-      return [];
-    }
-
-    // Get potential connections
-    const members = await prisma.member.findMany({
-      where: {
-        community: { slug: communitySlug },
-        userId: { not: userId },
-        status: "ACTIVE",
-      },
-      select: {
-        id: true,
-        role: true,
-        points: true,
-        level: true,
-        user: {
-          select: {
-            name: true,
-            image: true,
-          },
-        },
-      },
-      take: 20,
-    });
-
-    // Score members based on similarity
-    const membersWithReason = members.map((member) => {
-      let matchReason = "";
-
-      // Similar level
-      if (Math.abs((member.level || 0) - (currentMember.level || 0)) <= 2) {
-        matchReason = "Similar level - great match for collaboration!";
-      }
-      // High points (experienced)
-      else if (member.points > currentMember.points * 1.5) {
-        matchReason = "Experienced member - learn from them!";
-      }
-      // Similar points
-      else if (Math.abs(member.points - currentMember.points) < 50) {
-        matchReason = "Similar activity - potential buddy!";
-      }
-      // Admin or moderator
-      else if (member.role === "ADMIN" || member.role === "MODERATOR") {
-        matchReason = "Community leader - get guidance!";
-      }
-      // Default
-      else {
-        matchReason = "Active community member!";
-      }
-
-      return {
-        ...member,
-        matchReason,
-      };
-    });
-
-    // Return top matches
-    return membersWithReason.slice(0, limit);
-  } catch (error) {
-    console.error("Member recommendation error:", error);
-    return [];
-  }
-}
-
-/**
  * Get personalized feed for user
  */
 export async function getPersonalizedFeed(communitySlug: string) {
   try {
-    const [recommendedPosts, recommendedMembers] = await Promise.all([
-      getRecommendedPosts(communitySlug, 5),
-      getRecommendedMembers(communitySlug, 3),
-    ]);
+    const recommendedPosts = await getRecommendedPosts(communitySlug, 5);
 
     return {
       posts: recommendedPosts,
-      members: recommendedMembers,
+      members: [],
     };
   } catch (error) {
     console.error("Feed error:", error);

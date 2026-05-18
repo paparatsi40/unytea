@@ -3,7 +3,6 @@
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/auth-utils";
 import { revalidatePath } from "next/cache";
-import { checkAndUnlockAchievements } from "./achievements";
 
 /**
  * Find a buddy match for a user in a community
@@ -169,10 +168,6 @@ export async function createBuddyPartnership(buddyId: string, communityId: strin
         },
       },
     });
-
-    // Check for achievements for both users (don't await)
-    checkAndUnlockAchievements(userId).catch(console.error);
-    checkAndUnlockAchievements(buddyId).catch(console.error);
 
     revalidatePath(`/dashboard/c/${communityId}/buddy`);
 

@@ -378,18 +378,6 @@ export async function getMemberAnalytics(communityId: string) {
       _count: true,
     });
 
-    // Members by level
-    const membersByLevel = await prisma.member.findMany({
-      where: { communityId, status: "ACTIVE" },
-      select: { level: true },
-    });
-
-    const levelDistribution = membersByLevel.reduce((acc, member) => {
-      const levelBucket = Math.floor(member.level / 10) * 10;
-      acc[levelBucket] = (acc[levelBucket] || 0) + 1;
-      return acc;
-    }, {} as Record<number, number>);
-
     // Recent joins (last 30 days)
     const recentJoins = await prisma.member.findMany({
       where: {
@@ -410,39 +398,13 @@ export async function getMemberAnalytics(communityId: string) {
       take: 20,
     });
 
-    // Top members by points
-    const topMembers = await prisma.member.findMany({
-      where: { communityId, status: "ACTIVE" },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            username: true,
-            image: true,
-          },
-        },
-      },
-      orderBy: { points: "desc" },
-      take: 10,
-    });
-
     return {
       success: true,
       data: {
         byRole: membersByRole,
-        byLevel: levelDistribution,
         recentJoins: recentJoins.map((m) => ({
           user: m.user,
           joinedAt: m.joinedAt,
-          level: m.level,
-          points: m.points,
-        })),
-        topMembers: topMembers.map((m) => ({
-          user: m.user,
-          level: m.level,
-          points: m.points,
-          role: m.role,
         })),
       },
     };

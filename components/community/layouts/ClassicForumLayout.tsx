@@ -213,9 +213,6 @@ export function ClassicForumLayout({
                           <div className="truncate text-sm font-medium text-gray-900">
                             {member.user?.name}
                           </div>
-                          <div className="text-xs text-gray-500">
-                            {member.points} points
-                          </div>
                         </div>
                       </div>
                     ))}

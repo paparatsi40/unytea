@@ -2,7 +2,6 @@
 
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/auth-utils";
-import { recordActivity } from "@/lib/streaks";
 
 // ── Generate Certificate Number ──────────────────────────────────────
 function generateCertificateNumber(): string {
@@ -107,9 +106,6 @@ export async function issueCertificate(enrollmentId: string) {
         },
       },
     });
-
-    // Award XP for earning a certificate
-    recordActivity(userId, "resource", 50).catch(console.error);
 
     return { success: true, certificate };
   } catch (error) {

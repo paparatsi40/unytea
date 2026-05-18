@@ -13,7 +13,6 @@ export default function PrivacyPage() {
     showLocation: true,
     allowMessages: "everyone" as "everyone" | "members" | "none",
     showActivity: true,
-    showAchievements: true,
   });
 
   const handleSave = async () => {
