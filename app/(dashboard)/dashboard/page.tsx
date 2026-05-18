@@ -22,7 +22,6 @@ import {
   Radio,
   Sparkles,
   AlertTriangle,
-  Flame,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -128,13 +127,6 @@ interface HostAlert {
   communityName?: string;
 }
 
-interface LeaderboardMember {
-  userId: string;
-  name: string;
-  image: string | null;
-  score: number;
-}
-
 interface CommunityOSSnapshot {
   weeklyProgram: Array<{
     id: string;
@@ -202,36 +194,6 @@ interface HostScoreSystem {
     description: string;
     href: string;
     cta: string;
-  }>;
-}
-
-interface HostGamificationSnapshot {
-  streak: {
-    weeks: number;
-    isActiveThisWeek: boolean;
-  };
-  milestones: Array<{
-    key: string;
-    label: string;
-    target: number;
-    current: number;
-    completed: boolean;
-    progress: number;
-  }>;
-  nextMilestone: {
-    key: string;
-    label: string;
-    target: number;
-    current: number;
-    completed: boolean;
-    progress: number;
-  };
-  weeklyGoals: Array<{
-    key: string;
-    label: string;
-    target: number;
-    current: number;
-    completed: boolean;
   }>;
 }
 
@@ -357,11 +319,8 @@ export default function DashboardPage() {
   const [hostAnalytics, setHostAnalytics] = useState<HostAnalyticsV1 | null>(null);
   const [nextAction, setNextAction] = useState<NextRecommendedAction | null>(null);
   const [hostAlerts, setHostAlerts] = useState<HostAlert[]>([]);
-  const [topContributors, setTopContributors] = useState<LeaderboardMember[]>([]);
-  const [topAttendees, setTopAttendees] = useState<LeaderboardMember[]>([]);
   const [communityOS, setCommunityOS] = useState<CommunityOSSnapshot | null>(null);
   const [hostScoreSystem, setHostScoreSystem] = useState<HostScoreSystem | null>(null);
-  const [gamification, setGamification] = useState<HostGamificationSnapshot | null>(null);
   const [aiPlaybook, setAiPlaybook] = useState<AIPlaybookSystem | null>(null);
   const [autopilot, setAutopilot] = useState<AutopilotDashboard | null>(null);
   const [identity, setIdentity] = useState<UserIdentitySnapshot | null>(null);
@@ -395,10 +354,8 @@ export default function DashboardPage() {
         hostAnalyticsRes,
         nextActionRes,
         hostAlertsRes,
-        leaderboardRes,
         communityOSRes,
         hostScoreRes,
-        gamificationRes,
         aiPlaybookRes,
         autopilotRes,
         identityRes,
@@ -414,23 +371,7 @@ export default function DashboardPage() {
       if (hostAnalyticsRes.success) setHostAnalytics(hostAnalyticsRes.analytics || null);
       if (nextActionRes.success) setNextAction(nextActionRes.recommendation || null);
       if (hostAlertsRes.success) setHostAlerts(hostAlertsRes.alerts || []);
-      if (leaderboardRes.success) {
-        setTopContributors(leaderboardRes.contributors || []);
-        setTopAttendees(leaderboardRes.attendees || []);
-      }
       if (communityOSRes.success) setCommunityOS(communityOSRes.snapshot || null);
-      if (
-        gamificationRes.success &&
-        gamificationRes.streak &&
-        gamificationRes.nextMilestone
-      ) {
-        setGamification({
-          streak: gamificationRes.streak,
-          milestones: gamificationRes.milestones || [],
-          nextMilestone: gamificationRes.nextMilestone,
-          weeklyGoals: gamificationRes.weeklyGoals || [],
-        });
-      }
       if (
         hostScoreRes.success &&
         typeof hostScoreRes.hostScore === "number" &&
@@ -990,7 +931,7 @@ export default function DashboardPage() {
           </Card>
         )}
 
-        {(hostScoreSystem || gamification) && (
+        {hostScoreSystem && (
           <Card className="border-zinc-200 bg-white">
             <CardContent className="p-5 space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
@@ -1002,51 +943,8 @@ export default function DashboardPage() {
                     <h3 className="text-lg font-semibold text-zinc-900">Grow your weekly consistency</h3>
                   )}
                 </div>
-                {gamification?.streak ? (
-                  <Badge className="bg-orange-100 text-orange-800 hover:bg-orange-100">
-                    <Flame className="h-3.5 w-3.5 mr-1" />
-                    {gamification.streak.weeks} week streak
-                  </Badge>
-                ) : (
-                  <Badge variant="outline">Community OS Brain</Badge>
-                )}
+                <Badge variant="outline">Community OS Brain</Badge>
               </div>
-
-              {gamification && (
-                <div className="grid gap-3 md:grid-cols-3">
-                  <div className="rounded-lg border border-orange-200 bg-orange-50 p-3">
-                    <p className="text-xs text-orange-700">Streak</p>
-                    <p className="mt-1 text-2xl font-bold text-orange-900">🔥 {gamification.streak.weeks}</p>
-                    <p className="text-xs text-orange-800">
-                      {gamification.streak.isActiveThisWeek
-                        ? "You hosted this week — streak alive"
-                        : "Host this week to keep the streak"}
-                    </p>
-                  </div>
-
-                  <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3 md:col-span-2">
-                    <p className="text-xs font-medium text-zinc-500">This week goals</p>
-                    <div className="mt-2 space-y-1.5">
-                      {gamification.weeklyGoals.map((goal) => (
-                        <p key={goal.key} className={`text-sm ${goal.completed ? "text-green-700" : "text-zinc-700"}`}>
-                          {goal.completed ? "☑" : "☐"} {goal.label} ({Math.min(goal.current, goal.target)}/{goal.target})
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {gamification?.nextMilestone && (
-                <div className="rounded-lg border border-purple-200 bg-purple-50 p-3">
-                  <p className="text-xs font-medium text-purple-700">Next milestone</p>
-                  <p className="mt-1 text-sm font-semibold text-purple-900">🎯 {gamification.nextMilestone.label}</p>
-                  <p className="mt-1 text-xs text-purple-800">
-                    Progress: {Math.min(gamification.nextMilestone.current, gamification.nextMilestone.target)} / {gamification.nextMilestone.target}
-                  </p>
-                  <Progress value={gamification.nextMilestone.progress} className="mt-2 h-1.5" />
-                </div>
-              )}
 
               {hostScoreSystem && (
                 <>
@@ -1391,54 +1289,6 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
             ))}
-          </div>
-        )}
-
-        {(topContributors.length > 0 || topAttendees.length > 0) && (
-          <div className="grid gap-4 md:grid-cols-2">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg">Top Contributors</CardTitle>
-                <CardDescription>By contribution points</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {topContributors.slice(0, 5).map((member, idx) => (
-                  <div key={member.userId} className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs font-semibold text-zinc-500 w-5">#{idx + 1}</span>
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage src={member.image || ""} />
-                        <AvatarFallback>{member.name.slice(0, 1).toUpperCase()}</AvatarFallback>
-                      </Avatar>
-                      <span className="text-sm font-medium text-zinc-900">{member.name}</span>
-                    </div>
-                    <span className="text-sm font-semibold text-purple-700">{member.score} pts</span>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg">Top Attendees</CardTitle>
-                <CardDescription>By session participations</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {topAttendees.slice(0, 5).map((member, idx) => (
-                  <div key={member.userId} className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs font-semibold text-zinc-500 w-5">#{idx + 1}</span>
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage src={member.image || ""} />
-                        <AvatarFallback>{member.name.slice(0, 1).toUpperCase()}</AvatarFallback>
-                      </Avatar>
-                      <span className="text-sm font-medium text-zinc-900">{member.name}</span>
-                    </div>
-                    <span className="text-sm font-semibold text-blue-700">{member.score}</span>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
           </div>
         )}
 

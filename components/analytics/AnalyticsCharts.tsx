@@ -5,9 +5,7 @@ import {
   BarChart3,
   BookOpen,
   DollarSign,
-  Flame,
   PlayCircle,
-  Trophy,
   Users,
   TrendingUp,
   Award,
@@ -30,19 +28,6 @@ interface CourseBreakdown {
   modules: number;
   completionRate: number;
   avgProgress: number;
-}
-
-interface LeaderboardEntry {
-  user: {
-    id: string;
-    name: string | null;
-    username: string | null;
-    image: string | null;
-  };
-  points: number;
-  level: number;
-  streak: number;
-  longestStreak: number;
 }
 
 interface SessionData {
@@ -76,22 +61,13 @@ interface RevenueData {
   communityBreakdown: { name: string; price: number; members: number; revenue: number }[];
 }
 
-interface GamificationData {
-  leaderboard: LeaderboardEntry[];
-  streakDistribution: { range: string; count: number }[];
-  levelDistribution: { range: string; count: number }[];
-  totalAchievements: number;
-  avgStreak: number;
-}
-
 interface AnalyticsChartsProps {
   sessions: SessionData | null;
   courses: CourseData | null;
   revenue: RevenueData | null;
-  gamification: GamificationData | null;
 }
 
-type TabId = "sessions" | "courses" | "revenue" | "gamification";
+type TabId = "sessions" | "courses" | "revenue";
 
 // ── Mini Bar Chart (pure CSS) ────────────────────────────────────────
 function MiniBarChart({
@@ -182,7 +158,6 @@ export function AnalyticsCharts({
   sessions,
   courses,
   revenue,
-  gamification,
 }: AnalyticsChartsProps) {
   const [tab, setTab] = useState<TabId>("sessions");
 
@@ -190,7 +165,6 @@ export function AnalyticsCharts({
     { id: "sessions", label: "Sessions", icon: PlayCircle },
     { id: "courses", label: "Courses", icon: BookOpen },
     { id: "revenue", label: "Revenue", icon: DollarSign },
-    { id: "gamification", label: "Gamification", icon: Trophy },
   ];
 
   return (
@@ -422,125 +396,6 @@ export function AnalyticsCharts({
           </>
         )}
 
-        {/* ── Gamification Tab ──────────────────────────────── */}
-        {tab === "gamification" && (
-          <>
-            {gamification ? (
-              <div className="space-y-6">
-                <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-                  <StatBox
-                    icon={Flame}
-                    label="Avg Streak"
-                    value={`${gamification.avgStreak} days`}
-                    color="text-orange-500"
-                  />
-                  <StatBox
-                    icon={Trophy}
-                    label="Achievements"
-                    value={gamification.totalAchievements}
-                    sub="total unlocked"
-                    color="text-amber-500"
-                  />
-                  <StatBox
-                    icon={Users}
-                    label="Leaderboard"
-                    value={gamification.leaderboard.length}
-                    sub="ranked members"
-                    color="text-purple-500"
-                  />
-                </div>
-
-                {/* Streak distribution */}
-                <div>
-                  <h4 className="mb-3 text-sm font-medium text-gray-500">
-                    Streak Distribution
-                  </h4>
-                  <div className="flex gap-2">
-                    {gamification.streakDistribution.map((s) => {
-                      const total = gamification.streakDistribution.reduce(
-                        (sum, x) => sum + x.count,
-                        0
-                      );
-                      const pct = total > 0 ? (s.count / total) * 100 : 0;
-                      return (
-                        <div key={s.range} className="flex-1 text-center">
-                          <div className="mx-auto mb-1 h-20 w-full overflow-hidden rounded-lg bg-gray-100">
-                            <div
-                              className="mt-auto h-full rounded-lg bg-gradient-to-t from-orange-400 to-amber-300 transition-all"
-                              style={{
-                                height: `${Math.max(pct, 5)}%`,
-                                marginTop: `${100 - Math.max(pct, 5)}%`,
-                              }}
-                            />
-                          </div>
-                          <p className="text-xs font-medium text-gray-900">{s.count}</p>
-                          <p className="text-[10px] text-gray-400">{s.range}</p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Leaderboard */}
-                {gamification.leaderboard.length > 0 && (
-                  <div>
-                    <h4 className="mb-3 text-sm font-medium text-gray-500">
-                      Top Members
-                    </h4>
-                    <div className="space-y-1.5">
-                      {gamification.leaderboard.map((entry, i) => (
-                        <div
-                          key={entry.user.id}
-                          className="flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 p-3"
-                        >
-                          <span
-                            className={`w-6 text-center text-sm font-bold ${
-                              i === 0
-                                ? "text-amber-500"
-                                : i === 1
-                                  ? "text-gray-400"
-                                  : i === 2
-                                    ? "text-amber-700"
-                                    : "text-gray-300"
-                            }`}
-                          >
-                            {i + 1}
-                          </span>
-                          <div className="h-8 w-8 overflow-hidden rounded-full bg-gray-200">
-                            {entry.user.image ? (
-                              <img
-                                src={entry.user.image}
-                                alt=""
-                                className="h-full w-full object-cover"
-                              />
-                            ) : (
-                              <div className="flex h-full w-full items-center justify-center text-xs text-gray-500">
-                                {(entry.user.name || "?")[0]}
-                              </div>
-                            )}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm font-medium text-gray-900">
-                              {entry.user.name || entry.user.username}
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              Lvl {entry.level} · {entry.streak}d streak
-                            </p>
-                          </div>
-                          <span className="text-sm font-bold text-purple-600">
-                            {entry.points.toLocaleString()} pts
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <EmptyState text="No gamification data yet" />
-            )}
-          </>
-        )}
       </div>
     </div>
   );

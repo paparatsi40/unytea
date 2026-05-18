@@ -59,7 +59,7 @@
       "title": "Plus d'une audience mérite une plateforme",
       "titleStart": "Plus d'une audience",
       "titleHighlight": "mérite une plateforme",
-      "description": "Unytea est la plateforme pour les créateurs qui gèrent plusieurs communautés. Sessions en direct, cours, gamification — pour chaque audience que vous servez.",
+      "description": "Unytea est la plateforme pour les créateurs qui gèrent plusieurs communautés. Sessions en direct, cours structurés et communauté durable — pour chaque audience que vous servez.",
       "cta": {
         "primary": "Créer votre communauté gratuitement",
         "secondary": "Voir la Démo",
@@ -311,10 +311,6 @@
       "title": "Communautés Tendance",
       "join": "Rejoindre",
       "viewAll": "Voir tout"
-    },
-    "dailyStreak": {
-      "title": "Série Quotidienne",
-      "days": "jours"
     }
   },
   "navigation": {
@@ -418,7 +414,6 @@
       "knowledgeLibrary": "Bibliothèque de connaissances",
       "courses": "Cours",
       "analytics": "Analytiques",
-      "achievements": "Réalisations",
       "notifications": "Notifications",
       "settings": "Paramètres"
     },

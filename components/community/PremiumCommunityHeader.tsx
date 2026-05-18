@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CommunityActions } from "@/components/community/CommunityActions";
-import { MessageCircle, Trophy, Users, Crown, BookOpen, Flame, Video, TrendingUp, Heart, GraduationCap } from "lucide-react";
+import { MessageCircle, Users, Crown, BookOpen, Flame, Video, TrendingUp, Heart, GraduationCap } from "lucide-react";
 
 type Community = {
   id: string;
@@ -175,18 +175,6 @@ export function PremiumCommunityHeader({
           >
             <GraduationCap className="h-3.5 w-3.5 md:h-4 md:w-4" />
             <span>Courses</span>
-          </Link>
-          <Link
-            href={`/dashboard/c/${community.slug}/leaderboard`}
-            className={`flex items-center space-x-1.5 md:space-x-2 border-b-2 px-3 md:px-4 py-2.5 md:py-3 text-xs md:text-sm font-medium transition-colors whitespace-nowrap ${
-              pathname?.startsWith(`/dashboard/c/${community.slug}/leaderboard`)
-                ? "border-purple-600 text-purple-600"
-                : "border-transparent text-gray-600 hover:text-gray-900"
-            }`}
-          >
-            <Trophy className="h-3.5 w-3.5 md:h-4 md:w-4" />
-            <span className="hidden sm:inline">Leaderboard</span>
-            <span className="sm:hidden">Rank</span>
           </Link>
           <Link
             href={`/dashboard/c/${community.slug}/buddy`}

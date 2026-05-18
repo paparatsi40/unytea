@@ -12,7 +12,6 @@ import {
   BookOpen,
   Settings,
   TrendingUp,
-  Award,
   Bell,
   Library,
 } from "lucide-react";
@@ -25,7 +24,6 @@ const navigation = [
   { key: "knowledgeLibrary", href: "/dashboard/knowledge-library", icon: BookOpen },
   { key: "courses", href: "/dashboard/courses", icon: BookOpen },
   { key: "analytics", href: "/dashboard/analytics", icon: TrendingUp },
-  { key: "achievements", href: "/dashboard/achievements", icon: Award },
   { key: "notifications", href: "/dashboard/notifications", icon: Bell },
   { key: "settings", href: "/dashboard/settings", icon: Settings },
 ];

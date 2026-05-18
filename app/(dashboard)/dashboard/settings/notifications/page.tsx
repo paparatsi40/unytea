@@ -142,27 +142,6 @@ export default function NotificationsPage() {
               <div className="peer h-6 w-11 rounded-full bg-muted after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-border after:bg-background after:transition-all peer-checked:bg-primary peer-checked:after:translate-x-full"></div>
             </label>
           </div>
-
-          {/* Achievements */}
-          <div className="flex items-center justify-between rounded-lg border border-border p-4">
-            <div>
-              <p className="font-medium text-foreground">Achievements</p>
-              <p className="text-sm text-muted-foreground">
-                When you unlock a new achievement
-              </p>
-            </div>
-            <label className="relative inline-flex cursor-pointer items-center">
-              <input
-                type="checkbox"
-                checked={settings.notifyOnAchievement}
-                onChange={(e) =>
-                  setSettings({ ...settings, notifyOnAchievement: e.target.checked })
-                }
-                className="peer sr-only"
-              />
-              <div className="peer h-6 w-11 rounded-full bg-muted after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-border after:bg-background after:transition-all peer-checked:bg-primary peer-checked:after:translate-x-full"></div>
-            </label>
-          </div>
         </div>
 
         {/* Save Button */}

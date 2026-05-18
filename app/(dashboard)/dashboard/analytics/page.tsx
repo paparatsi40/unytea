@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { getLiveCommunityHealthMetrics, getNorthStarDecisionSnapshot, getOverviewAnalytics, getRetentionCohorts } from "@/app/actions/analytics";
-import { getSessionAnalytics, getCourseAnalytics, getRevenueAnalytics, getGamificationAnalytics } from "@/app/actions/analytics-extended";
+import { getSessionAnalytics, getCourseAnalytics, getRevenueAnalytics } from "@/app/actions/analytics-extended";
 import { BarChart3, TrendingUp } from "lucide-react";
 import { StatsCard } from "@/components/analytics/StatsCard";
 import { CommunitySelector } from "@/components/analytics/CommunitySelector";
@@ -25,7 +25,7 @@ const session = await auth();
   const resolvedSearchParams = await searchParams;
   const selectedCommunityId = resolvedSearchParams?.communityId;
 
-  const [result, retentionResult, healthResult, northStarResult, sessionResult, courseResult, revenueResult, gamificationResult] = await Promise.all([
+  const [result, retentionResult, healthResult, northStarResult, sessionResult, courseResult, revenueResult] = await Promise.all([
     getOverviewAnalytics(),
     getRetentionCohorts(selectedCommunityId),
     getLiveCommunityHealthMetrics(selectedCommunityId),
@@ -33,7 +33,6 @@ const session = await auth();
     getSessionAnalytics(selectedCommunityId),
     getCourseAnalytics(selectedCommunityId),
     getRevenueAnalytics(selectedCommunityId),
-    getGamificationAnalytics(selectedCommunityId),
   ]);
 
   if (!result.success || !result.data) {
@@ -130,12 +129,11 @@ const session = await auth();
         />
       </div>
 
-      {/* Deep Analytics (Sessions, Courses, Revenue, Gamification) */}
+      {/* Deep Analytics (Sessions, Courses, Revenue) */}
       <AnalyticsCharts
         sessions={sessionResult.success ? sessionResult.data ?? null : null}
         courses={courseResult.success ? courseResult.data ?? null : null}
         revenue={revenueResult.success ? revenueResult.data ?? null : null}
-        gamification={gamificationResult.success ? gamificationResult.data ?? null : null}
       />
 
       {/* Growth Chart Section */}

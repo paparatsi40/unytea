@@ -59,7 +59,7 @@
       "title": "More than one audience deserves one platform",
       "titleStart": "More than one audience",
       "titleHighlight": "deserves one platform",
-      "description": "Unytea is the platform for creators running multiple communities. Live sessions, courses, gamification — across every audience you serve.",
+      "description": "Unytea is the platform for creators running multiple communities. Live sessions, structured courses, and lasting community — across every audience you serve.",
       "cta": {
         "primary": "Create Your Community Free",
         "secondary": "Watch Demo",
@@ -312,10 +312,6 @@
       "title": "Trending Communities",
       "join": "Join",
       "viewAll": "View all"
-    },
-    "dailyStreak": {
-      "title": "Daily Streak",
-      "days": "days"
     }
   },
   "navigation": {
@@ -419,7 +415,6 @@
       "knowledgeLibrary": "Knowledge Library",
       "courses": "Courses",
       "analytics": "Analytics",
-      "achievements": "Achievements",
       "notifications": "Notifications",
       "settings": "Settings"
     },
