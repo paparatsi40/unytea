@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CommunityActions } from "@/components/community/CommunityActions";
@@ -37,10 +38,13 @@ export function PremiumCommunityHeader({
       {/* Cover Image - Hidden on mobile */}
       <div className="relative h-32 md:h-48 bg-gradient-to-r from-purple-50 via-pink-50 to-purple-50">
         {community.coverImageUrl && (
-          <img
+          <Image
             src={community.coverImageUrl}
             alt={community.name}
-            className="h-full w-full object-cover opacity-60"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover opacity-60"
           />
         )}
       </div>
@@ -51,10 +55,13 @@ export function PremiumCommunityHeader({
           {/* Community Icon - Smaller on mobile */}
           <div className="absolute -top-10 md:-top-16 flex h-20 w-20 md:h-32 md:w-32 items-center justify-center overflow-hidden rounded-xl md:rounded-2xl border-4 border-white bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg transition-transform hover:scale-105">
             {community.imageUrl ? (
-              <img
+              <Image
                 src={community.imageUrl}
                 alt={community.name}
-                className="h-full w-full object-cover"
+                fill
+                priority
+                sizes="(min-width: 768px) 128px, 80px"
+                className="object-cover"
               />
             ) : (
               <Users className="h-10 w-10 md:h-16 md:w-16 text-white" />
