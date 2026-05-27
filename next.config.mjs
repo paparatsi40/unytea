@@ -70,7 +70,7 @@ const nextConfig = {
       "font-src 'self' data: https:",
       "frame-src 'self' https://vercel.live",
       // Allow all connections for WebRTC/LiveKit - simplified
-      "connect-src 'self' https: ws: wss:",
+      "connect-src 'self' https: ws: wss: https://*.sentry.io https://*.ingest.sentry.io https://*.ingest.us.sentry.io",
       // Phase 4c-pre: capture real-user violations against the enforced CSP.
       // Persisted to the csp_violations table by app/api/csp-report.
       "report-uri /api/csp-report",
@@ -97,7 +97,7 @@ const nextConfig = {
       "media-src 'self' blob: https://utfs.io https://*.livekit.cloud",
       "font-src 'self' data:",
       "frame-src 'self' https://js.stripe.com https://vercel.live",
-      "connect-src 'self' https://api.stripe.com https://*.uploadthing.com https://utfs.io https://*.livekit.cloud wss://*.livekit.cloud https://*.pusher.com wss://*.pusher.com wss://ws-*.pusher.com wss://sockjs-*.pusher.com",
+      "connect-src 'self' https://api.stripe.com https://*.uploadthing.com https://utfs.io https://*.livekit.cloud wss://*.livekit.cloud https://*.pusher.com wss://*.pusher.com wss://ws-*.pusher.com wss://sockjs-*.pusher.com https://*.sentry.io https://*.ingest.sentry.io https://*.ingest.us.sentry.io",
       // Phase 4c-pre: capture real-user violations against the tightened CSP.
       // Persisted to the csp_violations table by app/api/csp-report.
       "report-uri /api/csp-report",
