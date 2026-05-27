@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { X, ZoomIn } from "lucide-react";
 
 type ImageGalleryProps = {
@@ -32,10 +33,13 @@ export function ImageGallery({ images, columns = 3 }: ImageGalleryProps) {
             className="group relative aspect-square cursor-pointer overflow-hidden rounded-lg border border-gray-200 bg-gray-100 transition-all hover:border-purple-300 hover:shadow-lg"
             onClick={() => setSelectedImage(image.url)}
           >
-            <img
+            <Image
               src={image.url}
               alt={image.alt || `Image ${index + 1}`}
-              className="h-full w-full object-cover transition-transform group-hover:scale-105"
+              fill
+              sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+              unoptimized
+              className="object-cover transition-transform group-hover:scale-105"
             />
 
             {/* Overlay on hover */}
@@ -60,7 +64,11 @@ export function ImageGallery({ images, columns = 3 }: ImageGalleryProps) {
             <X className="h-6 w-6" />
           </button>
 
-          {/* Image */}
+          {/* Image: lightbox kept as <img>. Full-screen modal renders at
+              natural aspect ratio (max-h-full max-w-full object-contain);
+              next/image needs fixed width/height or fill, neither fits this
+              "viewer" pattern without distortion. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={selectedImage}
             alt="Full size"

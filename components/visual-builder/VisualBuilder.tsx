@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
+import Image from "next/image";
 import {
   DndContext,
   DragEndEvent,
@@ -188,13 +189,16 @@ const DraggableCanvasElement = function DraggableCanvasElement({
         );
       case "image":
         return (
-          <div className="flex h-full items-center justify-center bg-gray-100">
+          <div className="relative flex h-full items-center justify-center bg-gray-100">
             {element.content?.url ? (
-              <img
+              <Image
                 src={element.content.url}
                 alt={element.content.label || "Canvas image"}
-                className="h-full w-full object-cover"
-                draggable={false}                // evita drag nativo del navegador
+                fill
+                sizes="(min-width: 1024px) 600px, 100vw"
+                unoptimized
+                draggable={false}
+                className="object-cover"
               />
             ) : (
               <ImagePlus className="h-8 w-8 text-gray-400" />

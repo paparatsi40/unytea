@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { SectionSchema } from "../types";
 
 export const HeroRender = (props: Record<string, any>) => {
@@ -27,12 +28,15 @@ export const HeroRender = (props: Record<string, any>) => {
           )}
         </div>
         <div className={`${isLeft ? "md:order-2" : "md:order-1"}`}>
-          <div className="aspect-video w-full overflow-hidden rounded-xl bg-gray-100 shadow-2xl">
+          <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-gray-100 shadow-2xl">
             {imageUrl ? (
-              <img
+              <Image
                 src={imageUrl}
                 alt="Hero"
-                className="h-full w-full object-cover"
+                fill
+                sizes="(min-width: 768px) 50vw, 100vw"
+                unoptimized
+                className="object-cover"
               />
             ) : (
               <div className="flex h-full items-center justify-center text-gray-400">
