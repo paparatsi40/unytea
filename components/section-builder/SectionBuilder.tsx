@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState, useEffect } from "react";
+import Image from "next/image";
 import { ChevronUp, ChevronDown, Trash2, Copy, Save, Eye, X, Sparkles } from "lucide-react";
 import { SectionInstance, SectionType, FieldDef } from "./types";
 import { SECTIONS, SECTION_ORDER } from "./sections";
@@ -87,7 +88,16 @@ function renderSection(section: SectionInstance, t: ReturnType<typeof useTransla
                 allowFullScreen
               />
             ) : thumbnailUrl ? (
-              <img src={thumbnailUrl} alt={title} className="h-72 w-full object-cover" />
+              <div className="relative h-72 w-full">
+                <Image
+                  src={thumbnailUrl}
+                  alt={title}
+                  fill
+                  sizes="(min-width: 1024px) 800px, 100vw"
+                  unoptimized
+                  className="object-cover"
+                />
+              </div>
             ) : (
               <div className="flex h-72 items-center justify-center text-sm text-gray-500">
                 Video will appear here once you add a video URL.

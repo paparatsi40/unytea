@@ -849,12 +849,12 @@ export default async function Home(
                 className="group flex flex-col rounded-xl border bg-white overflow-hidden hover:shadow-lg transition-all hover:-translate-y-0.5"
               >
                 <div className="relative h-40 w-full overflow-hidden bg-gradient-to-br from-primary/10 to-purple-100">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <Image
                     src={post.featuredImage}
                     alt={post.title}
-                    className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                    loading="lazy"
+                    fill
+                    sizes="(min-width: 768px) 33vw, 100vw"
+                    className="object-cover transition-transform group-hover:scale-105"
                   />
                 </div>
                 <div className="flex flex-grow flex-col p-5">

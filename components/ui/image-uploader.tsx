@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Image from "next/image";
 import { Upload, Link as LinkIcon, Loader2, X } from "lucide-react";
 import { useUploadThing } from "@/lib/uploadthing";
 import { Button } from "./button";
@@ -60,11 +61,14 @@ export function ImageUploader({ value, onChange, onRemove }: ImageUploaderProps)
 
   if (value) {
     return (
-      <div className="relative group">
-        <img
+      <div className="relative group h-32 w-full">
+        <Image
           src={value}
           alt="Upload preview"
-          className="h-32 w-full rounded-lg object-cover"
+          fill
+          sizes="(min-width: 768px) 400px, 100vw"
+          unoptimized
+          className="rounded-lg object-cover"
         />
         {onRemove && (
           <Button

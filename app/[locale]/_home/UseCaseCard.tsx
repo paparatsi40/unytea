@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { CheckCircle, Users } from "lucide-react";
 
 /**
@@ -26,16 +27,17 @@ export function UseCaseCard({
 
       <div className="relative">
         <div
-          className={`w-full h-40 rounded-xl overflow-hidden mb-4 shadow-sm ${
+          className={`relative w-full h-40 rounded-xl overflow-hidden mb-4 shadow-sm ${
             imgError ? "bg-gradient-to-br from-gray-200 to-gray-300" : ""
           }`}
         >
           {!imgError ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={image}
               alt={title}
-              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+              fill
+              sizes="(min-width: 768px) 33vw, 100vw"
+              className="object-cover transition-transform duration-300 group-hover:scale-110"
               onError={() => setImgError(true)}
             />
           ) : (

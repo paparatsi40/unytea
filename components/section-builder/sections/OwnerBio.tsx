@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { SectionSchema } from "../types";
 
 export const OwnerBioRender = (props: Record<string, any>) => {
@@ -23,12 +24,15 @@ export const OwnerBioRender = (props: Record<string, any>) => {
         
         <div className="grid gap-8 md:grid-cols-[300px_1fr] md:items-start">
           <div className="mx-auto md:mx-0">
-            <div className="h-64 w-64 overflow-hidden rounded-2xl bg-gray-100 shadow-xl">
+            <div className="relative h-64 w-64 overflow-hidden rounded-2xl bg-gray-100 shadow-xl">
               {imageUrl ? (
-                <img
+                <Image
                   src={imageUrl}
                   alt={name || "Owner"}
-                  className="h-full w-full object-cover"
+                  fill
+                  sizes="256px"
+                  unoptimized
+                  className="object-cover"
                 />
               ) : (
                 <div className="flex h-full items-center justify-center text-gray-400">

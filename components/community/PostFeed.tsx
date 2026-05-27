@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { createPost } from "@/app/actions/posts";
 import { Button } from "@/components/ui/button";
@@ -113,9 +114,11 @@ export function PostFeed({
             <div className="flex items-start space-x-5">
               {user?.image ? (
                 <div className="relative">
-                  <img
+                  <Image
                     src={user.image}
                     alt={user.name || "User"}
+                    width={56}
+                    height={56}
                     className="h-14 w-14 rounded-2xl border-2 border-primary/20 object-cover shadow-lg ring-2 ring-primary/10"
                   />
                   <div className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-background bg-green-500 shadow-sm" />

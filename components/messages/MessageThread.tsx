@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { MessageBubble } from "./MessageBubble";
 import { MessageInput } from "./MessageInput";
 import { getConversationMessages, markMessagesAsRead } from "@/app/actions/messages";
@@ -138,9 +139,11 @@ export function MessageThread({
 
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-pink-500 text-sm font-semibold text-white shadow-sm">
               {otherUser.image ? (
-                <img
+                <Image
                   src={otherUser.image}
                   alt={displayName}
+                  width={44}
+                  height={44}
                   className="h-full w-full rounded-full object-cover"
                 />
               ) : (

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import NextImage from "next/image";
 import { formatDistanceToNow } from "date-fns";
 import {
   Check,
@@ -84,9 +85,11 @@ export function MessageBubble({
       {!isOwnMessage && (
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-pink-500 text-sm font-semibold text-white shadow-sm">
           {message.sender.image ? (
-            <img
+            <NextImage
               src={message.sender.image}
               alt={message.sender.firstName || message.sender.name || "User"}
+              width={32}
+              height={32}
               className="h-full w-full rounded-full object-cover"
             />
           ) : (
@@ -103,6 +106,13 @@ export function MessageBubble({
             {attachments.map((url: string, index: number) => (
               <div key={index} className="relative">
                 {url.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
+                  // Kept as <img>: user-uploaded message attachments have
+                  // unknown natural dimensions and the original layout
+                  // (max-w-xs + natural aspect ratio) cannot be reproduced
+                  // with next/image without forcing a fixed aspect ratio that
+                  // would distort vertical photos. Restructuring this is a
+                  // separate UX decision.
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={url}
                     alt="Attachment"

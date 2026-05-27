@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import {
   Dialog,
   DialogContent,
@@ -261,10 +262,12 @@ export function CreateSocialClipDialog({
                     {/* Video Preview Placeholder */}
                     <div className="aspect-video bg-zinc-950 rounded-lg flex items-center justify-center mb-4 relative overflow-hidden">
                       {clip.thumbnailUrl ? (
-                        <img
+                        <Image
                           src={clip.thumbnailUrl}
                           alt="Clip thumbnail"
-                          className="w-full h-full object-cover"
+                          fill
+                          sizes="(min-width: 768px) 600px, 100vw"
+                          className="object-cover"
                         />
                       ) : (
                         <div className="flex flex-col items-center text-zinc-500">

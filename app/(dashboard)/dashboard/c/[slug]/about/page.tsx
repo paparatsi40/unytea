@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { Loader2, Users, Calendar, BookOpen, Shield, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import Image from "next/image";
 
 interface CommunityData {
   id: string;
@@ -88,10 +89,12 @@ export default function CommunityAboutPage() {
       {/* Cover Image */}
       {community.coverImage && (
         <div className="mb-8 rounded-2xl overflow-hidden h-64 relative">
-          <img
+          <Image
             src={community.coverImage}
             alt={community.name}
-            className="w-full h-full object-cover"
+            fill
+            sizes="(min-width: 1024px) 1024px, 100vw"
+            className="object-cover"
           />
         </div>
       )}
@@ -162,9 +165,11 @@ export default function CommunityAboutPage() {
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Community Owner</h2>
           <div className="flex items-center gap-4">
             {community.owner.image ? (
-              <img
+              <Image
                 src={community.owner.image}
                 alt={community.owner.name || "Owner"}
+                width={64}
+                height={64}
                 className="w-16 h-16 rounded-full object-cover"
               />
             ) : (

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { 
   MessageSquare, 
@@ -277,9 +278,11 @@ function ChatMessageComponent({
       {/* Avatar */}
       <div className="flex-shrink-0">
         {message.userImage ? (
-          <img
+          <Image
             src={message.userImage}
             alt={message.userName}
+            width={32}
+            height={32}
             className="w-8 h-8 rounded-full"
           />
         ) : (

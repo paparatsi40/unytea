@@ -6,6 +6,7 @@ import { format, isToday, isTomorrow, formatDistanceToNow } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import Image from "next/image";
 
 function formatSessionDate(date: Date): string {
   if (isToday(date)) return "Today";
@@ -125,9 +126,11 @@ export default async function AgendaPage() {
                     {/* Community Avatar */}
                     <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-zinc-900">
                       {s.community?.imageUrl ? (
-                        <img
+                        <Image
                           src={s.community.imageUrl}
                           alt={s.community.name}
+                          width={48}
+                          height={48}
                           className="h-full w-full rounded-lg object-cover"
                         />
                       ) : (

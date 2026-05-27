@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import Link from "next/link";
+import Image from "next/image";
 import { User as UserIcon, Shield } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -69,9 +70,11 @@ export default function ProfilePage() {
       <div className="rounded-xl border border-border bg-card p-8">
         <div className="mb-8 flex items-center space-x-6">
           {user.image ? (
-            <img
+            <Image
               src={user.image}
               alt={user.name || "User"}
+              width={96}
+              height={96}
               className="h-24 w-24 rounded-full border-4 border-border object-cover"
             />
           ) : (

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import NextImage from "next/image";
 import { UploadDropzone } from "@uploadthing/react";
 import { X, File, Image as ImageIcon, FileText, Loader2 } from "lucide-react";
 
@@ -136,10 +137,12 @@ export function FileUpload({
                 {/* Image Preview */}
                 {file.url.match(/\.(jpg|jpeg|png|gif|webp)$/i) && (
                   <div className="absolute inset-0 -z-10 overflow-hidden rounded-lg opacity-10">
-                    <img
+                    <NextImage
                       src={file.url}
                       alt="Preview"
-                      className="h-full w-full object-cover"
+                      fill
+                      sizes="(min-width: 640px) 50vw, 100vw"
+                      className="object-cover"
                     />
                   </div>
                 )}

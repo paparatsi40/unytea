@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import {
   Users,
   Target,
@@ -164,9 +165,11 @@ export function BuddyDashboard({ communityId, communitySlug: _communitySlug }: P
                   <div className="relative">
                     <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 text-xl font-bold text-white">
                       {m.image ? (
-                        <img
+                        <Image
                           src={m.image}
-                          alt=""
+                          alt={m.name || "Buddy match"}
+                          width={56}
+                          height={56}
                           className="h-full w-full rounded-full object-cover"
                         />
                       ) : (
@@ -297,9 +300,11 @@ export function BuddyDashboard({ communityId, communitySlug: _communitySlug }: P
           <div className="flex items-center gap-4">
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 text-xl font-bold text-white">
               {buddy?.image ? (
-                <img
+                <Image
                   src={buddy.image}
-                  alt=""
+                  alt={buddy.name || "Buddy"}
+                  width={56}
+                  height={56}
                   className="h-full w-full rounded-full object-cover"
                 />
               ) : (
@@ -595,9 +600,11 @@ export function BuddyDashboard({ communityId, communitySlug: _communitySlug }: P
                     <div className="flex items-center gap-2">
                       <div className="flex h-6 w-6 items-center justify-center rounded-full bg-zinc-800 text-xs">
                         {checkIn.user?.image ? (
-                          <img
+                          <Image
                             src={checkIn.user.image}
-                            alt=""
+                            alt={checkIn.user.name || "Check-in user"}
+                            width={24}
+                            height={24}
                             className="h-full w-full rounded-full object-cover"
                           />
                         ) : (

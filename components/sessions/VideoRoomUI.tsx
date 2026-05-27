@@ -34,6 +34,7 @@ import {
   Pencil,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 import { MainStage } from "./MainStage";
 import { SessionMode } from "./ModeSwitcher";
@@ -573,9 +574,11 @@ export function VideoRoomUI({
               <div className="flex items-center gap-3 rounded-lg bg-zinc-800/50 px-3 py-2">
                 <div className="relative">
                   {hostAvatar ? (
-                    <img
+                    <Image
                       src={hostAvatar}
                       alt={hostName}
+                      width={32}
+                      height={32}
                       className="h-8 w-8 rounded-full object-cover"
                     />
                   ) : (

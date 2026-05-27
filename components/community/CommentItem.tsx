@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { formatDistanceToNow } from "date-fns";
 import { MessageCircle, Heart, Trash2, Clock } from "lucide-react";
 import { CommentForm } from "./CommentForm";
@@ -72,10 +73,12 @@ export function CommentItem({
         <div className="flex-shrink-0">
           <div className="relative h-8 w-8 overflow-hidden rounded-full border border-gray-100 bg-gradient-to-br from-purple-500 to-pink-500">
             {comment.author.image ? (
-              <img
+              <Image
                 src={comment.author.image}
                 alt={authorName}
-                className="h-full w-full object-cover"
+                fill
+                sizes="32px"
+                className="object-cover"
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center text-xs font-semibold text-white">

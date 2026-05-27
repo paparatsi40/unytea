@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { PostReactions } from "@/components/community/PostReactions";
 import { MessageSquare, Share2, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -85,9 +86,11 @@ export function PostCard({ post, index = 0 }: PostCardProps) {
           <div className="flex items-center space-x-4">
             {post.author.imageUrl ? (
               <div className="relative">
-                <img
+                <Image
                   src={post.author.imageUrl}
                   alt={getAuthorName(post.author)}
+                  width={48}
+                  height={48}
                   className={cn(
                     "h-12 w-12 rounded-2xl border-2 border-primary/10 object-cover shadow-lg ring-2 ring-primary/5 transition-all duration-300",
                     isHovered && "scale-110 ring-primary/20 shadow-2xl"

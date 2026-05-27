@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 /**
  * Image used in the "Most community platforms are built like forums from 2010"
  * section. Hides itself on broken src so the colored circle behind it stays
@@ -8,11 +10,12 @@
  */
 export function ProblemImage({ src, alt }: { src: string; alt: string }) {
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
+    <Image
       src={src}
       alt={alt}
-      className="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity"
+      fill
+      sizes="(min-width: 768px) 33vw, 100vw"
+      className="object-cover opacity-60 group-hover:opacity-40 transition-opacity"
       onError={(e) => {
         (e.target as HTMLImageElement).style.display = "none";
       }}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Sparkles } from "lucide-react";
 
 /**
@@ -42,11 +43,12 @@ export function FeatureCard({
         } ${imgError ? "bg-gradient-to-br from-gray-200 to-gray-300" : ""}`}
       >
         {!imgError && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={image}
             alt={title}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+            fill
+            sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+            className="object-cover transition-transform duration-300 group-hover:scale-110"
             onError={() => setImgError(true)}
           />
         )}
