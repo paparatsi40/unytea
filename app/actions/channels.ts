@@ -59,7 +59,6 @@ export async function getChannelMessages(channelId: string, limit = 50) {
             id: true,
             name: true,
             image: true,
-            level: true,
           },
         },
       },
@@ -102,16 +101,9 @@ export async function sendChannelMessage(channelId: string, content: string, att
             id: true,
             name: true,
             image: true,
-            level: true,
           },
         },
       },
-    });
-
-    // Update user points (+1 for sending message)
-    await prisma.user.update({
-      where: { id: userId },
-      data: { points: { increment: 1 } },
     });
 
     // WebSocket events disabled - using Pusher for real-time updates
@@ -267,7 +259,6 @@ export async function getChannelOnlineMembers(channelId: string) {
             id: true,
             name: true,
             image: true,
-            level: true,
           },
         },
       },

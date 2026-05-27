@@ -101,8 +101,6 @@ export async function getMemberProfile(userId: string, communityId?: string) {
         location: true,
         timezone: true,
         availabilityStatus: true,
-        level: true,
-        points: true,
         createdAt: true,
         lastActiveAt: true,
       },
@@ -124,8 +122,6 @@ export async function getMemberProfile(userId: string, communityId?: string) {
         },
         select: {
           role: true,
-          level: true,
-          points: true,
           joinedAt: true,
         },
       });

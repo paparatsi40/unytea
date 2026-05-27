@@ -198,7 +198,6 @@ export async function getMyBuddyPartnership(communityId: string) {
             id: true,
             name: true,
             image: true,
-            level: true,
           },
         },
         user2: {
@@ -206,7 +205,6 @@ export async function getMyBuddyPartnership(communityId: string) {
             id: true,
             name: true,
             image: true,
-            level: true,
           },
         },
         goals: {
