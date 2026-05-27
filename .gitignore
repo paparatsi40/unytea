@@ -68,3 +68,10 @@ Thumbs.db
 # Local backups
 .env.local.backup-*
 .claude/
+
+# Sentry Config File
+.env.sentry-build-plugin
+
+# npm audit scratch output
+npm-audit.json
+npm-audit-*.json
