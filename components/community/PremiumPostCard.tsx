@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { PostReactions } from "@/components/community/PostReactions";
 import { CommentSection } from "@/components/community/CommentSection";
@@ -178,10 +179,12 @@ export function PremiumPostCard({ post, canModeratePost = false }: { post: Post;
           {/* Avatar */}
           <div className="relative h-10 w-10 overflow-hidden rounded-full border border-gray-100 bg-gradient-to-br from-purple-500 to-pink-500">
             {post.author.image ? (
-              <img
+              <Image
                 src={post.author.image}
                 alt={authorName}
-                className="h-full w-full object-cover"
+                fill
+                sizes="40px"
+                className="object-cover"
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center text-sm font-semibold text-white">
@@ -328,11 +331,15 @@ export function PremiumPostCard({ post, canModeratePost = false }: { post: Post;
                     className="overflow-hidden rounded-lg border border-gray-200 bg-gray-50 hover:bg-gray-100"
                   >
                     {isImage ? (
-                      <img
-                        src={attachment?.url}
-                        alt={attachment?.name || "Attachment"}
-                        className="h-36 w-full object-cover"
-                      />
+                      <div className="relative h-36 w-full">
+                        <Image
+                          src={attachment?.url}
+                          alt={attachment?.name || "Attachment"}
+                          fill
+                          sizes="(min-width: 640px) 50vw, 100vw"
+                          className="object-cover"
+                        />
+                      </div>
                     ) : (
                       <div className="flex items-center gap-2 px-3 py-3 text-sm text-gray-700">
                         <span className="truncate">{attachment?.name || "Attachment"}</span>

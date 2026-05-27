@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Image from "next/image";
 import {
   GraduationCap,
   Plus,
@@ -363,10 +364,12 @@ export default function CommunityCoursesPage() {
               {/* Image */}
               {course.imageUrl ? (
                 <div className="relative h-40 w-full overflow-hidden bg-gray-100">
-                  <img
+                  <Image
                     src={course.imageUrl}
                     alt={course.title}
-                    className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                    fill
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    className="object-cover transition-transform group-hover:scale-105"
                   />
                 </div>
               ) : (

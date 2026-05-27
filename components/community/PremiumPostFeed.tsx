@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { PremiumPostCard } from "@/components/community/PremiumPostCard";
 import { createPost } from "@/app/actions/posts";
@@ -472,10 +473,12 @@ export function PremiumPostFeed({
           <div className="mb-3 flex items-center space-x-3">
             <div className="relative h-10 w-10 overflow-hidden rounded-full border border-gray-100 bg-gradient-to-br from-purple-500 to-pink-500">
               {user?.image ? (
-                <img
+                <Image
                   src={user.image}
                   alt={userFullName}
-                  className="h-full w-full object-cover"
+                  fill
+                  sizes="40px"
+                  className="object-cover"
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center text-sm font-semibold text-white">

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { Button } from "@/components/ui/button";
 import { createCommunity, checkCommunityPlanLimit } from "@/app/actions/communities";
@@ -566,19 +567,25 @@ export default function NewCommunityPage() {
                   <div className="overflow-hidden rounded-lg">
                     <div className="relative h-32 bg-gradient-to-br from-primary/20 to-purple-500/20">
                       {formData.coverImageUrl && (
-                        <img
+                        <Image
                           src={formData.coverImageUrl}
                           alt="Cover"
-                          className="h-full w-full object-cover"
+                          fill
+                          sizes="(min-width: 768px) 50vw, 100vw"
+                          unoptimized
+                          className="object-cover"
                         />
                       )}
                       {formData.imageUrl && (
                         <div className="absolute -bottom-6 left-6">
-                          <div className="h-12 w-12 overflow-hidden rounded-xl border-4 border-background shadow-lg">
-                            <img
+                          <div className="relative h-12 w-12 overflow-hidden rounded-xl border-4 border-background shadow-lg">
+                            <Image
                               src={formData.imageUrl}
                               alt="Logo preview"
-                              className="h-full w-full object-cover"
+                              fill
+                              sizes="48px"
+                              unoptimized
+                              className="object-cover"
                             />
                           </div>
                         </div>
@@ -806,21 +813,27 @@ export default function NewCommunityPage() {
                   >
                     {formData.coverImageUrl && (
                       <div className="absolute inset-0 opacity-10">
-                        <img
+                        <Image
                           src={formData.coverImageUrl}
                           alt="Cover"
-                          className="h-full w-full object-cover"
+                          fill
+                          sizes="(min-width: 768px) 50vw, 100vw"
+                          unoptimized
+                          className="object-cover"
                         />
                       </div>
                     )}
                     
                     <div className="relative text-center">
                       {formData.imageUrl && (
-                        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl shadow-lg ring-4 ring-white">
-                          <img
+                        <div className="relative mx-auto mb-4 flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl shadow-lg ring-4 ring-white">
+                          <Image
                             src={formData.imageUrl}
                             alt="Logo"
-                            className="h-full w-full object-cover"
+                            fill
+                            sizes="64px"
+                            unoptimized
+                            className="object-cover"
                           />
                         </div>
                       )}

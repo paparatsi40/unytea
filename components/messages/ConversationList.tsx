@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { Search, Loader2 } from "lucide-react";
 import { getUserConversations } from "@/app/actions/messages";
 import { formatDistanceToNow } from "date-fns";
@@ -228,9 +229,11 @@ export function ConversationList({
                     <div className="relative shrink-0">
                       <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-pink-500 text-sm font-semibold text-white">
                         {otherUser.image ? (
-                          <img
+                          <Image
                             src={otherUser.image}
                             alt={displayName}
+                            width={44}
+                            height={44}
                             className="h-full w-full rounded-full object-cover"
                           />
                         ) : (

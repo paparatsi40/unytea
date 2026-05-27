@@ -16,6 +16,7 @@ import {
 import { markNotificationAsRead, deleteNotification } from "@/app/actions/notifications";
 import { toast } from "sonner";
 import Link from "next/link";
+import Image from "next/image";
 
 interface NotificationItemProps {
   notification: {
@@ -106,9 +107,15 @@ export function NotificationItem({ notification, onUpdate }: NotificationItemPro
 
       {/* Avatar or Icon */}
       <div className="flex-shrink-0 pl-4">
-        {notification.sender ? (
+        {notification.sender?.image ? (
           <div className="h-10 w-10 rounded-full bg-white/5 flex items-center justify-center">
-            <img src={notification.sender.image || ""} className="h-8 w-8 rounded-full" />
+            <Image
+              src={notification.sender.image}
+              alt={notification.sender.name || "Notification sender"}
+              width={32}
+              height={32}
+              className="h-8 w-8 rounded-full"
+            />
           </div>
         ) : (
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
