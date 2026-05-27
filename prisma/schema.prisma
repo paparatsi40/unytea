@@ -81,11 +81,6 @@ model User {
   timezone               String?      @default("UTC")
   availabilityStatus     String?      @default("AVAILABLE") // AVAILABLE, BUSY, DO_NOT_DISTURB, MENTORING
   isOnboarded            Boolean      @default(false)
-  points                 Int          @default(0)
-  level                  Int          @default(1)
-  currentStreak          Int          @default(0)
-  longestStreak          Int          @default(0)
-  lastStreakDate         DateTime? // Last date the streak was updated
   createdAt              DateTime     @default(now())
   updatedAt              DateTime     @updatedAt
   lastActiveAt           DateTime?
@@ -113,7 +108,6 @@ model User {
   menteeSessions              MentorSession[]        @relation("MenteeSessions")
   mentorSessions              MentorSession[]        @relation("MentorSessions")
   sessionSeries               SessionSeries[] // Host of recurring session series
-  achievements                UserAchievement[]
   channelMessages             ChannelMessage[]
   channelMembers              ChannelMember[]
   buddyPartnerships1          BuddyPartnership[]     @relation("BuddyUser1")
@@ -127,9 +121,6 @@ model User {
   resources        Resource[]         @relation("ResourceAuthor")
   resourceProgress ResourceProgress[]
   resourceLikes    ResourceLike[]
-
-  // Gamification
-  dailyActivities DailyActivity[]
 
   // Push Notifications
   pushSubscriptions PushSubscription[]
@@ -223,8 +214,6 @@ model Member {
   customRole  String? // Custom role name (e.g., "Content Manager", "Lead Instructor")
   permissions Json? // Granular permissions object
 
-  points             Int          @default(0)
-  level              Int          @default(1)
   status             MemberStatus @default(ACTIVE)
   joinedAt           DateTime     @default(now())
   updatedAt          DateTime     @updatedAt
@@ -832,34 +821,6 @@ model Subscription {
   @@map("subscriptions")
 }
 
-model Achievement {
-  id               String            @id @default(cuid())
-  name             String
-  description      String?
-  icon             String?
-  points           Int               @default(0)
-  criteria         Json
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  userAchievements UserAchievement[]
-
-  @@map("achievements")
-}
-
-model UserAchievement {
-  id            String      @id @default(cuid())
-  unlockedAt    DateTime    @default(now())
-  userId        String
-  achievementId String
-  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
-  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, achievementId])
-  @@index([userId])
-  @@index([achievementId])
-  @@map("user_achievements")
-}
-
 model Notification {
   id        String           @id @default(cuid())
   type      NotificationType
@@ -1345,35 +1306,6 @@ model ResourceLike {
 // ============================================
 // GAMIFICATION - DAILY ACTIVITY & STREAKS
 // ============================================
-
-model DailyActivity {
-  id     String   @id @default(cuid())
-  userId String
-  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  date   DateTime @db.Date // Date only (no time), one record per day
-
-  // Activity counts for the day
-  posts     Int @default(0)
-  comments  Int @default(0)
-  messages  Int @default(0)
-  reactions Int @default(0)
-  sessions  Int @default(0) // Live sessions attended
-  resources Int @default(0) // Resources viewed/completed
-
-  // Points earned this day
-  pointsEarned Int @default(0)
-
-  // Whether this day counted toward a streak
-  streakDay Boolean @default(true)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([userId, date])
-  @@index([userId, date])
-  @@index([date])
-  @@map("daily_activities")
-}
 
 // ── Push Notification Subscriptions ──────────────────────────────────
 model PushSubscription {
