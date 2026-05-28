@@ -266,18 +266,18 @@
 
 ### Completion Metrics
 
-| Category | Status | Completion |
-|----------|--------|-----------|
-| **Project Setup** | ✅ Complete | 100% |
-| **Design System** | ✅ Complete | 100% |
-| **Database Schema** | ✅ Complete | 100% |
-| **Landing Page** | ✅ Complete | 100% |
-| **Documentation** | ✅ Complete | 100% |
-| **Authentication** | 🚧 Ready to start | 0% |
-| **Dashboard** | 🚧 Ready to start | 0% |
-| **Communities** | 🚧 Ready to start | 0% |
-| **Video Calls** | 📋 Planned | 0% |
-| **AI Features** | 📋 Planned | 0% |
+| Category            | Status            | Completion |
+| ------------------- | ----------------- | ---------- |
+| **Project Setup**   | ✅ Complete       | 100%       |
+| **Design System**   | ✅ Complete       | 100%       |
+| **Database Schema** | ✅ Complete       | 100%       |
+| **Landing Page**    | ✅ Complete       | 100%       |
+| **Documentation**   | ✅ Complete       | 100%       |
+| **Authentication**  | 🚧 Ready to start | 0%         |
+| **Dashboard**       | 🚧 Ready to start | 0%         |
+| **Communities**     | 🚧 Ready to start | 0%         |
+| **Video Calls**     | 📋 Planned        | 0%         |
+| **AI Features**     | 📋 Planned        | 0%         |
 
 ### Overall Progress: **~30%** of MVP
 
@@ -331,6 +331,7 @@ The MVP (Minimum Viable Product) includes:
 ### Immediate Next Steps
 
 1. **Set up authentication**
+
    ```bash
    # Get Clerk keys from clerk.com
    # Add to .env
@@ -339,6 +340,7 @@ The MVP (Minimum Viable Product) includes:
    ```
 
 2. **Create dashboard layout**
+
    ```bash
    # Build sidebar component
    # Add navigation

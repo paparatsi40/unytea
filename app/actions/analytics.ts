@@ -56,7 +56,7 @@ export async function getOverviewAnalytics() {
 
     // Growth this month
     const startOfMonth = startOfDay(new Date(new Date().setDate(1)));
-    
+
     const newMembersThisMonth = await prisma.member.count({
       where: {
         communityId: { in: communityIds },
@@ -129,7 +129,7 @@ export async function getCommunityAnalytics(communityId: string) {
 
     // Get growth data (last 30 days)
     const last30Days = subDays(new Date(), 30);
-    
+
     const memberGrowth = await prisma.member.groupBy({
       by: ["joinedAt"],
       where: {
@@ -181,17 +181,19 @@ export async function getCommunityAnalytics(communityId: string) {
       select: { createdAt: true },
     });
 
-    const hourDistribution = posts.reduce((acc, post) => {
-      const hour = new Date(post.createdAt).getHours();
-      acc[hour] = (acc[hour] || 0) + 1;
-      return acc;
-    }, {} as Record<number, number>);
+    const hourDistribution = posts.reduce(
+      (acc, post) => {
+        const hour = new Date(post.createdAt).getHours();
+        acc[hour] = (acc[hour] || 0) + 1;
+        return acc;
+      },
+      {} as Record<number, number>
+    );
 
     // Engagement rate
     const totalEngagement = commentCount + postCount;
-    const engagementRate = memberCount > 0 
-      ? ((totalEngagement / memberCount) * 100).toFixed(2)
-      : "0";
+    const engagementRate =
+      memberCount > 0 ? ((totalEngagement / memberCount) * 100).toFixed(2) : "0";
 
     return {
       success: true,
@@ -307,9 +309,7 @@ export async function getEngagementAnalytics(communityId: string) {
           },
         },
       },
-      orderBy: [
-        { viewCount: "desc" },
-      ],
+      orderBy: [{ viewCount: "desc" }],
       take: 10,
     });
 
@@ -486,7 +486,9 @@ export async function getLiveCommunityHealthMetrics(communityId?: string) {
     ]);
 
     const uniqueAttendeesCount = attendeeRows.length;
-    const returningAttendeesCount = attendeeRows.filter((row) => (row._count?.userId || 0) > 1).length;
+    const returningAttendeesCount = attendeeRows.filter(
+      (row) => (row._count?.userId || 0) > 1
+    ).length;
     const returningAttendeesRate =
       uniqueAttendeesCount > 0
         ? Math.round((returningAttendeesCount / uniqueAttendeesCount) * 100)
@@ -499,9 +501,7 @@ export async function getLiveCommunityHealthMetrics(communityId?: string) {
 
     const feedActiveMembersCount = feedActiveSet.size;
     const feedParticipationRate =
-      activeMembersCount > 0
-        ? Math.round((feedActiveMembersCount / activeMembersCount) * 100)
-        : 0;
+      activeMembersCount > 0 ? Math.round((feedActiveMembersCount / activeMembersCount) * 100) : 0;
 
     return {
       success: true,
@@ -565,7 +565,15 @@ export async function getNorthStarDecisionSnapshot(communityId?: string) {
     const now = new Date();
     const last7Days = subDays(now, 7);
 
-    const [activeMembersCount, postUsers, commentUsers, participationRows, completedSessions7d, recordingBackedSessions, attendeeRows] = await Promise.all([
+    const [
+      activeMembersCount,
+      postUsers,
+      commentUsers,
+      participationRows,
+      completedSessions7d,
+      recordingBackedSessions,
+      attendeeRows,
+    ] = await Promise.all([
       prisma.member.count({
         where: {
           communityId: { in: communityIds },
@@ -646,7 +654,14 @@ export async function getNorthStarDecisionSnapshot(communityId?: string) {
       : 0;
 
     const feedParticipationRate = activeMembersCount
-      ? Math.round((postUsers.length + commentUsers.length > 0 ? new Set([...postUsers.map((p) => p.authorId), ...commentUsers.map((c) => c.authorId)]).size : 0) / activeMembersCount * 100)
+      ? Math.round(
+          ((postUsers.length + commentUsers.length > 0
+            ? new Set([...postUsers.map((p) => p.authorId), ...commentUsers.map((c) => c.authorId)])
+                .size
+            : 0) /
+            activeMembersCount) *
+            100
+        )
       : 0;
 
     const contentReuseRate = completedSessions7d.length

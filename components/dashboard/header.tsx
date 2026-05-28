@@ -50,7 +50,12 @@ export function DashboardHeader() {
 
         <div className="flex items-center space-x-3">
           <Link href="/dashboard/messages">
-            <Button variant="ghost" size="icon" className="relative" aria-label={t("navigation.messages")}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative"
+              aria-label={t("navigation.messages")}
+            >
               <MessageSquare className="h-5 w-5" />
             </Button>
           </Link>
@@ -70,7 +75,10 @@ export function DashboardHeader() {
                 </div>
 
                 <Avatar className="h-10 w-10 cursor-pointer ring-2 ring-border transition-all hover:ring-primary">
-                  <AvatarImage src={user?.image || undefined} alt={user?.name || t("navigation.profile")} />
+                  <AvatarImage
+                    src={user?.image || undefined}
+                    alt={user?.name || t("navigation.profile")}
+                  />
                   <AvatarFallback className="bg-gradient-to-br from-purple-600 to-pink-600 font-semibold text-white">
                     {getInitials(user?.name)}
                   </AvatarFallback>

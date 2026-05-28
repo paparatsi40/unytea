@@ -14,10 +14,7 @@ export async function GET() {
     const session = await auth();
 
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
@@ -33,9 +30,7 @@ export async function GET() {
     }
 
     // Check account status with Stripe
-    const account = await stripe.accounts.retrieve(
-      user.stripeConnectAccountId
-    );
+    const account = await stripe.accounts.retrieve(user.stripeConnectAccountId);
 
     const isActive =
       account.capabilities?.card_payments === "active" &&
@@ -49,9 +44,6 @@ export async function GET() {
     });
   } catch (error) {
     console.error("Error checking Stripe Connect status:", error);
-    return NextResponse.json(
-      { error: "Failed to check status" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to check status" }, { status: 500 });
   }
 }

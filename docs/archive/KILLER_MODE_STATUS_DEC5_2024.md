@@ -913,9 +913,9 @@ Total: 32-44 hours (4-5 days)
 Tell the AI:
 
 ```
-"I'm continuing the Unytea project. We're in KILLER MODE - 
-eliminating all placeholders. Read KILLER_MODE_STATUS_DEC5_2024.md 
-for full context. We're at 96% complete. Next priority: 
+"I'm continuing the Unytea project. We're in KILLER MODE -
+eliminating all placeholders. Read KILLER_MODE_STATUS_DEC5_2024.md
+for full context. We're at 96% complete. Next priority:
 [choose from list above]."
 ```
 

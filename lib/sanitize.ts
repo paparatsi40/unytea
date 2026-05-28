@@ -9,17 +9,32 @@ import sanitizeHtml from "sanitize-html";
  */
 const ALLOWED_TAGS = [
   // Structure
-  "p", "br", "hr",
+  "p",
+  "br",
+  "hr",
   // Inline formatting
-  "strong", "em", "u", "s", "code",
+  "strong",
+  "em",
+  "u",
+  "s",
+  "code",
   // Headings
-  "h1", "h2", "h3", "h4", "h5", "h6",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
   // Lists
-  "ul", "ol", "li",
+  "ul",
+  "ol",
+  "li",
   // Block quotes / code blocks
-  "blockquote", "pre",
+  "blockquote",
+  "pre",
   // Links and images
-  "a", "img",
+  "a",
+  "img",
 ];
 
 /**

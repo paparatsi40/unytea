@@ -66,9 +66,9 @@ export const PLAN_LIMITS: Record<PlatformPlan, PlanLimits> = {
 
 export function getPlanFromPriceId(priceId: string): PlatformPlan | null {
   const priceMap: Record<string, PlatformPlan> = {
-    [process.env.NEXT_PUBLIC_STRIPE_CREATOR_PRICE_ID ?? ""]:  "CREATOR",
+    [process.env.NEXT_PUBLIC_STRIPE_CREATOR_PRICE_ID ?? ""]: "CREATOR",
     [process.env.NEXT_PUBLIC_STRIPE_BUSINESS_PRICE_ID ?? ""]: "BUSINESS",
-    [process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID ?? ""]:      "PRO",
+    [process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID ?? ""]: "PRO",
   };
   return priceMap[priceId] ?? null;
 }

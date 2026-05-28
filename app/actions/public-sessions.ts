@@ -27,13 +27,19 @@ function safeParseResources(value: string | null): any[] {
 function safeParseChapters(value: string | null): { title: string; timestamp?: string }[] {
   return safeParseResources(value)
     .filter((r) => r?.type === "chapter" && typeof r?.title === "string")
-    .map((r) => ({ title: r.title as string, timestamp: typeof r.timestamp === "string" ? r.timestamp : undefined }));
+    .map((r) => ({
+      title: r.title as string,
+      timestamp: typeof r.timestamp === "string" ? r.timestamp : undefined,
+    }));
 }
 
 function safeParseQuotes(value: string | null): { text: string; reason?: string }[] {
   return safeParseResources(value)
     .filter((r) => r?.type === "quote" && typeof r?.text === "string")
-    .map((r) => ({ text: r.text as string, reason: typeof r.reason === "string" ? r.reason : undefined }));
+    .map((r) => ({
+      text: r.text as string,
+      reason: typeof r.reason === "string" ? r.reason : undefined,
+    }));
 }
 
 export interface PublicSessionData {
@@ -261,22 +267,20 @@ export async function getRelatedSessions(
 }
 
 // Alias for compatibility with existing code
-export async function getPublicSessionBySlug(
-  slug: string
-): Promise<any | null> {
+export async function getPublicSessionBySlug(slug: string): Promise<any | null> {
   const result = await getPublicSession(slug);
   if (!result.success || !result.session) return null;
-  
-      // Transform to legacy format expected by other components
-    const session = result.session;
-    return {
-      ...session,
-      mentor: session.host,
-      community: {
-        ...session.community,
-        imageUrl: session.community.imageUrl,
-      },
-    };
+
+  // Transform to legacy format expected by other components
+  const session = result.session;
+  return {
+    ...session,
+    mentor: session.host,
+    community: {
+      ...session.community,
+      imageUrl: session.community.imageUrl,
+    },
+  };
 }
 
 // For sitemap generation

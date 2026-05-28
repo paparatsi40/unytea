@@ -39,11 +39,7 @@ export const getStripeSession = async ({
   return session;
 };
 
-export const createStripeCustomerPortal = async ({
-  customerId,
-}: {
-  customerId: string;
-}) => {
+export const createStripeCustomerPortal = async ({ customerId }: { customerId: string }) => {
   const portalSession = await stripe.billingPortal.sessions.create({
     customer: customerId,
     return_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/settings/billing`,
@@ -66,9 +62,7 @@ export const getOrCreateStripeCustomer = async ({
     limit: 1,
   });
 
-  const existingCustomer = customers.data.find(
-    (customer) => customer.metadata?.userId === userId
-  );
+  const existingCustomer = customers.data.find((customer) => customer.metadata?.userId === userId);
 
   if (existingCustomer) {
     return existingCustomer;

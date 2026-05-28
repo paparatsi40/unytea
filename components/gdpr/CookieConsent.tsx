@@ -22,25 +22,28 @@ const PREFERENCES_KEY = "unytea-cookie-preferences";
 const SUPPORTED = ["en", "es", "fr"] as const;
 type SupportedLocale = (typeof SUPPORTED)[number];
 
-const TRANSLATIONS: Record<SupportedLocale, {
-  title: string;
-  description: string;
-  learnMore: string;
-  acceptAll: string;
-  rejectNonEssential: string;
-  customize: string;
-  settingsTitle: string;
-  closeAria: string;
-  necessary: string;
-  necessaryDesc: string;
-  functional: string;
-  functionalDesc: string;
-  analytics: string;
-  analyticsDesc: string;
-  savePreferences: string;
-  toggleFunctionalAria: string;
-  toggleAnalyticsAria: string;
-}> = {
+const TRANSLATIONS: Record<
+  SupportedLocale,
+  {
+    title: string;
+    description: string;
+    learnMore: string;
+    acceptAll: string;
+    rejectNonEssential: string;
+    customize: string;
+    settingsTitle: string;
+    closeAria: string;
+    necessary: string;
+    necessaryDesc: string;
+    functional: string;
+    functionalDesc: string;
+    analytics: string;
+    analyticsDesc: string;
+    savePreferences: string;
+    toggleFunctionalAria: string;
+    toggleAnalyticsAria: string;
+  }
+> = {
   en: {
     title: "Cookie Preferences",
     description:
@@ -55,8 +58,7 @@ const TRANSLATIONS: Record<SupportedLocale, {
     necessaryDesc:
       "Authentication, security, and core platform functionality. These cannot be disabled.",
     functional: "Functional",
-    functionalDesc:
-      "Language preferences, theme settings, and interface customizations.",
+    functionalDesc: "Language preferences, theme settings, and interface customizations.",
     analytics: "Performance & Analytics",
     analyticsDesc:
       "Aggregated usage data to help us understand how the platform is used and improve the experience.",
@@ -78,8 +80,7 @@ const TRANSLATIONS: Record<SupportedLocale, {
     necessaryDesc:
       "Autenticación, seguridad y funcionalidad esencial de la plataforma. No se pueden desactivar.",
     functional: "Funcionales",
-    functionalDesc:
-      "Preferencias de idioma, ajustes de tema y personalizaciones de la interfaz.",
+    functionalDesc: "Preferencias de idioma, ajustes de tema y personalizaciones de la interfaz.",
     analytics: "Rendimiento y análisis",
     analyticsDesc:
       "Datos de uso agregados que nos ayudan a entender cómo se usa la plataforma y mejorar la experiencia.",
@@ -133,9 +134,7 @@ function saveConsent(preferences: CookiePreferences) {
   localStorage.setItem(PREFERENCES_KEY, JSON.stringify(preferences));
 
   // Dispatch custom event so other parts of the app can react
-  window.dispatchEvent(
-    new CustomEvent("cookie-consent-updated", { detail: preferences })
-  );
+  window.dispatchEvent(new CustomEvent("cookie-consent-updated", { detail: preferences }));
 }
 
 function useLocaleFromPath(): SupportedLocale {
@@ -202,21 +201,18 @@ export function CookieConsent() {
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-0 inset-x-0 z-[9999] p-4 sm:p-6">
-      <div className="mx-auto max-w-2xl rounded-xl border bg-background/95 backdrop-blur-md shadow-2xl">
+    <div className="fixed inset-x-0 bottom-0 z-[9999] p-4 sm:p-6">
+      <div className="mx-auto max-w-2xl rounded-xl border bg-background/95 shadow-2xl backdrop-blur-md">
         {/* Main banner */}
         {!showSettings && (
           <div className="p-5 sm:p-6">
-            <div className="flex items-start gap-3 mb-4">
-              <Shield className="w-5 h-5 text-primary mt-0.5 shrink-0" />
+            <div className="mb-4 flex items-start gap-3">
+              <Shield className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
               <div>
-                <h3 className="font-semibold text-sm mb-1">{t.title}</h3>
+                <h3 className="mb-1 text-sm font-semibold">{t.title}</h3>
                 <p className="text-sm text-muted-foreground">
                   {t.description}{" "}
-                  <Link
-                    href={`/${locale}/cookies`}
-                    className="text-primary hover:underline"
-                  >
+                  <Link href={`/${locale}/cookies`} className="text-primary hover:underline">
                     {t.learnMore}
                   </Link>
                 </p>
@@ -226,21 +222,21 @@ export function CookieConsent() {
             <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={handleAcceptAll}
-                className="inline-flex items-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+                className="inline-flex items-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
               >
                 {t.acceptAll}
               </button>
               <button
                 onClick={handleRejectNonEssential}
-                className="inline-flex items-center rounded-lg border bg-background px-4 py-2 text-sm font-medium hover:bg-muted transition-colors"
+                className="inline-flex items-center rounded-lg border bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-muted"
               >
                 {t.rejectNonEssential}
               </button>
               <button
                 onClick={() => setShowSettings(true)}
-                className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
               >
-                <Settings2 className="w-3.5 h-3.5" />
+                <Settings2 className="h-3.5 w-3.5" />
                 {t.customize}
               </button>
             </div>
@@ -250,9 +246,9 @@ export function CookieConsent() {
         {/* Granular settings */}
         {showSettings && (
           <div className="p-5 sm:p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-sm flex items-center gap-2">
-                <Settings2 className="w-4 h-4 text-primary" />
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="flex items-center gap-2 text-sm font-semibold">
+                <Settings2 className="h-4 w-4 text-primary" />
                 {t.settingsTitle}
               </h3>
               <button
@@ -260,22 +256,20 @@ export function CookieConsent() {
                 className="text-muted-foreground hover:text-foreground"
                 aria-label={t.closeAria}
               >
-                <X className="w-4 h-4" />
+                <X className="h-4 w-4" />
               </button>
             </div>
 
-            <div className="space-y-4 mb-5">
+            <div className="mb-5 space-y-4">
               {/* Necessary - always on */}
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-sm font-medium">{t.necessary}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {t.necessaryDesc}
-                  </p>
+                  <p className="text-xs text-muted-foreground">{t.necessaryDesc}</p>
                 </div>
-                <div className="shrink-0 mt-0.5">
-                  <div className="w-10 h-5 rounded-full bg-primary relative cursor-not-allowed opacity-70">
-                    <div className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-white" />
+                <div className="mt-0.5 shrink-0">
+                  <div className="relative h-5 w-10 cursor-not-allowed rounded-full bg-primary opacity-70">
+                    <div className="absolute right-0.5 top-0.5 h-4 w-4 rounded-full bg-white" />
                   </div>
                 </div>
               </div>
@@ -284,9 +278,7 @@ export function CookieConsent() {
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-sm font-medium">{t.functional}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {t.functionalDesc}
-                  </p>
+                  <p className="text-xs text-muted-foreground">{t.functionalDesc}</p>
                 </div>
                 <button
                   onClick={() =>
@@ -295,18 +287,18 @@ export function CookieConsent() {
                       functional: !p.functional,
                     }))
                   }
-                  className="shrink-0 mt-0.5"
+                  className="mt-0.5 shrink-0"
                   role="switch"
                   aria-checked={preferences.functional}
                   aria-label={t.toggleFunctionalAria}
                 >
                   <div
-                    className={`w-10 h-5 rounded-full relative transition-colors ${
+                    className={`relative h-5 w-10 rounded-full transition-colors ${
                       preferences.functional ? "bg-primary" : "bg-muted-foreground/30"
                     }`}
                   >
                     <div
-                      className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${
+                      className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition-all ${
                         preferences.functional ? "right-0.5" : "left-0.5"
                       }`}
                     />
@@ -318,9 +310,7 @@ export function CookieConsent() {
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-sm font-medium">{t.analytics}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {t.analyticsDesc}
-                  </p>
+                  <p className="text-xs text-muted-foreground">{t.analyticsDesc}</p>
                 </div>
                 <button
                   onClick={() =>
@@ -329,18 +319,18 @@ export function CookieConsent() {
                       analytics: !p.analytics,
                     }))
                   }
-                  className="shrink-0 mt-0.5"
+                  className="mt-0.5 shrink-0"
                   role="switch"
                   aria-checked={preferences.analytics}
                   aria-label={t.toggleAnalyticsAria}
                 >
                   <div
-                    className={`w-10 h-5 rounded-full relative transition-colors ${
+                    className={`relative h-5 w-10 rounded-full transition-colors ${
                       preferences.analytics ? "bg-primary" : "bg-muted-foreground/30"
                     }`}
                   >
                     <div
-                      className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${
+                      className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition-all ${
                         preferences.analytics ? "right-0.5" : "left-0.5"
                       }`}
                     />
@@ -352,13 +342,13 @@ export function CookieConsent() {
             <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={handleSavePreferences}
-                className="inline-flex items-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+                className="inline-flex items-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
               >
                 {t.savePreferences}
               </button>
               <button
                 onClick={handleAcceptAll}
-                className="inline-flex items-center rounded-lg border bg-background px-4 py-2 text-sm font-medium hover:bg-muted transition-colors"
+                className="inline-flex items-center rounded-lg border bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-muted"
               >
                 {t.acceptAll}
               </button>

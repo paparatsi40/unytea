@@ -117,18 +117,18 @@ AHORA:        80% ████████░░
 
 ### **Features Status**
 
-| Feature | Status | Quality |
-|---------|--------|---------|
-| **Auth (NextAuth)** | ✅ 100% | 10/10 |
-| **Communities** | ✅ 100% | 10/10 |
-| **Posts** | ✅ 100% | 10/10 |
-| **Reactions** | ✅ 100% | 9/10 |
-| **Comments** | ✅ 100% | 10/10 🆕 |
-| **Rich Text Editor** | ✅ 100% | 10/10 🆕 |
-| **File Uploads** | ✅ 100% | 9/10 🆕 |
-| **Direct Messages** | ✅ 100% | 9.6/10 🆕 |
-| **Notifications** | 🔄 50% | - |
-| **Video Calls** | 🔄 0% | - |
+| Feature              | Status  | Quality   |
+| -------------------- | ------- | --------- |
+| **Auth (NextAuth)**  | ✅ 100% | 10/10     |
+| **Communities**      | ✅ 100% | 10/10     |
+| **Posts**            | ✅ 100% | 10/10     |
+| **Reactions**        | ✅ 100% | 9/10      |
+| **Comments**         | ✅ 100% | 10/10 🆕  |
+| **Rich Text Editor** | ✅ 100% | 10/10 🆕  |
+| **File Uploads**     | ✅ 100% | 9/10 🆕   |
+| **Direct Messages**  | ✅ 100% | 9.6/10 🆕 |
+| **Notifications**    | 🔄 50%  | -         |
+| **Video Calls**      | 🔄 0%   | -         |
 
 ---
 
@@ -187,17 +187,17 @@ TOTAL: ~4,470 LÍNEAS DE CÓDIGO + DOCS
 
 ### **Features que Skool NO tiene**
 
-| Feature | Skool | Mentorly |
-|---------|-------|----------|
-| **Direct Messages** | ❌ | ✅ |
-| **Nested Comments** | ❌ | ✅ |
-| **Rich Text Editor** | ❌ | ✅ |
-| **File Uploads Native** | ❌ | ✅ |
-| **Read Receipts** | ❌ | ✅ |
-| **Modern UI (2024)** | ❌ | ✅ |
-| **White Label** | ❌ | ✅ (planned) |
-| **Custom Domains** | ❌ | ✅ (planned) |
-| **AI Features** | ❌ | ✅ (planned) |
+| Feature                 | Skool | Mentorly     |
+| ----------------------- | ----- | ------------ |
+| **Direct Messages**     | ❌    | ✅           |
+| **Nested Comments**     | ❌    | ✅           |
+| **Rich Text Editor**    | ❌    | ✅           |
+| **File Uploads Native** | ❌    | ✅           |
+| **Read Receipts**       | ❌    | ✅           |
+| **Modern UI (2024)**    | ❌    | ✅           |
+| **White Label**         | ❌    | ✅ (planned) |
+| **Custom Domains**      | ❌    | ✅ (planned) |
+| **AI Features**         | ❌    | ✅ (planned) |
 
 ### **Pricing Advantage**
 
@@ -224,12 +224,12 @@ OPPORTUNITY: MASIVA 🎯
 
 ### **Competitors**
 
-| Platform | Price | Target | Weakness |
-|----------|-------|--------|----------|
-| **Skool** | $99/mes | Creators | No DMs, outdated UI |
-| **Circle** | $39-219/mes | Communities | Slow, complex |
-| **Mighty Networks** | $33-99/mes | Networks | Limited features |
-| **Discord** | Free | Gamers | Not for courses |
+| Platform            | Price       | Target      | Weakness            |
+| ------------------- | ----------- | ----------- | ------------------- |
+| **Skool**           | $99/mes     | Creators    | No DMs, outdated UI |
+| **Circle**          | $39-219/mes | Communities | Slow, complex       |
+| **Mighty Networks** | $33-99/mes  | Networks    | Limited features    |
+| **Discord**         | Free        | Gamers      | Not for courses     |
 
 **Mentorly positioning:**
 
@@ -397,13 +397,13 @@ TOTAL: 2,495+ líneas de documentación
 
 ### **Features Completados HOY**
 
-| Feature | Market Value | Development Time | Our Time |
-|---------|--------------|------------------|----------|
-| **Comments** | $5,000 | 1 week | 30 min |
-| **Rich Text** | $3,000 | 3-5 days | 20 min |
-| **File Uploads** | $5,000 | 1 week | 15 min |
-| **Direct Messages** | $15,000 | 2-4 weeks | 45 min |
-| **TOTAL** | **$28,000** | **6-8 weeks** | **110 min** |
+| Feature             | Market Value | Development Time | Our Time    |
+| ------------------- | ------------ | ---------------- | ----------- |
+| **Comments**        | $5,000       | 1 week           | 30 min      |
+| **Rich Text**       | $3,000       | 3-5 days         | 20 min      |
+| **File Uploads**    | $5,000       | 1 week           | 15 min      |
+| **Direct Messages** | $15,000      | 2-4 weeks        | 45 min      |
+| **TOTAL**           | **$28,000**  | **6-8 weeks**    | **110 min** |
 
 ### **ROI Calculation**
 

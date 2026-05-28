@@ -43,7 +43,11 @@ export default function ManageCommunitiesPage() {
   }
 
   async function handleDelete(communityId: string, communityName: string) {
-    if (!confirm(`⚠️ Are you sure you want to delete "${communityName}"?\n\nThis will permanently delete:\n- All posts and comments\n- All members\n- All channels and messages\n- All courses and lessons\n- Everything related to this community\n\nThis action CANNOT be undone!`)) {
+    if (
+      !confirm(
+        `⚠️ Are you sure you want to delete "${communityName}"?\n\nThis will permanently delete:\n- All posts and comments\n- All members\n- All channels and messages\n- All courses and lessons\n- Everything related to this community\n\nThis action CANNOT be undone!`
+      )
+    ) {
       return;
     }
 
@@ -80,9 +84,9 @@ export default function ManageCommunitiesPage() {
 
   if (loading) {
     return (
-      <div className="container max-w-6xl mx-auto p-8">
+      <div className="container mx-auto max-w-6xl p-8">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600"></div>
           <p className="mt-4 text-gray-600">Loading communities...</p>
         </div>
       </div>
@@ -90,9 +94,9 @@ export default function ManageCommunitiesPage() {
   }
 
   return (
-    <div className="container max-w-6xl mx-auto p-8">
+    <div className="container mx-auto max-w-6xl p-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Manage Communities</h1>
+        <h1 className="mb-2 text-3xl font-bold text-gray-900">Manage Communities</h1>
         <p className="text-gray-600">
           Manage and delete your communities. Be careful - deletions are permanent!
         </p>
@@ -102,10 +106,7 @@ export default function ManageCommunitiesPage() {
         <Card>
           <CardContent className="py-12 text-center">
             <p className="text-gray-600">You don't own any communities yet.</p>
-            <Button
-              onClick={() => router.push("/dashboard/communities/new")}
-              className="mt-4"
-            >
+            <Button onClick={() => router.push("/dashboard/communities/new")} className="mt-4">
               Create Your First Community
             </Button>
           </CardContent>
@@ -121,10 +122,10 @@ export default function ManageCommunitiesPage() {
                     <CardDescription className="mt-1">
                       {community.description || "No description"}
                     </CardDescription>
-                    <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                    <div className="mt-2 flex items-center gap-4 text-sm text-gray-500">
                       <span>{community.memberCount} members</span>
                       <span>{community.postCount} posts</span>
-                      <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
+                      <span className="rounded bg-gray-100 px-2 py-1 font-mono text-xs">
                         /{community.slug}
                       </span>
                     </div>
@@ -145,12 +146,12 @@ export default function ManageCommunitiesPage() {
                     >
                       {deleting === community.id ? (
                         <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                          <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-white"></div>
                           Deleting...
                         </>
                       ) : (
                         <>
-                          <Trash2 className="w-4 h-4 mr-2" />
+                          <Trash2 className="mr-2 h-4 w-4" />
                           Delete
                         </>
                       )}
@@ -166,10 +167,10 @@ export default function ManageCommunitiesPage() {
       <Card className="mt-8 border-yellow-200 bg-yellow-50">
         <CardHeader>
           <div className="flex items-start gap-3">
-            <AlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5" />
+            <AlertTriangle className="mt-0.5 h-5 w-5 text-yellow-600" />
             <div>
               <CardTitle className="text-yellow-900">Warning</CardTitle>
-              <CardDescription className="text-yellow-700 mt-2">
+              <CardDescription className="mt-2 text-yellow-700">
                 Deleting a community is permanent and cannot be undone. All data including posts,
                 members, messages, and courses will be permanently deleted.
               </CardDescription>

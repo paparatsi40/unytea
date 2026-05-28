@@ -39,12 +39,7 @@ export function LocalVideo({ className, cameraTrack, isCameraEnabled }: LocalVid
     return (
       <div className={`flex h-full w-full items-center justify-center bg-zinc-900 ${className}`}>
         <div className="flex flex-col items-center gap-4 text-zinc-500">
-          <svg
-            className="h-20 w-20"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg className="h-20 w-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -54,9 +49,7 @@ export function LocalVideo({ className, cameraTrack, isCameraEnabled }: LocalVid
           </svg>
           <div className="text-center">
             <p className="text-lg font-medium text-zinc-300">Camera is off</p>
-            <p className="mt-1 text-sm text-zinc-500">
-              Turn on your camera to start the session
-            </p>
+            <p className="mt-1 text-sm text-zinc-500">Turn on your camera to start the session</p>
           </div>
         </div>
       </div>

@@ -14,10 +14,7 @@ export const metadata = {
 async function getRecordedSessions(userId: string) {
   const sessions = await prisma.mentorSession.findMany({
     where: {
-      OR: [
-        { mentorId: userId },
-        { menteeId: userId },
-      ],
+      OR: [{ mentorId: userId }, { menteeId: userId }],
       status: "COMPLETED",
       recordingUrl: { not: null },
     },
@@ -146,9 +143,7 @@ export default async function RecordingsLibraryPage() {
             </div>
             <div>
               <p className="text-2xl font-bold text-foreground">
-                {Math.round(
-                  recordings.reduce((acc, r) => acc + (r.duration || 0), 0) / 60
-                )}h
+                {Math.round(recordings.reduce((acc, r) => acc + (r.duration || 0), 0) / 60)}h
               </p>
               <p className="text-xs text-muted-foreground">Total content</p>
             </div>
@@ -176,9 +171,7 @@ export default async function RecordingsLibraryPage() {
           <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
             <Video className="h-8 w-8 text-muted-foreground" />
           </div>
-          <h3 className="mb-2 text-lg font-semibold text-foreground">
-            No recordings yet
-          </h3>
+          <h3 className="mb-2 text-lg font-semibold text-foreground">No recordings yet</h3>
           <p className="mb-6 text-sm text-muted-foreground">
             Start a live session and record it to build your library
           </p>
@@ -220,10 +213,8 @@ export default async function RecordingsLibraryPage() {
 
               {/* Info */}
               <div className="p-4">
-                <h3 className="font-semibold text-foreground line-clamp-1">
-                  {recording.title}
-                </h3>
-                <p className="mt-1 text-sm text-muted-foreground line-clamp-1">
+                <h3 className="line-clamp-1 font-semibold text-foreground">{recording.title}</h3>
+                <p className="mt-1 line-clamp-1 text-sm text-muted-foreground">
                   {recording.description || "No description"}
                 </p>
 
@@ -261,7 +252,9 @@ export default async function RecordingsLibraryPage() {
                 <div className="mt-2">
                   <RecordingDistributionActions
                     recordingUrl={recording.recording?.url || recording.recordingUrl || null}
-                    publicUrl={recording.slug ? `https://www.unytea.com/sessions/${recording.slug}` : null}
+                    publicUrl={
+                      recording.slug ? `https://www.unytea.com/sessions/${recording.slug}` : null
+                    }
                     title={recording.title}
                   />
                 </div>

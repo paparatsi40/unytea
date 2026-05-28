@@ -112,7 +112,7 @@ export default function KnowledgeLibraryPage() {
 
   if (isAuthLoading || loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
           <p className="text-muted-foreground">Loading your knowledge library...</p>
@@ -134,28 +134,31 @@ export default function KnowledgeLibraryPage() {
     .slice(0, 5);
 
   const keyTopics = Object.entries(
-    sessions.reduce((acc, session) => {
-      const title = (session.title || "").toLowerCase();
-      const candidates = [
-        "marketing",
-        "sales",
-        "product",
-        "engineering",
-        "leadership",
-        "finance",
-        "strategy",
-        "operations",
-        "ai",
-      ];
+    sessions.reduce(
+      (acc, session) => {
+        const title = (session.title || "").toLowerCase();
+        const candidates = [
+          "marketing",
+          "sales",
+          "product",
+          "engineering",
+          "leadership",
+          "finance",
+          "strategy",
+          "operations",
+          "ai",
+        ];
 
-      for (const topic of candidates) {
-        if (title.includes(topic)) {
-          acc[topic] = (acc[topic] || 0) + 1;
+        for (const topic of candidates) {
+          if (title.includes(topic)) {
+            acc[topic] = (acc[topic] || 0) + 1;
+          }
         }
-      }
 
-      return acc;
-    }, {} as Record<string, number>)
+        return acc;
+      },
+      {} as Record<string, number>
+    )
   )
     .sort((a, b) => b[1] - a[1])
     .slice(0, 8);
@@ -167,7 +170,7 @@ export default function KnowledgeLibraryPage() {
         <div className="mx-auto max-w-7xl">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+              <h1 className="flex items-center gap-2 text-2xl font-bold text-foreground">
                 <BookOpen className="h-6 w-6 text-purple-500" />
                 Knowledge Library
               </h1>
@@ -177,7 +180,7 @@ export default function KnowledgeLibraryPage() {
             </div>
             <Button
               onClick={() => setShowCreateDialog(true)}
-              className="bg-purple-600 hover:bg-purple-700 gap-2 text-white"
+              className="gap-2 bg-purple-600 text-white hover:bg-purple-700"
               disabled={!hasConvertibleSessions}
             >
               <Sparkles className="h-4 w-4" />
@@ -191,7 +194,7 @@ export default function KnowledgeLibraryPage() {
         {/* CTA CARDS - Growth Driven */}
         {hasSuggestions && (
           <section className="mb-8">
-            <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+            <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-foreground">
               <Sparkles className="h-5 w-5 text-amber-500" />
               Course Potential
             </h2>
@@ -199,42 +202,49 @@ export default function KnowledgeLibraryPage() {
               {suggestions.map((suggestion, index) => (
                 <Card
                   key={index}
-                  className="bg-card border-border hover:border-purple-500/50 transition-all cursor-pointer group"
+                  className="group cursor-pointer border-border bg-card transition-all hover:border-purple-500/50"
                   onClick={() => setShowCreateDialog(true)}
                 >
                   <CardContent className="p-5">
                     <div className="flex items-start justify-between">
                       <div>
-                        <h3 className="font-semibold text-foreground group-hover:text-purple-400 transition-colors">
+                        <h3 className="font-semibold text-foreground transition-colors group-hover:text-purple-400">
                           {suggestion.title}
                         </h3>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {suggestion.sessionCount} sessions • {Math.round(suggestion.totalDuration / 60)}h total
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          {suggestion.sessionCount} sessions •{" "}
+                          {Math.round(suggestion.totalDuration / 60)}h total
                         </p>
                       </div>
                       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-500/10 text-purple-500">
                         <TrendingUp className="h-5 w-5" />
                       </div>
                     </div>
-                    
+
                     <div className="mt-4 space-y-3">
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-muted-foreground">Potential students</span>
-                        <span className="font-medium text-foreground">{suggestion.potentialStudents}</span>
+                        <span className="font-medium text-foreground">
+                          {suggestion.potentialStudents}
+                        </span>
                       </div>
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-muted-foreground">Total attendees</span>
-                        <span className="font-medium text-foreground">{suggestion.totalAttendees}</span>
+                        <span className="font-medium text-foreground">
+                          {suggestion.totalAttendees}
+                        </span>
                       </div>
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-muted-foreground">Engagement score</span>
-                        <span className="font-medium text-green-400">{suggestion.avgEngagement}/100</span>
+                        <span className="font-medium text-green-400">
+                          {suggestion.avgEngagement}/100
+                        </span>
                       </div>
                     </div>
 
                     <Button
                       variant="ghost"
-                      className="w-full mt-4 text-purple-400 hover:text-purple-300 hover:bg-purple-500/10"
+                      className="mt-4 w-full text-purple-400 hover:bg-purple-500/10 hover:text-purple-300"
                     >
                       Create Course
                       <ArrowRight className="ml-2 h-4 w-4" />
@@ -249,40 +259,41 @@ export default function KnowledgeLibraryPage() {
         {/* KNOWLEDGE IMPACT STATS */}
         {stats && (
           <section className="mb-8">
-            <h2 className="text-lg font-semibold text-foreground mb-4">Your Knowledge Impact</h2>
+            <h2 className="mb-4 text-lg font-semibold text-foreground">Your Knowledge Impact</h2>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              <Card className="bg-card border-border">
+              <Card className="border-border bg-card">
                 <CardContent className="p-5">
                   <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500/10 text-blue-500">
                       <Video className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="text-2xl font-bold text-foreground">{stats.completedSessions}</p>
+                      <p className="text-2xl font-bold text-foreground">
+                        {stats.completedSessions}
+                      </p>
                       <p className="text-sm text-muted-foreground">Sessions recorded</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-card border-border">
+              <Card className="border-border bg-card">
                 <CardContent className="p-5">
                   <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-500/10 text-purple-500">
                       <GraduationCap className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="text-2xl font-bold text-foreground">{stats.coursesFromSessions}</p>
+                      <p className="text-2xl font-bold text-foreground">
+                        {stats.coursesFromSessions}
+                      </p>
                       <p className="text-sm text-muted-foreground">Courses created</p>
                     </div>
                   </div>
                   {stats?.totalCourses > 0 && (
                     <div className="mt-3">
-                      <Progress 
-                        value={stats?.conversionRate} 
-                        className="h-1.5 bg-muted"
-                      />
-                      <p className="text-xs text-muted-foreground mt-1">
+                      <Progress value={stats?.conversionRate} className="h-1.5 bg-muted" />
+                      <p className="mt-1 text-xs text-muted-foreground">
                         {stats?.conversionRate}% conversion rate
                       </p>
                     </div>
@@ -290,7 +301,7 @@ export default function KnowledgeLibraryPage() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-card border-border">
+              <Card className="border-border bg-card">
                 <CardContent className="p-5">
                   <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-500/10 text-green-500">
@@ -304,7 +315,7 @@ export default function KnowledgeLibraryPage() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-card border-border">
+              <Card className="border-border bg-card">
                 <CardContent className="p-5">
                   <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-500/10 text-amber-500">
@@ -324,20 +335,26 @@ export default function KnowledgeLibraryPage() {
         {/* CURATED DISCOVERY */}
         {hasConvertibleSessions && (
           <section className="mb-8 grid gap-4 md:grid-cols-3">
-            <Card className="bg-card border-border md:col-span-2">
+            <Card className="border-border bg-card md:col-span-2">
               <CardContent className="p-5">
-                <h2 className="text-lg font-semibold text-foreground mb-3">Best Sessions</h2>
+                <h2 className="mb-3 text-lg font-semibold text-foreground">Best Sessions</h2>
                 <div className="space-y-3">
                   {bestSessions.map((session) => (
-                    <div key={session.id} className="flex items-center justify-between rounded-lg border border-border bg-card/60 px-3 py-2">
+                    <div
+                      key={session.id}
+                      className="flex items-center justify-between rounded-lg border border-border bg-card/60 px-3 py-2"
+                    >
                       <div>
                         <p className="font-medium text-foreground">{session.title}</p>
                         <p className="text-xs text-muted-foreground">
-                          {session.community?.name || "Community"} • {session._count.participations} attendees
+                          {session.community?.name || "Community"} • {session._count.participations}{" "}
+                          attendees
                         </p>
                       </div>
                       <Link href={`/dashboard/sessions/${session.id}`}>
-                        <Button variant="ghost" size="sm" className="text-purple-400">Open</Button>
+                        <Button variant="ghost" size="sm" className="text-purple-400">
+                          Open
+                        </Button>
                       </Link>
                     </div>
                   ))}
@@ -345,9 +362,9 @@ export default function KnowledgeLibraryPage() {
               </CardContent>
             </Card>
 
-            <Card className="bg-card border-border">
+            <Card className="border-border bg-card">
               <CardContent className="p-5">
-                <h2 className="text-lg font-semibold text-foreground mb-3">Key Topics</h2>
+                <h2 className="mb-3 text-lg font-semibold text-foreground">Key Topics</h2>
                 <div className="flex flex-wrap gap-2">
                   {keyTopics.length > 0 ? (
                     keyTopics.map(([topic, count]) => (
@@ -356,7 +373,9 @@ export default function KnowledgeLibraryPage() {
                       </Badge>
                     ))
                   ) : (
-                    <p className="text-sm text-muted-foreground">Topics will appear as sessions accumulate.</p>
+                    <p className="text-sm text-muted-foreground">
+                      Topics will appear as sessions accumulate.
+                    </p>
                   )}
                 </div>
               </CardContent>
@@ -366,23 +385,29 @@ export default function KnowledgeLibraryPage() {
 
         {hasConvertibleSessions && (
           <section className="mb-8">
-            <div className="flex items-center justify-between mb-4">
+            <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-foreground">Curated Recordings</h2>
               <Link href="/dashboard/recordings">
-                <Button variant="outline" size="sm" className="border-border text-foreground">View recordings</Button>
+                <Button variant="outline" size="sm" className="border-border text-foreground">
+                  View recordings
+                </Button>
               </Link>
             </div>
 
             <div className="grid gap-3 md:grid-cols-2">
               {curatedRecordings.map((session) => (
-                <Card key={session.id} className="bg-card border-border">
-                  <CardContent className="p-4 flex items-center justify-between">
+                <Card key={session.id} className="border-border bg-card">
+                  <CardContent className="flex items-center justify-between p-4">
                     <div>
                       <p className="font-medium text-foreground">{session.title}</p>
-                      <p className="text-xs text-muted-foreground">{session._count.participations} attendees • {session.duration} min</p>
+                      <p className="text-xs text-muted-foreground">
+                        {session._count.participations} attendees • {session.duration} min
+                      </p>
                     </div>
                     <Link href={`/dashboard/sessions/${session.id}`}>
-                      <Button variant="ghost" size="sm" className="text-purple-400">Watch</Button>
+                      <Button variant="ghost" size="sm" className="text-purple-400">
+                        Watch
+                      </Button>
                     </Link>
                   </CardContent>
                 </Card>
@@ -394,17 +419,15 @@ export default function KnowledgeLibraryPage() {
         {/* CONVERTIBLE SESSIONS */}
         {hasConvertibleSessions && (
           <section>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-foreground">
-                Sessions Ready to Convert
-              </h2>
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-foreground">Sessions Ready to Convert</h2>
               <Button
                 variant="outline"
                 size="sm"
                 className="border-border text-foreground"
                 onClick={() => setShowCreateDialog(true)}
               >
-                <Plus className="h-4 w-4 mr-1" />
+                <Plus className="mr-1 h-4 w-4" />
                 Select Multiple
               </Button>
             </div>
@@ -413,14 +436,14 @@ export default function KnowledgeLibraryPage() {
               {sessions.slice(0, 6).map((session) => (
                 <Card
                   key={session.id}
-                  className="bg-card border-border hover:border-border transition-colors"
+                  className="border-border bg-card transition-colors hover:border-border"
                 >
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
                         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
                           {session.mode === "AUDIO" ? (
-                            <span className="text-blue-400 text-xs font-medium">AUDIO</span>
+                            <span className="text-xs font-medium text-blue-400">AUDIO</span>
                           ) : (
                             <Video className="h-4 w-4 text-muted-foreground" />
                           )}
@@ -428,7 +451,8 @@ export default function KnowledgeLibraryPage() {
                         <div>
                           <h3 className="font-medium text-foreground">{session.title}</h3>
                           <p className="text-sm text-muted-foreground">
-                            {session.community?.name} • {session.duration} min • {session._count.participations} attendees
+                            {session.community?.name} • {session.duration} min •{" "}
+                            {session._count.participations} attendees
                           </p>
                         </div>
                       </div>
@@ -470,23 +494,25 @@ export default function KnowledgeLibraryPage() {
 
         {/* EMPTY STATE */}
         {!hasConvertibleSessions && !loading && (
-          <Card className="bg-card border-border">
+          <Card className="border-border bg-card">
             <CardContent className="p-12 text-center">
-              <div className="flex justify-center mb-4">
+              <div className="mb-4 flex justify-center">
                 <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
                   <Video className="h-8 w-8 text-muted-foreground" />
                 </div>
               </div>
-              <h3 className="text-lg font-semibold text-foreground mb-2">
-                {hasRecordedSessions ? "No convertible recordings yet" : "No sessions to convert yet"}
+              <h3 className="mb-2 text-lg font-semibold text-foreground">
+                {hasRecordedSessions
+                  ? "No convertible recordings yet"
+                  : "No sessions to convert yet"}
               </h3>
-              <p className="text-muted-foreground max-w-md mx-auto mb-6">
+              <p className="mx-auto mb-6 max-w-md text-muted-foreground">
                 {hasRecordedSessions
                   ? "You already have completed sessions. Open Recordings to review status and convert those ready for courses."
                   : "Complete live sessions with recordings will appear here, ready to be turned into courses."}
               </p>
               <Link href={hasRecordedSessions ? "/dashboard/recordings" : "/dashboard/sessions"}>
-                <Button className="bg-purple-600 hover:bg-purple-700 text-white">
+                <Button className="bg-purple-600 text-white hover:bg-purple-700">
                   <Plus className="mr-2 h-4 w-4" />
                   {hasRecordedSessions ? "Open Recordings" : "Host Your First Session"}
                 </Button>

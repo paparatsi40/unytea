@@ -67,7 +67,9 @@ export async function GET(req: Request) {
 
   const priceId = getTierPriceId(community.pricing, tier);
   if (!priceId) {
-    return NextResponse.redirect(new URL(`/${locale}/community/${slug}?paywall=1&error=missing_price`, req.url));
+    return NextResponse.redirect(
+      new URL(`/${locale}/community/${slug}?paywall=1&error=missing_price`, req.url)
+    );
   }
 
   const existing = await prisma.member.findFirst({
@@ -79,7 +81,9 @@ export async function GET(req: Request) {
   }
 
   if (!community.owner.stripeConnectAccountId) {
-    return NextResponse.redirect(new URL(`/${locale}/community/${slug}?paywall=1&error=owner_not_connected`, req.url));
+    return NextResponse.redirect(
+      new URL(`/${locale}/community/${slug}?paywall=1&error=owner_not_connected`, req.url)
+    );
   }
 
   const customer = await getOrCreateStripeCustomer({
@@ -119,7 +123,9 @@ export async function GET(req: Request) {
   });
 
   if (!checkout.url) {
-    return NextResponse.redirect(new URL(`/${locale}/community/${slug}?paywall=1&error=checkout_failed`, req.url));
+    return NextResponse.redirect(
+      new URL(`/${locale}/community/${slug}?paywall=1&error=checkout_failed`, req.url)
+    );
   }
 
   return NextResponse.redirect(checkout.url);

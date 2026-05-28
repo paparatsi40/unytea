@@ -50,7 +50,9 @@ export default function AppearancePage() {
       localStorage.setItem("theme", theme);
       const resolvedTheme =
         theme === "system"
-          ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
+          ? window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light"
           : theme;
       document.documentElement.classList.toggle("dark", resolvedTheme === "dark");
     } catch {
@@ -71,9 +73,7 @@ export default function AppearancePage() {
     <div className="space-y-6">
       <div className="rounded-xl border border-border bg-card p-6">
         <h2 className="mb-4 text-xl font-bold text-foreground">Theme</h2>
-        <p className="mb-6 text-sm text-muted-foreground">
-          Choose how Unytea looks to you
-        </p>
+        <p className="mb-6 text-sm text-muted-foreground">Choose how Unytea looks to you</p>
 
         <div className="grid gap-4 md:grid-cols-3">
           <button
@@ -165,7 +165,9 @@ export default function AppearancePage() {
                     <span className="font-medium text-foreground">Landing Page Builder</span>
                     <LayoutTemplate className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  <p className="text-xs text-muted-foreground">Edit hero, sections, and page structure</p>
+                  <p className="text-xs text-muted-foreground">
+                    Edit hero, sections, and page structure
+                  </p>
                 </button>
               </Link>
 
@@ -175,7 +177,9 @@ export default function AppearancePage() {
                     <span className="font-medium text-foreground">Section Presets</span>
                     <Sliders className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  <p className="text-xs text-muted-foreground">Reorder, show/hide, and configure sections</p>
+                  <p className="text-xs text-muted-foreground">
+                    Reorder, show/hide, and configure sections
+                  </p>
                 </button>
               </Link>
             </div>

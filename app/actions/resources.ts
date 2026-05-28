@@ -1,6 +1,6 @@
 /**
  * Resource Library - Server Actions
- * 
+ *
  * Server actions 100% type-safe con:
  * - Validación Zod estricta
  * - Autorización RBAC (Role-Based Access Control)
@@ -52,9 +52,9 @@ async function checkCommunityAccess(
     where: { slug: communitySlug },
     include: {
       members: {
-        where: { 
+        where: {
           userId,
-          status: "ACTIVE",  // Solo miembros activos
+          status: "ACTIVE", // Solo miembros activos
         },
       },
     },
@@ -74,13 +74,13 @@ async function checkCommunityAccess(
   // OWNER always has full access
   if (community.ownerId === userId) {
     console.log("[checkCommunityAccess] User is OWNER - access granted");
-    return { 
-      community, 
-      member: { 
-        role: "OWNER", 
+    return {
+      community,
+      member: {
+        role: "OWNER",
         userId,
-        status: "ACTIVE"
-      } 
+        status: "ACTIVE",
+      },
     };
   }
 
@@ -96,7 +96,12 @@ async function checkCommunityAccess(
 
   const hasAccess = requiredRoles.includes(member.role);
   if (!hasAccess) {
-    console.log("[checkCommunityAccess] Role not authorized:", member.role, "required:", requiredRoles);
+    console.log(
+      "[checkCommunityAccess] Role not authorized:",
+      member.role,
+      "required:",
+      requiredRoles
+    );
     return null;
   }
 
@@ -127,7 +132,8 @@ async function checkResourcePermission(
   const member = resource.community.members[0];
   const isOwner = resource.community.ownerId === userId;
   const isAuthor = resource.authorId === userId;
-  const isAdmin = member?.role === "ADMIN" || member?.role === "OWNER" || member?.role === "MODERATOR";
+  const isAdmin =
+    member?.role === "ADMIN" || member?.role === "OWNER" || member?.role === "MODERATOR";
 
   const canEdit = isOwner || isAuthor || isAdmin;
 
@@ -206,9 +212,7 @@ export async function createResourceCategory(
 /**
  * Obtener todas las categorías de una comunidad
  */
-export async function getResourceCategories(
-  communitySlug: string
-): Promise<ActionResult<any[]>> {
+export async function getResourceCategories(communitySlug: string): Promise<ActionResult<any[]>> {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -251,7 +255,7 @@ export async function createResource(
 ): Promise<ActionResult<any>> {
   try {
     console.log("[createResource] Received data:", JSON.stringify(data, null, 2));
-    
+
     const session = await auth();
     if (!session?.user?.id) {
       console.log("[createResource] No session found");
@@ -281,8 +285,15 @@ export async function createResource(
       return { success: false, error: "Los links externos requieren una URL", code: "VALIDATION" };
     }
 
-    if ((validated.type === "AUDIO" || validated.type === "VIDEO" || validated.type === "DOCUMENT") && !validated.fileUrl) {
-      return { success: false, error: "Los archivos requieren una URL de archivo", code: "VALIDATION" };
+    if (
+      (validated.type === "AUDIO" || validated.type === "VIDEO" || validated.type === "DOCUMENT") &&
+      !validated.fileUrl
+    ) {
+      return {
+        success: false,
+        error: "Los archivos requieren una URL de archivo",
+        code: "VALIDATION",
+      };
     }
 
     // Verificar slug único
@@ -346,29 +357,44 @@ export async function createResource(
     const verifyResource = await prisma.resource.findUnique({
       where: { id: resource.id },
     });
-    console.log("[createResource] VERIFICATION - Resource found in DB:", verifyResource ? "YES" : "NO");
+    console.log(
+      "[createResource] VERIFICATION - Resource found in DB:",
+      verifyResource ? "YES" : "NO"
+    );
     if (verifyResource) {
-      console.log("[createResource] VERIFICATION - Resource communityId:", verifyResource.communityId);
+      console.log(
+        "[createResource] VERIFICATION - Resource communityId:",
+        verifyResource.communityId
+      );
     }
 
     // RAW SQL VERIFICATION: Check directly in database
     const rawResult = await prisma.$queryRaw`SELECT * FROM resources WHERE id = ${resource.id}`;
-    console.log("[createResource] RAW SQL VERIFICATION - Result:", JSON.stringify(rawResult, null, 2));
+    console.log(
+      "[createResource] RAW SQL VERIFICATION - Result:",
+      JSON.stringify(rawResult, null, 2)
+    );
 
     // Count all resources in this community immediately after creation
     const countResources = await prisma.resource.count({
-      where: { communityId: access.community.id }
+      where: { communityId: access.community.id },
     });
-    console.log("[createResource] VERIFICATION - Total resources in community after creation:", countResources);
+    console.log(
+      "[createResource] VERIFICATION - Total resources in community after creation:",
+      countResources
+    );
 
     // Small delay to ensure replication (if using Neon pooler)
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     // Second verification after delay
     const countAfterDelay = await prisma.resource.count({
-      where: { communityId: access.community.id }
+      where: { communityId: access.community.id },
     });
-    console.log("[createResource] VERIFICATION - Total resources after 500ms delay:", countAfterDelay);
+    console.log(
+      "[createResource] VERIFICATION - Total resources after 500ms delay:",
+      countAfterDelay
+    );
 
     revalidatePath(`/dashboard/c/${communitySlug}/library`);
 
@@ -475,7 +501,11 @@ export async function deleteResource(resourceId: string): Promise<ActionResult<v
     }
 
     if (!permission.canEdit) {
-      return { success: false, error: "Sin permisos para eliminar este recurso", code: "FORBIDDEN" };
+      return {
+        success: false,
+        error: "Sin permisos para eliminar este recurso",
+        code: "FORBIDDEN",
+      };
     }
 
     const { community } = permission.resource;
@@ -544,14 +574,10 @@ export async function getResources(
 
     // Solo mostrar públicos o del autor (para no-admins)
     const isAdmin = ["OWNER", "ADMIN", "MODERATOR"].includes(access.member.role);
-    
+
     console.log("[getResources] isAdmin:", isAdmin);
     if (!isAdmin) {
-      where.OR = [
-        ...(where.OR || []),
-        { isPublic: true },
-        { authorId: session.user.id },
-      ];
+      where.OR = [...(where.OR || []), { isPublic: true }, { authorId: session.user.id }];
     }
 
     console.log("[getResources] Where clause:", JSON.stringify(where, null, 2));
@@ -593,7 +619,12 @@ export async function getResources(
     console.log("[getResources] Total resources found:", total);
     console.log("[getResources] Resources count:", resources.length);
     if (resources.length > 0) {
-      console.log("[getResources] First resource:", resources[0].title, "by", resources[0].authorId);
+      console.log(
+        "[getResources] First resource:",
+        resources[0].title,
+        "by",
+        resources[0].authorId
+      );
     }
 
     // Verificar si hay más resultados
@@ -671,10 +702,12 @@ export async function getResourceById(
     }
 
     // Incrementar view count (en background, no bloquear)
-    prisma.resource.update({
-      where: { id: resourceId },
-      data: { viewCount: { increment: 1 } },
-    }).catch(console.error);
+    prisma.resource
+      .update({
+        where: { id: resourceId },
+        data: { viewCount: { increment: 1 } },
+      })
+      .catch(console.error);
 
     return { success: true, data: resource };
   } catch (error) {
@@ -851,10 +884,7 @@ export async function getPopularResources(
         status: "PUBLISHED",
         isPublic: true,
       },
-      orderBy: [
-        { viewCount: "desc" },
-        { createdAt: "desc" },
-      ],
+      orderBy: [{ viewCount: "desc" }, { createdAt: "desc" }],
       take: limit,
       include: {
         category: true,

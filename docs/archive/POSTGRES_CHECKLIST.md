@@ -141,13 +141,13 @@ DATABASE_URL="postgresql://postgres:mentorly2024@localhost:5433/mentorly"
 
 ## Estado Actual ✅
 
-| Componente | Estado | Detalles |
-|------------|--------|----------|
-| PostgreSQL 18 | ✅ Running | Puerto 5433 |
-| Base de datos `mentorly` | 🔄 Pendiente | Se crea con db:push |
-| 18 Tablas | 🔄 Pendiente | Se crean con db:push |
-| Contraseña | 🔄 A resetear | Script listo |
-| Prisma Client | ✅ Generado | Auto-genera con postinstall |
+| Componente               | Estado        | Detalles                    |
+| ------------------------ | ------------- | --------------------------- |
+| PostgreSQL 18            | ✅ Running    | Puerto 5433                 |
+| Base de datos `mentorly` | 🔄 Pendiente  | Se crea con db:push         |
+| 18 Tablas                | 🔄 Pendiente  | Se crean con db:push        |
+| Contraseña               | 🔄 A resetear | Script listo                |
+| Prisma Client            | ✅ Generado   | Auto-genera con postinstall |
 
 ## Después del Setup
 

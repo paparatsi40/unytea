@@ -110,10 +110,10 @@ await prisma.member.create({
 1. ✅ Eliminado el redirect a `/join` que no existía
 2. ✅ Creado componente `JoinCommunityView` inline
 3. ✅ Agregado manejo de 3 estados de membresía:
-    - **No member:** Muestra UI para unirse
-    - **PENDING:** Muestra mensaje de "Esperando aprobación"
-    - **SUSPENDED/BANNED:** Muestra mensaje de "Acceso denegado"
-    - **ACTIVE:** Muestra contenido de la comunidad
+   - **No member:** Muestra UI para unirse
+   - **PENDING:** Muestra mensaje de "Esperando aprobación"
+   - **SUSPENDED/BANNED:** Muestra mensaje de "Acceso denegado"
+   - **ACTIVE:** Muestra contenido de la comunidad
 
 **Beneficios:**
 
@@ -132,7 +132,7 @@ function JoinCommunityView({ community }: { community: any }) {
     if (!session?.user?.id) {
       redirect("/auth/signin");
     }
-    
+
     const result = await joinCommunity(community.id);
     if (result.success) {
       redirect(`/dashboard/c/${community.slug}`);
@@ -237,7 +237,7 @@ await prisma.member.create({
 
 ```typescript
 // ❌ ANTES:
-await new Promise(resolve => setTimeout(resolve, 500));
+await new Promise((resolve) => setTimeout(resolve, 500));
 router.push(redirectUrl);
 
 // ✅ DESPUÉS:
@@ -292,13 +292,13 @@ router.refresh(); // Force fresh data
 
 ## 📊 **MÉTRICAS DE IMPACTO**
 
-| Métrica | Antes | Después | Mejora |
-|---------|-------|---------|--------|
-| Tasa de éxito creación | 0% | 100% | +100% |
-| Race conditions | Frecuentes | 0 | -100% |
-| Tiempo de redirect | 500ms+ | <50ms | -90% |
-| UX de join | No existe | Completa | +∞ |
-| Consistencia de datos | 🔴 Baja | 🟢 Alta | +100% |
+| Métrica                | Antes      | Después  | Mejora |
+| ---------------------- | ---------- | -------- | ------ |
+| Tasa de éxito creación | 0%         | 100%     | +100%  |
+| Race conditions        | Frecuentes | 0        | -100%  |
+| Tiempo de redirect     | 500ms+     | <50ms    | -90%   |
+| UX de join             | No existe  | Completa | +∞     |
+| Consistencia de datos  | 🔴 Baja    | 🟢 Alta  | +100%  |
 
 ---
 
@@ -327,40 +327,40 @@ El flujo de comunidades ahora:
 ## 🔗 **ARCHIVOS MODIFICADOS**
 
 1. **`web/app/(dashboard)/dashboard/c/[slug]/page.tsx`**
-    - Agregado `JoinCommunityView` component
-    - Agregado manejo de estados de membresía
-    - Eliminado redirect a `/join`
-    - +110 líneas
+   - Agregado `JoinCommunityView` component
+   - Agregado manejo de estados de membresía
+   - Eliminado redirect a `/join`
+   - +110 líneas
 
 2. **`web/app/actions/communities.ts`**
-    - Implementado `prisma.$transaction()`
-    - Garantía de consistencia atómica
-    - Mejor logging
-    - +15 líneas
+   - Implementado `prisma.$transaction()`
+   - Garantía de consistencia atómica
+   - Mejor logging
+   - +15 líneas
 
 3. **`web/app/api/communities/route.ts`**
-    - Agregado `status: "ACTIVE"` explícito
-    - +1 línea
+   - Agregado `status: "ACTIVE"` explícito
+   - +1 línea
 
 ---
 
 ## 📝 **LECCIONES APRENDIDAS**
 
 1. **Siempre usar transacciones para operaciones relacionadas**
-    - Community + Member deben crearse juntos
-    - Todo o nada (ACID properties)
+   - Community + Member deben crearse juntos
+   - Todo o nada (ACID properties)
 
 2. **Nunca usar delays artificiales**
-    - Son síntoma de race conditions
-    - Solucionarlo con transacciones, no con timeouts
+   - Son síntoma de race conditions
+   - Solucionarlo con transacciones, no con timeouts
 
 3. **Manejar todos los estados posibles**
-    - No solo "member" vs "no member"
-    - También PENDING, SUSPENDED, BANNED
+   - No solo "member" vs "no member"
+   - También PENDING, SUSPENDED, BANNED
 
 4. **Logging detallado es crucial**
-    - Ayuda a debuggear problemas rápidamente
-    - Console.logs salvaron el día
+   - Ayuda a debuggear problemas rápidamente
+   - Console.logs salvaron el día
 
 ---
 

@@ -289,10 +289,10 @@ model Event {
   description String?
   date        DateTime
   createdAt   DateTime @default(now())
-  
+
   communityId String
   community   Community @relation(fields: [communityId], references: [id])
-  
+
   @@map("events")
 }
 ```
@@ -356,10 +356,10 @@ Make sure to set these in Vercel:
 2. Check the [Architecture docs](./ARCHITECTURE.md)
 3. Search existing GitHub issues
 4. Create a new issue with:
-    - What you tried to do
-    - What happened
-    - Error messages
-    - Your environment (OS, Node version)
+   - What you tried to do
+   - What happened
+   - Error messages
+   - Your environment (OS, Node version)
 
 ---
 

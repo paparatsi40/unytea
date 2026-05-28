@@ -1,4 +1,3 @@
-
 ## Proyecto de Plataforma de Comunidades y Mentoría
 
 **Fecha:** Diciembre 2024  
@@ -15,7 +14,7 @@ con Skool.com, superándolo en características, diseño y precio.
 ### Propuesta de Valor Central
 
 > "Todo lo que Skool tiene, más videollamadas integradas, branding personalizable completo, features
-de IA, y una UI moderna - a la mitad del precio."
+> de IA, y una UI moderna - a la mitad del precio."
 
 **Precio:** $49/mes vs $99/mes de Skool  
 **Target:** Mismo mercado que Skool pero con producto superior
@@ -137,36 +136,36 @@ de IA, y una UI moderna - a la mitad del precio."
 **5 Documentos Principales:**
 
 1. **README.md** (358 líneas)
-    - Overview del proyecto
-    - Comparación vs Skool
-    - Features principales
-    - Setup instructions
-    - Roadmap
+   - Overview del proyecto
+   - Comparación vs Skool
+   - Features principales
+   - Setup instructions
+   - Roadmap
 
 2. **ARCHITECTURE.md** (451 líneas)
-    - Stack tecnológico detallado
-    - Flujo de datos
-    - Estructura de carpetas
-    - Decisiones técnicas
-    - Seguridad y compliance
+   - Stack tecnológico detallado
+   - Flujo de datos
+   - Estructura de carpetas
+   - Decisiones técnicas
+   - Seguridad y compliance
 
 3. **QUICKSTART.md** (406 líneas)
-    - Guía paso a paso
-    - Setup en 5 minutos
-    - Troubleshooting
-    - Comandos útiles
+   - Guía paso a paso
+   - Setup en 5 minutos
+   - Troubleshooting
+   - Comandos útiles
 
 4. **PROGRESS.md** (416 líneas)
-    - Checklist de features
-    - Status actual
-    - Next steps
-    - Timeline
+   - Checklist de features
+   - Status actual
+   - Next steps
+   - Timeline
 
 5. **PROJECT_SUMMARY.md** (522 líneas)
-    - Resumen ejecutivo
-    - Business model
-    - Go-to-market strategy
-    - Proyecciones financieras
+   - Resumen ejecutivo
+   - Business model
+   - Go-to-market strategy
+   - Proyecciones financieras
 
 **Total:** 2,153 líneas de documentación
 
@@ -176,27 +175,27 @@ de IA, y una UI moderna - a la mitad del precio."
 
 ### Ya Implementado en la Fundación:
 
-| Aspecto | Skool | Mentorly |
-|---------|-------|----------|
-| **UI/UX** | Anticuada (2015) | ✅ Moderna premium (2024) |
-| **Dark Mode** | ❌ No | ✅ Implementado |
-| **Animaciones** | Básicas | ✅ Suaves y premium |
-| **Personalización** | Logo solo | ✅ Sistema preparado |
-| **Architecture** | Legacy | ✅ Next.js 14 + TypeScript |
-| **Type Safety** | Parcial | ✅ 100% end-to-end |
-| **Documentación** | Mínima | ✅ 2,000+ líneas |
+| Aspecto             | Skool            | Mentorly                   |
+| ------------------- | ---------------- | -------------------------- |
+| **UI/UX**           | Anticuada (2015) | ✅ Moderna premium (2024)  |
+| **Dark Mode**       | ❌ No            | ✅ Implementado            |
+| **Animaciones**     | Básicas          | ✅ Suaves y premium        |
+| **Personalización** | Logo solo        | ✅ Sistema preparado       |
+| **Architecture**    | Legacy           | ✅ Next.js 14 + TypeScript |
+| **Type Safety**     | Parcial          | ✅ 100% end-to-end         |
+| **Documentación**   | Mínima           | ✅ 2,000+ líneas           |
 
 ### Por Implementar (Roadmap):
 
-| Feature | Skool | Mentorly (Planned) |
-|---------|-------|-------------------|
-| **Precio** | $99/mes | **$49/mes** 💰 |
-| **Video Calls** | ❌ Externo | ✅ Built-in (Livekit) |
-| **Branding** | ❌ Logo | ✅ 100% customizable |
-| **Domain** | Subdomain | ✅ Custom domain |
-| **Mobile Apps** | ❌ Web only | ✅ Nativas iOS/Android |
-| **AI Features** | ❌ Ninguno | ✅ Recomendaciones, moderation |
-| **Analytics** | Básico | ✅ Avanzado con insights |
+| Feature         | Skool       | Mentorly (Planned)             |
+| --------------- | ----------- | ------------------------------ |
+| **Precio**      | $99/mes     | **$49/mes** 💰                 |
+| **Video Calls** | ❌ Externo  | ✅ Built-in (Livekit)          |
+| **Branding**    | ❌ Logo     | ✅ 100% customizable           |
+| **Domain**      | Subdomain   | ✅ Custom domain               |
+| **Mobile Apps** | ❌ Web only | ✅ Nativas iOS/Android         |
+| **AI Features** | ❌ Ninguno  | ✅ Recomendaciones, moderation |
+| **Analytics**   | Básico      | ✅ Avanzado con insights       |
 
 ---
 
@@ -403,12 +402,12 @@ de IA, y una UI moderna - a la mitad del precio."
 
 #### Escenario Conservador
 
-| Mes | Clientes | MRR | ARR |
-|-----|----------|-----|-----|
-| 3 | 20 | $980 | $11,760 |
-| 6 | 100 | $4,900 | $58,800 |
-| 12 | 500 | $24,500 | $294,000 |
-| 24 | 2,000 | $98,000 | $1,176,000 |
+| Mes | Clientes | MRR     | ARR        |
+| --- | -------- | ------- | ---------- |
+| 3   | 20       | $980    | $11,760    |
+| 6   | 100      | $4,900  | $58,800    |
+| 12  | 500      | $24,500 | $294,000   |
+| 24  | 2,000    | $98,000 | $1,176,000 |
 
 #### Escenario Optimista (5% del mercado de Skool)
 
@@ -739,29 +738,29 @@ npm run db:push
 ### Lo Que Hace Especial a Este Proyecto
 
 1. **Arquitectura Enterprise-Grade desde Día 1**
-    - No reescribiremos código
-    - Escalable de 10 a 10M usuarios
-    - Type-safe completo
+   - No reescribiremos código
+   - Escalable de 10 a 10M usuarios
+   - Type-safe completo
 
 2. **UI que Compite con Productos de $10M**
-    - No se ve como un MVP
-    - Diseño premium desde el inicio
-    - Animaciones suaves
+   - No se ve como un MVP
+   - Diseño premium desde el inicio
+   - Animaciones suaves
 
 3. **Features que Skool NO Tiene**
-    - Video calls integradas
-    - Branding 100% customizable
-    - AI features
-    - Native mobile apps
+   - Video calls integradas
+   - Branding 100% customizable
+   - AI features
+   - Native mobile apps
 
 4. **Mejor Precio**
-    - $49 vs $99 de Skool
-    - Más features incluidas
+   - $49 vs $99 de Skool
+   - Más features incluidas
 
 5. **Documentación Excepcional**
-    - 2,000+ líneas
-    - Cualquiera puede continuar
-    - Decisiones documentadas
+   - 2,000+ líneas
+   - Cualquiera puede continuar
+   - Decisiones documentadas
 
 ---
 
@@ -826,9 +825,9 @@ npm run db:push
 
 ---
 
-*Documento creado: Diciembre 2024*  
-*Última actualización: Hoy*  
-*Próxima revisión: Después de MVP*
+_Documento creado: Diciembre 2024_  
+_Última actualización: Hoy_  
+_Próxima revisión: Después de MVP_
 
 ---
 

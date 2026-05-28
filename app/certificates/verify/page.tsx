@@ -31,14 +31,17 @@ function VerifyCertificateContent() {
     try {
       const res = await verifyCertificate(code.trim());
       if (res.success && res.valid && res.certificate) {
-        setResult({ valid: true, certificate: res.certificate as {
-          certificateNumber: string;
-          userName: string;
-          courseName: string;
-          communityName?: string | null;
-          completionDate: Date;
-          issuedAt: Date;
-        } });
+        setResult({
+          valid: true,
+          certificate: res.certificate as {
+            certificateNumber: string;
+            userName: string;
+            courseName: string;
+            communityName?: string | null;
+            completionDate: Date;
+            issuedAt: Date;
+          },
+        });
       } else {
         setResult({ valid: false });
       }
@@ -60,9 +63,7 @@ function VerifyCertificateContent() {
     <div className="min-h-screen bg-zinc-950 px-4 py-12">
       <div className="mx-auto max-w-lg">
         <div className="mb-8 text-center">
-          <h1 className="mb-2 text-2xl font-bold text-white">
-            Verify Certificate
-          </h1>
+          <h1 className="mb-2 text-2xl font-bold text-white">Verify Certificate</h1>
           <p className="text-sm text-zinc-500">
             Enter a certificate number to verify its authenticity
           </p>
@@ -99,9 +100,7 @@ function VerifyCertificateContent() {
               <div>
                 <div className="mb-4 flex items-center justify-center gap-2 text-emerald-400">
                   <ShieldCheck className="h-5 w-5" />
-                  <span className="text-sm font-medium">
-                    Valid Certificate
-                  </span>
+                  <span className="text-sm font-medium">Valid Certificate</span>
                 </div>
                 <CertificateView
                   certificate={{
@@ -115,12 +114,10 @@ function VerifyCertificateContent() {
             ) : (
               <div className="rounded-xl border border-red-500/30 bg-red-500/5 p-6 text-center">
                 <ShieldX className="mx-auto mb-3 h-10 w-10 text-red-400" />
-                <h3 className="mb-1 text-lg font-bold text-white">
-                  Certificate Not Found
-                </h3>
+                <h3 className="mb-1 text-lg font-bold text-white">Certificate Not Found</h3>
                 <p className="text-sm text-zinc-500">
-                  The certificate number you entered could not be verified.
-                  Please check the number and try again.
+                  The certificate number you entered could not be verified. Please check the number
+                  and try again.
                 </p>
               </div>
             )}

@@ -4,7 +4,6 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-
 interface UpdateNoteData {
   noteId: string;
   content: string;
@@ -38,9 +37,7 @@ export async function getOrCreateSessionNotes(sessionId: string) {
 
   // Check access (mentor, mentee, or community member)
   const userId = session.user.id;
-  const hasAccess = 
-    mentorSession.mentorId === userId || 
-    mentorSession.menteeId === userId;
+  const hasAccess = mentorSession.mentorId === userId || mentorSession.menteeId === userId;
 
   if (!hasAccess && mentorSession.communityId) {
     // Check if user is community member
@@ -110,9 +107,8 @@ export async function updateSessionNotes(data: UpdateNoteData) {
 
   // Check access
   const userId = session.user.id;
-  const hasAccess = 
-    existingNote.session.mentorId === userId || 
-    existingNote.session.menteeId === userId;
+  const hasAccess =
+    existingNote.session.mentorId === userId || existingNote.session.menteeId === userId;
 
   if (!hasAccess) {
     throw new Error("Unauthorized");

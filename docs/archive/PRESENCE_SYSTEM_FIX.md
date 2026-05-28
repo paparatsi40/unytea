@@ -85,7 +85,7 @@ const members = await prisma.channelMember.findMany({
 
 ```
 Heartbeat interval:     5 segundos
-Online threshold:       10 segundos  
+Online threshold:       10 segundos
 Auditorium polling:     3 segundos
 Grace period:           10 segundos (sin heartbeat)
 ```

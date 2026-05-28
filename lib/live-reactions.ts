@@ -1,14 +1,14 @@
 /**
  * Live Reactions System
- * 
+ *
  * Handles emoji reactions during live sessions with animations
  */
 
-export type ReactionType = 
-  | "thumbsup" 
-  | "heart" 
-  | "fire" 
-  | "clap" 
+export type ReactionType =
+  | "thumbsup"
+  | "heart"
+  | "fire"
+  | "clap"
   | "laugh"
   | "mind_blown"
   | "tada"
@@ -37,11 +37,7 @@ export const REACTIONS: Record<ReactionType, { emoji: string; label: string; col
 /**
  * Create a reaction object
  */
-export function createReaction(
-  type: ReactionType,
-  userId: string,
-  userName: string
-): Reaction {
+export function createReaction(type: ReactionType, userId: string, userName: string): Reaction {
   return {
     id: `${userId}-${Date.now()}-${Math.random()}`,
     type,
@@ -68,15 +64,15 @@ export function getRandomPosition() {
  */
 export function aggregateReactions(reactions: Reaction[]): Record<ReactionType, number> {
   const aggregated = {} as Record<ReactionType, number>;
-  
+
   Object.keys(REACTIONS).forEach((type) => {
     aggregated[type as ReactionType] = 0;
   });
-  
+
   reactions.forEach((reaction) => {
     aggregated[reaction.type]++;
   });
-  
+
   return aggregated;
 }
 

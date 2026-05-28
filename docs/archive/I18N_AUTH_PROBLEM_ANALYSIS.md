@@ -1,4 +1,4 @@
-# Análisis del Problema de i18n en Rutas /auth/*
+# Análisis del Problema de i18n en Rutas /auth/\*
 
 ## Resumen Ejecutivo
 
@@ -9,14 +9,18 @@ Las páginas de autenticación (`/auth/signin`, `/auth/signup`, `/auth/forgot-pa
 ## Archivos Involucrados
 
 ### 1. Middleware Principal
+
 **Archivo:** `middleware.ts`
+
 ```typescript
 // Líneas críticas: 19-35
-if (pathname.startsWith("/api") || 
-    pathname.startsWith("/auth") ||  // ← SALTA i18n PARA AUTH
-    pathname.startsWith("/dashboard") ||
-    pathname.startsWith("/onboarding")) {
-  return NextResponse.next()  // No aplica i18n middleware
+if (
+  pathname.startsWith("/api") ||
+  pathname.startsWith("/auth") || // ← SALTA i18n PARA AUTH
+  pathname.startsWith("/dashboard") ||
+  pathname.startsWith("/onboarding")
+) {
+  return NextResponse.next(); // No aplica i18n middleware
 }
 ```
 
@@ -25,7 +29,9 @@ if (pathname.startsWith("/api") ||
 ---
 
 ### 2. Configuración de i18n
+
 **Archivo:** `src/i18n.ts`
+
 ```typescript
 import { getRequestConfig } from "next-intl/server";
 
@@ -44,7 +50,9 @@ export default getRequestConfig(async ({ requestLocale }) => {
 ---
 
 ### 3. Layout Raíz
+
 **Archivo:** `app/layout.tsx`
+
 ```typescript
 export default async function RootLayout({
   children,
@@ -69,7 +77,9 @@ export default async function RootLayout({
 ---
 
 ### 4. Archivo de Traducciones
+
 **Archivo:** `locales/en.json`
+
 ```json
 {
   "navigation": {
@@ -92,16 +102,19 @@ export default async function RootLayout({
 ---
 
 ### 5. Páginas de Auth
+
 **Archivos:**
+
 - `app/auth/forgot-password/page.tsx`
 - `app/auth/signin/page.tsx`
 - `app/auth/signup/page.tsx`
 - `app/auth/signin/signin-content.tsx`
 
 **Uso:** Todas usan `useTranslations()` de next-intl:
+
 ```typescript
-import { useTranslations } from "next-intl"
-const t = useTranslations()
+import { useTranslations } from "next-intl";
+const t = useTranslations();
 ```
 
 ---
@@ -138,18 +151,22 @@ Usuario visita /auth/forgot-password
 ## Intentos Previos y Resultados
 
 ### Intento 1: Aplicar i18n a todas las rutas
+
 **Cambio:** Modificar middleware para no saltar `/auth/*`
 **Resultado:** Rutas de auth funcionaron, pero el dashboard dio 404
 
 ### Intento 2: Crear layout específico para auth
+
 **Cambio:** `app/auth/layout.tsx` con provider
 **Resultado:** Errores de Server Components
 
 ### Intento 3: Usar localePrefix: "never"
+
 **Cambio:** Middleware sin prefijo de URL
 **Resultado:** App completamente rota, todos los routes daban 404
 
 ### Intento 4: Mover archivos fuera de [locale]
+
 **Intento:** Eliminar `app/[locale]/`
 **Resultado:** Cancelado - reestructuración muy invasiva
 
@@ -158,16 +175,19 @@ Usuario visita /auth/forgot-password
 ## Soluciones Potenciales
 
 ### Opción A: Modificar middleware (Riesgo Alto)
+
 ```typescript
 // Aplicar i18n a auth pero mantener dashboard excluido
 if (pathname.startsWith("/dashboard") || pathname.startsWith("/onboarding")) {
   // Solo saltar dashboard, no auth
-  return NextResponse.next()
+  return NextResponse.next();
 }
 ```
+
 **Riesgo:** Puede romper dashboard o causar inconsistencias de routing
 
 ### Opción B: Layout client-side para auth (Riesgo Medio)
+
 ```typescript
 // app/auth/layout.tsx
 "use client"
@@ -182,9 +202,11 @@ export default function AuthLayout({ children }) {
   )
 }
 ```
+
 **Riesgo:** Hydration mismatches, no soporta cambio de idioma en auth
 
 ### Opción C: Cargar traducciones dinámicamente (Riesgo Bajo)
+
 ```typescript
 // forgot-password/page.tsx
 import { useTranslations } from "next-intl"
@@ -200,9 +222,11 @@ export default function Page() {
   )
 }
 ```
+
 **Riesgo:** Texto hardcodeado como fallback (rechazado por usuario)
 
 ### Opción D: Estructura [locale]/auth (Riesgo Medio-Alto)
+
 Mover `app/auth/` → `app/[locale]/auth/`
 **Riesgo:** Requiere cambiar todas las referencias a `/auth/*` en la app
 
@@ -211,6 +235,7 @@ Mover `app/auth/` → `app/[locale]/auth/`
 ## Recomendación
 
 El problema existe porque la arquitectura de next-intl con `next-auth` crea conflictos cuando:
+
 1. next-intl espera un patrón de URL con locale (`[locale]/`)
 2. next-auth tiene rutas fijas en `/auth/*`
 3. El middleware no puede satisfacer ambos requisitos simultáneamente

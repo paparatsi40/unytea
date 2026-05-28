@@ -18,11 +18,7 @@ interface LiveReactionsProps {
   showPicker?: boolean;
 }
 
-export function LiveReactions({
-  reactions,
-  onReact,
-  showPicker = true,
-}: LiveReactionsProps) {
+export function LiveReactions({ reactions, onReact, showPicker = true }: LiveReactionsProps) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [floatingReactions, setFloatingReactions] = useState<Reaction[]>([]);
 
@@ -44,16 +40,12 @@ export function LiveReactions({
   return (
     <div className="relative">
       {/* Floating Reactions Container */}
-      <div className="fixed inset-0 pointer-events-none z-40 overflow-hidden">
+      <div className="pointer-events-none fixed inset-0 z-40 overflow-hidden">
         <AnimatePresence>
           {floatingReactions.map((reaction) => {
             const position = getRandomPosition();
             return (
-              <FloatingReaction
-                key={reaction.id}
-                emoji={reaction.emoji}
-                position={position}
-              />
+              <FloatingReaction key={reaction.id} emoji={reaction.emoji} position={position} />
             );
           })}
         </AnimatePresence>
@@ -66,12 +58,10 @@ export function LiveReactions({
           <div className="relative">
             <button
               onClick={() => setPickerOpen(!pickerOpen)}
-              className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-full hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm"
+              className="flex items-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-2 shadow-sm transition-colors hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:hover:bg-gray-700"
             >
-              <Smile className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                React
-              </span>
+              <Smile className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">React</span>
             </button>
 
             {/* Picker Dropdown */}
@@ -81,7 +71,7 @@ export function LiveReactions({
                   initial={{ opacity: 0, scale: 0.9, y: -10 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.9, y: -10 }}
-                  className="absolute bottom-full mb-2 left-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-xl p-3 min-w-[280px]"
+                  className="absolute bottom-full left-0 mb-2 min-w-[280px] rounded-2xl border border-gray-200 bg-white p-3 shadow-xl dark:border-gray-700 dark:bg-gray-800"
                 >
                   <div className="grid grid-cols-4 gap-2">
                     {Object.entries(REACTIONS).map(([type, data]) => (
@@ -90,7 +80,7 @@ export function LiveReactions({
                         onClick={() => handleReact(type as ReactionType)}
                         whileHover={{ scale: 1.2 }}
                         whileTap={{ scale: 0.9 }}
-                        className="flex flex-col items-center gap-1 p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                        className="flex flex-col items-center gap-1 rounded-xl p-3 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
                         style={{
                           backgroundColor: `${data.color}10`,
                         }}
@@ -109,7 +99,7 @@ export function LiveReactions({
 
           {/* Reaction Counts */}
           {hasReactions && (
-            <div className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-full shadow-sm">
+            <div className="flex items-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-2 shadow-sm dark:border-gray-600 dark:bg-gray-800">
               {Object.entries(aggregated).map(([type, count]) => {
                 if (count === 0) return null;
                 const data = REACTIONS[type as ReactionType];
@@ -170,7 +160,7 @@ function FloatingReaction({ emoji, position }: FloatingReactionProps) {
           times: [0, 0.1, 0.8, 1],
         },
       }}
-      className="absolute text-6xl pointer-events-none"
+      className="pointer-events-none absolute text-6xl"
       style={{
         filter: "drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))",
       }}
@@ -188,11 +178,14 @@ export function useReactions() {
 
   const addReaction = (reaction: Reaction) => {
     setReactions((prev) => [...prev, reaction]);
-    
+
     // Auto-cleanup old reactions (older than 5 minutes)
-    setTimeout(() => {
-      setReactions((prev) => prev.filter((r) => r.id !== reaction.id));
-    }, 5 * 60 * 1000);
+    setTimeout(
+      () => {
+        setReactions((prev) => prev.filter((r) => r.id !== reaction.id));
+      },
+      5 * 60 * 1000
+    );
   };
 
   const clearReactions = () => {

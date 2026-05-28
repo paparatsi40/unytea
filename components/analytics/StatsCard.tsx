@@ -38,9 +38,7 @@ export function StatsCard({ title, value, change, iconName, color = "blue" }: St
         <div className="flex-1">
           <p className="mb-1 text-sm font-medium text-muted-foreground">{title}</p>
           <p className="text-3xl font-bold text-foreground">{value.toLocaleString()}</p>
-          {change && (
-            <p className="mt-2 text-sm text-green-500">{change}</p>
-          )}
+          {change && <p className="mt-2 text-sm text-green-500">{change}</p>}
         </div>
 
         <div className={`rounded-xl p-3 ${colorClasses[color]}`}>

@@ -1,11 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import {
-  LiveKitRoom,
-  RoomAudioRenderer,
-  useLocalParticipant,
-} from "@livekit/components-react";
+import { LiveKitRoom, RoomAudioRenderer, useLocalParticipant } from "@livekit/components-react";
 import "@livekit/components-styles";
 import { Loader2, AlertCircle } from "lucide-react";
 import { VideoRoomUI } from "./VideoRoomUI";
@@ -73,11 +69,15 @@ function AudioUnlocker() {
       console.log("[LiveKit] Permissions:", JSON.stringify(localParticipant.permissions));
       console.log("[LiveKit] Audio tracks:", audioTracks.size);
       audioTracks.forEach((pub, sid) => {
-        console.log(`[LiveKit]   Audio track ${sid}: subscribed=${pub.isSubscribed}, muted=${pub.isMuted}, enabled=${pub.isEnabled}, source=${pub.source}`);
+        console.log(
+          `[LiveKit]   Audio track ${sid}: subscribed=${pub.isSubscribed}, muted=${pub.isMuted}, enabled=${pub.isEnabled}, source=${pub.source}`
+        );
       });
       console.log("[LiveKit] Video tracks:", videoTracks.size);
       videoTracks.forEach((pub, sid) => {
-        console.log(`[LiveKit]   Video track ${sid}: subscribed=${pub.isSubscribed}, muted=${pub.isMuted}, enabled=${pub.isEnabled}, source=${pub.source}`);
+        console.log(
+          `[LiveKit]   Video track ${sid}: subscribed=${pub.isSubscribed}, muted=${pub.isMuted}, enabled=${pub.isEnabled}, source=${pub.source}`
+        );
       });
       console.log("[LiveKit] Mic enabled:", localParticipant.isMicrophoneEnabled);
       console.log("[LiveKit] Camera enabled:", localParticipant.isCameraEnabled);
@@ -172,7 +172,13 @@ export function VideoRoom({
         video={sessionMode === "video"}
         audio={true}
         onConnected={() => {
-          console.log("[LiveKit] Connected to room. Mode:", sessionMode, "| video:", sessionMode === "video", "| audio: true");
+          console.log(
+            "[LiveKit] Connected to room. Mode:",
+            sessionMode,
+            "| video:",
+            sessionMode === "video",
+            "| audio: true"
+          );
         }}
         onDisconnected={(reason) => {
           console.log("[LiveKit] Disconnected from room", reason);
@@ -184,7 +190,7 @@ export function VideoRoom({
         onMediaDeviceFailure={(failure) => {
           console.error("[LiveKit] Media device failure:", failure);
         }}
-        className="h-full flex flex-col"
+        className="flex h-full flex-col"
       >
         <VideoRoomUI
           sessionId={sessionId}

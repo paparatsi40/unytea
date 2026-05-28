@@ -41,21 +41,20 @@ export async function getOnboardingProgress(): Promise<{
     );
     if (daysSinceCreation > 30) return { success: true, showChecklist: false };
 
-    const [membership, post, sessionParticipation, lessonProgress, buddy] =
-      await Promise.all([
-        prisma.member.findFirst({ where: { userId, status: "ACTIVE" } }),
-        prisma.post.findFirst({ where: { authorId: userId } }),
-        prisma.sessionParticipation.findFirst({ where: { userId } }),
-        prisma.lessonProgress.findFirst({
-          where: { enrollment: { userId }, isCompleted: true },
-        }),
-        prisma.buddyPartnership.findFirst({
-          where: {
-            status: "ACTIVE",
-            OR: [{ user1Id: userId }, { user2Id: userId }],
-          },
-        }),
-      ]);
+    const [membership, post, sessionParticipation, lessonProgress, buddy] = await Promise.all([
+      prisma.member.findFirst({ where: { userId, status: "ACTIVE" } }),
+      prisma.post.findFirst({ where: { authorId: userId } }),
+      prisma.sessionParticipation.findFirst({ where: { userId } }),
+      prisma.lessonProgress.findFirst({
+        where: { enrollment: { userId }, isCompleted: true },
+      }),
+      prisma.buddyPartnership.findFirst({
+        where: {
+          status: "ACTIVE",
+          OR: [{ user1Id: userId }, { user2Id: userId }],
+        },
+      }),
+    ]);
 
     const progress: OnboardingProgress = {
       hasProfile: !!(user.name && user.bio && (user.interests as string[]).length > 0),

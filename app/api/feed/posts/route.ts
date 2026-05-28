@@ -13,10 +13,7 @@ export async function GET() {
     const session = await auth();
 
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const userId = session.user.id;
@@ -94,7 +91,7 @@ export async function GET() {
       } catch {
         // Ignore parsing errors
       }
-      
+
       return {
         id: post.id,
         author: {
@@ -117,10 +114,7 @@ export async function GET() {
     return NextResponse.json({ posts: formattedPosts });
   } catch (error: any) {
     console.error("Error fetching feed posts:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch posts" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch posts" }, { status: 500 });
   }
 }
 

@@ -69,15 +69,15 @@ export async function findBuddyMatch(communityId: string) {
     // Simple random match for MVP (can be improved with ML later)
     const randomMatch = usersWithoutBuddy[Math.floor(Math.random() * usersWithoutBuddy.length)];
 
-    return { 
-      success: true, 
+    return {
+      success: true,
       match: {
         id: randomMatch.userId,
         name: randomMatch.user.name,
         image: randomMatch.user.image,
         skills: randomMatch.user.skills,
         interests: randomMatch.user.interests,
-      }
+      },
     };
   } catch (error) {
     console.error("Error finding buddy match:", error);
@@ -243,7 +243,12 @@ export async function getMyBuddyPartnership(communityId: string) {
 /**
  * Create a shared goal
  */
-export async function createBuddyGoal(partnershipId: string, title: string, description?: string, targetDate?: Date) {
+export async function createBuddyGoal(
+  partnershipId: string,
+  title: string,
+  description?: string,
+  targetDate?: Date
+) {
   try {
     const goal = await prisma.buddyGoal.create({
       data: {

@@ -68,8 +68,7 @@ function getCommunityPriority(community: Community): {
   const attendeesThisWeek = community.attendeesThisWeek || 0;
   const postsThisWeek = community.postsThisWeek || 0;
   const members = community._count.members || 0;
-  const hasRunASession =
-    Boolean(community.lastSessionAt) || weeklySessions > 0;
+  const hasRunASession = Boolean(community.lastSessionAt) || weeklySessions > 0;
 
   let score = 0;
   let reason: CommunityPriorityReason = "healthy";
@@ -197,8 +196,7 @@ function getCommunityState(community: Community): {
 
 function getHeroContent(community: Community) {
   const nextSession = community.nextSession;
-  const hasRunASession =
-    Boolean(community.lastSessionAt) || (community.weeklySessions || 0) > 0;
+  const hasRunASession = Boolean(community.lastSessionAt) || (community.weeklySessions || 0) > 0;
   const priority = getCommunityPriority(community);
 
   if (priority.reason === "in_progress" && nextSession) {
@@ -471,9 +469,7 @@ export function CommunitiesClient() {
                 <p className="text-2xl font-semibold tracking-tight text-foreground">
                   {hero.title}
                 </p>
-                <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
-                  {hero.subtitle}
-                </p>
+                <p className="max-w-2xl text-sm leading-6 text-muted-foreground">{hero.subtitle}</p>
               </div>
 
               <div className="flex flex-wrap gap-3">
@@ -505,9 +501,7 @@ export function CommunitiesClient() {
               >
                 <div
                   className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold ${
-                    item.done
-                      ? "bg-emerald-100 text-emerald-700"
-                      : "bg-muted text-muted-foreground"
+                    item.done ? "bg-emerald-100 text-emerald-700" : "bg-muted text-muted-foreground"
                   }`}
                 >
                   {item.done ? "✓" : "○"}
@@ -540,9 +534,7 @@ export function CommunitiesClient() {
             <div className="space-y-2 rounded-2xl border border-border/60 bg-background/60 p-4 text-sm">
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Sessions</span>
-                <span className="font-medium text-foreground">
-                  {momentum.sessions} scheduled
-                </span>
+                <span className="font-medium text-foreground">{momentum.sessions} scheduled</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Members</span>

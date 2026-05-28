@@ -44,16 +44,16 @@ Si tienes problemas, puedes crear una directamente en la DB:
 ```sql
 -- En pgAdmin o psql:
 INSERT INTO communities (
-  id, 
-  name, 
-  slug, 
-  description, 
-  "ownerId", 
-  "createdAt", 
+  id,
+  name,
+  slug,
+  description,
+  "ownerId",
+  "createdAt",
   "updatedAt"
 ) VALUES (
-  'cm123test456', 
-  'Test Community', 
+  'cm123test456',
+  'Test Community',
   'test-community',
   'Testing live chat',
   'TU_USER_ID_AQUI',  -- Cambia esto por tu user ID
@@ -167,9 +167,9 @@ Dashboard → Communities → Click en "Test Community"
 
 ```javascript
 // En cualquier página logueada:
-fetch('/api/auth/session')
-  .then(r => r.json())
-  .then(d => console.log('User ID:', d.user?.id));
+fetch("/api/auth/session")
+  .then((r) => r.json())
+  .then((d) => console.log("User ID:", d.user?.id));
 ```
 
 ### **Desde pgAdmin:**

@@ -65,7 +65,7 @@ function SidebarDraggable({
         e.dataTransfer.effectAllowed = "copy";
         e.dataTransfer.setData("elementType", type);
       }}
-      className="rounded-lg border-2 border-dashed border-border bg-muted/50 p-3 cursor-move hover:bg-muted transition-colors"
+      className="cursor-move rounded-lg border-2 border-dashed border-border bg-muted/50 p-3 transition-colors hover:bg-muted"
     >
       <div className="flex items-center gap-2">
         <Icon className="h-4 w-4 text-muted-foreground" />
@@ -169,7 +169,16 @@ const DraggableCanvasElement = function DraggableCanvasElement({
       document.removeEventListener("mousemove", handleMove);
       document.removeEventListener("mouseup", handleUp);
     };
-  }, [isResizing, resizeHandle, resizeStart, element.id, element.x, size.width, size.height, onResizeEnd]);
+  }, [
+    isResizing,
+    resizeHandle,
+    resizeStart,
+    element.id,
+    element.x,
+    size.width,
+    size.height,
+    onResizeEnd,
+  ]);
 
   // Render content per type
   const renderContent = () => {
@@ -311,12 +320,14 @@ const DraggableCanvasElement = function DraggableCanvasElement({
       {/* Resize Handles */}
       {isSelected && (
         <>
-          {([
-            ["bottom-right", "bottom-0 right-0 cursor-se-resize"],
-            ["bottom-left", "bottom-0 left-0 cursor-sw-resize"],
-            ["top-right", "top-0 right-0 cursor-ne-resize"],
-            ["top-left", "top-0 left-0 cursor-nw-resize"],
-          ] as const).map(([handle, classes]) => (
+          {(
+            [
+              ["bottom-right", "bottom-0 right-0 cursor-se-resize"],
+              ["bottom-left", "bottom-0 left-0 cursor-sw-resize"],
+              ["top-right", "top-0 right-0 cursor-ne-resize"],
+              ["top-left", "top-0 left-0 cursor-nw-resize"],
+            ] as const
+          ).map(([handle, classes]) => (
             <div
               key={handle}
               className={`absolute h-3 w-3 rounded-full bg-primary ${classes}`}
@@ -351,7 +362,7 @@ const DraggableCanvasElement = function DraggableCanvasElement({
             aria-label="Resize right"
           />
           <div
-            className="absolute left-1/2 bottom-0 h-2 w-6 -translate-x-1/2 cursor-s-resize rounded-t-full bg-primary"
+            className="absolute bottom-0 left-1/2 h-2 w-6 -translate-x-1/2 cursor-s-resize rounded-t-full bg-primary"
             onMouseDown={(e) => {
               e.stopPropagation();
               setResizeStart({
@@ -409,10 +420,10 @@ export function VisualBuilder() {
         type === "text"
           ? { text: "Edit this text..." }
           : type === "button"
-          ? { label: "Click me", url: "" }
-          : type === "image"
-          ? { url: "" }
-          : {},
+            ? { label: "Click me", url: "" }
+            : type === "image"
+              ? { url: "" }
+              : {},
     };
 
     setElements((prev) => [...prev, newElement]);
@@ -573,13 +584,17 @@ export function VisualBuilder() {
                 <input
                   type="number"
                   value={selectedElement.width}
-                  onChange={(e) => updateElement(selectedElement.id, { width: Number(e.target.value) })}
+                  onChange={(e) =>
+                    updateElement(selectedElement.id, { width: Number(e.target.value) })
+                  }
                   className="rounded border p-1 text-xs"
                 />
                 <input
                   type="number"
                   value={selectedElement.height}
-                  onChange={(e) => updateElement(selectedElement.id, { height: Number(e.target.value) })}
+                  onChange={(e) =>
+                    updateElement(selectedElement.id, { height: Number(e.target.value) })
+                  }
                   className="rounded border p-1 text-xs"
                 />
               </div>

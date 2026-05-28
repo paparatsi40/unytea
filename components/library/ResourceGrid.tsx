@@ -63,7 +63,9 @@ export function ResourceGrid({
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState<ResourceType | "ALL">("ALL");
-  const [sortBy, setSortBy] = useState<"createdAt" | "updatedAt" | "viewCount" | "title">("createdAt");
+  const [sortBy, setSortBy] = useState<"createdAt" | "updatedAt" | "viewCount" | "title">(
+    "createdAt"
+  );
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
   const typeFilters = [
@@ -125,7 +127,7 @@ export function ResourceGrid({
             <Skeleton key={i} className="h-10 w-28" />
           ))}
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
             <div key={i} className="space-y-3">
               <Skeleton className="aspect-video rounded-xl" />
@@ -141,20 +143,20 @@ export function ResourceGrid({
   return (
     <div className="space-y-6">
       {/* Header with Search and Filters */}
-      <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
-        <div className="flex-1 w-full lg:max-w-md relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+      <div className="flex flex-col items-start justify-between gap-4 lg:flex-row lg:items-center">
+        <div className="relative w-full flex-1 lg:max-w-md">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder={t("searchPlaceholder")}
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
-            className="pl-10 h-11 bg-background/50"
+            className="h-11 bg-background/50 pl-10"
           />
         </div>
 
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex flex-wrap items-center gap-3">
           {/* View Mode Toggle */}
-          <div className="flex items-center border rounded-lg p-1 bg-background/50">
+          <div className="flex items-center rounded-lg border bg-background/50 p-1">
             <Button
               variant={viewMode === "grid" ? "secondary" : "ghost"}
               size="icon"
@@ -175,8 +177,8 @@ export function ResourceGrid({
 
           {/* Sort */}
           <Select value={sortBy} onValueChange={handleSortChange}>
-            <SelectTrigger className="w-[180px] h-10">
-              <SlidersHorizontal className="w-4 h-4 mr-2" />
+            <SelectTrigger className="h-10 w-[180px]">
+              <SlidersHorizontal className="mr-2 h-4 w-4" />
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -188,24 +190,16 @@ export function ResourceGrid({
             </SelectContent>
           </Select>
 
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-10 w-10"
-            onClick={toggleSortOrder}
-          >
+          <Button variant="outline" size="icon" className="h-10 w-10" onClick={toggleSortOrder}>
             <ChevronDown
-              className={cn(
-                "h-4 w-4 transition-transform",
-                sortOrder === "asc" && "rotate-180"
-              )}
+              className={cn("h-4 w-4 transition-transform", sortOrder === "asc" && "rotate-180")}
             />
           </Button>
         </div>
       </div>
 
       {/* Type Filters */}
-      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+      <div className="scrollbar-hide flex gap-2 overflow-x-auto pb-2">
         {typeFilters.map((filter) => {
           const Icon = filter.icon;
           const isActive = selectedType === filter.value;
@@ -217,22 +211,18 @@ export function ResourceGrid({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className={cn(
-                "flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium",
-                "transition-colors duration-200 whitespace-nowrap",
+                "flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium",
+                "whitespace-nowrap transition-colors duration-200",
                 isActive
                   ? "bg-primary text-primary-foreground"
                   : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
               )}
             >
-              <Icon className="w-4 h-4" />
+              <Icon className="h-4 w-4" />
               {filter.label}
               {filter.value !== "ALL" && totalCount !== undefined && (
                 <span className="ml-1 opacity-70">
-                  (
-                  {
-                    resources.filter((r) => r.type === filter.value).length
-                  }
-                  )
+                  ({resources.filter((r) => r.type === filter.value).length})
                 </span>
               )}
             </motion.button>
@@ -245,7 +235,10 @@ export function ResourceGrid({
         <p>
           {resources.length} {resources.length === 1 ? t("resource") : t("resources")}
           {totalCount !== undefined && totalCount > resources.length && (
-            <span> {t("of")} {totalCount}</span>
+            <span>
+              {" "}
+              {t("of")} {totalCount}
+            </span>
           )}
         </p>
       </div>
@@ -286,16 +279,14 @@ export function ResourceGrid({
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-center py-20"
+            className="py-20 text-center"
           >
-            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
-              <Search className="w-10 h-10 text-muted-foreground" />
+            <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-muted">
+              <Search className="h-10 w-10 text-muted-foreground" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">{t("noResults")}</h3>
-            <p className="text-muted-foreground max-w-md mx-auto">
-              {searchQuery
-                ? t("noResultsSearch")
-                : t("noResultsEmpty")}
+            <h3 className="mb-2 text-xl font-semibold">{t("noResults")}</h3>
+            <p className="mx-auto max-w-md text-muted-foreground">
+              {searchQuery ? t("noResultsSearch") : t("noResultsEmpty")}
             </p>
           </motion.div>
         )}

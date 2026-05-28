@@ -40,7 +40,7 @@ async function getCommunity(slug: string) {
 
 function renderSection(section: SectionInstance, index: number) {
   const key = section.id || `section-${index}`;
-  
+
   switch (section.type) {
     case "hero":
       return <HeroRender key={key} {...section.props} />;
@@ -59,20 +59,24 @@ function renderSection(section: SectionInstance, index: number) {
     case "gallery":
       return <GalleryRender key={key} {...section.props} />;
     case "pricing":
-      return <div key={key} className="p-8 text-center text-gray-500">Pricing section coming soon</div>;
+      return (
+        <div key={key} className="p-8 text-center text-gray-500">
+          Pricing section coming soon
+        </div>
+      );
     case "video":
-      return <div key={key} className="p-8 text-center text-gray-500">Video section coming soon</div>;
+      return (
+        <div key={key} className="p-8 text-center text-gray-500">
+          Video section coming soon
+        </div>
+      );
     default:
       console.warn(`Unknown section type: ${section.type}`);
       return null;
   }
 }
 
-export default async function PublicCommunityPage(
-  props: {
-    params: Promise<{ slug: string }>;
-  }
-) {
+export default async function PublicCommunityPage(props: { params: Promise<{ slug: string }> }) {
   const params = await props.params;
   const community = await getCommunity(params.slug);
 
@@ -105,7 +109,7 @@ export default async function PublicCommunityPage(
               <p className="text-xs text-muted-foreground">Public Landing Page</p>
             </div>
           </div>
-          
+
           {isOwner && (
             <Link href={`/dashboard/c/${params.slug}/settings/landing`}>
               <Button variant="outline" size="sm">
@@ -119,7 +123,7 @@ export default async function PublicCommunityPage(
       <main className="container mx-auto px-4 py-12">
         {sections.length === 0 ? (
           // Empty State
-          (<div className="mx-auto max-w-3xl rounded-2xl border-2 border-dashed border-border bg-white p-16 text-center">
+          <div className="mx-auto max-w-3xl rounded-2xl border-2 border-dashed border-border bg-white p-16 text-center">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-purple-100">
               <svg
                 className="h-8 w-8 text-purple-600"
@@ -135,9 +139,7 @@ export default async function PublicCommunityPage(
                 />
               </svg>
             </div>
-            <h2 className="mb-2 text-2xl font-bold text-gray-900">
-              No Landing Page Yet
-            </h2>
+            <h2 className="mb-2 text-2xl font-bold text-gray-900">No Landing Page Yet</h2>
             <p className="mb-6 text-gray-600">
               {isOwner
                 ? "Get started by creating your landing page with our Section Builder"
@@ -148,10 +150,10 @@ export default async function PublicCommunityPage(
                 <Button>Build Landing Page</Button>
               </Link>
             )}
-          </div>)
+          </div>
         ) : (
           // Render Sections
-          (<div className="mx-auto max-w-6xl space-y-12">
+          <div className="mx-auto max-w-6xl space-y-12">
             {sections.map((section, index) => renderSection(section, index))}
             {/* Footer CTA if owner */}
             {isOwner && (
@@ -166,7 +168,7 @@ export default async function PublicCommunityPage(
                 </Link>
               </div>
             )}
-          </div>)
+          </div>
         )}
       </main>
       {/* Footer */}

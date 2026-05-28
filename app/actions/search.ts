@@ -1,24 +1,24 @@
-"use server"
+"use server";
 
-import { getCurrentUserId } from "@/lib/auth-utils"
-import { prisma } from "@/lib/prisma"
+import { getCurrentUserId } from "@/lib/auth-utils";
+import { prisma } from "@/lib/prisma";
 
 interface SearchResult {
-  id: string
-  title?: string
-  name?: string
-  description?: string
-  snippet?: string
-  type: "post" | "course" | "community" | "member"
-  url: string
-  imageUrl?: string | null
+  id: string;
+  title?: string;
+  name?: string;
+  description?: string;
+  snippet?: string;
+  type: "post" | "course" | "community" | "member";
+  url: string;
+  imageUrl?: string | null;
 }
 
 interface SearchResponse {
-  posts: SearchResult[]
-  courses: SearchResult[]
-  communities: SearchResult[]
-  members: SearchResult[]
+  posts: SearchResult[];
+  courses: SearchResult[];
+  communities: SearchResult[];
+  members: SearchResult[];
 }
 
 /**
@@ -31,38 +31,38 @@ export async function searchGlobal(
 ): Promise<SearchResponse | { error: string }> {
   try {
     // 1. AUTHENTICATION CHECK
-    const userId = await getCurrentUserId()
+    const userId = await getCurrentUserId();
     if (!userId) {
-      return { error: "Unauthorized - authentication required" }
+      return { error: "Unauthorized - authentication required" };
     }
 
     // 2. VALIDATE INPUTS
-    const trimmedQuery = query.trim()
+    const trimmedQuery = query.trim();
 
     if (!trimmedQuery || trimmedQuery.length < 2) {
-      return { error: "Query must be at least 2 characters long" }
+      return { error: "Query must be at least 2 characters long" };
     }
 
     if (trimmedQuery.length > 200) {
-      return { error: "Query must be less than 200 characters" }
+      return { error: "Query must be less than 200 characters" };
     }
 
-    const normalizedType = type.toLowerCase()
-    const validTypes = ["all", "posts", "courses", "communities", "members"]
+    const normalizedType = type.toLowerCase();
+    const validTypes = ["all", "posts", "courses", "communities", "members"];
     if (!validTypes.includes(normalizedType)) {
       return {
         error: "Invalid type parameter. Must be one of: all, posts, courses, communities, members",
-      }
+      };
     }
 
-    const perTypeLimit = 5 // Default 5 results per type
+    const perTypeLimit = 5; // Default 5 results per type
 
     const response: SearchResponse = {
       posts: [],
       courses: [],
       communities: [],
       members: [],
-    }
+    };
 
     // 3. SEARCH ACROSS MODELS
     const searchCondition = {
@@ -70,7 +70,7 @@ export async function searchGlobal(
         { title: { contains: trimmedQuery, mode: "insensitive" as const } },
         { content: { contains: trimmedQuery, mode: "insensitive" as const } },
       ],
-    }
+    };
 
     // Search Posts
     if (normalizedType === "all" || normalizedType === "posts") {
@@ -95,7 +95,7 @@ export async function searchGlobal(
         },
         take: perTypeLimit,
         orderBy: { createdAt: "desc" },
-      })
+      });
 
       response.posts = posts.map((post) => ({
         id: post.id,
@@ -104,7 +104,7 @@ export async function searchGlobal(
         snippet: post.content.substring(0, 150),
         type: "post" as const,
         url: `/community/${post.community.slug}/post/${post.id}`,
-      }))
+      }));
     }
 
     // Search Courses
@@ -135,7 +135,7 @@ export async function searchGlobal(
         },
         take: perTypeLimit,
         orderBy: { createdAt: "desc" },
-      })
+      });
 
       response.courses = courses.map((course) => ({
         id: course.id,
@@ -145,7 +145,7 @@ export async function searchGlobal(
         type: "course" as const,
         url: `/community/${course.community.slug}/courses/${course.slug}`,
         imageUrl: course.imageUrl,
-      }))
+      }));
     }
 
     // Search Communities
@@ -172,7 +172,7 @@ export async function searchGlobal(
         },
         take: perTypeLimit,
         orderBy: { createdAt: "desc" },
-      })
+      });
 
       response.communities = communities.map((community) => ({
         id: community.id,
@@ -183,7 +183,7 @@ export async function searchGlobal(
         type: "community" as const,
         url: `/community/${community.slug}`,
         imageUrl: community.imageUrl,
-      }))
+      }));
     }
 
     // Search Members (Users)
@@ -210,7 +210,7 @@ export async function searchGlobal(
         },
         take: perTypeLimit,
         orderBy: { createdAt: "desc" },
-      })
+      });
 
       response.members = users.map((user) => ({
         id: user.id,
@@ -221,12 +221,12 @@ export async function searchGlobal(
         type: "member" as const,
         url: `/profile/${user.username || user.id}`,
         imageUrl: user.image,
-      }))
+      }));
     }
 
-    return response
+    return response;
   } catch (error) {
-    console.error("[search-action] Error:", error)
-    return { error: "An error occurred while searching" }
+    console.error("[search-action] Error:", error);
+    return { error: "An error occurred while searching" };
   }
 }

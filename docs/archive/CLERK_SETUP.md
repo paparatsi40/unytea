@@ -30,10 +30,10 @@ Go to: **https://clerk.com**
 - Click "Create Application"
 - **Application Name:** `Mentorly`
 - **Select authentication methods:**
-    - ✅ Email (required)
-    - ✅ Google OAuth (recommended)
-    - ✅ GitHub OAuth (optional)
-    - ✅ Any others you want
+  - ✅ Email (required)
+  - ✅ Google OAuth (recommended)
+  - ✅ GitHub OAuth (optional)
+  - ✅ Any others you want
 
 - Click "Create Application"
 
@@ -122,9 +122,9 @@ npm run dev
 2. Click "Start Free" or "Get Started"
 3. Should redirect to: http://localhost:3000/sign-up
 4. Create an account:
-    - ✅ Try email/password
-    - ✅ Try Google OAuth
-    - ✅ Try GitHub OAuth
+   - ✅ Try email/password
+   - ✅ Try Google OAuth
+   - ✅ Try GitHub OAuth
 5. After sign up → Redirects to `/onboarding`
 6. Complete onboarding → Redirects to `/dashboard`
 
@@ -186,14 +186,14 @@ web/
 
 ### Routes:
 
-| Route | Description | Protected |
-|-------|-------------|-----------|
-| `/` | Landing page | No |
-| `/sign-in` | Login page | No |
-| `/sign-up` | Registration page | No |
-| `/onboarding` | First-time setup | Yes |
-| `/dashboard` | Main dashboard | Yes |
-| `/dashboard/*` | All dashboard routes | Yes |
+| Route          | Description          | Protected |
+| -------------- | -------------------- | --------- |
+| `/`            | Landing page         | No        |
+| `/sign-in`     | Login page           | No        |
+| `/sign-up`     | Registration page    | No        |
+| `/onboarding`  | First-time setup     | Yes       |
+| `/dashboard`   | Main dashboard       | Yes       |
+| `/dashboard/*` | All dashboard routes | Yes       |
 
 ---
 
@@ -304,7 +304,7 @@ import { useUser } from "@clerk/nextjs";
 
 function MyComponent() {
   const { user } = useUser();
-  
+
   return <div>Hello {user?.firstName}!</div>;
 }
 ```
@@ -318,11 +318,11 @@ import { auth } from "@clerk/nextjs/server";
 
 async function MyServerComponent() {
   const { userId } = await auth();
-  
+
   if (!userId) {
     redirect("/sign-in");
   }
-  
+
   // ... fetch data
 }
 ```

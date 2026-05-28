@@ -63,18 +63,14 @@ export default function IntegrationsPage() {
             <span className="text-2xl">{integration.icon}</span>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
-                <h3 className="text-sm font-semibold text-gray-900">
-                  {integration.name}
-                </h3>
+                <h3 className="text-sm font-semibold text-gray-900">{integration.name}</h3>
                 {integration.status === "coming_soon" && (
                   <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-500">
                     Coming Soon
                   </span>
                 )}
               </div>
-              <p className="mt-0.5 text-xs text-gray-500">
-                {integration.description}
-              </p>
+              <p className="mt-0.5 text-xs text-gray-500">{integration.description}</p>
               {integration.status === "available" && integration.href && (
                 <a
                   href={integration.href}
@@ -93,15 +89,10 @@ export default function IntegrationsPage() {
         <div className="flex items-start gap-3">
           <Zap className="h-5 w-5 text-purple-600" />
           <div>
-            <h3 className="text-sm font-semibold text-purple-900">
-              Request an Integration
-            </h3>
+            <h3 className="text-sm font-semibold text-purple-900">Request an Integration</h3>
             <p className="mt-1 text-xs text-purple-700">
               Need a specific integration? Let us know at{" "}
-              <a
-                href="mailto:support@unytea.com"
-                className="font-medium underline"
-              >
+              <a href="mailto:support@unytea.com" className="font-medium underline">
                 support@unytea.com
               </a>{" "}
               and we&apos;ll consider adding it.

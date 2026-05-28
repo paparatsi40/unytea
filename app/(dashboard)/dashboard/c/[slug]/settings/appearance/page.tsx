@@ -11,9 +11,9 @@ export default function AppearanceSettingsPage() {
   const slug = (params?.slug as string) || "";
 
   return (
-    <div className="container max-w-4xl mx-auto py-8 space-y-6">
+    <div className="container mx-auto max-w-4xl space-y-6 py-8">
       <div>
-        <h1 className="text-3xl font-bold mb-2">Appearance</h1>
+        <h1 className="mb-2 text-3xl font-bold">Appearance</h1>
         <p className="text-muted-foreground">
           Customize your community layout and branding experience
         </p>

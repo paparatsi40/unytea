@@ -49,7 +49,7 @@ export default function CommunitySettingsMembers() {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-gray-900">Members</h2>
-        <p className="text-sm text-gray-500 mt-1">
+        <p className="mt-1 text-sm text-gray-500">
           Manage roles, approve requests, and remove members.
         </p>
       </div>

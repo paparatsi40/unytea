@@ -1,7 +1,16 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { getLiveCommunityHealthMetrics, getNorthStarDecisionSnapshot, getOverviewAnalytics, getRetentionCohorts } from "@/app/actions/analytics";
-import { getSessionAnalytics, getCourseAnalytics, getRevenueAnalytics } from "@/app/actions/analytics-extended";
+import {
+  getLiveCommunityHealthMetrics,
+  getNorthStarDecisionSnapshot,
+  getOverviewAnalytics,
+  getRetentionCohorts,
+} from "@/app/actions/analytics";
+import {
+  getSessionAnalytics,
+  getCourseAnalytics,
+  getRevenueAnalytics,
+} from "@/app/actions/analytics-extended";
 import { BarChart3, TrendingUp } from "lucide-react";
 import { StatsCard } from "@/components/analytics/StatsCard";
 import { CommunitySelector } from "@/components/analytics/CommunitySelector";
@@ -17,7 +26,7 @@ export default async function AnalyticsPage({
 }: {
   searchParams: Promise<{ communityId?: string }>;
 }) {
-const session = await auth();
+  const session = await auth();
   if (!session?.user?.id) {
     redirect("/auth/signin");
   }
@@ -25,7 +34,15 @@ const session = await auth();
   const resolvedSearchParams = await searchParams;
   const selectedCommunityId = resolvedSearchParams?.communityId;
 
-  const [result, retentionResult, healthResult, northStarResult, sessionResult, courseResult, revenueResult] = await Promise.all([
+  const [
+    result,
+    retentionResult,
+    healthResult,
+    northStarResult,
+    sessionResult,
+    courseResult,
+    revenueResult,
+  ] = await Promise.all([
     getOverviewAnalytics(),
     getRetentionCohorts(selectedCommunityId),
     getLiveCommunityHealthMetrics(selectedCommunityId),
@@ -40,12 +57,8 @@ const session = await auth();
       <div className="flex min-h-[600px] items-center justify-center">
         <div className="text-center">
           <BarChart3 className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
-          <h2 className="mb-2 text-xl font-semibold text-foreground">
-            Failed to load analytics
-          </h2>
-          <p className="text-muted-foreground">
-            {result.error || "An error occurred"}
-          </p>
+          <h2 className="mb-2 text-xl font-semibold text-foreground">Failed to load analytics</h2>
+          <p className="text-muted-foreground">{result.error || "An error occurred"}</p>
         </div>
       </div>
     );
@@ -89,9 +102,7 @@ const session = await auth();
             </div>
             <div>
               <h1 className="text-3xl font-bold text-foreground">Analytics</h1>
-              <p className="text-muted-foreground">
-                Insights and metrics for your communities
-              </p>
+              <p className="text-muted-foreground">Insights and metrics for your communities</p>
             </div>
           </div>
         </div>
@@ -131,9 +142,9 @@ const session = await auth();
 
       {/* Deep Analytics (Sessions, Courses, Revenue) */}
       <AnalyticsCharts
-        sessions={sessionResult.success ? sessionResult.data ?? null : null}
-        courses={courseResult.success ? courseResult.data ?? null : null}
-        revenue={revenueResult.success ? revenueResult.data ?? null : null}
+        sessions={sessionResult.success ? (sessionResult.data ?? null) : null}
+        courses={courseResult.success ? (courseResult.data ?? null) : null}
+        revenue={revenueResult.success ? (revenueResult.data ?? null) : null}
       />
 
       {/* Growth Chart Section */}
@@ -141,9 +152,7 @@ const session = await auth();
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h2 className="text-xl font-bold text-foreground">Growth Overview</h2>
-            <p className="text-sm text-muted-foreground">
-              Member and content growth trends
-            </p>
+            <p className="text-sm text-muted-foreground">Member and content growth trends</p>
           </div>
           <TrendingUp className="h-6 w-6 text-green-500" />
         </div>
@@ -159,9 +168,7 @@ const session = await auth();
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">New This Month</span>
-                <span className="font-bold text-green-500">
-                  +{data.newMembersThisMonth}
-                </span>
+                <span className="font-bold text-green-500">+{data.newMembersThisMonth}</span>
               </div>
               <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-muted">
                 <div
@@ -184,9 +191,7 @@ const session = await auth();
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">New This Month</span>
-                <span className="font-bold text-green-500">
-                  +{data.newPostsThisMonth}
-                </span>
+                <span className="font-bold text-green-500">+{data.newPostsThisMonth}</span>
               </div>
               <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-muted">
                 <div
@@ -203,13 +208,12 @@ const session = await auth();
 
       {/* Communities Overview */}
       <div className="rounded-xl border border-border/50 bg-card/50 p-6">
-        <h2 className="mb-4 text-xl font-bold text-foreground">
-          Your Communities
-        </h2>
+        <h2 className="mb-4 text-xl font-bold text-foreground">Your Communities</h2>
         <p className="text-muted-foreground">
-          You own {data.totalCommunities} {data.totalCommunities === 1 ? "community" : "communities"}
+          You own {data.totalCommunities}{" "}
+          {data.totalCommunities === 1 ? "community" : "communities"}
         </p>
-        
+
         {data.totalCommunities === 0 && (
           <div className="mt-6 rounded-lg border border-border/30 bg-background p-8 text-center">
             <p className="mb-4 text-muted-foreground">
@@ -243,19 +247,27 @@ const session = await auth();
               </div>
               <div className="rounded-lg border border-border/30 bg-background p-4">
                 <p className="text-xs text-muted-foreground">Avg Live Attendance</p>
-                <p className="mt-1 text-2xl font-bold text-foreground">{northStar.avgLiveAttendance}</p>
+                <p className="mt-1 text-2xl font-bold text-foreground">
+                  {northStar.avgLiveAttendance}
+                </p>
               </div>
               <div className="rounded-lg border border-border/30 bg-background p-4">
                 <p className="text-xs text-muted-foreground">Returning Attendees</p>
-                <p className="mt-1 text-2xl font-bold text-foreground">{northStar.returningAttendeesRate}%</p>
+                <p className="mt-1 text-2xl font-bold text-foreground">
+                  {northStar.returningAttendeesRate}%
+                </p>
               </div>
               <div className="rounded-lg border border-border/30 bg-background p-4">
                 <p className="text-xs text-muted-foreground">Feed Participation</p>
-                <p className="mt-1 text-2xl font-bold text-foreground">{northStar.feedParticipationRate}%</p>
+                <p className="mt-1 text-2xl font-bold text-foreground">
+                  {northStar.feedParticipationRate}%
+                </p>
               </div>
               <div className="rounded-lg border border-border/30 bg-background p-4">
                 <p className="text-xs text-muted-foreground">Content Reuse</p>
-                <p className="mt-1 text-2xl font-bold text-foreground">{northStar.contentReuseRate}%</p>
+                <p className="mt-1 text-2xl font-bold text-foreground">
+                  {northStar.contentReuseRate}%
+                </p>
               </div>
             </div>
 
@@ -265,18 +277,26 @@ const session = await auth();
 
             {northActions.length > 0 && (
               <div className="mt-4 grid gap-3 md:grid-cols-3">
-                {northActions.map((action: { title: string; why: string; href: string; cta: string }) => (
-                  <a key={action.title} href={action.href} className="rounded-lg border border-border/40 bg-background p-4 hover:border-primary/40">
-                    <p className="font-semibold text-foreground">{action.title}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">{action.why}</p>
-                    <p className="mt-3 text-xs font-semibold text-primary">{action.cta} →</p>
-                  </a>
-                ))}
+                {northActions.map(
+                  (action: { title: string; why: string; href: string; cta: string }) => (
+                    <a
+                      key={action.title}
+                      href={action.href}
+                      className="rounded-lg border border-border/40 bg-background p-4 hover:border-primary/40"
+                    >
+                      <p className="font-semibold text-foreground">{action.title}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">{action.why}</p>
+                      <p className="mt-3 text-xs font-semibold text-primary">{action.cta} →</p>
+                    </a>
+                  )
+                )}
               </div>
             )}
           </>
         ) : (
-          <p className="text-sm text-muted-foreground">Could not load north star diagnostics right now.</p>
+          <p className="text-sm text-muted-foreground">
+            Could not load north star diagnostics right now.
+          </p>
         )}
       </div>
 
@@ -294,27 +314,39 @@ const session = await auth();
             <div className="rounded-lg border border-border/30 bg-background p-4">
               <p className="text-sm text-muted-foreground">Returning attendees</p>
               <div className="mt-1 flex items-center gap-3">
-                <p className="text-3xl font-bold text-foreground">{health.returningAttendeesRate}%</p>
-                <span className={`text-sm font-semibold ${returningBenchmark.tone}`}>{returningBenchmark.label}</span>
+                <p className="text-3xl font-bold text-foreground">
+                  {health.returningAttendeesRate}%
+                </p>
+                <span className={`text-sm font-semibold ${returningBenchmark.tone}`}>
+                  {returningBenchmark.label}
+                </span>
               </div>
               <p className="mt-2 text-xs text-muted-foreground">
-                {health.returningAttendeesCount} of {health.uniqueAttendeesCount} attendees joined more than one session.
+                {health.returningAttendeesCount} of {health.uniqueAttendeesCount} attendees joined
+                more than one session.
               </p>
             </div>
 
             <div className="rounded-lg border border-border/30 bg-background p-4">
               <p className="text-sm text-muted-foreground">Feed participation rate (30d)</p>
               <div className="mt-1 flex items-center gap-3">
-                <p className="text-3xl font-bold text-foreground">{health.feedParticipationRate}%</p>
-                <span className={`text-sm font-semibold ${feedBenchmark.tone}`}>{feedBenchmark.label}</span>
+                <p className="text-3xl font-bold text-foreground">
+                  {health.feedParticipationRate}%
+                </p>
+                <span className={`text-sm font-semibold ${feedBenchmark.tone}`}>
+                  {feedBenchmark.label}
+                </span>
               </div>
               <p className="mt-2 text-xs text-muted-foreground">
-                {health.feedActiveMembersCount} active members posted/commented from {health.activeMembersCount} active members.
+                {health.feedActiveMembersCount} active members posted/commented from{" "}
+                {health.activeMembersCount} active members.
               </p>
             </div>
           </div>
         ) : (
-          <p className="text-sm text-muted-foreground">Could not load live health metrics right now.</p>
+          <p className="text-sm text-muted-foreground">
+            Could not load live health metrics right now.
+          </p>
         )}
       </div>
 
@@ -328,7 +360,10 @@ const session = await auth();
             </p>
           </div>
           <div className="rounded-md border border-border/50 bg-background px-3 py-2 text-xs">
-            W1→W3 trend: <span className={retentionTrend >= 0 ? "text-green-600" : "text-red-600"}>{retentionTrend >= 0 ? `+${retentionTrend}` : retentionTrend}%</span>
+            W1→W3 trend:{" "}
+            <span className={retentionTrend >= 0 ? "text-green-600" : "text-red-600"}>
+              {retentionTrend >= 0 ? `+${retentionTrend}` : retentionTrend}%
+            </span>
           </div>
         </div>
 
@@ -395,7 +430,9 @@ const session = await auth();
       {/* Info */}
       <div className="rounded-lg border-l-4 border-primary bg-primary/5 p-4">
         <p className="text-sm text-foreground">
-          <strong>💡 Pro Tip:</strong> Use the community selector in the top-right corner ("All Communities") to view detailed analytics per community, including member insights, engagement metrics, and content performance.
+          <strong>💡 Pro Tip:</strong> Use the community selector in the top-right corner ("All
+          Communities") to view detailed analytics per community, including member insights,
+          engagement metrics, and content performance.
         </p>
       </div>
     </div>

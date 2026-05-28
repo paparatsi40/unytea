@@ -42,7 +42,7 @@ export function Toast({ message, type = "info", duration = 3000, onClose }: Toas
 
   return (
     <div
-      className={`fixed top-4 right-4 z-50 flex items-center gap-3 rounded-lg border p-4 shadow-lg ${bgColors[type]} animate-in slide-in-from-top-2 fade-in duration-300`}
+      className={`fixed right-4 top-4 z-50 flex items-center gap-3 rounded-lg border p-4 shadow-lg ${bgColors[type]} duration-300 animate-in fade-in slide-in-from-top-2`}
     >
       {icons[type]}
       <p className="text-sm font-medium text-gray-900">{message}</p>
@@ -87,7 +87,7 @@ export function ToastContainer() {
   const { toasts, removeToast } = useToast();
 
   return (
-    <div className="fixed top-4 right-4 z-50 flex flex-col gap-2">
+    <div className="fixed right-4 top-4 z-50 flex flex-col gap-2">
       {toasts.map((toast) => (
         <Toast
           key={toast.id}

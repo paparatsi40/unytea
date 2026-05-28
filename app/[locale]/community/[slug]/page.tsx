@@ -46,11 +46,16 @@ function dayNameFromIndex(dayOfWeek: number | null | undefined) {
   return names[dayOfWeek] || null;
 }
 
-function everyLabel(series: {
-  frequency?: string | null;
-  dayOfWeek?: number | null;
-  startTime?: string | null;
-} | null | undefined) {
+function everyLabel(
+  series:
+    | {
+        frequency?: string | null;
+        dayOfWeek?: number | null;
+        startTime?: string | null;
+      }
+    | null
+    | undefined
+) {
   if (!series || series.frequency !== "WEEKLY") return null;
   const day = dayNameFromIndex(series.dayOfWeek);
   if (!day || !series.startTime) return null;
@@ -86,11 +91,9 @@ function trackPublicCommunityEvent(params: {
   });
 }
 
-export async function generateMetadata(
-  props: {
-    params: Promise<{ locale: string; slug: string }>;
-  }
-): Promise<Metadata> {
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string; slug: string }>;
+}): Promise<Metadata> {
   const params = await props.params;
   const community = await prisma.community.findUnique({
     where: { slug: params.slug },
@@ -113,8 +116,7 @@ export async function generateMetadata(
   const title = `${community.name} Community | Unytea`;
   const host = formatHostName(community.owner);
   const description =
-    community.description?.slice(0, 160) ||
-    `Join ${community.name} hosted by ${host} on Unytea.`;
+    community.description?.slice(0, 160) || `Join ${community.name} hosted by ${host} on Unytea.`;
   const canonical = `https://www.unytea.com/${params.locale}/community/${params.slug}`;
   const image = community.imageUrl || "https://www.unytea.com/og-image.png";
 
@@ -140,12 +142,17 @@ export async function generateMetadata(
   };
 }
 
-export default async function CommunityPublicPreviewPage(
-  props: {
-    params: Promise<{ locale: string; slug: string }>;
-    searchParams?: Promise<{ src?: string; rank?: string; sort?: string; paywall?: string; paid?: string; error?: string }>;
-  }
-) {
+export default async function CommunityPublicPreviewPage(props: {
+  params: Promise<{ locale: string; slug: string }>;
+  searchParams?: Promise<{
+    src?: string;
+    rank?: string;
+    sort?: string;
+    paywall?: string;
+    paid?: string;
+    error?: string;
+  }>;
+}) {
   const searchParams = await props.searchParams;
   const params = await props.params;
   const { slug, locale } = params;
@@ -333,7 +340,9 @@ export default async function CommunityPublicPreviewPage(
     }
 
     if ((result as { code?: string })?.code === "PAYMENT_REQUIRED") {
-      redirect(`/api/stripe/community-checkout-start?communityId=${currentCommunity.id}&slug=${currentCommunity.slug}&locale=${locale}&tier=${defaultTier}`);
+      redirect(
+        `/api/stripe/community-checkout-start?communityId=${currentCommunity.id}&slug=${currentCommunity.slug}&locale=${locale}&tier=${defaultTier}`
+      );
     }
 
     redirect(`/${locale}/community/${currentCommunity.slug}`);
@@ -393,11 +402,14 @@ export default async function CommunityPublicPreviewPage(
 
   const tierPricing = (pricingRecord?.tierPricing as Record<string, unknown> | undefined) || {};
   const selectedTierPriceRaw = tierPricing[defaultTier];
-  const selectedTierPrice = typeof selectedTierPriceRaw === "number" || typeof selectedTierPriceRaw === "string"
-    ? Number(selectedTierPriceRaw)
-    : 0;
+  const selectedTierPrice =
+    typeof selectedTierPriceRaw === "number" || typeof selectedTierPriceRaw === "string"
+      ? Number(selectedTierPriceRaw)
+      : 0;
 
-  const accessTypeLabel = currentCommunity.isPaid ? `De pago · ${defaultTier.toUpperCase()}` : "Gratis";
+  const accessTypeLabel = currentCommunity.isPaid
+    ? `De pago · ${defaultTier.toUpperCase()}`
+    : "Gratis";
   const subscribeLabel = userId
     ? currentCommunity.isPaid
       ? `Suscribirme ${selectedTierPrice > 0 ? `(USD ${selectedTierPrice})` : `(${defaultTier.toUpperCase()})`}`
@@ -406,7 +418,7 @@ export default async function CommunityPublicPreviewPage(
   const weeklyIdentity = everyLabel(nextSession?.series);
 
   return (
-<div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background">
       <main className="mx-auto max-w-5xl space-y-6 px-4 py-10 sm:px-6">
         <section className="rounded-xl border border-border bg-card p-6">
           {searchParams?.paywall === "1" && (
@@ -425,9 +437,15 @@ export default async function CommunityPublicPreviewPage(
                 <h1 className="text-3xl font-bold text-foreground">{currentCommunity.name}</h1>
                 <Badge variant="outline">{accessTypeLabel}</Badge>
               </div>
-              <p className="text-muted-foreground">{currentCommunity.description || "Community preview page"}</p>
-              <p className="mt-2 text-sm text-muted-foreground">Hosted by {formatHostName(currentCommunity.owner)}</p>
-              <p className="mt-1 text-sm text-muted-foreground">{currentCommunity._count.members} members</p>
+              <p className="text-muted-foreground">
+                {currentCommunity.description || "Community preview page"}
+              </p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Hosted by {formatHostName(currentCommunity.owner)}
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {currentCommunity._count.members} members
+              </p>
             </div>
             <div className="min-w-[220px]">
               {membershipStatus === "ACTIVE" ? (
@@ -435,25 +453,42 @@ export default async function CommunityPublicPreviewPage(
                   <Button className="w-full">Entrar a la comunidad</Button>
                 </Link>
               ) : membershipStatus === "PENDING" ? (
-                <Button className="w-full" disabled>Request pending approval</Button>
+                <Button className="w-full" disabled>
+                  Request pending approval
+                </Button>
               ) : (
                 <form action={handleJoin}>
-                  <Button className="w-full" type="submit">{subscribeLabel}</Button>
+                  <Button className="w-full" type="submit">
+                    {subscribeLabel}
+                  </Button>
                 </form>
               )}
-              <p className="mt-2 text-xs text-muted-foreground">Acceso: {accessTypeLabel}. Suscríbete para asistir en vivo y ver grabaciones.</p>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Acceso: {accessTypeLabel}. Suscríbete para asistir en vivo y ver grabaciones.
+              </p>
             </div>
           </div>
         </section>
 
         <section className="rounded-xl border border-primary/30 bg-primary/5 p-6">
           <p className="text-xs uppercase tracking-wide text-muted-foreground">Next Live Session</p>
-          <h2 className="mt-2 text-xl font-semibold text-foreground">{nextSession?.title || "Weekly Community Q&A"}</h2>
-          <p className="mt-1 text-sm text-muted-foreground">{sessionUrgencyLabel(nextSession?.scheduledAt ?? null)} · {formatSchedule(nextSession?.scheduledAt ?? null)}</p>
+          <h2 className="mt-2 text-xl font-semibold text-foreground">
+            {nextSession?.title || "Weekly Community Q&A"}
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {sessionUrgencyLabel(nextSession?.scheduledAt ?? null)} ·{" "}
+            {formatSchedule(nextSession?.scheduledAt ?? null)}
+          </p>
           {weeklyIdentity && <p className="mt-1 text-xs text-muted-foreground">{weeklyIdentity}</p>}
-          <p className="mt-1 text-sm text-muted-foreground">🔥 {nextSessionAttendingCount} attending</p>
-          <p className="mt-2 text-sm text-muted-foreground">Join the community to attend live sessions.</p>
-          <p className="mt-1 text-xs text-muted-foreground">Members receive reminders automatically.</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            🔥 {nextSessionAttendingCount} attending
+          </p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Join the community to attend live sessions.
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Members receive reminders automatically.
+          </p>
           <div className="mt-4">
             {membershipStatus === "ACTIVE" ? (
               <Link href={`/dashboard/c/${currentCommunity.slug}`}>
@@ -463,7 +498,9 @@ export default async function CommunityPublicPreviewPage(
               <Button disabled>Request pending approval</Button>
             ) : (
               <form action={handleJoin}>
-                <Button type="submit">{userId ? "Suscribirme" : "Iniciar sesión para suscribirme"}</Button>
+                <Button type="submit">
+                  {userId ? "Suscribirme" : "Iniciar sesión para suscribirme"}
+                </Button>
               </form>
             )}
           </div>
@@ -472,13 +509,19 @@ export default async function CommunityPublicPreviewPage(
         <section className="rounded-xl border border-border bg-card p-6">
           <h2 className="text-lg font-semibold text-foreground">📅 This week</h2>
           {nextThreeSessions.length === 0 ? (
-            <p className="mt-3 text-sm text-muted-foreground">Weekly programming is being scheduled now.</p>
+            <p className="mt-3 text-sm text-muted-foreground">
+              Weekly programming is being scheduled now.
+            </p>
           ) : (
             <div className="mt-3 space-y-3">
               {nextThreeSessions.map((session) => (
                 <div key={session.id} className="rounded-lg border border-border p-3">
                   <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                    {session.scheduledAt.toLocaleDateString("en-US", { weekday: "long" })} · {session.scheduledAt.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
+                    {session.scheduledAt.toLocaleDateString("en-US", { weekday: "long" })} ·{" "}
+                    {session.scheduledAt.toLocaleTimeString("en-US", {
+                      hour: "numeric",
+                      minute: "2-digit",
+                    })}
                   </p>
                   <p className="mt-1 font-medium text-foreground">{session.title}</p>
                 </div>
@@ -495,8 +538,12 @@ export default async function CommunityPublicPreviewPage(
             ) : (
               currentCommunity.posts.map((post) => (
                 <div key={post.id} className="rounded-lg border border-border p-3">
-                  <p className="font-medium text-foreground">{post.title || post.content.slice(0, 90) || "Untitled discussion"}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">{post._count.comments} replies</p>
+                  <p className="font-medium text-foreground">
+                    {post.title || post.content.slice(0, 90) || "Untitled discussion"}
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {post._count.comments} replies
+                  </p>
                 </div>
               ))
             )}
@@ -507,27 +554,43 @@ export default async function CommunityPublicPreviewPage(
         <section className="grid gap-4 sm:grid-cols-3">
           <div className="rounded-xl border border-border bg-card p-4">
             <p className="text-xs uppercase tracking-wide text-muted-foreground">Members</p>
-            <p className="mt-1 flex items-center gap-2 text-xl font-semibold text-foreground"><Users className="h-4 w-4" />{currentCommunity._count.members}</p>
+            <p className="mt-1 flex items-center gap-2 text-xl font-semibold text-foreground">
+              <Users className="h-4 w-4" />
+              {currentCommunity._count.members}
+            </p>
           </div>
           <div className="rounded-xl border border-border bg-card p-4">
-            <p className="text-xs uppercase tracking-wide text-muted-foreground">Attending next session</p>
-            <p className="mt-1 text-xl font-semibold text-foreground">{nextSessionAttendingCount}</p>
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">
+              Attending next session
+            </p>
+            <p className="mt-1 text-xl font-semibold text-foreground">
+              {nextSessionAttendingCount}
+            </p>
           </div>
           <div className="rounded-xl border border-border bg-card p-4">
-            <p className="text-xs uppercase tracking-wide text-muted-foreground">Sessions this week</p>
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">
+              Sessions this week
+            </p>
             <p className="mt-1 text-xl font-semibold text-foreground">{sessionsThisWeek}</p>
           </div>
         </section>
 
         <section className="rounded-xl border border-border bg-card p-6">
-          <h2 className="text-lg font-semibold text-foreground">Hosted by {formatHostName(currentCommunity.owner)}</h2>
-          <p className="mt-2 text-sm text-muted-foreground">Founder, mentor, and community builder. Hosting weekly sessions to help members learn together and grow faster.</p>
+          <h2 className="text-lg font-semibold text-foreground">
+            Hosted by {formatHostName(currentCommunity.owner)}
+          </h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Founder, mentor, and community builder. Hosting weekly sessions to help members learn
+            together and grow faster.
+          </p>
           <p className="mt-2 text-xs text-muted-foreground">Sessions every week</p>
         </section>
 
         <section className="rounded-xl border border-primary/30 bg-primary/5 p-6">
           <h2 className="text-lg font-semibold text-foreground">Join the community</h2>
-          <p className="mt-2 text-sm text-muted-foreground">Attend live sessions • Access recordings • Connect with other members</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Attend live sessions • Access recordings • Connect with other members
+          </p>
           <div className="mt-4 flex flex-wrap gap-2">
             {membershipStatus === "ACTIVE" ? (
               <Link href={`/dashboard/c/${currentCommunity.slug}`}>
@@ -537,7 +600,9 @@ export default async function CommunityPublicPreviewPage(
               <Button disabled>Request pending approval</Button>
             ) : (
               <form action={handleJoin}>
-                <Button type="submit">{userId ? "Suscribirme" : "Iniciar sesión para suscribirme"}</Button>
+                <Button type="submit">
+                  {userId ? "Suscribirme" : "Iniciar sesión para suscribirme"}
+                </Button>
               </form>
             )}
           </div>

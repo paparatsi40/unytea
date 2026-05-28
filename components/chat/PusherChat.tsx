@@ -24,10 +24,7 @@ interface PusherChatProps {
 
 export function PusherChat({ channelId, channelName }: PusherChatProps) {
   const { user } = useCurrentUser();
-  const { sendMessage, onMessage, isConnected } = usePusher(
-    channelId,
-    user?.id || ""
-  );
+  const { sendMessage, onMessage, isConnected } = usePusher(channelId, user?.id || "");
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
@@ -81,26 +78,28 @@ export function PusherChat({ channelId, channelName }: PusherChatProps) {
   );
 
   // Group messages by sender
-  const groupedMessages = messages.reduce((acc, message, index) => {
-    const prevMessage = messages[index - 1];
-    const isSameSender = prevMessage?.senderId === message.senderId;
-    const timeDiff = prevMessage
-      ? new Date(message.timestamp).getTime() -
-        new Date(prevMessage.timestamp).getTime()
-      : Infinity;
-    const isWithinTimeWindow = timeDiff < 5 * 60 * 1000; // 5 minutes
+  const groupedMessages = messages.reduce(
+    (acc, message, index) => {
+      const prevMessage = messages[index - 1];
+      const isSameSender = prevMessage?.senderId === message.senderId;
+      const timeDiff = prevMessage
+        ? new Date(message.timestamp).getTime() - new Date(prevMessage.timestamp).getTime()
+        : Infinity;
+      const isWithinTimeWindow = timeDiff < 5 * 60 * 1000; // 5 minutes
 
-    if (isSameSender && isWithinTimeWindow) {
-      acc[acc.length - 1].messages.push(message);
-    } else {
-      acc.push({
-        senderId: message.senderId,
-        senderName: message.senderName,
-        messages: [message],
-      });
-    }
-    return acc;
-  }, [] as { senderId: string; senderName: string; messages: Message[] }[]);
+      if (isSameSender && isWithinTimeWindow) {
+        acc[acc.length - 1].messages.push(message);
+      } else {
+        acc.push({
+          senderId: message.senderId,
+          senderName: message.senderName,
+          messages: [message],
+        });
+      }
+      return acc;
+    },
+    [] as { senderId: string; senderName: string; messages: Message[] }[]
+  );
 
   return (
     <div className="flex h-full flex-col">
@@ -129,10 +128,7 @@ export function PusherChat({ channelId, channelName }: PusherChatProps) {
       </div>
 
       {/* Messages */}
-      <div
-        ref={scrollRef}
-        className="flex-1 overflow-y-auto p-4"
-      >
+      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4">
         <div className="space-y-4">
           {groupedMessages.length === 0 ? (
             <div className="flex h-40 flex-col items-center justify-center text-muted-foreground">
@@ -153,12 +149,10 @@ export function PusherChat({ channelId, channelName }: PusherChatProps) {
               return (
                 <div
                   key={`${group.senderId}-${group.messages[0].id}`}
-                  className={`flex gap-3 ${
-                    isOwnMessage ? "flex-row-reverse" : ""
-                  }`}
+                  className={`flex gap-3 ${isOwnMessage ? "flex-row-reverse" : ""}`}
                 >
                   <Avatar className="h-8 w-8 shrink-0">
-                    <AvatarFallback className="text-xs bg-primary text-primary-foreground">
+                    <AvatarFallback className="bg-primary text-xs text-primary-foreground">
                       {initials}
                     </AvatarFallback>
                   </Avatar>
@@ -167,17 +161,13 @@ export function PusherChat({ channelId, channelName }: PusherChatProps) {
                       isOwnMessage ? "items-end" : "items-start"
                     }`}
                   >
-                    <span className="mb-1 text-xs text-muted-foreground">
-                      {group.senderName}
-                    </span>
+                    <span className="mb-1 text-xs text-muted-foreground">{group.senderName}</span>
                     <div className="space-y-1">
                       {group.messages.map((msg) => (
                         <div
                           key={msg.id}
                           className={`rounded-lg px-3 py-2 text-sm ${
-                            isOwnMessage
-                              ? "bg-primary text-primary-foreground"
-                              : "bg-muted"
+                            isOwnMessage ? "bg-primary text-primary-foreground" : "bg-muted"
                           }`}
                         >
                           {msg.content}
@@ -188,8 +178,10 @@ export function PusherChat({ channelId, channelName }: PusherChatProps) {
                       {(() => {
                         const date = new Date(group.messages[group.messages.length - 1].timestamp);
                         const now = new Date();
-                        const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
-                        
+                        const diffInMinutes = Math.floor(
+                          (now.getTime() - date.getTime()) / (1000 * 60)
+                        );
+
                         if (diffInMinutes < 1) return "just now";
                         if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
                         if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;

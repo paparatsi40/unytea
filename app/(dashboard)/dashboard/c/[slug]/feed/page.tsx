@@ -8,11 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar, Play, Users } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
-export default async function CommunityFeedPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default async function CommunityFeedPage({ params }: { params: Promise<{ slug: string }> }) {
   const userId = await getCurrentUserId();
 
   if (!userId) {
@@ -135,7 +131,9 @@ export default async function CommunityFeedPage({
       commentCount: post._count.comments,
     }));
 
-  const canModeratePosts = ["OWNER", "ADMIN", "MODERATOR"].includes(community.members[0]?.role ?? "");
+  const canModeratePosts = ["OWNER", "ADMIN", "MODERATOR"].includes(
+    community.members[0]?.role ?? ""
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -156,7 +154,9 @@ export default async function CommunityFeedPage({
               Community feed
             </p>
             <h1 className="mt-1 text-lg font-semibold text-gray-900">{community.name}</h1>
-            <p className="mt-1 text-sm text-gray-600">Live activity from real posts and member discussions.</p>
+            <p className="mt-1 text-sm text-gray-600">
+              Live activity from real posts and member discussions.
+            </p>
           </div>
 
           {mappedUpcomingSession ? (
@@ -170,7 +170,9 @@ export default async function CommunityFeedPage({
                 <div className="mt-2 space-y-1 text-sm text-zinc-300">
                   <p className="flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
-                    {formatDistanceToNow(new Date(mappedUpcomingSession.scheduledAt), { addSuffix: true })}
+                    {formatDistanceToNow(new Date(mappedUpcomingSession.scheduledAt), {
+                      addSuffix: true,
+                    })}
                   </p>
                   <p className="flex items-center gap-2">
                     <Users className="h-4 w-4" />
@@ -179,7 +181,10 @@ export default async function CommunityFeedPage({
                 </div>
                 <div className="mt-4 flex gap-2">
                   {mappedUpcomingSession.roomId ? (
-                    <Link href={`/dashboard/sessions/${mappedUpcomingSession.id}/room`} className="flex-1">
+                    <Link
+                      href={`/dashboard/sessions/${mappedUpcomingSession.id}/room`}
+                      className="flex-1"
+                    >
                       <Button className="w-full bg-purple-600 hover:bg-purple-700">
                         <Play className="mr-2 h-4 w-4" />
                         {mappedUpcomingSession.status === "IN_PROGRESS" ? "Join now" : "Open room"}
@@ -194,7 +199,10 @@ export default async function CommunityFeedPage({
                     </Link>
                   )}
                   <Link href="/dashboard/sessions" className="flex-1">
-                    <Button variant="outline" className="w-full border-zinc-700 bg-zinc-800/50 text-zinc-200 hover:bg-zinc-800">
+                    <Button
+                      variant="outline"
+                      className="w-full border-zinc-700 bg-zinc-800/50 text-zinc-200 hover:bg-zinc-800"
+                    >
                       View all
                     </Button>
                   </Link>
@@ -204,9 +212,13 @@ export default async function CommunityFeedPage({
           ) : (
             <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
               <p className="text-sm font-medium text-gray-900">No upcoming live sessions</p>
-              <p className="mt-1 text-sm text-gray-600">When a new session is scheduled, it will appear here.</p>
+              <p className="mt-1 text-sm text-gray-600">
+                When a new session is scheduled, it will appear here.
+              </p>
               <Link href="/dashboard/sessions" className="mt-3 inline-block">
-                <Button size="sm" variant="outline">Open sessions</Button>
+                <Button size="sm" variant="outline">
+                  Open sessions
+                </Button>
               </Link>
             </div>
           )}

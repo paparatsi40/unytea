@@ -26,12 +26,12 @@ export default function LandingPageSettings() {
     try {
       const response = await fetch(`/api/communities/${slug}`);
       if (!response.ok) throw new Error("Failed to fetch community");
-      
+
       const data = await response.json();
-      
+
       setCommunityName(data.name || "");
       setCommunityDescription(data.description || null);
-      
+
       // Load existing landing layout or use empty array
       if (data.landingLayout && Array.isArray(data.landingLayout)) {
         setInitialSections(data.landingLayout);
@@ -96,10 +96,7 @@ export default function LandingPageSettings() {
           </div>
         </div>
         <div className="flex gap-3">
-          <Button
-            variant="outline"
-            onClick={() => window.open(`/c/${slug}`, "_blank")}
-          >
+          <Button variant="outline" onClick={() => window.open(`/c/${slug}`, "_blank")}>
             <Eye className="mr-2 h-4 w-4" />
             Preview
           </Button>
@@ -119,16 +116,27 @@ export default function LandingPageSettings() {
         <div className="flex gap-3">
           <div className="text-2xl">💡</div>
           <div>
-            <h3 className="text-sm font-semibold text-blue-900">
-              How to use the Section Builder
-            </h3>
+            <h3 className="text-sm font-semibold text-blue-900">How to use the Section Builder</h3>
             <ul className="mt-2 space-y-1 text-xs text-blue-700">
-              <li>• <strong>Add sections</strong> from the left panel by clicking on them</li>
-              <li>• <strong>Reorder sections</strong> using the ↑/↓ buttons in the layers panel</li>
-              <li>• <strong>Edit content</strong> by selecting a section and using the properties panel on the right</li>
-              <li>• <strong>Preview in real-time</strong> in the center panel</li>
-              <li>• <strong>Save your changes</strong> using the Save button</li>
-              <li>• <strong>All sections are responsive</strong> and work perfectly on mobile devices</li>
+              <li>
+                • <strong>Add sections</strong> from the left panel by clicking on them
+              </li>
+              <li>
+                • <strong>Reorder sections</strong> using the ↑/↓ buttons in the layers panel
+              </li>
+              <li>
+                • <strong>Edit content</strong> by selecting a section and using the properties
+                panel on the right
+              </li>
+              <li>
+                • <strong>Preview in real-time</strong> in the center panel
+              </li>
+              <li>
+                • <strong>Save your changes</strong> using the Save button
+              </li>
+              <li>
+                • <strong>All sections are responsive</strong> and work perfectly on mobile devices
+              </li>
             </ul>
           </div>
         </div>

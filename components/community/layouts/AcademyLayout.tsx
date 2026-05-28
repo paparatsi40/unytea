@@ -32,16 +32,12 @@ interface AcademyLayoutProps {
   instructors?: any[];
 }
 
-export function AcademyLayout({
-  community,
-  courses = [],
-  instructors = [],
-}: AcademyLayoutProps) {
+export function AcademyLayout({ community, courses = [], instructors = [] }: AcademyLayoutProps) {
   const primaryColor = community.primaryColor || "#8B5CF6";
   const secondaryColor = community.secondaryColor || "#EC4899";
   const accentColor = community.accentColor || "#F59E0B";
 
-  const featuredCourses = courses.filter(c => c.isPublished).slice(0, 6);
+  const featuredCourses = courses.filter((c) => c.isPublished).slice(0, 6);
   const topInstructors = instructors.slice(0, 4);
 
   return (
@@ -128,23 +124,17 @@ export function AcademyLayout({
               >
                 <div className="rounded-2xl bg-white/80 p-6 shadow-lg backdrop-blur">
                   <BookOpen className="mx-auto mb-2 h-8 w-8" style={{ color: primaryColor }} />
-                  <div className="text-3xl font-bold text-gray-900">
-                    {community._count.courses}
-                  </div>
+                  <div className="text-3xl font-bold text-gray-900">{community._count.courses}</div>
                   <div className="text-sm text-gray-600">Courses</div>
                 </div>
                 <div className="rounded-2xl bg-white/80 p-6 shadow-lg backdrop-blur">
                   <Users className="mx-auto mb-2 h-8 w-8" style={{ color: secondaryColor }} />
-                  <div className="text-3xl font-bold text-gray-900">
-                    {community._count.members}
-                  </div>
+                  <div className="text-3xl font-bold text-gray-900">{community._count.members}</div>
                   <div className="text-sm text-gray-600">Students</div>
                 </div>
                 <div className="rounded-2xl bg-white/80 p-6 shadow-lg backdrop-blur">
                   <Award className="mx-auto mb-2 h-8 w-8" style={{ color: accentColor }} />
-                  <div className="text-3xl font-bold text-gray-900">
-                    {instructors.length || 5}
-                  </div>
+                  <div className="text-3xl font-bold text-gray-900">{instructors.length || 5}</div>
                   <div className="text-sm text-gray-600">Instructors</div>
                 </div>
               </motion.div>
@@ -229,9 +219,7 @@ export function AcademyLayout({
                       className="mx-auto mb-4 rounded-full ring-4 ring-gray-100"
                     />
                   )}
-                  <h3 className="mb-1 text-lg font-bold text-gray-900">
-                    {instructor.user?.name}
-                  </h3>
+                  <h3 className="mb-1 text-lg font-bold text-gray-900">{instructor.user?.name}</h3>
                   <p className="mb-2 text-sm text-gray-500">
                     {instructor.customRole || "Instructor"}
                   </p>

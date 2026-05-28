@@ -70,18 +70,31 @@ export function MemberAvatar({ member, isCurrentUser, isHovered }: Props) {
       {/* Typing indicator */}
       {member.isTyping && (
         <g transform="translate(0, -40)">
-          <rect
-            x="-20"
-            y="-10"
-            width="40"
-            height="20"
-            rx="10"
-            fill="#3b82f6"
-            opacity="0.9"
+          <rect x="-20" y="-10" width="40" height="20" rx="10" fill="#3b82f6" opacity="0.9" />
+          <circle
+            cx="-8"
+            cy="0"
+            r="2"
+            fill="white"
+            className="animate-bounce"
+            style={{ animationDelay: "0ms" }}
           />
-          <circle cx="-8" cy="0" r="2" fill="white" className="animate-bounce" style={{ animationDelay: '0ms' }} />
-          <circle cx="0" cy="0" r="2" fill="white" className="animate-bounce" style={{ animationDelay: '150ms' }} />
-          <circle cx="8" cy="0" r="2" fill="white" className="animate-bounce" style={{ animationDelay: '300ms' }} />
+          <circle
+            cx="0"
+            cy="0"
+            r="2"
+            fill="white"
+            className="animate-bounce"
+            style={{ animationDelay: "150ms" }}
+          />
+          <circle
+            cx="8"
+            cy="0"
+            r="2"
+            fill="white"
+            className="animate-bounce"
+            style={{ animationDelay: "300ms" }}
+          />
         </g>
       )}
 

@@ -5,6 +5,7 @@
 This document captures the delta between [PRODUCT_DECISIONS_V1.md](./PRODUCT_DECISIONS_V1.md) Section 5 (anti-features) and the implemented unytea codebase as of commit `0a446099`.
 
 The audit was performed in 2 phases on 2026-05-15:
+
 - **Phase 1**: Visual audit during the PWA screenshot session
 - **Phase 2**: Codebase grep + Prisma schema review
 
@@ -22,6 +23,7 @@ The current implementation contains substantial surface that conflicts with anti
 Several categories are confirmed clean (Cat C affiliates/referrals, Cat D tips/super-chats, Cat F sentiment/churn modeling, Cat H tracking pixels). These represent existing alignments that the doc retroactively confirms.
 
 A small number of items need strategic calls before Sprint 3 work can proceed:
+
 - **Cat B** — Member-to-member DMs (already gated via `canUsersDirectMessage`)
 - **Cat F** — AIChatWidget on every community page (positioning unclear)
 
@@ -35,13 +37,13 @@ The product implements the classic Skool engagement-extraction stack. This is th
 
 ### Schema-level surface (`prisma/schema.prisma`)
 
-| Lines | Field/Model | Conflict |
-|---|---|---|
-| 84-87 | `User.points`, `User.level`, `User.currentStreak`, `User.longestStreak`, `User.lastStreakDate` | Per-user persistent gamification |
-| 226-227 | `Member.points`, `Member.level` | Per-community duplication of gamification |
-| 835-861 | `Achievement` + `UserAchievement` models | Badge / achievement infrastructure |
-| 898-915 | `ChannelMember.isOnline`, `isTyping`, `lastSeenAt`, `lastTypingAt` + `@@index([isOnline])` | Presence pressure |
-| 1349 | `DailyActivity { ... pointsEarned ... }` | Daily activity → streak computation |
+| Lines   | Field/Model                                                                                    | Conflict                                  |
+| ------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| 84-87   | `User.points`, `User.level`, `User.currentStreak`, `User.longestStreak`, `User.lastStreakDate` | Per-user persistent gamification          |
+| 226-227 | `Member.points`, `Member.level`                                                                | Per-community duplication of gamification |
+| 835-861 | `Achievement` + `UserAchievement` models                                                       | Badge / achievement infrastructure        |
+| 898-915 | `ChannelMember.isOnline`, `isTyping`, `lastSeenAt`, `lastTypingAt` + `@@index([isOnline])`     | Presence pressure                         |
+| 1349    | `DailyActivity { ... pointsEarned ... }`                                                       | Daily activity → streak computation       |
 
 ### Routes and pages
 
@@ -101,6 +103,7 @@ Captured from `unytea.com/dashboard/c/unytea-2912/members` on 2026-05-15:
 PRODUCT_DECISIONS_V1.md Section 5 Cat A explicitly names: streaks, leaderboards, badges/gamification, "trending posts", aggressive notifications, "last active" pressure. All of these are present in code.
 
 **Decision options:**
+
 - **A. Full removal**: remove all gamification UI + schema columns. Significant scope (~15 files + 4 Prisma models).
 - **B. Hide UI but keep schema columns inert**: less work, leaves mechanism present (and reversible regression).
 - **C. Revise PD V1 Cat A**: scope which gamification (if any) is acceptable. E.g., private streak-for-hosts as private analytics ≠ public streak-for-members as coercion. Would require explicit doc revision.
@@ -126,6 +129,7 @@ PRODUCT_DECISIONS_V1.md Section 5 Cat A explicitly names: streaks, leaderboards,
 PD V1 §5 Cat B lists "Member-to-member DMs" as anti-feature. The implementation exists but is already gated by `canUsersDirectMessage` (likely scoping is same-community only).
 
 **Decision needed:**
+
 - Enforce strict §5 Cat B (remove DMs entirely)
 - Accept same-community DMs as community-glue and revise §5 Cat B's interpretation
 - Restrict DMs to host→member only (remove member→member, keep host→member which is OK per Section 3 Layer 2)
@@ -136,20 +140,22 @@ PD V1 §5 Cat B lists "Member-to-member DMs" as anti-feature. The implementation
 
 ### Clean
 
-| Surface | Hits |
-|---|---|
-| Affiliate programs | 0 |
-| Referral / invite codes | 0 |
-| Member-to-member commissions | 0 |
-| Scarcity / countdown UX | 0 |
+| Surface                      | Hits |
+| ---------------------------- | ---- |
+| Affiliate programs           | 0    |
+| Referral / invite codes      | 0    |
+| Member-to-member commissions | 0    |
+| Scarcity / countdown UX      | 0    |
 
 ### Soft violations
 
 **"Don't miss" copy:**
+
 - `app/actions/session-jobs.ts:324` — `"${session.title} starts at ${time} · Join now so you don't miss it"`
 - `lib/email.ts:165` — `"Hey ${userName}, don't miss this session!"`
 
 **Session urgency labels** (probably acceptable — factual time-to-event, not artificial scarcity):
+
 - `app/[locale]/community/[slug]/page.tsx:32` — `sessionUrgencyLabel(date)`
 - `app/[locale]/explore/page.tsx:56` — `getSessionUrgencyLabel(date)`
 - `lib/email.ts:136-153` — `urgencyMap` for session reminders
@@ -164,12 +170,12 @@ Rewrite the 2 "don't miss" lines to factual phrasing. Keep urgency labels — th
 
 ### Clean
 
-| Surface | Hits |
-|---|---|
-| Tips / donations | 0 |
-| Super-chats | 0 |
-| Pay-per-session pricing | 0 |
-| Pay-to-promote-comments | 0 |
+| Surface                 | Hits |
+| ----------------------- | ---- |
+| Tips / donations        | 0    |
+| Super-chats             | 0    |
+| Pay-per-session pricing | 0    |
+| Pay-to-promote-comments | 0    |
 
 unytea is correctly subscription-only. **Confirmed alignment.**
 
@@ -207,6 +213,7 @@ The "All Communities" discovery card surfaces communities with `Join Community` 
 PD V1 §5 Cat E names cross-community discovery feed AND trending communities surface AS anti-features. The `/explore` page implements both as its centerpiece.
 
 **Decision needed:**
+
 - **A. Remove `/explore` entirely.** Communities are accessed only via direct link or already-joined dashboard.
 - **B. Keep `/explore` but reframe as "unytea marketing showcase"** — small curated set, no algorithmic ranking, no "trending" sort. Communities listed by editorial choice or join-by-link only.
 - **C. Revise PD V1 §5 Cat E.** Less likely — the rationale ("hosts own their relationship; unytea is not a marketplace") was solid.
@@ -226,18 +233,19 @@ PD V1 §5 Cat E names cross-community discovery feed AND trending communities su
 ### Defensible content scoring (NOT member targeting)
 
 These score content/sessions/communities, not individual members. Reasonable analytics:
+
 - `app/actions/knowledge-library.ts:63,76` — `calculateEngagementScore(session)` based on attendees + reactions
 - `app/actions/ai-recommendations.ts:98` — engagement score on posts (`comments*2 + reactions`)
 - `app/actions/dashboard.ts:927-948` — community health engagement score
 
 ### Clean
 
-| Surface | Hits |
-|---|---|
-| Sentiment analysis on members | 0 |
-| Churn risk modeling | 0 |
-| Host impersonation | 0 |
-| `memberScore` / `engagementScore` per-member | 0 |
+| Surface                                      | Hits |
+| -------------------------------------------- | ---- |
+| Sentiment analysis on members                | 0    |
+| Churn risk modeling                          | 0    |
+| Host impersonation                           | 0    |
+| `memberScore` / `engagementScore` per-member | 0    |
 
 ### Strategic question
 
@@ -269,12 +277,12 @@ These are positive features unytea should keep/expand. Sprint 3 should verify ea
 
 ### Clean
 
-| Surface | Hits |
-|---|---|
-| Meta/IG/TikTok tracking pixels (`fbq`, `fbevents`, `tiktokpixel`, `gtm.`, `googleAds`) | 0 |
-| WhatsApp Business mass DM | 0 |
-| Telegram bot | 0 |
-| Mass broadcast messaging | 0 |
+| Surface                                                                                | Hits |
+| -------------------------------------------------------------------------------------- | ---- |
+| Meta/IG/TikTok tracking pixels (`fbq`, `fbevents`, `tiktokpixel`, `gtm.`, `googleAds`) | 0    |
+| WhatsApp Business mass DM                                                              | 0    |
+| Telegram bot                                                                           | 0    |
+| Mass broadcast messaging                                                               | 0    |
 
 **Strong confirmed alignment** with §5 Cat H.
 
@@ -282,16 +290,16 @@ These are positive features unytea should keep/expand. Sprint 3 should verify ea
 
 ## Summary table
 
-| Category | Conflict severity | Surface size | Decision needed by Sprint 3 |
-|---|---|---|---|
-| **A — Engagement Extraction** | CRITICAL | ~15 files, 4 Prisma models | Yes — major strategic call |
-| **B — Member-to-Member DMs** | HIGH | DM + Conversation + actions | Yes — gate, restrict, or remove |
-| **C — Viral Growth** | LOW | 2 copy strings | Minor copy fix |
-| **D — Predatory Monetization** | CLEAN | 0 hits | Confirmed alignment |
-| **E — Marketplace Cannibalization** | CRITICAL | `/explore` + dashboard route | Yes — remove or reframe |
-| **F — AI Replacing Relationship** | HIGH | AIChatWidget on all communities | Yes — clarify positioning |
-| **G — Pro-features** | TBD | Not audited | Sprint 3 verification task |
-| **H — Anti-Integrations** | CLEAN | 0 hits | Confirmed alignment |
+| Category                            | Conflict severity | Surface size                    | Decision needed by Sprint 3     |
+| ----------------------------------- | ----------------- | ------------------------------- | ------------------------------- |
+| **A — Engagement Extraction**       | CRITICAL          | ~15 files, 4 Prisma models      | Yes — major strategic call      |
+| **B — Member-to-Member DMs**        | HIGH              | DM + Conversation + actions     | Yes — gate, restrict, or remove |
+| **C — Viral Growth**                | LOW               | 2 copy strings                  | Minor copy fix                  |
+| **D — Predatory Monetization**      | CLEAN             | 0 hits                          | Confirmed alignment             |
+| **E — Marketplace Cannibalization** | CRITICAL          | `/explore` + dashboard route    | Yes — remove or reframe         |
+| **F — AI Replacing Relationship**   | HIGH              | AIChatWidget on all communities | Yes — clarify positioning       |
+| **G — Pro-features**                | TBD               | Not audited                     | Sprint 3 verification task      |
+| **H — Anti-Integrations**           | CLEAN             | 0 hits                          | Confirmed alignment             |
 
 ---
 
@@ -312,6 +320,7 @@ This audit serves as **the input for Sprint 3 planning**. The decisions are NOT 
 
 **Phase 1 — Visual audit (2026-05-15)**:
 Conducted opportunistically during PWA screenshot capture session. Findings derived from screenshots of:
+
 - `/dashboard/c/unytea-2912/members` — Members view
 - `/dashboard/sessions/[id]/room` — Live session view
 - Community discovery card
@@ -345,21 +354,21 @@ The 2026-05-15 audit (above, "Cat E — Marketplace Cannibalization → CRITICAL
 
 - **A. Remove `/explore` entirely.**
 - **B. Keep `/explore` but reframe as marketing showcase.**
-- **C. Revise PD V1 §5 Cat E** — flagged at the time as *less likely* because "the rationale ('hosts own their relationship; unytea is not a marketplace') was solid."
+- **C. Revise PD V1 §5 Cat E** — flagged at the time as _less likely_ because "the rationale ('hosts own their relationship; unytea is not a marketplace') was solid."
 
 Sprint 3 chose **Option A — full removal**, executed in Phase 3.1 (commit `e8d7e2e0`). At the time the choice was internally consistent: PD V1 §2 specified a target user with pre-existing audience, so PD V1 §5 Cat E's cannibalization concern followed logically, and Option A was the strict-alignment path.
 
 ### What changed on 2026-05-27
 
-In the 2026-05-27 strategy review, **PD V1 §2 itself was revised**. The primary target user is no longer the established host with 1k–30k audience; it is the *emerging creator with 0–500 followers monetizables or none*. See revised PD V1 §1 and §2 for the new framing.
+In the 2026-05-27 strategy review, **PD V1 §2 itself was revised**. The primary target user is no longer the established host with 1k–30k audience; it is the _emerging creator with 0–500 followers monetizables or none_. See revised PD V1 §1 and §2 for the new framing.
 
-That change overturns the *premise* of Cat E's original reasoning. The Cat E reasoning was: "discovery cannibalizes hosts who bring their own audience." With no pre-existing audience to cannibalize, discovery is not a threat — it is the entry point. The platform's job for the §2 (revised) persona is to deliver the creator's first 30 members.
+That change overturns the _premise_ of Cat E's original reasoning. The Cat E reasoning was: "discovery cannibalizes hosts who bring their own audience." With no pre-existing audience to cannibalize, discovery is not a threat — it is the entry point. The platform's job for the §2 (revised) persona is to deliver the creator's first 30 members.
 
 Therefore, on 2026-05-27, PD V1 §5 Cat E was revised in place. See PD V1 §5 Cat E "REVISED 2026-05-27" for the new conclusion and the quality bar that gates listings. The original Cat E reasoning is preserved above it in PD V1, dated.
 
 ### Audit logic vs. audit premise
 
-The audit's logic (Option A is the strict-alignment path given the doc as it stood on 2026-05-15) was correct then and is correct as a historical artifact. The audit's *premise* — that PD V1 §2 was stable and correct — turned out to be wrong eleven days later. The 2026-05-27 revision corrects the premise; the audit itself remains a faithful record of the doc-vs-code delta at the time it was performed.
+The audit's logic (Option A is the strict-alignment path given the doc as it stood on 2026-05-15) was correct then and is correct as a historical artifact. The audit's _premise_ — that PD V1 §2 was stable and correct — turned out to be wrong eleven days later. The 2026-05-27 revision corrects the premise; the audit itself remains a faithful record of the doc-vs-code delta at the time it was performed.
 
 In other words: **the audit was right; the document it audited was wrong.**
 
@@ -379,7 +388,7 @@ Future readers (and future audits) should treat the chain in that order: **doc �
 - **Cat B (member-to-member friction):** unchanged.
 - **Cat C, D, F, G, H:** unchanged.
 - **The audit's verdicts for all other categories:** unchanged.
-- **The discovery quality bar:** the four criteria in revised PD V1 §5 Cat E (live session in 7 days; ≥3 active members; description + cover image; ≥14 days old) are *new* gating that did **not** exist in the pre-removal `/explore`. The revert restores discovery as a surface; it does **not** restore the un-gated 2026-05-15-era `/explore`.
+- **The discovery quality bar:** the four criteria in revised PD V1 §5 Cat E (live session in 7 days; ≥3 active members; description + cover image; ≥14 days old) are _new_ gating that did **not** exist in the pre-removal `/explore`. The revert restores discovery as a surface; it does **not** restore the un-gated 2026-05-15-era `/explore`.
 
 ### Implementation handoff
 

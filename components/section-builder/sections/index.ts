@@ -22,7 +22,7 @@ export const SECTIONS: Record<SectionType, SectionSchema> = {
   stats: StatsSchema,
   ownerBio: OwnerBioSchema,
   gallery: GallerySchema,
-  
+
   pricing: {
     type: "pricing",
     label: "Pricing",
@@ -36,11 +36,17 @@ export const SECTIONS: Record<SectionType, SectionSchema> = {
     },
     fields: [
       { key: "title", label: "Title", kind: "text", placeholder: "Choose the plan that fits you" },
-      { key: "subtitle", label: "Subtitle", kind: "textarea", placeholder: "Compare options and start..." },
+      {
+        key: "subtitle",
+        label: "Subtitle",
+        kind: "textarea",
+        placeholder: "Compare options and start...",
+      },
       { key: "ctaText", label: "Button label", kind: "text", placeholder: "View plans" },
       { key: "ctaUrl", label: "Plans URL", kind: "url", placeholder: "/pricing" },
     ],
-    Render: () => React.createElement('div', { className: "p-8 text-center text-gray-500" }, "Pricing section"),
+    Render: () =>
+      React.createElement("div", { className: "p-8 text-center text-gray-500" }, "Pricing section"),
   },
   video: {
     type: "video",
@@ -55,11 +61,22 @@ export const SECTIONS: Record<SectionType, SectionSchema> = {
     },
     fields: [
       { key: "title", label: "Title", kind: "text", placeholder: "Watch the intro" },
-      { key: "description", label: "Description", kind: "textarea", placeholder: "Add context for this video" },
-      { key: "videoUrl", label: "Video URL", kind: "url", placeholder: "https://www.youtube.com/watch?v=..." },
+      {
+        key: "description",
+        label: "Description",
+        kind: "textarea",
+        placeholder: "Add context for this video",
+      },
+      {
+        key: "videoUrl",
+        label: "Video URL",
+        kind: "url",
+        placeholder: "https://www.youtube.com/watch?v=...",
+      },
       { key: "thumbnailUrl", label: "Thumbnail URL", kind: "url", placeholder: "https://..." },
     ],
-    Render: () => React.createElement('div', { className: "p-8 text-center text-gray-500" }, "Video section"),
+    Render: () =>
+      React.createElement("div", { className: "p-8 text-center text-gray-500" }, "Video section"),
   },
 };
 

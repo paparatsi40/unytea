@@ -5,23 +5,21 @@ import { SectionSchema } from "../types";
 
 export const OwnerBioRender = (props: Record<string, any>) => {
   const { title, name, role, bio, imageUrl, link1Label, link1Url, link2Label, link2Url } = props;
-  
+
   const links = [
     { label: link1Label, url: link1Url },
     { label: link2Label, url: link2Url },
-  ].filter(l => l.label && l.url);
-  
+  ].filter((l) => l.label && l.url);
+
   return (
     <section className="rounded-2xl border border-border bg-white p-8 md:p-16">
       <div className="mx-auto max-w-4xl">
         {title && (
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">
-              {title}
-            </h2>
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">{title}</h2>
           </div>
         )}
-        
+
         <div className="grid gap-8 md:grid-cols-[300px_1fr] md:items-start">
           <div className="mx-auto md:mx-0">
             <div className="relative h-64 w-64 overflow-hidden rounded-2xl bg-gray-100 shadow-xl">
@@ -37,26 +35,25 @@ export const OwnerBioRender = (props: Record<string, any>) => {
               ) : (
                 <div className="flex h-full items-center justify-center text-gray-400">
                   <svg className="h-24 w-24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
                   </svg>
                 </div>
               )}
             </div>
           </div>
-          
+
           <div>
-            <h3 className="text-2xl font-bold text-gray-900 md:text-3xl">
-              {name || "Your Name"}
-            </h3>
-            {role && (
-              <p className="mt-2 text-lg font-semibold text-purple-600">
-                {role}
-              </p>
-            )}
-            <p className="mt-4 text-base text-gray-700 whitespace-pre-line md:text-lg">
+            <h3 className="text-2xl font-bold text-gray-900 md:text-3xl">{name || "Your Name"}</h3>
+            {role && <p className="mt-2 text-lg font-semibold text-purple-600">{role}</p>}
+            <p className="mt-4 whitespace-pre-line text-base text-gray-700 md:text-lg">
               {bio || "Share your story, expertise, and why you created this community..."}
             </p>
-            
+
             {links.length > 0 && (
               <div className="mt-6 flex flex-wrap gap-3">
                 {links.map((link, i) => (
@@ -98,7 +95,12 @@ export const OwnerBioSchema: SectionSchema = {
   fields: [
     { key: "title", label: "Title (optional)", kind: "text", placeholder: "Meet Your Host" },
     { key: "name", label: "Your Name", kind: "text", placeholder: "John Doe" },
-    { key: "role", label: "Your Role/Title", kind: "text", placeholder: "Founder & Lead Instructor" },
+    {
+      key: "role",
+      label: "Your Role/Title",
+      kind: "text",
+      placeholder: "Founder & Lead Instructor",
+    },
     { key: "bio", label: "Bio", kind: "textarea", placeholder: "Your story..." },
     { key: "imageUrl", label: "Profile Image (URL)", kind: "image", placeholder: "https://..." },
     { key: "link1Label", label: "Link 1 Label", kind: "text", placeholder: "LinkedIn" },

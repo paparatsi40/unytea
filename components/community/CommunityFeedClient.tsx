@@ -56,11 +56,7 @@ type HotTopic = {
   authorName: string | null;
 };
 
-export function CommunityFeedClient({
-  slug,
-}: {
-  slug: string;
-}) {
+export function CommunityFeedClient({ slug }: { slug: string }) {
   const { user, isLoading } = useCurrentUser();
   const router = useRouter();
   const [posts, setPosts] = useState<Post[]>([]);
@@ -86,9 +82,7 @@ export function CommunityFeedClient({
 
       try {
         // Fetch community and membership data
-        const communityResponse = await fetch(
-          `/api/communities/${slug}?userId=${user.id}`
-        );
+        const communityResponse = await fetch(`/api/communities/${slug}?userId=${user.id}`);
 
         if (!communityResponse.ok) {
           if (communityResponse.status === 404) {
@@ -169,8 +163,8 @@ export function CommunityFeedClient({
   return (
     <div className="container mx-auto px-6 py-12">
       {isMember || !isPrivate ? (
-        <PremiumPostFeed 
-          posts={posts} 
+        <PremiumPostFeed
+          posts={posts}
           communityId={communityId}
           upcomingSession={upcomingSession}
           hotTopics={hotTopics}
@@ -181,12 +175,9 @@ export function CommunityFeedClient({
           <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-amber-500/10">
             <Users className="h-8 w-8 text-amber-500" />
           </div>
-          <h2 className="mb-2 text-2xl font-bold text-foreground">
-            Request Pending
-          </h2>
+          <h2 className="mb-2 text-2xl font-bold text-foreground">Request Pending</h2>
           <p className="text-muted-foreground">
-            Your request to join this community is awaiting approval from the
-            community owner.
+            Your request to join this community is awaiting approval from the community owner.
           </p>
         </div>
       ) : (
@@ -195,12 +186,9 @@ export function CommunityFeedClient({
           <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-primary/5">
             <Users className="h-8 w-8 text-primary" />
           </div>
-          <h2 className="mb-2 text-2xl font-bold text-foreground">
-            Private Community
-          </h2>
+          <h2 className="mb-2 text-2xl font-bold text-foreground">Private Community</h2>
           <p className="mb-6 text-muted-foreground">
-            This is a private community. Join to see posts and participate in
-            discussions.
+            This is a private community. Join to see posts and participate in discussions.
           </p>
         </div>
       )}

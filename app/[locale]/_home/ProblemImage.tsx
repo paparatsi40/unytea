@@ -15,7 +15,7 @@ export function ProblemImage({ src, alt }: { src: string; alt: string }) {
       alt={alt}
       fill
       sizes="(min-width: 768px) 33vw, 100vw"
-      className="object-cover opacity-60 group-hover:opacity-40 transition-opacity"
+      className="object-cover opacity-60 transition-opacity group-hover:opacity-40"
       onError={(e) => {
         (e.target as HTMLImageElement).style.display = "none";
       }}

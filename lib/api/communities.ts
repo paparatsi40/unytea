@@ -153,10 +153,7 @@ export async function deleteCommunity(communityId: string) {
 /**
  * Check if user is owner of community
  */
-export async function isUserCommunityOwner(
-  userId: string,
-  communityId: string
-): Promise<boolean> {
+export async function isUserCommunityOwner(userId: string, communityId: string): Promise<boolean> {
   const community = await prisma.community.findUnique({
     where: { id: communityId },
     select: { ownerId: true },

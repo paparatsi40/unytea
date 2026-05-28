@@ -2,7 +2,18 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { getUserSessions } from "@/app/actions/sessions";
 import { prisma } from "@/lib/prisma";
-import { Video, Calendar, Clock, Play, Radio, Users, ArrowRight, VideoIcon, Sparkles, BellRing } from "lucide-react";
+import {
+  Video,
+  Calendar,
+  Clock,
+  Play,
+  Radio,
+  Users,
+  ArrowRight,
+  VideoIcon,
+  Sparkles,
+  BellRing,
+} from "lucide-react";
 import { CreateSessionDialog } from "@/components/sessions/CreateSessionDialog";
 import { format, isToday, isTomorrow, isThisWeek, formatDistanceToNow } from "date-fns";
 import { Button } from "@/components/ui/button";
@@ -50,9 +61,7 @@ export default async function SessionsPage() {
       <div className="flex min-h-[600px] items-center justify-center">
         <div className="text-center">
           <Video className="mx-auto mb-4 h-12 w-12 text-zinc-500" />
-          <h2 className="mb-2 text-xl font-semibold text-white">
-            Failed to load sessions
-          </h2>
+          <h2 className="mb-2 text-xl font-semibold text-white">Failed to load sessions</h2>
           <p className="text-zinc-400">{result.error || "An error occurred"}</p>
         </div>
       </div>
@@ -62,13 +71,13 @@ export default async function SessionsPage() {
   const { upcoming, past } = result.sessions;
 
   // Calculate sessions this week
-  const sessionsThisWeek = upcoming.filter(s => 
+  const sessionsThisWeek = upcoming.filter((s) =>
     isThisWeek(new Date(s.scheduledAt), { weekStartsOn: 1 })
   ).length;
 
   // Check if there's a live session (for demo purposes, we'll check status)
   // In production, you'd check if session.status === "LIVE" or similar
-  const liveSession = upcoming.find(s => {
+  const liveSession = upcoming.find((s) => {
     const sessionDate = new Date(s.scheduledAt);
     const now = new Date();
     // Consider "live" if scheduled within last hour and not ended
@@ -121,9 +130,12 @@ export default async function SessionsPage() {
               </div>
               <div>
                 <Badge className="bg-amber-500 text-zinc-900">STARTING SOON</Badge>
-                <h2 className="mt-2 text-xl font-semibold text-white">{startingSoonSession.title}</h2>
+                <h2 className="mt-2 text-xl font-semibold text-white">
+                  {startingSoonSession.title}
+                </h2>
                 <p className="mt-1 text-sm text-zinc-300">
-                  Starts in {nextSessionStartsInMinutes} min · {formatSessionTime(new Date(startingSoonSession.scheduledAt))}
+                  Starts in {nextSessionStartsInMinutes} min ·{" "}
+                  {formatSessionTime(new Date(startingSoonSession.scheduledAt))}
                 </p>
               </div>
             </div>
@@ -153,12 +165,8 @@ export default async function SessionsPage() {
                     Started {formatDistanceToNow(new Date(liveSession.scheduledAt))} ago
                   </span>
                 </div>
-                <h2 className="mt-1 text-xl font-semibold text-white">
-                  {liveSession.title}
-                </h2>
-                <p className="mt-1 text-sm text-zinc-400">
-                  with {liveSession.mentor.name}
-                </p>
+                <h2 className="mt-1 text-xl font-semibold text-white">{liveSession.title}</h2>
+                <p className="mt-1 text-sm text-zinc-400">with {liveSession.mentor.name}</p>
                 <div className="mt-3 flex items-center gap-4 text-sm text-zinc-400">
                   <span className="flex items-center gap-1">
                     <Users className="h-4 w-4" />
@@ -212,7 +220,8 @@ export default async function SessionsPage() {
                   Host your first live session
                 </h3>
                 <p className="mt-2 max-w-sm text-sm text-muted-foreground">
-                  Run coaching calls, workshops, or Q&A sessions. Engage your community in real-time.
+                  Run coaching calls, workshops, or Q&A sessions. Engage your community in
+                  real-time.
                 </p>
                 <div className="mt-6 flex items-center gap-4">
                   <CreateSessionDialog
@@ -258,12 +267,10 @@ export default async function SessionsPage() {
                 </div>
 
                 {/* Title & Host */}
-                <h3 className="font-semibold text-white group-hover:text-purple-400 transition-colors">
+                <h3 className="font-semibold text-white transition-colors group-hover:text-purple-400">
                   {s.title}
                 </h3>
-                <p className="mt-1 text-sm text-zinc-400">
-                  with {s.mentor.name}
-                </p>
+                <p className="mt-1 text-sm text-zinc-400">with {s.mentor.name}</p>
 
                 {/* Meta Info */}
                 <div className="mt-4 flex items-center gap-4 text-xs text-zinc-500">
@@ -273,16 +280,15 @@ export default async function SessionsPage() {
                   </span>
                   <span className="flex items-center gap-1">
                     <Users className="h-3 w-3" />
-                    {/* In production, fetch actual count */}
-                    0 attending
+                    {/* In production, fetch actual count */}0 attending
                   </span>
                 </div>
 
                 {/* Actions */}
                 <div className="mt-4 flex items-center gap-2">
                   <Link href={`/dashboard/sessions/${s.id}/room`} className="flex-1">
-                    <Button 
-                      variant="default" 
+                    <Button
+                      variant="default"
                       size="sm"
                       className="w-full rounded-full bg-purple-600 hover:bg-purple-700"
                     >
@@ -321,7 +327,7 @@ export default async function SessionsPage() {
                 {/* Recording Badge */}
                 {s.status === "COMPLETED" && (
                   <div className="absolute right-3 top-3">
-                    <Badge className="bg-green-500/10 text-green-400 border-green-500/20 text-xs">
+                    <Badge className="border-green-500/20 bg-green-500/10 text-xs text-green-400">
                       <VideoIcon className="mr-1 h-3 w-3" />
                       Recording available
                     </Badge>
@@ -335,7 +341,7 @@ export default async function SessionsPage() {
                 </div>
 
                 {/* Title */}
-                <h3 className="font-medium text-foreground group-hover:text-foreground transition-colors">
+                <h3 className="font-medium text-foreground transition-colors group-hover:text-foreground">
                   {s.title}
                 </h3>
 
@@ -349,21 +355,21 @@ export default async function SessionsPage() {
                 <div className="mt-4 flex items-center gap-2">
                   {/* Always show Enter Room button for past sessions */}
                   <Link href={`/dashboard/sessions/${s.id}/room`} className="flex-1">
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       size="sm"
                       className="w-full rounded-full border-border bg-background text-xs text-foreground hover:bg-accent"
                     >
                       Enter Room
                     </Button>
                   </Link>
-                  
+
                   {/* Show recording buttons if available */}
                   {s.recordingUrl && (
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       size="sm"
-                      className="text-xs text-green-400 hover:text-green-300 hover:bg-green-500/10"
+                      className="text-xs text-green-400 hover:bg-green-500/10 hover:text-green-300"
                     >
                       <Play className="mr-1 h-3 w-3" />
                       Watch

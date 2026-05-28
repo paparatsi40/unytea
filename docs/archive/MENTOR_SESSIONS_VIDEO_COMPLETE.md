@@ -117,14 +117,14 @@ model MentorSession {
 
 ## 📊 **COMPARACIÓN: ANTES vs DESPUÉS**
 
-| Feature | Antes | Después |
-|---------|-------|---------|
-| **Video Calls** | ❌ No implementado | ✅ Totalmente funcional |
-| **Room per Session** | ❌ N/A | ✅ Automático |
-| **Access Control** | ❌ N/A | ✅ Solo mentor/mentee |
-| **Pre-call Screen** | ❌ N/A | ✅ Info completa |
-| **In-call Info** | ❌ N/A | ✅ Detalles visibles |
-| **Leave Flow** | ❌ N/A | ✅ Back to sessions |
+| Feature              | Antes              | Después                 |
+| -------------------- | ------------------ | ----------------------- |
+| **Video Calls**      | ❌ No implementado | ✅ Totalmente funcional |
+| **Room per Session** | ❌ N/A             | ✅ Automático           |
+| **Access Control**   | ❌ N/A             | ✅ Solo mentor/mentee   |
+| **Pre-call Screen**  | ❌ N/A             | ✅ Info completa        |
+| **In-call Info**     | ❌ N/A             | ✅ Detalles visibles    |
+| **Leave Flow**       | ❌ N/A             | ✅ Back to sessions     |
 
 ---
 
@@ -149,24 +149,24 @@ O usa tu UI de creación de sesiones (si existe).
 ### **Test básico:**
 
 1. **Como Mentor:**
-    - Ve a `/dashboard/sessions`
-    - Encuentra una sesión donde eres mentor
-    - Click "Join Video Call"
-    - Deberías ver la página pre-call
-    - Click "Join Video Call"
-    - Conecta exitosamente
+   - Ve a `/dashboard/sessions`
+   - Encuentra una sesión donde eres mentor
+   - Click "Join Video Call"
+   - Deberías ver la página pre-call
+   - Click "Join Video Call"
+   - Conecta exitosamente
 
 2. **Como Mentee (en otra ventana/navegador):**
-    - Login con cuenta del mentee
-    - Ve a `/dashboard/sessions`
-    - Encuentra la MISMA sesión
-    - Click "Join Video Call"
-    - Ambos deberían verse en el video call
+   - Login con cuenta del mentee
+   - Ve a `/dashboard/sessions`
+   - Encuentra la MISMA sesión
+   - Click "Join Video Call"
+   - Ambos deberían verse en el video call
 
 3. **Como usuario ajeno:**
-    - Login con cuenta que NO es mentor ni mentee
-    - Intenta acceder a `/dashboard/sessions/[sessionId]/video`
-    - Deberías ver "Access Denied"
+   - Login con cuenta que NO es mentor ni mentee
+   - Intenta acceder a `/dashboard/sessions/[sessionId]/video`
+   - Deberías ver "Access Denied"
 
 ---
 
@@ -179,8 +179,7 @@ O usa tu UI de creación de sesiones (si existe).
 if (!session?.user?.id) return 401;
 
 // Verifica participación
-const isParticipant = 
-  userId === mentor.id || userId === mentee.id;
+const isParticipant = userId === mentor.id || userId === mentee.id;
 
 if (!isParticipant) return 403;
 ```
@@ -201,7 +200,7 @@ if (!isParticipant) {
 roomName = `session-${sessionId}`;
 
 // Token con identity del usuario
-identity: session.user.id
+identity: session.user.id;
 ```
 
 **Resultado:** Triple verificación de seguridad ✅

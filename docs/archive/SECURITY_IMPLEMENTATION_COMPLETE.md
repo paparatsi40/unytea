@@ -59,12 +59,12 @@ const identifier = getIdentifier(request, userId);
 const result = rateLimiters.api.check(identifier);
 
 if (!result.success) {
-  return new Response("Rate limit exceeded", { 
+  return new Response("Rate limit exceeded", {
     status: 429,
     headers: {
-      'X-RateLimit-Remaining': '0',
-      'X-RateLimit-Reset': result.resetTime.toString(),
-    }
+      "X-RateLimit-Remaining": "0",
+      "X-RateLimit-Reset": result.resetTime.toString(),
+    },
   });
 }
 ```
@@ -323,13 +323,13 @@ import { sanitizeHtml } from "@/lib/validations";
 ```typescript
 // Verify origin header in API routes
 export async function POST(request: Request) {
-  const origin = request.headers.get('origin');
-  const host = request.headers.get('host');
-  
+  const origin = request.headers.get("origin");
+  const host = request.headers.get("host");
+
   if (origin && new URL(origin).host !== host) {
-    return new Response('Forbidden', { status: 403 });
+    return new Response("Forbidden", { status: 403 });
   }
-  
+
   // Process request...
 }
 ```

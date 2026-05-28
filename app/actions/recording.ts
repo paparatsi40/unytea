@@ -27,7 +27,7 @@ export interface RecordingInfo {
 
 /**
  * Start composite recording for a session
- * 
+ *
  * NOTE: For V1, recording is started automatically via LiveKit Cloud dashboard
  * Egress configuration. This function validates permissions and creates the DB record.
  * The actual recording starts when the webhook 'egress_started' arrives.
@@ -100,7 +100,7 @@ export async function startCompositeRecording(
 
 /**
  * Stop recording for a session
- * 
+ *
  * NOTE: For V1, recording stops automatically when room ends or via LiveKit dashboard.
  * This function marks the recording as stopped in our DB.
  */
@@ -150,9 +150,7 @@ export async function stopRecording(
 /**
  * Get recording status and info
  */
-export async function getRecordingStatus(
-  sessionId: string
-): Promise<{
+export async function getRecordingStatus(sessionId: string): Promise<{
   success: boolean;
   recording?: {
     id: string;

@@ -13,8 +13,9 @@
 calidad enterprise-grade a precio accesible.**
 
 **Positioning Statement:**
+
 > "Mentorly: La plataforma que Skool debió ser. Modern design. Killer features. Better price. Zero
-limits."
+> limits."
 
 ---
 
@@ -354,31 +355,34 @@ VALUE: $$$ - Budget-friendly sin sacrificar calidad
 ### **Value Propositions**
 
 **1. Para Creators Frustrados con Skool:**
+
 > "Tired of Skool's dated design and missing features? Mentorly gives you everything Skool
-doesn't—video calls, AI tools, modern UI, and 50% lower price."
+> doesn't—video calls, AI tools, modern UI, and 50% lower price."
 
 **2. Para Nuevos Creators:**
+
 > "Build your dream community with enterprise-grade features at startup-friendly prices. Video
-calls, AI assistance, and stunning design—all built-in."
+> calls, AI assistance, and stunning design—all built-in."
 
 **3. Para Enterprise:**
+
 > "Scale your community without limits. White-label, API access, SSO, and dedicated support.
-Everything your growing business needs."
+> Everything your growing business needs."
 
 ### **Comparación Directa**
 
-| Feature | Skool | Mentorly | Winner |
-|---------|-------|----------|--------|
-| **Price** | $99/mes | $49/mes | 🏆 Mentorly |
-| **Design** | 2015 | 2024 | 🏆 Mentorly |
-| **Video Calls** | ❌ | ✅ | 🏆 Mentorly |
-| **Live Streaming** | ❌ | ✅ | 🏆 Mentorly |
-| **AI Features** | ❌ | ✅ | 🏆 Mentorly |
-| **Customization** | Minimal | Full | 🏆 Mentorly |
-| **File Uploads** | ❌ | ✅ | 🏆 Mentorly |
-| **Email Marketing** | ❌ | ✅ | 🏆 Mentorly |
-| **White Label** | ❌ | ✅ | 🏆 Mentorly |
-| **Transaction Fee** | 2.9% | 0% | 🏆 Mentorly |
+| Feature             | Skool   | Mentorly | Winner      |
+| ------------------- | ------- | -------- | ----------- |
+| **Price**           | $99/mes | $49/mes  | 🏆 Mentorly |
+| **Design**          | 2015    | 2024     | 🏆 Mentorly |
+| **Video Calls**     | ❌      | ✅       | 🏆 Mentorly |
+| **Live Streaming**  | ❌      | ✅       | 🏆 Mentorly |
+| **AI Features**     | ❌      | ✅       | 🏆 Mentorly |
+| **Customization**   | Minimal | Full     | 🏆 Mentorly |
+| **File Uploads**    | ❌      | ✅       | 🏆 Mentorly |
+| **Email Marketing** | ❌      | ✅       | 🏆 Mentorly |
+| **White Label**     | ❌      | ✅       | 🏆 Mentorly |
+| **Transaction Fee** | 2.9%    | 0%       | 🏆 Mentorly |
 
 ---
 

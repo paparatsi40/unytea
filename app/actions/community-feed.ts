@@ -59,10 +59,7 @@ export async function getCommunityUpcomingSession(communityId: string) {
 /**
  * Get hot discussions (posts with most comments) for a community
  */
-export async function getCommunityHotDiscussions(
-  communityId: string,
-  limit: number = 5
-) {
+export async function getCommunityHotDiscussions(communityId: string, limit: number = 5) {
   try {
     const userId = await getCurrentUserId();
     if (!userId) {
@@ -83,10 +80,7 @@ export async function getCommunityHotDiscussions(
         },
         author: { select: { name: true } },
       },
-      orderBy: [
-        { comments: { _count: "desc" } },
-        { createdAt: "desc" },
-      ],
+      orderBy: [{ comments: { _count: "desc" } }, { createdAt: "desc" }],
       take: limit,
     });
 

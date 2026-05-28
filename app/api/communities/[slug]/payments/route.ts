@@ -43,14 +43,10 @@ function extractPricing(pricing: unknown): {
   const rawYearly = record.yearlyPrice;
 
   const monthlyPrice =
-    typeof rawMonthly === "number" || typeof rawMonthly === "string"
-      ? String(rawMonthly)
-      : "29";
+    typeof rawMonthly === "number" || typeof rawMonthly === "string" ? String(rawMonthly) : "29";
 
   const yearlyPrice =
-    typeof rawYearly === "number" || typeof rawYearly === "string"
-      ? String(rawYearly)
-      : "290";
+    typeof rawYearly === "number" || typeof rawYearly === "string" ? String(rawYearly) : "290";
 
   const rawDefaultTier = record.defaultTier;
   const defaultTier =
@@ -61,24 +57,36 @@ function extractPricing(pricing: unknown): {
   const rawTierPricing = record.tierPricing as Record<string, unknown> | undefined;
   const tierPricing: TierPricing = {
     free:
-      rawTierPricing && (typeof rawTierPricing.free === "number" || typeof rawTierPricing.free === "string")
+      rawTierPricing &&
+      (typeof rawTierPricing.free === "number" || typeof rawTierPricing.free === "string")
         ? String(rawTierPricing.free)
         : "0",
     pro:
-      rawTierPricing && (typeof rawTierPricing.pro === "number" || typeof rawTierPricing.pro === "string")
+      rawTierPricing &&
+      (typeof rawTierPricing.pro === "number" || typeof rawTierPricing.pro === "string")
         ? String(rawTierPricing.pro)
         : monthlyPrice,
     vip:
-      rawTierPricing && (typeof rawTierPricing.vip === "number" || typeof rawTierPricing.vip === "string")
+      rawTierPricing &&
+      (typeof rawTierPricing.vip === "number" || typeof rawTierPricing.vip === "string")
         ? String(rawTierPricing.vip)
         : "99",
   };
 
   const rawTierStripePriceIds = record.tierStripePriceIds as Record<string, unknown> | undefined;
   const tierStripePriceIds: TierStripePriceIds = {
-    free: rawTierStripePriceIds && typeof rawTierStripePriceIds.free === "string" ? rawTierStripePriceIds.free : "",
-    pro: rawTierStripePriceIds && typeof rawTierStripePriceIds.pro === "string" ? rawTierStripePriceIds.pro : "",
-    vip: rawTierStripePriceIds && typeof rawTierStripePriceIds.vip === "string" ? rawTierStripePriceIds.vip : "",
+    free:
+      rawTierStripePriceIds && typeof rawTierStripePriceIds.free === "string"
+        ? rawTierStripePriceIds.free
+        : "",
+    pro:
+      rawTierStripePriceIds && typeof rawTierStripePriceIds.pro === "string"
+        ? rawTierStripePriceIds.pro
+        : "",
+    vip:
+      rawTierStripePriceIds && typeof rawTierStripePriceIds.vip === "string"
+        ? rawTierStripePriceIds.vip
+        : "",
   };
 
   return { monthlyPrice, yearlyPrice, defaultTier, tierPricing, tierStripePriceIds };
@@ -174,7 +182,10 @@ export async function PUT(req: Request, context: RouteContext) {
 
     if (isPaid) {
       if (!Number.isFinite(monthly) || monthly <= 0) {
-        return NextResponse.json({ error: "Monthly price must be greater than 0" }, { status: 400 });
+        return NextResponse.json(
+          { error: "Monthly price must be greater than 0" },
+          { status: 400 }
+        );
       }
       if (!Number.isFinite(yearly) || yearly <= 0) {
         return NextResponse.json({ error: "Yearly price must be greater than 0" }, { status: 400 });

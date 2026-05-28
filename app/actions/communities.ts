@@ -27,7 +27,7 @@ export async function createCommunity(data: {
 }) {
   try {
     const userId = await getCurrentUserId();
-    
+
     if (!userId) {
       return { success: false, error: "Not authenticated" };
     }
@@ -42,7 +42,7 @@ export async function createCommunity(data: {
       console.error("User not found in database:", userId);
       return {
         success: false,
-        error: "User account not found. Please sign in again."
+        error: "User account not found. Please sign in again.",
       };
     }
 
@@ -118,22 +118,22 @@ export async function createCommunity(data: {
     // Revalidate paths BEFORE returning
     revalidatePath("/dashboard/communities");
     revalidatePath(`/dashboard/c/${result.community.slug}`);
-    
+
     console.log("✅ Paths revalidated, returning success");
-    
+
     // Return success - let client handle redirect
-    return { 
-      success: true, 
+    return {
+      success: true,
       community: result.community,
-      membership: result.membership 
+      membership: result.membership,
     };
   } catch (error) {
     console.error("❌ Error creating community:", error);
     console.error("❌ Error details:", error instanceof Error ? error.message : String(error));
     console.error("❌ Error stack:", error instanceof Error ? error.stack : "No stack");
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : "Failed to create community" 
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to create community",
     };
   }
 }
@@ -154,7 +154,7 @@ export async function updateCommunity(
 ) {
   try {
     const userId = await getCurrentUserId();
-    
+
     if (!userId) {
       return { success: false, error: "Not authenticated" };
     }
@@ -191,7 +191,7 @@ export async function updateCommunity(
 export async function joinCommunity(communityId: string) {
   try {
     const userId = await getCurrentUserId();
-    
+
     if (!userId) {
       return { success: false, error: "Not authenticated" };
     }
@@ -279,7 +279,7 @@ export async function joinCommunity(communityId: string) {
 export async function leaveCommunity(communityId: string) {
   try {
     const userId = await getCurrentUserId();
-    
+
     if (!userId) {
       return { success: false, error: "Not authenticated" };
     }
@@ -352,11 +352,11 @@ export async function deleteCommunity(communityId: string) {
     // Verify user is the owner
     const community = await prisma.community.findUnique({
       where: { id: communityId },
-      select: { 
-        id: true, 
+      select: {
+        id: true,
         name: true,
         slug: true,
-        ownerId: true 
+        ownerId: true,
       },
     });
 
@@ -466,15 +466,15 @@ export async function deleteCommunity(communityId: string) {
       console.log("✅ Community and all related data deleted successfully");
     });
 
-    return { 
-      success: true, 
-      message: `Community "${community.name}" deleted successfully` 
+    return {
+      success: true,
+      message: `Community "${community.name}" deleted successfully`,
     };
   } catch (error) {
     console.error("❌ Error deleting community:", error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : "Failed to delete community" 
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to delete community",
     };
   }
 }
@@ -485,7 +485,7 @@ export async function deleteCommunity(communityId: string) {
 export async function getUserCommunities() {
   try {
     const userId = await getCurrentUserId();
-    
+
     if (!userId) {
       return { success: false, error: "Not authenticated" };
     }

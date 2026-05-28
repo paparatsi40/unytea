@@ -13,11 +13,7 @@ import {
   stopRecording,
 } from "@/app/actions/recording";
 
-export default function SessionRoomPage(
-  props: {
-    params: Promise<{ sessionId: string }>;
-  }
-) {
+export default function SessionRoomPage(props: { params: Promise<{ sessionId: string }> }) {
   const params = use(props.params);
   const router = useRouter();
   const { user, isLoading: isAuthLoading } = useCurrentUser();
@@ -74,7 +70,11 @@ export default function SessionRoomPage(
   };
 
   const handleEndSession = useCallback(async () => {
-    if (!confirm("Are you sure you want to end this session? This will stop the recording and generate a session recap.")) {
+    if (
+      !confirm(
+        "Are you sure you want to end this session? This will stop the recording and generate a session recap."
+      )
+    ) {
       return;
     }
 
@@ -183,7 +183,7 @@ export default function SessionRoomPage(
       {isEnding && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
           <div className="text-center">
-            <div className="mb-4 h-12 w-12 animate-spin rounded-full border-3 border-purple-500 border-t-transparent" />
+            <div className="border-3 mb-4 h-12 w-12 animate-spin rounded-full border-purple-500 border-t-transparent" />
             <p className="text-lg font-medium text-white">Ending session...</p>
             <p className="text-sm text-zinc-400">Generating recap and processing recording</p>
           </div>

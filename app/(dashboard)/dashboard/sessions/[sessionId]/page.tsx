@@ -3,14 +3,14 @@
 import { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { 
-  ArrowLeft, 
-  Play, 
-  BookOpen, 
-  Share2, 
-  Download, 
-  FileText, 
-  MessageSquare, 
+import {
+  ArrowLeft,
+  Play,
+  BookOpen,
+  Share2,
+  Download,
+  FileText,
+  MessageSquare,
   Folder,
   Clock,
   Users,
@@ -53,7 +53,9 @@ export default function SessionDetailPage(props: SessionPageProps) {
   const [rsvpStatus, setRsvpStatus] = useState<"attending" | "interested" | null>(null);
   const [attendingCount, setAttendingCount] = useState(0);
   const [interestedCount, setInterestedCount] = useState(0);
-  const [attendingPreview, setAttendingPreview] = useState<Array<{ id: string; name: string | null; image: string | null }>>([]);
+  const [attendingPreview, setAttendingPreview] = useState<
+    Array<{ id: string; name: string | null; image: string | null }>
+  >([]);
   const [isRSVPLoading, setIsRSVPLoading] = useState(false);
 
   useEffect(() => {
@@ -207,8 +209,11 @@ export default function SessionDetailPage(props: SessionPageProps) {
     ? `${window.location.origin}/sessions/${session.slug}?src=session_detail_share`
     : `${window.location.origin}/dashboard/sessions/${session.id}?src=session_detail_share`;
 
-  const startsInMinutes = Math.floor((new Date(session.scheduledAt).getTime() - Date.now()) / (1000 * 60));
-  const isStartingSoon = session.status === "SCHEDULED" && startsInMinutes >= 0 && startsInMinutes <= 10;
+  const startsInMinutes = Math.floor(
+    (new Date(session.scheduledAt).getTime() - Date.now()) / (1000 * 60)
+  );
+  const isStartingSoon =
+    session.status === "SCHEDULED" && startsInMinutes >= 0 && startsInMinutes <= 10;
 
   const handleCopyInviteLink = async () => {
     await navigator.clipboard.writeText(publicSessionUrl);
@@ -223,8 +228,8 @@ export default function SessionDetailPage(props: SessionPageProps) {
       network === "twitter"
         ? `https://twitter.com/intent/tweet?text=${text}&url=${url}`
         : network === "linkedin"
-        ? `https://www.linkedin.com/sharing/share-offsite/?url=${url}`
-        : `https://wa.me/?text=${text}%20${url}`;
+          ? `https://www.linkedin.com/sharing/share-offsite/?url=${url}`
+          : `https://wa.me/?text=${text}%20${url}`;
 
     window.open(target, "_blank", "noopener,noreferrer");
   };
@@ -288,7 +293,7 @@ export default function SessionDetailPage(props: SessionPageProps) {
           onCreateClip={() => setShowCreateClip(true)}
           onPublishToLibrary={handlePublishToLibrary}
         />
-        
+
         {/* Dialogs */}
         <AddToCourseDialog
           sessionId={session.id}
@@ -296,7 +301,7 @@ export default function SessionDetailPage(props: SessionPageProps) {
           open={showAddToCourse}
           onOpenChange={setShowAddToCourse}
         />
-        
+
         <CreateSocialClipDialog
           sessionId={session.id}
           open={showCreateClip}
@@ -421,7 +426,11 @@ export default function SessionDetailPage(props: SessionPageProps) {
                 onClick={() => handleSetRSVP("attending")}
               >
                 <Users className="h-4 w-4" />
-                {isRSVPLoading && rsvpStatus !== "attending" ? "Updating..." : rsvpStatus === "attending" ? "Attending" : "Attending"}
+                {isRSVPLoading && rsvpStatus !== "attending"
+                  ? "Updating..."
+                  : rsvpStatus === "attending"
+                    ? "Attending"
+                    : "Attending"}
               </Button>
               <Button
                 variant={rsvpStatus === "interested" ? "outline" : "secondary"}
@@ -493,7 +502,7 @@ export default function SessionDetailPage(props: SessionPageProps) {
           )}
 
           {hasRecording && !isProcessing && (
-            <Button 
+            <Button
               className="gap-2 bg-purple-600 hover:bg-purple-700"
               onClick={() => setActiveTab("recording")}
             >
@@ -523,9 +532,9 @@ export default function SessionDetailPage(props: SessionPageProps) {
               </Button>
             </>
           )}
-          
-          <Button 
-            variant="outline" 
+
+          <Button
+            variant="outline"
             className="gap-2 border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800"
             onClick={handleShareRecap}
             disabled={isSharing || session?.feedPostId}
@@ -535,11 +544,7 @@ export default function SessionDetailPage(props: SessionPageProps) {
           </Button>
 
           {session.recordingUrl && (
-            <Button 
-              variant="ghost" 
-              className="gap-2 text-zinc-400 hover:text-white"
-              asChild
-            >
+            <Button variant="ghost" className="gap-2 text-zinc-400 hover:text-white" asChild>
               <a href={session.recordingUrl} download>
                 <Download className="h-4 w-4" />
                 Download
@@ -553,28 +558,28 @@ export default function SessionDetailPage(props: SessionPageProps) {
           <div className="lg:col-span-2">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="w-full bg-zinc-900">
-                <TabsTrigger 
-                  value="recording" 
+                <TabsTrigger
+                  value="recording"
                   className="flex-1 data-[state=active]:bg-zinc-800 data-[state=active]:text-white"
                 >
                   <Play className="mr-2 h-4 w-4" />
                   Recording
                 </TabsTrigger>
-                <TabsTrigger 
+                <TabsTrigger
                   value="notes"
                   className="flex-1 data-[state=active]:bg-zinc-800 data-[state=active]:text-white"
                 >
                   <FileText className="mr-2 h-4 w-4" />
                   Notes
                 </TabsTrigger>
-                <TabsTrigger 
+                <TabsTrigger
                   value="resources"
                   className="flex-1 data-[state=active]:bg-zinc-800 data-[state=active]:text-white"
                 >
                   <Folder className="mr-2 h-4 w-4" />
                   Resources
                 </TabsTrigger>
-                <TabsTrigger 
+                <TabsTrigger
                   value="discussion"
                   className="flex-1 data-[state=active]:bg-zinc-800 data-[state=active]:text-white"
                 >
@@ -644,8 +649,8 @@ export default function SessionDetailPage(props: SessionPageProps) {
                           Capture key takeaways, resources, and action items from this session.
                         </p>
                       </div>
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         className="mt-2 border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
                       >
                         Add Notes
@@ -666,8 +671,8 @@ export default function SessionDetailPage(props: SessionPageProps) {
                         Add links, templates, or files from this session.
                       </p>
                     </div>
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       className="mt-2 border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
                     >
                       + Add Resource
@@ -687,8 +692,8 @@ export default function SessionDetailPage(props: SessionPageProps) {
                         Start a conversation with your community about this session.
                       </p>
                     </div>
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       className="mt-2 border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
                     >
                       Start Discussion
@@ -705,39 +710,43 @@ export default function SessionDetailPage(props: SessionPageProps) {
               <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-zinc-500">
                 Session Summary
               </h3>
-              
+
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-zinc-400">Status</span>
-                  <span className={cn(
-                    "text-sm font-medium",
-                    session.status === "COMPLETED" ? "text-green-400" : "text-yellow-400"
-                  )}>
+                  <span
+                    className={cn(
+                      "text-sm font-medium",
+                      session.status === "COMPLETED" ? "text-green-400" : "text-yellow-400"
+                    )}
+                  >
                     {session.status}
                   </span>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-zinc-400">Date</span>
                   <span className="text-sm text-white">{formattedDate}</span>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-zinc-400">Time</span>
                   <span className="text-sm text-white">{formattedTime}</span>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-zinc-400">Duration</span>
                   <span className="text-sm text-white">{session.duration} min</span>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-zinc-400">Mode</span>
-                  <span className={cn(
-                    "text-sm font-medium",
-                    isAudioOnly ? "text-blue-400" : "text-white"
-                  )}>
+                  <span
+                    className={cn(
+                      "text-sm font-medium",
+                      isAudioOnly ? "text-blue-400" : "text-white"
+                    )}
+                  >
                     {isAudioOnly ? "Audio only" : "Video"}
                   </span>
                 </div>
@@ -750,7 +759,9 @@ export default function SessionDetailPage(props: SessionPageProps) {
                 {session.communityId && (
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-zinc-400">Community</span>
-                    <span className="text-sm text-white">{session.community?.name || "Unknown"}</span>
+                    <span className="text-sm text-white">
+                      {session.community?.name || "Unknown"}
+                    </span>
                   </div>
                 )}
 
@@ -798,8 +809,8 @@ export default function SessionDetailPage(props: SessionPageProps) {
                     Create Clip
                   </Button>
                 )}
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="w-full justify-start gap-2 border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
                   onClick={handleShareRecap}
                   disabled={isSharing || session?.feedPostId}
@@ -807,8 +818,8 @@ export default function SessionDetailPage(props: SessionPageProps) {
                   <Share2 className="h-4 w-4" />
                   {session?.feedPostId ? "Shared to Feed" : "Share Recap"}
                 </Button>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="w-full justify-start gap-2 border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
                   onClick={() => router.push(`/dashboard/sessions/create?template=${session.id}`)}
                 >

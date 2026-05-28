@@ -46,13 +46,14 @@ public/
 
 ## Archivos pesados (>500 KB)
 
-| Archivo | Tamaño | Comentario |
-|---|---|---|
-| `public/excalidraw-assets/vendor-XXXX.js` | ~3 MB | **Bundle Excalidraw vendored**. Se sirve solo cuando el componente Excalidraw monta. El problema: vive en `public/` y se versiona en git. Cada cambio de versión Excalidraw mete 3 MB en git history. Lo correcto sería que `@excalidraw/excalidraw` lo cargue por sí mismo desde `node_modules`, no que esté en `public/`. |
+| Archivo                                   | Tamaño | Comentario                                                                                                                                                                                                                                                                                                                  |
+| ----------------------------------------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `public/excalidraw-assets/vendor-XXXX.js` | ~3 MB  | **Bundle Excalidraw vendored**. Se sirve solo cuando el componente Excalidraw monta. El problema: vive en `public/` y se versiona en git. Cada cambio de versión Excalidraw mete 3 MB en git history. Lo correcto sería que `@excalidraw/excalidraw` lo cargue por sí mismo desde `node_modules`, no que esté en `public/`. |
 
 ## Branding remnants
 
 `grep -r "Mentorly\|mentorly"` en `public/`:
+
 - 0 hits. ✅
 
 Logo: `unytea-logo.png` (208 KB) — usado en OG image dinámica (commit `ae81d1d2 feat(seo): add Unytea logo to dynamic OG image`).
@@ -64,6 +65,7 @@ Logo: `unytea-logo.png` (208 KB) — usado en OG image dinámica (commit `ae81d1
 ## Fuentes
 
 `grep "next/font|geist"`:
+
 - `app/layout.tsx` la única referencia.
 
 `package.json` tiene `"geist": "^1.3.1"` — instalada como dependency.
@@ -108,6 +110,7 @@ Logo: `unytea-logo.png` (208 KB) — usado en OG image dinámica (commit `ae81d1
 ## OG image dinámica
 
 `app/og/` es Next dynamic OG route. Commits recientes:
+
 - `ae81d1d2 feat(seo): add Unytea logo to dynamic OG image`
 - `003b1099 fix(middleware): exclude /og from intl matcher (was causing 404 on dynamic OG image)`
 

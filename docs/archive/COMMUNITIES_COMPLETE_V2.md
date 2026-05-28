@@ -116,9 +116,9 @@
 - ✅ Pending approval badge
 - ✅ Action buttons (CommunityActions component)
 - ✅ **Tabs de navegación funcionales:**
-    - Feed (`/c/[slug]`)
-    - Members (`/c/[slug]/members`)
-    - About (`/c/[slug]/about`)
+  - Feed (`/c/[slug]`)
+  - Members (`/c/[slug]/members`)
+  - About (`/c/[slug]/about`)
 - ✅ Hover effects en tabs
 
 **Ventaja:**
@@ -138,24 +138,24 @@
 - ✅ Lista de todos los miembros ACTIVE
 - ✅ Ordenados por role (OWNER primero) y joinedAt
 - ✅ Stats cards por rol:
-    - Total members
-    - Owners count
-    - Admins count
-    - Mentors count
+  - Total members
+  - Owners count
+  - Admins count
+  - Mentors count
 - ✅ Grid layout con member cards
 - ✅ **Member Card muestra:**
-    - Avatar (o iniciales)
-    - Level badge (gamification)
-    - Role badge con color coding:
-        - OWNER: Amber con Crown icon
-        - ADMIN: Red con Shield icon
-        - MODERATOR: Blue con Star icon
-        - MENTOR: Purple con User icon
-        - MEMBER: Muted
-    - Name (firstName + lastName)
-    - Bio (line-clamp-2)
-    - Points y level
-    - Joined date (formato corto)
+  - Avatar (o iniciales)
+  - Level badge (gamification)
+  - Role badge con color coding:
+    - OWNER: Amber con Crown icon
+    - ADMIN: Red con Shield icon
+    - MODERATOR: Blue con Star icon
+    - MENTOR: Purple con User icon
+    - MEMBER: Muted
+  - Name (firstName + lastName)
+  - Bio (line-clamp-2)
+  - Points y level
+  - Joined date (formato corto)
 - ✅ Permission check (solo miembros ven lista en private communities)
 - ✅ Empty state
 
@@ -171,9 +171,9 @@
 - ✅ Solo renderiza contenido (PostFeed o empty states)
 - ✅ Check de membership
 - ✅ 3 estados:
-    1. **Member o Public:** Muestra PostFeed
-    2. **Pending:** Mensaje de "Request Pending"
-    3. **Not Member (Private):** Mensaje de "Private Community"
+  1. **Member o Public:** Muestra PostFeed
+  2. **Pending:** Mensaje de "Request Pending"
+  3. **Not Member (Private):** Mensaje de "Private Community"
 
 ---
 
@@ -259,14 +259,14 @@ Type Safety:              100% TypeScript
 
 ### **1. Better than Skool**
 
-| Feature | Skool | Mentorly |
-|---------|-------|----------|
-| **Join Flow** | Click → member | ✅ Con approval opcional |
-| **Member Cards** | Basic list | ✅ Cards con level & role badges |
-| **Role Visualization** | Text only | ✅ Icons + colors |
-| **Empty States** | Basic | ✅ Beautiful con CTAs |
-| **Stats Dashboard** | Limited | ✅ Multi-level stats |
-| **Explore Page** | Basic | ✅ Con search & filters (ready) |
+| Feature                | Skool          | Mentorly                         |
+| ---------------------- | -------------- | -------------------------------- |
+| **Join Flow**          | Click → member | ✅ Con approval opcional         |
+| **Member Cards**       | Basic list     | ✅ Cards con level & role badges |
+| **Role Visualization** | Text only      | ✅ Icons + colors                |
+| **Empty States**       | Basic          | ✅ Beautiful con CTAs            |
+| **Stats Dashboard**    | Limited        | ✅ Multi-level stats             |
+| **Explore Page**       | Basic          | ✅ Con search & filters (ready)  |
 
 ### **2. Enterprise-Grade Code**
 
@@ -388,36 +388,36 @@ En cualquier community page:
 ### **Inmediato (Next Session):**
 
 1. **Reactions System** (3-4h)
-    - Like/Unlike posts
-    - Emoji reactions
-    - Counts display
-    - Optimistic updates
+   - Like/Unlike posts
+   - Emoji reactions
+   - Counts display
+   - Optimistic updates
 
 2. **Comments System** (4-6h)
-    - Create comments
-    - Nested replies
-    - Delete comments
-    - Edit comments
-    - Comment counts
+   - Create comments
+   - Nested replies
+   - Delete comments
+   - Edit comments
+   - Comment counts
 
 3. **Search & Filters** (2-3h)
-    - Search communities
-    - Filter by category
-    - Sort options
+   - Search communities
+   - Filter by category
+   - Sort options
 
 ### **Corto Plazo (Esta Semana):**
 
 4. **Direct Messages** (6-8h)
-    - DM interface
-    - Real-time con Socket.io
-    - Typing indicators
-    - Read receipts
+   - DM interface
+   - Real-time con Socket.io
+   - Typing indicators
+   - Read receipts
 
 5. **Notifications** (4-6h)
-    - In-app notifications
-    - Bell icon con badge
-    - Mark as read
-    - Notification types
+   - In-app notifications
+   - Bell icon con badge
+   - Mark as read
+   - Notification types
 
 ### **Mediano Plazo (Próximas 2 Semanas):**
 
@@ -477,10 +477,10 @@ const communities = await prisma.member.findMany({
     community: {
       include: {
         owner: true,
-        _count: { select: { members: true, posts: true } }
-      }
-    }
-  }
+        _count: { select: { members: true, posts: true } },
+      },
+    },
+  },
 });
 
 // No N+1 queries!

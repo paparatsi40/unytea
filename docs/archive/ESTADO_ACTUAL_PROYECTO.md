@@ -23,7 +23,7 @@
 ### Propuesta de Valor
 
 > **"Una plataforma de comunidades y mentoría que SUPERE a Skool en TODOS los aspectos - mejor
-diseño, más features, mejor precio."**
+> diseño, más features, mejor precio."**
 
 ### Objetivo Ambicioso
 
@@ -51,37 +51,37 @@ diseño, más features, mejor precio."**
 
 ### Comparación Detallada
 
-| Característica | Skool | Mentorly (Target) | Estado Actual |
-|----------------|-------|-------------------|---------------|
-| **🎨 DISEÑO Y UX** ||||
-| UI Moderna | ⚠️ Anticuada (2015) | ✅ Premium (2024) | ✅ **LOGRADO** |
-| Dark Mode | ❌ No | ✅ Sí | ⚠️ **Implementado pero revertido a light** |
-| Animaciones | ⚠️ Básicas | ✅ Premium | ✅ **LOGRADO** |
-| Mobile-First | ⚠️ Responsive | ✅ Native | 🔄 **En progreso** |
-| **🏗️ ARQUITECTURA** ||||
-| Framework | ⚠️ Legacy | ✅ Next.js 14 | ✅ **LOGRADO** |
-| Type Safety | ⚠️ Parcial | ✅ 100% | ✅ **LOGRADO** |
-| Performance | ⚠️ 60-70 | ✅ 95+ Lighthouse | 🔄 **En optimización** |
-| **👥 COMUNIDADES** ||||
-| Crear Comunidad | ✅ Sí | ✅ Sí | ✅ **FUNCIONANDO** |
-| Gestión Miembros | ✅ Sí | ✅ Mejor | ✅ **FUNCIONANDO** |
-| Roles/Permisos | ✅ Sí | ✅ Más granular | ✅ **IMPLEMENTADO** |
-| Branding Custom | ⚠️ Solo logo | ✅ 100% | ⚠️ **Schema listo, UI pendiente** |
-| **📝 CONTENIDO** ||||
-| Posts | ✅ Sí | ✅ Mejorado | ✅ **FUNCIONANDO** |
-| Comentarios | ✅ Sí | ✅ Mejorado | ⚠️ **Schema listo, UI pendiente** |
-| Reacciones | ✅ Básico | ✅ Premium | ✅ **FUNCIONANDO** |
-| Rich Text | ✅ Sí | ✅ Mejor | ⚠️ **Básico implementado** |
-| **🎥 VIDEO (KILLER FEATURE)** ||||
-| Video Calls | ❌ NO | ✅ Integradas | ❌ **PENDIENTE** |
-| Screen Share | ❌ NO | ✅ Sí | ❌ **PENDIENTE** |
-| Recording | ❌ NO | ✅ Sí | ❌ **PENDIENTE** |
-| **🤖 IA (DIFERENCIADOR)** ||||
-| Recomendaciones | ❌ NO | ✅ Sí | ❌ **PENDIENTE** |
-| Auto-moderación | ❌ NO | ✅ Sí | ❌ **PENDIENTE** |
-| Chatbot | ❌ NO | ✅ Sí | ❌ **PENDIENTE** |
-| **💰 PRECIO** ||||
-| Plan Principal | $99/mes | $49/mes | ✅ **DEFINIDO** |
+| Característica                | Skool               | Mentorly (Target) | Estado Actual                              |
+| ----------------------------- | ------------------- | ----------------- | ------------------------------------------ |
+| **🎨 DISEÑO Y UX**            |                     |                   |                                            |
+| UI Moderna                    | ⚠️ Anticuada (2015) | ✅ Premium (2024) | ✅ **LOGRADO**                             |
+| Dark Mode                     | ❌ No               | ✅ Sí             | ⚠️ **Implementado pero revertido a light** |
+| Animaciones                   | ⚠️ Básicas          | ✅ Premium        | ✅ **LOGRADO**                             |
+| Mobile-First                  | ⚠️ Responsive       | ✅ Native         | 🔄 **En progreso**                         |
+| **🏗️ ARQUITECTURA**           |                     |                   |                                            |
+| Framework                     | ⚠️ Legacy           | ✅ Next.js 14     | ✅ **LOGRADO**                             |
+| Type Safety                   | ⚠️ Parcial          | ✅ 100%           | ✅ **LOGRADO**                             |
+| Performance                   | ⚠️ 60-70            | ✅ 95+ Lighthouse | 🔄 **En optimización**                     |
+| **👥 COMUNIDADES**            |                     |                   |                                            |
+| Crear Comunidad               | ✅ Sí               | ✅ Sí             | ✅ **FUNCIONANDO**                         |
+| Gestión Miembros              | ✅ Sí               | ✅ Mejor          | ✅ **FUNCIONANDO**                         |
+| Roles/Permisos                | ✅ Sí               | ✅ Más granular   | ✅ **IMPLEMENTADO**                        |
+| Branding Custom               | ⚠️ Solo logo        | ✅ 100%           | ⚠️ **Schema listo, UI pendiente**          |
+| **📝 CONTENIDO**              |                     |                   |                                            |
+| Posts                         | ✅ Sí               | ✅ Mejorado       | ✅ **FUNCIONANDO**                         |
+| Comentarios                   | ✅ Sí               | ✅ Mejorado       | ⚠️ **Schema listo, UI pendiente**          |
+| Reacciones                    | ✅ Básico           | ✅ Premium        | ✅ **FUNCIONANDO**                         |
+| Rich Text                     | ✅ Sí               | ✅ Mejor          | ⚠️ **Básico implementado**                 |
+| **🎥 VIDEO (KILLER FEATURE)** |                     |                   |                                            |
+| Video Calls                   | ❌ NO               | ✅ Integradas     | ❌ **PENDIENTE**                           |
+| Screen Share                  | ❌ NO               | ✅ Sí             | ❌ **PENDIENTE**                           |
+| Recording                     | ❌ NO               | ✅ Sí             | ❌ **PENDIENTE**                           |
+| **🤖 IA (DIFERENCIADOR)**     |                     |                   |                                            |
+| Recomendaciones               | ❌ NO               | ✅ Sí             | ❌ **PENDIENTE**                           |
+| Auto-moderación               | ❌ NO               | ✅ Sí             | ❌ **PENDIENTE**                           |
+| Chatbot                       | ❌ NO               | ✅ Sí             | ❌ **PENDIENTE**                           |
+| **💰 PRECIO**                 |                     |                   |                                            |
+| Plan Principal                | $99/mes             | $49/mes           | ✅ **DEFINIDO**                            |
 
 ---
 
@@ -236,34 +236,34 @@ diseño más limpio y profesional con fondo blanco.
 #### 📄 Archivos Modificados (Última Iteración):
 
 1. **`/components/community/PremiumCommunityHeader.tsx`**
-    - Revertido a fondo blanco
-    - Cover sutil (purple/pink gradient con opacidad 60%)
-    - Logo clean con border blanco
-    - Stats minimalistas (iconos + números)
-    - Badges discretos (Owner, Private, Pending)
-    - Tabs con border-bottom animation
+   - Revertido a fondo blanco
+   - Cover sutil (purple/pink gradient con opacidad 60%)
+   - Logo clean con border blanco
+   - Stats minimalistas (iconos + números)
+   - Badges discretos (Owner, Private, Pending)
+   - Tabs con border-bottom animation
 
 2. **`/components/community/PremiumPostCard.tsx`**
-    - Background blanco con border gray-100
-    - Sombra sutil (shadow-sm → shadow-md en hover)
-    - Avatar con border suave
-    - Typography: gray-900 headings, gray-700 content
-    - Hover effects sutiles (no scales exagerados)
-    - Action buttons minimalistas
+   - Background blanco con border gray-100
+   - Sombra sutil (shadow-sm → shadow-md en hover)
+   - Avatar con border suave
+   - Typography: gray-900 headings, gray-700 content
+   - Hover effects sutiles (no scales exagerados)
+   - Action buttons minimalistas
 
 3. **`/components/community/PremiumPostFeed.tsx`**
-    - Form con background blanco
-    - Focus states con border purple-200
-    - Title input opcional (aparece solo al focus)
-    - Character counter discreto
-    - Buttons con colores suaves
-    - Success toast limpio (green border, white bg)
-    - Empty state con iconos simples
+   - Form con background blanco
+   - Focus states con border purple-200
+   - Title input opcional (aparece solo al focus)
+   - Character counter discreto
+   - Buttons con colores suaves
+   - Success toast limpio (green border, white bg)
+   - Empty state con iconos simples
 
 4. **`/components/community/CommunityLayoutClient.tsx`**
-    - Background gray-50 (no dark)
-    - Loading states con spinner purple
-    - Error states limpios
+   - Background gray-50 (no dark)
+   - Loading states con spinner purple
+   - Error states limpios
 
 **Resultado:**
 
@@ -299,7 +299,7 @@ const { userId } = auth(); // ❌
 
 // DESPUÉS (solución):
 // Convertir a Client Components
-"use client";
+("use client");
 import { useUser } from "@clerk/nextjs";
 const { user } = useUser(); // ✅
 
@@ -391,7 +391,8 @@ type Post = {
   title: string | null;
   content: string;
   // ...
-  _count?: {  // ✅ Hacer opcional
+  _count?: {
+    // ✅ Hacer opcional
     comments: number;
     reactions: number;
   };
@@ -412,6 +413,7 @@ type Post = {
 - Usuario prefería algo más limpio
 
 **Filosofía del Usuario:**
+
 > "Sin atajos, sin parches. Si vamos a hacer algo, que sea bien desde el principio."
 
 **Iteraciones:**
@@ -1029,26 +1031,26 @@ Target:
 ### Para Acelerar Desarrollo
 
 1. **Enfoque Laser en MVP**
-    - ✅ Comments + DMs + Notifications
-    - ⏸️ Postponer: IA, Courses, Mobile apps
-    - 🎯 Goal: MVP en 3 meses (no 6)
+   - ✅ Comments + DMs + Notifications
+   - ⏸️ Postponer: IA, Courses, Mobile apps
+   - 🎯 Goal: MVP en 3 meses (no 6)
 
 2. **Usar Services Existentes**
-    - ✅ Clerk (auth) ✅
-    - ✅ Uploadthing (files)
-    - ✅ Pusher (real-time)
-    - ✅ Resend (emails)
-    - Razón: Velocidad > Costo en fase temprana
+   - ✅ Clerk (auth) ✅
+   - ✅ Uploadthing (files)
+   - ✅ Pusher (real-time)
+   - ✅ Resend (emails)
+   - Razón: Velocidad > Costo en fase temprana
 
 3. **Beta Testing Temprano**
-    - 🎯 Buscar 10 beta testers AHORA
-    - 🎯 Feedback real > Especulación
-    - 🎯 Iterar basado en uso real
+   - 🎯 Buscar 10 beta testers AHORA
+   - 🎯 Feedback real > Especulación
+   - 🎯 Iterar basado en uso real
 
 4. **Marketing Paralelo**
-    - 🎯 Crear Twitter/X para Mentorly
-    - 🎯 Documentar el proceso (build in public)
-    - 🎯 Lista de espera para beta
+   - 🎯 Crear Twitter/X para Mentorly
+   - 🎯 Documentar el proceso (build in public)
+   - 🎯 Lista de espera para beta
 
 ---
 
@@ -1127,6 +1129,7 @@ Target:
 **El reto NO es técnico - es ejecutar el roadmap.**
 
 **Filosofía:**
+
 > "Sin atajos, sin parches. Calidad premium desde el día 1."
 
 **Y lo estamos logrando.** 💪
@@ -1141,10 +1144,10 @@ Target:
 
 ---
 
-*Documento creado: Diciembre 2024*  
-*Autor: Team Mentorly*  
-*Versión: 1.0*  
-*Próxima revisión: Después de Comments*
+_Documento creado: Diciembre 2024_  
+_Autor: Team Mentorly_  
+_Versión: 1.0_  
+_Próxima revisión: Después de Comments_
 
 ---
 

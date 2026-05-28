@@ -75,8 +75,12 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: { /* custom colors */ },
-        secondary: { /* custom colors */ },
+        primary: {
+          /* custom colors */
+        },
+        secondary: {
+          /* custom colors */
+        },
       },
       fontFamily: {
         inter: ["Inter", "sans-serif"],
@@ -123,13 +127,13 @@ export function cn(...inputs: ClassValue[]) {
 - WAI-ARIA compliant
 - Keyboard navigation
 - Componentes usados:
-    - `@radix-ui/react-dialog` - Modals
-    - `@radix-ui/react-dropdown-menu` - Dropdowns
-    - `@radix-ui/react-accordion` - Accordions
-    - `@radix-ui/react-tabs` - Tabs
-    - `@radix-ui/react-select` - Selects
-    - `@radix-ui/react-popover` - Popovers
-    - `@radix-ui/react-tooltip` - Tooltips
+  - `@radix-ui/react-dialog` - Modals
+  - `@radix-ui/react-dropdown-menu` - Dropdowns
+  - `@radix-ui/react-accordion` - Accordions
+  - `@radix-ui/react-tabs` - Tabs
+  - `@radix-ui/react-select` - Selects
+  - `@radix-ui/react-popover` - Popovers
+  - `@radix-ui/react-tooltip` - Tooltips
 
 **Lucide React**
 
@@ -141,7 +145,7 @@ export function cn(...inputs: ClassValue[]) {
 ```tsx
 import { User, Settings, LogOut } from "lucide-react";
 
-<User className="w-4 h-4" />
+<User className="h-4 w-4" />;
 ```
 
 **Custom Components**
@@ -174,7 +178,7 @@ import { motion } from "framer-motion";
   transition={{ duration: 0.3 }}
 >
   {children}
-</motion.div>
+</motion.div>;
 ```
 
 **CSS Transitions**
@@ -222,11 +226,11 @@ import { motion } from "framer-motion";
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const query = searchParams.get("q");
-  
+
   const communities = await prisma.community.findMany({
-    where: { name: { contains: query } }
+    where: { name: { contains: query } },
   });
-  
+
   return NextResponse.json(communities);
 }
 ```
@@ -247,13 +251,13 @@ export async function GET(request: Request) {
 export async function createCommunity(formData: FormData) {
   const session = await auth();
   if (!session?.user) throw new Error("Unauthorized");
-  
+
   const data = {
     name: formData.get("name") as string,
     slug: formData.get("slug") as string,
     ownerId: session.user.id,
   };
-  
+
   const community = await prisma.community.create({ data });
   revalidatePath("/communities");
   redirect(`/c/${community.slug}`);
@@ -342,7 +346,7 @@ model Community {
   posts       Post[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
+
   @@index([slug])
   @@index([ownerId])
 }
@@ -431,10 +435,10 @@ export default async function CommunitiesPage() {
   const communities = await prisma.community.findMany({
     include: { _count: { select: { members: true } } },
   });
-  
+
   return (
     <div>
-      {communities.map(community => (
+      {communities.map((community) => (
         <CommunityCard key={community.id} community={community} />
       ))}
     </div>
@@ -455,12 +459,8 @@ export default async function CommunitiesPage() {
 
 export function InteractiveButton() {
   const [count, setCount] = useState(0);
-  
-  return (
-    <button onClick={() => setCount(count + 1)}>
-      Clicks: {count}
-    </button>
-  );
+
+  return <button onClick={() => setCount(count + 1)}>Clicks: {count}</button>;
 }
 ```
 
@@ -512,16 +512,16 @@ function useUser() {
 function useCommunity(slug: string) {
   const [community, setCommunity] = useState(null);
   const [loading, setLoading] = useState(true);
-  
+
   useEffect(() => {
     fetch(`/api/communities/${slug}`)
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         setCommunity(data);
         setLoading(false);
       });
   }, [slug]);
-  
+
   return { community, loading };
 }
 ```
@@ -541,7 +541,7 @@ const [user, setUser] = useState<User | null>(null);
 **2. useReducer** - State complejo con múltiples acciones
 
 ```tsx
-type Action = 
+type Action =
   | { type: "ADD_ELEMENT"; element: Element }
   | { type: "UPDATE_ELEMENT"; id: string; updates: Partial<Element> }
   | { type: "DELETE_ELEMENT"; id: string };
@@ -551,11 +551,9 @@ function reducer(state: Element[], action: Action) {
     case "ADD_ELEMENT":
       return [...state, action.element];
     case "UPDATE_ELEMENT":
-      return state.map(el => 
-        el.id === action.id ? { ...el, ...action.updates } : el
-      );
+      return state.map((el) => (el.id === action.id ? { ...el, ...action.updates } : el));
     case "DELETE_ELEMENT":
-      return state.filter(el => el.id !== action.id);
+      return state.filter((el) => el.id !== action.id);
   }
 }
 
@@ -569,12 +567,8 @@ const UserContext = createContext<User | null>(null);
 
 export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  
-  return (
-    <UserContext.Provider value={user}>
-      {children}
-    </UserContext.Provider>
-  );
+
+  return <UserContext.Provider value={user}>{children}</UserContext.Provider>;
 }
 
 export function useUser() {
@@ -618,13 +612,13 @@ const query = searchParams.get("q");
 export async function createPost(formData: FormData) {
   const title = formData.get("title") as string;
   const content = formData.get("content") as string;
-  
+
   await prisma.post.create({ data: { title, content } });
   revalidatePath("/posts");
 }
 
 // Client Component
-"use client";
+("use client");
 export function CreatePostForm() {
   return (
     <form action={createPost}>
@@ -663,7 +657,7 @@ export default async function Dashboard() {
     getCommunities(),
     getRecentPosts(),
   ]);
-  
+
   return (
     <div>
       <UserProfile user={user} />
@@ -711,14 +705,14 @@ const VisualBuilder = dynamic(() => import("./VisualBuilder"), {
 ```tsx
 import Image from "next/image";
 
-<Image 
-  src="/hero.jpg" 
-  alt="Hero" 
-  width={1200} 
+<Image
+  src="/hero.jpg"
+  alt="Hero"
+  width={1200}
   height={600}
   priority // Para above-the-fold images
   placeholder="blur" // Blur placeholder mientras carga
-/>
+/>;
 ```
 
 **3. Lazy Loading** - React.lazy + Suspense
@@ -728,7 +722,7 @@ const HeavyComponent = React.lazy(() => import("./HeavyComponent"));
 
 <Suspense fallback={<Loading />}>
   <HeavyComponent />
-</Suspense>
+</Suspense>;
 ```
 
 **4. Memoization**
@@ -753,15 +747,15 @@ const MemoizedComponent = React.memo(ExpensiveComponent);
 ```tsx
 function useDebounce<T>(value: T, delay: number): T {
   const [debouncedValue, setDebouncedValue] = useState(value);
-  
+
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedValue(value);
     }, delay);
-    
+
     return () => clearTimeout(handler);
   }, [value, delay]);
-  
+
   return debouncedValue;
 }
 
@@ -792,7 +786,7 @@ useEffect(() => {
 ```tsx
 // ✅ SEGURO (Prisma)
 await prisma.user.findMany({
-  where: { name: { contains: userInput } }
+  where: { name: { contains: userInput } },
 });
 
 // ❌ INSEGURO (Raw SQL sin sanitizar)
@@ -841,11 +835,11 @@ const ratelimit = new Ratelimit({
 export async function POST(request: Request) {
   const ip = request.headers.get("x-forwarded-for");
   const { success } = await ratelimit.limit(ip);
-  
+
   if (!success) {
     return new Response("Too Many Requests", { status: 429 });
   }
-  
+
   // ... handle request
 }
 ```
@@ -902,7 +896,7 @@ export const metadata: Metadata = {
 ```tsx
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const community = await getCommunity(params.slug);
-  
+
   return {
     title: `${community.name} - Unytea`,
     description: community.description,
@@ -928,7 +922,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 ```tsx
 export async function generateStaticParams() {
   const communities = await prisma.community.findMany();
-  
+
   return communities.map((community) => ({
     slug: community.slug,
   }));
@@ -941,7 +935,7 @@ export async function generateStaticParams() {
 // app/sitemap.ts
 export default async function sitemap() {
   const communities = await prisma.community.findMany();
-  
+
   return [
     { url: "https://unytea.com", lastModified: new Date() },
     ...communities.map((c) => ({
@@ -977,7 +971,7 @@ import { UploadButton } from "@/lib/uploadthing";
   onUploadError={(error: Error) => {
     alert(`ERROR! ${error.message}`);
   }}
-/>
+/>;
 ```
 
 **Features:**
@@ -1226,8 +1220,8 @@ const carousel3DStyle = {
 const cardStyle = (index: number, activeIndex: number) => {
   const totalCards = 6;
   const anglePerCard = 360 / totalCards;
-  const currentAngle = ((activeIndex - index) * anglePerCard);
-  
+  const currentAngle = (activeIndex - index) * anglePerCard;
+
   return {
     transform: `
       rotateY(${currentAngle}deg) 
@@ -1277,7 +1271,7 @@ const cardStyle = (index: number, activeIndex: number) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    
+
     addElement(type, x, y);
   }}
 >
@@ -1302,29 +1296,29 @@ const cardStyle = (index: number, activeIndex: number) => {
 export function ImageUploader({ onUploadComplete }: Props) {
   const [mode, setMode] = useState<"upload" | "url">("upload");
   const { startUpload, isUploading } = useUploadThing("imageUploader");
-  
+
   // Mode 1: Upload from PC
   const handleFileUpload = async (file: File) => {
     const [result] = await startUpload([file]);
     onUploadComplete(result.url);
   };
-  
+
   // Mode 2: Paste URL
   const handleUrlSubmit = (url: string) => {
     onUploadComplete(url);
   };
-  
+
   return (
     <Tabs value={mode} onValueChange={setMode}>
       <TabsList>
         <TabsTrigger value="upload">Upload from PC</TabsTrigger>
         <TabsTrigger value="url">Use URL</TabsTrigger>
       </TabsList>
-      
+
       <TabsContent value="upload">
         <input type="file" onChange={(e) => handleFileUpload(e.target.files[0])} />
       </TabsContent>
-      
+
       <TabsContent value="url">
         <input type="url" onBlur={(e) => handleUrlSubmit(e.target.value)} />
       </TabsContent>
@@ -1350,15 +1344,15 @@ export async function createCommunity(formData: FormData) {
   // 1. Authentication
   const session = await auth();
   if (!session?.user) throw new Error("Unauthorized");
-  
+
   // 2. Validation
   const name = formData.get("name") as string;
   const slug = formData.get("slug") as string;
-  
+
   if (!name || !slug) {
     throw new Error("Name and slug are required");
   }
-  
+
   // 3. Business Logic
   const community = await prisma.community.create({
     data: {
@@ -1367,7 +1361,7 @@ export async function createCommunity(formData: FormData) {
       ownerId: session.user.id,
     },
   });
-  
+
   // 4. Side Effects
   await prisma.member.create({
     data: {
@@ -1377,21 +1371,21 @@ export async function createCommunity(formData: FormData) {
       status: "ACTIVE",
     },
   });
-  
+
   // 5. Cache Revalidation
   revalidatePath("/communities");
   revalidatePath(`/c/${slug}`);
-  
+
   // 6. Redirect
   redirect(`/c/${slug}`);
 }
 
 // Client Component
-"use client";
+("use client");
 
 export function CreateCommunityForm() {
   const [pending, setPending] = useState(false);
-  
+
   async function handleSubmit(formData: FormData) {
     setPending(true);
     try {
@@ -1401,7 +1395,7 @@ export function CreateCommunityForm() {
       setPending(false);
     }
   }
-  
+
   return (
     <form action={handleSubmit}>
       <input name="name" required />
@@ -1424,15 +1418,15 @@ export function CreateCommunityForm() {
 export function JoinButton({ communityId }: Props) {
   const [joined, setJoined] = useState(false);
   const [optimistic, setOptimistic] = useState(false);
-  
+
   async function handleJoin() {
     // 1. Optimistic update (inmediato)
     setOptimistic(true);
-    
+
     try {
       // 2. Server action (asíncrono)
       await joinCommunity(communityId);
-      
+
       // 3. Success - actualizar estado real
       setJoined(true);
       setOptimistic(false);
@@ -1442,9 +1436,9 @@ export function JoinButton({ communityId }: Props) {
       alert("Failed to join");
     }
   }
-  
+
   const isJoined = joined || optimistic;
-  
+
   return (
     <button onClick={handleJoin} disabled={optimistic}>
       {isJoined ? "Joined ✓" : "Join"}
@@ -1463,17 +1457,17 @@ export default function CommunityPage({ params }: Props) {
     <div>
       {/* Hero - Renders inmediatamente */}
       <Hero slug={params.slug} />
-      
+
       {/* Posts - Suspende hasta que termine */}
       <Suspense fallback={<PostsSkeleton />}>
         <RecentPosts slug={params.slug} />
       </Suspense>
-      
+
       {/* Members - Suspende independientemente */}
       <Suspense fallback={<MembersSkeleton />}>
         <TopMembers slug={params.slug} />
       </Suspense>
-      
+
       {/* Stats - Ya disponibles del cache */}
       <Stats slug={params.slug} />
     </div>
@@ -1483,13 +1477,13 @@ export default function CommunityPage({ params }: Props) {
 // Componente async que suspende
 async function RecentPosts({ slug }: { slug: string }) {
   // Simula delay de 2s
-  await new Promise(resolve => setTimeout(resolve, 2000));
-  
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+
   const posts = await prisma.post.findMany({
     where: { community: { slug } },
     take: 10,
   });
-  
+
   return <PostsList posts={posts} />;
 }
 ```
@@ -1509,11 +1503,11 @@ export const communityRepository = {
   async findBySlug(slug: string) {
     return await prisma.community.findUnique({ where: { slug } });
   },
-  
+
   async create(data: CreateCommunityInput) {
     return await prisma.community.create({ data });
   },
-  
+
   async update(id: string, data: UpdateCommunityInput) {
     return await prisma.community.update({ where: { id }, data });
   },
@@ -1533,7 +1527,7 @@ function createElementFactory(type: ElementType, x: number, y: number) {
     x,
     y,
   };
-  
+
   switch (type) {
     case "text":
       return { ...baseElement, type: "text", content: "New Text", width: 200, height: 100 };
@@ -1553,17 +1547,17 @@ function createElementFactory(type: ElementType, x: number, y: number) {
 ```tsx
 function ChatRoom() {
   const [messages, setMessages] = useState([]);
-  
+
   useEffect(() => {
     // Subscribe to new messages
     const unsubscribe = socket.on("message", (message) => {
-      setMessages(prev => [...prev, message]);
+      setMessages((prev) => [...prev, message]);
     });
-    
+
     // Cleanup on unmount
     return () => unsubscribe();
   }, []);
-  
+
   return <MessageList messages={messages} />;
 }
 ```
@@ -1609,7 +1603,7 @@ function CardBody({ children }) {
 <Card>
   <CardHeader>Title</CardHeader>
   <CardBody>Content</CardBody>
-</Card>
+</Card>;
 ```
 
 **6. Higher-Order Component (HOC)**
@@ -1620,10 +1614,10 @@ function CardBody({ children }) {
 function withAuth<P extends object>(Component: React.ComponentType<P>) {
   return function AuthenticatedComponent(props: P) {
     const { data: session, status } = useSession();
-    
+
     if (status === "loading") return <Loading />;
     if (!session) return <Redirect to="/signin" />;
-    
+
     return <Component {...props} />;
   };
 }
@@ -1700,15 +1694,15 @@ const ProtectedPage = withAuth(DashboardPage);
 #### **Libros Recomendados**
 
 1. **"Learning React" by Alex Banks & Eve Porcello**
-    - Modern React patterns
-    - Hooks deep dive
+   - Modern React patterns
+   - Hooks deep dive
 
 2. **"Effective TypeScript" by Dan Vanderkam**
-    - TypeScript best practices
-    - Type system mastery
+   - TypeScript best practices
+   - Type system mastery
 
 3. **"Design Patterns: Elements of Reusable Object-Oriented Software"**
-    - Classic patterns aplicables a React
+   - Classic patterns aplicables a React
 
 ---
 

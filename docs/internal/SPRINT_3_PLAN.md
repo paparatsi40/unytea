@@ -3,6 +3,7 @@
 **Status**: Active sprint plan. Created 2026-05-16. Living document — updated as Sprint 3 progresses.
 
 **Inputs:**
+
 - [PRODUCT_DECISIONS_V1.md](./PRODUCT_DECISIONS_V1.md) — canonical product decisions
 - [SECTION_5_AUDIT.md](./SECTION_5_AUDIT.md) — code-vs-PD V1 §5 delta audit
 - [CONTEXT_BRIEFING.md](./CONTEXT_BRIEFING.md) — operational state at sprint start
@@ -65,6 +66,7 @@ Remove the entire Skool-style gamification stack:
   - `app/(dashboard)/dashboard/settings/privacy/page.tsx` — `showAchievements` toggle
 
 **What stays:**
+
 - Course progress (% complete) — utility tracking, not gamification
 - Member join-date — historical, not ranking
 - Quiz completion (binary) — tracking without XP
@@ -82,6 +84,7 @@ Remove all cross-community discovery surface:
   - "Explore" sidebar item in primary nav
 
 **Discovery replacement model:**
+
 - Direct link from host to prospect (host shares URL via their channels)
 - Member dashboard shows only communities user has joined
 - Each community gets its own SEO-friendly public landing (host opts in)
@@ -102,11 +105,13 @@ Restrict DM authorization to host→member only:
   - `DirectMessage` + `Conversation` models stay — still needed for host→member
 
 **What stays:**
+
 - Host can initiate DM with any member of their community
 - Member can reply to host's DM
 - Host can have ongoing 1:1 conversation with any member
 
 **What's blocked:**
+
 - Member→Member direct messages (any direction)
 - Member→Host DMs initiated by member (host initiates only)
 
@@ -127,6 +132,7 @@ Remove the AI chat widget entirely:
   - After removal, audit `.env.example` and Vercel env for any AI provider keys (Anthropic/OpenAI) that are no longer used. If they're only used by this widget, remove from env.
 
 **What stays (still aligned with PD V1 §7 logistics-not-relationship):**
+
 - `app/actions/knowledge-library.ts` — `calculateEngagementScore(session)` (content scoring, not member scoring — defensible)
 - `app/actions/ai-recommendations.ts:98` — engagement score on posts (same rationale)
 - `app/actions/dashboard.ts:927-948` — community health engagement score
@@ -245,7 +251,7 @@ ETA: 0.5 day. **Risk: medium** — destructive migration. Pre-launch (0 real use
 
 ### Phase 3.5 — Reverting Phase 3.1 /explore de-feat (planning entry, 2026-05-27)
 
-> **Status**: planning entry only. This section documents *what* and *why*. Implementation ships as a separate PR (code), not part of the doc-only revision that introduced this section.
+> **Status**: planning entry only. This section documents _what_ and _why_. Implementation ships as a separate PR (code), not part of the doc-only revision that introduced this section.
 
 **Trigger.** PD V1 §1, §2, and §5 Cat E were revised on 2026-05-27 (emerging-creator pivot). The revised §5 Cat E re-opens the discovery surface, gated by a four-criterion quality bar. See PD V1 §5 Cat E "REVISED 2026-05-27" for the normative text. See also `SECTION_5_AUDIT.md` 2026-05-27 entry for the audit-side rationale.
 
@@ -309,16 +315,16 @@ These fold into the natural sprint work where possible, but are not gating:
 
 ## Estimated total Sprint 3 effort
 
-| Phase | Scope | ETA |
-|---|---|---|
-| 3.0 Quick wins | 3 small fixes | 30-60 min |
-| 3.1 Cat E removal | /explore + trending (executed; superseded by 3.5 revert) | 30-60 min |
-| 3.2 Cat F removal | AIChatWidget | 30-60 min |
-| 3.3 Cat B DM gating | Auth + UI | 2-4 hr |
-| 3.4 Cat A gamification | UI + actions + schema | 2-3 days |
-| 3.5 Revert /explore de-feat | Revert + quality-bar gating + opt-out | 0.5-1 day |
-| 3.6 Phase 4c re-recon (was 3.5) | Data check + decision | 1-2 hr (twice) |
-| 3.7 Bug investigation (was 3.6) | Logout cache | 1-2 hr |
+| Phase                           | Scope                                                    | ETA            |
+| ------------------------------- | -------------------------------------------------------- | -------------- |
+| 3.0 Quick wins                  | 3 small fixes                                            | 30-60 min      |
+| 3.1 Cat E removal               | /explore + trending (executed; superseded by 3.5 revert) | 30-60 min      |
+| 3.2 Cat F removal               | AIChatWidget                                             | 30-60 min      |
+| 3.3 Cat B DM gating             | Auth + UI                                                | 2-4 hr         |
+| 3.4 Cat A gamification          | UI + actions + schema                                    | 2-3 days       |
+| 3.5 Revert /explore de-feat     | Revert + quality-bar gating + opt-out                    | 0.5-1 day      |
+| 3.6 Phase 4c re-recon (was 3.5) | Data check + decision                                    | 1-2 hr (twice) |
+| 3.7 Bug investigation (was 3.6) | Logout cache                                             | 1-2 hr         |
 
 **Total:** ~5-6 working days for de-featurization + the /explore revert + Phase 4c operational closure.
 
@@ -332,7 +338,7 @@ Sprint 3 closes when:
 
 - [ ] All Section 5 alignment phases (3.1–3.4) committed and deployed
 - [ ] Phase 3.5 (/explore revert + quality-bar gating per revised PD V1 §5 Cat E) committed and deployed
-- [ ] `git grep` re-audit shows 0 hits in critical categories that remain anti-feature (Cat A) and in the *un-gated* surfaces that revised Cat E still excludes (cross-community member browsing, generic "trending" sort, peer ratings)
+- [ ] `git grep` re-audit shows 0 hits in critical categories that remain anti-feature (Cat A) and in the _un-gated_ surfaces that revised Cat E still excludes (cross-community member browsing, generic "trending" sort, peer ratings)
 - [ ] `npx next build` passes after each commit
 - [ ] Phase 4c CSP enforce switch decision made (enforce or extended wait)
 - [ ] `tests/unit/auth-security.test.ts` extended with DM authorization defensive test
@@ -391,6 +397,7 @@ These need quick decisions Monday morning before starting Phase 3.0:
 ## Sprint 3 → Sprint 4 transition
 
 When Sprint 3 closes:
+
 - `SPRINT_3_CLOSURE.md` retro created
 - Briefing updated to Sprint 4 state
 - Open questions from this doc resolved or carried forward

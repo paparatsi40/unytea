@@ -5,11 +5,7 @@ import { usePathname, useParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Settings, Users, Eye, CreditCard } from "lucide-react";
 
-export default function CommunitySettingsLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function CommunitySettingsLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const params = useParams();
   const slug = (params?.slug as string) || "";
@@ -43,13 +39,11 @@ export default function CommunitySettingsLayout({
   ];
 
   return (
-    <div className="container max-w-7xl mx-auto px-4 py-8">
+    <div className="container mx-auto max-w-7xl px-4 py-8">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Community Settings</h1>
-        <p className="text-gray-500 mt-2">
-          Manage your community preferences and configuration
-        </p>
+        <p className="mt-2 text-gray-500">Manage your community preferences and configuration</p>
       </div>
 
       <div className="flex gap-8">
@@ -59,7 +53,7 @@ export default function CommunitySettingsLayout({
             {settingsNav.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
-              
+
               return (
                 <Link
                   key={item.href}
@@ -67,11 +61,11 @@ export default function CommunitySettingsLayout({
                   className={cn(
                     "flex items-start gap-3 rounded-lg px-3 py-2.5 text-sm transition-all",
                     isActive
-                      ? "bg-sky-50 text-sky-600 border-l-2 border-sky-600"
+                      ? "border-l-2 border-sky-600 bg-sky-50 text-sky-600"
                       : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                   )}
                 >
-                  <Icon className="h-5 w-5 shrink-0 mt-0.5" />
+                  <Icon className="mt-0.5 h-5 w-5 shrink-0" />
                   <div>
                     <div className="font-medium">{item.name}</div>
                     <div className="text-xs text-gray-500">{item.description}</div>
@@ -83,9 +77,7 @@ export default function CommunitySettingsLayout({
         </aside>
 
         {/* Main content */}
-        <div className="flex-1">
-          {children}
-        </div>
+        <div className="flex-1">{children}</div>
       </div>
     </div>
   );

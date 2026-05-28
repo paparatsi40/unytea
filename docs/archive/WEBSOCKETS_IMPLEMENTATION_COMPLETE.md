@@ -14,7 +14,7 @@ Sistema completo de WebSockets usando Socket.io que reemplaza polling con real-t
 
 ```
 ❌ Chat: polling cada 3s
-❌ Presence: polling cada 5s  
+❌ Presence: polling cada 5s
 ❌ Notifications: polling cada 30s
 ❌ Alto uso de servidor
 ❌ Latencia notable
@@ -112,14 +112,14 @@ import { useChatSocket } from "@/hooks/use-socket";
 
 function ChatComponent({ channelId }) {
   const { messages, sendTyping, stopTyping, isConnected } = useChatSocket(channelId);
-  
+
   // Messages auto-update via WebSocket
   // No need for polling!
-  
+
   return (
     <div>
       {messages.map(msg => <Message key={msg.id} {...msg} />)}
-      <input 
+      <input
         onKeyDown={() => sendTyping(userId, userName)}
         onBlur={() => stopTyping(userId)}
       />
@@ -135,7 +135,7 @@ import { usePresenceSocket } from "@/hooks/use-socket";
 
 function PresenceIndicator({ communityId }) {
   const { onlineUsers, isConnected } = usePresenceSocket(communityId);
-  
+
   return (
     <div>
       {onlineUsers.length} online
@@ -151,7 +151,7 @@ import { useNotificationsSocket } from "@/hooks/use-socket";
 
 function NotificationBell({ userId }) {
   const { notifications, isConnected } = useNotificationsSocket(userId);
-  
+
   return (
     <Bell badge={notifications.filter(n => !n.isRead).length} />
   );
@@ -170,13 +170,13 @@ import { socketEvents } from "@/lib/socket";
 // Después de crear un mensaje
 export async function sendMessage(channelId: string, content: string) {
   const message = await prisma.channelMessage.create({ ... });
-  
+
   // Emit via WebSocket
   const io = global.io; // Get Socket.io instance
   if (io) {
     socketEvents.newMessage(io, channelId, message);
   }
-  
+
   return { success: true, message };
 }
 ```
@@ -186,13 +186,13 @@ export async function sendMessage(channelId: string, content: string) {
 ```typescript
 export async function createNotification(userId: string, data: any) {
   const notification = await prisma.notification.create({ ... });
-  
+
   // Instant delivery via WebSocket
   const io = global.io;
   if (io) {
     socketEvents.newNotification(io, userId, notification);
   }
-  
+
   return { success: true };
 }
 ```
@@ -268,7 +268,7 @@ community:{communityId} - Community presence
 
 ```
 Chat:          3 req/sec × users
-Presence:      0.2 req/sec × users  
+Presence:      0.2 req/sec × users
 Notifications: 0.033 req/sec × users
 
 100 users:     ~320 req/sec
@@ -330,7 +330,7 @@ if (global.io) {
 ```typescript
 // Open browser console
 // Should see:
-"Socket connected: abc123xyz"
+"Socket connected: abc123xyz";
 ```
 
 ### **Test Chat:**
@@ -410,24 +410,24 @@ import { useState } from "react";
 export function RealtimeChat({ channelId, userId, userName }) {
   const { messages, sendTyping, stopTyping, isConnected } = useChatSocket(channelId);
   const [input, setInput] = useState("");
-  
+
   const handleType = () => {
     sendTyping(userId, userName);
-    
+
     // Stop typing after 3 seconds of inactivity
     setTimeout(() => stopTyping(userId), 3000);
   };
-  
+
   return (
     <div>
       <div className="status">
         {isConnected ? "🟢 Connected" : "🔴 Disconnected"}
       </div>
-      
+
       {messages.map(msg => (
         <div key={msg.id}>{msg.content}</div>
       ))}
-      
+
       <input
         value={input}
         onChange={(e) => {
@@ -450,7 +450,7 @@ import { usePresenceSocket } from "@/hooks/use-socket";
 
 export function LivePresence({ communityId }) {
   const { onlineUsers, isConnected } = usePresenceSocket(communityId);
-  
+
   return (
     <div>
       <h3>{onlineUsers.length} members online</h3>

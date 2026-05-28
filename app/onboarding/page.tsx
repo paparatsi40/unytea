@@ -93,16 +93,12 @@ export default function OnboardingPage() {
       fields: (
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-foreground mb-2">
-              Full Name
-            </label>
+            <label className="mb-2 block text-sm font-medium text-foreground">Full Name</label>
             <input
               type="text"
               value={formData.fullName}
-              onChange={(e) =>
-                setFormData({ ...formData, fullName: e.target.value })
-              }
-              className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+              onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+              className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
               placeholder="John Doe"
             />
           </div>
@@ -117,15 +113,11 @@ export default function OnboardingPage() {
       fields: (
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-foreground mb-2">
-              Your Role
-            </label>
+            <label className="mb-2 block text-sm font-medium text-foreground">Your Role</label>
             <select
               value={formData.role}
-              onChange={(e) =>
-                setFormData({ ...formData, role: e.target.value })
-              }
-              className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+              onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+              className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
             >
               <option value="">Select your role...</option>
               <option value="coach">Coach / Mentor</option>
@@ -146,16 +138,14 @@ export default function OnboardingPage() {
       fields: (
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-foreground mb-2">
+            <label className="mb-2 block text-sm font-medium text-foreground">
               Tell us about your goals
             </label>
             <textarea
               value={formData.goals}
-              onChange={(e) =>
-                setFormData({ ...formData, goals: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, goals: e.target.value })}
               rows={4}
-              className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none"
+              className="w-full resize-none rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
               placeholder="I want to build a thriving community and share my knowledge..."
             />
           </div>
@@ -190,7 +180,7 @@ export default function OnboardingPage() {
                 <Card
                   key={plan.id}
                   onClick={() => setFormData({ ...formData, selectedPlan: plan.id })}
-                  className={`p-4 cursor-pointer transition-all ${
+                  className={`cursor-pointer p-4 transition-all ${
                     isSelected
                       ? "border-primary ring-2 ring-primary/20"
                       : "border-border hover:border-primary/50"
@@ -203,11 +193,11 @@ export default function OnboardingPage() {
                   )}
                   <div className="flex items-start gap-4">
                     <div
-                      className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                      className={`flex h-10 w-10 items-center justify-center rounded-lg ${
                         isSelected ? "bg-primary text-primary-foreground" : "bg-muted"
                       }`}
                     >
-                      <Icon className="w-5 h-5" />
+                      <Icon className="h-5 w-5" />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
@@ -217,22 +207,20 @@ export default function OnboardingPage() {
                             {plan.price === 0 ? "Free" : `$${plan.price}`}
                           </span>
                           {plan.price > 0 && (
-                            <span className="text-muted-foreground text-sm">/month</span>
+                            <span className="text-sm text-muted-foreground">/month</span>
                           )}
                         </div>
                       </div>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {plan.description}
-                      </p>
+                      <p className="mt-1 text-sm text-muted-foreground">{plan.description}</p>
                       <ul className="mt-3 space-y-1">
                         {plan.features.slice(0, 3).map((feature, i) => (
                           <li key={i} className="flex items-center gap-2 text-sm">
-                            <Check className="w-4 h-4 text-primary flex-shrink-0" />
+                            <Check className="h-4 w-4 flex-shrink-0 text-primary" />
                             <span>{feature}</span>
                           </li>
                         ))}
                         {plan.features.length > 3 && (
-                          <li className="text-sm text-muted-foreground pl-6">
+                          <li className="pl-6 text-sm text-muted-foreground">
                             +{plan.features.length - 3} more features
                           </li>
                         )}
@@ -243,7 +231,7 @@ export default function OnboardingPage() {
               );
             })}
           </div>
-          <p className="text-sm text-muted-foreground text-center">
+          <p className="text-center text-sm text-muted-foreground">
             All paid plans include a 14-day free trial. No credit card required to start.
           </p>
         </div>
@@ -303,7 +291,7 @@ export default function OnboardingPage() {
             return;
           }
         }
-        
+
         // Otherwise go to dashboard
         router.push("/dashboard");
       }
@@ -335,18 +323,18 @@ export default function OnboardingPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-background px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-2xl">
         {/* Progress Bar */}
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-2">
+          <div className="mb-2 flex items-center justify-between">
             <span className="text-sm font-medium text-muted-foreground">
               Step {currentStep} of {steps.length}
             </span>
@@ -354,32 +342,30 @@ export default function OnboardingPage() {
               {Math.round((currentStep / steps.length) * 100)}%
             </span>
           </div>
-          <div className="w-full bg-muted rounded-full h-2">
+          <div className="h-2 w-full rounded-full bg-muted">
             <div
-              className="bg-primary h-2 rounded-full transition-all duration-300"
+              className="h-2 rounded-full bg-primary transition-all duration-300"
               style={{ width: `${(currentStep / steps.length) * 100}%` }}
             />
           </div>
         </div>
 
         {/* Step Content */}
-        <div className="bg-card rounded-2xl shadow-lg p-8 border">
+        <div className="rounded-2xl border bg-card p-8 shadow-lg">
           {/* Icon */}
-          <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
-            <Icon className="w-8 h-8 text-primary" />
+          <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
+            <Icon className="h-8 w-8 text-primary" />
           </div>
 
           {/* Title & Description */}
-          <h1 className="text-2xl font-bold mb-2">{currentStepData.title}</h1>
-          <p className="text-muted-foreground mb-8">
-            {currentStepData.description}
-          </p>
+          <h1 className="mb-2 text-2xl font-bold">{currentStepData.title}</h1>
+          <p className="mb-8 text-muted-foreground">{currentStepData.description}</p>
 
           {/* Fields */}
           {currentStepData.fields}
 
           {/* Navigation */}
-          <div className="flex gap-4 mt-8">
+          <div className="mt-8 flex gap-4">
             {currentStep > 1 && (
               <Button variant="outline" onClick={handleBack} className="flex-1">
                 Back
@@ -392,7 +378,7 @@ export default function OnboardingPage() {
             >
               {isSubmitting ? (
                 <div className="flex items-center gap-2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <div className="h-4 w-4 animate-spin rounded-full border-b-2 border-white"></div>
                   Setting up...
                 </div>
               ) : currentStep === steps.length ? (
@@ -409,10 +395,10 @@ export default function OnboardingPage() {
         </div>
 
         {/* Skip Option */}
-        <div className="text-center mt-6">
+        <div className="mt-6 text-center">
           <button
             onClick={() => router.push("/dashboard")}
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             Skip for now →
           </button>

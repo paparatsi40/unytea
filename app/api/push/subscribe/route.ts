@@ -16,10 +16,7 @@ export async function POST(request: Request) {
     const { subscription, userAgent } = body;
 
     if (!subscription?.endpoint || !subscription?.keys?.p256dh || !subscription?.keys?.auth) {
-      return NextResponse.json(
-        { error: "Invalid subscription object" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid subscription object" }, { status: 400 });
     }
 
     // Upsert subscription (endpoint is unique)
@@ -43,10 +40,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("[push/subscribe] Error:", error);
-    return NextResponse.json(
-      { error: "Failed to subscribe" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to subscribe" }, { status: 500 });
   }
 }
 
@@ -62,10 +56,7 @@ export async function DELETE(request: Request) {
     const { endpoint } = body;
 
     if (!endpoint) {
-      return NextResponse.json(
-        { error: "Endpoint is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Endpoint is required" }, { status: 400 });
     }
 
     await prisma.pushSubscription.deleteMany({
@@ -75,9 +66,6 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("[push/unsubscribe] Error:", error);
-    return NextResponse.json(
-      { error: "Failed to unsubscribe" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to unsubscribe" }, { status: 500 });
   }
 }

@@ -60,7 +60,7 @@ Functions:
 ✅ updateCommunityTheme(slug, theme) - 13 customization options
 ✅ updateCommunityLayout(slug, layout) - Switch layouts
 ✅ createCommunitySection(slug, data) - Add sections
-✅ updateCommunitySection(sectionId, data) - Edit sections  
+✅ updateCommunitySection(sectionId, data) - Edit sections
 ✅ deleteCommunitySection(sectionId) - Remove sections
 ✅ reorderCommunitySections(slug, sectionIds) - Drag & drop
 ✅ getCommunityWithSections(slug) - Fetch with relations
@@ -195,7 +195,7 @@ File: web/app/(dashboard)/dashboard/c/[slug]/settings/layout.tsx
 
 Navigation Sections:
 1. General - Basic community settings
-2. Appearance - Layout & theme customization  
+2. Appearance - Layout & theme customization
 3. Members - Role & permission management
 4. Moderation - Content moderation settings
 5. Notifications - Notification preferences
@@ -456,11 +456,13 @@ On Unytea:
 ### **For Community Owners:**
 
 1. **Go to Settings:**
+
    ```
    Dashboard → My Communities → [Community] → Settings → Appearance
    ```
 
 2. **Choose Layout:**
+
    ```
    - Modern Grid (Pinterest-style)
    - Classic Forum (Reddit-style)
@@ -470,6 +472,7 @@ On Unytea:
    ```
 
 3. **Customize Colors:**
+
    ```
    - Pick from 6 presets, OR
    - Use custom color pickers
@@ -597,31 +600,31 @@ Result: Professional education platform
 ### **Phase 2 (Optional):**
 
 1. **Advanced Editor:**
-    - Drag & drop section manager
-    - Live preview mode
-    - Section settings panel
-    - Template library
+   - Drag & drop section manager
+   - Live preview mode
+   - Section settings panel
+   - Template library
 
 2. **More Layouts:**
-    - Magazine layout
-    - Corporate layout
-    - Gaming layout
-    - Portfolio layout
+   - Magazine layout
+   - Corporate layout
+   - Gaming layout
+   - Portfolio layout
 
 3. **More Sections:**
-    - FAQ section
-    - Pricing table
-    - Contact form
-    - Newsletter signup
-    - Social proof
-    - Video embed
+   - FAQ section
+   - Pricing table
+   - Contact form
+   - Newsletter signup
+   - Social proof
+   - Video embed
 
 4. **Advanced Features:**
-    - A/B testing layouts
-    - Analytics per layout
-    - Custom CSS editor
-    - Layout marketplace
-    - Import/export
+   - A/B testing layouts
+   - Analytics per layout
+   - Custom CSS editor
+   - Layout marketplace
+   - Import/export
 
 ---
 

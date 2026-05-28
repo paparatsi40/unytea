@@ -50,47 +50,59 @@ export default function BuddyPage() {
       <div className="min-h-screen bg-gray-50 p-4 md:p-8">
         <div className="mx-auto max-w-2xl">
           <div className="text-center">
-            <div className="mx-auto flex h-14 w-14 md:h-16 md:w-16 items-center justify-center rounded-full bg-purple-100">
-              <Users className="h-7 w-7 md:h-8 md:w-8 text-purple-600" />
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-purple-100 md:h-16 md:w-16">
+              <Users className="h-7 w-7 text-purple-600 md:h-8 md:w-8" />
             </div>
-            <h2 className="mt-3 md:mt-4 text-xl md:text-2xl font-bold text-gray-900">Find Your Accountability Partner</h2>
-            <p className="mt-2 text-sm md:text-base text-gray-600 px-4">
+            <h2 className="mt-3 text-xl font-bold text-gray-900 md:mt-4 md:text-2xl">
+              Find Your Accountability Partner
+            </h2>
+            <p className="mt-2 px-4 text-sm text-gray-600 md:text-base">
               Get matched with someone to keep each other motivated and accountable!
             </p>
 
             <button
               onClick={() => alert("Match functionality coming - for now showing you matched!")}
-              className="mt-4 md:mt-6 inline-flex items-center space-x-2 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 px-5 py-2.5 md:px-6 md:py-3 text-sm md:text-base font-semibold text-white shadow-lg transition-all hover:from-purple-700 hover:to-pink-700"
+              className="mt-4 inline-flex items-center space-x-2 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg transition-all hover:from-purple-700 hover:to-pink-700 md:mt-6 md:px-6 md:py-3 md:text-base"
             >
               <Users className="h-4 w-4 md:h-5 md:w-5" />
               <span>Find My Buddy</span>
             </button>
           </div>
 
-          <div className="mt-8 md:mt-12 grid grid-cols-3 gap-4 md:gap-6">
+          <div className="mt-8 grid grid-cols-3 gap-4 md:mt-12 md:gap-6">
             <div className="text-center">
-              <Target className="mx-auto h-6 w-6 md:h-8 md:w-8 text-purple-600" />
-              <h3 className="mt-2 text-sm md:text-base font-semibold text-gray-900">Set Goals</h3>
-              <p className="mt-1 text-xs md:text-sm text-gray-600 hidden sm:block">Work towards shared objectives</p>
+              <Target className="mx-auto h-6 w-6 text-purple-600 md:h-8 md:w-8" />
+              <h3 className="mt-2 text-sm font-semibold text-gray-900 md:text-base">Set Goals</h3>
+              <p className="mt-1 hidden text-xs text-gray-600 sm:block md:text-sm">
+                Work towards shared objectives
+              </p>
             </div>
             <div className="text-center">
-              <Heart className="mx-auto h-6 w-6 md:h-8 md:w-8 text-purple-600" />
-              <h3 className="mt-2 text-sm md:text-base font-semibold text-gray-900">Check-Ins</h3>
-              <p className="mt-1 text-xs md:text-sm text-gray-600 hidden sm:block">Regular progress updates</p>
+              <Heart className="mx-auto h-6 w-6 text-purple-600 md:h-8 md:w-8" />
+              <h3 className="mt-2 text-sm font-semibold text-gray-900 md:text-base">Check-Ins</h3>
+              <p className="mt-1 hidden text-xs text-gray-600 sm:block md:text-sm">
+                Regular progress updates
+              </p>
             </div>
             <div className="text-center">
-              <Users className="mx-auto h-6 w-6 md:h-8 md:w-8 text-purple-600" />
-              <h3 className="mt-2 text-sm md:text-base font-semibold text-gray-900">Grow Together</h3>
-              <p className="mt-1 text-xs md:text-sm text-gray-600 hidden sm:block">10x better results</p>
+              <Users className="mx-auto h-6 w-6 text-purple-600 md:h-8 md:w-8" />
+              <h3 className="mt-2 text-sm font-semibold text-gray-900 md:text-base">
+                Grow Together
+              </h3>
+              <p className="mt-1 hidden text-xs text-gray-600 sm:block md:text-sm">
+                10x better results
+              </p>
             </div>
           </div>
 
-          <div className="mt-8 md:mt-12 rounded-xl border border-purple-200 bg-purple-50 p-4 md:p-6">
-            <h3 className="text-sm md:text-base font-bold text-purple-900">✅ Buddy System MVP Completado</h3>
-            <p className="mt-2 text-xs md:text-sm text-purple-700">
+          <div className="mt-8 rounded-xl border border-purple-200 bg-purple-50 p-4 md:mt-12 md:p-6">
+            <h3 className="text-sm font-bold text-purple-900 md:text-base">
+              ✅ Buddy System MVP Completado
+            </h3>
+            <p className="mt-2 text-xs text-purple-700 md:text-sm">
               El sistema está funcional. Funcionalidad completa:
             </p>
-            <ul className="mt-3 space-y-1 text-xs md:text-sm text-purple-700">
+            <ul className="mt-3 space-y-1 text-xs text-purple-700 md:text-sm">
               <li>✅ Auto-matching algorithm</li>
               <li>✅ Shared goals creation</li>
               <li>✅ Daily check-ins with mood tracker</li>

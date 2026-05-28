@@ -52,9 +52,7 @@ export function usePusher(channelId: string, userId: string) {
 
     pusher.connection.bind("disconnected", () => {
       setIsConnected(false);
-      connectionHandlersRef.current.forEach((handler) =>
-        handler("disconnected")
-      );
+      connectionHandlersRef.current.forEach((handler) => handler("disconnected"));
     });
 
     // Handle incoming messages

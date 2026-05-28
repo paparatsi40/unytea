@@ -42,7 +42,7 @@ export default function CommunityAboutPage() {
     try {
       const response = await fetch(`/api/communities/${slug}`);
       const data = await response.json();
-      
+
       if (data.community) {
         setCommunity(data.community);
       } else if (data.id) {
@@ -79,16 +79,16 @@ export default function CommunityAboutPage() {
   });
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="container mx-auto max-w-4xl px-4 py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">About {community.name}</h1>
+        <h1 className="mb-2 text-3xl font-bold text-gray-900">About {community.name}</h1>
         <p className="text-gray-600">Learn more about this community</p>
       </div>
 
       {/* Cover Image */}
       {community.coverImage && (
-        <div className="mb-8 rounded-2xl overflow-hidden h-64 relative">
+        <div className="relative mb-8 h-64 overflow-hidden rounded-2xl">
           <Image
             src={community.coverImage}
             alt={community.name}
@@ -100,49 +100,49 @@ export default function CommunityAboutPage() {
       )}
 
       {/* Description */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Description</h2>
-        <p className="text-gray-700 leading-relaxed">
+      <div className="mb-6 rounded-xl border border-gray-200 bg-white p-6">
+        <h2 className="mb-4 text-xl font-semibold text-gray-900">Description</h2>
+        <p className="leading-relaxed text-gray-700">
           {community.description || "No description available."}
         </p>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-white rounded-xl border border-gray-200 p-6 flex items-center gap-4">
-          <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+      <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="flex items-center gap-4 rounded-xl border border-gray-200 bg-white p-6">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-100">
             <Users className="h-6 w-6 text-purple-600" />
           </div>
           <div>
             <p className="text-2xl font-bold text-gray-900">{community._count?.members || 0}</p>
-            <p className="text-gray-600 text-sm">Members</p>
+            <p className="text-sm text-gray-600">Members</p>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-6 flex items-center gap-4">
-          <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+        <div className="flex items-center gap-4 rounded-xl border border-gray-200 bg-white p-6">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
             <BookOpen className="h-6 w-6 text-blue-600" />
           </div>
           <div>
             <p className="text-2xl font-bold text-gray-900">{community._count?.posts || 0}</p>
-            <p className="text-gray-600 text-sm">Posts</p>
+            <p className="text-sm text-gray-600">Posts</p>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-6 flex items-center gap-4">
-          <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+        <div className="flex items-center gap-4 rounded-xl border border-gray-200 bg-white p-6">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
             <Globe className="h-6 w-6 text-green-600" />
           </div>
           <div>
             <p className="text-2xl font-bold text-gray-900">{community._count?.courses || 0}</p>
-            <p className="text-gray-600 text-sm">Courses</p>
+            <p className="text-sm text-gray-600">Courses</p>
           </div>
         </div>
       </div>
 
       {/* Details */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Community Details</h2>
+      <div className="mb-6 rounded-xl border border-gray-200 bg-white p-6">
+        <h2 className="mb-4 text-xl font-semibold text-gray-900">Community Details</h2>
         <div className="space-y-4">
           <div className="flex items-center gap-3">
             <Calendar className="h-5 w-5 text-gray-400" />
@@ -161,8 +161,8 @@ export default function CommunityAboutPage() {
 
       {/* Owner */}
       {community.owner && (
-        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Community Owner</h2>
+        <div className="mb-6 rounded-xl border border-gray-200 bg-white p-6">
+          <h2 className="mb-4 text-xl font-semibold text-gray-900">Community Owner</h2>
           <div className="flex items-center gap-4">
             {community.owner.image ? (
               <Image
@@ -170,16 +170,16 @@ export default function CommunityAboutPage() {
                 alt={community.owner.name || "Owner"}
                 width={64}
                 height={64}
-                className="w-16 h-16 rounded-full object-cover"
+                className="h-16 w-16 rounded-full object-cover"
               />
             ) : (
-              <div className="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-purple-100">
                 <Users className="h-8 w-8 text-purple-600" />
               </div>
             )}
             <div>
               <p className="font-semibold text-gray-900">{community.owner.name || "Unknown"}</p>
-              <p className="text-gray-600 text-sm">Owner</p>
+              <p className="text-sm text-gray-600">Owner</p>
             </div>
           </div>
         </div>
@@ -188,9 +188,7 @@ export default function CommunityAboutPage() {
       {/* Back Button */}
       <div className="flex gap-4">
         <Link href={`/dashboard/c/${slug}/chat`}>
-          <Button variant="outline">
-            Back to Community
-          </Button>
+          <Button variant="outline">Back to Community</Button>
         </Link>
       </div>
     </div>

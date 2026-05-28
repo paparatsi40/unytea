@@ -16,12 +16,12 @@
 
 ## Conteos de findings
 
-| Severidad | Cantidad |
-|---|---|
-| **P0** (bloquea launch / expone seguridad ahora) | **18** |
-| **P1** (debería fixearse en Sprint 1) | **65** |
-| **P2** (mejora valiosa, no urgente) | **53** |
-| **Total** | **136** |
+| Severidad                                        | Cantidad |
+| ------------------------------------------------ | -------- |
+| **P0** (bloquea launch / expone seguridad ahora) | **18**   |
+| **P1** (debería fixearse en Sprint 1)            | **65**   |
+| **P2** (mejora valiosa, no urgente)              | **53**   |
+| **Total**                                        | **136**  |
 
 (Sumas aproximadas — algunos findings se solapan entre reportes.)
 
@@ -50,26 +50,26 @@
 
 ## TODOS los findings P0
 
-| # | Finding | Reporte |
-|---|---|---|
-| **P0-1** | `prisma db push --skip-generate` en cada build de prod → schema drift silencioso sobre DB con datos reales | 04 |
-| **P0-2** | `CRON_SECRET` check con fallback `if (expectedSecret && ...)` → si la env var falta, endpoints cron públicos | 03, 05 |
-| **P0-3** | 8 vulnerabilidades npm **HIGH** activas (`next`, `glob`, `@uploadthing`, `effect`, `eslint-config-next`) | 02, 05 |
-| **P0-4** | NextAuth v5 **en beta** (`5.0.0-beta.25`) corriendo en producción | 02, 03 |
-| **P0-5** | Lockfile vs `node_modules` local desincronizado: Next 16 + React 19 instalado vs Next 14 + React 18 declarado → 607 TS errors locales vs CI verde | 02, 07 |
-| **P0-6** | Migration tracked `20260306082705_add_welcome_message` rota (referencia `"Community"` en lugar de `"communities"`) | 04 |
-| **P0-7** | 3 archivos untracked en `prisma/migrations/` (recording_transcription, welcome_message duplicate, social_hub_layout stray) | 04 |
-| **P0-8** | Tipo `Session.user.role` declarado en NextAuth augmentation pero **`role` NO existe en `User` Prisma model** → cualquier check basado en `session.user.role` lee `undefined` | 03, 04 |
-| **P0-9** | `/api/sessions/[sessionId]/route.ts` archivo VACÍO (solo `force-dynamic` sin handlers) | 08 |
-| **P0-10** | `/api/admin/make-super-admin/` carpeta vacía — si alguien la termina sin auth fuerte, abre escalada de privilegios | 01, 08 |
-| **P0-11** | `/api/webhooks/clerk/` legacy de un intento Clerk previo — eliminar | 08 |
-| **P0-12** | CSP `script-src 'unsafe-eval' 'unsafe-inline'` + `unpkg.com` permitido → XSS-vulnerable si hay injection | 05 |
-| **P0-13** | CI lint y format-check con `continue-on-error: true` → 293 warnings se acumulan sin presión, incluido al menos un `react-hooks/rules-of-hooks called conditionally` que es bug runtime | 07 |
-| **P0-14** | CI no corre `next build` → errores que pasan tsc pero rompen build solo se descubren en Vercel deploy | 07 |
-| **P0-15** | `react-hooks/rules-of-hooks called conditionally` en al menos un componente → bug runtime real | 07 |
-| **P0-16** | `app/[locale]/dashboard/camera-test/page.tsx` untracked, ejecuta `getUserMedia` sin guard de env | 01, 08, 09 |
-| **P0-17** | `ARCHITECTURE.md` documenta carpetas `server/`/`types/`/`config/` que **no existen** + branding "Mentorly" — repo público da impresión de inconsistencia | 01 |
-| **P0-18** | `eslint-config-next@16.0.6` y `eslint@9.39.1` instalados (vs `^14.2.28` / `^8.57.0` declarados) → `npm ci` reproducible en riesgo | 02 |
+| #         | Finding                                                                                                                                                                                | Reporte    |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| **P0-1**  | `prisma db push --skip-generate` en cada build de prod → schema drift silencioso sobre DB con datos reales                                                                             | 04         |
+| **P0-2**  | `CRON_SECRET` check con fallback `if (expectedSecret && ...)` → si la env var falta, endpoints cron públicos                                                                           | 03, 05     |
+| **P0-3**  | 8 vulnerabilidades npm **HIGH** activas (`next`, `glob`, `@uploadthing`, `effect`, `eslint-config-next`)                                                                               | 02, 05     |
+| **P0-4**  | NextAuth v5 **en beta** (`5.0.0-beta.25`) corriendo en producción                                                                                                                      | 02, 03     |
+| **P0-5**  | Lockfile vs `node_modules` local desincronizado: Next 16 + React 19 instalado vs Next 14 + React 18 declarado → 607 TS errors locales vs CI verde                                      | 02, 07     |
+| **P0-6**  | Migration tracked `20260306082705_add_welcome_message` rota (referencia `"Community"` en lugar de `"communities"`)                                                                     | 04         |
+| **P0-7**  | 3 archivos untracked en `prisma/migrations/` (recording_transcription, welcome_message duplicate, social_hub_layout stray)                                                             | 04         |
+| **P0-8**  | Tipo `Session.user.role` declarado en NextAuth augmentation pero **`role` NO existe en `User` Prisma model** → cualquier check basado en `session.user.role` lee `undefined`           | 03, 04     |
+| **P0-9**  | `/api/sessions/[sessionId]/route.ts` archivo VACÍO (solo `force-dynamic` sin handlers)                                                                                                 | 08         |
+| **P0-10** | `/api/admin/make-super-admin/` carpeta vacía — si alguien la termina sin auth fuerte, abre escalada de privilegios                                                                     | 01, 08     |
+| **P0-11** | `/api/webhooks/clerk/` legacy de un intento Clerk previo — eliminar                                                                                                                    | 08         |
+| **P0-12** | CSP `script-src 'unsafe-eval' 'unsafe-inline'` + `unpkg.com` permitido → XSS-vulnerable si hay injection                                                                               | 05         |
+| **P0-13** | CI lint y format-check con `continue-on-error: true` → 293 warnings se acumulan sin presión, incluido al menos un `react-hooks/rules-of-hooks called conditionally` que es bug runtime | 07         |
+| **P0-14** | CI no corre `next build` → errores que pasan tsc pero rompen build solo se descubren en Vercel deploy                                                                                  | 07         |
+| **P0-15** | `react-hooks/rules-of-hooks called conditionally` en al menos un componente → bug runtime real                                                                                         | 07         |
+| **P0-16** | `app/[locale]/dashboard/camera-test/page.tsx` untracked, ejecuta `getUserMedia` sin guard de env                                                                                       | 01, 08, 09 |
+| **P0-17** | `ARCHITECTURE.md` documenta carpetas `server/`/`types/`/`config/` que **no existen** + branding "Mentorly" — repo público da impresión de inconsistencia                               | 01         |
+| **P0-18** | `eslint-config-next@16.0.6` y `eslint@9.39.1` instalados (vs `^14.2.28` / `^8.57.0` declarados) → `npm ci` reproducible en riesgo                                                      | 02         |
 
 ## Top 15 findings P1 más impactantes
 

@@ -10,7 +10,7 @@ import { getCurrentUserId } from "@/lib/auth-utils";
 export async function createPost(formData: FormData) {
   try {
     const userId = await getCurrentUserId();
-    
+
     if (!userId) {
       return { success: false, error: "Not authenticated" };
     }
@@ -82,7 +82,7 @@ export async function createPost(formData: FormData) {
 export async function deletePost(postId: string) {
   try {
     const userId = await getCurrentUserId();
-    
+
     if (!userId) {
       return { success: false, error: "Not authenticated" };
     }
@@ -144,7 +144,7 @@ export async function deletePost(postId: string) {
 export async function updatePost(postId: string, formData: FormData) {
   try {
     const userId = await getCurrentUserId();
-    
+
     if (!userId) {
       return { success: false, error: "Not authenticated" };
     }
@@ -193,7 +193,7 @@ export async function updatePost(postId: string, formData: FormData) {
 export async function togglePostPin(postId: string) {
   try {
     const userId = await getCurrentUserId();
-    
+
     if (!userId) {
       return { success: false, error: "Not authenticated" };
     }

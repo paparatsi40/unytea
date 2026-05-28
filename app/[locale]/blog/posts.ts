@@ -14,8 +14,7 @@ export const BLOG_POSTS: BlogPost[] = [
   {
     slug: "launch-community-that-converts",
     title: "How to Launch a Community That Converts",
-    excerpt:
-      "A practical framework to go from first members to repeat revenue.",
+    excerpt: "A practical framework to go from first members to repeat revenue.",
     seoDescription:
       "Learn a proven launch framework to turn new community members into active participants and paying customers.",
     date: "2026-04-09",
@@ -36,8 +35,7 @@ export const BLOG_POSTS: BlogPost[] = [
   {
     slug: "live-sessions-playbook-attendance",
     title: "Live Sessions Playbook for Higher Attendance",
-    excerpt:
-      "Simple structure and reminders that improve participation consistently.",
+    excerpt: "Simple structure and reminders that improve participation consistently.",
     seoDescription:
       "Increase session attendance with a reliable reminder cadence, clearer positioning, and post-session follow-through.",
     date: "2026-04-09",
@@ -58,8 +56,7 @@ export const BLOG_POSTS: BlogPost[] = [
   {
     slug: "pricing-paid-access-without-killing-growth",
     title: "Pricing Paid Access Without Killing Growth",
-    excerpt:
-      "How to balance conversion, retention, and long-term trust.",
+    excerpt: "How to balance conversion, retention, and long-term trust.",
     seoDescription:
       "Set paid access pricing that protects growth, improves retention, and builds long-term trust in your community brand.",
     date: "2026-04-09",

@@ -49,19 +49,13 @@ export function MemberCard({ member }: { member: Member }) {
 
         {/* Name & Tagline */}
         <div className="mb-3">
-          <h3 className="text-lg font-semibold text-gray-900">
-            {member.user.name || "Anonymous"}
-          </h3>
-          {member.user.tagline && (
-            <p className="text-sm text-gray-600">{member.user.tagline}</p>
-          )}
+          <h3 className="text-lg font-semibold text-gray-900">{member.user.name || "Anonymous"}</h3>
+          {member.user.tagline && <p className="text-sm text-gray-600">{member.user.tagline}</p>}
         </div>
 
         {/* Bio */}
         {member.user.bio && (
-          <p className="mb-3 line-clamp-2 text-sm text-gray-600">
-            {member.user.bio}
-          </p>
+          <p className="mb-3 line-clamp-2 text-sm text-gray-600">{member.user.bio}</p>
         )}
 
         {/* Skills */}
@@ -102,7 +96,7 @@ export function MemberCard({ member }: { member: Member }) {
           </Link>
           <button
             disabled
-            className="flex flex-1 items-center justify-center space-x-1 rounded-lg bg-gray-50 px-3 py-2 text-sm font-medium text-gray-400 transition-colors cursor-not-allowed opacity-50"
+            className="flex flex-1 cursor-not-allowed items-center justify-center space-x-1 rounded-lg bg-gray-50 px-3 py-2 text-sm font-medium text-gray-400 opacity-50 transition-colors"
           >
             <Video className="h-4 w-4" />
             <span>Call</span>
@@ -116,7 +110,7 @@ export function MemberCard({ member }: { member: Member }) {
         <button
           disabled
           type="button"
-          className="mt-3 flex items-center justify-center space-x-1 text-xs font-medium text-purple-600 opacity-50 cursor-not-allowed"
+          className="mt-3 flex cursor-not-allowed items-center justify-center space-x-1 text-xs font-medium text-purple-600 opacity-50"
           aria-label="Profile page coming soon"
           title="Profile page coming in Sprint 4"
         >

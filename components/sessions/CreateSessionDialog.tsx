@@ -67,7 +67,7 @@ export function CreateSessionDialog({
 
   // Mode: now or scheduled
   const [mode, setMode] = useState<SessionMode>("scheduled");
-  
+
   // Session type: video or audio
   const [sessionType, setSessionType] = useState<SessionType>("video");
 
@@ -99,10 +99,10 @@ export function CreateSessionDialog({
   // Generate preview dates for recurring sessions
   const previewDates = useMemo(() => {
     if (mode === "now" || recurrence === "once" || !scheduledAt) return [];
-    
+
     const dates: Date[] = [];
     const startDate = new Date(scheduledAt);
-    
+
     for (let i = 0; i < Math.min(generateCount, 6); i++) {
       const date = new Date(startDate);
       if (recurrence === "weekly") {
@@ -112,7 +112,7 @@ export function CreateSessionDialog({
       }
       dates.push(date);
     }
-    
+
     return dates;
   }, [scheduledAt, recurrence, interval, generateCount, mode]);
 
@@ -176,11 +176,8 @@ export function CreateSessionDialog({
         // Schedule session
         const scheduledDate = new Date(scheduledAt);
 
-        const apiRepeat = recurrence === "once" 
-          ? "once" 
-          : recurrence === "weekly" 
-            ? "WEEKLY" 
-            : "MONTHLY";
+        const apiRepeat =
+          recurrence === "once" ? "once" : recurrence === "weekly" ? "WEEKLY" : "MONTHLY";
 
         const result = await createSessionOrSeries({
           title,
@@ -302,9 +299,7 @@ export function CreateSessionDialog({
           "flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
         }
       >
-        {!className?.includes("Schedule your first") && (
-          <Plus className="h-4 w-4" />
-        )}
+        {!className?.includes("Schedule your first") && <Plus className="h-4 w-4" />}
         {triggerText}
       </button>
 
@@ -314,17 +309,13 @@ export function CreateSessionDialog({
           onClick={() => !isLoading && setIsOpen(false)}
         >
           <div
-            className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl border border-border bg-card p-6 shadow-2xl"
+            className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl border border-border bg-card p-6 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
             <div className="mb-6">
-              <h2 className="text-xl font-bold text-foreground">
-                Create Live Session
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                Start now or schedule for later
-              </p>
+              <h2 className="text-xl font-bold text-foreground">Create Live Session</h2>
+              <p className="text-sm text-muted-foreground">Start now or schedule for later</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
@@ -429,12 +420,10 @@ export function CreateSessionDialog({
                       value={scheduledAt}
                       onChange={(e) => handleDateChange(e.target.value)}
                       required={mode === "scheduled"}
-                      className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-foreground focus:border-purple-500 focus:outline-none [&::-webkit-calendar-picker-indicator]:opacity-90 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
+                      className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-foreground focus:border-purple-500 focus:outline-none [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-90"
                     />
                     {scheduledAt && (
-                      <p className="mt-1 text-sm text-purple-400">
-                        {formatDateFull(scheduledAt)}
-                      </p>
+                      <p className="mt-1 text-sm text-purple-400">{formatDateFull(scheduledAt)}</p>
                     )}
                   </div>
 
@@ -455,24 +444,18 @@ export function CreateSessionDialog({
                       ))}
                     </select>
                     {scheduledAt && (
-                      <p className="mt-1 text-xs text-zinc-500">
-                        Your time: {timezoneLabel}
-                      </p>
+                      <p className="mt-1 text-xs text-zinc-500">Your time: {timezoneLabel}</p>
                     )}
                   </div>
 
                   {/* Growth tip for weekly - shorter text */}
                   <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-3 py-2">
-                    <p className="text-xs text-amber-300">
-                      ⭐ Weekly sessions boost engagement 3x
-                    </p>
+                    <p className="text-xs text-amber-300">⭐ Weekly sessions boost engagement 3x</p>
                   </div>
 
                   {/* Repeat */}
                   <div>
-                    <label className="mb-2 block text-sm font-medium text-zinc-300">
-                      Repeat
-                    </label>
+                    <label className="mb-2 block text-sm font-medium text-zinc-300">Repeat</label>
                     <div className="flex gap-2">
                       {[
                         { id: "once", label: "Once" },
@@ -515,8 +498,12 @@ export function CreateSessionDialog({
                           </select>
                           <span className="text-sm text-muted-foreground">
                             {recurrence === "weekly"
-                              ? interval === 1 ? "week" : "weeks"
-                              : interval === 1 ? "month" : "months"}
+                              ? interval === 1
+                                ? "week"
+                                : "weeks"
+                              : interval === 1
+                                ? "month"
+                                : "months"}
                           </span>
                         </div>
                       </div>
@@ -573,7 +560,7 @@ export function CreateSessionDialog({
                   {/* Preview Dates */}
                   {previewDates.length > 0 && (
                     <div className="rounded-xl border border-border bg-muted/40 p-4">
-                      <p className="mb-2 text-xs font-medium text-zinc-500 uppercase">
+                      <p className="mb-2 text-xs font-medium uppercase text-zinc-500">
                         Upcoming sessions
                       </p>
                       <div className="flex flex-wrap gap-2">
@@ -638,11 +625,17 @@ export function CreateSessionDialog({
                 </button>
                 <button
                   type="submit"
-                  disabled={isLoading || (mode === "scheduled" && (!scheduledAt || !title)) || (mode === "now" && !title)}
+                  disabled={
+                    isLoading ||
+                    (mode === "scheduled" && (!scheduledAt || !title)) ||
+                    (mode === "now" && !title)
+                  }
                   className="flex-1 rounded-xl bg-purple-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-purple-700 disabled:opacity-50"
                 >
                   {isLoading
-                    ? mode === "now" ? "Starting..." : "Creating..."
+                    ? mode === "now"
+                      ? "Starting..."
+                      : "Creating..."
                     : mode === "now"
                       ? "Start Live Session"
                       : recurrence === "once"

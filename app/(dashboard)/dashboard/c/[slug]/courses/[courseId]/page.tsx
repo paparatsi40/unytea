@@ -384,7 +384,9 @@ export default function CourseBuilderPage() {
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">Description</label>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                    Description
+                  </label>
                   <textarea
                     value={courseForm.description}
                     onChange={(e) => setCourseForm({ ...courseForm, description: e.target.value })}
@@ -416,13 +418,17 @@ export default function CourseBuilderPage() {
                   {courseForm.isPaid && (
                     <div className="mt-3">
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">$</span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">
+                          $
+                        </span>
                         <input
                           type="number"
                           min="0"
                           step="0.01"
                           value={courseForm.price}
-                          onChange={(e) => setCourseForm({ ...courseForm, price: parseFloat(e.target.value) || 0 })}
+                          onChange={(e) =>
+                            setCourseForm({ ...courseForm, price: parseFloat(e.target.value) || 0 })
+                          }
                           className="w-48 rounded-lg border border-gray-200 py-2 pl-8 pr-4 text-sm text-gray-900 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
                         />
                       </div>
@@ -436,7 +442,11 @@ export default function CourseBuilderPage() {
                     disabled={isSavingDetails}
                     className="flex items-center gap-1.5 rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700 disabled:opacity-50"
                   >
-                    {isSavingDetails ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                    {isSavingDetails ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Save className="h-4 w-4" />
+                    )}
                     Save
                   </button>
                   <button
@@ -514,9 +524,7 @@ export default function CourseBuilderPage() {
       {/* Modules List */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Modules ({course.modules.length})
-          </h2>
+          <h2 className="text-lg font-semibold text-gray-900">Modules ({course.modules.length})</h2>
           <button
             onClick={() => setAddingModule(true)}
             className="flex items-center gap-1.5 rounded-lg bg-purple-50 px-3 py-2 text-sm font-medium text-purple-700 hover:bg-purple-100"
@@ -544,7 +552,11 @@ export default function CourseBuilderPage() {
                 disabled={isAddingModule || !newModuleTitle.trim()}
                 className="flex items-center gap-1.5 rounded-lg bg-purple-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-purple-700 disabled:opacity-50"
               >
-                {isAddingModule ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                {isAddingModule ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Plus className="h-4 w-4" />
+                )}
                 Add
               </button>
               <button
@@ -618,7 +630,9 @@ export default function CourseBuilderPage() {
                             <input
                               type="text"
                               value={editLessonForm.title}
-                              onChange={(e) => setEditLessonForm({ ...editLessonForm, title: e.target.value })}
+                              onChange={(e) =>
+                                setEditLessonForm({ ...editLessonForm, title: e.target.value })
+                              }
                               className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm text-gray-900 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
                               placeholder="Lesson title"
                             />
@@ -628,7 +642,9 @@ export default function CourseBuilderPage() {
                                 <button
                                   key={type}
                                   type="button"
-                                  onClick={() => setEditLessonForm({ ...editLessonForm, contentType: type })}
+                                  onClick={() =>
+                                    setEditLessonForm({ ...editLessonForm, contentType: type })
+                                  }
                                   className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium ${
                                     editLessonForm.contentType === type
                                       ? "bg-purple-100 text-purple-700"
@@ -644,14 +660,18 @@ export default function CourseBuilderPage() {
                               <input
                                 type="url"
                                 value={editLessonForm.videoUrl}
-                                onChange={(e) => setEditLessonForm({ ...editLessonForm, videoUrl: e.target.value })}
+                                onChange={(e) =>
+                                  setEditLessonForm({ ...editLessonForm, videoUrl: e.target.value })
+                                }
                                 placeholder="Video URL (YouTube, Vimeo, etc.)"
                                 className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm text-gray-900 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
                               />
                             )}
                             <textarea
                               value={editLessonForm.content}
-                              onChange={(e) => setEditLessonForm({ ...editLessonForm, content: e.target.value })}
+                              onChange={(e) =>
+                                setEditLessonForm({ ...editLessonForm, content: e.target.value })
+                              }
                               rows={4}
                               placeholder="Lesson content..."
                               className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm text-gray-900 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
@@ -660,7 +680,12 @@ export default function CourseBuilderPage() {
                             <div className="flex items-center gap-2">
                               <button
                                 type="button"
-                                onClick={() => setEditLessonForm({ ...editLessonForm, isFree: !editLessonForm.isFree })}
+                                onClick={() =>
+                                  setEditLessonForm({
+                                    ...editLessonForm,
+                                    isFree: !editLessonForm.isFree,
+                                  })
+                                }
                                 className="flex items-center gap-1.5 text-sm"
                               >
                                 {editLessonForm.isFree ? (
@@ -668,7 +693,11 @@ export default function CourseBuilderPage() {
                                 ) : (
                                   <Lock className="h-4 w-4 text-gray-400" />
                                 )}
-                                <span className={editLessonForm.isFree ? "text-green-700" : "text-gray-500"}>
+                                <span
+                                  className={
+                                    editLessonForm.isFree ? "text-green-700" : "text-gray-500"
+                                  }
+                                >
                                   {editLessonForm.isFree ? "Free preview" : "Paid only"}
                                 </span>
                               </button>
@@ -679,7 +708,11 @@ export default function CourseBuilderPage() {
                                 disabled={isSavingLesson}
                                 className="flex items-center gap-1.5 rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700 disabled:opacity-50"
                               >
-                                {isSavingLesson ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                                {isSavingLesson ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  <Save className="h-4 w-4" />
+                                )}
                                 Save
                               </button>
                               <button
@@ -756,14 +789,18 @@ export default function CourseBuilderPage() {
                           <input
                             type="url"
                             value={lessonForm.videoUrl}
-                            onChange={(e) => setLessonForm({ ...lessonForm, videoUrl: e.target.value })}
+                            onChange={(e) =>
+                              setLessonForm({ ...lessonForm, videoUrl: e.target.value })
+                            }
                             placeholder="Video URL (YouTube, Vimeo, etc.)"
                             className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
                           />
                         )}
                         <textarea
                           value={lessonForm.content}
-                          onChange={(e) => setLessonForm({ ...lessonForm, content: e.target.value })}
+                          onChange={(e) =>
+                            setLessonForm({ ...lessonForm, content: e.target.value })
+                          }
                           rows={3}
                           placeholder="Lesson content..."
                           className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
@@ -772,7 +809,9 @@ export default function CourseBuilderPage() {
                         <div className="flex items-center gap-2">
                           <button
                             type="button"
-                            onClick={() => setLessonForm({ ...lessonForm, isFree: !lessonForm.isFree })}
+                            onClick={() =>
+                              setLessonForm({ ...lessonForm, isFree: !lessonForm.isFree })
+                            }
                             className="flex items-center gap-1.5 text-sm"
                           >
                             {lessonForm.isFree ? (
@@ -780,7 +819,9 @@ export default function CourseBuilderPage() {
                             ) : (
                               <Lock className="h-4 w-4 text-gray-400" />
                             )}
-                            <span className={lessonForm.isFree ? "text-green-700" : "text-gray-500"}>
+                            <span
+                              className={lessonForm.isFree ? "text-green-700" : "text-gray-500"}
+                            >
                               {lessonForm.isFree ? "Free preview" : "Paid only"}
                             </span>
                           </button>
@@ -791,13 +832,23 @@ export default function CourseBuilderPage() {
                             disabled={isAddingLesson || !lessonForm.title.trim()}
                             className="flex items-center gap-1.5 rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700 disabled:opacity-50"
                           >
-                            {isAddingLesson ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                            {isAddingLesson ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Plus className="h-4 w-4" />
+                            )}
                             Add Lesson
                           </button>
                           <button
                             onClick={() => {
                               setAddingLessonToModule(null);
-                              setLessonForm({ title: "", content: "", contentType: "TEXT", videoUrl: "", isFree: false });
+                              setLessonForm({
+                                title: "",
+                                content: "",
+                                contentType: "TEXT",
+                                videoUrl: "",
+                                isFree: false,
+                              });
                             }}
                             className="rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
                           >

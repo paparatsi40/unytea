@@ -120,10 +120,10 @@ web/
 ```prisma
 model Community {
   // ... otros campos
-  
+
   // 🚀 SECTION BUILDER (NEW)
   landingLayout  Json?  // Array de SectionInstance
-  
+
   // ... relaciones
 }
 ```
@@ -141,8 +141,8 @@ landingLayout: [
       imageUrl: "https://...",
       ctaLabel: "Join Now",
       ctaUrl: "#",
-      alignment: "left"
-    }
+      alignment: "left",
+    },
   },
   {
     id: "section-1736459821456-def456",
@@ -151,31 +151,31 @@ landingLayout: [
       title: "What You'll Get",
       subtitle: "Everything you need",
       items: ["Feature 1", "Feature 2", "Feature 3"],
-      itemsCsv: "Feature 1, Feature 2, Feature 3"
-    }
+      itemsCsv: "Feature 1, Feature 2, Feature 3",
+    },
   },
   // ... más secciones
-]
+];
 ```
 
 ---
 
 ## 📊 **COMPARACIÓN: VISUAL BUILDER vs SECTION BUILDER**
 
-| Aspecto | Visual Builder ❌ | Section Builder ✅ |
-|---------|-------------------|-------------------|
-| **Responsive** | Manual, difícil | Automático |
-| **Re-renders** | Infinitos (bug) | Ninguno |
-| **State Management** | Complejo y frágil | Simple y predecible |
-| **Complejidad código** | 750 líneas | 350 líneas |
-| **Agregar features** | Difícil | Trivial (agregar al registry) |
-| **Debugging** | Pesadilla | Fácil |
-| **UX para owner** | Frustrante | Intuitivo |
-| **Velocidad de creación** | 30+ minutos | 5 minutos |
-| **Consistencia visual** | Inconsistente | Profesional |
-| **Guardar/Cargar** | No implementado | Funciona |
-| **Serialización** | Compleja | JSON directo |
-| **Performance** | Malo | Excelente |
+| Aspecto                   | Visual Builder ❌ | Section Builder ✅            |
+| ------------------------- | ----------------- | ----------------------------- |
+| **Responsive**            | Manual, difícil   | Automático                    |
+| **Re-renders**            | Infinitos (bug)   | Ninguno                       |
+| **State Management**      | Complejo y frágil | Simple y predecible           |
+| **Complejidad código**    | 750 líneas        | 350 líneas                    |
+| **Agregar features**      | Difícil           | Trivial (agregar al registry) |
+| **Debugging**             | Pesadilla         | Fácil                         |
+| **UX para owner**         | Frustrante        | Intuitivo                     |
+| **Velocidad de creación** | 30+ minutos       | 5 minutos                     |
+| **Consistencia visual**   | Inconsistente     | Profesional                   |
+| **Guardar/Cargar**        | No implementado   | Funciona                      |
+| **Serialización**         | Compleja          | JSON directo                  |
+| **Performance**           | Malo              | Excelente                     |
 
 ---
 
@@ -270,7 +270,7 @@ import { SectionSchema } from "../types";
 
 export const PricingRender = (props: Record<string, any>) => {
   const { title, plan1Name, plan1Price, plan2Name, plan2Price } = props;
-  
+
   return (
     <section className="rounded-2xl border bg-white p-8 md:p-16">
       <h2 className="text-center text-3xl font-bold">{title}</h2>
@@ -319,7 +319,7 @@ import { PricingSchema } from "./Pricing";
 
 export const SECTIONS: Record<SectionType, SectionSchema> = {
   // ... otras secciones
-  pricing: PricingSchema,  // ← Cambiar el placeholder
+  pricing: PricingSchema, // ← Cambiar el placeholder
 };
 
 export { PricingSchema };
@@ -331,14 +331,14 @@ export { PricingSchema };
 
 ## 🎯 **VENTAJAS COMPETITIVAS vs SKOOL**
 
-| Feature | Skool | Unytea |
-|---------|-------|--------|
-| Landing page customizable | ❌ | ✅ Section Builder |
-| Pre-designed sections | ❌ | ✅ 8+ secciones |
-| Drag & drop builder | ❌ | ✅ Reordenar fácil |
-| Responsive automático | 🟡 | ✅ Tailwind CSS |
-| Real-time preview | ❌ | ✅ Sí |
-| Templates | ❌ | ✅ Default layout |
+| Feature                   | Skool | Unytea             |
+| ------------------------- | ----- | ------------------ |
+| Landing page customizable | ❌    | ✅ Section Builder |
+| Pre-designed sections     | ❌    | ✅ 8+ secciones    |
+| Drag & drop builder       | ❌    | ✅ Reordenar fácil |
+| Responsive automático     | 🟡    | ✅ Tailwind CSS    |
+| Real-time preview         | ❌    | ✅ Sí              |
+| Templates                 | ❌    | ✅ Default layout  |
 
 ---
 
@@ -373,12 +373,12 @@ export { PricingSchema };
 5. **Copy landing** - Copiar layout entre comunidades
 6. **Export/Import** - JSON import/export
 7. **Más secciones:**
-    - Team (equipo)
-    - Events (eventos)
-    - Newsletter signup
-    - Social proof
-    - Video hero
-    - Timeline
+   - Team (equipo)
+   - Events (eventos)
+   - Newsletter signup
+   - Social proof
+   - Video hero
+   - Timeline
 
 ### **Integraciones futuras:**
 
@@ -442,4 +442,3 @@ El **Section Builder** es una solución **elegante, simple y funcional** que:
 **Autor:** AI Assistant (Claude)  
 **Proyecto:** Unytea  
 **Estado:** ✅ **COMPLETADO**
-

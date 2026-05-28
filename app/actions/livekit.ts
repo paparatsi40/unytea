@@ -62,7 +62,7 @@ export async function generateLiveKitToken(
 
     // Determine role
     let role = options.role || ParticipationRole.listener;
-    
+
     // Host is the mentor
     if (session.mentorId === userId) {
       role = ParticipationRole.host;
@@ -84,7 +84,7 @@ export async function generateLiveKitToken(
 
     // Generate unique identity
     const identity = `${userId}-${Date.now()}`;
-    
+
     // Use session ID as room name (consistency with our domain)
     const roomName = options.roomName || session.videoRoomName || `session-${session.id}`;
 
@@ -140,11 +140,9 @@ export async function generateLiveKitToken(
 /**
  * Join a session - creates participation record and returns token
  */
-export async function joinSession(
-  sessionId: string
-): Promise<{ 
-  success: boolean; 
-  token?: TokenPayload; 
+export async function joinSession(sessionId: string): Promise<{
+  success: boolean;
+  token?: TokenPayload;
   error?: string;
   session?: {
     id: string;
@@ -387,9 +385,7 @@ export async function trackEngagement(
 /**
  * Get session participants with engagement stats
  */
-export async function getSessionParticipants(
-  sessionId: string
-): Promise<{
+export async function getSessionParticipants(sessionId: string): Promise<{
   success: boolean;
   participants?: Array<{
     id: string;

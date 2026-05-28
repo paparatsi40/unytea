@@ -28,10 +28,7 @@ export function ServiceWorkerRegistrar() {
           if (!newWorker) return;
 
           newWorker.addEventListener("statechange", () => {
-            if (
-              newWorker.state === "installed" &&
-              navigator.serviceWorker.controller
-            ) {
+            if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
               // New version available — could show update banner here
               console.log("[SW] New version available");
             }

@@ -19,8 +19,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
     }
 
-    const roomName =
-      typeof body.roomName === "string" ? body.roomName.trim() : "";
+    const roomName = typeof body.roomName === "string" ? body.roomName.trim() : "";
     const participantName =
       typeof body.participantName === "string" ? body.participantName.trim() : "";
 
@@ -31,9 +30,7 @@ export async function POST(request: NextRequest) {
     const apiKey = process.env.LIVEKIT_API_KEY;
     const apiSecret = process.env.LIVEKIT_API_SECRET;
     const wsUrl =
-      process.env.LIVEKIT_URL?.trim() ||
-      process.env.NEXT_PUBLIC_LIVEKIT_URL?.trim() ||
-      "";
+      process.env.LIVEKIT_URL?.trim() || process.env.NEXT_PUBLIC_LIVEKIT_URL?.trim() || "";
 
     if (!apiKey || !apiSecret || !wsUrl) {
       console.error("LiveKit config missing", {
@@ -42,18 +39,11 @@ export async function POST(request: NextRequest) {
         hasWsUrl: Boolean(wsUrl),
       });
 
-      return NextResponse.json(
-        { error: "Video call service not configured" },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: "Video call service not configured" }, { status: 500 });
     }
 
     const identity = session.user.id;
-    const name =
-      participantName ||
-      session.user.name ||
-      session.user.email ||
-      "Participant";
+    const name = participantName || session.user.name || session.user.email || "Participant";
 
     const token = new AccessToken(apiKey, apiSecret, {
       identity,
@@ -115,9 +105,6 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Error generating LiveKit token:", error);
 
-    return NextResponse.json(
-      { error: "Failed to generate token" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to generate token" }, { status: 500 });
   }
 }

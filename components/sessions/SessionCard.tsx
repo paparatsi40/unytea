@@ -18,7 +18,7 @@ interface SessionCardProps {
 export function SessionCard({ session, isPast = false, currentUserId }: SessionCardProps) {
   const router = useRouter();
   const [isStarting, setIsStarting] = useState(false);
-  
+
   const sessionDate = new Date(session.scheduledAt);
   const canJoin = !isPast && new Date() >= new Date(sessionDate.getTime() - 5 * 60 * 1000);
   const isMentor = currentUserId && session.mentorId === currentUserId;
@@ -26,7 +26,7 @@ export function SessionCard({ session, isPast = false, currentUserId }: SessionC
   const handleStartSession = async () => {
     setIsStarting(true);
     const result = await startSession(session.id);
-    
+
     if (result.success) {
       toast.success("Session started!");
       router.push(`/dashboard/sessions/${session.id}/room`);
@@ -45,10 +45,10 @@ export function SessionCard({ session, isPast = false, currentUserId }: SessionC
             session.status === "COMPLETED"
               ? "bg-green-500/10 text-green-500"
               : session.status === "CANCELLED"
-              ? "bg-red-500/10 text-red-500"
-              : session.status === "IN_PROGRESS"
-              ? "bg-blue-500/10 text-blue-500 animate-pulse"
-              : "bg-yellow-500/10 text-yellow-500"
+                ? "bg-red-500/10 text-red-500"
+                : session.status === "IN_PROGRESS"
+                  ? "animate-pulse bg-blue-500/10 text-blue-500"
+                  : "bg-yellow-500/10 text-yellow-500"
           }`}
         >
           {session.status === "IN_PROGRESS" && "● "}
@@ -57,14 +57,10 @@ export function SessionCard({ session, isPast = false, currentUserId }: SessionC
       </div>
 
       {/* Title */}
-      <h3 className="mb-2 pr-20 text-lg font-bold text-foreground">
-        {session.title}
-      </h3>
+      <h3 className="mb-2 pr-20 text-lg font-bold text-foreground">{session.title}</h3>
 
       {session.description && (
-        <p className="mb-4 line-clamp-2 text-sm text-muted-foreground">
-          {session.description}
-        </p>
+        <p className="mb-4 line-clamp-2 text-sm text-muted-foreground">{session.description}</p>
       )}
 
       {/* Info */}
@@ -92,7 +88,7 @@ export function SessionCard({ session, isPast = false, currentUserId }: SessionC
         <Button
           onClick={handleStartSession}
           disabled={isStarting}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-700 mb-3"
+          className="mb-3 flex w-full items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-700"
         >
           <Play className="h-4 w-4" />
           {isStarting ? "Starting..." : "Start Session"}

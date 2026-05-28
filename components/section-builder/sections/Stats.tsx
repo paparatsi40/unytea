@@ -3,34 +3,36 @@
 import { SectionSchema } from "../types";
 
 export const StatsRender = (props: Record<string, any>) => {
-  const { title, stat1Value, stat1Label, stat2Value, stat2Label, stat3Value, stat3Label, stat4Value, stat4Label } = props;
-  
+  const {
+    title,
+    stat1Value,
+    stat1Label,
+    stat2Value,
+    stat2Label,
+    stat3Value,
+    stat3Label,
+    stat4Value,
+    stat4Label,
+  } = props;
+
   const stats = [
     { value: stat1Value, label: stat1Label },
     { value: stat2Value, label: stat2Label },
     { value: stat3Value, label: stat3Label },
     { value: stat4Value, label: stat4Label },
-  ].filter(s => s.value);
-  
+  ].filter((s) => s.value);
+
   return (
     <section className="rounded-2xl border border-border bg-gradient-to-br from-purple-600 to-fuchsia-500 p-8 text-white md:p-16">
-      <div className="text-center mb-12">
-        {title && (
-          <h2 className="text-3xl font-bold md:text-4xl">
-            {title}
-          </h2>
-        )}
+      <div className="mb-12 text-center">
+        {title && <h2 className="text-3xl font-bold md:text-4xl">{title}</h2>}
       </div>
-      
+
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat, i) => (
           <div key={i} className="text-center">
-            <div className="text-4xl font-bold md:text-5xl lg:text-6xl">
-              {stat.value}
-            </div>
-            <div className="mt-2 text-lg text-white/90 md:text-xl">
-              {stat.label}
-            </div>
+            <div className="text-4xl font-bold md:text-5xl lg:text-6xl">{stat.value}</div>
+            <div className="mt-2 text-lg text-white/90 md:text-xl">{stat.label}</div>
           </div>
         ))}
       </div>

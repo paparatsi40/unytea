@@ -49,7 +49,8 @@ function renderSection(section: SectionInstance, t: ReturnType<typeof useTransla
       return <GalleryRender {...section.props} />;
     case "pricing": {
       const title = section.props.title || "Choose the plan that fits you";
-      const subtitle = section.props.subtitle || "Compare options and start with the best plan for your goals.";
+      const subtitle =
+        section.props.subtitle || "Compare options and start with the best plan for your goals.";
       const ctaText = section.props.ctaText || "View plans";
       const ctaUrl = section.props.ctaUrl || "/pricing";
 
@@ -108,7 +109,9 @@ function renderSection(section: SectionInstance, t: ReturnType<typeof useTransla
       );
     }
     default:
-      return <div className="p-8 text-center text-gray-500">{t("sectionBuilder.unknownSection")}</div>;
+      return (
+        <div className="p-8 text-center text-gray-500">{t("sectionBuilder.unknownSection")}</div>
+      );
   }
 }
 
@@ -121,11 +124,11 @@ interface SectionBuilderProps {
   communityDescription?: string | null;
 }
 
-export function SectionBuilder({ 
-  initialSections = [], 
+export function SectionBuilder({
+  initialSections = [],
   onSave,
   communityName,
-  communityDescription
+  communityDescription,
 }: SectionBuilderProps) {
   const t = useTranslations();
   const [sections, setSections] = useState<SectionInstance[]>(initialSections);
@@ -202,9 +205,7 @@ export function SectionBuilder({
 
   const updateProps = useCallback((id: string, updates: Record<string, any>) => {
     setSections((prev) =>
-      prev.map((s) =>
-        s.id === id ? { ...s, props: { ...s.props, ...updates } } : s
-      )
+      prev.map((s) => (s.id === id ? { ...s, props: { ...s.props, ...updates } } : s))
     );
   }, []);
 
@@ -237,12 +238,7 @@ export function SectionBuilder({
               Preview
             </Button>
             {onSave && (
-              <Button
-                size="sm"
-                onClick={handleSave}
-                disabled={saving}
-                className="h-8"
-              >
+              <Button size="sm" onClick={handleSave} disabled={saving} className="h-8">
                 {saving ? (
                   <>
                     <Save className="mr-1 h-3 w-3 animate-spin" />
@@ -272,9 +268,7 @@ export function SectionBuilder({
                   <span className="text-lg">{schema.icon}</span>
                   <div className="flex-1">
                     <div className="font-medium">{schema.label}</div>
-                    <div className="text-[10px] text-muted-foreground">
-                      {schema.description}
-                    </div>
+                    <div className="text-[10px] text-muted-foreground">{schema.description}</div>
                   </div>
                   <span className="text-primary opacity-0 transition-opacity group-hover:opacity-100">
                     +
@@ -287,9 +281,7 @@ export function SectionBuilder({
 
         {/* Layers */}
         <div className="mt-6 border-t border-border pt-4">
-          <h4 className="mb-2 text-xs font-bold">
-            LAYERS ({sections.length})
-          </h4>
+          <h4 className="mb-2 text-xs font-bold">LAYERS ({sections.length})</h4>
           <div className="space-y-1">
             {sections.map((s, idx) => {
               const schema = SECTIONS[s.type];
@@ -298,15 +290,10 @@ export function SectionBuilder({
                   key={s.id}
                   className={[
                     "flex items-center gap-1 rounded p-2 text-xs transition-colors",
-                    selectedId === s.id
-                      ? "bg-primary text-primary-foreground"
-                      : "hover:bg-muted",
+                    selectedId === s.id ? "bg-primary text-primary-foreground" : "hover:bg-muted",
                   ].join(" ")}
                 >
-                  <button
-                    onClick={() => setSelectedId(s.id)}
-                    className="flex-1 truncate text-left"
-                  >
+                  <button onClick={() => setSelectedId(s.id)} className="flex-1 truncate text-left">
                     <span className="mr-1">{schema.icon}</span>
                     {schema.label} #{idx + 1}
                   </button>
@@ -352,21 +339,19 @@ export function SectionBuilder({
       {/* CENTER: Preview */}
       <main className="flex-1 overflow-y-auto rounded-2xl border border-border bg-gray-50 p-4">
         {/* Preview Header */}
-        <div className="mb-4 flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3 rounded-t-xl">
+        <div className="mb-4 flex items-center justify-between rounded-t-xl border-b border-gray-200 bg-white px-4 py-3">
           <div className="flex items-center gap-2">
             <span className="text-sm font-semibold text-gray-700">Live Preview</span>
             <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-medium text-green-700">
               {sections.length} sections
             </span>
           </div>
-          <span className="text-xs text-gray-400">
-            Click any section to edit
-          </span>
+          <span className="text-xs text-gray-400">Click any section to edit</span>
         </div>
 
-        <div 
+        <div
           className="mx-auto max-w-5xl origin-top scale-[0.85] transform"
-          style={{ width: '117.65%' }} // Compensate scale: 100/0.85 = 117.65%
+          style={{ width: "117.65%" }} // Compensate scale: 100/0.85 = 117.65%
         >
           {sections.length === 0 && (
             <div className="rounded-lg border border-dashed border-border bg-white p-12 text-center">
@@ -397,9 +382,7 @@ export function SectionBuilder({
         <h3 className="mb-4 text-sm font-bold">{t("sectionBuilder.properties")}</h3>
 
         {!selected && (
-          <p className="text-xs text-muted-foreground">
-            {t("sectionBuilder.selectSection")}
-          </p>
+          <p className="text-xs text-muted-foreground">{t("sectionBuilder.selectSection")}</p>
         )}
 
         {selected && (
@@ -408,9 +391,7 @@ export function SectionBuilder({
               <div className="flex items-center gap-2">
                 <span className="text-2xl">{SECTIONS[selected.type].icon}</span>
                 <div>
-                  <div className="text-sm font-semibold">
-                    {SECTIONS[selected.type].label}
-                  </div>
+                  <div className="text-sm font-semibold">{SECTIONS[selected.type].label}</div>
                   <div className="text-[10px] text-muted-foreground">
                     {SECTIONS[selected.type].description}
                   </div>
@@ -430,7 +411,10 @@ export function SectionBuilder({
                   }
                   setGeneratingAI(true);
                   try {
-                    const faqs = await generateCommunityFAQs(communityName, communityDescription ?? null);
+                    const faqs = await generateCommunityFAQs(
+                      communityName,
+                      communityDescription ?? null
+                    );
                     const updates: Record<string, string> = {};
                     faqs.forEach((faq, i) => {
                       updates[`q${i + 1}`] = faq.q;
@@ -479,9 +463,7 @@ export function SectionBuilder({
 
               return (
                 <div key={field.key} className="space-y-1.5">
-                  <label className="text-xs font-medium text-foreground">
-                    {field.label}
-                  </label>
+                  <label className="text-xs font-medium text-foreground">{field.label}</label>
 
                   {field.kind === "textarea" ? (
                     <textarea
@@ -510,7 +492,9 @@ export function SectionBuilder({
                     </select>
                   ) : (
                     <input
-                      type={field.kind === "url" ? "url" : field.kind === "number" ? "number" : "text"}
+                      type={
+                        field.kind === "url" ? "url" : field.kind === "number" ? "number" : "text"
+                      }
                       value={value}
                       onChange={(e) => handleChange(e.target.value)}
                       placeholder={field.placeholder}
@@ -540,11 +524,7 @@ export function SectionBuilder({
                 <span className="rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-800">
                   Unsaved Preview
                 </span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowPreview(false)}
-                >
+                <Button variant="ghost" size="sm" onClick={() => setShowPreview(false)}>
                   <X className="h-5 w-5" />
                 </Button>
               </div>
@@ -560,11 +540,7 @@ export function SectionBuilder({
                     </p>
                   </div>
                 ) : (
-                  sections.map((s) => (
-                    <div key={s.id}>
-                      {renderSection(s, t)}
-                    </div>
-                  ))
+                  sections.map((s) => <div key={s.id}>{renderSection(s, t)}</div>)
                 )}
               </div>
             </div>
@@ -575,10 +551,7 @@ export function SectionBuilder({
                 Changes are not saved until you click "Save" in the builder
               </p>
               <div className="flex gap-3">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowPreview(false)}
-                >
+                <Button variant="outline" onClick={() => setShowPreview(false)}>
                   Close Preview
                 </Button>
                 {onSave && (

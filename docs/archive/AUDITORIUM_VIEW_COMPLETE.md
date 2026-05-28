@@ -82,11 +82,11 @@ const seatsPerRow = 6;
 const totalSeats = rows * seatsPerRow; // 18
 
 // Posicionamiento SVG
-row = index / seatsPerRow (floor)
-col = index % seatsPerRow
+row = index / seatsPerRow(floor);
+col = index % seatsPerRow;
 
-x = 50 + (col * 140) // Espaciado horizontal
-y = 50 + (row * 160) // Espaciado vertical
+x = 50 + col * 140; // Espaciado horizontal
+y = 50 + row * 160; // Espaciado vertical
 ```
 
 ### **Gradient Generation:**

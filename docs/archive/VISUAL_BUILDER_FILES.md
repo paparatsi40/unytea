@@ -155,14 +155,12 @@ propio endpoint para guardar layouts.
 export function VisualBuilder() {
   const [elements, setElements] = useState<CanvasElement[]>([]);
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
-  
+
   // ❌ PROBLEMA: updateElement tiene closure sobre elements
   function updateElement(id: string, updates: Partial<CanvasElement>) {
-    setElements(elements.map(el => 
-      el.id === id ? { ...el, ...updates } : el
-    ));
+    setElements(elements.map((el) => (el.id === id ? { ...el, ...updates } : el)));
   }
-  
+
   // ❌ PROBLEMA: useCallback sin dependencies correctas
   const handleDragEnd = useCallback((event: DragEndEvent) => {
     // ... usa elements implícitamente
@@ -174,15 +172,17 @@ export function VisualBuilder() {
 
 ```tsx
 // El textarea para editar texto no captura onChange
-{selectedElement.type === "text" && (
-  <textarea
-    value={selectedElement.content}
-    onChange={(e) => {
-      // ❌ Esta función se recrea en cada render
-      updateElement(selectedElement.id, { content: e.target.value });
-    }}
-  />
-)}
+{
+  selectedElement.type === "text" && (
+    <textarea
+      value={selectedElement.content}
+      onChange={(e) => {
+        // ❌ Esta función se recrea en cada render
+        updateElement(selectedElement.id, { content: e.target.value });
+      }}
+    />
+  );
+}
 ```
 
 **Problema 3: Console.logs y alerts agregados para debug**
@@ -224,11 +224,9 @@ function visualBuilderReducer(state: CanvasElement[], action: Action) {
     case "ADD_ELEMENT":
       return [...state, action.element];
     case "UPDATE_ELEMENT":
-      return state.map(el => 
-        el.id === action.id ? { ...el, ...action.updates } : el
-      );
+      return state.map((el) => (el.id === action.id ? { ...el, ...action.updates } : el));
     case "DELETE_ELEMENT":
-      return state.filter(el => el.id !== action.id);
+      return state.filter((el) => el.id !== action.id);
     default:
       return state;
   }
@@ -241,7 +239,7 @@ function visualBuilderReducer(state: CanvasElement[], action: Action) {
 export function VisualBuilder() {
   const [elements, dispatch] = useReducer(visualBuilderReducer, []);
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
-  
+
   // ✅ Sin closures problemáticos
   function updateElement(id: string, updates: Partial<CanvasElement>) {
     dispatch({ type: "UPDATE_ELEMENT", id, updates });
@@ -268,21 +266,19 @@ const VisualBuilderContext = createContext<VisualBuilderContextType | null>(null
 // VisualBuilderProvider.tsx
 export function VisualBuilderProvider({ children }) {
   const [elements, setElements] = useState<CanvasElement[]>([]);
-  
-  const value = useMemo(() => ({
-    elements,
-    addElement: (element) => setElements(prev => [...prev, element]),
-    updateElement: (id, updates) => setElements(prev => 
-      prev.map(el => el.id === id ? { ...el, ...updates } : el)
-    ),
-    // ... más funciones
-  }), [elements]);
-  
-  return (
-    <VisualBuilderContext.Provider value={value}>
-      {children}
-    </VisualBuilderContext.Provider>
+
+  const value = useMemo(
+    () => ({
+      elements,
+      addElement: (element) => setElements((prev) => [...prev, element]),
+      updateElement: (id, updates) =>
+        setElements((prev) => prev.map((el) => (el.id === id ? { ...el, ...updates } : el))),
+      // ... más funciones
+    }),
+    [elements]
   );
+
+  return <VisualBuilderContext.Provider value={value}>{children}</VisualBuilderContext.Provider>;
 }
 
 // useVisualBuilder.ts
@@ -320,22 +316,23 @@ type VisualBuilderStore = {
 export const useVisualBuilderStore = create<VisualBuilderStore>((set) => ({
   elements: [],
   selectedElementId: null,
-  
-  addElement: (element) => set((state) => ({
-    elements: [...state.elements, element]
-  })),
-  
-  updateElement: (id, updates) => set((state) => ({
-    elements: state.elements.map(el => 
-      el.id === id ? { ...el, ...updates } : el
-    )
-  })),
-  
-  deleteElement: (id) => set((state) => ({
-    elements: state.elements.filter(el => el.id !== id),
-    selectedElementId: state.selectedElementId === id ? null : state.selectedElementId
-  })),
-  
+
+  addElement: (element) =>
+    set((state) => ({
+      elements: [...state.elements, element],
+    })),
+
+  updateElement: (id, updates) =>
+    set((state) => ({
+      elements: state.elements.map((el) => (el.id === id ? { ...el, ...updates } : el)),
+    })),
+
+  deleteElement: (id) =>
+    set((state) => ({
+      elements: state.elements.filter((el) => el.id !== id),
+      selectedElementId: state.selectedElementId === id ? null : state.selectedElementId,
+    })),
+
   selectElement: (id) => set({ selectedElementId: id }),
 }));
 ```
@@ -347,7 +344,7 @@ import { useVisualBuilderStore } from "@/stores/visualBuilderStore";
 
 export function VisualBuilder() {
   const { elements, selectedElementId, updateElement, selectElement } = useVisualBuilderStore();
-  
+
   // ✅ Sin re-renders infinitos
   // ✅ Sin closures problemáticos
 }
@@ -458,18 +455,18 @@ web/
 
 ## 📊 **ESTADO ACTUAL vs DESEADO**
 
-| Feature | Estado Actual | Deseado | Blocker |
-|---------|---------------|---------|---------|
-| Drag & Drop | ✅ Funciona | ✅ | - |
-| Posicionamiento | ✅ Funciona | ✅ | - |
-| Resize | ✅ Funciona | ✅ | - |
-| Selection | ✅ Funciona | ✅ | - |
-| Layers Panel | ✅ Funciona | ✅ | - |
-| **Properties Panel** | ❌ NO responde | ✅ | 🔴 Re-renders infinitos |
-| **Editar texto** | ❌ NO funciona | ✅ | 🔴 Properties Panel |
-| **Upload imágenes** | ❌ NO funciona | ✅ | 🔴 Properties Panel |
-| **Guardar layout** | ❌ No implementado | ✅ | Pendiente API |
-| **Cargar layout** | ❌ No implementado | ✅ | Pendiente API |
+| Feature              | Estado Actual      | Deseado | Blocker                 |
+| -------------------- | ------------------ | ------- | ----------------------- |
+| Drag & Drop          | ✅ Funciona        | ✅      | -                       |
+| Posicionamiento      | ✅ Funciona        | ✅      | -                       |
+| Resize               | ✅ Funciona        | ✅      | -                       |
+| Selection            | ✅ Funciona        | ✅      | -                       |
+| Layers Panel         | ✅ Funciona        | ✅      | -                       |
+| **Properties Panel** | ❌ NO responde     | ✅      | 🔴 Re-renders infinitos |
+| **Editar texto**     | ❌ NO funciona     | ✅      | 🔴 Properties Panel     |
+| **Upload imágenes**  | ❌ NO funciona     | ✅      | 🔴 Properties Panel     |
+| **Guardar layout**   | ❌ No implementado | ✅      | Pendiente API           |
+| **Cargar layout**    | ❌ No implementado | ✅      | Pendiente API           |
 
 ---
 

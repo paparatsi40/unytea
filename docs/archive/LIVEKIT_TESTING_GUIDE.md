@@ -67,16 +67,16 @@
 ## 👥 **TEST 3: Múltiples participantes (3+)**
 
 1. Abre en **3 ventanas diferentes**:
-    - Navegador normal
-    - Modo incógnito
-    - Otro navegador (Chrome + Firefox)
+   - Navegador normal
+   - Modo incógnito
+   - Otro navegador (Chrome + Firefox)
 
 2. **Todos** con el mismo room name: `test-room-multi`
 
 3. **Nombres diferentes:**
-    - Alice
-    - Bob
-    - Charlie
+   - Alice
+   - Bob
+   - Charlie
 
 ### **Resultado esperado:** ✅
 
@@ -92,17 +92,17 @@
 
 1. En una ventana, habla claramente
 2. En la otra, verifica que:
-    - ✅ Audio se escucha sin eco
-    - ✅ Sin delay significativo (<500ms)
-    - ✅ Calidad clara
+   - ✅ Audio se escucha sin eco
+   - ✅ Sin delay significativo (<500ms)
+   - ✅ Calidad clara
 
 ### **Test de video:**
 
 1. Mueve la mano frente a la cámara
 2. Verifica que:
-    - ✅ Video no está pixelado
-    - ✅ Movimientos fluidos (no choppy)
-    - ✅ Sin congelamiento
+   - ✅ Video no está pixelado
+   - ✅ Movimientos fluidos (no choppy)
+   - ✅ Sin congelamiento
 
 ---
 
@@ -113,9 +113,9 @@ En el video call, busca el **ícono de settings** (⚙️):
 1. Click en settings
 2. Ve a **"Advanced"** o **"Stats"**
 3. Verifica:
-    - ✅ **Bitrate:** >500 kbps (bueno), >1000 kbps (excelente)
-    - ✅ **Packet Loss:** <5% (aceptable), <1% (excelente)
-    - ✅ **Latency:** <100ms (excelente), <300ms (bueno)
+   - ✅ **Bitrate:** >500 kbps (bueno), >1000 kbps (excelente)
+   - ✅ **Packet Loss:** <5% (aceptable), <1% (excelente)
+   - ✅ **Latency:** <100ms (excelente), <300ms (bueno)
 
 ---
 
@@ -216,13 +216,13 @@ Una vez completados todos los tests:
 
 ## 📊 **MÉTRICAS DE CALIDAD ESPERADAS:**
 
-| Métrica | Bueno | Excelente |
-|---------|-------|-----------|
-| **Bitrate** | >500 kbps | >1000 kbps |
-| **Latency** | <300ms | <100ms |
-| **Packet Loss** | <5% | <1% |
-| **Video FPS** | >15 | >24 |
-| **Resolution** | 480p | 720p+ |
+| Métrica         | Bueno     | Excelente  |
+| --------------- | --------- | ---------- |
+| **Bitrate**     | >500 kbps | >1000 kbps |
+| **Latency**     | <300ms    | <100ms     |
+| **Packet Loss** | <5%       | <1%        |
+| **Video FPS**   | >15       | >24        |
+| **Resolution**  | 480p      | 720p+      |
 
 ---
 

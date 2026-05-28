@@ -15,15 +15,15 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Sparkles, 
-    Loader2,
+import {
+  Sparkles,
+  Loader2,
   CheckCircle,
   Clock,
   Users,
   Check,
   ArrowRight,
-  Lightbulb
+  Lightbulb,
 } from "lucide-react";
 import { toast } from "sonner";
 import { createCourseFromSessions } from "@/app/actions/knowledge-library";
@@ -97,9 +97,7 @@ export function CreateCourseFromSessionsDialog({
 
   function toggleSession(sessionId: string) {
     setSelectedSessions((prev) =>
-      prev.includes(sessionId)
-        ? prev.filter((id) => id !== sessionId)
-        : [...prev, sessionId]
+      prev.includes(sessionId) ? prev.filter((id) => id !== sessionId) : [...prev, sessionId]
     );
   }
 
@@ -160,7 +158,7 @@ export function CreateCourseFromSessionsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl bg-zinc-900 border-zinc-800 text-white max-h-[90vh]">
+      <DialogContent className="max-h-[90vh] max-w-2xl border-zinc-800 bg-zinc-900 text-white">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
             <Sparkles className="h-5 w-5 text-purple-500" />
@@ -178,7 +176,7 @@ export function CreateCourseFromSessionsDialog({
             {/* Suggestions */}
             {suggestions.length > 0 && (
               <div className="space-y-2">
-                <Label className="text-zinc-300 flex items-center gap-2">
+                <Label className="flex items-center gap-2 text-zinc-300">
                   <Lightbulb className="h-4 w-4 text-amber-500" />
                   Suggested Course Topics
                 </Label>
@@ -189,7 +187,9 @@ export function CreateCourseFromSessionsDialog({
                       type="button"
                       variant={selectedSuggestion === suggestion ? "default" : "outline"}
                       size="sm"
-                      onClick={() => setSelectedSuggestion(selectedSuggestion === suggestion ? null : suggestion)}
+                      onClick={() =>
+                        setSelectedSuggestion(selectedSuggestion === suggestion ? null : suggestion)
+                      }
                       className={
                         selectedSuggestion === suggestion
                           ? "bg-purple-600 hover:bg-purple-700"
@@ -209,9 +209,7 @@ export function CreateCourseFromSessionsDialog({
             {/* Session Selection */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label className="text-zinc-300">
-                  Available Sessions ({sessions.length})
-                </Label>
+                <Label className="text-zinc-300">Available Sessions ({sessions.length})</Label>
                 <div className="flex gap-2">
                   <Button
                     type="button"
@@ -234,12 +232,12 @@ export function CreateCourseFromSessionsDialog({
                 </div>
               </div>
 
-              <ScrollArea className="h-[300px] border border-zinc-800 rounded-md">
-                <div className="p-3 space-y-2">
+              <ScrollArea className="h-[300px] rounded-md border border-zinc-800">
+                <div className="space-y-2 p-3">
                   {sessions.map((session) => (
                     <div
                       key={session.id}
-                      className={`flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer ${
+                      className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-all ${
                         selectedSessions.includes(session.id)
                           ? "border-purple-500 bg-purple-500/10"
                           : "border-zinc-800 bg-zinc-800/50 hover:border-zinc-700"
@@ -249,18 +247,21 @@ export function CreateCourseFromSessionsDialog({
                       <Checkbox
                         checked={selectedSessions.includes(session.id)}
                         onCheckedChange={() => toggleSession(session.id)}
-                        className="mt-0.5 border-zinc-600 data-[state=checked]:bg-purple-500 data-[state=checked]:border-purple-500"
+                        className="mt-0.5 border-zinc-600 data-[state=checked]:border-purple-500 data-[state=checked]:bg-purple-500"
                       />
-                      <div className="flex-1 min-w-0">
+                      <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <h4 className="font-medium text-white truncate">{session.title}</h4>
+                          <h4 className="truncate font-medium text-white">{session.title}</h4>
                           {session.mode === "AUDIO" && (
-                            <Badge variant="secondary" className="bg-blue-500/20 text-blue-400 text-xs">
+                            <Badge
+                              variant="secondary"
+                              className="bg-blue-500/20 text-xs text-blue-400"
+                            >
                               AUDIO
                             </Badge>
                           )}
                         </div>
-                        <div className="flex items-center gap-3 mt-1 text-sm text-zinc-400">
+                        <div className="mt-1 flex items-center gap-3 text-sm text-zinc-400">
                           <span className="flex items-center gap-1">
                             <Clock className="h-3.5 w-3.5" />
                             {session.duration} min
@@ -284,13 +285,14 @@ export function CreateCourseFromSessionsDialog({
 
             {/* Summary */}
             {selectedSessions.length > 0 && (
-              <div className="flex items-center justify-between p-3 bg-zinc-800/50 rounded-lg">
+              <div className="flex items-center justify-between rounded-lg bg-zinc-800/50 p-3">
                 <div className="flex items-center gap-4 text-sm">
                   <span className="text-zinc-400">
                     <strong className="text-white">{selectedSessions.length}</strong> sessions
                   </span>
                   <span className="text-zinc-400">
-                    <strong className="text-white">{Math.round(totalDuration / 60)}h</strong> content
+                    <strong className="text-white">{Math.round(totalDuration / 60)}h</strong>{" "}
+                    content
                   </span>
                   <span className="text-zinc-400">
                     <strong className="text-white">{totalAttendees}</strong> total attendees
@@ -310,8 +312,8 @@ export function CreateCourseFromSessionsDialog({
         ) : (
           <div className="space-y-4">
             {/* Selected Sessions Preview */}
-            <div className="p-3 bg-zinc-800/50 rounded-lg">
-              <div className="flex items-center justify-between mb-2">
+            <div className="rounded-lg bg-zinc-800/50 p-3">
+              <div className="mb-2 flex items-center justify-between">
                 <span className="text-sm text-zinc-400">Selected sessions</span>
                 <Button
                   type="button"
@@ -350,7 +352,7 @@ export function CreateCourseFromSessionsDialog({
                 value={courseTitle}
                 onChange={(e) => setCourseTitle(e.target.value)}
                 placeholder="e.g., Marketing Mastery"
-                className="bg-zinc-800 border-zinc-700 text-white"
+                className="border-zinc-700 bg-zinc-800 text-white"
               />
             </div>
 
@@ -363,7 +365,7 @@ export function CreateCourseFromSessionsDialog({
                 value={courseDescription}
                 onChange={(e) => setCourseDescription(e.target.value)}
                 placeholder="What will students learn in this course?"
-                className="bg-zinc-800 border-zinc-700 text-white min-h-[80px]"
+                className="min-h-[80px] border-zinc-700 bg-zinc-800 text-white"
               />
             </div>
 
@@ -412,7 +414,7 @@ export function CreateCourseFromSessionsDialog({
                     placeholder="29.99"
                     min="0"
                     step="0.01"
-                    className="bg-zinc-800 border-zinc-700 text-white"
+                    className="border-zinc-700 bg-zinc-800 text-white"
                   />
                 </div>
               )}

@@ -1,8 +1,8 @@
-'use server';
+"use server";
 
-import { prisma } from '@/lib/prisma';
-import { getCurrentUserId } from '@/lib/auth-utils';
-import { ReportReason, ReportStatus, ReportTargetType } from '@prisma/client';
+import { prisma } from "@/lib/prisma";
+import { getCurrentUserId } from "@/lib/auth-utils";
+import { ReportReason, ReportStatus, ReportTargetType } from "@prisma/client";
 
 export interface CreateReportInput {
   targetType: ReportTargetType;
@@ -49,17 +49,16 @@ export async function createReport(data: CreateReportInput) {
     if (!reporterId) {
       return {
         success: false,
-        error: 'You must be authenticated to report content',
+        error: "You must be authenticated to report content",
       };
     }
 
     // Validate that at least one target is specified
-    const hasTarget =
-      data.postId || data.commentId || data.userId || data.messageId;
+    const hasTarget = data.postId || data.commentId || data.userId || data.messageId;
     if (!hasTarget) {
       return {
         success: false,
-        error: 'You must specify what you are reporting',
+        error: "You must specify what you are reporting",
       };
     }
 
@@ -73,7 +72,7 @@ export async function createReport(data: CreateReportInput) {
         userId: data.userId || undefined,
         messageId: data.messageId || undefined,
         status: {
-          in: ['PENDING', 'REVIEWING'],
+          in: ["PENDING", "REVIEWING"],
         },
       },
     });
@@ -81,7 +80,7 @@ export async function createReport(data: CreateReportInput) {
     if (existingReport) {
       return {
         success: false,
-        error: 'You have already reported this content',
+        error: "You have already reported this content",
       };
     }
 
@@ -104,10 +103,10 @@ export async function createReport(data: CreateReportInput) {
       data: report,
     };
   } catch (error) {
-    console.error('[createReport] Error:', error);
+    console.error("[createReport] Error:", error);
     return {
       success: false,
-      error: 'Failed to create report',
+      error: "Failed to create report",
     };
   }
 }
@@ -116,17 +115,14 @@ export async function createReport(data: CreateReportInput) {
  * Get reports (for admins/moderators)
  * Optionally filter by status
  */
-export async function getReports(
-  status?: ReportStatus | string,
-  _communityId?: string
-) {
+export async function getReports(status?: ReportStatus | string, _communityId?: string) {
   try {
     const userId = await getCurrentUserId();
 
     if (!userId) {
       return {
         success: false,
-        error: 'You must be authenticated',
+        error: "You must be authenticated",
       };
     }
 
@@ -140,7 +136,7 @@ export async function getReports(
         ...(status && { status: status as ReportStatus }),
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
     });
 
@@ -149,10 +145,10 @@ export async function getReports(
       data: reports,
     };
   } catch (error) {
-    console.error('[getReports] Error:', error);
+    console.error("[getReports] Error:", error);
     return {
       success: false,
-      error: 'Failed to fetch reports',
+      error: "Failed to fetch reports",
     };
   }
 }
@@ -163,7 +159,7 @@ export async function getReports(
 export async function resolveReport(
   reportId: string,
   resolution: string,
-  status: 'RESOLVED' | 'DISMISSED'
+  status: "RESOLVED" | "DISMISSED"
 ) {
   try {
     const userId = await getCurrentUserId();
@@ -171,7 +167,7 @@ export async function resolveReport(
     if (!userId) {
       return {
         success: false,
-        error: 'You must be authenticated',
+        error: "You must be authenticated",
       };
     }
 
@@ -180,10 +176,10 @@ export async function resolveReport(
     // if (!isAdmin) throw new Error('Unauthorized');
 
     // Validate status
-    if (!['RESOLVED', 'DISMISSED'].includes(status)) {
+    if (!["RESOLVED", "DISMISSED"].includes(status)) {
       return {
         success: false,
-        error: 'Invalid status. Must be RESOLVED or DISMISSED',
+        error: "Invalid status. Must be RESOLVED or DISMISSED",
       };
     }
 
@@ -202,10 +198,10 @@ export async function resolveReport(
       data: report,
     };
   } catch (error) {
-    console.error('[resolveReport] Error:', error);
+    console.error("[resolveReport] Error:", error);
     return {
       success: false,
-      error: 'Failed to resolve report',
+      error: "Failed to resolve report",
     };
   }
 }
@@ -220,7 +216,7 @@ export async function getReportById(reportId: string) {
     if (!userId) {
       return {
         success: false,
-        error: 'You must be authenticated',
+        error: "You must be authenticated",
       };
     }
 
@@ -231,7 +227,7 @@ export async function getReportById(reportId: string) {
     if (!report) {
       return {
         success: false,
-        error: 'Report not found',
+        error: "Report not found",
       };
     }
 
@@ -240,10 +236,10 @@ export async function getReportById(reportId: string) {
       data: report,
     };
   } catch (error) {
-    console.error('[getReportById] Error:', error);
+    console.error("[getReportById] Error:", error);
     return {
       success: false,
-      error: 'Failed to fetch report',
+      error: "Failed to fetch report",
     };
   }
 }

@@ -21,6 +21,9 @@ public/workbox-*.js
 *.min.js
 *.min.css
 
+# Vendor assets (pre-built bundles from upstream packages, hashed filenames)
+public/excalidraw-assets/
+
 # Test coverage
 coverage/
 

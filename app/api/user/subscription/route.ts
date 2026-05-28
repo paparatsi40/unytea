@@ -7,12 +7,9 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     const session = await auth();
-    
+
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Get user's active subscription with plan details
@@ -62,9 +59,6 @@ export async function GET() {
     });
   } catch (error) {
     console.error("Error fetching subscription:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch subscription" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch subscription" }, { status: 500 });
   }
 }

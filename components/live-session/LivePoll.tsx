@@ -33,12 +33,7 @@ interface LivePollProps {
   onClose?: () => void;
 }
 
-export function LivePoll({
-  poll,
-  currentUserId,
-  onVote,
-  onClose,
-}: LivePollProps) {
+export function LivePoll({ poll, currentUserId, onVote, onClose }: LivePollProps) {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [hasVoted, setHasVoted] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
@@ -47,11 +42,9 @@ export function LivePoll({
   useEffect(() => {
     const voted = poll.options.some((option) => option.voters.includes(currentUserId));
     setHasVoted(voted);
-    
+
     if (voted) {
-      const votedOption = poll.options.find((option) =>
-        option.voters.includes(currentUserId)
-      );
+      const votedOption = poll.options.find((option) => option.voters.includes(currentUserId));
       if (votedOption) {
         setSelectedOption(votedOption.id);
       }
@@ -65,7 +58,7 @@ export function LivePoll({
     const interval = setInterval(() => {
       const remaining = Math.max(0, poll.endsAt! - Date.now());
       setTimeRemaining(remaining);
-      
+
       if (remaining === 0) {
         clearInterval(interval);
       }
@@ -76,7 +69,7 @@ export function LivePoll({
 
   const handleVote = () => {
     if (!selectedOption || hasVoted) return;
-    
+
     onVote(poll.id, selectedOption);
     setHasVoted(true);
   };
@@ -103,53 +96,48 @@ export function LivePoll({
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden max-w-2xl w-full"
+      className="w-full max-w-2xl overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-800"
     >
       {/* Header */}
       <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-6 text-white">
         <div className="flex items-start justify-between">
-          <div className="flex items-start gap-3 flex-1">
-            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
-              <BarChart3 className="w-5 h-5" />
+          <div className="flex flex-1 items-start gap-3">
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-white/20">
+              <BarChart3 className="h-5 w-5" />
             </div>
             <div className="flex-1">
-              <h3 className="text-lg font-bold mb-1">{poll.question}</h3>
+              <h3 className="mb-1 text-lg font-bold">{poll.question}</h3>
               <p className="text-sm opacity-90">
                 by {poll.createdByName} • {poll.totalVotes} vote{poll.totalVotes !== 1 ? "s" : ""}
               </p>
             </div>
           </div>
-          
+
           {onClose && (
-            <button
-              onClick={onClose}
-              className="text-white/80 hover:text-white transition-colors"
-            >
-              <X className="w-5 h-5" />
+            <button onClick={onClose} className="text-white/80 transition-colors hover:text-white">
+              <X className="h-5 w-5" />
             </button>
           )}
         </div>
 
         {/* Timer */}
         {poll.endsAt && timeRemaining !== null && timeRemaining > 0 && (
-          <div className="mt-4 flex items-center gap-2 bg-white/20 rounded-lg px-3 py-2">
-            <Clock className="w-4 h-4" />
-            <span className="text-sm font-medium">
-              Time remaining: {formatTime(timeRemaining)}
-            </span>
+          <div className="mt-4 flex items-center gap-2 rounded-lg bg-white/20 px-3 py-2">
+            <Clock className="h-4 w-4" />
+            <span className="text-sm font-medium">Time remaining: {formatTime(timeRemaining)}</span>
           </div>
         )}
 
         {isExpired && (
-          <div className="mt-4 flex items-center gap-2 bg-red-500/20 rounded-lg px-3 py-2">
-            <Clock className="w-4 h-4" />
+          <div className="mt-4 flex items-center gap-2 rounded-lg bg-red-500/20 px-3 py-2">
+            <Clock className="h-4 w-4" />
             <span className="text-sm font-medium">Poll ended</span>
           </div>
         )}
       </div>
 
       {/* Options */}
-      <div className="p-6 space-y-3">
+      <div className="space-y-3 p-6">
         {poll.options.map((option) => (
           <PollOptionComponent
             key={option.id}
@@ -166,20 +154,20 @@ export function LivePoll({
       </div>
 
       {/* Actions */}
-      <div className="border-t border-gray-200 dark:border-gray-700 p-4">
+      <div className="border-t border-gray-200 p-4 dark:border-gray-700">
         {!hasVoted && !isExpired ? (
           <button
             onClick={handleVote}
             disabled={!selectedOption}
-            className="w-full px-6 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-purple-600 px-6 py-3 font-medium text-white transition-colors hover:bg-purple-700 disabled:cursor-not-allowed disabled:bg-gray-400"
           >
-            <CheckCircle className="w-5 h-5" />
+            <CheckCircle className="h-5 w-5" />
             Submit Vote
           </button>
         ) : (
           <div className="text-center">
-            <p className="text-sm font-medium text-green-600 dark:text-green-400 flex items-center justify-center gap-2">
-              <CheckCircle className="w-4 h-4" />
+            <p className="flex items-center justify-center gap-2 text-sm font-medium text-green-600 dark:text-green-400">
+              <CheckCircle className="h-4 w-4" />
               {hasVoted ? "You voted!" : "Poll ended"}
             </p>
           </div>
@@ -187,8 +175,8 @@ export function LivePoll({
 
         {/* Quiz results */}
         {hasVoted && poll.correctAnswer && (
-          <div className="mt-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg border border-green-200 dark:border-green-800">
-            <p className="text-sm font-medium text-green-900 dark:text-green-100 mb-2">
+          <div className="mt-4 rounded-lg border border-green-200 bg-gradient-to-r from-green-50 to-emerald-50 p-4 dark:border-green-800 dark:from-green-900/20 dark:to-emerald-900/20">
+            <p className="mb-2 text-sm font-medium text-green-900 dark:text-green-100">
               {selectedOption === poll.correctAnswer ? "✅ Correct!" : "❌ Incorrect"}
             </p>
             {selectedOption !== poll.correctAnswer && (
@@ -232,11 +220,11 @@ function PollOptionComponent({
     <button
       onClick={onSelect}
       disabled={disabled}
-      className={`relative w-full text-left p-4 rounded-lg border-2 transition-all overflow-hidden ${
+      className={`relative w-full overflow-hidden rounded-lg border-2 p-4 text-left transition-all ${
         isSelected
           ? "border-purple-600 bg-purple-50 dark:bg-purple-900/20"
-          : "border-gray-300 dark:border-gray-600 hover:border-purple-400 dark:hover:border-purple-500"
-      } ${disabled && !isSelected ? "opacity-60 cursor-not-allowed" : ""}`}
+          : "border-gray-300 hover:border-purple-400 dark:border-gray-600 dark:hover:border-purple-500"
+      } ${disabled && !isSelected ? "cursor-not-allowed opacity-60" : ""}`}
     >
       {/* Progress Bar Background */}
       {showResults && (
@@ -254,10 +242,10 @@ function PollOptionComponent({
 
       {/* Content */}
       <div className="relative flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3 flex-1">
+        <div className="flex flex-1 items-center gap-3">
           {/* Radio/Checkbox */}
           <div
-            className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${
+            className={`flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border-2 ${
               isSelected
                 ? "border-purple-600 bg-purple-600"
                 : "border-gray-400 dark:border-gray-500"
@@ -267,19 +255,17 @@ function PollOptionComponent({
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                className="w-2 h-2 bg-white rounded-full"
+                className="h-2 w-2 rounded-full bg-white"
               />
             )}
           </div>
 
           {/* Text */}
-          <span className="text-sm font-medium text-gray-900 dark:text-white">
-            {option.text}
-          </span>
+          <span className="text-sm font-medium text-gray-900 dark:text-white">{option.text}</span>
 
           {/* Correct indicator */}
           {isCorrect && hasVoted && (
-            <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+            <CheckCircle className="h-4 w-4 flex-shrink-0 text-green-600" />
           )}
         </div>
 
@@ -288,7 +274,7 @@ function PollOptionComponent({
           <motion.span
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-sm font-bold text-gray-700 dark:text-gray-300 flex-shrink-0"
+            className="flex-shrink-0 text-sm font-bold text-gray-700 dark:text-gray-300"
           >
             {percentage}%
           </motion.span>
@@ -313,7 +299,13 @@ function PollOptionComponent({
  * Poll Creator Component (for moderators)
  */
 interface PollCreatorProps {
-  onCreatePoll: (question: string, options: string[], duration?: number, isQuiz?: boolean, correctAnswer?: string) => void;
+  onCreatePoll: (
+    question: string,
+    options: string[],
+    duration?: number,
+    isQuiz?: boolean,
+    correctAnswer?: string
+  ) => void;
   onClose: () => void;
 }
 
@@ -357,23 +349,23 @@ export function PollCreator({ onCreatePoll, onClose }: PollCreatorProps) {
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden max-w-2xl w-full"
+      className="w-full max-w-2xl overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-800"
     >
       {/* Header */}
       <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-6 text-white">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-bold">Create Poll/Quiz</h3>
           <button onClick={onClose} className="text-white/80 hover:text-white">
-            <X className="w-5 h-5" />
+            <X className="h-5 w-5" />
           </button>
         </div>
       </div>
 
       {/* Form */}
-      <div className="p-6 space-y-4">
+      <div className="space-y-4 p-6">
         {/* Question */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
             Question
           </label>
           <input
@@ -381,13 +373,13 @@ export function PollCreator({ onCreatePoll, onClose }: PollCreatorProps) {
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             placeholder="What's your question?"
-            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-500 focus:border-transparent focus:ring-2 focus:ring-purple-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
           />
         </div>
 
         {/* Options */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
             Options
           </label>
           <div className="space-y-2">
@@ -396,14 +388,14 @@ export function PollCreator({ onCreatePoll, onClose }: PollCreatorProps) {
                 {isQuiz && (
                   <button
                     onClick={() => setCorrectAnswer(index)}
-                    className={`w-8 h-8 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${
+                    className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2 ${
                       correctAnswer === index
                         ? "border-green-600 bg-green-600 text-white"
                         : "border-gray-400 dark:border-gray-500"
                     }`}
                     title="Mark as correct answer"
                   >
-                    {correctAnswer === index && <CheckCircle className="w-4 h-4" />}
+                    {correctAnswer === index && <CheckCircle className="h-4 w-4" />}
                   </button>
                 )}
                 <input
@@ -411,14 +403,14 @@ export function PollCreator({ onCreatePoll, onClose }: PollCreatorProps) {
                   value={option}
                   onChange={(e) => updateOption(index, e.target.value)}
                   placeholder={`Option ${index + 1}`}
-                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="flex-1 rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                 />
                 {options.length > 2 && (
                   <button
                     onClick={() => removeOption(index)}
-                    className="px-3 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
+                    className="rounded-lg px-3 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
                   >
-                    <X className="w-4 h-4" />
+                    <X className="h-4 w-4" />
                   </button>
                 )}
               </div>
@@ -426,7 +418,7 @@ export function PollCreator({ onCreatePoll, onClose }: PollCreatorProps) {
           </div>
           <button
             onClick={addOption}
-            className="mt-2 text-sm text-purple-600 hover:text-purple-700 dark:text-purple-400 font-medium"
+            className="mt-2 text-sm font-medium text-purple-600 hover:text-purple-700 dark:text-purple-400"
           >
             + Add option
           </button>
@@ -435,7 +427,7 @@ export function PollCreator({ onCreatePoll, onClose }: PollCreatorProps) {
         {/* Settings */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
               Duration (seconds)
             </label>
             <input
@@ -443,19 +435,19 @@ export function PollCreator({ onCreatePoll, onClose }: PollCreatorProps) {
               value={duration}
               onChange={(e) => setDuration(parseInt(e.target.value))}
               min="0"
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
               Type
             </label>
             <button
               onClick={() => setIsQuiz(!isQuiz)}
-              className={`w-full px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`w-full rounded-lg px-4 py-2 font-medium transition-colors ${
                 isQuiz
                   ? "bg-green-600 text-white"
-                  : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                  : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
               }`}
             >
               {isQuiz ? "Quiz Mode" : "Poll Mode"}
@@ -465,17 +457,17 @@ export function PollCreator({ onCreatePoll, onClose }: PollCreatorProps) {
       </div>
 
       {/* Actions */}
-      <div className="border-t border-gray-200 dark:border-gray-700 p-4 flex gap-3">
+      <div className="flex gap-3 border-t border-gray-200 p-4 dark:border-gray-700">
         <button
           onClick={onClose}
-          className="flex-1 px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+          className="flex-1 rounded-lg border border-gray-300 px-6 py-3 font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
         >
           Cancel
         </button>
         <button
           onClick={handleSubmit}
           disabled={!question.trim() || options.filter((o) => o.trim()).length < 2}
-          className="flex-1 px-6 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+          className="flex-1 rounded-lg bg-purple-600 px-6 py-3 font-medium text-white transition-colors hover:bg-purple-700 disabled:cursor-not-allowed disabled:bg-gray-400"
         >
           Create {isQuiz ? "Quiz" : "Poll"}
         </button>

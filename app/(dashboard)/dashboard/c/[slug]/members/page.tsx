@@ -19,7 +19,7 @@ export default function CommunityMembers() {
     try {
       const response = await fetch(`/api/communities/${slug}`);
       const data = await response.json();
-      
+
       if (data.id) {
         setCommunityId(data.id);
       }

@@ -39,7 +39,8 @@ Return ONLY a JSON array in this exact format:
       messages: [
         {
           role: "system",
-          content: "You are a helpful community manager. Generate natural, helpful FAQ content. Always return valid JSON.",
+          content:
+            "You are a helpful community manager. Generate natural, helpful FAQ content. Always return valid JSON.",
         },
         {
           role: "user",
@@ -62,7 +63,7 @@ Return ONLY a JSON array in this exact format:
     }
 
     const faqs: GeneratedFAQ[] = JSON.parse(jsonMatch[0]);
-    
+
     // Validate structure
     if (!Array.isArray(faqs) || faqs.length !== 5) {
       throw new Error("Invalid FAQ format received");
@@ -73,11 +74,23 @@ Return ONLY a JSON array in this exact format:
     console.error("Error generating FAQs:", error);
     // Return default FAQs as fallback
     return [
-      { q: "What is this community about?", a: "This is a space for members to connect, learn, and grow together." },
-      { q: "How can I join?", a: "Click the 'Join' button and follow the simple registration process." },
-      { q: "What are the benefits?", a: "Access to exclusive content, community discussions, and networking opportunities." },
+      {
+        q: "What is this community about?",
+        a: "This is a space for members to connect, learn, and grow together.",
+      },
+      {
+        q: "How can I join?",
+        a: "Click the 'Join' button and follow the simple registration process.",
+      },
+      {
+        q: "What are the benefits?",
+        a: "Access to exclusive content, community discussions, and networking opportunities.",
+      },
       { q: "Is there a cost?", a: "Please check our pricing page for current membership options." },
-      { q: "How do I get started?", a: "After joining, introduce yourself in the welcome channel and explore the community!" },
+      {
+        q: "How do I get started?",
+        a: "After joining, introduce yourself in the welcome channel and explore the community!",
+      },
     ];
   }
 }

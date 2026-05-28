@@ -111,8 +111,8 @@ export function MessageInput({ conversationId, onMessageSent }: MessageInputProp
         const uploadedFiles = isImage
           ? await startImageUpload([file])
           : isMedia
-          ? await startMediaUpload([file])
-          : await startDocumentUpload([file]);
+            ? await startMediaUpload([file])
+            : await startDocumentUpload([file]);
 
         if (uploadedFiles && uploadedFiles.length > 0) {
           uploadedAttachments.push({
@@ -144,7 +144,7 @@ export function MessageInput({ conversationId, onMessageSent }: MessageInputProp
   };
 
   return (
-    <div className="border-t border-gray-200 bg-white/95 px-4 py-3 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur supports-[backdrop-filter]:bg-white/80 shadow-[0_-4px_18px_rgba(15,23,42,0.05)]">
+    <div className="border-t border-gray-200 bg-white/95 px-4 py-3 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-[0_-4px_18px_rgba(15,23,42,0.05)] backdrop-blur supports-[backdrop-filter]:bg-white/80">
       {attachments.length > 0 && (
         <div className="mb-3 flex flex-wrap gap-2">
           {attachments.map((attachment) => (
@@ -174,7 +174,7 @@ export function MessageInput({ conversationId, onMessageSent }: MessageInputProp
             onKeyDown={handleKeyDown}
             placeholder="Type a message... (Shift+Enter for new line)"
             disabled={isSending}
-            className={`w-full resize-none rounded-2xl border bg-white px-4 py-3 pr-24 text-sm text-gray-900 placeholder:text-gray-400 transition-all focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 disabled:opacity-50 ${
+            className={`w-full resize-none rounded-2xl border bg-white px-4 py-3 pr-24 text-sm text-gray-900 transition-all placeholder:text-gray-400 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 disabled:opacity-50 ${
               errorText ? "border-red-400" : "border-gray-300"
             }`}
             rows={1}
@@ -227,14 +227,12 @@ export function MessageInput({ conversationId, onMessageSent }: MessageInputProp
 
         <button
           onClick={handleSend}
-          disabled={(!message.trim() && attachments.length === 0) || isSending || isUploadingAttachment}
+          disabled={
+            (!message.trim() && attachments.length === 0) || isSending || isUploadingAttachment
+          }
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white transition-all hover:shadow-lg hover:shadow-purple-500/20 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {isSending ? (
-            <Loader2 className="h-5 w-5 animate-spin" />
-          ) : (
-            <Send className="h-5 w-5" />
-          )}
+          {isSending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
         </button>
       </div>
 

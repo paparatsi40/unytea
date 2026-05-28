@@ -32,9 +32,9 @@ If a proposed feature conflicts with this document, the document wins unless the
 
 - **Category**: "plataforma de lanzamiento e infraestructura" — dual role. Not a marketplace, not a pure infrastructure tool. Discovery surface + business OS for the same creator across two stages.
 - **User**: emerging creator (see §2). Treat established hosts as a secondary, future segment — they can migrate, but we do not design around them.
-- **Stage (a) — Launchpad**: the creator's first 30 paid members come *through unytea's discovery surface*, not from a pre-existing follower base. This is the structural reason §5 Cat E's removal premise has been overturned.
+- **Stage (a) — Launchpad**: the creator's first 30 paid members come _through unytea's discovery surface_, not from a pre-existing follower base. This is the structural reason §5 Cat E's removal premise has been overturned.
 - **Stage (b) — Infrastructure**: once tracción exists, unytea is the recurring business OS — live sessions, library, monetization, custom domain (on paid tiers), branding.
-- **Outcome unchanged**: a recurring business based on real relationship, NOT "máquina de engagement vacío." The anti-Skool stance carries forward; the change is *who* we serve, not *how* we serve them.
+- **Outcome unchanged**: a recurring business based on real relationship, NOT "máquina de engagement vacío." The anti-Skool stance carries forward; the change is _who_ we serve, not _how_ we serve them.
 
 ### Key implications
 
@@ -77,7 +77,7 @@ Profesional emergente con conocimiento enseñable. 0–500 followers monetizable
 
 ### Secondary segment (not optimized for): "Host Establecido"
 
-Hosts with 1k–30k pre-existing reachable audience (the original §2 persona). They can migrate to unytea at any time and will benefit from the same infrastructure — but we do not build *for* them. Specifically:
+Hosts with 1k–30k pre-existing reachable audience (the original §2 persona). They can migrate to unytea at any time and will benefit from the same infrastructure — but we do not build _for_ them. Specifically:
 
 - Their needs (custom domain, white-label, advanced analytics) are covered by Business/Pro tiers in §6, not by special workflows.
 - They will not see /explore as the primary entry point — they will land on a community URL directly. That is fine; discovery is opt-in (Cat E revised).
@@ -106,21 +106,23 @@ Someone who has been a reference for "their people" — students, trainees, cons
 
 #### The 6 Dimensions
 
-| Dimension | Spec |
-|-----------|------|
-| **Market** | Spanish-speaking LATAM (México, Colombia, Argentina, Chile, Perú). España secondary. |
-| **"Their people" size** | 1k–30k reachable (combined online followers + offline clients + mailing list). Floor: enough to sustain 20–300 paid members at $10–50/mo. |
-| **Niche / vertical** | Knowledge transfer + practice ownership: educators of skills, coaches (life/business/wellness), wellness practitioners, expert advisors, artist-teachers. NOT pure entertainment, lifestyle, or brand influencers. |
-| **Origin mix** | Daniela side: IG/YouTube primary, fragmented in Hotmart + Patreon + WhatsApp. Marco side: established physical practice, fragmented in Calendly + Stripe + WhatsApp + Zoom + rent. Same product solves both. |
-| **Monetization stage** | Already monetizing somehow (loose courses, 1:1 calls, ad-hoc memberships, in-person clients). NOT for someone pre-monetization still exploring. |
-| **Psychographics** | Believes relationship is the asset, not reach. Prefers 30 committed members over 3000 cold followers. Wants to be teacher/guide, not influencer. Tired of overhead (algorithmic OR physical). Willing to pay to reduce operational friction. "Alma" / "intentionality" / "own space" are real values, not marketing. |
+| Dimension               | Spec                                                                                                                                                                                                                                                                                                                 |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Market**              | Spanish-speaking LATAM (México, Colombia, Argentina, Chile, Perú). España secondary.                                                                                                                                                                                                                                 |
+| **"Their people" size** | 1k–30k reachable (combined online followers + offline clients + mailing list). Floor: enough to sustain 20–300 paid members at $10–50/mo.                                                                                                                                                                            |
+| **Niche / vertical**    | Knowledge transfer + practice ownership: educators of skills, coaches (life/business/wellness), wellness practitioners, expert advisors, artist-teachers. NOT pure entertainment, lifestyle, or brand influencers.                                                                                                   |
+| **Origin mix**          | Daniela side: IG/YouTube primary, fragmented in Hotmart + Patreon + WhatsApp. Marco side: established physical practice, fragmented in Calendly + Stripe + WhatsApp + Zoom + rent. Same product solves both.                                                                                                         |
+| **Monetization stage**  | Already monetizing somehow (loose courses, 1:1 calls, ad-hoc memberships, in-person clients). NOT for someone pre-monetization still exploring.                                                                                                                                                                      |
+| **Psychographics**      | Believes relationship is the asset, not reach. Prefers 30 committed members over 3000 cold followers. Wants to be teacher/guide, not influencer. Tired of overhead (algorithmic OR physical). Willing to pay to reduce operational friction. "Alma" / "intentionality" / "own space" are real values, not marketing. |
 
 #### Original marketing copy by frame
 
 **Creator-economy frame** (was primary):
+
 > "Tu espacio propio fuera del algoritmo."
 
 **Physical-replacement frame** (was alternative):
+
 > "Tu salón virtual. Tu taller. Tu estudio. Tu gym. Tú eliges cómo llamarlo. Sin renta. Sin servicios. Sin empleados auxiliares."
 
 #### Original shared pain points
@@ -143,6 +145,7 @@ Someone who has been a reference for "their people" — students, trainees, cons
 ### Layer 1 — Live Experience (CORE)
 
 **IN v1:**
+
 - Schedule live sessions (one-off + recurring weekly/monthly)
 - LiveKit video/audio rooms, multi-participant
 - Live chat during sessions
@@ -159,6 +162,7 @@ Someone who has been a reference for "their people" — students, trainees, cons
 > and §10 for the parallel Success Metrics revisit.
 
 **OUT v1:**
+
 - Polls in-session
 - Breakout rooms
 - Automatic captions / transcription → v1.5+
@@ -166,6 +170,7 @@ Someone who has been a reference for "their people" — students, trainees, cons
 ### Layer 2 — Community
 
 **IN v1:**
+
 - Long-form posts feed (no chat)
 - Host posts + member posts (per-community configurable)
 - Comments on posts (replies, no nested threads)
@@ -174,6 +179,7 @@ Someone who has been a reference for "their people" — students, trainees, cons
 - Host → Member DMs (private 1:1)
 
 **OUT v1:**
+
 - Member → Member DMs (anti-feature, see Section 5)
 - Channels / sub-spaces (one community = one feed)
 - Reactions / emoji on posts
@@ -183,6 +189,7 @@ Someone who has been a reference for "their people" — students, trainees, cons
 ### Layer 3 — Library + Courses
 
 **IN v1:**
+
 - Searchable session recordings (by title)
 - Host upload of docs + videos
 - Folder/category organization (minimal)
@@ -194,6 +201,7 @@ Someone who has been a reference for "their people" — students, trainees, cons
 - Discussion seeds (lessons can open community thread automatically)
 
 **OUT v1:**
+
 - Formal graded quizzes → v1.5+ if hosts demand with real data
 - Completion certificates → v1.5+
 - Full-text transcript search
@@ -201,6 +209,7 @@ Someone who has been a reference for "their people" — students, trainees, cons
 ### Layer 4 — Monetization
 
 **IN v1:**
+
 - Tiered membership per community: free tier + 1–2 paid tiers
 - Monthly + Annual plans (~20% annual discount)
 - Stripe Checkout for subscriptions
@@ -212,6 +221,7 @@ Someone who has been a reference for "their people" — students, trainees, cons
 - Embedded Stripe Customer Portal for self-service
 
 **OUT v1:**
+
 - Scarcity coupons (countdowns, "first N only")
 - Affiliate programs (anti-feature)
 - Multi-currency (USD-only or host's local currency initially)
@@ -222,30 +232,33 @@ Someone who has been a reference for "their people" — students, trainees, cons
 ### Layer 5 — Integrations (Tier 1+2)
 
 **Tier 1 — In v1:**
+
 - Stripe Connect Express (done)
 - Google Calendar / iCal sync for live sessions
 - Outbound webhooks (host configures their own automations)
 - Transactional email service (Resend or similar)
 
 **Tier 2 — v1.5:**
+
 - Zapier / Make / n8n connector (universal multiplier — leverages host's existing tools)
 - Mailchimp / ConvertKit / Beehiiv export for newsletter sync
 - Embed widget for external sites
 
 **Tier 3 — v2+:**
+
 - YouTube cross-post (with "your canonical home is unytea" disclaimer)
 - Notion content sync
 - Custom OAuth providers
 
 **Tier-gating by plan:**
 
-| | Creator | Business | Pro |
-|---|---|---|---|
-| Calendar sync | ✓ | ✓ | ✓ |
-| Webhooks | 3 limited | 20 standard | Unlimited |
-| API access | ✗ | ✗ | ✓ (full) |
-| Zapier/Make | ✗ | ✓ | ✓ |
-| Embed widget | ✗ | ✓ | ✓ |
+|               | Creator   | Business    | Pro       |
+| ------------- | --------- | ----------- | --------- |
+| Calendar sync | ✓         | ✓           | ✓         |
+| Webhooks      | 3 limited | 20 standard | Unlimited |
+| API access    | ✗         | ✗           | ✓ (full)  |
+| Zapier/Make   | ✗         | ✓           | ✓         |
+| Embed widget  | ✗         | ✓           | ✓         |
 
 ---
 
@@ -282,12 +295,12 @@ Trade-off acknowledged: no-CC trials convert at ~10% vs ~30% for CC-required. Th
 
 ### Add-ons (modular, monthly recurring, self-serve)
 
-| Add-on | Founder | Practice | Studio |
-|---|---|---|---|
-| +5 live hrs | $30 | $60 | $80 |
-| +50 paid members | $5 | $10 | N/A (already unlimited) |
-| +50 GB storage | $5 | $10 | $15 |
-| +1 admin seat | $10 | $15 | $20 |
+| Add-on           | Founder | Practice | Studio                  |
+| ---------------- | ------- | -------- | ----------------------- |
+| +5 live hrs      | $30     | $60      | $80                     |
+| +50 paid members | $5      | $10      | N/A (already unlimited) |
+| +50 GB storage   | $5      | $10      | $15                     |
+| +1 admin seat    | $10     | $15      | $20                     |
 
 **Tier-gated features** (white-label, API, custom domain, multi-community) remain plan-level — not available as add-ons.
 
@@ -318,6 +331,7 @@ Pricing re-evaluated **quarterly post-launch** with real cost data per tier and 
 ## Section 5 — Anti-Features
 
 **These features will NEVER be built**, regardless of:
+
 - User requests
 - Competitor moves
 - Revenue upside arguments
@@ -388,6 +402,7 @@ This conclusion drove the SECTION_5_AUDIT.md verdict (Option A — full removal)
 The original premise — that discovery cannibalizes hosts' ownership of audience — assumed hosts brought their own audience (per old §2). With §2 revised to "creador emergente sin audiencia," the cannibalization risk is moot: there is no pre-existing relationship to cannibalize. Discovery becomes the entry point, not a threat.
 
 Risk mitigation for quality (replaces the removal decision):
+
 - Curated quality bar before listing in /explore (see below).
 - Creators can opt-OUT of public listing (community-level setting).
 - Discovery favors topical match (filtros por especialidad) over generic "trending," to reduce one-creator-eats-another dynamic.
@@ -462,16 +477,16 @@ When a feature request arrives:
 
 ### Tier structure
 
-| | **Creator** | **Business** | **Pro** |
-|---|---|---|---|
-| Plan flat fee | $15 / mo | $49 / mo | $149 / mo |
-| Revenue share | 8% | 5% | 3% |
-| Communities | 1 | 3 | Unlimited |
-| Paid members | Unlimited | Unlimited | Unlimited |
-| Custom domain | — | ✓ | ✓ |
-| Branding controls | — | ✓ | ✓ White-label |
-| Analytics | Basic | Advanced | Advanced + API |
-| API access | — | — | ✓ |
+|                   | **Creator** | **Business** | **Pro**        |
+| ----------------- | ----------- | ------------ | -------------- |
+| Plan flat fee     | $15 / mo    | $49 / mo     | $149 / mo      |
+| Revenue share     | 8%          | 5%           | 3%             |
+| Communities       | 1           | 3            | Unlimited      |
+| Paid members      | Unlimited   | Unlimited    | Unlimited      |
+| Custom domain     | —           | ✓            | ✓              |
+| Branding controls | —           | ✓            | ✓ White-label  |
+| Analytics         | Basic       | Advanced     | Advanced + API |
+| API access        | —           | —            | ✓              |
 
 The Creator tier is the entry point for the §2 primary persona. Business is for emerging creators who have validated demand and want their own brand surface. Pro is for established hosts (the §2 secondary segment) and small studios with multiple programs.
 
@@ -519,7 +534,7 @@ Pricing re-evaluated **quarterly post-launch** with real cost data per tier and 
 >
 > Sub-line: **"Tu academia online sin oficina ni desarrollo web."**
 
-This pair is the canonical hero. It frames the host as a *business owner*, not as a hobbyist, an influencer, or a "content creator" in the social-media sense.
+This pair is the canonical hero. It frames the host as a _business owner_, not as a hobbyist, an influencer, or a "content creator" in the social-media sense.
 
 ### Comparison frame: platform vs renting a physical aula
 
@@ -530,7 +545,7 @@ Concretely:
 - Renting an aula in a mid-tier LATAM city: roughly $300–$1,500/month, plus utilities, insurance, signage, scheduling overhead.
 - Building a basic website + payments + scheduling stack: weeks of work or a freelancer's invoice.
 - Business tier at $49/mo is a low cost of goods compared to either alternative.
-- Pro tier at $149/mo is *still* cheaper than the physical aula it replaces, while serving members worldwide.
+- Pro tier at $149/mo is _still_ cheaper than the physical aula it replaces, while serving members worldwide.
 
 When a prospect hesitates at $49 or $149, the response is not "look how cheap we are vs other SaaS" — it's "what does your current operation cost you in rent, in tools, in the weekend you spent making a Squarespace?"
 
@@ -644,7 +659,7 @@ Until ≥1,000 creators and ≥50,000 visitors, ad inventory is too small to att
 
 ## Section 10 — Success Metrics
 
-> **Note 2026-05-27 — flagged for revisit, not yet revised.** The $5k Day-90 / $30k Month-12 Healthy MRR targets below were sized against the original §4 pricing ($99/$199/$399). The revised pricing in §6 (Creator $15, Business $49, Pro $149) implies materially different ARPA at the same host count. These targets are flagged for revisit in the next quarterly pricing review (§6 cadence). Until then, they remain on file as the prior baseline; the **Operating Principles** rule still binds — *never raise thresholds to inflate numbers* — and any change to these targets must be a documented decision, not a quiet adjustment. Healthy MRR's definitional criteria (the three boolean tests below) are unaffected by the pricing pivot.
+> **Note 2026-05-27 — flagged for revisit, not yet revised.** The $5k Day-90 / $30k Month-12 Healthy MRR targets below were sized against the original §4 pricing ($99/$199/$399). The revised pricing in §6 (Creator $15, Business $49, Pro $149) implies materially different ARPA at the same host count. These targets are flagged for revisit in the next quarterly pricing review (§6 cadence). Until then, they remain on file as the prior baseline; the **Operating Principles** rule still binds — _never raise thresholds to inflate numbers_ — and any change to these targets must be a documented decision, not a quiet adjustment. Healthy MRR's definitional criteria (the three boolean tests below) are unaffected by the pricing pivot.
 
 ### North Star: **Healthy MRR**
 
@@ -669,11 +684,13 @@ A host who fails any criterion: their revenue stays in raw MRR but exits Healthy
 ### Scorecard
 
 **GROWTH**
+
 - MRR (raw)
 - Number of paid hosts
 - ARPA per host
 
 **QUALITY**
+
 - Host 90-day survival rate (target ≥ 75%)
 - % of MRR that is Healthy MRR (target ≥ 70% by month 6)
 - NRR — Net Revenue Retention (target ≥ 110% at 12 months)
@@ -681,16 +698,19 @@ A host who fails any criterion: their revenue stays in raw MRR but exits Healthy
 - Member retention 30/90d (segmented by vertical)
 
 **ACTIVATION**
+
 - Trial-to-paid (no-CC trial) — target ≥ 10%; reconsider if ≤ 8% at 6 months
 - Time-to-first-paid-member (target ≤ 14 days from signup)
 - Host activation 7-day (target ≥ 60% ran a live session)
 
 **LOVE / PULL**
+
 - Organic host referral rate (no incentivized)
 - PMF score "Very disappointed if couldn't use" — target ≥ 40%
   - **Sample eligibility**: paid ≥ 14 days + ran ≥ 1 live + has ≥ 3 paid members + 3+ logins in last 7 days
 
 **HEALTH (problem signals)**
+
 - Tickets per ACTIVE host-month (yellow > 1, red > 2)
 - Stripe payment failure rate (yellow > 5%)
 - Stripe dunning recovery rate (yellow < 60%)
@@ -699,6 +719,7 @@ A host who fails any criterion: their revenue stays in raw MRR but exits Healthy
 - CSP violations unique/week (post-Phase 4c)
 
 **ANTI-METRICS (explicitly NOT tracked)**
+
 - DAU
 - Time on platform
 - Notification open rate
@@ -747,26 +768,31 @@ Autopilot does NOT enter external rollout until ALL conditions are met:
 **Advance is by quality gates, NOT calendar time.**
 
 #### Phase A — Safe automation
+
 - Jobs: `auto_capture`, `auto_queue_next`
 - Risk: low (pure mechanics, no relational touch)
 
 **Gate A→B** (all must hold for ≥ 30 days):
+
 - Tickets autopilot ≤ 0.2 / active host-month
 - Undo/revert rate ≤ 5%
 - Zero trust incidents
 - Hosts report ≥ 2 hrs/month time savings
 
 #### Phase B — Communication automation
+
 - Jobs: `auto_promote`, `auto_distribute`
 - Risk: medium (touches members with host's templates)
 
 **Gate B→C** (same set + greater scrutiny):
+
 - Phase A metrics still green
 - Host edit rate < 30% (autopilot tone-accurate)
 - Zero significant unwanted-action reports
 - Zero AI-generated content posted without explicit approval
 
 #### Phase C — Relational automation
+
 - Jobs: `auto_engage`
 - Risk: high (touches pre-session relationship)
 - ONLY activatable if host configures explicit prep content
@@ -787,35 +813,40 @@ Autopilot does NOT enter external rollout until ALL conditions are met:
 
 ### Per-Job Specifications
 
-| Job | DOES | DOES NOT |
-|---|---|---|
-| **auto_capture** | Recording start/stop, transcription, library indexing | Modify A/V with AI, generate "highlight reels", tag members as engaged/disengaged |
-| **auto_queue_next** | Recurring schedule, calendar invites with factual info | Suggest frequency increases for "engagement boost", "we missed you" guilt-pings |
-| **auto_promote** | Pre-session reminders with host's templates, configurable timing | AI-generated copy posing as host, FOMO/scarcity, forced personalization |
-| **auto_distribute** | Post-live: "X is in your library" + transcript link | "X members already watched" manipulation, urgency artifice, re-mailing non-openers |
-| **auto_engage** | Deliver prep content the host configured | Generate new content posing as host, AI-personalized fake intimacy, "set it and forget it" without host visibility |
+| Job                 | DOES                                                             | DOES NOT                                                                                                           |
+| ------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| **auto_capture**    | Recording start/stop, transcription, library indexing            | Modify A/V with AI, generate "highlight reels", tag members as engaged/disengaged                                  |
+| **auto_queue_next** | Recurring schedule, calendar invites with factual info           | Suggest frequency increases for "engagement boost", "we missed you" guilt-pings                                    |
+| **auto_promote**    | Pre-session reminders with host's templates, configurable timing | AI-generated copy posing as host, FOMO/scarcity, forced personalization                                            |
+| **auto_distribute** | Post-live: "X is in your library" + transcript link              | "X members already watched" manipulation, urgency artifice, re-mailing non-openers                                 |
+| **auto_engage**     | Deliver prep content the host configured                         | Generate new content posing as host, AI-personalized fake intimacy, "set it and forget it" without host visibility |
 
 ### Autopilot-Specific Metrics
 
 **ADOPTION**
+
 - % paid hosts with ≥ 1 job active
 - % activation per specific job
 - Target: ≥ 60% of hosts on Phase A jobs by month 6
 
 **QUALITY / CONTROL** (the most important category)
+
 - Host edit rate before send/action
 - Host reject rate (% suggestions discarded)
 - Undo/revert rate (% actions reverted)
 - Unwanted action reports (host marks "this shouldn't have happened")
-- *No hardcoded targets — track from day 1, calibrate with data*
+- _No hardcoded targets — track from day 1, calibrate with data_
 
 **HEALTH**
+
 - Tickets autopilot per active host-month (target ≤ 0.2)
 
 **LOVE**
+
 - Self-reported time savings (target ≥ 4 hrs/month for hosts with all Phase A jobs active)
 
 **ANTI-METRICS**
+
 - ✗ Engagement uplift attributed to autopilot
 - ✗ Frequency of messages sent
 - ✗ Email open rates
@@ -832,7 +863,7 @@ This document is **versioned**. v1 was locked 2026-05-15; revised 2026-05-27 (em
 - **Minor revisions** (target adjustments in Section 10, new metrics, pricing tweaks within §6 cadence) can be patched incrementally.
 - **Anti-features** (Section 5) can only be removed by explicit policy decision, documented in this file. The §5 Cat E re-opening is itself the worked example: original reasoning preserved, revision below it, dated.
 
-When a future Claude (or human collaborator) is asked to make decisions that would conflict with this document, the response is: *the document wins unless the document is revised first.*
+When a future Claude (or human collaborator) is asked to make decisions that would conflict with this document, the response is: _the document wins unless the document is revised first._
 
 ---
 

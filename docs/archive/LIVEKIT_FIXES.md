@@ -11,7 +11,7 @@
 ### **Error:**
 
 ```
-'https://your-livekit-url/rtc/validate?...' violates the following Content Security Policy directive: 
+'https://your-livekit-url/rtc/validate?...' violates the following Content Security Policy directive:
 "connect-src 'self' wss: ws: https://sea1.ingest.uploadthing.com https://uploadthing.com https://utfs.io"
 ```
 
@@ -25,10 +25,10 @@ WebSocket y HTTPS a LiveKit Cloud.
 Actualizado `web/next.config.mjs` para agregar:
 
 ```javascript
-"connect-src 'self' wss: ws: 
-  https://sea1.ingest.uploadthing.com 
-  https://uploadthing.com 
-  https://utfs.io 
+"connect-src 'self' wss: ws:
+  https://sea1.ingest.uploadthing.com
+  https://uploadthing.com
+  https://utfs.io
   https://*.livekit.cloud      // ← NUEVO
   https://*.livekit.io         // ← NUEVO
   wss://*.livekit.cloud"       // ← NUEVO
@@ -206,7 +206,7 @@ Este es el **segundo fix de CSP** que hacemos (primero UploadThing, ahora LiveKi
 Cuando integres un servicio externo que use WebSocket o HTTPS, **SIEMPRE actualiza el CSP**:
 
 ```javascript
-"connect-src 'self' wss: ws: 
+"connect-src 'self' wss: ws:
   https://servicio-existente.com
   https://NUEVO-SERVICIO.com      // ← Agregar
   wss://NUEVO-SERVICIO.com"       // ← Agregar si usa WebSocket

@@ -92,9 +92,7 @@ export function CommentItem({
         <div className="flex-1 space-y-2">
           {/* Header */}
           <div className="flex items-center space-x-2">
-            <span className="text-sm font-semibold text-gray-900">
-              {authorName}
-            </span>
+            <span className="text-sm font-semibold text-gray-900">{authorName}</span>
             <span className="flex items-center space-x-1 text-xs text-gray-500">
               <Clock className="h-3 w-3" />
               <span>{timeAgo}</span>
@@ -111,9 +109,7 @@ export function CommentItem({
           </div>
 
           {/* Content */}
-          <p className="text-sm text-gray-700 leading-relaxed">
-            {comment.content}
-          </p>
+          <p className="text-sm leading-relaxed text-gray-700">{comment.content}</p>
 
           {/* Actions */}
           <div className="flex items-center space-x-3">

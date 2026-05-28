@@ -102,19 +102,19 @@ Icons:
 
 ### **vs Skool:**
 
-| Attribute | Skool | Unytea |
-|-----------|-------|--------|
-| **Feel** | Cold, business | Warm, human |
-| **Design** | 2015 style | 2024 modern |
-| **Price** | $99/mo | $49/mo |
-| **Unique Features** | 0 | 2 (Buddy + Auditorium) |
-| **Performance** | Good | Excellent (0ms) |
-| **Soul** | ❌ | ✅ ☕ |
+| Attribute           | Skool          | Unytea                 |
+| ------------------- | -------------- | ---------------------- |
+| **Feel**            | Cold, business | Warm, human            |
+| **Design**          | 2015 style     | 2024 modern            |
+| **Price**           | $99/mo         | $49/mo                 |
+| **Unique Features** | 0              | 2 (Buddy + Auditorium) |
+| **Performance**     | Good           | Excellent (0ms)        |
+| **Soul**            | ❌             | ✅ ☕                  |
 
 ### **Value Proposition:**
 
 > "Skool treats communities like classrooms. Unytea treats them like gathering places where people
-genuinely connect. Where Skool is cold and transactional, Unytea is warm and relational."
+> genuinely connect. Where Skool is cold and transactional, Unytea is warm and relational."
 
 ---
 

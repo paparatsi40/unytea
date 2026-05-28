@@ -13,7 +13,7 @@ export default function AccountPage() {
   const handleSave = async () => {
     setLoading(true);
     const result = await updateAccountSettings({ timezone });
-    
+
     if (result.success) {
       toast.success("Account settings saved!");
     } else {
@@ -26,16 +26,12 @@ export default function AccountPage() {
     <div className="space-y-6">
       {/* Account Settings */}
       <div className="rounded-xl border border-border bg-card p-6">
-        <h2 className="mb-4 text-xl font-bold text-foreground">
-          Account Settings
-        </h2>
+        <h2 className="mb-4 text-xl font-bold text-foreground">Account Settings</h2>
 
         <div className="space-y-6">
           {/* Timezone */}
           <div>
-            <label className="mb-2 block font-medium text-foreground">
-              Timezone
-            </label>
+            <label className="mb-2 block font-medium text-foreground">Timezone</label>
             <select
               value={timezone}
               onChange={(e) => setTimezone(e.target.value)}

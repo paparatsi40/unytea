@@ -62,7 +62,7 @@ export default function SessionVideoPage() {
     try {
       setLoading(true);
       const response = await fetch(`/api/sessions/${sessionId}`);
-      
+
       if (!response.ok) {
         throw new Error("Failed to load session");
       }
@@ -144,8 +144,7 @@ export default function SessionVideoPage() {
   }
 
   // Verify user is mentor or mentee
-  const isParticipant =
-    currentUserId === session.mentor.id || currentUserId === session.mentee.id;
+  const isParticipant = currentUserId === session.mentor.id || currentUserId === session.mentee.id;
 
   if (!isParticipant) {
     return (
@@ -191,7 +190,7 @@ export default function SessionVideoPage() {
   if (inCall) {
     return (
       <>
-        <div className="space-y-6 h-screen flex flex-col">
+        <div className="flex h-screen flex-col space-y-6">
           {/* Header */}
           <div className="flex items-center justify-between px-6 pt-6">
             <div>
@@ -220,7 +219,7 @@ export default function SessionVideoPage() {
 
           {/* Gamification tip */}
           <div className="px-6 pb-6">
-            <div className="rounded-lg border border-purple-200 bg-purple-50 dark:bg-purple-900/20 p-4">
+            <div className="rounded-lg border border-purple-200 bg-purple-50 p-4 dark:bg-purple-900/20">
               <div className="flex gap-3">
                 <div className="text-2xl">🎮</div>
                 <div>
@@ -228,7 +227,8 @@ export default function SessionVideoPage() {
                     Earn more points during this session!
                   </h3>
                   <p className="mt-1 text-xs text-purple-700 dark:text-purple-300">
-                    Stay engaged to earn bonus points. Use reactions, participate in chat, and answer polls!
+                    Stay engaged to earn bonus points. Use reactions, participate in chat, and
+                    answer polls!
                   </p>
                 </div>
               </div>
@@ -253,14 +253,9 @@ export default function SessionVideoPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Mentor Session</h1>
-          <p className="mt-2 text-muted-foreground">
-            Ready to start your video call
-          </p>
+          <p className="mt-2 text-muted-foreground">Ready to start your video call</p>
         </div>
-        <Button
-          variant="ghost"
-          onClick={() => router.push("/dashboard/sessions")}
-        >
+        <Button variant="ghost" onClick={() => router.push("/dashboard/sessions")}>
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back
         </Button>
@@ -277,15 +272,12 @@ export default function SessionVideoPage() {
             <div>
               <h2 className="text-2xl font-bold">{session.title}</h2>
               <p className="text-sm text-muted-foreground">
-                {isMentor ? "with" : "with"}{" "}
-                {isMentor ? session.mentee.name : session.mentor.name}
+                {isMentor ? "with" : "with"} {isMentor ? session.mentee.name : session.mentor.name}
               </p>
             </div>
           </div>
 
-          {session.description && (
-            <p className="text-muted-foreground">{session.description}</p>
-          )}
+          {session.description && <p className="text-muted-foreground">{session.description}</p>}
         </div>
 
         {/* Details Grid */}
@@ -329,9 +321,7 @@ export default function SessionVideoPage() {
         <div className="flex gap-3">
           <div className="text-2xl">💡</div>
           <div>
-            <h3 className="text-sm font-semibold text-blue-900">
-              Before you join:
-            </h3>
+            <h3 className="text-sm font-semibold text-blue-900">Before you join:</h3>
             <ul className="mt-2 space-y-1 text-xs text-blue-700">
               <li>• Make sure your camera and microphone are working</li>
               <li>• Find a quiet place with good lighting</li>
@@ -351,8 +341,12 @@ export default function SessionVideoPage() {
               Earn points during this session!
             </h3>
             <ul className="mt-2 space-y-1 text-xs text-purple-700">
-              <li>• <strong>+10 points</strong> for joining the session</li>
-              <li>• <strong>+30 points</strong> if you stay for the full duration</li>
+              <li>
+                • <strong>+10 points</strong> for joining the session
+              </li>
+              <li>
+                • <strong>+30 points</strong> if you stay for the full duration
+              </li>
               <li>• Stay engaged and earn bonus points for participation!</li>
             </ul>
           </div>

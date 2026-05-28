@@ -11,12 +11,7 @@ interface FeedbackModalProps {
   sessionTitle: string;
 }
 
-export function FeedbackModal({
-  isOpen,
-  onClose,
-  onSubmit,
-  sessionTitle,
-}: FeedbackModalProps) {
+export function FeedbackModal({ isOpen, onClose, onSubmit, sessionTitle }: FeedbackModalProps) {
   const [rating, setRating] = useState<number>(0);
   const [hoveredRating, setHoveredRating] = useState<number>(0);
   const [comment, setComment] = useState("");
@@ -30,7 +25,7 @@ export function FeedbackModal({
     try {
       await onSubmit(rating, comment || undefined);
       setSubmitted(true);
-      
+
       // Close after 2 seconds
       setTimeout(() => {
         onClose();
@@ -55,7 +50,7 @@ export function FeedbackModal({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
+            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
             onClick={handleSkip}
           />
 
@@ -67,33 +62,33 @@ export function FeedbackModal({
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-gray-800">
               {!submitted ? (
                 <>
                   {/* Header */}
-                  <div className="flex items-start justify-between mb-6">
+                  <div className="mb-6 flex items-start justify-between">
                     <div>
                       <h3 className="text-xl font-bold text-gray-900 dark:text-white">
                         How was the session?
                       </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                      <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
                         {sessionTitle}
                       </p>
                     </div>
                     <button
                       onClick={handleSkip}
-                      className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                      className="text-gray-400 transition-colors hover:text-gray-600 dark:hover:text-gray-300"
                     >
-                      <X className="w-5 h-5" />
+                      <X className="h-5 w-5" />
                     </button>
                   </div>
 
                   {/* Star Rating */}
                   <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                    <label className="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
                       Your rating
                     </label>
-                    <div className="flex gap-2 justify-center">
+                    <div className="flex justify-center gap-2">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <motion.button
                           key={star}
@@ -106,7 +101,7 @@ export function FeedbackModal({
                           className="focus:outline-none"
                         >
                           <Star
-                            className={`w-12 h-12 transition-all ${
+                            className={`h-12 w-12 transition-all ${
                               star <= (hoveredRating || rating)
                                 ? "fill-yellow-400 text-yellow-400"
                                 : "text-gray-300 dark:text-gray-600"
@@ -121,7 +116,7 @@ export function FeedbackModal({
                   <div className="mb-6">
                     <label
                       htmlFor="comment"
-                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                      className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
                     >
                       Comments (optional)
                     </label>
@@ -131,7 +126,7 @@ export function FeedbackModal({
                       onChange={(e) => setComment(e.target.value)}
                       placeholder="What did you like? What could be improved?"
                       rows={4}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                      className="w-full resize-none rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-500 focus:border-transparent focus:ring-2 focus:ring-purple-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                     />
                   </div>
 
@@ -139,23 +134,23 @@ export function FeedbackModal({
                   <div className="flex gap-3">
                     <button
                       onClick={handleSkip}
-                      className="flex-1 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg font-medium transition-colors"
+                      className="flex-1 rounded-lg px-4 py-3 font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
                     >
                       Skip
                     </button>
                     <button
                       onClick={handleSubmit}
                       disabled={rating === 0 || isSubmitting}
-                      className="flex-1 px-4 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                      className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-3 font-medium text-white transition-colors hover:bg-purple-700 disabled:cursor-not-allowed disabled:bg-gray-400"
                     >
                       {isSubmitting ? (
                         <>
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
                           Submitting...
                         </>
                       ) : (
                         <>
-                          <Send className="w-4 h-4" />
+                          <Send className="h-4 w-4" />
                           Submit
                         </>
                       )}
@@ -167,16 +162,16 @@ export function FeedbackModal({
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="text-center py-8"
+                  className="py-8 text-center"
                 >
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: 0.2, type: "spring" }}
-                    className="w-20 h-20 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4"
+                    className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-green-100 dark:bg-green-900"
                   >
                     <svg
-                      className="w-10 h-10 text-green-600 dark:text-green-400"
+                      className="h-10 w-10 text-green-600 dark:text-green-400"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -189,12 +184,10 @@ export function FeedbackModal({
                       />
                     </svg>
                   </motion.div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                  <h3 className="mb-2 text-xl font-bold text-gray-900 dark:text-white">
                     Thank you for your feedback!
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    Your input helps us improve
-                  </p>
+                  <p className="text-gray-600 dark:text-gray-400">Your input helps us improve</p>
                 </motion.div>
               )}
             </div>

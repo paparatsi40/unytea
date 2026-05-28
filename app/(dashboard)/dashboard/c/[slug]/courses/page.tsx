@@ -185,9 +185,7 @@ export default function CommunityCoursesPage() {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Courses</h1>
-            <p className="text-sm text-gray-500">
-              Create and manage courses for your community
-            </p>
+            <p className="text-sm text-gray-500">Create and manage courses for your community</p>
           </div>
         </div>
 
@@ -232,17 +230,13 @@ export default function CommunityCoursesPage() {
 
               {/* Slug */}
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                  URL Slug
-                </label>
+                <label className="mb-1.5 block text-sm font-medium text-gray-700">URL Slug</label>
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-gray-400">/courses/</span>
                   <input
                     type="text"
                     value={formData.slug}
-                    onChange={(e) =>
-                      setFormData({ ...formData, slug: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                     placeholder="introduction-to-marketing"
                     className="flex-1 rounded-lg border border-gray-200 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
                   />
@@ -256,9 +250,7 @@ export default function CommunityCoursesPage() {
                 </label>
                 <textarea
                   value={formData.description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="What will students learn in this course?"
                   rows={3}
                   className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
@@ -283,9 +275,7 @@ export default function CommunityCoursesPage() {
                   </div>
                   <button
                     type="button"
-                    onClick={() =>
-                      setFormData({ ...formData, isPaid: !formData.isPaid })
-                    }
+                    onClick={() => setFormData({ ...formData, isPaid: !formData.isPaid })}
                     className="text-gray-500 hover:text-purple-600"
                   >
                     {formData.isPaid ? (
@@ -382,9 +372,7 @@ export default function CommunityCoursesPage() {
               <div className="absolute left-3 top-3">
                 <span
                   className={`rounded-full px-2.5 py-1 text-xs font-medium ${
-                    course.isPublished
-                      ? "bg-green-100 text-green-700"
-                      : "bg-gray-100 text-gray-600"
+                    course.isPublished ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"
                   }`}
                 >
                   {course.isPublished ? "Published" : "Draft"}
@@ -405,13 +393,11 @@ export default function CommunityCoursesPage() {
 
               {/* Content */}
               <div className="p-5">
-                <h3 className="mb-1 text-base font-semibold text-gray-900 line-clamp-1">
+                <h3 className="mb-1 line-clamp-1 text-base font-semibold text-gray-900">
                   {course.title}
                 </h3>
                 {course.description && (
-                  <p className="mb-3 text-sm text-gray-500 line-clamp-2">
-                    {course.description}
-                  </p>
+                  <p className="mb-3 line-clamp-2 text-sm text-gray-500">{course.description}</p>
                 )}
 
                 {/* Stats */}
@@ -429,9 +415,7 @@ export default function CommunityCoursesPage() {
                 {/* Actions */}
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() =>
-                      router.push(`/dashboard/c/${slug}/courses/${course.id}`)
-                    }
+                    onClick={() => router.push(`/dashboard/c/${slug}/courses/${course.id}`)}
                     className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-purple-50 px-3 py-2 text-xs font-medium text-purple-700 transition-colors hover:bg-purple-100"
                   >
                     <Pencil className="h-3.5 w-3.5" />
@@ -450,7 +434,7 @@ export default function CommunityCoursesPage() {
                   </button>
                   <button
                     onClick={() => handleDeleteCourse(course.id)}
-                    className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-red-600 transition-colors hover:bg-red-50 hover:border-red-200"
+                    className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-red-600 transition-colors hover:border-red-200 hover:bg-red-50"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
@@ -463,9 +447,7 @@ export default function CommunityCoursesPage() {
         /* Empty State */
         <div className="rounded-xl border border-gray-200 bg-white p-12 text-center shadow-sm">
           <GraduationCap className="mx-auto mb-4 h-16 w-16 text-gray-300" />
-          <h3 className="mb-2 text-lg font-semibold text-gray-900">
-            No courses yet
-          </h3>
+          <h3 className="mb-2 text-lg font-semibold text-gray-900">No courses yet</h3>
           <p className="mb-6 text-sm text-gray-500">
             Create your first course to start teaching your community
           </p>

@@ -28,8 +28,8 @@ visitantes en miembros con un diseño profesional y persuasivo.
 - **Trust indicators** con checkmarks verdes
 - **Privacy badge** si es comunidad privada
 - **Stat cards** flotantes en el lado derecho (desktop)
-    - Large stat: Active Members con progress bar
-    - Small stats: Courses y Posts
+  - Large stat: Active Members con progress bar
+  - Small stats: Courses y Posts
 - **Wave divider** SVG al final para transición suave
 
 **Colores dinámicos:**
@@ -45,10 +45,10 @@ visitantes en miembros con un diseño profesional y persuasivo.
 - **Hover effects** que escalan y cambian borde a purple
 - **Grid responsive** (1 col → 2 → 4)
 - **Contenido:**
-    - 🎯 Core Fundamentals
-    - 🚀 Advanced Techniques
-    - 💡 Real-World Projects
-    - 🤝 Community Support
+  - 🎯 Core Fundamentals
+  - 🚀 Advanced Techniques
+  - 💡 Real-World Projects
+  - 🤝 Community Support
 
 ---
 
@@ -110,10 +110,10 @@ visitantes en miembros con un diseño profesional y persuasivo.
 - **Hover border** que cambia a purple
 - **Plus icon** que rota 45° al abrir
 - **4 FAQs** por defecto:
-    - What's included?
-    - Money-back guarantee?
-    - Can I cancel?
-    - How do I get support?
+  - What's included?
+  - Money-back guarantee?
+  - Can I cancel?
+  - How do I get support?
 
 **TODO:** Hacer FAQs editables desde settings
 
@@ -128,9 +128,9 @@ visitantes en miembros con un diseño profesional y persuasivo.
 - **Subtitle persuasiva**
 - **CTA button** igual al hero
 - **Trust indicators** al fondo:
-    - No credit card required
-    - Cancel anytime
-    - 30-day guarantee
+  - No credit card required
+  - Cancel anytime
+  - 30-day guarantee
 
 ---
 
@@ -175,16 +175,16 @@ visitantes en miembros con un diseño profesional y persuasivo.
 
 ## 🆚 **COMPARACIÓN vs SKOOL**
 
-| Feature | Skool | Unytea |
-|---------|-------|--------|
-| Hero Section | Básico, 1 CTA | ✅ Épico con gradientes animados |
-| Stats Display | No visible | ✅ Stat cards flotantes |
-| Trust Indicators | No | ✅ Checkmarks y badges |
-| Testimonials | No en landing | ✅ 3 cards con avatars |
-| FAQ | No | ✅ Accordion interactivo |
-| Multiple CTAs | 1 botón | ✅ 3 CTAs estratégicos |
-| Personalización | Nula | ✅ Colores, fonts, layout |
-| Mobile Experience | Básico | ✅ Responsive profesional |
+| Feature           | Skool         | Unytea                           |
+| ----------------- | ------------- | -------------------------------- |
+| Hero Section      | Básico, 1 CTA | ✅ Épico con gradientes animados |
+| Stats Display     | No visible    | ✅ Stat cards flotantes          |
+| Trust Indicators  | No            | ✅ Checkmarks y badges           |
+| Testimonials      | No en landing | ✅ 3 cards con avatars           |
+| FAQ               | No            | ✅ Accordion interactivo         |
+| Multiple CTAs     | 1 botón       | ✅ 3 CTAs estratégicos           |
+| Personalización   | Nula          | ✅ Colores, fonts, layout        |
+| Mobile Experience | Básico        | ✅ Responsive profesional        |
 
 **VEREDICTO: Unytea es 10x mejor** ✅
 
@@ -220,12 +220,12 @@ visitantes en miembros con un diseño profesional y persuasivo.
 
 ```tsx
 // En el dashboard de settings:
-community.primaryColor = "#8B5CF6"
-community.secondaryColor = "#EC4899"
-community.accentColor = "#F59E0B"
-community.heroTitle = "Custom Hero Title"
-community.heroSubtitle = "Custom Subtitle"
-community.layoutType = "MODERN_GRID"
+community.primaryColor = "#8B5CF6";
+community.secondaryColor = "#EC4899";
+community.accentColor = "#F59E0B";
+community.heroTitle = "Custom Hero Title";
+community.heroSubtitle = "Custom Subtitle";
+community.layoutType = "MODERN_GRID";
 ```
 
 ### **Contenido editable:**

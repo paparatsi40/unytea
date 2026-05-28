@@ -13,12 +13,60 @@ type ReactionData = {
 };
 
 const REACTIONS = [
-  { type: "LOVE" as ReactionType, emoji: "❤️", icon: Heart, label: "Love", color: "text-red-500", bgColor: "bg-red-500/10", hoverColor: "hover:bg-red-500/20" },
-  { type: "LIKE" as ReactionType, emoji: "👍", icon: ThumbsUp, label: "Like", color: "text-blue-500", bgColor: "bg-blue-500/10", hoverColor: "hover:bg-blue-500/20" },
-  { type: "CELEBRATE" as ReactionType, emoji: "🎉", icon: PartyPopper, label: "Celebrate", color: "text-purple-500", bgColor: "bg-purple-500/10", hoverColor: "hover:bg-purple-500/20" },
-  { type: "FIRE" as ReactionType, emoji: "🔥", icon: Flame, label: "Fire", color: "text-orange-500", bgColor: "bg-orange-500/10", hoverColor: "hover:bg-orange-500/20" },
-  { type: "IDEA" as ReactionType, emoji: "💡", icon: Lightbulb, label: "Idea", color: "text-yellow-500", bgColor: "bg-yellow-500/10", hoverColor: "hover:bg-yellow-500/20" },
-  { type: "CLAP" as ReactionType, emoji: "👏", icon: Hand, label: "Clap", color: "text-green-500", bgColor: "bg-green-500/10", hoverColor: "hover:bg-green-500/20" },
+  {
+    type: "LOVE" as ReactionType,
+    emoji: "❤️",
+    icon: Heart,
+    label: "Love",
+    color: "text-red-500",
+    bgColor: "bg-red-500/10",
+    hoverColor: "hover:bg-red-500/20",
+  },
+  {
+    type: "LIKE" as ReactionType,
+    emoji: "👍",
+    icon: ThumbsUp,
+    label: "Like",
+    color: "text-blue-500",
+    bgColor: "bg-blue-500/10",
+    hoverColor: "hover:bg-blue-500/20",
+  },
+  {
+    type: "CELEBRATE" as ReactionType,
+    emoji: "🎉",
+    icon: PartyPopper,
+    label: "Celebrate",
+    color: "text-purple-500",
+    bgColor: "bg-purple-500/10",
+    hoverColor: "hover:bg-purple-500/20",
+  },
+  {
+    type: "FIRE" as ReactionType,
+    emoji: "🔥",
+    icon: Flame,
+    label: "Fire",
+    color: "text-orange-500",
+    bgColor: "bg-orange-500/10",
+    hoverColor: "hover:bg-orange-500/20",
+  },
+  {
+    type: "IDEA" as ReactionType,
+    emoji: "💡",
+    icon: Lightbulb,
+    label: "Idea",
+    color: "text-yellow-500",
+    bgColor: "bg-yellow-500/10",
+    hoverColor: "hover:bg-yellow-500/20",
+  },
+  {
+    type: "CLAP" as ReactionType,
+    emoji: "👏",
+    icon: Hand,
+    label: "Clap",
+    color: "text-green-500",
+    bgColor: "bg-green-500/10",
+    hoverColor: "hover:bg-green-500/20",
+  },
 ] as const;
 
 export function PostReactions({ postId }: { postId: string }) {
@@ -54,7 +102,7 @@ export function PostReactions({ postId }: { postId: string }) {
     setTimeout(() => setAnimatingReaction(null), 600);
 
     // Update local state immediately
-    setReactions(prev => ({
+    setReactions((prev) => ({
       ...prev,
       [type]: {
         count: wasReacted ? Math.max(0, currentCount - 1) : currentCount + 1,
@@ -63,7 +111,7 @@ export function PostReactions({ postId }: { postId: string }) {
       },
     }));
 
-    setTotalCount(prev => wasReacted ? Math.max(0, prev - 1) : prev + 1);
+    setTotalCount((prev) => (wasReacted ? Math.max(0, prev - 1) : prev + 1));
     setShowPicker(false);
 
     // Actual API call
@@ -76,7 +124,7 @@ export function PostReactions({ postId }: { postId: string }) {
       loadReactions();
     } else {
       // Revert on error
-      setReactions(prev => ({
+      setReactions((prev) => ({
         ...prev,
         [type]: {
           count: currentCount,
@@ -84,12 +132,12 @@ export function PostReactions({ postId }: { postId: string }) {
           userReacted: wasReacted,
         },
       }));
-      setTotalCount(prev => wasReacted ? prev + 1 : prev - 1);
+      setTotalCount((prev) => (wasReacted ? prev + 1 : prev - 1));
     }
   }
 
   // Get reactions that have been used
-  const usedReactions = REACTIONS.filter(r => (reactions[r.type]?.count || 0) > 0);
+  const usedReactions = REACTIONS.filter((r) => (reactions[r.type]?.count || 0) > 0);
 
   return (
     <div className="relative">
@@ -97,7 +145,7 @@ export function PostReactions({ postId }: { postId: string }) {
         {/* Existing Reactions */}
         {usedReactions.length > 0 && (
           <div className="flex items-center space-x-1">
-            {usedReactions.map(reaction => {
+            {usedReactions.map((reaction) => {
               const data = reactions[reaction.type];
               if (!data || data.count === 0) return null;
 
@@ -109,17 +157,19 @@ export function PostReactions({ postId }: { postId: string }) {
                   className={cn(
                     "group relative flex items-center space-x-1.5 rounded-xl px-3 py-1.5 text-sm font-medium transition-all",
                     data.userReacted
-                      ? `${reaction.bgColor} ${reaction.color} ring-2 ring-inset ring-current/20`
+                      ? `${reaction.bgColor} ${reaction.color} ring-current/20 ring-2 ring-inset`
                       : "bg-accent/50 text-muted-foreground hover:bg-accent",
                     animatingReaction === reaction.type && "animate-bounce",
                     "active:scale-95"
                   )}
                 >
-                  <span className={cn(
-                    "text-base transition-transform",
-                    data.userReacted && "scale-110",
-                    animatingReaction === reaction.type && "animate-ping"
-                  )}>
+                  <span
+                    className={cn(
+                      "text-base transition-transform",
+                      data.userReacted && "scale-110",
+                      animatingReaction === reaction.type && "animate-ping"
+                    )}
+                  >
                     {reaction.emoji}
                   </span>
                   <span className="font-semibold">{data.count}</span>
@@ -129,11 +179,16 @@ export function PostReactions({ postId }: { postId: string }) {
                     <div className="rounded-lg border border-border bg-popover px-3 py-2 text-xs text-popover-foreground shadow-xl backdrop-blur-xl">
                       <div className="flex items-center space-x-2">
                         <span>{reaction.emoji}</span>
-                        <span>{data.count} {reaction.label}</span>
+                        <span>
+                          {data.count} {reaction.label}
+                        </span>
                       </div>
                       {data.users.length > 0 && (
                         <div className="mt-1 max-w-[200px] text-muted-foreground">
-                          {data.users.slice(0, 3).map(u => u.name).join(", ")}
+                          {data.users
+                            .slice(0, 3)
+                            .map((u) => u.name)
+                            .join(", ")}
                           {data.users.length > 3 && ` and ${data.users.length - 3} more`}
                         </div>
                       )}
@@ -163,10 +218,10 @@ export function PostReactions({ postId }: { postId: string }) {
 
           {/* Reaction Picker */}
           {showPicker && (
-            <div className="absolute bottom-full left-0 mb-2 z-10 animate-in fade-in slide-in-from-bottom-2 duration-200">
+            <div className="absolute bottom-full left-0 z-10 mb-2 duration-200 animate-in fade-in slide-in-from-bottom-2">
               <div className="rounded-2xl border border-border bg-popover/95 p-2 shadow-2xl backdrop-blur-xl">
                 <div className="flex items-center space-x-1">
-                  {REACTIONS.map(reaction => (
+                  {REACTIONS.map((reaction) => (
                     <button
                       key={reaction.type}
                       onClick={() => handleReaction(reaction.type)}
@@ -178,7 +233,7 @@ export function PostReactions({ postId }: { postId: string }) {
                       )}
                     >
                       <span className="text-2xl">{reaction.emoji}</span>
-                      
+
                       {/* Mini tooltip */}
                       <div className="pointer-events-none absolute bottom-full left-1/2 mb-1 -translate-x-1/2 opacity-0 transition-opacity group-hover/emoji:opacity-100">
                         <div className="whitespace-nowrap rounded-lg bg-popover px-2 py-1 text-xs font-medium text-popover-foreground shadow-lg">
@@ -195,12 +250,7 @@ export function PostReactions({ postId }: { postId: string }) {
       </div>
 
       {/* Click outside to close picker */}
-      {showPicker && (
-        <div
-          className="fixed inset-0 z-0"
-          onClick={() => setShowPicker(false)}
-        />
-      )}
+      {showPicker && <div className="fixed inset-0 z-0" onClick={() => setShowPicker(false)} />}
     </div>
   );
 }

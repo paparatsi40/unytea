@@ -107,11 +107,9 @@ export function CommunityLayoutClient({
         isOwner={isOwner}
         isPending={isPending}
       />
-      
+
       {/* Main Content */}
-      <div className="min-h-screen bg-gray-50">
-        {children}
-      </div>
+      <div className="min-h-screen bg-gray-50">{children}</div>
     </>
   );
 }

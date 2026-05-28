@@ -7,7 +7,17 @@ import { PostReactions } from "@/components/community/PostReactions";
 import { CommentSection } from "@/components/community/CommentSection";
 import { SessionAnnouncementCard } from "@/components/community/SessionAnnouncementCard";
 import { deletePost, togglePostPin, updatePost } from "@/app/actions/posts";
-import { MessageCircle, Link2, MoreHorizontal, Clock, Edit2, Trash2, X, Check, Pin } from "lucide-react";
+import {
+  MessageCircle,
+  Link2,
+  MoreHorizontal,
+  Clock,
+  Edit2,
+  Trash2,
+  X,
+  Check,
+  Pin,
+} from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 
@@ -47,7 +57,13 @@ type Post = {
   };
 };
 
-export function PremiumPostCard({ post, canModeratePost = false }: { post: Post; canModeratePost?: boolean }) {
+export function PremiumPostCard({
+  post,
+  canModeratePost = false,
+}: {
+  post: Post;
+  canModeratePost?: boolean;
+}) {
   const { user } = useCurrentUser();
 
   // IMPORTANT: All hooks must be called BEFORE any early return (Rules of Hooks).
@@ -98,7 +114,7 @@ export function PremiumPostCard({ post, canModeratePost = false }: { post: Post;
     const formData = new FormData();
     if (editTitle) formData.append("title", editTitle);
     formData.append("content", editContent);
-    
+
     const result = await updatePost(post.id, formData);
 
     if (result.success) {
@@ -195,9 +211,7 @@ export function PremiumPostCard({ post, canModeratePost = false }: { post: Post;
 
           {/* Author Info */}
           <div>
-            <h3 className="text-sm font-semibold text-gray-900">
-              {authorName}
-            </h3>
+            <h3 className="text-sm font-semibold text-gray-900">{authorName}</h3>
             <div className="flex items-center space-x-1 text-xs text-gray-500">
               <Clock className="h-3 w-3" />
               <span>{timeAgo}</span>
@@ -218,11 +232,8 @@ export function PremiumPostCard({ post, canModeratePost = false }: { post: Post;
             {/* Dropdown Menu */}
             {showMenu && (
               <>
-                <div 
-                  className="fixed inset-0 z-10" 
-                  onClick={() => setShowMenu(false)}
-                />
-                <div className="absolute right-0 top-full z-20 mt-1 w-48 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
+                <div className="absolute right-0 top-full z-20 mt-1 w-48 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg duration-200 animate-in fade-in slide-in-from-top-2">
                   {canModeratePost && (
                     <button
                       onClick={handleTogglePin}
@@ -230,7 +241,9 @@ export function PremiumPostCard({ post, canModeratePost = false }: { post: Post;
                       className="flex w-full items-center space-x-2 px-4 py-2.5 text-left text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-60"
                     >
                       <Pin className="h-4 w-4" />
-                      <span>{isPinToggling ? "Updating..." : isPinned ? "Unpin post" : "Pin post"}</span>
+                      <span>
+                        {isPinToggling ? "Updating..." : isPinned ? "Unpin post" : "Pin post"}
+                      </span>
                     </button>
                   )}
                   {isAuthor && (
@@ -307,21 +320,19 @@ export function PremiumPostCard({ post, canModeratePost = false }: { post: Post;
       ) : (
         <>
           {/* Title */}
-          {post.title && (
-            <h2 className="mb-3 text-lg font-semibold text-gray-900">
-              {post.title}
-            </h2>
-          )}
+          {post.title && <h2 className="mb-3 text-lg font-semibold text-gray-900">{post.title}</h2>}
 
           {/* Content */}
-          <div className="mb-4 text-sm leading-relaxed text-gray-700 whitespace-pre-wrap">
+          <div className="mb-4 whitespace-pre-wrap text-sm leading-relaxed text-gray-700">
             {post.content}
           </div>
 
           {Array.isArray(post.attachments) && post.attachments.length > 0 && (
             <div className="mb-4 grid gap-2 sm:grid-cols-2">
               {post.attachments.map((attachment: any, index: number) => {
-                const isImage = attachment?.type === "image" || /\.(png|jpe?g|gif|webp|svg)$/i.test(attachment?.url || "");
+                const isImage =
+                  attachment?.type === "image" ||
+                  /\.(png|jpe?g|gif|webp|svg)$/i.test(attachment?.url || "");
                 return (
                   <a
                     key={`${attachment?.url || "file"}-${index}`}

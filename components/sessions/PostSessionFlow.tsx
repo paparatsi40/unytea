@@ -82,9 +82,12 @@ export function PostSessionFlow({
   const [showCreateClip, setShowCreateClip] = useState(false);
 
   // Calculate session duration
-  const duration = session.startedAt && session.endedAt
-    ? Math.floor((new Date(session.endedAt).getTime() - new Date(session.startedAt).getTime()) / 60000)
-    : 0;
+  const duration =
+    session.startedAt && session.endedAt
+      ? Math.floor(
+          (new Date(session.endedAt).getTime() - new Date(session.startedAt).getTime()) / 60000
+        )
+      : 0;
 
   // Recording status
   const recordingStatus = session.recording?.status || "PROCESSING";
@@ -112,10 +115,12 @@ export function PostSessionFlow({
       <Card className="border-zinc-800 bg-zinc-900/50">
         <CardContent className="p-6">
           <div className="flex items-center gap-4">
-            <div className={cn(
-              "flex h-14 w-14 items-center justify-center rounded-full",
-              isRecordingReady ? "bg-green-500/20" : "bg-amber-500/20"
-            )}>
+            <div
+              className={cn(
+                "flex h-14 w-14 items-center justify-center rounded-full",
+                isRecordingReady ? "bg-green-500/20" : "bg-amber-500/20"
+              )}
+            >
               {isRecordingReady ? (
                 <Video className="h-7 w-7 text-green-400" />
               ) : (
@@ -127,15 +132,15 @@ export function PostSessionFlow({
                 {isRecordingReady
                   ? "Recording ready"
                   : isRecordingProcessing
-                  ? "Recording is processing..."
-                  : "Recording status"}
+                    ? "Recording is processing..."
+                    : "Recording status"}
               </h3>
               <p className="text-sm text-zinc-400">
                 {isRecordingReady
                   ? "Your session recording is ready to watch and share"
                   : isRecordingProcessing
-                  ? "It will be ready in a few minutes"
-                  : "Processing your session recording"}
+                    ? "It will be ready in a few minutes"
+                    : "Processing your session recording"}
               </p>
             </div>
             {isRecordingReady && session.recording?.url && (
@@ -153,9 +158,7 @@ export function PostSessionFlow({
 
       {/* ==================== NEXT STEPS ==================== */}
       <div>
-        <h2 className="mb-4 text-lg font-semibold text-white">
-          Turn this session into content
-        </h2>
+        <h2 className="mb-4 text-lg font-semibold text-white">Turn this session into content</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           {/* Write Notes */}
           <Card
@@ -208,9 +211,7 @@ export function PostSessionFlow({
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold text-white">Share Recap</h3>
-                <p className="text-sm text-zinc-400">
-                  Post session summary to community feed
-                </p>
+                <p className="text-sm text-zinc-400">Post session summary to community feed</p>
                 {session.feedPostId && (
                   <span className="mt-2 inline-flex items-center gap-1 text-xs text-blue-400">
                     <CheckCircle className="h-3 w-3" />
@@ -239,9 +240,7 @@ export function PostSessionFlow({
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold text-white">Add to Course</h3>
-                <p className="text-sm text-zinc-400">
-                  Add this recording to a course module
-                </p>
+                <p className="text-sm text-zinc-400">Add this recording to a course module</p>
               </div>
               <ArrowRight className="h-5 w-5 text-zinc-500" />
             </CardContent>
@@ -264,9 +263,7 @@ export function PostSessionFlow({
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold text-white">Create Clips</h3>
-                <p className="text-sm text-zinc-400">
-                  Generate short clips for social media
-                </p>
+                <p className="text-sm text-zinc-400">Generate short clips for social media</p>
               </div>
               <ArrowRight className="h-5 w-5 text-zinc-500" />
             </CardContent>

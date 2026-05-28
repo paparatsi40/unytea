@@ -32,29 +32,30 @@ Items que aparecieron durante Sprint 1 pero NO se cerraron porque (a) están fue
 
 Eliminación de código muerto y `node_modules` trackeado.
 
-| Commit | Cambio |
-|--------|--------|
+| Commit     | Cambio                                              |
+| ---------- | --------------------------------------------------- |
 | `2a65d917` | Remove `/web/` (-848,961 LOC, tracked node_modules) |
-| `59be4dbb` | Dead root files |
-| `40ed0f12` | Dead/empty API routes |
-| `5a2ebaf9` | Move notes → `docs/internal/` |
-| `320b287b` | Move camera-test → `(debug)` |
-| `feb44238` | Archive old docs |
-| `5ce0bb72` | Remove phantom role type |
+| `59be4dbb` | Dead root files                                     |
+| `40ed0f12` | Dead/empty API routes                               |
+| `5a2ebaf9` | Move notes → `docs/internal/`                       |
+| `320b287b` | Move camera-test → `(debug)`                        |
+| `feb44238` | Archive old docs                                    |
+| `5ce0bb72` | Remove phantom role type                            |
 
 **Resultado:** TS errors 607 → 0. Build OK.
 
 ### Phase 1 — Prisma migrations modernization (5 commits)
 
-| Sub-phase | Commit | Cambio |
-|-----------|--------|--------|
-| 1a | `740fea95` | fix(prisma): welcome_message migration table name (Community → communities) |
-| 1b | `90cf2c87` | feat(build): prisma db push → migrate deploy |
-| 1b | `148d066f` | chore: gitignore .env.production |
-| 1c | `e652b438` | feat(welcome): showWelcomeMessage + welcomeMessageSeen tracking |
-| 1d | `4d0f1883` | feat(community): SOCIAL_HUB enum value to CommunityLayoutType |
+| Sub-phase | Commit     | Cambio                                                                      |
+| --------- | ---------- | --------------------------------------------------------------------------- |
+| 1a        | `740fea95` | fix(prisma): welcome_message migration table name (Community → communities) |
+| 1b        | `90cf2c87` | feat(build): prisma db push → migrate deploy                                |
+| 1b        | `148d066f` | chore: gitignore .env.production                                            |
+| 1c        | `e652b438` | feat(welcome): showWelcomeMessage + welcomeMessageSeen tracking             |
+| 1d        | `4d0f1883` | feat(community): SOCIAL_HUB enum value to CommunityLayoutType               |
 
 **Debugging notable durante Phase 1:**
+
 - Vercel CLI OAuth flow para `vercel env pull` (sin permisos automáticos)
 - Corporate WiFi bloqueando outbound 5432 → workaround con hotspot móvil
 - `DIRECT_URL` vacío en Vercel prod (resuelto seteando = `DATABASE_URL_UNPOOLED`)
@@ -63,8 +64,8 @@ Eliminación de código muerto y `node_modules` trackeado.
 
 ### Phase 2a — Cron security (1 commit)
 
-| Commit | Cambio |
-|--------|--------|
+| Commit     | Cambio                                                           |
+| ---------- | ---------------------------------------------------------------- |
 | `830f2293` | feat(security): fail-closed CRON_SECRET + timing-safe comparison |
 
 Refactor de 3 cron routes (`sessions`, `session-reminders`, `autopilot`) para usar `lib/cron-auth.ts` con `verifyCronAuth()` helper. **16 unit tests** en `tests/unit/cron-security.test.ts`.
@@ -73,8 +74,8 @@ Refactor de 3 cron routes (`sessions`, `session-reminders`, `autopilot`) para us
 
 ### Phase 2b — Auth shape rename (1 commit)
 
-| Commit | Cambio |
-|--------|--------|
+| Commit     | Cambio                                                    |
+| ---------- | --------------------------------------------------------- |
 | `c0e684dd` | refactor(auth): requireAuth → requireUserId + module docs |
 
 Cleanup de naming entre `lib/authorization.ts` (250 LOC scaffold sin callers externos — kept como foundation para 2c.3+) y `lib/auth-utils.ts` (40 callers, mostly `getCurrentUserId`).
@@ -85,17 +86,18 @@ Cleanup de naming entre `lib/authorization.ts` (250 LOC scaffold sin callers ext
 
 La fase más sustancial de Sprint 1. Inspección sistemática y fix de 9 findings.
 
-| Sub-phase | Commit | Findings cerrados |
-|-----------|--------|-------------------|
-| 2c.1 | (recon) | 2 HIGH, 3 MED, 3 LOW security + 1 MED + 1 LOW perf |
-| 2c.2 | `14bacce0` | UserRole enum infrastructure (foundation para admin gate) |
-| 2c.3 | `0b8f1da3` | IDOR fix en `GET /communities/[slug]` + admin gate en `GET /reports` (2 HIGH) |
-| 2c.4 | `239fbf9a` | Rate-limit + zod + plan-limit en `POST /communities` + zod en `PATCH /landing` (2 MED) |
-| 2c.5 | `bc2db035` | DOMPurify sanitization de aboutSection (XSS descubierto durante recon de 2c.4) |
-| 2c.6 | `f5e35273` | 401 status fix + zod en `POST /onboarding` + rel hook en sanitizer (3 LOW + carry-over) |
-| 2c.7 | `3f6ec634` | N+1 fix en `GET /communities` + hard cap en `GET /posts` (MED + LOW perf) |
+| Sub-phase | Commit     | Findings cerrados                                                                       |
+| --------- | ---------- | --------------------------------------------------------------------------------------- |
+| 2c.1      | (recon)    | 2 HIGH, 3 MED, 3 LOW security + 1 MED + 1 LOW perf                                      |
+| 2c.2      | `14bacce0` | UserRole enum infrastructure (foundation para admin gate)                               |
+| 2c.3      | `0b8f1da3` | IDOR fix en `GET /communities/[slug]` + admin gate en `GET /reports` (2 HIGH)           |
+| 2c.4      | `239fbf9a` | Rate-limit + zod + plan-limit en `POST /communities` + zod en `PATCH /landing` (2 MED)  |
+| 2c.5      | `bc2db035` | DOMPurify sanitization de aboutSection (XSS descubierto durante recon de 2c.4)          |
+| 2c.6      | `f5e35273` | 401 status fix + zod en `POST /onboarding` + rel hook en sanitizer (3 LOW + carry-over) |
+| 2c.7      | `3f6ec634` | N+1 fix en `GET /communities` + hard cap en `GET /posts` (MED + LOW perf)               |
 
 **Patrones establecidos durante 2c (reusables Sprint 2+):**
+
 - `requireUserId()` / `requireAdmin()` throw typed errors
 - `handleApiError()` mapea typed errors → HTTP status codes (401/403/500)
 - Zod validation + `ZodError` → 400 con `error.flatten()`
@@ -106,20 +108,20 @@ La fase más sustancial de Sprint 1. Inspección sistemática y fix de 9 finding
 
 ## Métricas
 
-| Métrica | Valor |
-|---------|-------|
-| Commits totales | 20 |
-| Phases ejecutadas | 12 (0, 1a–1d, 2a, 2b, 2c.1–2c.7) |
-| LOC eliminado neto | ~849,000 |
-| TS errors | 607 → 0 |
-| Migrations nuevas aplicadas | 4 |
-| API routes inspectadas | 12 (de 46 totales) |
-| Findings HIGH security cerrados | 2 |
-| Findings MED cerrados (security + perf) | 3 |
-| Findings LOW cerrados (security + perf) | 4 |
-| Dependencies nuevas | 1 (`isomorphic-dompurify@3.12.0`) |
-| Tests unit agregados | 35 (16 cron + 19 sanitize) |
-| Vercel deploys verdes | 13 |
+| Métrica                                 | Valor                             |
+| --------------------------------------- | --------------------------------- |
+| Commits totales                         | 20                                |
+| Phases ejecutadas                       | 12 (0, 1a–1d, 2a, 2b, 2c.1–2c.7)  |
+| LOC eliminado neto                      | ~849,000                          |
+| TS errors                               | 607 → 0                           |
+| Migrations nuevas aplicadas             | 4                                 |
+| API routes inspectadas                  | 12 (de 46 totales)                |
+| Findings HIGH security cerrados         | 2                                 |
+| Findings MED cerrados (security + perf) | 3                                 |
+| Findings LOW cerrados (security + perf) | 4                                 |
+| Dependencies nuevas                     | 1 (`isomorphic-dompurify@3.12.0`) |
+| Tests unit agregados                    | 35 (16 cron + 19 sanitize)        |
+| Vercel deploys verdes                   | 13                                |
 
 ---
 
@@ -213,14 +215,17 @@ Items registrados para phases/sprints futuros:
 ## Next steps
 
 ### Sprint 2 (técnico)
+
 - Phase 3: dependencies + npm vulns
 - Phase 4: CSP rewrite
 
 ### Pre-Sprint-3 gate (producto, NO código)
+
 - `docs/PRODUCT_DECISIONS_V1.md` requerido antes de Sprint 3
 - Cubre: canonical identity, target user, core v1 features, revenue model, anti-features, success metrics, autopilot activation strategy
 
 ### Sprint 3+ (producto, post-gate)
+
 - Implementación de v1 features según decisions del gate
 - Scope depende del gate
 

@@ -55,8 +55,7 @@ export async function issueCertificate(enrollmentId: string) {
     });
 
     if (!enrollment) return { success: false, error: "Enrollment not found" };
-    if (enrollment.userId !== userId)
-      return { success: false, error: "Not your enrollment" };
+    if (enrollment.userId !== userId) return { success: false, error: "Not your enrollment" };
 
     // Fetch user name
     const user = await prisma.user.findUnique({

@@ -261,16 +261,16 @@ LiveKit data channel soporta 6 tipos de mensajes:
 ### **2. Role-based Permissions** 🔐
 
 - **Moderators:**
-    - Create polls
-    - Pin messages
-    - Mark questions as answered
-    - Resource sharing
+  - Create polls
+  - Pin messages
+  - Mark questions as answered
+  - Resource sharing
 
 - **Participants:**
-    - Send reactions
-    - Chat (general/questions)
-    - Vote in polls
-    - View all content
+  - Send reactions
+  - Chat (general/questions)
+  - Vote in polls
+  - View all content
 
 ### **3. Animations** ✨
 
@@ -326,9 +326,9 @@ const [showPollCreator, setShowPollCreator] = useState(false);
 2. Click reactions button (bottom right)
 3. Select emoji (e.g., 👍)
 4. **Expected:**
-    - Emoji floats from bottom to top
-    - Count increases in aggregated display
-    - Other participants see it too
+   - Emoji floats from bottom to top
+   - Count increases in aggregated display
+   - Other participants see it too
 
 **Test with 2 users:**
 
@@ -346,10 +346,10 @@ const [showPollCreator, setShowPollCreator] = useState(false);
 3. Type message: "Hello!"
 4. Click send
 5. **Expected:**
-    - Message appears immediately
-    - Shows your avatar/initial
-    - Timestamp displayed
-    - Other participants see it
+   - Message appears immediately
+   - Shows your avatar/initial
+   - Timestamp displayed
+   - Other participants see it
 
 **Test Q&A mode:**
 
@@ -357,18 +357,18 @@ const [showPollCreator, setShowPollCreator] = useState(false);
 - Write: "How does this work?"
 - Send
 - **Expected:**
-    - Badge shows "1" in Q&A tab
-    - Message has blue background
-    - Shows "Question" tag
+  - Badge shows "1" in Q&A tab
+  - Message has blue background
+  - Shows "Question" tag
 
 **Test Moderator actions:**
 
 - As moderator, hover over message
 - Click pin icon
 - **Expected:**
-    - Yellow highlight
-    - Shows in Resources tab
-    - Pin icon visible
+  - Yellow highlight
+  - Shows in Resources tab
+  - Pin icon visible
 
 ---
 
@@ -379,9 +379,9 @@ const [showPollCreator, setShowPollCreator] = useState(false);
 1. Click poll button (bottom left)
 2. Enter question: "What's your favorite feature?"
 3. Add options:
-    - Reactions
-    - Chat
-    - Polls
+   - Reactions
+   - Chat
+   - Polls
 4. Set duration: 60 seconds
 5. Click "Create Poll"
 
@@ -391,10 +391,10 @@ const [showPollCreator, setShowPollCreator] = useState(false);
 2. Select option "Reactions"
 3. Click "Submit Vote"
 4. **Expected:**
-    - Progress bar animates
-    - Percentage shows
-    - "You voted!" message
-    - Other participants see updated results
+   - Progress bar animates
+   - Percentage shows
+   - "You voted!" message
+   - Other participants see updated results
 
 **Test Quiz Mode:**
 
@@ -403,9 +403,9 @@ const [showPollCreator, setShowPollCreator] = useState(false);
 3. Create quiz
 4. Vote wrong answer
 5. **Expected:**
-    - "❌ Incorrect" feedback
-    - Shows correct answer
-    - Green highlight on correct option
+   - "❌ Incorrect" feedback
+   - Shows correct answer
+   - Green highlight on correct option
 
 ---
 
@@ -418,9 +418,9 @@ const [showPollCreator, setShowPollCreator] = useState(false);
 5. Stay for 90%+ duration
 6. Leave call
 7. **Expected:**
-    - Points notifications throughout
-    - Bonus +30 pts at end
-    - Feedback modal appears
+   - Points notifications throughout
+   - Bonus +30 pts at end
+   - Feedback modal appears
 
 ---
 
@@ -489,9 +489,9 @@ const [showPollCreator, setShowPollCreator] = useState(false);
 ### **Rate Limiting:**
 
 - 🔄 TODO: Add rate limiting for:
-    - Reactions (max per minute)
-    - Chat messages (max per minute)
-    - Poll creation (moderators only)
+  - Reactions (max per minute)
+  - Chat messages (max per minute)
+  - Poll creation (moderators only)
 
 ---
 
@@ -513,13 +513,13 @@ const [showPollCreator, setShowPollCreator] = useState(false);
 
 ## 🎯 **VENTAJAS vs COMPETENCIA:**
 
-| Feature | Zoom | Discord | Skool | Unytea |
-|---------|------|---------|-------|--------|
-| **Reactions Live** | ❌ | ✅ Basic | ❌ | ✅ **Animated** |
-| **Segmented Chat** | ❌ | ❌ | ❌ | ✅ **Q&A/Resources** |
-| **Live Polls** | ✅ Pro | ❌ | ❌ | ✅ **+ Quiz mode** |
-| **Gamification** | ❌ | ❌ | ❌ | ✅ **Integrated** |
-| **All in One** | ❌ | ❌ | ❌ | ✅ **Yes!** |
+| Feature            | Zoom   | Discord  | Skool | Unytea               |
+| ------------------ | ------ | -------- | ----- | -------------------- |
+| **Reactions Live** | ❌     | ✅ Basic | ❌    | ✅ **Animated**      |
+| **Segmented Chat** | ❌     | ❌       | ❌    | ✅ **Q&A/Resources** |
+| **Live Polls**     | ✅ Pro | ❌       | ❌    | ✅ **+ Quiz mode**   |
+| **Gamification**   | ❌     | ❌       | ❌    | ✅ **Integrated**    |
+| **All in One**     | ❌     | ❌       | ❌    | ✅ **Yes!**          |
 
 **Resultado:** Unytea tiene la **mejor experiencia** de video calls para educación 🏆
 

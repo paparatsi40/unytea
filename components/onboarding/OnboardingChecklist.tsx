@@ -16,10 +16,7 @@ interface OnboardingChecklistProps {
   onDismiss?: () => void;
 }
 
-export function OnboardingChecklist({
-  items,
-  onDismiss,
-}: OnboardingChecklistProps) {
+export function OnboardingChecklist({ items, onDismiss }: OnboardingChecklistProps) {
   const [dismissed, setDismissed] = useState(false);
   const [isOpen, setIsOpen] = useState(true);
 
@@ -38,7 +35,7 @@ export function OnboardingChecklist({
   if (dismissed) return null;
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
       {/* Header */}
       <button
         onClick={() => setIsOpen(!isOpen)}
@@ -49,9 +46,7 @@ export function OnboardingChecklist({
             <Sparkles className="h-4 w-4 text-purple-600" />
           </div>
           <div className="text-left">
-            <p className="text-sm font-semibold text-gray-900">
-              Getting Started
-            </p>
+            <p className="text-sm font-semibold text-gray-900">Getting Started</p>
             <p className="text-xs text-gray-500">
               {completed}/{total} completed
             </p>
@@ -73,7 +68,7 @@ export function OnboardingChecklist({
               setDismissed(true);
               onDismiss?.();
             }}
-            className="rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
+            className="rounded-md p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
           >
             <X className="h-3.5 w-3.5" />
           </button>
@@ -89,9 +84,7 @@ export function OnboardingChecklist({
                 key={item.id}
                 href={item.href}
                 className={`flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors ${
-                  item.completed
-                    ? "opacity-50"
-                    : "hover:bg-gray-50"
+                  item.completed ? "opacity-50" : "hover:bg-gray-50"
                 }`}
               >
                 {item.completed ? (
@@ -102,20 +95,14 @@ export function OnboardingChecklist({
                 <div className="min-w-0 flex-1">
                   <p
                     className={`text-sm ${
-                      item.completed
-                        ? "text-gray-400 line-through"
-                        : "font-medium text-gray-900"
+                      item.completed ? "text-gray-400 line-through" : "font-medium text-gray-900"
                     }`}
                   >
                     {item.title}
                   </p>
-                  {!item.completed && (
-                    <p className="text-xs text-gray-500">{item.description}</p>
-                  )}
+                  {!item.completed && <p className="text-xs text-gray-500">{item.description}</p>}
                 </div>
-                {!item.completed && (
-                  <ChevronRight className="h-4 w-4 shrink-0 text-gray-400" />
-                )}
+                {!item.completed && <ChevronRight className="h-4 w-4 shrink-0 text-gray-400" />}
               </a>
             ))}
           </div>

@@ -15,36 +15,24 @@ interface CTASectionProps {
   };
 }
 
-export function CTASection({
-  title,
-  description,
-  buttonText,
-  buttonLink,
-  theme,
-}: CTASectionProps) {
+export function CTASection({ title, description, buttonText, buttonLink, theme }: CTASectionProps) {
   const primaryColor = theme?.primaryColor || "#0ea5e9";
   const secondaryColor = theme?.secondaryColor || "#06b6d4";
 
   return (
-    <section 
+    <section
       className="rounded-2xl p-12 text-center text-white"
       style={{
-        background: `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`
+        background: `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`,
       }}
     >
-      <h2 className="text-3xl md:text-4xl font-bold mb-4">
-        {title}
-      </h2>
-      
-      {description && (
-        <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-          {description}
-        </p>
-      )}
+      <h2 className="mb-4 text-3xl font-bold md:text-4xl">{title}</h2>
+
+      {description && <p className="mx-auto mb-8 max-w-2xl text-xl text-white/90">{description}</p>}
 
       <Button
         size="lg"
-        className="bg-white text-gray-900 hover:bg-gray-100 px-8 py-6 text-lg"
+        className="bg-white px-8 py-6 text-lg text-gray-900 hover:bg-gray-100"
         asChild
       >
         <a href={buttonLink}>

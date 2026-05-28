@@ -16,68 +16,65 @@ const SITE_URL = "https://www.unytea.com";
  */
 export async function GET() {
   return new ImageResponse(
-    (
+    <div
+      style={{
+        height: "100%",
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "linear-gradient(135deg, #7c3aed 0%, #ec4899 50%, #f59e0b 100%)",
+        color: "white",
+        fontFamily: "system-ui, -apple-system, sans-serif",
+        padding: 80,
+      }}
+    >
+      {/* Logo — sits above the wordmark */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={`${SITE_URL}/unytea-logo.png`}
+        alt="Unytea"
+        width={140}
+        height={140}
+        style={{
+          borderRadius: 24,
+          marginBottom: 32,
+          boxShadow: "0 20px 60px rgba(0,0,0,0.25)",
+        }}
+      />
+
       <div
         style={{
-          height: "100%",
-          width: "100%",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          background:
-            "linear-gradient(135deg, #7c3aed 0%, #ec4899 50%, #f59e0b 100%)",
-          color: "white",
-          fontFamily: "system-ui, -apple-system, sans-serif",
-          padding: 80,
+          fontSize: 110,
+          fontWeight: 800,
+          letterSpacing: "-0.04em",
+          lineHeight: 1,
         }}
       >
-        {/* Logo — sits above the wordmark */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={`${SITE_URL}/unytea-logo.png`}
-          alt="Unytea"
-          width={140}
-          height={140}
-          style={{
-            borderRadius: 24,
-            marginBottom: 32,
-            boxShadow: "0 20px 60px rgba(0,0,0,0.25)",
-          }}
-        />
-
-        <div
-          style={{
-            fontSize: 110,
-            fontWeight: 800,
-            letterSpacing: "-0.04em",
-            lineHeight: 1,
-          }}
-        >
-          Unytea
-        </div>
-        <div
-          style={{
-            fontSize: 44,
-            marginTop: 18,
-            opacity: 0.95,
-            textAlign: "center",
-          }}
-        >
-          Where Communities Unite
-        </div>
-        <div
-          style={{
-            fontSize: 26,
-            marginTop: 40,
-            opacity: 0.85,
-            letterSpacing: "0.05em",
-          }}
-        >
-          unytea.com
-        </div>
+        Unytea
       </div>
-    ),
+      <div
+        style={{
+          fontSize: 44,
+          marginTop: 18,
+          opacity: 0.95,
+          textAlign: "center",
+        }}
+      >
+        Where Communities Unite
+      </div>
+      <div
+        style={{
+          fontSize: 26,
+          marginTop: 40,
+          opacity: 0.85,
+          letterSpacing: "0.05em",
+        }}
+      >
+        unytea.com
+      </div>
+    </div>,
     { width: 1200, height: 630 }
   );
 }

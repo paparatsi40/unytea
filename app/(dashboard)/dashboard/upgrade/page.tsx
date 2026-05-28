@@ -86,7 +86,7 @@ export default function UpgradePage() {
 
     try {
       setIsLoading(planName);
-      
+
       const response = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: {
@@ -103,7 +103,7 @@ export default function UpgradePage() {
       }
 
       const { url } = await response.json();
-      
+
       if (url) {
         window.location.href = url;
       } else {
@@ -121,16 +121,15 @@ export default function UpgradePage() {
     <div className="space-y-8">
       {/* Header */}
       <div className="text-center">
-        <h1 className="text-4xl font-bold text-foreground mb-4">
-          Upgrade to Premium
-        </h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          Hosts pay for the platform. Members join for free. Fees apply only when you sell paid access or courses.
+        <h1 className="mb-4 text-4xl font-bold text-foreground">Upgrade to Premium</h1>
+        <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+          Hosts pay for the platform. Members join for free. Fees apply only when you sell paid
+          access or courses.
         </p>
       </div>
 
       {/* Pricing Cards */}
-      <div className="grid gap-8 md:grid-cols-3 max-w-7xl mx-auto">
+      <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-3">
         {plans.map((plan) => {
           const Icon = plan.icon;
           return (
@@ -138,39 +137,37 @@ export default function UpgradePage() {
               key={plan.name}
               className={`relative rounded-2xl border ${
                 plan.popular
-                  ? "border-primary shadow-2xl shadow-primary/20 scale-105"
+                  ? "scale-105 border-primary shadow-2xl shadow-primary/20"
                   : "border-border"
-              } bg-card p-8 flex flex-col`}
+              } flex flex-col bg-card p-8`}
             >
               {plan.popular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full text-white text-sm font-semibold">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-1 text-sm font-semibold text-white">
                   Most Popular
                 </div>
               )}
 
               {/* Icon */}
-              <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${plan.color} flex items-center justify-center mb-4`}>
-                <Icon className="w-6 h-6 text-white" />
+              <div
+                className={`h-12 w-12 rounded-xl bg-gradient-to-br ${plan.color} mb-4 flex items-center justify-center`}
+              >
+                <Icon className="h-6 w-6 text-white" />
               </div>
 
               {/* Plan Name */}
-              <h3 className="text-2xl font-bold text-foreground mb-2">
-                {plan.name}
-              </h3>
+              <h3 className="mb-2 text-2xl font-bold text-foreground">{plan.name}</h3>
 
               {/* Price */}
               <div className="mb-6">
-                <span className="text-4xl font-bold text-foreground">
-                  ${plan.price}
-                </span>
+                <span className="text-4xl font-bold text-foreground">${plan.price}</span>
                 <span className="text-muted-foreground">/month</span>
               </div>
 
               {/* Features */}
-              <ul className="space-y-3 mb-8 flex-1">
+              <ul className="mb-8 flex-1 space-y-3">
                 {plan.features.map((feature) => (
                   <li key={feature} className="flex items-start gap-3">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                    <Check className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" />
                     <span className="text-foreground">{feature}</span>
                   </li>
                 ))}
@@ -179,9 +176,7 @@ export default function UpgradePage() {
               {/* CTA Button */}
               <Button
                 className={`w-full ${
-                  plan.popular
-                    ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:shadow-xl"
-                    : ""
+                  plan.popular ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:shadow-xl" : ""
                 }`}
                 variant={plan.popular ? "default" : "outline"}
                 onClick={() => handleSubscribe(plan.name, plan.priceId)}
@@ -204,12 +199,11 @@ export default function UpgradePage() {
       </div>
 
       {/* FAQ Preview */}
-      <div className="max-w-4xl mx-auto mt-16 p-8 rounded-2xl border border-border bg-card/50">
-        <h2 className="text-2xl font-bold text-foreground mb-4 text-center">
-          Billing clarity
-        </h2>
+      <div className="mx-auto mt-16 max-w-4xl rounded-2xl border border-border bg-card/50 p-8">
+        <h2 className="mb-4 text-center text-2xl font-bold text-foreground">Billing clarity</h2>
         <p className="text-center text-muted-foreground">
-          Members can join free. Transaction fees are charged only on paid memberships and paid courses, based on your plan tier.
+          Members can join free. Transaction fees are charged only on paid memberships and paid
+          courses, based on your plan tier.
         </p>
       </div>
     </div>

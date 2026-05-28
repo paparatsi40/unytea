@@ -50,8 +50,8 @@ http://localhost:3000/dashboard/c/[tu-slug]/settings/landing
 ### **3. Edita el contenido:**
 
 - En el panel derecho, cambia:
-    - **Title:** "Bienvenido a mi comunidad"
-    - **Subtitle:** "Aprende, conecta y crece"
+  - **Title:** "Bienvenido a mi comunidad"
+  - **Subtitle:** "Aprende, conecta y crece"
 - El preview se actualiza en tiempo real ✨
 
 ### **4. Sube una imagen:**

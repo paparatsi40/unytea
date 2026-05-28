@@ -17,16 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Library,
-  Upload,
-  TrendingUp,
-  Clock,
-  Sparkles,
-  BookOpen,
-  X,
-  Plus,
-} from "lucide-react";
+import { Library, Upload, TrendingUp, Clock, Sparkles, BookOpen, X, Plus } from "lucide-react";
 import {
   getResources,
   getResourceCategories,
@@ -96,19 +87,19 @@ export default function LibraryPage() {
     if (!communitySlug) return;
     setIsLoading(true);
     try {
-      const [resourcesResult, categoriesResult, popularResult, continueResult] =
-        await Promise.all([
-          getResources({
-            communitySlug,
-            page: 1,
-            limit: 20,
-            ...filters,
-            categoryId: selectedCategory === "uncategorized" ? undefined : selectedCategory || undefined,
-          }),
-          getResourceCategories(communitySlug),
-          getPopularResources(communitySlug, 5),
-          getContinueWatching(communitySlug, 5),
-        ]);
+      const [resourcesResult, categoriesResult, popularResult, continueResult] = await Promise.all([
+        getResources({
+          communitySlug,
+          page: 1,
+          limit: 20,
+          ...filters,
+          categoryId:
+            selectedCategory === "uncategorized" ? undefined : selectedCategory || undefined,
+        }),
+        getResourceCategories(communitySlug),
+        getPopularResources(communitySlug, 5),
+        getContinueWatching(communitySlug, 5),
+      ]);
 
       if (resourcesResult.success) {
         setResources(resourcesResult.data.resources);
@@ -185,37 +176,43 @@ export default function LibraryPage() {
     }
   }, [communitySlug, filters, pagination.page]);
 
-  const handleLike = useCallback(async (resourceId: string) => {
-    const result = await toggleResourceLike({ resourceId });
-    if (result.success) {
-      toast.success(result.data.liked ? t("like.liked") : t("like.unliked"));
-      setResources((prev) =>
-        prev.map((r) =>
-          r.id === resourceId
-            ? {
-                ...r,
-                _count: { likes: result.data.likesCount },
-                likes: result.data.liked ? [{ id: "temp" }] : [],
-              }
-            : r
-        )
-      );
-    }
-  }, [t]);
+  const handleLike = useCallback(
+    async (resourceId: string) => {
+      const result = await toggleResourceLike({ resourceId });
+      if (result.success) {
+        toast.success(result.data.liked ? t("like.liked") : t("like.unliked"));
+        setResources((prev) =>
+          prev.map((r) =>
+            r.id === resourceId
+              ? {
+                  ...r,
+                  _count: { likes: result.data.likesCount },
+                  likes: result.data.liked ? [{ id: "temp" }] : [],
+                }
+              : r
+          )
+        );
+      }
+    },
+    [t]
+  );
 
-  const handleDelete = useCallback(async (resourceId: string) => {
-    if (!confirm(t("delete.confirm"))) {
-      return;
-    }
+  const handleDelete = useCallback(
+    async (resourceId: string) => {
+      if (!confirm(t("delete.confirm"))) {
+        return;
+      }
 
-    const result = await deleteResource(resourceId);
-    if (result.success) {
-      toast.success(t("delete.success"));
-      setResources((prev) => prev.filter((r) => r.id !== resourceId));
-    } else {
-      toast.error(result.error);
-    }
-  }, [t]);
+      const result = await deleteResource(resourceId);
+      if (result.success) {
+        toast.success(t("delete.success"));
+        setResources((prev) => prev.filter((r) => r.id !== resourceId));
+      } else {
+        toast.error(result.error);
+      }
+    },
+    [t]
+  );
 
   // Early return after ALL hooks are declared (Rules of Hooks).
   if (!communitySlug) {
@@ -243,66 +240,60 @@ export default function LibraryPage() {
       {/* Header */}
       <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 py-6">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
             <div>
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="flex items-center gap-3"
               >
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white shadow-lg">
-                  <Library className="w-6 h-6" />
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-lg">
+                  <Library className="h-6 w-6" />
                 </div>
                 <div>
                   <h1 className="text-3xl font-bold">{t("title")}</h1>
-                  <p className="text-muted-foreground">
-                    {t("subtitle")}
-                  </p>
+                  <p className="text-muted-foreground">{t("subtitle")}</p>
                 </div>
               </motion.div>
             </div>
 
             <div className="flex items-center gap-3">
               <Button variant="outline" className="gap-2">
-                <BookOpen className="w-4 h-4" />
+                <BookOpen className="h-4 w-4" />
                 {t("myFavorites")}
               </Button>
               <Button
                 className="gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
                 onClick={() => setIsUploadModalOpen(true)}
               >
-                <Upload className="w-4 h-4" />
+                <Upload className="h-4 w-4" />
                 {t("uploadResource")}
               </Button>
             </div>
           </div>
 
           {/* Tabs */}
-          <Tabs
-            value={activeTab}
-            onValueChange={setActiveTab}
-            className="mt-6"
-          >
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
             <TabsList className="bg-muted/50">
               <TabsTrigger value="all" className="gap-2">
-                <BookOpen className="w-4 h-4" />
+                <BookOpen className="h-4 w-4" />
                 {t("tabs.all")}
               </TabsTrigger>
               <TabsTrigger value="popular" className="gap-2">
-                <TrendingUp className="w-4 h-4" />
+                <TrendingUp className="h-4 w-4" />
                 {t("tabs.popular")}
               </TabsTrigger>
               <TabsTrigger value="continue" className="gap-2">
-                <Clock className="w-4 h-4" />
+                <Clock className="h-4 w-4" />
                 {t("tabs.continueWatching")}
                 {continueWatching.length > 0 && (
-                  <span className="ml-1 text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full">
+                  <span className="ml-1 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
                     {continueWatching.length}
                   </span>
                 )}
               </TabsTrigger>
               <TabsTrigger value="new" className="gap-2">
-                <Sparkles className="w-4 h-4" />
+                <Sparkles className="h-4 w-4" />
                 {t("tabs.new")}
               </TabsTrigger>
             </TabsList>
@@ -312,9 +303,9 @@ export default function LibraryPage() {
 
       {/* Content */}
       <div className="container mx-auto px-4 py-8">
-        <div className="flex flex-col lg:flex-row gap-8">
+        <div className="flex flex-col gap-8 lg:flex-row">
           {/* Sidebar */}
-          <aside className="lg:w-64 flex-shrink-0">
+          <aside className="flex-shrink-0 lg:w-64">
             <div className="sticky top-24">
               <CategorySidebar
                 categories={categories}
@@ -327,7 +318,7 @@ export default function LibraryPage() {
           </aside>
 
           {/* Main Content */}
-          <main className="flex-1 min-w-0">
+          <main className="min-w-0 flex-1">
             <ResourceGrid
               resources={getFilteredResources()}
               communitySlug={communitySlug}
@@ -348,23 +339,21 @@ export default function LibraryPage() {
       {/* Upload Resource Modal */}
       {isUploadModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-lg shadow-xl">
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-white shadow-xl">
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b">
+            <div className="flex items-center justify-between border-b p-6">
               <div>
-                <h2 className="text-xl font-semibold flex items-center gap-2">
-                  <Upload className="w-5 h-5" />
+                <h2 className="flex items-center gap-2 text-xl font-semibold">
+                  <Upload className="h-5 w-5" />
                   {t("upload.title")}
                 </h2>
-                <p className="text-sm text-gray-500 mt-1">
-                  {t("upload.subtitle")}
-                </p>
+                <p className="mt-1 text-sm text-gray-500">{t("upload.subtitle")}</p>
               </div>
               <button
                 onClick={() => setIsUploadModalOpen(false)}
-                className="p-2 hover:bg-gray-100 rounded-full"
+                className="rounded-full p-2 hover:bg-gray-100"
               >
-                <X className="w-5 h-5" />
+                <X className="h-5 w-5" />
               </button>
             </div>
 
@@ -389,7 +378,13 @@ export default function LibraryPage() {
                   type: uploadForm.type,
                   categoryId: uploadForm.categoryId || undefined,
                   fileUrl: fileUrl,
-                  slug: uploadForm.title.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "") + "-" + Date.now(),
+                  slug:
+                    uploadForm.title
+                      .toLowerCase()
+                      .replace(/\s+/g, "-")
+                      .replace(/[^a-z0-9-]/g, "") +
+                    "-" +
+                    Date.now(),
                   tags: [],
                   isPublic: false,
                   status: "PUBLISHED",
@@ -414,7 +409,7 @@ export default function LibraryPage() {
 
                 setIsSubmitting(false);
               }}
-              className="p-6 space-y-6"
+              className="space-y-6 p-6"
             >
               {/* Title */}
               <div className="space-y-2">
@@ -437,7 +432,7 @@ export default function LibraryPage() {
                   onChange={(e) => setUploadForm({ ...uploadForm, description: e.target.value })}
                   placeholder={t("upload.descriptionPlaceholder")}
                   rows={3}
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
               </div>
 
@@ -446,7 +441,9 @@ export default function LibraryPage() {
                 <Label htmlFor="type">{t("upload.typeLabel")}</Label>
                 <Select
                   value={uploadForm.type}
-                  onValueChange={(value: string) => setUploadForm({ ...uploadForm, type: value as ResourceType })}
+                  onValueChange={(value: string) =>
+                    setUploadForm({ ...uploadForm, type: value as ResourceType })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder={t("upload.typePlaceholder")} />
@@ -469,9 +466,9 @@ export default function LibraryPage() {
                     <button
                       type="button"
                       onClick={() => setIsCreatingCategory(true)}
-                      className="text-xs text-purple-600 hover:text-purple-700 flex items-center gap-1"
+                      className="flex items-center gap-1 text-xs text-purple-600 hover:text-purple-700"
                     >
-                      <Plus className="w-3 h-3" />
+                      <Plus className="h-3 w-3" />
                       {t("upload.categoryNew")}
                     </button>
                   )}
@@ -495,7 +492,10 @@ export default function LibraryPage() {
                         setIsCreatingCategorySubmitting(true);
                         const result = await createResourceCategory(communitySlug, {
                           name: newCategoryName.trim(),
-                          slug: newCategoryName.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""),
+                          slug: newCategoryName
+                            .toLowerCase()
+                            .replace(/\s+/g, "-")
+                            .replace(/[^a-z0-9-]/g, ""),
                           description: null,
                           icon: null,
                           color: null,
@@ -527,13 +527,15 @@ export default function LibraryPage() {
                         setNewCategoryName("");
                       }}
                     >
-                      <X className="w-4 h-4" />
+                      <X className="h-4 w-4" />
                     </Button>
                   </div>
                 ) : (
                   <Select
                     value={uploadForm.categoryId || "none"}
-                    onValueChange={(value: string) => setUploadForm({ ...uploadForm, categoryId: value === "none" ? "" : value })}
+                    onValueChange={(value: string) =>
+                      setUploadForm({ ...uploadForm, categoryId: value === "none" ? "" : value })
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder={t("upload.categorySelectPlaceholder")} />
@@ -547,7 +549,7 @@ export default function LibraryPage() {
                           </SelectItem>
                         ))
                       ) : (
-                        <div className="px-2 py-3 text-sm text-gray-400 italic">
+                        <div className="px-2 py-3 text-sm italic text-gray-400">
                           {t("upload.categoryEmpty")}
                         </div>
                       )}
@@ -560,7 +562,13 @@ export default function LibraryPage() {
               <div className="space-y-2">
                 <Label>{t("upload.fileLabel")}</Label>
                 <FileUpload
-                  endpoint={uploadForm.type === "DOCUMENT" ? "documentUploader" : uploadForm.type === "VIDEO" || uploadForm.type === "AUDIO" ? "mediaUploader" : "imageUploader"}
+                  endpoint={
+                    uploadForm.type === "DOCUMENT"
+                      ? "documentUploader"
+                      : uploadForm.type === "VIDEO" || uploadForm.type === "AUDIO"
+                        ? "mediaUploader"
+                        : "imageUploader"
+                  }
                   onUploadComplete={(files) => setUploadedFiles(files)}
                   onUploadError={(error: Error) => toast.error(error.message)}
                   maxFiles={1}
@@ -570,14 +578,14 @@ export default function LibraryPage() {
               </div>
 
               {/* Actions */}
-              <div className="flex justify-end gap-3 pt-4 border-t">
+              <div className="flex justify-end gap-3 border-t pt-4">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setIsUploadModalOpen(false)}
                   disabled={isSubmitting}
                 >
-                  <X className="w-4 h-4 mr-2" />
+                  <X className="mr-2 h-4 w-4" />
                   {t("upload.cancel")}
                 </Button>
                 <Button
@@ -587,12 +595,12 @@ export default function LibraryPage() {
                 >
                   {isSubmitting ? (
                     <>
-                      <span className="animate-spin mr-2">⏳</span>
+                      <span className="mr-2 animate-spin">⏳</span>
                       {t("upload.uploading")}
                     </>
                   ) : (
                     <>
-                      <Upload className="w-4 h-4 mr-2" />
+                      <Upload className="mr-2 h-4 w-4" />
                       {t("upload.submit")}
                     </>
                   )}

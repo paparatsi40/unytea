@@ -1,12 +1,7 @@
 import Pusher from "pusher";
 import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
-export const dynamic = 'force-dynamic';
-
-
-
-
-
+export const dynamic = "force-dynamic";
 
 const pusher = new Pusher({
   appId: process.env.PUSHER_APP_ID!,
@@ -19,7 +14,7 @@ const pusher = new Pusher({
 // POST /api/pusher/auth - Authenticate private channels
 export async function POST(req: Request) {
   const session = await auth();
-  
+
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -52,7 +47,7 @@ export async function POST(req: Request) {
 // POST /api/pusher/trigger - Trigger events (server-side)
 export async function PUT(req: Request) {
   const session = await auth();
-  
+
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -66,13 +61,10 @@ export async function PUT(req: Request) {
       senderId: session.user.id,
       timestamp: new Date().toISOString(),
     });
-    
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Pusher trigger error:", error);
-    return NextResponse.json(
-      { error: "Failed to trigger event" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to trigger event" }, { status: 500 });
   }
 }

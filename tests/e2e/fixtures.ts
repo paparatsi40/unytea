@@ -1,8 +1,8 @@
-import { test as base, type Page } from '@playwright/test';
+import { test as base, type Page } from "@playwright/test";
 
 export const test = base.extend({});
 
-export { expect } from '@playwright/test';
+export { expect } from "@playwright/test";
 
 // Common selectors and helpers
 export const selectors = {

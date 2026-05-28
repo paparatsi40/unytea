@@ -166,15 +166,13 @@ export function MinimalistLayout({
                       {post.author?.name} · {new Date(post.createdAt).toLocaleDateString()}
                     </span>
                   </div>
-                  
+
                   <h3 className="mb-2 text-lg font-medium text-gray-900 group-hover:text-blue-600">
                     {post.title || "Untitled"}
                   </h3>
-                  
-                  <p className="mb-3 text-gray-600 line-clamp-2">
-                    {post.content}
-                  </p>
-                  
+
+                  <p className="mb-3 line-clamp-2 text-gray-600">{post.content}</p>
+
                   <div className="flex items-center gap-4 text-sm text-gray-500">
                     <span>{post._count?.comments || 0} comments</span>
                     <span>·</span>
@@ -231,11 +229,9 @@ export function MinimalistLayout({
                   <h3 className="mb-2 text-lg font-medium text-gray-900 group-hover:text-blue-600">
                     {course.title}
                   </h3>
-                  
-                  <p className="mb-3 text-sm text-gray-600 line-clamp-2">
-                    {course.description}
-                  </p>
-                  
+
+                  <p className="mb-3 line-clamp-2 text-sm text-gray-600">{course.description}</p>
+
                   <div className="flex items-center gap-4 text-sm text-gray-500">
                     <span>{course.enrollmentCount || 0} students</span>
                     {course.isPaid && (
@@ -255,11 +251,7 @@ export function MinimalistLayout({
 
         {/* Members Section */}
         {members.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-          >
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
             <div className="mb-8 flex items-center justify-between">
               <h2 className="text-2xl font-semibold text-gray-900">Community Members</h2>
               <Link
@@ -290,9 +282,7 @@ export function MinimalistLayout({
                     </div>
                   )}
                   <div className="flex-1 overflow-hidden">
-                    <div className="truncate font-medium text-gray-900">
-                      {member.user?.name}
-                    </div>
+                    <div className="truncate font-medium text-gray-900">{member.user?.name}</div>
                   </div>
                 </div>
               ))}
@@ -307,9 +297,7 @@ export function MinimalistLayout({
           <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
             <Sparkles className="h-6 w-6 text-blue-600" />
           </div>
-          <h2 className="mb-4 text-3xl font-semibold text-gray-900">
-            Join the community
-          </h2>
+          <h2 className="mb-4 text-3xl font-semibold text-gray-900">Join the community</h2>
           <p className="mb-8 text-lg text-gray-600">
             Connect with like-minded people and grow together
           </p>

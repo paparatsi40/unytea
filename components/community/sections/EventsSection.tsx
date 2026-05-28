@@ -26,11 +26,7 @@ interface EventsSectionProps {
   };
 }
 
-export function EventsSection({
-  title = "Upcoming Events",
-  events,
-  theme,
-}: EventsSectionProps) {
+export function EventsSection({ title = "Upcoming Events", events, theme }: EventsSectionProps) {
   const primaryColor = theme?.primaryColor || "#0ea5e9";
 
   if (events.length === 0) {
@@ -40,18 +36,11 @@ export function EventsSection({
   return (
     <section>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h2 
-          className="text-2xl font-bold"
-          style={{ color: primaryColor }}
-        >
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-2xl font-bold" style={{ color: primaryColor }}>
           {title}
         </h2>
-        <a 
-          href="#" 
-          className="text-sm hover:underline"
-          style={{ color: primaryColor }}
-        >
+        <a href="#" className="text-sm hover:underline" style={{ color: primaryColor }}>
           View all →
         </a>
       </div>
@@ -61,36 +50,28 @@ export function EventsSection({
         {events.slice(0, 5).map((event) => (
           <article
             key={event.id}
-            className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+            className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
           >
             <div className="flex gap-6">
               {/* Date Badge */}
-              <div 
-                className="flex-shrink-0 w-16 h-16 rounded-lg flex flex-col items-center justify-center text-white"
+              <div
+                className="flex h-16 w-16 flex-shrink-0 flex-col items-center justify-center rounded-lg text-white"
                 style={{ backgroundColor: primaryColor }}
               >
-                <div className="text-2xl font-bold">
-                  {format(new Date(event.startDate), "dd")}
-                </div>
-                <div className="text-xs uppercase">
-                  {format(new Date(event.startDate), "MMM")}
-                </div>
+                <div className="text-2xl font-bold">{format(new Date(event.startDate), "dd")}</div>
+                <div className="text-xs uppercase">{format(new Date(event.startDate), "MMM")}</div>
               </div>
 
               {/* Event Info */}
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  {event.title}
-                </h3>
+                <h3 className="mb-2 text-lg font-semibold text-gray-900">{event.title}</h3>
 
                 {event.description && (
-                  <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                    {event.description}
-                  </p>
+                  <p className="mb-3 line-clamp-2 text-sm text-gray-600">{event.description}</p>
                 )}
 
                 {/* Event Details */}
-                <div className="flex flex-wrap gap-4 text-sm text-gray-500 mb-3">
+                <div className="mb-3 flex flex-wrap gap-4 text-sm text-gray-500">
                   <div className="flex items-center gap-1">
                     <Clock className="h-4 w-4" />
                     <span>

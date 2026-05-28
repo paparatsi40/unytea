@@ -14,10 +14,7 @@ export async function GET(_req: Request, props: { params: Promise<{ courseId: st
     const session = await auth();
 
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { courseId } = params;
@@ -49,18 +46,12 @@ export async function GET(_req: Request, props: { params: Promise<{ courseId: st
     });
 
     if (!course) {
-      return NextResponse.json(
-        { error: "Course not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Course not found" }, { status: 404 });
     }
 
     return NextResponse.json(course);
   } catch (error: any) {
     console.error("Error fetching course:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch course" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch course" }, { status: 500 });
   }
 }

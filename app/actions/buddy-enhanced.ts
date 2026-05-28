@@ -21,8 +21,7 @@ function computeCompatibility(
   const sharedSkills = userA.skills.filter((s) =>
     userB.skills.some((t) => t.toLowerCase() === s.toLowerCase())
   ).length;
-  const uniqueSkills =
-    userA.skills.length + userB.skills.length - sharedSkills * 2;
+  const uniqueSkills = userA.skills.length + userB.skills.length - sharedSkills * 2;
   score += Math.min(uniqueSkills * 5, 20) + Math.min(sharedSkills * 5, 10);
 
   return Math.min(score, 70);
@@ -85,8 +84,7 @@ export async function findSmartBuddyMatch(communityId: string) {
       if (!hasBuddy) available.push(m);
     }
 
-    if (available.length === 0)
-      return { success: false, error: "No available buddies right now" };
+    if (available.length === 0) return { success: false, error: "No available buddies right now" };
 
     // Score and rank matches
     const scored = available.map((m) => ({
@@ -115,9 +113,7 @@ export async function findSmartBuddyMatch(communityId: string) {
       interests: (s.member.user.interests as string[]).slice(0, 4),
       compatibility: s.compatibility,
       sharedInterests: (currentUser.interests as string[]).filter((i) =>
-        (s.member.user.interests as string[]).some(
-          (j) => j.toLowerCase() === i.toLowerCase()
-        )
+        (s.member.user.interests as string[]).some((j) => j.toLowerCase() === i.toLowerCase())
       ),
     }));
 
@@ -149,7 +145,9 @@ export async function getBuddyStats(partnershipId: string) {
       return { success: false, error: "Not your partnership" };
 
     const totalGoals = partnership.goals.length;
-    const completedGoals = partnership.goals.filter((g: { completed: boolean }) => g.completed).length;
+    const completedGoals = partnership.goals.filter(
+      (g: { completed: boolean }) => g.completed
+    ).length;
     const totalCheckIns = partnership.checkIns.length;
 
     // Check-in streak (consecutive days both checked in)
@@ -176,17 +174,14 @@ export async function getBuddyStats(partnershipId: string) {
 
     // Partnership age in days
     const ageInDays = Math.floor(
-      (Date.now() - new Date(partnership.matchedAt).getTime()) /
-        (1000 * 60 * 60 * 24)
+      (Date.now() - new Date(partnership.matchedAt).getTime()) / (1000 * 60 * 60 * 24)
     );
 
     // Accountability score (0-100)
     const goalScore = totalGoals > 0 ? (completedGoals / totalGoals) * 40 : 20;
     const checkInScore = Math.min((checkInDays.size / 7) * 40, 40);
     const consistencyScore = Math.min(ageInDays / 30, 1) * 20;
-    const accountabilityScore = Math.round(
-      goalScore + checkInScore + consistencyScore
-    );
+    const accountabilityScore = Math.round(goalScore + checkInScore + consistencyScore);
 
     return {
       success: true,
@@ -241,10 +236,7 @@ export async function buddyCheckInWithStreak(
 }
 
 // ── Update Goal Progress ─────────────────────────────────────────────
-export async function updateGoalProgress(
-  goalId: string,
-  progress: number
-) {
+export async function updateGoalProgress(goalId: string, progress: number) {
   try {
     const goal = await prisma.buddyGoal.update({
       where: { id: goalId },

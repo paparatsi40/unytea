@@ -127,9 +127,7 @@ export function BuddyDashboard({ communityId, communitySlug: _communitySlug }: P
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-purple-500/10">
             <Users className="h-8 w-8 text-purple-400" />
           </div>
-          <h2 className="text-2xl font-bold text-white">
-            Find Your Accountability Partner
-          </h2>
+          <h2 className="text-2xl font-bold text-white">Find Your Accountability Partner</h2>
           <p className="mt-2 text-sm text-zinc-400">
             Get matched with someone based on shared interests and complementary skills
           </p>
@@ -152,9 +150,7 @@ export function BuddyDashboard({ communityId, communitySlug: _communitySlug }: P
           </div>
         ) : (
           <div className="space-y-3">
-            <h3 className="text-center text-sm font-medium text-zinc-400">
-              Top Matches for You
-            </h3>
+            <h3 className="text-center text-sm font-medium text-zinc-400">Top Matches for You</h3>
             {matches.map((m, i) => (
               <div
                 key={m.id}
@@ -186,9 +182,7 @@ export function BuddyDashboard({ communityId, communitySlug: _communitySlug }: P
                   {/* Info */}
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <p className="font-semibold text-white">
-                        {m.name || m.username}
-                      </p>
+                      <p className="font-semibold text-white">{m.name || m.username}</p>
                     </div>
 
                     {/* Compatibility bar */}
@@ -312,12 +306,8 @@ export function BuddyDashboard({ communityId, communitySlug: _communitySlug }: P
               )}
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white">
-                Your Buddy: {buddy?.name}
-              </h2>
-              <p className="text-sm text-zinc-400">
-                Partners for {stats?.ageInDays || 0} days
-              </p>
+              <h2 className="text-lg font-bold text-white">Your Buddy: {buddy?.name}</h2>
+              <p className="text-sm text-zinc-400">Partners for {stats?.ageInDays || 0} days</p>
             </div>
           </div>
 
@@ -347,14 +337,10 @@ export function BuddyDashboard({ communityId, communitySlug: _communitySlug }: P
                   />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-sm font-bold text-white">
-                    {stats.accountabilityScore}
-                  </span>
+                  <span className="text-sm font-bold text-white">{stats.accountabilityScore}</span>
                 </div>
               </div>
-              <p className="mt-1 text-[10px] text-zinc-500">
-                Accountability
-              </p>
+              <p className="mt-1 text-[10px] text-zinc-500">Accountability</p>
             </div>
           )}
         </div>
@@ -369,15 +355,11 @@ export function BuddyDashboard({ communityId, communitySlug: _communitySlug }: P
               <p className="text-[10px] text-zinc-500">Goals Done</p>
             </div>
             <div className="rounded-lg bg-zinc-900/50 p-2.5 text-center">
-              <p className="text-lg font-bold text-white">
-                {stats.totalCheckIns}
-              </p>
+              <p className="text-lg font-bold text-white">{stats.totalCheckIns}</p>
               <p className="text-[10px] text-zinc-500">Check-ins</p>
             </div>
             <div className="rounded-lg bg-zinc-900/50 p-2.5 text-center">
-              <p className="text-lg font-bold text-white">
-                {stats.checkInsThisWeek}/7
-              </p>
+              <p className="text-lg font-bold text-white">{stats.checkInsThisWeek}/7</p>
               <p className="text-[10px] text-zinc-500">This Week</p>
             </div>
             <div className="rounded-lg bg-zinc-900/50 p-2.5 text-center">
@@ -402,11 +384,7 @@ export function BuddyDashboard({ communityId, communitySlug: _communitySlug }: P
               onClick={() => setShowGoalForm(!showGoalForm)}
               className="rounded-md p-1 text-zinc-500 hover:bg-zinc-800 hover:text-white"
             >
-              {showGoalForm ? (
-                <X className="h-4 w-4" />
-              ) : (
-                <Plus className="h-4 w-4" />
-              )}
+              {showGoalForm ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
             </button>
           </div>
 
@@ -455,9 +433,7 @@ export function BuddyDashboard({ communityId, communitySlug: _communitySlug }: P
 
           <div className="space-y-2">
             {activeGoals.length === 0 ? (
-              <p className="py-6 text-center text-sm text-zinc-600">
-                No active goals yet
-              </p>
+              <p className="py-6 text-center text-sm text-zinc-600">No active goals yet</p>
             ) : (
               activeGoals.map((goal: any) => (
                 <div
@@ -472,13 +448,9 @@ export function BuddyDashboard({ communityId, communitySlug: _communitySlug }: P
                     className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 border-zinc-600 hover:border-purple-500"
                   />
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-white">
-                      {goal.title}
-                    </p>
+                    <p className="text-sm font-medium text-white">{goal.title}</p>
                     {goal.description && (
-                      <p className="mt-0.5 text-xs text-zinc-500">
-                        {goal.description}
-                      </p>
+                      <p className="mt-0.5 text-xs text-zinc-500">{goal.description}</p>
                     )}
                   </div>
                 </div>
@@ -519,11 +491,7 @@ export function BuddyDashboard({ communityId, communitySlug: _communitySlug }: P
               onClick={() => setShowCheckInForm(!showCheckInForm)}
               className="rounded-md p-1 text-zinc-500 hover:bg-zinc-800 hover:text-white"
             >
-              {showCheckInForm ? (
-                <X className="h-4 w-4" />
-              ) : (
-                <Plus className="h-4 w-4" />
-              )}
+              {showCheckInForm ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
             </button>
           </div>
 
@@ -541,9 +509,7 @@ export function BuddyDashboard({ communityId, communitySlug: _communitySlug }: P
               className="mb-4 space-y-3"
             >
               <div>
-                <label className="mb-1.5 block text-xs text-zinc-400">
-                  How are you feeling?
-                </label>
+                <label className="mb-1.5 block text-xs text-zinc-400">How are you feeling?</label>
                 <div className="flex gap-1">
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
                     <label key={n} className="flex-1">
@@ -554,7 +520,7 @@ export function BuddyDashboard({ communityId, communitySlug: _communitySlug }: P
                         defaultChecked={n === 7}
                         className="peer sr-only"
                       />
-                      <div className="cursor-pointer rounded-md border border-zinc-700 bg-zinc-800 py-1.5 text-center text-xs text-zinc-500 transition-colors peer-checked:border-purple-500 peer-checked:bg-purple-500/10 peer-checked:text-white hover:border-zinc-600">
+                      <div className="cursor-pointer rounded-md border border-zinc-700 bg-zinc-800 py-1.5 text-center text-xs text-zinc-500 transition-colors hover:border-zinc-600 peer-checked:border-purple-500 peer-checked:bg-purple-500/10 peer-checked:text-white">
                         {n}
                       </div>
                     </label>
@@ -587,9 +553,7 @@ export function BuddyDashboard({ communityId, communitySlug: _communitySlug }: P
 
           <div className="space-y-2">
             {recentCheckIns.length === 0 ? (
-              <p className="py-6 text-center text-sm text-zinc-600">
-                No check-ins yet
-              </p>
+              <p className="py-6 text-center text-sm text-zinc-600">No check-ins yet</p>
             ) : (
               recentCheckIns.map((checkIn: any) => (
                 <div
@@ -611,19 +575,13 @@ export function BuddyDashboard({ communityId, communitySlug: _communitySlug }: P
                           (checkIn.user?.name || "?")[0]
                         )}
                       </div>
-                      <span className="text-sm text-white">
-                        {checkIn.user?.name}
-                      </span>
+                      <span className="text-sm text-white">{checkIn.user?.name}</span>
                     </div>
                     <span className="text-sm">
                       {moodEmoji(checkIn.mood)} {checkIn.mood}/10
                     </span>
                   </div>
-                  {checkIn.notes && (
-                    <p className="mt-1.5 text-xs text-zinc-400">
-                      {checkIn.notes}
-                    </p>
-                  )}
+                  {checkIn.notes && <p className="mt-1.5 text-xs text-zinc-400">{checkIn.notes}</p>}
                   <p className="mt-1 text-[10px] text-zinc-600">
                     {new Date(checkIn.createdAt).toLocaleDateString()}
                   </p>

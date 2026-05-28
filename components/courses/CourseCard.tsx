@@ -41,9 +41,7 @@ export function CourseCard({ course, progress = 0, completed = false }: CourseCa
 
         {/* Description */}
         {course.description && (
-          <p className="mb-4 line-clamp-2 text-sm text-muted-foreground">
-            {course.description}
-          </p>
+          <p className="mb-4 line-clamp-2 text-sm text-muted-foreground">{course.description}</p>
         )}
 
         {/* Stats */}

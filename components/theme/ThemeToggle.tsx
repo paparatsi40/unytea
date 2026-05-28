@@ -25,9 +25,7 @@ export function ThemeToggle() {
   };
 
   if (!mounted) {
-    return (
-      <Button variant="ghost" size="icon" aria-label="Toggle theme" className="opacity-0" />
-    );
+    return <Button variant="ghost" size="icon" aria-label="Toggle theme" className="opacity-0" />;
   }
 
   return (

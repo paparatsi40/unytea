@@ -28,25 +28,26 @@ Configuración estricta — **muy buena**. Es la razón por la que aparecen 607 
 
 ### TS errors detectados (`npx tsc --noEmit`)
 
-| Tipo | Count |
-|---|---|
-| TS2339 Property does not exist | 319 |
-| TS2353 Object literal may only specify known properties | 107 |
-| TS2551 Property does not exist (suggestion) | 72 |
-| TS7006 Parameter has implicit 'any' | 27 |
-| TS2307 Cannot find module | 20 |
-| TS2322 Type not assignable | 17 |
-| TS2305 Module has no exported member | 14 |
-| TS7031 Binding element has implicit 'any' | 12 |
-| TS18048 Possibly undefined | 5 |
-| TS7053 Element implicitly has 'any' | 4 |
-| **Total** | **607** |
+| Tipo                                                    | Count   |
+| ------------------------------------------------------- | ------- |
+| TS2339 Property does not exist                          | 319     |
+| TS2353 Object literal may only specify known properties | 107     |
+| TS2551 Property does not exist (suggestion)             | 72      |
+| TS7006 Parameter has implicit 'any'                     | 27      |
+| TS2307 Cannot find module                               | 20      |
+| TS2322 Type not assignable                              | 17      |
+| TS2305 Module has no exported member                    | 14      |
+| TS7031 Binding element has implicit 'any'               | 12      |
+| TS18048 Possibly undefined                              | 5       |
+| TS7053 Element implicitly has 'any'                     | 4       |
+| **Total**                                               | **607** |
 
 (Excluí 100+ errors adicionales del `.next/dev/types/validator.ts` que son stale — referencian pages que ya no existen bajo `[locale]/dashboard/` después del rename a `(dashboard)/`).
 
 ### Causa raíz
 
 La instalación local tiene **Next 16 + React 19**, pero el código está escrito en **Next 14 + React 18** style:
+
 - Next 15+ cambió `{ params }: { params: { slug: string } }` a `{ params }: { params: Promise<{ slug: string }> }` (params es async). Todas las API routes y dynamic pages dan TS2322 contra Next 16.
 - React 19 cambió tipos de `ReactNode`/`children` — varios `Layout` components fallan.
 
@@ -67,6 +68,7 @@ Extiende `next/core-web-vitals` + `next/typescript`. Rules custom razonables: la
 ### Resultado actual
 
 `lint-errors.txt` (47 KB) y `lint-after.txt` (42 KB) son outputs commiteados. Hoy:
+
 - **293 entries** que matchean `Warning:|Error:` en lint-errors.
 - Top issues (sample):
   - `@typescript-eslint/no-explicit-any`: ~100+ instances (cualquier `any` explícita)
@@ -84,9 +86,9 @@ Declarado `^14.2.28` pero instalado `16.0.6`. La config 16 introduce reglas nuev
 
 ```yaml
 jobs:
-  test:       # vitest, ✅ blocking
+  test: # vitest, ✅ blocking
   type-check: # tsc --noEmit, ✅ blocking
-  lint:       # next lint, ⚠️ continue-on-error: true
+  lint: # next lint, ⚠️ continue-on-error: true
   format-check: # prettier --check, ⚠️ continue-on-error: true
 ```
 
@@ -109,6 +111,7 @@ jobs:
 ### CI env
 
 Variables dummy bien manejadas:
+
 ```yaml
 DATABASE_URL: "postgresql://ci:ci@localhost:5432/ci?schema=public"
 DIRECT_URL: idem
@@ -121,6 +124,7 @@ NEXTAUTH_URL: "http://localhost:3000"
 ## Playwright (E2E)
 
 `playwright.config.ts`:
+
 - `testDir: ./tests/e2e`
 - Projects: chromium, firefox, mobile-chrome (3) — bien
 - `webServer: npm run dev` con `reuseExistingServer: !CI`
@@ -136,6 +140,7 @@ tests/e2e/fixtures.ts         — shared fixtures
 ```
 
 **Cobertura mínima**. No hay specs para:
+
 - Onboarding completo (signup → onboarding → dashboard)
 - Crear sesión en vivo + unirse (LiveKit)
 - Stripe checkout flow
@@ -152,6 +157,7 @@ tests/e2e/fixtures.ts         — shared fixtures
 ## Vitest (Unit)
 
 `vitest.config.ts`:
+
 - environment: jsdom
 - coverage: v8, include `lib/**`, `app/api/**`, `app/actions/**`
 
@@ -165,6 +171,7 @@ tests/unit/signup.test.ts         — signup endpoint logic
 ```
 
 **Excellent foco**: 4 tests, todos sobre superficie de seguridad. Pero cobertura de código real es mínima:
+
 - 0 tests para los 44 server actions
 - 0 tests para los 47 API routes (excepto los 4 de arriba)
 - 0 tests para componentes React

@@ -23,14 +23,20 @@ interface CommunityStats {
 }
 
 // Component for Join Community UI - PUBLIC LANDING PAGE
-function JoinCommunityView({ community, stats }: { community: Community; stats?: CommunityStats | null }) {
+function JoinCommunityView({
+  community,
+  stats,
+}: {
+  community: Community;
+  stats?: CommunityStats | null;
+}) {
   async function handleJoin() {
     "use server";
     const session = await auth();
     if (!session?.user?.id) {
       redirect("/auth/signin");
     }
-    
+
     const result = await joinCommunity(community.id);
     if (result.success) {
       redirect(`/dashboard/c/${community.slug}`);
@@ -42,17 +48,23 @@ function JoinCommunityView({ community, stats }: { community: Community; stats?:
       <div className="relative overflow-hidden bg-gradient-to-br from-purple-900 via-purple-700 to-pink-600 py-24">
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-white mb-4">{community.name}</h1>
+            <h1 className="mb-4 text-4xl font-bold text-white">{community.name}</h1>
             {community.description && (
-              <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">{community.description}</p>
+              <p className="mx-auto mb-8 max-w-2xl text-xl text-white/80">
+                {community.description}
+              </p>
             )}
-            <div className="flex items-center justify-center gap-4 text-white/60 mb-8">
+            <div className="mb-8 flex items-center justify-center gap-4 text-white/60">
               <span>{stats?._count?.members || 0} members</span>
               <span>•</span>
               <span>{stats?._count?.posts || 0} posts</span>
             </div>
             <form action={handleJoin}>
-              <Button type="submit" size="lg" className="bg-white text-purple-900 hover:bg-white/90">
+              <Button
+                type="submit"
+                size="lg"
+                className="bg-white text-purple-900 hover:bg-white/90"
+              >
                 Join community • Attend live sessions
               </Button>
             </form>
@@ -72,13 +84,13 @@ export default async function CommunityPage(props: PageProps) {
   if (!session?.user?.id) {
     // For non-logged in users, show public landing page
     const result = await getCommunityWithSections(slug);
-    
+
     if (!result.success || !result.community) {
       notFound();
     }
-    
+
     const community = result.community;
-    
+
     return <JoinCommunityView community={community} />;
   }
 
@@ -109,12 +121,14 @@ export default async function CommunityPage(props: PageProps) {
 
   // If not a member, show join page
   if (!membership) {
-    const stats: CommunityStats | null = community._count ? {
-      _count: {
-        members: community._count.members || 0,
-        posts: community._count.posts || 0,
-      }
-    } : null;
+    const stats: CommunityStats | null = community._count
+      ? {
+          _count: {
+            members: community._count.members || 0,
+            posts: community._count.posts || 0,
+          },
+        }
+      : null;
     return <JoinCommunityView community={community} stats={stats} />;
   }
 
@@ -131,16 +145,14 @@ export default async function CommunityPage(props: PageProps) {
               </Button>
             </Link>
 
-            <div className="rounded-2xl border border-border bg-card p-8 shadow-xl text-center">
+            <div className="rounded-2xl border border-border bg-card p-8 text-center shadow-xl">
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-amber-500/10">
                 <Lock className="h-8 w-8 text-amber-500" />
               </div>
-              <h1 className="text-2xl font-bold text-foreground">
-                Membership Pending
-              </h1>
+              <h1 className="text-2xl font-bold text-foreground">Membership Pending</h1>
               <p className="mt-2 text-muted-foreground">
-                Your request to join <strong>{community.name}</strong> is pending approval.
-                You'll be notified when the community owner reviews your request.
+                Your request to join <strong>{community.name}</strong> is pending approval. You'll
+                be notified when the community owner reviews your request.
               </p>
             </div>
           </div>
@@ -162,16 +174,14 @@ export default async function CommunityPage(props: PageProps) {
               </Button>
             </Link>
 
-            <div className="rounded-2xl border border-border bg-card p-8 shadow-xl text-center">
+            <div className="rounded-2xl border border-border bg-card p-8 text-center shadow-xl">
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-500/10">
                 <Lock className="h-8 w-8 text-red-500" />
               </div>
-              <h1 className="text-2xl font-bold text-foreground">
-                Access Denied
-              </h1>
+              <h1 className="text-2xl font-bold text-foreground">Access Denied</h1>
               <p className="mt-2 text-muted-foreground">
-                Your access to <strong>{community.name}</strong> has been restricted.
-                Please contact the community owner for more information.
+                Your access to <strong>{community.name}</strong> has been restricted. Please contact
+                the community owner for more information.
               </p>
             </div>
           </div>

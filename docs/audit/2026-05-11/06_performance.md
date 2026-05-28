@@ -34,7 +34,7 @@ Muestra (primeros 10 encontrados con `grep -L "useState|useEffect|useRef|useRedu
 - `components/community/sections/CTASection.tsx`
 - `components/community/sections/CustomHTMLSection.tsx`
 
-Esto **probablemente sea inexacto** (algunos importan motion/icons que ellos sí re-exportan client, lo que justifica). Pero los **community/layouts/*** y **community/sections/*** parecen perfectos candidatos a server: son layouts estáticos que renderizan branding + contenido server-fetched. Marcarlos client significa que toda esa rama del árbol pierde SSR streaming y se hidrata en cliente.
+Esto **probablemente sea inexacto** (algunos importan motion/icons que ellos sí re-exportan client, lo que justifica). Pero los **community/layouts/\*** y **community/sections/\*** parecen perfectos candidatos a server: son layouts estáticos que renderizan branding + contenido server-fetched. Marcarlos client significa que toda esa rama del árbol pierde SSR streaming y se hidrata en cliente.
 
 **Acción**: revisar manualmente cada uno con `npx next-unused` o similar, o ir uno a uno con un thinking pass.
 
@@ -53,6 +53,7 @@ Hay **32 pages/routes con `force-dynamic`** — significa que esas vistas NUNCA 
 ## Suspense boundaries
 
 Solo **3** detectados. Sin Suspense:
+
 - Streaming en Next 14 no entrega chunks parciales.
 - En pages con varios data fetches, una sola query lenta bloquea todo el render.
 
@@ -60,15 +61,15 @@ Recomendación: añadir `<Suspense fallback={<Skeleton/>}>` alrededor de seccion
 
 ## Bundle: imports pesados sin lazy
 
-| Librería | Tamaño (approx) | Archivos que la importan | Dynamic import? |
-|---|---|---|---|
-| `framer-motion` | ~80 KB gz | 15+ | ❌ |
-| `recharts` | ~250 KB gz | `components/analytics/*` (varios) | ❌ |
-| `@excalidraw/excalidraw` | **~1 MB** gz | 1 archivo (`SessionWhiteboard`) | ❌ |
-| `@livekit/components-react` | ~150 KB gz | `EnhancedVideoCall`, `LivePoll`, etc | ❌ (en client component sí, pero la página completa lo carga) |
-| `lottie-react` | ~100 KB gz | 1-3 archivos | ❌ |
-| `@tiptap/*` | ~100 KB gz | `RichTextEditor` | ❌ |
-| `html-to-image` | ~30 KB gz | 1 archivo (`ShareableMetrics`) | ❌ |
+| Librería                    | Tamaño (approx) | Archivos que la importan             | Dynamic import?                                               |
+| --------------------------- | --------------- | ------------------------------------ | ------------------------------------------------------------- |
+| `framer-motion`             | ~80 KB gz       | 15+                                  | ❌                                                            |
+| `recharts`                  | ~250 KB gz      | `components/analytics/*` (varios)    | ❌                                                            |
+| `@excalidraw/excalidraw`    | **~1 MB** gz    | 1 archivo (`SessionWhiteboard`)      | ❌                                                            |
+| `@livekit/components-react` | ~150 KB gz      | `EnhancedVideoCall`, `LivePoll`, etc | ❌ (en client component sí, pero la página completa lo carga) |
+| `lottie-react`              | ~100 KB gz      | 1-3 archivos                         | ❌                                                            |
+| `@tiptap/*`                 | ~100 KB gz      | `RichTextEditor`                     | ❌                                                            |
+| `html-to-image`             | ~30 KB gz       | 1 archivo (`ShareableMetrics`)       | ❌                                                            |
 
 **Recomendación**: `dynamic(() => import("..."), { ssr: false })` para Excalidraw y video call. Esos componentes solo se montan cuando el user llega a las vistas correspondientes, no antes.
 
@@ -77,7 +78,7 @@ Recomendación: añadir `<Suspense fallback={<Skeleton/>}>` alrededor de seccion
 - **2 `<img>` tags raw** detectados — excelente, casi todo usa `next/image`.
 - 18 archivos importan `from "next/image"` — la regla de ESLint `@next/next/no-img-element: "warn"` está activa.
 
-`next.config.mjs` configura `formats: ["image/webp", "image/avif"]`, `minimumCacheTTL: 1 año`, deviceSizes y imageSizes razonables, remote patterns para 7 dominios (utfs.io, uploadthing, clerk (legacy!), googleusercontent, githubusercontent, discordapp, unsplash). 
+`next.config.mjs` configura `formats: ["image/webp", "image/avif"]`, `minimumCacheTTL: 1 año`, deviceSizes y imageSizes razonables, remote patterns para 7 dominios (utfs.io, uploadthing, clerk (legacy!), googleusercontent, githubusercontent, discordapp, unsplash).
 
 ⚠️ **`hostname: "img.clerk.com"`** — vestigio del intento Clerk (auth) que fue reemplazado por NextAuth. Eliminar para reducir lista.
 
@@ -103,6 +104,7 @@ No detecto N+1 obvios pero **no fue un escaneo exhaustivo**. Recomendar añadir 
 ### `optimizePackageImports`
 
 En `next.config.mjs`:
+
 ```js
 experimental: {
   optimizePackageImports: ["lucide-react", "@radix-ui/react-icons"],
@@ -110,6 +112,7 @@ experimental: {
 ```
 
 Solo 2 packages. Agregar candidatos:
+
 - `date-fns` (cada import sin tree-shake mete 80 KB+)
 - `lodash` si se usa
 - `framer-motion`

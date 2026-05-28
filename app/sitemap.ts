@@ -7,7 +7,11 @@ const LOCALES = ["en", "es", "fr"] as const;
 const DEFAULT_LOCALE = "en";
 
 // Rutas estáticas indexables que existen bajo /[locale]
-const STATIC_PATHS: { path: string; changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"]; priority: number }[] = [
+const STATIC_PATHS: {
+  path: string;
+  changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"];
+  priority: number;
+}[] = [
   { path: "", changeFrequency: "daily", priority: 1.0 },
   { path: "/blog", changeFrequency: "weekly", priority: 0.8 },
   { path: "/changelog", changeFrequency: "weekly", priority: 0.5 },
@@ -29,9 +33,7 @@ function buildLocalizedEntry(
   changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"],
   priority: number
 ): MetadataRoute.Sitemap {
-  const languages = Object.fromEntries(
-    LOCALES.map((l) => [l, `${BASE_URL}/${l}${path}`])
-  );
+  const languages = Object.fromEntries(LOCALES.map((l) => [l, `${BASE_URL}/${l}${path}`]));
 
   return LOCALES.map((locale) => ({
     url: `${BASE_URL}/${locale}${path}`,

@@ -100,9 +100,8 @@ export async function addSessionToCourse(
         courseModule = liveSessionsModule;
       } else {
         // Create a new "Live Sessions" module
-        const lastPosition = course.modules.length > 0
-          ? Math.max(...course.modules.map(m => m.position))
-          : 0;
+        const lastPosition =
+          course.modules.length > 0 ? Math.max(...course.modules.map((m) => m.position)) : 0;
 
         courseModule = await prisma.module.create({
           data: {
@@ -132,16 +131,16 @@ export async function addSessionToCourse(
     // Create the lesson from session data
     const lessonTitle = options?.lessonTitle || session.title;
     const recordingUrl = session.recordingUrl || session.recording?.url || "";
-    
+
     // Build rich content from session notes if available
     let content = "";
     if (session.notes?.content) {
       content = `## Session Notes\n\n${session.notes.content}`;
     }
-    
+
     // Add metadata
     content += `\n\n---\n\n**Session Info:**\n- Duration: ${session.duration} minutes\n- Format: ${session.mode === "AUDIO" ? "Audio only" : "Video"}`;
-    
+
     if (session.series) {
       content += `\n- Part of series: ${session.series.title}`;
     }
@@ -291,7 +290,10 @@ export async function createCourseFromSession(
     }
 
     // Generate slug
-    const baseSlug = courseTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    const baseSlug = courseTitle
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
     const uniqueSlug = `${baseSlug}-${Date.now()}`;
 
     // Create course

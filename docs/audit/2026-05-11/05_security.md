@@ -28,6 +28,7 @@ git ls-files | grep ".env"
 ```
 
 **Resultados**:
+
 - `.env`/`.env.local`/`.env.production` nunca fueron añadidos al repo. ✅
 - `DATABASE_URL` aparece en `.env.example` (que es lo correcto — placeholder).
 - `postgres://`, `postgresql://`: 0 hits con valores reales en history.
@@ -70,6 +71,7 @@ build-*.log
 ❌ **No cubre**: `.idea/`, `.vscode/` están listados, pero `*.log`, `*.swp`, `coverage`, `lint-*.txt`, `BANNER.txt` no. Los archivos `lint-after.txt`/`lint-errors.txt` están commiteados como evidencia.
 
 Sugerencia adicional al `.gitignore`:
+
 ```
 # audit outputs
 audit-*.txt
@@ -84,37 +86,37 @@ Búsqueda: `grep -rEoh "process\.env\.[A-Z_][A-Z0-9_]+"` en `*.ts/*.tsx/*.mjs/*.
 
 ### Server-only (no expuestas al cliente)
 
-| Variable | Uso |
-|---|---|
-| `DATABASE_URL` | Prisma datasource (pooled) |
-| `DIRECT_URL` | Prisma direct connection |
-| `NEXTAUTH_URL` | NextAuth absolute URL |
-| `NEXTAUTH_SECRET` | NextAuth JWT signing (implícita) |
-| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | OAuth Google |
-| `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | OAuth GitHub |
-| `STRIPE_SECRET_KEY` | Stripe server-side |
-| `STRIPE_WEBHOOK_SECRET` | Webhook signature verify |
-| `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET`, `LIVEKIT_URL` | LiveKit server SDK |
-| `OPENAI_API_KEY` | OpenAI SDK |
-| `PUSHER_APP_ID`, `PUSHER_KEY`, `PUSHER_SECRET`, `PUSHER_CLUSTER` | Pusher server |
-| `RESEND_API_KEY` | Email |
-| `EMAIL_FROM` | Sender |
-| `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | Rate limit |
-| `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | Push notifications |
-| `CRON_SECRET` | Cron endpoints |
-| `AUTO_START_RECORDING` | Feature flag |
-| `NODE_ENV`, `CI` | Standard |
+| Variable                                                         | Uso                              |
+| ---------------------------------------------------------------- | -------------------------------- |
+| `DATABASE_URL`                                                   | Prisma datasource (pooled)       |
+| `DIRECT_URL`                                                     | Prisma direct connection         |
+| `NEXTAUTH_URL`                                                   | NextAuth absolute URL            |
+| `NEXTAUTH_SECRET`                                                | NextAuth JWT signing (implícita) |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`                       | OAuth Google                     |
+| `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`                       | OAuth GitHub                     |
+| `STRIPE_SECRET_KEY`                                              | Stripe server-side               |
+| `STRIPE_WEBHOOK_SECRET`                                          | Webhook signature verify         |
+| `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET`, `LIVEKIT_URL`           | LiveKit server SDK               |
+| `OPENAI_API_KEY`                                                 | OpenAI SDK                       |
+| `PUSHER_APP_ID`, `PUSHER_KEY`, `PUSHER_SECRET`, `PUSHER_CLUSTER` | Pusher server                    |
+| `RESEND_API_KEY`                                                 | Email                            |
+| `EMAIL_FROM`                                                     | Sender                           |
+| `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`             | Rate limit                       |
+| `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`                             | Push notifications               |
+| `CRON_SECRET`                                                    | Cron endpoints                   |
+| `AUTO_START_RECORDING`                                           | Feature flag                     |
+| `NODE_ENV`, `CI`                                                 | Standard                         |
 
-### Públicas (NEXT_PUBLIC_*)
+### Públicas (NEXT*PUBLIC*\*)
 
-| Variable | Es OK que sea pública? |
-|---|---|
-| `NEXT_PUBLIC_APP_URL` | ✅ sí (URL canonical) |
-| `NEXT_PUBLIC_LIVEKIT_URL` | ✅ sí (URL WebRTC) |
-| `NEXT_PUBLIC_PUSHER_KEY`, `NEXT_PUBLIC_PUSHER_CLUSTER` | ✅ sí (Pusher key es pública por diseño) |
-| `NEXT_PUBLIC_STRIPE_CREATOR_PRICE_ID`, `NEXT_PUBLIC_STRIPE_BUSINESS_PRICE_ID`, `NEXT_PUBLIC_STRIPE_PRO_PRICE_ID`, `NEXT_PUBLIC_STRIPE_PROFESSIONAL_PRICE_ID`, `NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID` | ✅ price IDs son públicos |
-| `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | ✅ pública por diseño (push notifications) |
-| `NEXT_PUBLIC_EXCALIDRAW_ASSET_PATH` | ✅ |
+| Variable                                                                                                                                                                                            | Es OK que sea pública?                     |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| `NEXT_PUBLIC_APP_URL`                                                                                                                                                                               | ✅ sí (URL canonical)                      |
+| `NEXT_PUBLIC_LIVEKIT_URL`                                                                                                                                                                           | ✅ sí (URL WebRTC)                         |
+| `NEXT_PUBLIC_PUSHER_KEY`, `NEXT_PUBLIC_PUSHER_CLUSTER`                                                                                                                                              | ✅ sí (Pusher key es pública por diseño)   |
+| `NEXT_PUBLIC_STRIPE_CREATOR_PRICE_ID`, `NEXT_PUBLIC_STRIPE_BUSINESS_PRICE_ID`, `NEXT_PUBLIC_STRIPE_PRO_PRICE_ID`, `NEXT_PUBLIC_STRIPE_PROFESSIONAL_PRICE_ID`, `NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID` | ✅ price IDs son públicos                  |
+| `NEXT_PUBLIC_VAPID_PUBLIC_KEY`                                                                                                                                                                      | ✅ pública por diseño (push notifications) |
+| `NEXT_PUBLIC_EXCALIDRAW_ASSET_PATH`                                                                                                                                                                 | ✅                                         |
 
 ⚠️ **Inconsistencia**: `.env.example` lista `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` y `NEXT_PUBLIC_APP_NAME` y `NEXT_PUBLIC_POSTHOG_KEY`/`HOST`, pero el código **NO referencia** estas variables. Son env vars muertas en el ejemplo (o features no implementadas).
 
@@ -154,6 +156,7 @@ connect-src 'self' https: ws: wss:
 ```
 
 **Problemas**:
+
 - `script-src 'unsafe-eval' 'unsafe-inline'` ← XSS-vulnerable. Cualquier `<script>injection</script>` en una vista corre.
 - `script-src ... https://unpkg.com` ← carga arbitraria de scripts third-party desde unpkg. Si compromete unpkg, comprometen tu app. Investigar **qué carga de unpkg** (Excalidraw quizás) y limitar a dominio + subpath.
 - `connect-src 'self' https: ws: wss:` ← wide open: **cualquier endpoint HTTPS/WS**. Pierde valor el CSP para data exfiltration. Restringir a dominios conocidos: `https://*.livekit.cloud https://*.pusher.com https://api.stripe.com https://api.openai.com` etc.
@@ -186,31 +189,32 @@ Permissions-Policy: camera=(self "https://*.livekit.cloud"), microphone=(self "h
 ## F. Cookies y sesiones
 
 (Ver reporte 03 para detalle de cookies de session.)
+
 - `httpOnly`, `secure`, `sameSite=lax`, `__Secure-` prefix en prod. ✅
 - JWT con `maxAge: 30 días` sin rotation. ⚠️
 - No hay cookies adicionales seteadas que detecté. Next-intl `localeCookie` está **disabled** en middleware (línea 17) — decisión consciente para CDN cache. ✅
 
 ## G. API routes — validación e auth
 
-| Práctica | Coverage |
-|---|---|
-| Importa `auth()` | 25 / 47 (53%) — 22 sin import (ver reporte 03, algunos legítimos) |
-| Importa zod | 3 / 47 (6%) |
-| Importa rate-limit | 5 / 47 (10%) |
-| Maneja errors con try/catch | mayoría sí (no contado exhaustivamente) |
+| Práctica                    | Coverage                                                          |
+| --------------------------- | ----------------------------------------------------------------- |
+| Importa `auth()`            | 25 / 47 (53%) — 22 sin import (ver reporte 03, algunos legítimos) |
+| Importa zod                 | 3 / 47 (6%)                                                       |
+| Importa rate-limit          | 5 / 47 (10%)                                                      |
+| Maneja errors con try/catch | mayoría sí (no contado exhaustivamente)                           |
 
 **P1**: solo 6% de las routes validan input con zod. Para una API que recibe JSON de clientes públicos, esto es bajo. Aplicar zod a todas las rutas con POST/PUT/PATCH.
 
 ## H. Scripts del repo (verificación de hardcoded creds)
 
-| Script | Hardcoded creds | Otros riesgos |
-|---|---|---|
-| `clean-restart.ps1` | No | Mata procesos `node` sin discriminar (puede afectar otros proyectos Node corriendo en la sesión del dev) |
-| `restart-clean.bat` | No | Idem |
-| `reset-postgres-password.ps1` | No | **Cambia `pg_hba.conf` a `trust`** (autenticación sin password) y reinicia el servicio Postgres. Esto deja al Postgres local del dev **sin password durante un tiempo**. Si el dev tiene Postgres expuesto a la red, riesgo alto. Para dev local-only, OK pero requiere awareness. Referencia path legacy `C:\Users\calfaro\AndroidStudioProjects\Mentorly\web` — solo cosmético. |
-| `check_translations.py` | No | Lee `locales/en.json`, imprime keys. Inocuo. |
-| `generate_landing.py` | No | Sobrescribe `app/[locale]/page.tsx` (la landing) sin warning. Si un dev edita la landing y otro corre el script, se pierden cambios. |
-| `check-file.js` | No | Trivial, lee 10 líneas de la landing. Inocuo. |
+| Script                        | Hardcoded creds | Otros riesgos                                                                                                                                                                                                                                                                                                                                                                     |
+| ----------------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `clean-restart.ps1`           | No              | Mata procesos `node` sin discriminar (puede afectar otros proyectos Node corriendo en la sesión del dev)                                                                                                                                                                                                                                                                          |
+| `restart-clean.bat`           | No              | Idem                                                                                                                                                                                                                                                                                                                                                                              |
+| `reset-postgres-password.ps1` | No              | **Cambia `pg_hba.conf` a `trust`** (autenticación sin password) y reinicia el servicio Postgres. Esto deja al Postgres local del dev **sin password durante un tiempo**. Si el dev tiene Postgres expuesto a la red, riesgo alto. Para dev local-only, OK pero requiere awareness. Referencia path legacy `C:\Users\calfaro\AndroidStudioProjects\Mentorly\web` — solo cosmético. |
+| `check_translations.py`       | No              | Lee `locales/en.json`, imprime keys. Inocuo.                                                                                                                                                                                                                                                                                                                                      |
+| `generate_landing.py`         | No              | Sobrescribe `app/[locale]/page.tsx` (la landing) sin warning. Si un dev edita la landing y otro corre el script, se pierden cambios.                                                                                                                                                                                                                                              |
+| `check-file.js`               | No              | Trivial, lee 10 líneas de la landing. Inocuo.                                                                                                                                                                                                                                                                                                                                     |
 
 ## I. Otros
 
@@ -225,6 +229,7 @@ Instalados pero no usados (ver reporte 02). Cada paquete instalado es una potenc
 ### Stripe webhook
 
 `app/api/stripe/webhook/route.ts` — no inspeccionado en detalle pero confirma:
+
 - Modelo `ProcessedStripeEvent` existe para idempotencia ✅
 - `STRIPE_WEBHOOK_SECRET` referenciado en código ✅
 

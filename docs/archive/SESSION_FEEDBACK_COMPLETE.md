@@ -20,12 +20,12 @@ vivo, con rating de estrellas y comentario opcional.
 
 - **Tabla:** `SessionFeedback`
 - **Campos:**
-    - `id` - UUID único
-    - `sessionId` - Referencia a MentorSession
-    - `userId` - Quién dio el feedback
-    - `rating` - 1-5 estrellas (Int)
-    - `comment` - Texto opcional
-    - `createdAt` / `updatedAt` - Timestamps
+  - `id` - UUID único
+  - `sessionId` - Referencia a MentorSession
+  - `userId` - Quién dio el feedback
+  - `rating` - 1-5 estrellas (Int)
+  - `comment` - Texto opcional
+  - `createdAt` / `updatedAt` - Timestamps
 
 **Migración:** `20251209233754_add_session_feedback`
 
@@ -62,7 +62,7 @@ interface FeedbackModalProps {
 **UX Flow:**
 
 ```
-User clicks "Leave" 
+User clicks "Leave"
   ↓
 Modal appears (backdrop blur)
   ↓
@@ -107,9 +107,9 @@ Auto-close → redirect to sessions
 - Solo accesible por el host (mentor)
 - Retorna todo el feedback de la sesión
 - Incluye estadísticas agregadas:
-    - Total de feedback
-    - Rating promedio
-    - Distribución por estrellas
+  - Total de feedback
+  - Rating promedio
+  - Distribución por estrellas
 
 **Return:**
 
@@ -133,7 +133,7 @@ Auto-close → redirect to sessions
       rating: number;
       count: number;
     }>;
-  };
+  }
 }
 ```
 
@@ -323,13 +323,13 @@ Para hosts, el sistema calcula automáticamente:
 
 ## 🚀 **VENTAJAS vs SKOOL:**
 
-| Feature | Skool | Unytea |
-|---------|-------|--------|
-| **Feedback después de sesión** | ❌ Manual | ✅ **Automático** |
-| **Timing** | Días después | ✅ **Inmediato** |
-| **UX** | Formulario web | ✅ **Modal animado** |
-| **Stats para hosts** | ❌ | ✅ **Incluido** |
-| **Prevención duplicados** | ❌ | ✅ **Automática** |
+| Feature                        | Skool          | Unytea               |
+| ------------------------------ | -------------- | -------------------- |
+| **Feedback después de sesión** | ❌ Manual      | ✅ **Automático**    |
+| **Timing**                     | Días después   | ✅ **Inmediato**     |
+| **UX**                         | Formulario web | ✅ **Modal animado** |
+| **Stats para hosts**           | ❌             | ✅ **Incluido**      |
+| **Prevención duplicados**      | ❌             | ✅ **Automática**    |
 
 **Resultado:** Unytea tiene feedback mucho más efectivo 📈
 
@@ -349,25 +349,25 @@ Con feedback inmediato, se espera:
 ## 🔮 **PRÓXIMAS MEJORAS (FASE 2):**
 
 1. **Dashboard para hosts** (4-5h)
-    - Visual charts (rating distribution)
-    - Comentarios recientes
-    - Trends over time
-    - Export to CSV
+   - Visual charts (rating distribution)
+   - Comentarios recientes
+   - Trends over time
+   - Export to CSV
 
 2. **Email notifications** (2-3h)
-    - Notificar al host cuando recibe feedback
-    - Resumen semanal de feedback
+   - Notificar al host cuando recibe feedback
+   - Resumen semanal de feedback
 
 3. **Feedback público** (3-4h)
-    - Mostrar rating promedio en página de sesión
-    - Testimonials de mejores comentarios
-    - Filter por rating
+   - Mostrar rating promedio en página de sesión
+   - Testimonials de mejores comentarios
+   - Filter por rating
 
 4. **IA Analysis** (6-8h)
-    - Sentiment analysis de comentarios
-    - Auto-categorización
-    - Sugerencias de mejora
-    - Keywords extraction
+   - Sentiment analysis de comentarios
+   - Auto-categorización
+   - Sugerencias de mejora
+   - Keywords extraction
 
 ---
 
@@ -457,7 +457,7 @@ FASE 1 (Quick Wins):
 ├─ ⏳ 4. Chat Segmentado     [PENDIENTE] 4-5h
 └─ ⏳ 5. Polls/Quizzes       [PENDIENTE] 5-6h
 
-Progress: 2/5 (40%) 
+Progress: 2/5 (40%)
 Remaining: 12-15 horas
 ```
 

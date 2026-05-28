@@ -97,7 +97,7 @@ function analyzeMoments(session: any) {
   if (totalDuration > 600) {
     const midStart = Math.floor(totalDuration * 0.3);
     const midEnd = Math.floor(totalDuration * 0.7);
-    
+
     moments.push({
       startTime: midStart,
       endTime: midEnd,
@@ -123,7 +123,7 @@ function analyzeMoments(session: any) {
   const note = session.notes;
   if (note && note.content && note.content.length > 100) {
     const estimatedTime = Math.floor(totalDuration * 0.4);
-    
+
     moments.push({
       startTime: Math.max(0, estimatedTime - 30),
       endTime: Math.min(totalDuration, estimatedTime + 60),
@@ -177,11 +177,7 @@ function dedupeMoments(moments: any[]) {
 /**
  * Generate shareable clip metadata
  */
-export async function generateClipMetadata(
-  sessionId: string,
-  startTime: number,
-  endTime: number
-) {
+export async function generateClipMetadata(sessionId: string, startTime: number, endTime: number) {
   try {
     const userId = await getCurrentUserId();
     if (!userId) {
@@ -258,10 +254,7 @@ ${clipUrl}`;
 /**
  * Track clip shares for analytics
  */
-export async function trackClipShare(
-  clipId: string,
-  platform: "twitter" | "linkedin" | "copy"
-) {
+export async function trackClipShare(clipId: string, platform: "twitter" | "linkedin" | "copy") {
   try {
     console.log(`Clip ${clipId} shared to ${platform}`);
     return { success: true };

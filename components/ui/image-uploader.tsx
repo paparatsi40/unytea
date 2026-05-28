@@ -14,7 +14,7 @@ export function ImageUploader({ value, onChange, onRemove }: ImageUploaderProps)
   const [uploading, setUploading] = useState(false);
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [urlInput, setUrlInput] = useState("");
-  
+
   const { startUpload } = useUploadThing("imageUploader");
 
   async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -29,9 +29,9 @@ export function ImageUploader({ value, onChange, onRemove }: ImageUploaderProps)
     try {
       setUploading(true);
       const res = await startUpload([file]);
-      
+
       console.log("📥 Upload response:", res);
-      
+
       if (res && res[0]) {
         console.log("✅ Upload successful! URL:", res[0].url);
         onChange(res[0].url);
@@ -61,7 +61,7 @@ export function ImageUploader({ value, onChange, onRemove }: ImageUploaderProps)
 
   if (value) {
     return (
-      <div className="relative group h-32 w-full">
+      <div className="group relative h-32 w-full">
         <Image
           src={value}
           alt="Upload preview"
@@ -75,7 +75,7 @@ export function ImageUploader({ value, onChange, onRemove }: ImageUploaderProps)
             type="button"
             variant="destructive"
             size="sm"
-            className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity"
+            className="absolute right-2 top-2 opacity-0 transition-opacity group-hover:opacity-100"
             onClick={onRemove}
           >
             <X className="h-4 w-4" />
@@ -100,9 +100,7 @@ export function ImageUploader({ value, onChange, onRemove }: ImageUploaderProps)
               ) : (
                 <>
                   <Upload className="h-5 w-5 text-muted-foreground" />
-                  <span className="text-sm font-medium text-foreground">
-                    Upload from PC
-                  </span>
+                  <span className="text-sm font-medium text-foreground">Upload from PC</span>
                 </>
               )}
             </div>
@@ -122,9 +120,7 @@ export function ImageUploader({ value, onChange, onRemove }: ImageUploaderProps)
             className="flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border bg-muted/50 px-4 py-8 transition-colors hover:bg-muted"
           >
             <LinkIcon className="h-5 w-5 text-muted-foreground" />
-            <span className="text-sm font-medium text-foreground">
-              Use URL
-            </span>
+            <span className="text-sm font-medium text-foreground">Use URL</span>
           </button>
         </div>
       ) : (

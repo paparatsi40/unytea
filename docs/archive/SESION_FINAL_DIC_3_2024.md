@@ -78,19 +78,19 @@ DESPUÉS:      85% ████████░░
 
 ### **Features Status**
 
-| Feature | Status | Quality | Time |
-|---------|--------|---------|------|
-| **Auth (NextAuth)** | ✅ 100% | 10/10 | - |
-| **Communities** | ✅ 100% | 10/10 | - |
-| **Posts** | ✅ 100% | 10/10 | - |
-| **Reactions** | ✅ 100% | 9/10 | - |
-| **Comments** | ✅ 100% | 10/10 | 30m 🆕 |
-| **Rich Text Editor** | ✅ 100% | 10/10 | 20m 🆕 |
-| **File Uploads** | ✅ 100% | 9/10 | 15m 🆕 |
-| **Direct Messages** | ✅ 100% | 9.6/10 | 45m 🆕 |
-| **Notifications** | ✅ 100% | 9.8/10 | 25m 🆕 |
-| **Settings Pages** | ✅ 100% | 8/10 | Fixes |
-| **Video Calls** | 🔄 0% | - | Q1 2025 |
+| Feature              | Status  | Quality | Time    |
+| -------------------- | ------- | ------- | ------- |
+| **Auth (NextAuth)**  | ✅ 100% | 10/10   | -       |
+| **Communities**      | ✅ 100% | 10/10   | -       |
+| **Posts**            | ✅ 100% | 10/10   | -       |
+| **Reactions**        | ✅ 100% | 9/10    | -       |
+| **Comments**         | ✅ 100% | 10/10   | 30m 🆕  |
+| **Rich Text Editor** | ✅ 100% | 10/10   | 20m 🆕  |
+| **File Uploads**     | ✅ 100% | 9/10    | 15m 🆕  |
+| **Direct Messages**  | ✅ 100% | 9.6/10  | 45m 🆕  |
+| **Notifications**    | ✅ 100% | 9.8/10  | 25m 🆕  |
+| **Settings Pages**   | ✅ 100% | 8/10    | Fixes   |
+| **Video Calls**      | 🔄 0%   | -       | Q1 2025 |
 
 ---
 
@@ -152,19 +152,19 @@ OVERALL: 98% 🌟
 
 ### **Features**
 
-| Feature | Skool | Mentorly | Winner |
-|---------|-------|----------|--------|
-| **Communities** | ✅ | ✅ | Tie |
-| **Posts** | ✅ | ✅ | Tie |
-| **Comments** | Basic | Nested | 🏆 Mentorly |
-| **Reactions** | ✅ | ✅ (6 tipos) | 🏆 Mentorly |
-| **Direct Messages** | ❌ | ✅ Full system | 🏆 Mentorly |
-| **Notifications** | Basic | Advanced (10 types) | 🏆 Mentorly |
-| **Rich Text Editor** | ❌ | ✅ Tiptap Pro | 🏆 Mentorly |
-| **File Uploads** | External | ✅ Native + CDN | 🏆 Mentorly |
-| **Read Receipts** | ❌ | ✅ | 🏆 Mentorly |
-| **Modern UI (2024)** | ❌ (2015) | ✅ | 🏆 Mentorly |
-| **Customization** | Minimal | Full | 🏆 Mentorly |
+| Feature              | Skool     | Mentorly            | Winner      |
+| -------------------- | --------- | ------------------- | ----------- |
+| **Communities**      | ✅        | ✅                  | Tie         |
+| **Posts**            | ✅        | ✅                  | Tie         |
+| **Comments**         | Basic     | Nested              | 🏆 Mentorly |
+| **Reactions**        | ✅        | ✅ (6 tipos)        | 🏆 Mentorly |
+| **Direct Messages**  | ❌        | ✅ Full system      | 🏆 Mentorly |
+| **Notifications**    | Basic     | Advanced (10 types) | 🏆 Mentorly |
+| **Rich Text Editor** | ❌        | ✅ Tiptap Pro       | 🏆 Mentorly |
+| **File Uploads**     | External  | ✅ Native + CDN     | 🏆 Mentorly |
+| **Read Receipts**    | ❌        | ✅                  | 🏆 Mentorly |
+| **Modern UI (2024)** | ❌ (2015) | ✅                  | 🏆 Mentorly |
+| **Customization**    | Minimal   | Full                | 🏆 Mentorly |
 
 ### **Pricing**
 
@@ -271,7 +271,7 @@ TOTAL: 165 minutos para 5 features + fixes
 ```
 Typical Startup (5-person team):
 - DM system: 3-4 weeks
-- Notifications: 2-3 weeks  
+- Notifications: 2-3 weeks
 - Comments: 1 week
 - File uploads: 1 week
 - Rich text: 3-5 days
@@ -286,14 +286,14 @@ SPEED ADVANTAGE: 320x faster 🚀
 
 ### **Value Created**
 
-| Feature | Market Value | Our Time | ROI |
-|---------|--------------|----------|-----|
-| Comments | $5,000 | 30 min | 10,000% |
-| Rich Text | $3,000 | 20 min | 9,000% |
-| File Uploads | $5,000 | 15 min | 20,000% |
-| DMs | $15,000 | 45 min | 20,000% |
-| Notifications | $8,000 | 25 min | 19,200% |
-| **TOTAL** | **$36,000** | **135 min** | **16,000%** |
+| Feature       | Market Value | Our Time    | ROI         |
+| ------------- | ------------ | ----------- | ----------- |
+| Comments      | $5,000       | 30 min      | 10,000%     |
+| Rich Text     | $3,000       | 20 min      | 9,000%      |
+| File Uploads  | $5,000       | 15 min      | 20,000%     |
+| DMs           | $15,000      | 45 min      | 20,000%     |
+| Notifications | $8,000       | 25 min      | 19,200%     |
+| **TOTAL**     | **$36,000**  | **135 min** | **16,000%** |
 
 ---
 

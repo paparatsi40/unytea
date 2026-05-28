@@ -55,7 +55,7 @@ interface PublicSessionPageProps {
       quotes: { text: string; reason?: string }[];
       createdAt: Date;
     } | null;
-};
+  };
   relatedSessions?: {
     id: string;
     slug: string | null;
@@ -92,10 +92,16 @@ interface PublicSessionPageProps {
   }[];
 }
 
-export function PublicSessionPage({ locale = "en", session, relatedSessions, nextSession, relatedCommunities }: PublicSessionPageProps) {
+export function PublicSessionPage({
+  locale = "en",
+  session,
+  relatedSessions,
+  nextSession,
+  relatedCommunities,
+}: PublicSessionPageProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [question, setQuestion] = useState("");
   const [isSubmittingQuestion, setIsSubmittingQuestion] = useState(false);
   const [questionMessage, setQuestionMessage] = useState<string | null>(null);
@@ -103,7 +109,9 @@ const [isPlaying, setIsPlaying] = useState(false);
   const [nextRsvpStatus, setNextRsvpStatus] = useState<"attending" | "interested" | null>(null);
   const [nextAttendingCount, setNextAttendingCount] = useState<number | null>(null);
   const [nextInterestedCount, setNextInterestedCount] = useState<number | null>(null);
-  const [nextAttendingPreview, setNextAttendingPreview] = useState<Array<{ id: string; name: string | null; image: string | null }>>([]);
+  const [nextAttendingPreview, setNextAttendingPreview] = useState<
+    Array<{ id: string; name: string | null; image: string | null }>
+  >([]);
   const [rsvpMessage, setRsvpMessage] = useState<string | null>(null);
 
   const formattedDate = format(new Date(session.scheduledAt), "MMMM d, yyyy");
@@ -115,18 +123,23 @@ const [isPlaying, setIsPlaying] = useState(false);
   joinParams.set("src", "public_session_join_cta");
   if (src) joinParams.set("parent_src", src);
   const joinCommunityHref = `/c/${session.community.slug}${joinParams.toString() ? `?${joinParams.toString()}` : ""}`;
-const roomParams = new URLSearchParams();
+  const roomParams = new URLSearchParams();
   roomParams.set("src", "public_next_live_card");
   if (ref) roomParams.set("ref", ref);
   if (src) roomParams.set("parent_src", src);
   const nextSessionRoomHref = `/dashboard/sessions/${nextSession?.id}/room?${roomParams.toString()}`;
   const formattedDuration = session.recording?.durationSeconds
-? `${Math.round(session.recording.durationSeconds / 60)} min`
+    ? `${Math.round(session.recording.durationSeconds / 60)} min`
     : session.duration
-    ? `${session.duration} min`
-    : null;
+      ? `${session.duration} min`
+      : null;
 
-  const buildGoogleCalendarUrl = (item: { title: string; description?: string | null; scheduledAt: Date; duration?: number | null; }) => {
+  const buildGoogleCalendarUrl = (item: {
+    title: string;
+    description?: string | null;
+    scheduledAt: Date;
+    duration?: number | null;
+  }) => {
     const start = new Date(item.scheduledAt);
     const end = new Date(start.getTime() + (item.duration || 60) * 60 * 1000);
     const formatCalDate = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
@@ -141,7 +154,13 @@ const roomParams = new URLSearchParams();
     return `https://calendar.google.com/calendar/render?${params.toString()}`;
   };
 
-  const downloadAppleCalendarIcs = (item: { id: string; title: string; description?: string | null; scheduledAt: Date; duration?: number | null; }) => {
+  const downloadAppleCalendarIcs = (item: {
+    id: string;
+    title: string;
+    description?: string | null;
+    scheduledAt: Date;
+    duration?: number | null;
+  }) => {
     const start = new Date(item.scheduledAt);
     const end = new Date(start.getTime() + (item.duration || 60) * 60 * 1000);
     const formatCalDate = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
@@ -197,8 +216,8 @@ const roomParams = new URLSearchParams();
       network === "twitter"
         ? `https://twitter.com/intent/tweet?text=${text}&url=${url}`
         : network === "linkedin"
-        ? `https://www.linkedin.com/sharing/share-offsite/?url=${url}`
-        : `https://wa.me/?text=${text}%20${url}`;
+          ? `https://www.linkedin.com/sharing/share-offsite/?url=${url}`
+          : `https://wa.me/?text=${text}%20${url}`;
 
     window.open(target, "_blank", "noopener,noreferrer");
   };
@@ -294,9 +313,30 @@ const roomParams = new URLSearchParams();
                 <Share2 className="mr-2 h-4 w-4" />
                 Share
               </Button>
-              <Button variant="ghost" size="sm" onClick={() => shareToNetwork("twitter")} className="text-zinc-400 hover:text-white">X</Button>
-              <Button variant="ghost" size="sm" onClick={() => shareToNetwork("linkedin")} className="text-zinc-400 hover:text-white">LinkedIn</Button>
-              <Button variant="ghost" size="sm" onClick={() => shareToNetwork("whatsapp")} className="text-zinc-400 hover:text-white">WhatsApp</Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => shareToNetwork("twitter")}
+                className="text-zinc-400 hover:text-white"
+              >
+                X
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => shareToNetwork("linkedin")}
+                className="text-zinc-400 hover:text-white"
+              >
+                LinkedIn
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => shareToNetwork("whatsapp")}
+                className="text-zinc-400 hover:text-white"
+              >
+                WhatsApp
+              </Button>
             </div>
           </div>
         </div>
@@ -305,15 +345,13 @@ const roomParams = new URLSearchParams();
       <main className="mx-auto max-w-6xl px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <Badge className={`mb-3 border ${session.canWatchRecording ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" : "bg-amber-500/20 text-amber-400 border-amber-500/30"}`}>
+          <Badge
+            className={`mb-3 border ${session.canWatchRecording ? "border-emerald-500/30 bg-emerald-500/20 text-emerald-400" : "border-amber-500/30 bg-amber-500/20 text-amber-400"}`}
+          >
             {session.canWatchRecording ? "Recording Available" : "Members-only recording"}
           </Badge>
-          <h1 className="mb-4 text-3xl font-bold text-white sm:text-4xl">
-            {session.title}
-          </h1>
-          <p className="mb-4 text-lg text-zinc-400 max-w-3xl">
-            {session.description}
-          </p>
+          <h1 className="mb-4 text-3xl font-bold text-white sm:text-4xl">{session.title}</h1>
+          <p className="mb-4 max-w-3xl text-lg text-zinc-400">{session.description}</p>
           <div className="flex flex-wrap items-center gap-4 text-sm text-zinc-500">
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
@@ -336,16 +374,11 @@ const roomParams = new URLSearchParams();
         {session.recording?.url && (
           <div className="mb-8 aspect-video overflow-hidden rounded-xl bg-zinc-900">
             {isPlaying ? (
-              <video
-                src={session.recording.url}
-                controls
-                autoPlay
-                className="h-full w-full"
-              />
+              <video src={session.recording.url} controls autoPlay className="h-full w-full" />
             ) : (
               <div
                 onClick={() => setIsPlaying(true)}
-                className="flex h-full cursor-pointer items-center justify-center bg-zinc-800 hover:bg-zinc-700 transition-colors"
+                className="flex h-full cursor-pointer items-center justify-center bg-zinc-800 transition-colors hover:bg-zinc-700"
               >
                 <div className="flex flex-col items-center gap-4">
                   <div className="flex h-20 w-20 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400">
@@ -362,7 +395,8 @@ const roomParams = new URLSearchParams();
           <div className="mb-8 rounded-xl border border-amber-500/30 bg-amber-500/10 p-6">
             <h3 className="text-lg font-semibold text-white">Members-only replay</h3>
             <p className="mt-2 text-sm text-zinc-300">
-              This recording is available to community members. Join to watch the full replay and attend the next live session.
+              This recording is available to community members. Join to watch the full replay and
+              attend the next live session.
             </p>
           </div>
         )}
@@ -391,9 +425,7 @@ const roomParams = new URLSearchParams();
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
-                        <h3 className="font-semibold text-white">
-                          Hosted by {session.host.name}
-                        </h3>
+                        <h3 className="font-semibold text-white">Hosted by {session.host.name}</h3>
                         <p className="text-sm text-zinc-500">
                           Live session host at {session.community.name}
                         </p>
@@ -410,7 +442,9 @@ const roomParams = new URLSearchParams();
 
                       {session.notes.keyInsights.length > 0 && (
                         <div className="mt-4">
-                          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">Key takeaways</p>
+                          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">
+                            Key takeaways
+                          </p>
                           <ul className="list-disc space-y-1 pl-5 text-sm text-zinc-300">
                             {session.notes.keyInsights.slice(0, 5).map((item, idx) => (
                               <li key={idx}>{item}</li>
@@ -421,12 +455,19 @@ const roomParams = new URLSearchParams();
 
                       {session.notes.chapters.length > 0 && (
                         <div className="mt-5">
-                          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">Chapters</p>
+                          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">
+                            Chapters
+                          </p>
                           <div className="space-y-2">
                             {session.notes.chapters.slice(0, 6).map((chapter, idx) => (
-                              <div key={idx} className="flex items-center justify-between rounded-md border border-zinc-800 bg-zinc-900/60 px-3 py-2 text-sm">
+                              <div
+                                key={idx}
+                                className="flex items-center justify-between rounded-md border border-zinc-800 bg-zinc-900/60 px-3 py-2 text-sm"
+                              >
                                 <span className="text-zinc-200">{chapter.title}</span>
-                                {chapter.timestamp && <span className="text-zinc-500">{chapter.timestamp}</span>}
+                                {chapter.timestamp && (
+                                  <span className="text-zinc-500">{chapter.timestamp}</span>
+                                )}
                               </div>
                             ))}
                           </div>
@@ -435,10 +476,15 @@ const roomParams = new URLSearchParams();
 
                       {session.notes.quotes.length > 0 && (
                         <div className="mt-5">
-                          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">Key quotes</p>
+                          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">
+                            Key quotes
+                          </p>
                           <div className="space-y-3">
                             {session.notes.quotes.slice(0, 3).map((quote, idx) => (
-                              <blockquote key={idx} className="rounded-md border-l-2 border-emerald-500/50 bg-zinc-900/60 px-3 py-2 text-sm text-zinc-300">
+                              <blockquote
+                                key={idx}
+                                className="rounded-md border-l-2 border-emerald-500/50 bg-zinc-900/60 px-3 py-2 text-sm text-zinc-300"
+                              >
                                 “{quote.text}”
                                 {quote.reason && (
                                   <div className="mt-1 text-xs text-zinc-500">{quote.reason}</div>
@@ -469,7 +515,8 @@ const roomParams = new URLSearchParams();
                     <CardContent className="p-6">
                       <h3 className="mb-2 font-semibold text-white">Members-only insights</h3>
                       <p className="text-sm text-zinc-300">
-                        Join the community to unlock AI summary, key takeaways, chapters, and full session notes.
+                        Join the community to unlock AI summary, key takeaways, chapters, and full
+                        session notes.
                       </p>
                       <Button
                         className="mt-4 bg-emerald-500 text-white hover:bg-emerald-600"
@@ -521,9 +568,7 @@ const roomParams = new URLSearchParams();
                         <p className="mb-2 text-sm text-zinc-500">
                           {session.community.memberCount} members
                         </p>
-                        <p className="text-zinc-400">
-                          {session.community.description}
-                        </p>
+                        <p className="text-zinc-400">{session.community.description}</p>
                       </div>
                     </div>
                   </CardContent>
@@ -534,9 +579,7 @@ const roomParams = new URLSearchParams();
             {/* Related Sessions */}
             {relatedSessions && relatedSessions.length > 0 && (
               <div className="mt-8">
-                <h3 className="mb-4 text-xl font-semibold text-white">
-                  Related sessions
-                </h3>
+                <h3 className="mb-4 text-xl font-semibold text-white">Related sessions</h3>
                 <div className="grid gap-4 sm:grid-cols-2">
                   {relatedSessions.map((related) => {
                     const hasPublicPage = Boolean(related.slug);
@@ -555,7 +598,7 @@ const roomParams = new URLSearchParams();
                         }}
                       >
                         <CardContent className="p-4">
-                          <h4 className="mb-2 font-medium text-white line-clamp-2">
+                          <h4 className="mb-2 line-clamp-2 font-medium text-white">
                             {related.title}
                           </h4>
                           <div className="flex items-center gap-3 text-sm text-zinc-500">
@@ -568,7 +611,9 @@ const roomParams = new URLSearchParams();
                             <span>{related.host.name}</span>
                           </div>
                           {!hasPublicPage && (
-                            <p className="mt-2 text-xs text-zinc-500">No public page for this session</p>
+                            <p className="mt-2 text-xs text-zinc-500">
+                              No public page for this session
+                            </p>
                           )}
                         </CardContent>
                       </Card>
@@ -581,8 +626,12 @@ const roomParams = new URLSearchParams();
             {/* Cross-community discovery */}
             {relatedCommunities && relatedCommunities.length > 0 && (
               <div className="mt-8">
-                <h3 className="mb-2 text-xl font-semibold text-white">Other communities hosting this week</h3>
-                <p className="mb-4 text-sm text-zinc-400">Discover active communities and join their next live sessions.</p>
+                <h3 className="mb-2 text-xl font-semibold text-white">
+                  Other communities hosting this week
+                </h3>
+                <p className="mb-4 text-sm text-zinc-400">
+                  Discover active communities and join their next live sessions.
+                </p>
                 <div className="grid gap-4 sm:grid-cols-2">
                   {relatedCommunities.map((community) => (
                     <Card
@@ -599,11 +648,17 @@ const roomParams = new URLSearchParams();
                             </AvatarFallback>
                           </Avatar>
                           <div className="min-w-0 flex-1">
-                            <p className="font-medium text-white truncate">{community.name}</p>
-                            <p className="mt-1 text-xs text-zinc-400">{community.memberCount} members</p>
+                            <p className="truncate font-medium text-white">{community.name}</p>
+                            <p className="mt-1 text-xs text-zinc-400">
+                              {community.memberCount} members
+                            </p>
                             {community.nextSession && (
                               <p className="mt-2 text-xs text-emerald-400">
-                                {format(new Date(community.nextSession.scheduledAt), "EEE, MMM d · h:mm a")} · {community.nextSession.attendingCount} attending
+                                {format(
+                                  new Date(community.nextSession.scheduledAt),
+                                  "EEE, MMM d · h:mm a"
+                                )}{" "}
+                                · {community.nextSession.attendingCount} attending
                               </p>
                             )}
                           </div>
@@ -628,17 +683,14 @@ const roomParams = new URLSearchParams();
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <h3 className="font-semibold text-white">
-                      {session.community.name}
-                    </h3>
-                    <p className="text-sm text-zinc-500">
-                      {session.community.memberCount} members
-                    </p>
+                    <h3 className="font-semibold text-white">{session.community.name}</h3>
+                    <p className="text-sm text-zinc-500">{session.community.memberCount} members</p>
                   </div>
                 </div>
 
                 <p className="mb-6 text-sm text-zinc-400">
-                  Join this community to access live sessions, recordings, and connect with like-minded people.
+                  Join this community to access live sessions, recordings, and connect with
+                  like-minded people.
                 </p>
 
                 {nextSession && (
@@ -688,12 +740,16 @@ const roomParams = new URLSearchParams();
                           variant="outline"
                           className="mt-2 w-full border-zinc-700 text-zinc-200 hover:bg-zinc-800"
                         >
-                          <a href={buildGoogleCalendarUrl({
-                            title: nextSession.title,
-                            description: session.description,
-                            scheduledAt: new Date(nextSession.scheduledAt),
-                            duration: nextSession.duration,
-                          })} target="_blank" rel="noreferrer">
+                          <a
+                            href={buildGoogleCalendarUrl({
+                              title: nextSession.title,
+                              description: session.description,
+                              scheduledAt: new Date(nextSession.scheduledAt),
+                              duration: nextSession.duration,
+                            })}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
                             Add to Google Calendar
                           </a>
                         </Button>
@@ -712,9 +768,7 @@ const roomParams = new URLSearchParams();
                         >
                           Add to Apple Calendar
                         </Button>
-                        {rsvpMessage && (
-                          <p className="mt-2 text-xs text-zinc-300">{rsvpMessage}</p>
-                        )}
+                        {rsvpMessage && <p className="mt-2 text-xs text-zinc-300">{rsvpMessage}</p>}
                         <Button
                           onClick={() => router.push(nextSessionRoomHref)}
                           variant="outline"
@@ -722,9 +776,11 @@ const roomParams = new URLSearchParams();
                         >
                           View session room
                         </Button>
-</>
+                      </>
                     ) : (
-                      <p className="mt-2 text-xs text-zinc-300">Join community to RSVP and participate live.</p>
+                      <p className="mt-2 text-xs text-zinc-300">
+                        Join community to RSVP and participate live.
+                      </p>
                     )}
                   </div>
                 )}
@@ -747,14 +803,12 @@ const roomParams = new URLSearchParams();
                     >
                       {isSubmittingQuestion ? "Submitting..." : "Submit Question"}
                     </Button>
-                    {questionMessage && (
-                      <p className="text-xs text-zinc-400">{questionMessage}</p>
-                    )}
+                    {questionMessage && <p className="text-xs text-zinc-400">{questionMessage}</p>}
                   </div>
                 )}
 
                 <Button
-                  className="mb-3 w-full bg-emerald-500 hover:bg-emerald-600 text-white"
+                  className="mb-3 w-full bg-emerald-500 text-white hover:bg-emerald-600"
                   onClick={() => router.push(joinCommunityHref)}
                 >
                   {session.isMember ? "Go to Community" : "Join Community"}

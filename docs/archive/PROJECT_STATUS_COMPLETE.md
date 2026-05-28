@@ -109,23 +109,23 @@ Skool, pero con características avanzadas que Skool no tiene. Es un "Skool Kill
 **Completado:**
 
 - ✅ 5 Layouts profesionales:
-    - Modern Grid
-    - Classic Forum
-    - Academy
-    - Dashboard
-    - Minimalist
+  - Modern Grid
+  - Classic Forum
+  - Academy
+  - Dashboard
+  - Minimalist
 - ✅ 11 Section Components:
-    - Hero Section
-    - About Section
-    - Features Grid
-    - Testimonials
-    - Courses Showcase
-    - Stats Display
-    - Members Grid
-    - Recent Posts
-    - CTA Section
-    - FAQ Accordion
-    - Custom HTML
+  - Hero Section
+  - About Section
+  - Features Grid
+  - Testimonials
+  - Courses Showcase
+  - Stats Display
+  - Members Grid
+  - Recent Posts
+  - CTA Section
+  - FAQ Accordion
+  - Custom HTML
 - ✅ Theme customization (colores, fonts)
 - ✅ Hero section editable (title, subtitle, CTA)
 - ✅ Drag-and-drop ordering (planeado)
@@ -253,12 +253,12 @@ Skool, pero con características avanzadas que Skool no tiene. Es un "Skool Kill
 - ✅ Sistema de puntos (XP)
 - ✅ 10 niveles (Novice → Legend)
 - ✅ 26 Achievements:
-    - First Steps (primera vez)
-    - Social Butterfly (engagement)
-    - Knowledge Seeker (cursos)
-    - Community Leader (ownership)
-    - Power User (actividad)
-    - Supporter (ayudar a otros)
+  - First Steps (primera vez)
+  - Social Butterfly (engagement)
+  - Knowledge Seeker (cursos)
+  - Community Leader (ownership)
+  - Power User (actividad)
+  - Supporter (ayudar a otros)
 - ✅ Leaderboards por comunidad
 - ✅ Achievement notifications
 - ✅ Progress tracking
@@ -562,18 +562,18 @@ Skool, pero con características avanzadas que Skool no tiene. Es un "Skool Kill
 
 ## 🏆 **VENTAJAS COMPETITIVAS vs SKOOL**
 
-| Feature | Skool | Unytea | Estado |
-|---------|-------|--------|--------|
-| Comunidades | ✅ Básico | ✅ Avanzado | ✅ |
-| Page Builder | ❌ | ✅ 5 layouts | ✅ |
-| AI Assistant | ❌ | ✅ OpenAI | ✅ |
-| Video Calls | ✅ Zoom | ✅ LiveKit nativo | ✅ |
-| Auditorium View | ❌ | ✅ 1000+ viewers | ✅ |
-| Buddy System | ❌ | ✅ Matching inteligente | ✅ |
-| Achievements | ✅ Básico | ✅ 26 achievements | ✅ |
-| Chat Real-time | ✅ | ✅ WebSockets | ✅ |
-| Image CDN | ✅ | ✅ Uploadthing | ✅ |
-| Theme Customization | ❌ | ✅ Completo | ✅ |
+| Feature             | Skool     | Unytea                  | Estado |
+| ------------------- | --------- | ----------------------- | ------ |
+| Comunidades         | ✅ Básico | ✅ Avanzado             | ✅     |
+| Page Builder        | ❌        | ✅ 5 layouts            | ✅     |
+| AI Assistant        | ❌        | ✅ OpenAI               | ✅     |
+| Video Calls         | ✅ Zoom   | ✅ LiveKit nativo       | ✅     |
+| Auditorium View     | ❌        | ✅ 1000+ viewers        | ✅     |
+| Buddy System        | ❌        | ✅ Matching inteligente | ✅     |
+| Achievements        | ✅ Básico | ✅ 26 achievements      | ✅     |
+| Chat Real-time      | ✅        | ✅ WebSockets           | ✅     |
+| Image CDN           | ✅        | ✅ Uploadthing          | ✅     |
+| Theme Customization | ❌        | ✅ Completo             | ✅     |
 
 **TOTAL:** Unytea tiene **7 ventajas únicas** que Skool NO tiene
 
@@ -583,14 +583,14 @@ Skool, pero con características avanzadas que Skool no tiene. Es un "Skool Kill
 
 ### **Servicios Externos:**
 
-| Servicio | Plan | Costo | Incluye |
-|----------|------|-------|---------|
-| Vercel | Pro | $20 | Hosting + CDN |
-| Supabase | Pro | $25 | PostgreSQL DB |
-| LiveKit | Starter | $29 | 1000 mins video |
-| OpenAI | Pay-as-go | ~$10 | 5K conversaciones |
-| Uploadthing | Free | $0 | 2GB storage |
-| Socket.io | Self-hosted | $0 | Incluido en Vercel |
+| Servicio    | Plan        | Costo | Incluye            |
+| ----------- | ----------- | ----- | ------------------ |
+| Vercel      | Pro         | $20   | Hosting + CDN      |
+| Supabase    | Pro         | $25   | PostgreSQL DB      |
+| LiveKit     | Starter     | $29   | 1000 mins video    |
+| OpenAI      | Pay-as-go   | ~$10  | 5K conversaciones  |
+| Uploadthing | Free        | $0    | 2GB storage        |
+| Socket.io   | Self-hosted | $0    | Incluido en Vercel |
 
 **TOTAL:** ~$84/mes para 100-500 usuarios
 

@@ -13,17 +13,17 @@ export default function CommunityPaymentsPage() {
   const { toast } = useToast();
   const params = useParams<{ slug: string }>();
   const slug = params?.slug;
-  
+
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
-  
+
   const [stripeStatus, setStripeStatus] = useState<{
     isConnected: boolean;
     status: string;
     accountId?: string;
   } | null>(null);
-  
+
   const [settings, setSettings] = useState({
     isPaid: false,
     monthlyPrice: "29",
@@ -65,10 +65,15 @@ export default function CommunityPaymentsPage() {
               isPaid: !!payload.settings.isPaid,
               monthlyPrice: String(payload.settings.monthlyPrice ?? "29"),
               yearlyPrice: String(payload.settings.yearlyPrice ?? "290"),
-              defaultTier: payload.settings.defaultTier === "free" || payload.settings.defaultTier === "vip" ? payload.settings.defaultTier : "pro",
+              defaultTier:
+                payload.settings.defaultTier === "free" || payload.settings.defaultTier === "vip"
+                  ? payload.settings.defaultTier
+                  : "pro",
               tierPricing: {
                 free: String(payload.settings.tierPricing?.free ?? "0"),
-                pro: String(payload.settings.tierPricing?.pro ?? payload.settings.monthlyPrice ?? "29"),
+                pro: String(
+                  payload.settings.tierPricing?.pro ?? payload.settings.monthlyPrice ?? "29"
+                ),
                 vip: String(payload.settings.tierPricing?.vip ?? "99"),
               },
               tierStripePriceIds: {
@@ -150,9 +155,15 @@ export default function CommunityPaymentsPage() {
             vip: String(payload.settings.tierPricing?.vip ?? settings.tierPricing.vip),
           },
           tierStripePriceIds: {
-            free: String(payload.settings.tierStripePriceIds?.free ?? settings.tierStripePriceIds.free),
-            pro: String(payload.settings.tierStripePriceIds?.pro ?? settings.tierStripePriceIds.pro),
-            vip: String(payload.settings.tierStripePriceIds?.vip ?? settings.tierStripePriceIds.vip),
+            free: String(
+              payload.settings.tierStripePriceIds?.free ?? settings.tierStripePriceIds.free
+            ),
+            pro: String(
+              payload.settings.tierStripePriceIds?.pro ?? settings.tierStripePriceIds.pro
+            ),
+            vip: String(
+              payload.settings.tierStripePriceIds?.vip ?? settings.tierStripePriceIds.vip
+            ),
           },
         });
       }
@@ -174,7 +185,7 @@ export default function CommunityPaymentsPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex h-64 items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
       </div>
     );
@@ -185,7 +196,7 @@ export default function CommunityPaymentsPage() {
       {/* Header */}
       <div>
         <h2 className="text-2xl font-bold text-gray-900">Payments & Monetization</h2>
-        <p className="text-gray-500 mt-1">
+        <p className="mt-1 text-gray-500">
           Configure paid memberships and connect your Stripe account
         </p>
       </div>
@@ -198,20 +209,18 @@ export default function CommunityPaymentsPage() {
             Stripe Connect
           </CardTitle>
           <CardDescription>
-            Connect your Stripe account to receive payments from community members.
-            You keep 95% of all revenue, platform fee is 5%.
+            Connect your Stripe account to receive payments from community members. You keep 95% of
+            all revenue, platform fee is 5%.
           </CardDescription>
         </CardHeader>
         <CardContent>
           {!stripeStatus?.isConnected ? (
             <div className="space-y-4">
-              <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                <AlertCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+              <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
+                <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
                 <div>
-                  <p className="text-sm font-medium text-amber-800">
-                    Stripe account not connected
-                  </p>
-                  <p className="text-sm text-amber-700 mt-1">
+                  <p className="text-sm font-medium text-amber-800">Stripe account not connected</p>
+                  <p className="mt-1 text-sm text-amber-700">
                     You need to connect a Stripe account before you can charge for memberships.
                   </p>
                 </div>
@@ -219,16 +228,16 @@ export default function CommunityPaymentsPage() {
               <Button
                 onClick={handleConnectStripe}
                 disabled={isConnecting}
-                className="bg-[#635BFF] hover:bg-[#4f48cc] text-white"
+                className="bg-[#635BFF] text-white hover:bg-[#4f48cc]"
               >
                 {isConnecting ? (
                   <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Connecting...
                   </>
                 ) : (
                   <>
-                    <CreditCard className="h-4 w-4 mr-2" />
+                    <CreditCard className="mr-2 h-4 w-4" />
                     Connect with Stripe
                   </>
                 )}
@@ -236,13 +245,13 @@ export default function CommunityPaymentsPage() {
             </div>
           ) : stripeStatus.status === "active" ? (
             <div className="space-y-4">
-              <div className="flex items-start gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
-                <Check className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
+              <div className="flex items-start gap-3 rounded-lg border border-green-200 bg-green-50 p-4">
+                <Check className="mt-0.5 h-5 w-5 shrink-0 text-green-600" />
                 <div>
                   <p className="text-sm font-medium text-green-800">
                     Stripe account connected and active
                   </p>
-                  <p className="text-sm text-green-700 mt-1">
+                  <p className="mt-1 text-sm text-green-700">
                     Account ID: {stripeStatus.accountId}
                   </p>
                 </div>
@@ -251,35 +260,32 @@ export default function CommunityPaymentsPage() {
                 variant="outline"
                 onClick={() => window.open("https://dashboard.stripe.com", "_blank")}
               >
-                <ExternalLink className="h-4 w-4 mr-2" />
+                <ExternalLink className="mr-2 h-4 w-4" />
                 Open Stripe Dashboard
               </Button>
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="flex items-start gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <AlertCircle className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
+              <div className="flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4">
+                <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-blue-600" />
                 <div>
                   <p className="text-sm font-medium text-blue-800">
                     Stripe account pending verification
                   </p>
-                  <p className="text-sm text-blue-700 mt-1">
+                  <p className="mt-1 text-sm text-blue-700">
                     Please complete the verification process in Stripe.
                   </p>
                 </div>
               </div>
-              <Button
-                onClick={handleConnectStripe}
-                disabled={isConnecting}
-              >
+              <Button onClick={handleConnectStripe} disabled={isConnecting}>
                 {isConnecting ? (
                   <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Loading...
                   </>
                 ) : (
                   <>
-                    <ExternalLink className="h-4 w-4 mr-2" />
+                    <ExternalLink className="mr-2 h-4 w-4" />
                     Complete Verification
                   </>
                 )}
@@ -299,22 +305,18 @@ export default function CommunityPaymentsPage() {
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Paid Toggle */}
-          <div className="flex items-center justify-between p-4 border rounded-lg">
+          <div className="flex items-center justify-between rounded-lg border p-4">
             <div>
               <Label htmlFor="isPaid" className="text-base font-medium">
                 Paid Community
               </Label>
-              <p className="text-sm text-gray-500">
-                Require payment to join this community
-              </p>
+              <p className="text-sm text-gray-500">Require payment to join this community</p>
             </div>
             <input
               type="checkbox"
               id="isPaid"
               checked={settings.isPaid}
-              onChange={(e) =>
-                setSettings((prev) => ({ ...prev, isPaid: e.target.checked }))
-              }
+              onChange={(e) => setSettings((prev) => ({ ...prev, isPaid: e.target.checked }))}
               className="h-5 w-5 rounded border-gray-300 text-sky-600 focus:ring-sky-500"
             />
           </div>
@@ -322,11 +324,13 @@ export default function CommunityPaymentsPage() {
           {/* Pricing Fields */}
           {settings.isPaid && (
             <div className="space-y-5">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="monthlyPrice">Monthly Price (USD)</Label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                      $
+                    </span>
                     <Input
                       id="monthlyPrice"
                       type="number"
@@ -336,7 +340,10 @@ export default function CommunityPaymentsPage() {
                         setSettings((prev) => ({
                           ...prev,
                           monthlyPrice: e.target.value,
-                          tierPricing: { ...prev.tierPricing, pro: e.target.value || prev.tierPricing.pro },
+                          tierPricing: {
+                            ...prev.tierPricing,
+                            pro: e.target.value || prev.tierPricing.pro,
+                          },
                         }))
                       }
                       className="pl-7"
@@ -348,7 +355,9 @@ export default function CommunityPaymentsPage() {
                 <div className="space-y-2">
                   <Label htmlFor="yearlyPrice">Yearly Price (USD)</Label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                      $
+                    </span>
                     <Input
                       id="yearlyPrice"
                       type="number"
@@ -367,7 +376,7 @@ export default function CommunityPaymentsPage() {
                 </div>
               </div>
 
-              <div className="rounded-lg border p-4 space-y-4">
+              <div className="space-y-4 rounded-lg border p-4">
                 <div className="space-y-2">
                   <Label htmlFor="defaultTier">Default Paid Tier</Label>
                   <select
@@ -387,7 +396,7 @@ export default function CommunityPaymentsPage() {
                   </select>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
                   <div className="space-y-1">
                     <Label htmlFor="tierFree">Free tier</Label>
                     <Input
@@ -435,7 +444,7 @@ export default function CommunityPaymentsPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
                   <div className="space-y-1">
                     <Label htmlFor="stripePriceFree">Stripe Price ID (Free)</Label>
                     <Input
@@ -482,20 +491,18 @@ export default function CommunityPaymentsPage() {
               </div>
 
               <p className="text-xs text-gray-500">
-                You receive: ${(parseFloat(settings.monthlyPrice || "0") * 0.95).toFixed(2)}/mo · ${(parseFloat(settings.yearlyPrice || "0") * 0.95).toFixed(2)}/yr after 5% platform fee
+                You receive: ${(parseFloat(settings.monthlyPrice || "0") * 0.95).toFixed(2)}/mo · $
+                {(parseFloat(settings.yearlyPrice || "0") * 0.95).toFixed(2)}/yr after 5% platform
+                fee
               </p>
             </div>
           )}
 
           {/* Save Button */}
-          <Button
-            onClick={handleSaveSettings}
-            disabled={isSaving}
-            className="w-full md:w-auto"
-          >
+          <Button onClick={handleSaveSettings} disabled={isSaving} className="w-full md:w-auto">
             {isSaving ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Saving...
               </>
             ) : (
@@ -508,7 +515,7 @@ export default function CommunityPaymentsPage() {
       {/* Revenue Info */}
       <Card className="bg-gray-50">
         <CardContent className="p-6">
-          <h3 className="font-semibold text-gray-900 mb-2">Revenue Split</h3>
+          <h3 className="mb-2 font-semibold text-gray-900">Revenue Split</h3>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <p className="text-2xl font-bold text-green-600">95%</p>
@@ -519,8 +526,9 @@ export default function CommunityPaymentsPage() {
               <p className="text-sm text-gray-600">Platform fee</p>
             </div>
           </div>
-          <p className="text-xs text-gray-500 mt-4">
-            Payments are processed securely through Stripe and transferred to your account automatically.
+          <p className="mt-4 text-xs text-gray-500">
+            Payments are processed securely through Stripe and transferred to your account
+            automatically.
           </p>
         </CardContent>
       </Card>

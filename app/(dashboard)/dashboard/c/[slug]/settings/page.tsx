@@ -11,7 +11,7 @@ export default function GeneralSettingsPage() {
   const params = useParams();
   const router = useRouter();
   const slug = params?.slug as string;
-  
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -39,10 +39,8 @@ export default function GeneralSettingsPage() {
             community.settings && typeof community.settings === "object"
               ? (community.settings as Record<string, unknown>)
               : {};
-          const category =
-            typeof settings.category === "string" ? settings.category : "";
-          const language =
-            typeof settings.language === "string" ? settings.language : "";
+          const category = typeof settings.category === "string" ? settings.category : "";
+          const language = typeof settings.language === "string" ? settings.language : "";
           setFormData({
             name: community.name ?? data.name ?? "",
             description: community.description ?? "",
@@ -146,18 +144,14 @@ export default function GeneralSettingsPage() {
       {/* Header */}
       <div>
         <h2 className="text-2xl font-bold text-gray-900">General Settings</h2>
-        <p className="text-sm text-gray-500 mt-1">
-          Update your community's basic information
-        </p>
+        <p className="mt-1 text-sm text-gray-500">Update your community's basic information</p>
       </div>
 
       {/* Form */}
-      <div className="rounded-lg border border-gray-200 bg-white p-6 space-y-6">
+      <div className="space-y-6 rounded-lg border border-gray-200 bg-white p-6">
         {/* Community Name */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Community Name
-          </label>
+          <label className="mb-2 block text-sm font-medium text-gray-700">Community Name</label>
           <input
             type="text"
             value={formData.name}
@@ -169,9 +163,7 @@ export default function GeneralSettingsPage() {
 
         {/* Description */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Description
-          </label>
+          <label className="mb-2 block text-sm font-medium text-gray-700">Description</label>
           <textarea
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -187,9 +179,7 @@ export default function GeneralSettingsPage() {
         {/* Category + Language */}
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Category
-            </label>
+            <label className="mb-2 block text-sm font-medium text-gray-700">Category</label>
             <select
               value={formData.category}
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
@@ -217,9 +207,7 @@ export default function GeneralSettingsPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Primary language
-            </label>
+            <label className="mb-2 block text-sm font-medium text-gray-700">Primary language</label>
             <select
               value={formData.language}
               onChange={(e) => setFormData({ ...formData, language: e.target.value })}
@@ -254,7 +242,7 @@ export default function GeneralSettingsPage() {
               <label htmlFor="isPrivate" className="block text-sm font-medium text-gray-900">
                 Private Community
               </label>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="mt-1 text-xs text-gray-500">
                 Only approved members can see the community content
               </p>
             </div>
@@ -272,7 +260,7 @@ export default function GeneralSettingsPage() {
               <label htmlFor="requireApproval" className="block text-sm font-medium text-gray-900">
                 Require Approval for New Members
               </label>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="mt-1 text-xs text-gray-500">
                 You'll need to approve each member before they can join
               </p>
             </div>
@@ -280,18 +268,11 @@ export default function GeneralSettingsPage() {
         </div>
 
         {/* Save Button */}
-        <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-          <Button
-            variant="outline"
-            onClick={() => router.push(`/dashboard/c/${slug}`)}
-          >
+        <div className="flex items-center justify-between border-t border-gray-200 pt-4">
+          <Button variant="outline" onClick={() => router.push(`/dashboard/c/${slug}`)}>
             Cancel
           </Button>
-          <Button
-            onClick={handleSave}
-            disabled={saving}
-            className="flex items-center gap-2"
-          >
+          <Button onClick={handleSave} disabled={saving} className="flex items-center gap-2">
             {saving ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -309,8 +290,8 @@ export default function GeneralSettingsPage() {
 
       {/* Danger Zone */}
       <div className="rounded-lg border border-red-200 bg-red-50 p-6">
-        <h3 className="text-lg font-semibold text-red-900 mb-2">Danger Zone</h3>
-        <p className="text-sm text-red-700 mb-4">
+        <h3 className="mb-2 text-lg font-semibold text-red-900">Danger Zone</h3>
+        <p className="mb-4 text-sm text-red-700">
           Once you delete a community, there is no going back. Please be certain.
         </p>
         <Button
@@ -321,12 +302,12 @@ export default function GeneralSettingsPage() {
         >
           {deleting ? (
             <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Deleting...
             </>
           ) : (
             <>
-              <Trash2 className="h-4 w-4 mr-2" />
+              <Trash2 className="mr-2 h-4 w-4" />
               Delete Community
             </>
           )}

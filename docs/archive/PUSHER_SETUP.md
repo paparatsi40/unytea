@@ -3,13 +3,16 @@
 ## Setup Instructions
 
 ### 1. Create Pusher Account
+
 1. Go to [https://pusher.com](https://pusher.com)
 2. Sign up for a free account
 3. Create a new app
 4. Select "US East (Ohio)" as the cluster
 
 ### 2. Get Your Credentials
+
 In your Pusher dashboard, find these values:
+
 - **App ID** (e.g., "1234567")
 - **Key** (e.g., "abc123def456")
 - **Secret** (e.g., "xyz789abc123")
@@ -29,15 +32,19 @@ NEXT_PUBLIC_PUSHER_CLUSTER=us2
 ```
 
 **Important:**
+
 - `PUSHER_SECRET` and `PUSHER_APP_ID` are **server-side only** (keep them secret)
 - `NEXT_PUBLIC_PUSHER_KEY` and `NEXT_PUBLIC_PUSHER_CLUSTER` are **client-side** (prefixed with NEXT_PUBLIC)
 
 ### 4. Redeploy Your App
+
 After adding the environment variables, redeploy your app:
+
 - In Vercel dashboard, go to Deployments
 - Click "Redeploy" on the latest deployment
 
 ### 5. Test the Chat
+
 1. Go to any community
 2. Click on the "Chat" tab
 3. Open the community in two different browsers/incognito windows
@@ -55,6 +62,7 @@ After adding the environment variables, redeploy your app:
 ## Free Tier Limits
 
 Pusher's free tier includes:
+
 - 200k messages per day
 - 100 concurrent connections
 - Unlimited channels
@@ -64,22 +72,26 @@ This is plenty for testing and small communities!
 ## Troubleshooting
 
 ### "Not connected to Pusher"
+
 - Check that environment variables are set correctly
 - Verify NEXT_PUBLIC_PUSHER_KEY matches your Pusher dashboard
 - Check browser console for errors
 
 ### Messages not appearing
+
 - Check that both users are in the same community
 - Verify the community ID is being passed correctly
 - Check Pusher dashboard for connection logs
 
 ### 401 Unauthorized errors
+
 - Make sure user is authenticated
 - Check that the /api/pusher endpoint is accessible
 
 ## Next Steps
 
 After confirming the chat works, you can:
+
 1. Add typing indicators
 2. Add message reactions (emoji)
 3. Add file attachments

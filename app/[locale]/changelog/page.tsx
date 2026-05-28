@@ -5,15 +5,12 @@ import { localizedAlternates } from "@/lib/seo/locale-metadata";
 
 const META = {
   title: "Changelog | Unytea",
-  description:
-    "See what's new on Unytea — recent updates, features, improvements, and fixes.",
+  description: "See what's new on Unytea — recent updates, features, improvements, and fixes.",
 };
 
-export async function generateMetadata(
-  props: {
-    params: Promise<{ locale: string }>;
-  }
-): Promise<Metadata> {
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
   const params = await props.params;
   return {
     title: META.title,
@@ -40,10 +37,7 @@ type ReleaseEntry = {
   changes: ChangeEntry[];
 };
 
-const changeConfig: Record<
-  ChangeType,
-  { label: string; color: string; icon: typeof Rocket }
-> = {
+const changeConfig: Record<ChangeType, { label: string; color: string; icon: typeof Rocket }> = {
   feature: { label: "New", color: "bg-emerald-100 text-emerald-800", icon: Rocket },
   improvement: { label: "Improved", color: "bg-blue-100 text-blue-800", icon: Zap },
   fix: { label: "Fixed", color: "bg-amber-100 text-amber-800", icon: Bug },
@@ -230,11 +224,7 @@ const RELEASES: ReleaseEntry[] = [
   },
 ];
 
-export default async function ChangelogPage(
-  props: {
-    params: Promise<{ locale: string }>;
-  }
-) {
+export default async function ChangelogPage(props: { params: Promise<{ locale: string }> }) {
   const params = await props.params;
   const { locale } = params;
 
@@ -242,49 +232,45 @@ export default async function ChangelogPage(
     <main className="min-h-screen bg-background">
       <section className="border-b bg-muted/20">
         <div className="container mx-auto px-4 py-12">
-          <p className="text-sm text-muted-foreground mb-2">Product</p>
+          <p className="mb-2 text-sm text-muted-foreground">Product</p>
           <h1 className="text-4xl font-bold tracking-tight">Changelog</h1>
           <p className="mt-3 max-w-3xl text-muted-foreground">
-            A timeline of what we&apos;ve shipped. New features, improvements,
-            and fixes — all in one place.
+            A timeline of what we&apos;ve shipped. New features, improvements, and fixes — all in
+            one place.
           </p>
         </div>
       </section>
 
       <section className="container mx-auto px-4 py-10">
         <div className="max-w-3xl">
-          <div className="relative border-l-2 border-muted pl-8 space-y-12">
+          <div className="relative space-y-12 border-l-2 border-muted pl-8">
             {RELEASES.map((release) => (
               <div key={release.version} className="relative">
                 {/* Timeline dot */}
-                <div className="absolute -left-[calc(2rem+5px)] top-1 w-3 h-3 rounded-full bg-primary border-2 border-background" />
+                <div className="absolute -left-[calc(2rem+5px)] top-1 h-3 w-3 rounded-full border-2 border-background bg-primary" />
 
-                <div className="flex flex-wrap items-baseline gap-3 mb-2">
-                  <span className="text-xs font-mono font-medium bg-muted px-2 py-0.5 rounded">
+                <div className="mb-2 flex flex-wrap items-baseline gap-3">
+                  <span className="rounded bg-muted px-2 py-0.5 font-mono text-xs font-medium">
                     v{release.version}
                   </span>
-                  <span className="text-sm text-muted-foreground">
-                    {release.date}
-                  </span>
+                  <span className="text-sm text-muted-foreground">{release.date}</span>
                 </div>
 
-                <h2 className="text-xl font-semibold mb-4">{release.title}</h2>
+                <h2 className="mb-4 text-xl font-semibold">{release.title}</h2>
 
                 <div className="space-y-3">
                   {release.changes.map((change, i) => {
                     const config = changeConfig[change.type];
                     const Icon = config.icon;
                     return (
-                      <div key={i} className="flex gap-3 items-start">
+                      <div key={i} className="flex items-start gap-3">
                         <span
-                          className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full shrink-0 mt-0.5 ${config.color}`}
+                          className={`mt-0.5 inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${config.color}`}
                         >
-                          <Icon className="w-3 h-3" />
+                          <Icon className="h-3 w-3" />
                           {config.label}
                         </span>
-                        <p className="text-sm text-muted-foreground">
-                          {change.text}
-                        </p>
+                        <p className="text-sm text-muted-foreground">{change.text}</p>
                       </div>
                     );
                   })}
@@ -295,10 +281,7 @@ export default async function ChangelogPage(
         </div>
 
         <div className="pt-10">
-          <Link
-            href={`/${locale}`}
-            className="text-sm font-medium text-primary hover:underline"
-          >
+          <Link href={`/${locale}`} className="text-sm font-medium text-primary hover:underline">
             &larr; Back to Home
           </Link>
         </div>
