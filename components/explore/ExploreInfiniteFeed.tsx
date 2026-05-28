@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AlertCircle, Loader2, SearchX } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { loadMoreCommunitiesAction } from "@/app/[locale]/explore/actions";
 import { cn } from "@/lib/utils";
 import type { ExploreCommunity, ExploreFilters, ExploreResponse } from "@/types/explore";
@@ -16,14 +17,6 @@ type ExploreInfiniteFeedProps = {
 const SENTINEL_ROOT_MARGIN = "200px";
 const SKELETON_COUNT = 4;
 const LCP_PRIORITY_CARDS = 4;
-
-const STRINGS = {
-  emptyTitle: "No communities match",
-  emptyDescription: "Try adjusting your filters to see more results.",
-  endOfResults: "You've reached the end",
-  errorTitle: "Failed to load more",
-  errorDescription: "Try refreshing the page.",
-};
 
 function CommunityCardSkeleton() {
   return (
@@ -40,16 +33,18 @@ function CommunityCardSkeleton() {
 }
 
 function EmptyState() {
+  const t = useTranslations("explore.feed");
   return (
     <div className="col-span-full flex flex-col items-center justify-center rounded-xl border border-dashed border-border/60 py-16 text-center">
       <SearchX className="mb-4 h-10 w-10 text-muted-foreground" aria-hidden />
-      <h3 className="mb-1 text-base font-medium">{STRINGS.emptyTitle}</h3>
-      <p className="max-w-sm text-sm text-muted-foreground">{STRINGS.emptyDescription}</p>
+      <h3 className="mb-1 text-base font-medium">{t("emptyTitle")}</h3>
+      <p className="max-w-sm text-sm text-muted-foreground">{t("emptyDescription")}</p>
     </div>
   );
 }
 
 function ErrorBanner({ onRetry }: { onRetry: () => void }) {
+  const t = useTranslations("explore.feed");
   return (
     <div
       role="alert"
@@ -57,15 +52,15 @@ function ErrorBanner({ onRetry }: { onRetry: () => void }) {
     >
       <AlertCircle className="h-4 w-4 shrink-0" aria-hidden />
       <div className="flex-1">
-        <p className="font-medium">{STRINGS.errorTitle}</p>
-        <p className="text-xs opacity-80">{STRINGS.errorDescription}</p>
+        <p className="font-medium">{t("errorTitle")}</p>
+        <p className="text-xs opacity-80">{t("errorDescription")}</p>
       </div>
       <button
         type="button"
         onClick={onRetry}
         className="text-xs font-medium underline-offset-2 hover:underline"
       >
-        Retry
+        {t("retry")}
       </button>
     </div>
   );
@@ -76,6 +71,7 @@ export function ExploreInfiniteFeed({
   currentFilters,
   locale,
 }: ExploreInfiniteFeedProps) {
+  const t = useTranslations("explore.feed");
   const [communities, setCommunities] = useState<ExploreCommunity[]>(initialData.communities);
   const [currentPage, setCurrentPage] = useState(initialData.page);
   const [hasMore, setHasMore] = useState(initialData.hasMore);
@@ -165,7 +161,7 @@ export function ExploreInfiniteFeed({
       <div ref={sentinelRef} aria-hidden className="h-px" />
 
       {!hasMore && !isEmpty && !isLoading && !error && (
-        <p className="mt-8 text-center text-sm text-muted-foreground">{STRINGS.endOfResults}</p>
+        <p className="mt-8 text-center text-sm text-muted-foreground">{t("endOfResults")}</p>
       )}
 
       {isLoading && !error && (

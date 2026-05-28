@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import type { ExploreSampleMember } from "@/types/explore";
 
@@ -18,20 +21,14 @@ const FALLBACK_COLORS = [
 const VISIBLE_COUNT = 4;
 const AVATAR_PX = 22;
 
-const STRINGS = {
-  members: "members",
-};
-
 function pickFallbackColor(id: string): string {
-  // Deterministic: sum char codes mod palette length.
-  // (id.charCodeAt(0) mod len would be biased toward letters with lower codes;
-  // sum-of-codes spreads more evenly across the 5 buckets.)
   let sum = 0;
   for (let i = 0; i < id.length; i++) sum += id.charCodeAt(i);
   return FALLBACK_COLORS[sum % FALLBACK_COLORS.length];
 }
 
 export function MemberAvatarsStack({ members, totalCount }: MemberAvatarsStackProps) {
+  const t = useTranslations("explore.card");
   const visible = members.slice(0, VISIBLE_COUNT);
   const showOverflow = totalCount > VISIBLE_COUNT;
 
@@ -69,14 +66,14 @@ export function MemberAvatarsStack({ members, totalCount }: MemberAvatarsStackPr
               visible.length > 0 && "-ml-2"
             )}
             style={{ width: AVATAR_PX, height: AVATAR_PX }}
-            aria-label={`${totalCount - VISIBLE_COUNT} more members`}
+            aria-label={t("members", { count: totalCount - VISIBLE_COUNT })}
           >
             +
           </div>
         )}
       </div>
       <span className="ml-2 text-xs text-muted-foreground">
-        {totalCount.toLocaleString()} {STRINGS.members}
+        {t("members", { count: totalCount })}
       </span>
     </div>
   );

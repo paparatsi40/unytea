@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { CommunityCategory } from "@prisma/client";
 import { getExploreCommunities } from "@/lib/explore-query";
 import { localizedAlternates } from "@/lib/seo/locale-metadata";
@@ -36,29 +36,20 @@ const VALID_SIZES = new Set<ExploreSize>(["all", "small", "medium", "large"]);
 const VALID_TYPES = new Set<ExploreType>(["all", "free", "paid"]);
 const VALID_SORTS = new Set<ExploreSort>(["newest", "most-active", "most-members"]);
 
-const STRINGS = {
-  pageTitle: "Explore communities — Unytea",
-  pageDescription:
-    "Discover live-first communities led by emerging creators. Browse by category, language, and topic. Find your next community on Unytea.",
-  ogTitle: "Explore communities on Unytea",
-  ogDescription: "Live-first communities led by emerging creators.",
-  h1: "Explore communities",
-  h1Subtitle: "Discover live-first communities led by emerging creators.",
-};
-
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "explore.page" });
   return {
-    title: STRINGS.pageTitle,
-    description: STRINGS.pageDescription,
+    title: t("metaTitle"),
+    description: t("metaDescription"),
     ...localizedAlternates({ path: "/explore", locale }),
     openGraph: {
-      title: STRINGS.ogTitle,
-      description: STRINGS.ogDescription,
+      title: t("ogTitle"),
+      description: t("ogDescription"),
       url: `https://www.unytea.com/${locale}/explore`,
       type: "website",
     },
@@ -129,6 +120,7 @@ export default async function ExplorePage(props: Props) {
   const { locale } = params;
   setRequestLocale(locale);
 
+  const t = await getTranslations({ locale, namespace: "explore.page" });
   const { filters, pagination } = parseSearchParams(searchParamsRaw);
 
   // Server-side fetch initial page. Soft-fail if DB unavailable so the page
@@ -144,8 +136,8 @@ export default async function ExplorePage(props: Props) {
   return (
     <div className="container mx-auto max-w-7xl px-4 py-8">
       <header className="mb-6">
-        <h1 className="mb-2 text-3xl font-bold tracking-tight">{STRINGS.h1}</h1>
-        <p className="text-muted-foreground">{STRINGS.h1Subtitle}</p>
+        <h1 className="mb-2 text-3xl font-bold tracking-tight">{t("title")}</h1>
+        <p className="text-muted-foreground">{t("description")}</p>
       </header>
 
       <ExploreFiltersComponent currentFilters={filters} totalResults={initialData.total} />

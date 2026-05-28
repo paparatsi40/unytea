@@ -5,16 +5,20 @@ import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Loader2, Save, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { CommunityCategory } from "@prisma/client";
 import { deleteCommunity } from "@/app/actions/communities";
-import { CATEGORY_LABELS } from "@/components/explore/CommunityCard";
-import type { CommunityCategory } from "@prisma/client";
 
 type FormCategory = CommunityCategory | "";
+
+const KNOWN_CATEGORIES = Object.keys(CommunityCategory) as CommunityCategory[];
 
 export default function GeneralSettingsPage() {
   const params = useParams();
   const router = useRouter();
   const slug = params?.slug as string;
+  const tCat = useTranslations("explore.categories");
+  const tDiscovery = useTranslations("explore.settings");
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -55,7 +59,7 @@ export default function GeneralSettingsPage() {
           // harmless because read paths use the typed columns only.
           const rawCategory = community.category;
           const category: FormCategory =
-            typeof rawCategory === "string" && rawCategory in CATEGORY_LABELS
+            typeof rawCategory === "string" && rawCategory in CommunityCategory
               ? (rawCategory as CommunityCategory)
               : "";
           setFormData({
@@ -209,9 +213,9 @@ export default function GeneralSettingsPage() {
               className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
             >
               <option value="">Select a category…</option>
-              {(Object.keys(CATEGORY_LABELS) as CommunityCategory[]).map((value) => (
+              {KNOWN_CATEGORIES.map((value) => (
                 <option key={value} value={value}>
-                  {CATEGORY_LABELS[value]}
+                  {tCat(value)}
                 </option>
               ))}
             </select>
@@ -242,10 +246,10 @@ export default function GeneralSettingsPage() {
 
         {/* Discovery */}
         <div className="border-t border-gray-200 pt-6">
-          <h3 className="mb-1 text-sm font-medium text-gray-900">Discovery</h3>
-          <p className="mb-4 text-xs text-gray-500">
-            Control whether your community appears on Unytea's public /explore page.
-          </p>
+          <h3 className="mb-1 text-sm font-medium text-gray-900">
+            {tDiscovery("discoveryHeader")}
+          </h3>
+          <p className="mb-4 text-xs text-gray-500">{tDiscovery("discoveryDescription")}</p>
 
           <label className="flex cursor-pointer items-start gap-3">
             <input
@@ -257,12 +261,8 @@ export default function GeneralSettingsPage() {
               className="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
             />
             <div>
-              <div className="text-sm font-medium text-gray-900">List on /explore</div>
-              <div className="text-xs text-gray-500">
-                When enabled, your community appears in public listings for the category and
-                language you&apos;ve selected, provided it meets quality criteria (≥3 active
-                members, ≥1 upcoming live session, description + cover image set, ≥14 days old).
-              </div>
+              <div className="text-sm font-medium text-gray-900">{tDiscovery("listToggle")}</div>
+              <div className="text-xs text-gray-500">{tDiscovery("listToggleDescription")}</div>
             </div>
           </label>
         </div>

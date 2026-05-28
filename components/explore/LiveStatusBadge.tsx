@@ -1,4 +1,7 @@
+"use client";
+
 import { format, formatDistanceToNowStrict } from "date-fns";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import type { ExploreLiveStatus } from "@/types/explore";
 
@@ -18,29 +21,26 @@ const STATUS_CLASSES: Record<Exclude<ExploreLiveStatus["status"], "none">, strin
   live_this_week: "border-blue-500/40 bg-blue-500/15 text-blue-700 dark:text-blue-300",
 };
 
-const STRINGS = {
-  liveNow: "Live now",
-  liveSoon: (timeDistance: string) => `Starts in ${timeDistance}`,
-  liveToday: (time: string) => `Live today ${time}`,
-  liveThisWeek: (dayTime: string) => `Live ${dayTime}`,
-};
-
 export function LiveStatusBadge({
   status,
   nextSessionStartsAt,
   nextSessionTitle,
 }: LiveStatusBadgeProps) {
+  const t = useTranslations("explore.card.liveStatus");
+
   if (status === "none") return null;
 
   let label: string;
   if (status === "live_now") {
-    label = STRINGS.liveNow;
+    label = t("live_now");
   } else if (status === "live_soon" && nextSessionStartsAt) {
-    label = STRINGS.liveSoon(formatDistanceToNowStrict(nextSessionStartsAt));
+    label = t("live_soon", { time: formatDistanceToNowStrict(nextSessionStartsAt) });
   } else if (status === "live_today" && nextSessionStartsAt) {
-    label = STRINGS.liveToday(format(nextSessionStartsAt, "h:mma").toLowerCase());
+    label = t("live_today", { time: format(nextSessionStartsAt, "h:mma").toLowerCase() });
   } else if (status === "live_this_week" && nextSessionStartsAt) {
-    label = STRINGS.liveThisWeek(format(nextSessionStartsAt, "EEE h:mma").toLowerCase());
+    label = t("live_this_week", {
+      day: format(nextSessionStartsAt, "EEE h:mma").toLowerCase(),
+    });
   } else {
     return null;
   }

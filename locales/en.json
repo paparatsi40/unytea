@@ -425,6 +425,91 @@
       "cta": "Upgrade Now"
     }
   },
+  "explore": {
+    "page": {
+      "title": "Explore communities",
+      "description": "Discover live-first communities led by emerging creators.",
+      "metaTitle": "Explore communities — Unytea",
+      "metaDescription": "Discover live-first communities led by emerging creators. Browse by category, language, and topic. Find your next community on Unytea.",
+      "ogTitle": "Explore communities on Unytea",
+      "ogDescription": "Live-first communities led by emerging creators."
+    },
+    "filters": {
+      "searchPlaceholder": "Search communities...",
+      "allCategories": "All categories",
+      "allLanguages": "All languages",
+      "allSizes": "All",
+      "small": "Small",
+      "medium": "Medium",
+      "large": "Large",
+      "allTypes": "All",
+      "free": "Free",
+      "paid": "Paid",
+      "sortLabel": "Sort by",
+      "newest": "Newest",
+      "mostMembers": "Most members",
+      "mostActive": "Most active",
+      "clearAll": "Clear all filters",
+      "resultsCount": "{count, plural, =0 {No communities} =1 {1 community} other {# communities}}"
+    },
+    "card": {
+      "free": "Free",
+      "paid": "Paid",
+      "byOwner": "by {name}",
+      "byOwnerWithTitle": "by {name} · {title}",
+      "members": "{count, plural, =1 {1 member} other {# members}}",
+      "activityLabel": "Activity · last 30 days",
+      "activityStatus": {
+        "very_active": "Very active",
+        "active": "Active",
+        "moderate": "Moderate",
+        "quiet": "Quiet"
+      },
+      "liveStatus": {
+        "live_now": "Live now",
+        "live_soon": "Starts in {time}",
+        "live_today": "Live today {time}",
+        "live_this_week": "Live {day}"
+      }
+    },
+    "categories": {
+      "BUSINESS_ENTREPRENEURSHIP": "Business & entrepreneurship",
+      "MARKETING_SALES": "Marketing & sales",
+      "TECH_PROGRAMMING": "Tech & programming",
+      "AI_DATA_SCIENCE": "AI & data science",
+      "HEALTH_WELLNESS": "Health & wellness",
+      "FITNESS_SPORTS": "Fitness & sports",
+      "COOKING_NUTRITION": "Cooking & nutrition",
+      "PHOTOGRAPHY": "Photography",
+      "ART_DESIGN": "Art & design",
+      "MUSIC": "Music",
+      "WRITING_PUBLISHING": "Writing & publishing",
+      "EDUCATION_LANGUAGES": "Education & languages",
+      "PERSONAL_FINANCE": "Personal finance",
+      "TRAVEL": "Travel",
+      "PARENTING_FAMILY": "Parenting & family",
+      "SPIRITUALITY_MINDFULNESS": "Spirituality & mindfulness",
+      "GAMING": "Gaming",
+      "CRAFTS_DIY": "Crafts & DIY",
+      "BOOKS_READING": "Books & reading",
+      "OTHER": "Other"
+    },
+    "feed": {
+      "emptyTitle": "No communities match",
+      "emptyDescription": "Try adjusting your filters to see more results.",
+      "loading": "Loading more...",
+      "endOfResults": "You've reached the end",
+      "errorTitle": "Failed to load more",
+      "errorDescription": "Try refreshing the page.",
+      "retry": "Retry"
+    },
+    "settings": {
+      "discoveryHeader": "Discovery",
+      "discoveryDescription": "Control whether your community appears on Unytea's public /explore page.",
+      "listToggle": "List on /explore",
+      "listToggleDescription": "When enabled, your community appears in public listings for the category and language you've selected, provided it meets quality criteria (≥3 active members, ≥1 upcoming live session, description + cover image set, ≥14 days old)."
+    }
+  },
   "exploreFilters": {
     "searchPlaceholder": "Search communities",
     "monetization": {

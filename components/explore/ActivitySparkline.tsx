@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import type { ExploreActivityStatus } from "@/types/explore";
 
@@ -13,26 +16,21 @@ const STATUS_COLOR_CLASS: Record<ExploreActivityStatus, string> = {
   quiet: "text-muted-foreground",
 };
 
-const STRINGS = {
-  activityLabel: "Activity · last 30 days",
-  status: {
-    very_active: "Very active",
-    active: "Active",
-    moderate: "Moderate",
-    quiet: "Quiet",
-  } satisfies Record<ExploreActivityStatus, string>,
-};
-
 const VIEWBOX_WIDTH = 280;
 const VIEWBOX_HEIGHT = 22;
-const Y_MIN = 2; // 2px top margin
-const Y_MAX = 20; // 2px bottom margin
+const Y_MIN = 2;
+const Y_MAX = 20;
 const Y_RANGE = Y_MAX - Y_MIN;
 
 export function ActivitySparkline({ history, status }: ActivitySparklineProps) {
+  const t = useTranslations("explore.card");
+  const tStatus = useTranslations("explore.card.activityStatus");
+
   const safeHistory = history.length > 0 ? history : [0];
   const max = Math.max(...safeHistory, 1);
   const colorClass = STATUS_COLOR_CLASS[status];
+  const activityLabel = t("activityLabel");
+  const statusLabel = tStatus(status);
 
   const points = safeHistory
     .map((value, i) => {
@@ -48,15 +46,15 @@ export function ActivitySparkline({ history, status }: ActivitySparklineProps) {
   return (
     <div className="mb-2.5">
       <div className="mb-1 flex justify-between text-xs text-muted-foreground">
-        <span>{STRINGS.activityLabel}</span>
-        <span className={cn("font-medium", colorClass)}>{STRINGS.status[status]}</span>
+        <span>{activityLabel}</span>
+        <span className={cn("font-medium", colorClass)}>{statusLabel}</span>
       </div>
       <svg
         viewBox={`0 0 ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`}
         preserveAspectRatio="none"
         className="block h-5 w-full"
         role="img"
-        aria-label={`${STRINGS.activityLabel}: ${STRINGS.status[status]}`}
+        aria-label={`${activityLabel}: ${statusLabel}`}
       >
         <polyline
           points={points}

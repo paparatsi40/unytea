@@ -1,7 +1,10 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { Globe, Lock } from "lucide-react";
 import { CommunityCategory } from "@prisma/client";
+import { useTranslations } from "next-intl";
 import { cn, getInitials } from "@/lib/utils";
 import type { ExploreCommunity } from "@/types/explore";
 import { LiveStatusBadge } from "./LiveStatusBadge";
@@ -12,29 +15,6 @@ type CommunityCardProps = {
   community: ExploreCommunity;
   locale: string;
   priority?: boolean;
-};
-
-export const CATEGORY_LABELS: Record<CommunityCategory, string> = {
-  BUSINESS_ENTREPRENEURSHIP: "Business & entrepreneurship",
-  MARKETING_SALES: "Marketing & sales",
-  TECH_PROGRAMMING: "Tech & programming",
-  AI_DATA_SCIENCE: "AI & data science",
-  HEALTH_WELLNESS: "Health & wellness",
-  FITNESS_SPORTS: "Fitness & sports",
-  COOKING_NUTRITION: "Cooking & nutrition",
-  PHOTOGRAPHY: "Photography",
-  ART_DESIGN: "Art & design",
-  MUSIC: "Music",
-  WRITING_PUBLISHING: "Writing & publishing",
-  EDUCATION_LANGUAGES: "Education & languages",
-  PERSONAL_FINANCE: "Personal finance",
-  TRAVEL: "Travel",
-  PARENTING_FAMILY: "Parenting & family",
-  SPIRITUALITY_MINDFULNESS: "Spirituality & mindfulness",
-  GAMING: "Gaming",
-  CRAFTS_DIY: "Crafts & DIY",
-  BOOKS_READING: "Books & reading",
-  OTHER: "Other",
 };
 
 const CATEGORY_COLOR_CLASS: Record<CommunityCategory, string> = {
@@ -60,12 +40,6 @@ const CATEGORY_COLOR_CLASS: Record<CommunityCategory, string> = {
   OTHER: "bg-muted text-muted-foreground",
 };
 
-const STRINGS = {
-  by: "by",
-  free: "Free",
-  paid: "Paid",
-};
-
 type PricingShape = { amount?: unknown; interval?: unknown; currency?: unknown };
 
 function parsePricing(
@@ -74,16 +48,17 @@ function parsePricing(
   if (!pricing || typeof pricing !== "object") return null;
   const p = pricing as PricingShape;
   if (typeof p.amount !== "number" || !Number.isFinite(p.amount) || p.amount < 0) return null;
-  const interval = p.interval === "year" ? "year" : "month"; // default to month
+  const interval = p.interval === "year" ? "year" : "month";
   const currency = typeof p.currency === "string" ? p.currency : "usd";
   return { amount: p.amount, interval, currency };
 }
 
 function PricingChip({ isPaid, pricing }: { isPaid: boolean; pricing: unknown }) {
+  const t = useTranslations("explore.card");
   if (!isPaid) {
     return (
       <span className="inline-flex shrink-0 items-center rounded-md border border-border bg-card px-1.5 py-0.5 text-xs font-medium text-muted-foreground">
-        {STRINGS.free}
+        {t("free")}
       </span>
     );
   }
@@ -91,7 +66,7 @@ function PricingChip({ isPaid, pricing }: { isPaid: boolean; pricing: unknown })
   const parsed = parsePricing(pricing);
   const label = parsed
     ? `$${parsed.amount.toFixed(0)}/${parsed.interval === "year" ? "yr" : "mo"}`
-    : STRINGS.paid;
+    : t("paid");
 
   return (
     <span className="inline-flex shrink-0 items-center gap-0.5 rounded-md bg-blue-100 px-1.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/40 dark:text-blue-200">
@@ -102,6 +77,7 @@ function PricingChip({ isPaid, pricing }: { isPaid: boolean; pricing: unknown })
 }
 
 function CategoryBadge({ category }: { category: CommunityCategory }) {
+  const t = useTranslations("explore.categories");
   return (
     <span
       className={cn(
@@ -109,7 +85,7 @@ function CategoryBadge({ category }: { category: CommunityCategory }) {
         CATEGORY_COLOR_CLASS[category]
       )}
     >
-      {CATEGORY_LABELS[category]}
+      {t(category)}
     </span>
   );
 }
@@ -124,14 +100,18 @@ function LanguageBadge({ language }: { language: string }) {
 }
 
 export function CommunityCard({ community, locale, priority = false }: CommunityCardProps) {
+  const t = useTranslations("explore.card");
   const ownerInitial = getInitials(community.owner.name).slice(0, 1) || "?";
+
+  const ownerLine = community.owner.title
+    ? t("byOwnerWithTitle", { name: community.owner.name, title: community.owner.title })
+    : t("byOwner", { name: community.owner.name });
 
   return (
     <Link
       href={`/${locale}/c/${community.slug}`}
       className="group flex flex-col overflow-hidden rounded-xl border border-border/50 bg-card transition-all hover:border-border hover:shadow-lg"
     >
-      {/* COVER + OVERLAYS */}
       <div className="relative h-32 w-full bg-muted">
         <Image
           src={community.coverImageUrl}
@@ -147,7 +127,6 @@ export function CommunityCard({ community, locale, priority = false }: Community
           nextSessionTitle={community.liveStatus.nextSessionTitle}
         />
 
-        {/* LOGO overlapping */}
         {community.imageUrl ? (
           <div className="absolute -bottom-5 left-3.5 h-[52px] w-[52px] overflow-hidden rounded-md border-[3px] border-card bg-card">
             <Image
@@ -168,15 +147,12 @@ export function CommunityCard({ community, locale, priority = false }: Community
         )}
       </div>
 
-      {/* BODY */}
       <div className="flex flex-1 flex-col px-4 pb-3.5 pt-7">
-        {/* Name + Pricing chip */}
         <div className="mb-1 flex items-start justify-between gap-2">
           <h3 className="line-clamp-1 text-base font-medium leading-tight">{community.name}</h3>
           <PricingChip isPaid={community.isPaid} pricing={community.pricing} />
         </div>
 
-        {/* Owner row */}
         <div className="mb-2 flex items-center gap-1.5 text-xs text-muted-foreground">
           {community.owner.image ? (
             <Image
@@ -194,25 +170,18 @@ export function CommunityCard({ community, locale, priority = false }: Community
               {ownerInitial}
             </span>
           )}
-          <span className="truncate">
-            {STRINGS.by} {community.owner.name}
-            {community.owner.title && ` · ${community.owner.title}`}
-          </span>
+          <span className="truncate">{ownerLine}</span>
         </div>
 
-        {/* Description */}
         <p className="mb-2.5 line-clamp-2 text-sm text-muted-foreground">{community.description}</p>
 
-        {/* Badges row */}
         <div className="mb-3 flex flex-wrap gap-1.5">
           <CategoryBadge category={community.category} />
           {community.language && <LanguageBadge language={community.language} />}
         </div>
 
-        {/* Sparkline */}
         <ActivitySparkline history={community.activityHistory} status={community.activityStatus} />
 
-        {/* Member avatars footer */}
         <div className="mt-auto">
           <MemberAvatarsStack
             members={community.sampleMembers}
