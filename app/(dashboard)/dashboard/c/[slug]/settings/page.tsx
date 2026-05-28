@@ -11,7 +11,13 @@ import { deleteCommunity } from "@/app/actions/communities";
 
 type FormCategory = CommunityCategory | "";
 
-const KNOWN_CATEGORIES = Object.keys(CommunityCategory) as CommunityCategory[];
+// Object.keys(enum) is safe here (returns own enumerable keys only), but use
+// a Set for the membership check below so the pattern matches the other
+// validators in this PR. `rawCategory in CommunityCategory` would walk the
+// prototype chain and accept "hasOwnProperty" etc., which then survives the
+// `as CommunityCategory` cast and surfaces in the UI.
+const KNOWN_CATEGORIES = Object.values(CommunityCategory) as CommunityCategory[];
+const KNOWN_CATEGORY_SET = new Set<CommunityCategory>(KNOWN_CATEGORIES);
 
 export default function GeneralSettingsPage() {
   const params = useParams();
@@ -59,7 +65,8 @@ export default function GeneralSettingsPage() {
           // harmless because read paths use the typed columns only.
           const rawCategory = community.category;
           const category: FormCategory =
-            typeof rawCategory === "string" && rawCategory in CommunityCategory
+            typeof rawCategory === "string" &&
+            KNOWN_CATEGORY_SET.has(rawCategory as CommunityCategory)
               ? (rawCategory as CommunityCategory)
               : "";
           setFormData({

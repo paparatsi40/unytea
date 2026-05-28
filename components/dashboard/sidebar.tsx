@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
   Home,
   Compass,
@@ -17,12 +17,24 @@ import {
   Library,
 } from "lucide-react";
 
-const navigation = [
+type NavItem = {
+  key: string;
+  href: string;
+  icon: typeof Home;
+  // When true, prefix href with the active locale at render time. Used for
+  // links that exit the dashboard route group (which is mounted at root)
+  // into the locale-prefixed marketing tree.
+  localePrefix?: boolean;
+};
+
+const navigation: NavItem[] = [
   { key: "dashboard", href: "/dashboard", icon: Home },
   // Explore exits the dashboard to the marketing /explore surface (pattern
   // matches Skool/Circle). Per PD V1 §5 Cat E REVISED, discovery is the
-  // platform's job for the §2 emerging-creator persona.
-  { key: "explore", href: "/explore", icon: Compass },
+  // platform's job for the §2 emerging-creator persona. The /explore route
+  // lives under app/[locale]/explore/, so the href must be locale-prefixed
+  // at render time (the dashboard route group has no locale segment).
+  { key: "explore", href: "/explore", icon: Compass, localePrefix: true },
   { key: "communities", href: "/dashboard/communities", icon: Users },
   { key: "messages", href: "/dashboard/messages", icon: MessageSquare },
   { key: "recordings", href: "/dashboard/recordings", icon: Library },
@@ -35,6 +47,7 @@ const navigation = [
 
 export function DashboardSidebar() {
   const pathname = usePathname();
+  const locale = useLocale();
   const t = useTranslations("sidebar");
 
   return (
@@ -56,13 +69,14 @@ export function DashboardSidebar() {
       {/* Navigation */}
       <nav className="flex-1 space-y-1 px-3 py-4">
         {navigation.map((item) => {
-          const isActive = pathname === item.href || pathname?.startsWith(item.href + "/");
+          const href = item.localePrefix ? `/${locale}${item.href}` : item.href;
+          const isActive = pathname === href || pathname?.startsWith(href + "/");
           const Icon = item.icon;
 
           return (
             <Link
               key={item.key}
-              href={item.href}
+              href={href}
               className={cn(
                 "flex items-center space-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
                 isActive

@@ -100,12 +100,12 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
           <div className="hidden items-center gap-6 md:flex">
             {/* Explore is first in nav: highest-discovery-funnel surface for the
              * §2 emerging-creator persona (no audience → discovery is the
-             * platform's job). i18n key added in Commit 7. */}
+             * platform's job). */}
             <Link
               href={`/${locale}/explore`}
               className="text-sm font-medium transition-colors hover:text-primary"
             >
-              Explore
+              {t("nav.explore")}
             </Link>
             <Link
               href="#features"

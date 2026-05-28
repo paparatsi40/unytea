@@ -46,6 +46,7 @@
   },
   "landing": {
     "nav": {
+      "explore": "Explore",
       "features": "Features",
       "testimonials": "Testimonials",
       "pricing": "Pricing",

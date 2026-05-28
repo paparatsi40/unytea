@@ -104,7 +104,12 @@ export async function getExploreCommunities(
         status: { not: "CANCELLED" },
       },
     },
-    NOT: { description: "" },
+    // Empty-string guards are siblings of the not-null check above:
+    // Prisma's `not: null` returns true for "" since null !== "". The
+    // post-fetch `.map(c => if (!c.X) return null)` narrows catch this
+    // too, but we keep the WHERE strict so count() and findMany stay
+    // consistent and pagination math doesn't over-fetch placeholders.
+    AND: [{ description: { not: "" } }, { coverImageUrl: { not: "" } }],
   };
 
   if (filters.category) where.category = filters.category;

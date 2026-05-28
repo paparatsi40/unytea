@@ -4,9 +4,15 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/auth-utils";
 
 const LANGUAGE_PATTERN = /^[a-zA-Z-]{2,8}$/;
+// Object.values(enum) returns only own enumerable string values, so the Set
+// excludes prototype methods. `value in CommunityCategory` would have
+// returned true for "hasOwnProperty" → Prisma error → 500.
+const VALID_CATEGORIES = new Set<CommunityCategory>(
+  Object.values(CommunityCategory) as CommunityCategory[]
+);
 
 function isCommunityCategory(value: unknown): value is CommunityCategory {
-  return typeof value === "string" && value in CommunityCategory;
+  return typeof value === "string" && VALID_CATEGORIES.has(value as CommunityCategory);
 }
 
 export async function GET(_request: NextRequest, props: { params: Promise<{ slug: string }> }) {

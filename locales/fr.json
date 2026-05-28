@@ -46,6 +46,7 @@
   },
   "landing": {
     "nav": {
+      "explore": "Explorer",
       "features": "Fonctionnalités",
       "testimonials": "Témoignages",
       "pricing": "Tarifs",

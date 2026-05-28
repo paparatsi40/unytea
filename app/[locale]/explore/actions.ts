@@ -19,9 +19,15 @@ const MAX_LANGUAGE_LENGTH = 8; // ISO 639-1 (2) with room for region tags (e.g. 
 const VALID_SIZES: readonly ExploreSize[] = ["all", "small", "medium", "large"];
 const VALID_TYPES: readonly ExploreType[] = ["all", "free", "paid"];
 const VALID_SORTS: readonly ExploreSort[] = ["newest", "most-active", "most-members"];
+// Object.values(enum) excludes prototype methods, so the Set is safe to
+// query with untrusted strings. `value in CommunityCategory` would have
+// returned true for "hasOwnProperty" and friends.
+const VALID_CATEGORIES = new Set<CommunityCategory>(
+  Object.values(CommunityCategory) as CommunityCategory[]
+);
 
 function isCommunityCategory(value: unknown): value is CommunityCategory {
-  return typeof value === "string" && value in CommunityCategory;
+  return typeof value === "string" && VALID_CATEGORIES.has(value as CommunityCategory);
 }
 
 function sanitizeFilters(input: ExploreFilters): ExploreFilters {

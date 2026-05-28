@@ -161,7 +161,10 @@ describe("getExploreCommunities — quality bar WHERE clause", () => {
     expect(where.category).toEqual({ not: null });
     expect(where.description).toEqual({ not: null });
     expect(where.coverImageUrl).toEqual({ not: null });
-    expect(where.NOT).toEqual({ description: "" });
+    expect(where.AND).toEqual([
+      { description: { not: "" } },
+      { coverImageUrl: { not: "" } },
+    ]);
     // createdAt < (now - 14 days)
     const createdAtFilter = where.createdAt as { lt: Date };
     expect(createdAtFilter.lt.getTime()).toBe(subDays(NOW, 14).getTime());

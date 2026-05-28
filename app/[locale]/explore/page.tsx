@@ -35,6 +35,12 @@ const MAX_SEARCH_LENGTH = 100;
 const VALID_SIZES = new Set<ExploreSize>(["all", "small", "medium", "large"]);
 const VALID_TYPES = new Set<ExploreType>(["all", "free", "paid"]);
 const VALID_SORTS = new Set<ExploreSort>(["newest", "most-active", "most-members"]);
+// Object.values(enum) returns only own enumerable string values, so the Set
+// excludes prototype methods. `value in CommunityCategory` would have
+// returned true for "hasOwnProperty", letting it reach Prisma → 500.
+const VALID_CATEGORIES = new Set<CommunityCategory>(
+  Object.values(CommunityCategory) as CommunityCategory[]
+);
 
 export async function generateMetadata({
   params,
@@ -57,7 +63,7 @@ export async function generateMetadata({
 }
 
 function isCommunityCategory(value: unknown): value is CommunityCategory {
-  return typeof value === "string" && value in CommunityCategory;
+  return typeof value === "string" && VALID_CATEGORIES.has(value as CommunityCategory);
 }
 
 function parseSearchParams(sp: SearchParams): {
