@@ -35,7 +35,10 @@ function createRunId(sessionId: string) {
   return `autopilot:${sessionId}:${Date.now()}`;
 }
 
-export async function startSessionAutopilot(sessionId: string, trigger: string = "session_created") {
+export async function startSessionAutopilot(
+  sessionId: string,
+  trigger: string = "session_created"
+) {
   const session = await prisma.mentorSession.findUnique({
     where: { id: sessionId },
     select: {
@@ -85,8 +88,14 @@ export async function startSessionAutopilot(sessionId: string, trigger: string =
   const jobs: Array<{ jobType: AutopilotJobType; runAt: Date }> = [
     { jobType: "auto_promote", runAt: new Date(now + 5 * 1000) },
     { jobType: "auto_engage", runAt: runAtEngage },
-    { jobType: "auto_capture", runAt: new Date(scheduledMs + Math.max(15, session.duration) * 60 * 1000) },
-    { jobType: "auto_distribute", runAt: new Date(scheduledMs + Math.max(90, session.duration + 30) * 60 * 1000) },
+    {
+      jobType: "auto_capture",
+      runAt: new Date(scheduledMs + Math.max(15, session.duration) * 60 * 1000),
+    },
+    {
+      jobType: "auto_distribute",
+      runAt: new Date(scheduledMs + Math.max(90, session.duration + 30) * 60 * 1000),
+    },
     { jobType: "auto_queue_next", runAt: new Date(scheduledMs + 2 * 60 * 60 * 1000) },
   ];
 
@@ -341,7 +350,9 @@ async function executeAutopilotJob(sessionId: string, jobType: AutopilotJobType)
         attachments: {
           sessionId: session.id,
           lifecycleStage: "autopilot_distribution",
-          replayLink: session.slug ? `/sessions/${session.slug}` : `/dashboard/sessions/${session.id}`,
+          replayLink: session.slug
+            ? `/sessions/${session.slug}`
+            : `/dashboard/sessions/${session.id}`,
         } as any,
       },
     });
@@ -444,7 +455,10 @@ export async function getAutopilotOverview(limit: number = 20) {
     failed: jobs.filter((j) => j.status === "failed").length,
   };
 
-  const completionRate = stats.done + stats.failed > 0 ? Math.round((stats.done / (stats.done + stats.failed)) * 100) : 100;
+  const completionRate =
+    stats.done + stats.failed > 0
+      ? Math.round((stats.done / (stats.done + stats.failed)) * 100)
+      : 100;
 
   return {
     success: true,

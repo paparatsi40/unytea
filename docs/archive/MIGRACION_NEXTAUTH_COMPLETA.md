@@ -35,8 +35,8 @@ funcional** con una UI superior y sin dependencias de vendors externos.
 
 - ✅ Schema de Prisma migrado
 - ✅ Tabla `users` actualizada:
-    - ❌ Removido: `clerkId`, `imageUrl`
-    - ✅ Agregado: `password`, `emailVerified`, `image`
+  - ❌ Removido: `clerkId`, `imageUrl`
+  - ✅ Agregado: `password`, `emailVerified`, `image`
 - ✅ Nuevas tablas: `accounts`, `sessions`, `verification_tokens`
 - ✅ Tabla `sessions` renombrada a `mentor_sessions`
 - ✅ Push a PostgreSQL exitoso
@@ -173,21 +173,21 @@ funcional** con una UI superior y sin dependencias de vendors externos.
 
 ## 📈 COMPARACIÓN: CLERK vs NEXTAUTH
 
-| Aspecto | Clerk (Anterior) | NextAuth (Actual) |
-|---------|------------------|-------------------|
-| **Costo/mes** | $25-50 (después de 10K users) | $0 (gratis siempre) |
-| **Control UI** | ❌ Limitado a componentes | ✅ 100% customizable |
-| **Server Components** | ⚠️ Con hacks/workarounds | ✅ Nativo |
-| **Vendor Lock-in** | ❌ Dependencia total | ✅ Código nuestro |
-| **Velocidad Dev** | ⚠️ Errores frecuentes | ✅ Fluido |
-| **OAuth Providers** | ✅ 20+ | ✅ 20+ |
-| **Magic Links** | ✅ Sí | ✅ Sí (fácil agregar) |
-| **2FA** | ✅ Sí ($) | ✅ Sí (gratis) |
-| **Webhooks** | ✅ Sí | ⚠️ Manual (pero simple) |
-| **User Management** | ✅ Dashboard | ⚠️ Lo haremos nosotros |
-| **Calidad UI** | ⚠️ Genérica | ✅ Premium custom |
-| **Type Safety** | ⚠️ Parcial | ✅ 100% |
-| **Documentación** | ⚠️ Confusa en v5 | ✅ Excelente |
+| Aspecto               | Clerk (Anterior)              | NextAuth (Actual)       |
+| --------------------- | ----------------------------- | ----------------------- |
+| **Costo/mes**         | $25-50 (después de 10K users) | $0 (gratis siempre)     |
+| **Control UI**        | ❌ Limitado a componentes     | ✅ 100% customizable    |
+| **Server Components** | ⚠️ Con hacks/workarounds      | ✅ Nativo               |
+| **Vendor Lock-in**    | ❌ Dependencia total          | ✅ Código nuestro       |
+| **Velocidad Dev**     | ⚠️ Errores frecuentes         | ✅ Fluido               |
+| **OAuth Providers**   | ✅ 20+                        | ✅ 20+                  |
+| **Magic Links**       | ✅ Sí                         | ✅ Sí (fácil agregar)   |
+| **2FA**               | ✅ Sí ($)                     | ✅ Sí (gratis)          |
+| **Webhooks**          | ✅ Sí                         | ⚠️ Manual (pero simple) |
+| **User Management**   | ✅ Dashboard                  | ⚠️ Lo haremos nosotros  |
+| **Calidad UI**        | ⚠️ Genérica                   | ✅ Premium custom       |
+| **Type Safety**       | ⚠️ Parcial                    | ✅ 100%                 |
+| **Documentación**     | ⚠️ Confusa en v5              | ✅ Excelente            |
 
 ---
 
@@ -296,16 +296,16 @@ DATABASE_URL=postgresql://postgres:postgres@localhost:5433/mentorly?schema=publi
 ### **Server Components**
 
 ```typescript
-import { getCurrentUserId, getCurrentUser, requireAuth } from '@/lib/auth-utils'
+import { getCurrentUserId, getCurrentUser, requireAuth } from "@/lib/auth-utils";
 
 // Get user ID (returns null if not logged in)
-const userId = await getCurrentUserId()
+const userId = await getCurrentUserId();
 
 // Get full user (returns null if not logged in)
-const user = await getCurrentUser()
+const user = await getCurrentUser();
 
 // Require auth (redirects to login if not logged in)
-const session = await requireAuth()
+const session = await requireAuth();
 ```
 
 ### **Client Components**
@@ -315,10 +315,10 @@ import { useCurrentUser } from '@/hooks/use-current-user'
 
 function MyComponent() {
   const { user, isLoading, isAuthenticated } = useCurrentUser()
-  
+
   if (isLoading) return <Loader />
   if (!user) return <LoginPrompt />
-  
+
   return <div>Hello {user.name}</div>
 }
 ```
@@ -326,15 +326,15 @@ function MyComponent() {
 ### **API Routes**
 
 ```typescript
-import { getCurrentUserId } from '@/lib/auth-utils'
+import { getCurrentUserId } from "@/lib/auth-utils";
 
 export async function GET() {
-  const userId = await getCurrentUserId()
-  
+  const userId = await getCurrentUserId();
+
   if (!userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  
+
   // ... rest of logic
 }
 ```

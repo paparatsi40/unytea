@@ -49,7 +49,8 @@ function getAttendanceRecommendation(attendance: any) {
   if (attendance.rsvpToJoinRate < 50) {
     return {
       title: "Low RSVP → Join conversion",
-      description: "Tip: Ask members to drop questions in the feed before the session. This typically increases attendance by ~30%.",
+      description:
+        "Tip: Ask members to drop questions in the feed before the session. This typically increases attendance by ~30%.",
       tone: "warning" as const,
     };
   }
@@ -65,12 +66,16 @@ function getAttendanceRecommendation(attendance: any) {
   if (attendance.replayRate < 60 && attendance.completedSessions >= 2) {
     return {
       title: "Replay capture opportunity",
-      description: "More sessions need replay distribution. Push recording-ready notifications and share public links.",
+      description:
+        "More sessions need replay distribution. Push recording-ready notifications and share public links.",
       tone: "warning" as const,
     };
   }
 
-  if ((attendance.trend?.avgAttendanceDelta || 0) > 0 || (attendance.trend?.rsvpToJoinRateDelta || 0) > 0) {
+  if (
+    (attendance.trend?.avgAttendanceDelta || 0) > 0 ||
+    (attendance.trend?.rsvpToJoinRateDelta || 0) > 0
+  ) {
     return {
       title: "Momentum is improving",
       description: "Keep cadence stable this week and push one extra live session announcement.",
@@ -81,8 +86,11 @@ function getAttendanceRecommendation(attendance: any) {
   return null;
 }
 
-export default async function CommunitySessionsPage({ params, searchParams }: CommunitySessionsPageProps) {
-try {
+export default async function CommunitySessionsPage({
+  params,
+  searchParams,
+}: CommunitySessionsPageProps) {
+  try {
     const session = await auth();
     if (!session?.user?.id) {
       redirect("/auth/signin");
@@ -128,7 +136,7 @@ try {
           slug: true,
           recordingUrl: true,
           mentorId: true,
-mentor: {
+          mentor: {
             select: {
               id: true,
               name: true,
@@ -171,7 +179,8 @@ mentor: {
       (s) => s.status === "SCHEDULED" && new Date(s.scheduledAt) >= now
     );
     const past = allSessions.filter(
-      (s) => s.status !== "IN_PROGRESS" && !(s.status === "SCHEDULED" && new Date(s.scheduledAt) >= now)
+      (s) =>
+        s.status !== "IN_PROGRESS" && !(s.status === "SCHEDULED" && new Date(s.scheduledAt) >= now)
     );
     const pastSorted = [...past].sort(
       (a, b) => new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime()
@@ -189,13 +198,15 @@ mentor: {
         return new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime();
       })
       .slice(0, 3);
-const pastAllCount = pastSorted.length;
+    const pastAllCount = pastSorted.length;
     const pastReplayCount = pastSorted.filter((s) => Boolean(s.recordingUrl)).length;
-    const pastPublicReplayCount = pastSorted.filter((s) => Boolean(s.recordingUrl) && s.visibility === "public" && Boolean(s.slug)).length;
+    const pastPublicReplayCount = pastSorted.filter(
+      (s) => Boolean(s.recordingUrl) && s.visibility === "public" && Boolean(s.slug)
+    ).length;
 
     // Calculate sessions this week
-    const thisWeek = [...liveSessions, ...upcoming].filter(s => {
-const sessionDate = new Date(s.scheduledAt);
+    const thisWeek = [...liveSessions, ...upcoming].filter((s) => {
+      const sessionDate = new Date(s.scheduledAt);
       const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
       return sessionDate <= weekFromNow;
     });
@@ -242,29 +253,32 @@ const sessionDate = new Date(s.scheduledAt);
     const primarySession = liveSessions[0] || upcoming[0] || null;
 
     async function handleRSVP(sessionId: string, _formData: FormData) {
-"use server";
+      "use server";
       await toggleSessionRSVP(sessionId, `/dashboard/communities/${communityId}/sessions`);
     }
 
     return (
-<div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background">
         <div className="container mx-auto max-w-6xl px-4 py-6">
           {/* Header */}
           <div className="mb-8">
             <div className="flex items-center justify-between">
               <div>
-                <div className="flex items-center gap-2 mb-1">
+                <div className="mb-1 flex items-center gap-2">
                   <h1 className="text-2xl font-semibold text-foreground">Live Sessions</h1>
-                  <Badge variant="secondary" className="bg-muted text-muted-foreground text-xs">
+                  <Badge variant="secondary" className="bg-muted text-xs text-muted-foreground">
                     {allSessions.length} sessions
                   </Badge>
                 </div>
-                <p className="text-muted-foreground">{community.name} • Run live coaching, classes, and workshops</p>
+                <p className="text-muted-foreground">
+                  {community.name} • Run live coaching, classes, and workshops
+                </p>
                 {liveSessions.length > 0 && (
                   <div className="mt-2 flex items-center gap-2 text-sm">
                     <Sparkles className="h-4 w-4 text-red-500" />
                     <span className="text-foreground">
-                      {liveSessions.length} {liveSessions.length === 1 ? "session is" : "sessions are"} live now
+                      {liveSessions.length}{" "}
+                      {liveSessions.length === 1 ? "session is" : "sessions are"} live now
                     </span>
                   </div>
                 )}
@@ -276,18 +290,16 @@ const sessionDate = new Date(s.scheduledAt);
                     </span>
                   </div>
                 )}
-</div>
+              </div>
               {canCreateSessions && (
                 <CreateSessionDialog
                   triggerText="Schedule Session"
-                  className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2.5 rounded-lg font-medium flex items-center gap-2"
+                  className="flex items-center gap-2 rounded-lg bg-purple-600 px-5 py-2.5 font-medium text-white hover:bg-purple-700"
                   communityId={communityId}
                 />
               )}
               {!canCreateSessions && (
-                <div className="text-sm text-muted-foreground">
-                  (Owner only feature)
-                </div>
+                <div className="text-sm text-muted-foreground">(Owner only feature)</div>
               )}
             </div>
           </div>
@@ -295,10 +307,14 @@ const sessionDate = new Date(s.scheduledAt);
           <div className="mb-6 rounded-xl border border-border bg-card p-5">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
-                <p className="text-xs uppercase tracking-wide text-muted-foreground">Next / Current session</p>
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                  Next / Current session
+                </p>
                 {primarySession ? (
                   <>
-                    <h2 className="mt-1 text-lg font-semibold text-foreground">{primarySession.title}</h2>
+                    <h2 className="mt-1 text-lg font-semibold text-foreground">
+                      {primarySession.title}
+                    </h2>
                     <p className="mt-1 text-sm text-muted-foreground">
                       {primarySession.status === "IN_PROGRESS"
                         ? "Your community is live now. Keep momentum and drive join rate."
@@ -307,8 +323,12 @@ const sessionDate = new Date(s.scheduledAt);
                   </>
                 ) : (
                   <>
-                    <h2 className="mt-1 text-lg font-semibold text-foreground">No session scheduled yet</h2>
-                    <p className="mt-1 text-sm text-muted-foreground">Schedule your next live touchpoint to keep weekly community cadence.</p>
+                    <h2 className="mt-1 text-lg font-semibold text-foreground">
+                      No session scheduled yet
+                    </h2>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Schedule your next live touchpoint to keep weekly community cadence.
+                    </p>
                   </>
                 )}
               </div>
@@ -316,21 +336,33 @@ const sessionDate = new Date(s.scheduledAt);
               <div className="flex flex-wrap items-center gap-2">
                 {primarySession ? (
                   <>
-                    <Link href={`/dashboard/sessions/${primarySession.id}/room?src=sessions_hub_primary_action`}>
-                      <Button className={`${primarySession.status === "IN_PROGRESS" ? "bg-red-600 hover:bg-red-700" : "bg-purple-600 hover:bg-purple-700"} text-foreground`}>
+                    <Link
+                      href={`/dashboard/sessions/${primarySession.id}/room?src=sessions_hub_primary_action`}
+                    >
+                      <Button
+                        className={`${primarySession.status === "IN_PROGRESS" ? "bg-red-600 hover:bg-red-700" : "bg-purple-600 hover:bg-purple-700"} text-foreground`}
+                      >
                         {primarySession.status === "IN_PROGRESS" ? "Join live" : "Open session"}
                       </Button>
                     </Link>
                     {primarySession.status !== "IN_PROGRESS" && (
                       <form action={handleRSVP.bind(null, primarySession.id)}>
-                        <Button variant="outline" className="border-border text-foreground hover:bg-accent">
+                        <Button
+                          variant="outline"
+                          className="border-border text-foreground hover:bg-accent"
+                        >
                           {primarySession.participations?.length ? "Attending" : "RSVP"}
                         </Button>
                       </form>
                     )}
                     {canCreateSessions && (
-                      <Link href={`/dashboard/sessions/${primarySession.id}?src=sessions_hub_manage_primary`}>
-                        <Button variant="outline" className="border-border text-foreground hover:bg-accent">
+                      <Link
+                        href={`/dashboard/sessions/${primarySession.id}?src=sessions_hub_manage_primary`}
+                      >
+                        <Button
+                          variant="outline"
+                          className="border-border text-foreground hover:bg-accent"
+                        >
                           Manage
                         </Button>
                       </Link>
@@ -340,7 +372,7 @@ const sessionDate = new Date(s.scheduledAt);
                   canCreateSessions && (
                     <CreateSessionDialog
                       triggerText="Schedule session"
-                      className="bg-purple-600 hover:bg-purple-700 text-white"
+                      className="bg-purple-600 text-white hover:bg-purple-700"
                       communityId={communityId}
                     />
                   )
@@ -350,94 +382,128 @@ const sessionDate = new Date(s.scheduledAt);
           </div>
 
           {attendance && (
-<>
-            <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-              <p className="text-sm font-semibold text-foreground">Session performance</p>
-              <div className="flex items-center gap-2 text-xs">
-                {canCreateSessions && (
-                  <Link href="/dashboard/notifications?src=sessions_hub_reminders">
-                    <Button variant="outline" className="h-7 border-border px-2 text-[11px] text-foreground hover:bg-accent">
-                      Reminders
-                    </Button>
-                  </Link>
-                )}
-                <span className="text-muted-foreground">Window:</span>
-                {([7, 30, 90] as const).map((days) => (
-                  <Link
-                    key={days}
-                    href={`/dashboard/communities/${communityId}/sessions?filter=${filter}&pastFilter=${pastFilter}&window=${days}`}
-                    className={`rounded border px-2 py-1 transition ${
-                      metricWindow === days
-                        ? "border-border bg-muted text-foreground"
-                        : "border-border bg-card text-muted-foreground hover:bg-accent"
-                    }`}
-                  >
-                    {days}d
-                  </Link>
-                ))}
-              </div>
-            </div>
-            <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-<div className="rounded-lg border border-border bg-card p-4">
-                <p className="text-xs uppercase tracking-wide text-muted-foreground">Avg attendance</p>
-                <p className="mt-1 text-2xl font-semibold text-foreground">{attendance.avgAttendance}</p>
-                <p className="text-xs text-muted-foreground">last {attendance.periodDays} days</p>
-                <p className={`mt-1 text-xs ${attendance.trend?.avgAttendanceDelta >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
-                  {attendance.trend?.avgAttendanceDelta >= 0 ? "+" : ""}{attendance.trend?.avgAttendanceDelta || 0} vs prev period
-                </p>
-              </div>
-              <div className="rounded-lg border border-border bg-card p-4">
-                <p className="text-xs uppercase tracking-wide text-muted-foreground">RSVP → join</p>
-                <p className="mt-1 text-2xl font-semibold text-foreground">{attendance.rsvpToJoinRate}%</p>
-                <p className="text-xs text-muted-foreground">target: {rsvpJoinTarget}%</p>
-                <div className="mt-2 h-1.5 w-full rounded-full bg-muted">
-                  <div
-                    className={`h-1.5 rounded-full ${rsvpJoinProgress >= rsvpJoinTarget ? "bg-emerald-500" : "bg-amber-500"}`}
-                    style={{ width: `${rsvpJoinProgress}%` }}
-                  />
-                </div>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {rsvpJoinGap === 0 ? "On target" : `${rsvpJoinGap}pp to target`}
-                </p>
-                <p className={`mt-1 text-xs ${attendance.trend?.rsvpToJoinRateDelta >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
-                  {attendance.trend?.rsvpToJoinRateDelta >= 0 ? "+" : ""}{attendance.trend?.rsvpToJoinRateDelta || 0}pp vs prev period
-                </p>
-              </div>
-<div className="rounded-lg border border-border bg-card p-4">
-                <p className="text-xs uppercase tracking-wide text-muted-foreground">Reminders sent</p>
-                <p className="mt-1 text-2xl font-semibold text-foreground">{attendance.remindersSent}</p>
-                <p className="text-xs text-muted-foreground">delivery volume</p>
-                <p className={`mt-1 text-xs ${attendance.trend?.remindersSentDelta >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
-                  {attendance.trend?.remindersSentDelta >= 0 ? "+" : ""}{attendance.trend?.remindersSentDelta || 0} vs prev period
-                </p>
-              </div>
-              <div className="rounded-lg border border-border bg-card p-4">
-                <p className="text-xs uppercase tracking-wide text-muted-foreground">Completed sessions</p>
-                <p className="mt-1 text-2xl font-semibold text-foreground">{attendance.completedSessions}</p>
-                <p className="text-xs text-muted-foreground">Replay rate: {attendance.replayRate}%</p>
-                <p className={`mt-1 text-xs ${attendance.trend?.replayRateDelta >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
-                  {attendance.trend?.replayRateDelta >= 0 ? "+" : ""}{attendance.trend?.replayRateDelta || 0}pp replay vs prev period
-                </p>
-              </div>
-</div>
-            {recommendation && recommendation.tone === "warning" && (
-              <div className="mb-6 rounded-lg border border-amber-500/30 bg-amber-500/10 p-4">
-                <p className="text-sm font-semibold text-foreground">{recommendation.title}</p>
-                <p className="mt-1 text-sm text-foreground">{recommendation.description}</p>
-                {recommendation.title === "Low RSVP → Join conversion" && (
-                  <div className="mt-3">
-                    <Link href={`/dashboard/c/${community.slug}?src=attendance_tip_question_post`}>
-                      <Button className="bg-amber-400 text-black hover:bg-amber-300">
-                        Create question post
+            <>
+              <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+                <p className="text-sm font-semibold text-foreground">Session performance</p>
+                <div className="flex items-center gap-2 text-xs">
+                  {canCreateSessions && (
+                    <Link href="/dashboard/notifications?src=sessions_hub_reminders">
+                      <Button
+                        variant="outline"
+                        className="h-7 border-border px-2 text-[11px] text-foreground hover:bg-accent"
+                      >
+                        Reminders
                       </Button>
                     </Link>
-                  </div>
-                )}
+                  )}
+                  <span className="text-muted-foreground">Window:</span>
+                  {([7, 30, 90] as const).map((days) => (
+                    <Link
+                      key={days}
+                      href={`/dashboard/communities/${communityId}/sessions?filter=${filter}&pastFilter=${pastFilter}&window=${days}`}
+                      className={`rounded border px-2 py-1 transition ${
+                        metricWindow === days
+                          ? "border-border bg-muted text-foreground"
+                          : "border-border bg-card text-muted-foreground hover:bg-accent"
+                      }`}
+                    >
+                      {days}d
+                    </Link>
+                  ))}
+                </div>
               </div>
-            )}
-</>
+              <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="rounded-lg border border-border bg-card p-4">
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                    Avg attendance
+                  </p>
+                  <p className="mt-1 text-2xl font-semibold text-foreground">
+                    {attendance.avgAttendance}
+                  </p>
+                  <p className="text-xs text-muted-foreground">last {attendance.periodDays} days</p>
+                  <p
+                    className={`mt-1 text-xs ${attendance.trend?.avgAttendanceDelta >= 0 ? "text-emerald-400" : "text-rose-400"}`}
+                  >
+                    {attendance.trend?.avgAttendanceDelta >= 0 ? "+" : ""}
+                    {attendance.trend?.avgAttendanceDelta || 0} vs prev period
+                  </p>
+                </div>
+                <div className="rounded-lg border border-border bg-card p-4">
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                    RSVP → join
+                  </p>
+                  <p className="mt-1 text-2xl font-semibold text-foreground">
+                    {attendance.rsvpToJoinRate}%
+                  </p>
+                  <p className="text-xs text-muted-foreground">target: {rsvpJoinTarget}%</p>
+                  <div className="mt-2 h-1.5 w-full rounded-full bg-muted">
+                    <div
+                      className={`h-1.5 rounded-full ${rsvpJoinProgress >= rsvpJoinTarget ? "bg-emerald-500" : "bg-amber-500"}`}
+                      style={{ width: `${rsvpJoinProgress}%` }}
+                    />
+                  </div>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {rsvpJoinGap === 0 ? "On target" : `${rsvpJoinGap}pp to target`}
+                  </p>
+                  <p
+                    className={`mt-1 text-xs ${attendance.trend?.rsvpToJoinRateDelta >= 0 ? "text-emerald-400" : "text-rose-400"}`}
+                  >
+                    {attendance.trend?.rsvpToJoinRateDelta >= 0 ? "+" : ""}
+                    {attendance.trend?.rsvpToJoinRateDelta || 0}pp vs prev period
+                  </p>
+                </div>
+                <div className="rounded-lg border border-border bg-card p-4">
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                    Reminders sent
+                  </p>
+                  <p className="mt-1 text-2xl font-semibold text-foreground">
+                    {attendance.remindersSent}
+                  </p>
+                  <p className="text-xs text-muted-foreground">delivery volume</p>
+                  <p
+                    className={`mt-1 text-xs ${attendance.trend?.remindersSentDelta >= 0 ? "text-emerald-400" : "text-rose-400"}`}
+                  >
+                    {attendance.trend?.remindersSentDelta >= 0 ? "+" : ""}
+                    {attendance.trend?.remindersSentDelta || 0} vs prev period
+                  </p>
+                </div>
+                <div className="rounded-lg border border-border bg-card p-4">
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                    Completed sessions
+                  </p>
+                  <p className="mt-1 text-2xl font-semibold text-foreground">
+                    {attendance.completedSessions}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Replay rate: {attendance.replayRate}%
+                  </p>
+                  <p
+                    className={`mt-1 text-xs ${attendance.trend?.replayRateDelta >= 0 ? "text-emerald-400" : "text-rose-400"}`}
+                  >
+                    {attendance.trend?.replayRateDelta >= 0 ? "+" : ""}
+                    {attendance.trend?.replayRateDelta || 0}pp replay vs prev period
+                  </p>
+                </div>
+              </div>
+              {recommendation && recommendation.tone === "warning" && (
+                <div className="mb-6 rounded-lg border border-amber-500/30 bg-amber-500/10 p-4">
+                  <p className="text-sm font-semibold text-foreground">{recommendation.title}</p>
+                  <p className="mt-1 text-sm text-foreground">{recommendation.description}</p>
+                  {recommendation.title === "Low RSVP → Join conversion" && (
+                    <div className="mt-3">
+                      <Link
+                        href={`/dashboard/c/${community.slug}?src=attendance_tip_question_post`}
+                      >
+                        <Button className="bg-amber-400 text-black hover:bg-amber-300">
+                          Create question post
+                        </Button>
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
           )}
-
 
           <div className="mb-3 flex items-center justify-between">
             <p className="text-sm font-semibold text-foreground">Schedule surface</p>
@@ -445,14 +511,20 @@ const sessionDate = new Date(s.scheduledAt);
           </div>
 
           <Tabs defaultValue="upcoming" className="w-full">
-<TabsList className="bg-card border-border mb-6">
-              <TabsTrigger value="upcoming" className="data-[state=active]:bg-muted text-foreground">
+            <TabsList className="mb-6 border-border bg-card">
+              <TabsTrigger
+                value="upcoming"
+                className="text-foreground data-[state=active]:bg-muted"
+              >
                 Upcoming ({liveSessions.length + upcoming.length})
               </TabsTrigger>
-<TabsTrigger value="past" className="data-[state=active]:bg-muted text-foreground">
+              <TabsTrigger value="past" className="text-foreground data-[state=active]:bg-muted">
                 Past ({past.length})
               </TabsTrigger>
-              <TabsTrigger value="calendar" className="data-[state=active]:bg-muted text-foreground">
+              <TabsTrigger
+                value="calendar"
+                className="text-foreground data-[state=active]:bg-muted"
+              >
                 Calendar
               </TabsTrigger>
             </TabsList>
@@ -460,32 +532,54 @@ const sessionDate = new Date(s.scheduledAt);
             <TabsContent value="upcoming" className="space-y-4">
               <div className="mb-4 flex flex-wrap items-center gap-2">
                 {upcomingLiveCount > 0 && (
-                  <Badge className="bg-red-600 text-white text-xs">{upcomingLiveCount} live now</Badge>
+                  <Badge className="bg-red-600 text-xs text-white">
+                    {upcomingLiveCount} live now
+                  </Badge>
                 )}
-<Link href={`/dashboard/communities/${communityId}/sessions?filter=all&window=${metricWindow}`}>
-                  <Button variant="outline" className={`h-8 border-border text-xs ${filter === "all" ? "bg-muted text-foreground" : "text-foreground hover:bg-accent"}`}>
+                <Link
+                  href={`/dashboard/communities/${communityId}/sessions?filter=all&window=${metricWindow}`}
+                >
+                  <Button
+                    variant="outline"
+                    className={`h-8 border-border text-xs ${filter === "all" ? "bg-muted text-foreground" : "text-foreground hover:bg-accent"}`}
+                  >
                     All ({upcomingAllCount})
-</Button>
+                  </Button>
                 </Link>
-                <Link href={`/dashboard/communities/${communityId}/sessions?filter=live&window=${metricWindow}`}>
-                  <Button variant="outline" className={`h-8 border-border text-xs ${filter === "live" ? "bg-red-600 text-white border-red-500" : "bg-card text-foreground hover:bg-accent"}`}>
+                <Link
+                  href={`/dashboard/communities/${communityId}/sessions?filter=live&window=${metricWindow}`}
+                >
+                  <Button
+                    variant="outline"
+                    className={`h-8 border-border text-xs ${filter === "live" ? "border-red-500 bg-red-600 text-white" : "bg-card text-foreground hover:bg-accent"}`}
+                  >
                     Live ({upcomingLiveCount})
-</Button>
+                  </Button>
                 </Link>
-                <Link href={`/dashboard/communities/${communityId}/sessions?filter=today&window=${metricWindow}`}>
-                  <Button variant="outline" className={`h-8 border-border text-xs ${filter === "today" ? "bg-muted text-foreground" : "bg-card text-foreground hover:bg-accent"}`}>
+                <Link
+                  href={`/dashboard/communities/${communityId}/sessions?filter=today&window=${metricWindow}`}
+                >
+                  <Button
+                    variant="outline"
+                    className={`h-8 border-border text-xs ${filter === "today" ? "bg-muted text-foreground" : "bg-card text-foreground hover:bg-accent"}`}
+                  >
                     Today ({upcomingTodayCount})
-</Button>
+                  </Button>
                 </Link>
-                <Link href={`/dashboard/communities/${communityId}/sessions?filter=week&window=${metricWindow}`}>
-                  <Button variant="outline" className={`h-8 border-border text-xs ${filter === "week" ? "bg-muted text-foreground" : "bg-card text-foreground hover:bg-accent"}`}>
+                <Link
+                  href={`/dashboard/communities/${communityId}/sessions?filter=week&window=${metricWindow}`}
+                >
+                  <Button
+                    variant="outline"
+                    className={`h-8 border-border text-xs ${filter === "week" ? "bg-muted text-foreground" : "bg-card text-foreground hover:bg-accent"}`}
+                  >
                     This week ({upcomingWeekCount})
-</Button>
+                  </Button>
                 </Link>
               </div>
 
               {filteredUpcoming.length === 0 ? (
-<div className="rounded-xl border border-border bg-card p-5">
+                <div className="rounded-xl border border-border bg-card p-5">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-start gap-3">
                       <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-full bg-muted">
@@ -496,10 +590,10 @@ const sessionDate = new Date(s.scheduledAt);
                           {filter === "live"
                             ? "No sessions live right now"
                             : filter === "today"
-                            ? "No sessions scheduled for today"
-                            : filter === "week"
-                            ? "No sessions scheduled this week"
-                            : "No upcoming sessions yet"}
+                              ? "No sessions scheduled for today"
+                              : filter === "week"
+                                ? "No sessions scheduled this week"
+                                : "No upcoming sessions yet"}
                         </h3>
                         <p className="mt-1 text-xs text-muted-foreground">
                           {filter === "all"
@@ -513,13 +607,18 @@ const sessionDate = new Date(s.scheduledAt);
                       {canCreateSessions && (
                         <CreateSessionDialog
                           triggerText="Schedule session"
-                          className="bg-purple-600 hover:bg-purple-700 text-white"
+                          className="bg-purple-600 text-white hover:bg-purple-700"
                           communityId={communityId}
                         />
                       )}
                       {filter !== "all" && (
-                        <Link href={`/dashboard/communities/${communityId}/sessions?filter=all&window=${metricWindow}`}>
-                          <Button variant="outline" className="border-border text-foreground hover:bg-accent">
+                        <Link
+                          href={`/dashboard/communities/${communityId}/sessions?filter=all&window=${metricWindow}`}
+                        >
+                          <Button
+                            variant="outline"
+                            className="border-border text-foreground hover:bg-accent"
+                          >
                             Clear filter
                           </Button>
                         </Link>
@@ -530,7 +629,7 @@ const sessionDate = new Date(s.scheduledAt);
               ) : (
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {filteredUpcoming.map((s) => (
-<div
+                    <div
                       key={s.id}
                       className="group rounded-xl border border-border bg-background p-5 transition-all hover:border-border"
                     >
@@ -541,14 +640,12 @@ const sessionDate = new Date(s.scheduledAt);
                           {formatSessionDate(new Date(s.scheduledAt))}
                         </span>
                         {s.status === "IN_PROGRESS" && (
-                          <Badge className="bg-red-600 text-white text-[10px]">LIVE</Badge>
+                          <Badge className="bg-red-600 text-[10px] text-white">LIVE</Badge>
                         )}
                       </div>
 
                       {/* Title */}
-                      <h3 className="mb-2 text-lg font-semibold text-foreground">
-                        {s.title}
-                      </h3>
+                      <h3 className="mb-2 text-lg font-semibold text-foreground">{s.title}</h3>
 
                       {/* Host */}
                       <p className="mb-4 text-sm text-muted-foreground">
@@ -571,34 +668,50 @@ const sessionDate = new Date(s.scheduledAt);
 
                       {/* Actions */}
                       <div className="flex flex-wrap items-center gap-2">
-                        <Link href={`/dashboard/sessions/${s.id}/room?src=sessions_hub_upcoming_card`}>
-                          <Button className={`${s.status === "IN_PROGRESS" ? "bg-red-600 hover:bg-red-700" : "bg-purple-600 hover:bg-purple-700"} text-foreground`}>
-{s.status === "IN_PROGRESS" ? "Join Live" : "Join"}
+                        <Link
+                          href={`/dashboard/sessions/${s.id}/room?src=sessions_hub_upcoming_card`}
+                        >
+                          <Button
+                            className={`${s.status === "IN_PROGRESS" ? "bg-red-600 hover:bg-red-700" : "bg-purple-600 hover:bg-purple-700"} text-foreground`}
+                          >
+                            {s.status === "IN_PROGRESS" ? "Join Live" : "Join"}
                           </Button>
                         </Link>
                         {s.visibility === "public" && s.slug && (
-                          <Link href={`/sessions/${s.slug}?ref=sessions_hub&src=upcoming_card`} target="_blank">
-                            <Button variant="outline" className="border-border text-foreground hover:bg-accent">
+                          <Link
+                            href={`/sessions/${s.slug}?ref=sessions_hub&src=upcoming_card`}
+                            target="_blank"
+                          >
+                            <Button
+                              variant="outline"
+                              className="border-border text-foreground hover:bg-accent"
+                            >
                               Public Page
                             </Button>
                           </Link>
                         )}
                         {s.status !== "IN_PROGRESS" && (
                           <form action={handleRSVP.bind(null, s.id)}>
-                            <Button variant="outline" className="border-border text-foreground hover:bg-accent">
+                            <Button
+                              variant="outline"
+                              className="border-border text-foreground hover:bg-accent"
+                            >
                               {s.participations?.length ? "Attending" : "RSVP"}
                             </Button>
                           </form>
                         )}
                         {canCreateSessions && (
                           <Link href={`/dashboard/sessions/${s.id}?src=sessions_hub_manage_card`}>
-                            <Button variant="outline" className="border-border text-foreground hover:bg-accent">
+                            <Button
+                              variant="outline"
+                              className="border-border text-foreground hover:bg-accent"
+                            >
                               Manage
                             </Button>
                           </Link>
                         )}
                       </div>
-</div>
+                    </div>
                   ))}
                 </div>
               )}
@@ -609,59 +722,105 @@ const sessionDate = new Date(s.scheduledAt);
                 <div className="rounded-2xl border border-border bg-card p-8 text-center">
                   <Video className="mx-auto mb-3 h-12 w-12 text-muted-foreground" />
                   <p className="text-muted-foreground">No past sessions yet</p>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className="mt-1 text-sm text-muted-foreground">
                     Past sessions with recordings will appear here
                   </p>
                 </div>
               ) : (
                 <div className="space-y-6">
                   <div className="flex flex-wrap gap-2">
-                    <Link href={`/dashboard/communities/${communityId}/sessions?filter=${filter}&pastFilter=all&window=${metricWindow}`}>
-                      <Button variant="outline" className={`h-8 border-border text-xs ${pastFilter === "all" ? "bg-muted text-foreground" : "text-foreground hover:bg-accent"}`}>
+                    <Link
+                      href={`/dashboard/communities/${communityId}/sessions?filter=${filter}&pastFilter=all&window=${metricWindow}`}
+                    >
+                      <Button
+                        variant="outline"
+                        className={`h-8 border-border text-xs ${pastFilter === "all" ? "bg-muted text-foreground" : "text-foreground hover:bg-accent"}`}
+                      >
                         All ({pastAllCount})
                       </Button>
                     </Link>
-                    <Link href={`/dashboard/communities/${communityId}/sessions?filter=${filter}&pastFilter=replay&window=${metricWindow}`}>
-                      <Button variant="outline" className={`h-8 border-border text-xs ${pastFilter === "replay" ? "bg-muted text-foreground" : "text-foreground hover:bg-accent"}`}>
+                    <Link
+                      href={`/dashboard/communities/${communityId}/sessions?filter=${filter}&pastFilter=replay&window=${metricWindow}`}
+                    >
+                      <Button
+                        variant="outline"
+                        className={`h-8 border-border text-xs ${pastFilter === "replay" ? "bg-muted text-foreground" : "text-foreground hover:bg-accent"}`}
+                      >
                         With Replay ({pastReplayCount})
                       </Button>
                     </Link>
-                    <Link href={`/dashboard/communities/${communityId}/sessions?filter=${filter}&pastFilter=public&window=${metricWindow}`}>
-                      <Button variant="outline" className={`h-8 border-border text-xs ${pastFilter === "public" ? "bg-emerald-600 text-white border-emerald-500" : "text-foreground hover:bg-accent"}`}>
+                    <Link
+                      href={`/dashboard/communities/${communityId}/sessions?filter=${filter}&pastFilter=public&window=${metricWindow}`}
+                    >
+                      <Button
+                        variant="outline"
+                        className={`h-8 border-border text-xs ${pastFilter === "public" ? "border-emerald-500 bg-emerald-600 text-white" : "text-foreground hover:bg-accent"}`}
+                      >
                         Public Replays ({pastPublicReplayCount})
                       </Button>
                     </Link>
-</div>
-{featuredReplays.length > 0 && (
+                  </div>
+                  {featuredReplays.length > 0 && (
                     <div>
-                      <h3 className="mb-3 text-sm font-semibold text-foreground">Featured Replays</h3>
+                      <h3 className="mb-3 text-sm font-semibold text-foreground">
+                        Featured Replays
+                      </h3>
                       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         {featuredReplays.map((s, index) => (
-                          <div key={s.id} className="rounded-xl border border-emerald-500/30 bg-gradient-to-br from-card to-background p-5">
+                          <div
+                            key={s.id}
+                            className="rounded-xl border border-emerald-500/30 bg-gradient-to-br from-card to-background p-5"
+                          >
                             <div className="mb-3 flex items-center justify-between gap-2">
                               <div className="flex items-center gap-2">
-                                <Badge className="border-emerald-500/30 bg-emerald-500/20 text-emerald-300">Replay</Badge>
+                                <Badge className="border-emerald-500/30 bg-emerald-500/20 text-emerald-300">
+                                  Replay
+                                </Badge>
                                 {index === 0 && (
-                                  <Badge className="border-amber-500/40 bg-amber-500/20 text-amber-300">Top attended</Badge>
+                                  <Badge className="border-amber-500/40 bg-amber-500/20 text-amber-300">
+                                    Top attended
+                                  </Badge>
                                 )}
                               </div>
-                              <span className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(s.scheduledAt), { addSuffix: true })}</span>
+                              <span className="text-xs text-muted-foreground">
+                                {formatDistanceToNow(new Date(s.scheduledAt), { addSuffix: true })}
+                              </span>
                             </div>
-<h4 className="mb-2 line-clamp-2 text-base font-semibold text-foreground">{s.title}</h4>
-                            <p className="mb-4 text-xs text-muted-foreground">{s.duration || 60} min • {s._count?.participations || 0} attended</p>
+                            <h4 className="mb-2 line-clamp-2 text-base font-semibold text-foreground">
+                              {s.title}
+                            </h4>
+                            <p className="mb-4 text-xs text-muted-foreground">
+                              {s.duration || 60} min • {s._count?.participations || 0} attended
+                            </p>
                             <div className="grid grid-cols-2 gap-2">
                               <Link href={s.recordingUrl!} target="_blank">
-                                <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-foreground">Watch Replay</Button>
+                                <Button className="w-full bg-emerald-600 text-foreground hover:bg-emerald-700">
+                                  Watch Replay
+                                </Button>
                               </Link>
                               {s.visibility === "public" && s.slug ? (
-                                <Link href={`/sessions/${s.slug}?ref=sessions_hub&src=featured_replay`} target="_blank">
-                                  <Button variant="outline" className="w-full border-border text-foreground hover:bg-accent">Public Link</Button>
+                                <Link
+                                  href={`/sessions/${s.slug}?ref=sessions_hub&src=featured_replay`}
+                                  target="_blank"
+                                >
+                                  <Button
+                                    variant="outline"
+                                    className="w-full border-border text-foreground hover:bg-accent"
+                                  >
+                                    Public Link
+                                  </Button>
                                 </Link>
-) : (
-                                <Button variant="outline" disabled className="w-full border-border text-muted-foreground">Members-only</Button>
+                              ) : (
+                                <Button
+                                  variant="outline"
+                                  disabled
+                                  className="w-full border-border text-muted-foreground"
+                                >
+                                  Members-only
+                                </Button>
                               )}
                             </div>
-</div>
+                          </div>
                         ))}
                       </div>
                     </div>
@@ -669,13 +828,15 @@ const sessionDate = new Date(s.scheduledAt);
 
                   {filteredPast.length === 0 ? (
                     <div className="rounded-xl border border-dashed border-border bg-background p-8 text-center">
-                      <p className="text-sm font-medium text-foreground">No sessions match this filter</p>
+                      <p className="text-sm font-medium text-foreground">
+                        No sessions match this filter
+                      </p>
                       <p className="mt-1 text-xs text-muted-foreground">
                         {pastFilter === "public"
                           ? "No public replays yet. Mark a replay as public to distribute it."
                           : pastFilter === "replay"
-                          ? "No recordings available yet in this range."
-                          : "Try another filter or host a new live session."}
+                            ? "No recordings available yet in this range."
+                            : "Try another filter or host a new live session."}
                       </p>
                     </div>
                   ) : (
@@ -690,35 +851,51 @@ const sessionDate = new Date(s.scheduledAt);
                               {formatDistanceToNow(new Date(s.scheduledAt), { addSuffix: true })}
                             </span>
                             {s.recordingUrl && (
-                              <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                              <Badge className="border-green-500/30 bg-green-500/20 text-green-400">
                                 Recording available
                               </Badge>
                             )}
                           </div>
 
                           <h3 className="mb-2 text-base font-medium text-foreground">{s.title}</h3>
-                          <p className="mb-4 text-xs text-muted-foreground">{s.duration || 60} min • {s._count?.participations || 0} attended</p>
+                          <p className="mb-4 text-xs text-muted-foreground">
+                            {s.duration || 60} min • {s._count?.participations || 0} attended
+                          </p>
 
                           <div className="flex items-center gap-2">
                             {s.recordingUrl ? (
                               <>
                                 <Link href={s.recordingUrl} target="_blank">
-                                  <Button variant="outline" className="border-border text-foreground hover:bg-accent flex items-center gap-2">
+                                  <Button
+                                    variant="outline"
+                                    className="flex items-center gap-2 border-border text-foreground hover:bg-accent"
+                                  >
                                     <ArrowRight className="h-4 w-4" />
                                     Watch
                                   </Button>
                                 </Link>
                                 {s.visibility === "public" && s.slug && (
-                                  <Link href={`/sessions/${s.slug}?ref=sessions_hub&src=past_card`} target="_blank">
-                                    <Button variant="outline" className="border-border text-foreground hover:bg-accent">
+                                  <Link
+                                    href={`/sessions/${s.slug}?ref=sessions_hub&src=past_card`}
+                                    target="_blank"
+                                  >
+                                    <Button
+                                      variant="outline"
+                                      className="border-border text-foreground hover:bg-accent"
+                                    >
                                       Public Link
                                     </Button>
                                   </Link>
                                 )}
-</>
+                              </>
                             ) : (
-                              <Link href={`/dashboard/sessions/${s.id}/room?src=sessions_hub_past_enter_room`}>
-<Button variant="outline" className="border-border text-foreground hover:bg-accent">
+                              <Link
+                                href={`/dashboard/sessions/${s.id}/room?src=sessions_hub_past_enter_room`}
+                              >
+                                <Button
+                                  variant="outline"
+                                  className="border-border text-foreground hover:bg-accent"
+                                >
                                   Enter Room
                                 </Button>
                               </Link>
@@ -728,9 +905,9 @@ const sessionDate = new Date(s.scheduledAt);
                       ))}
                     </div>
                   )}
-</div>
+                </div>
               )}
-</TabsContent>
+            </TabsContent>
 
             <TabsContent value="calendar" className="space-y-6">
               <div className="rounded-xl border border-border bg-card p-5">
@@ -739,20 +916,13 @@ const sessionDate = new Date(s.scheduledAt);
                     {format(monthStart, "MMMM yyyy")}
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    {sessionsThisMonth.length} {sessionsThisMonth.length === 1 ? "session" : "sessions"} this month
+                    {sessionsThisMonth.length}{" "}
+                    {sessionsThisMonth.length === 1 ? "session" : "sessions"} this month
                   </p>
                 </div>
 
                 <div className="mb-2 grid grid-cols-7 gap-2 text-center text-xs text-muted-foreground">
-                  {[
-                    "Mon",
-                    "Tue",
-                    "Wed",
-                    "Thu",
-                    "Fri",
-                    "Sat",
-                    "Sun",
-                  ].map((d) => (
+                  {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
                     <div key={d} className="py-1 font-medium">
                       {d}
                     </div>
@@ -774,20 +944,27 @@ const sessionDate = new Date(s.scheduledAt);
                             : "border-border bg-background/40"
                         } ${isTodayDate ? "ring-1 ring-purple-500/70" : ""}`}
                       >
-                        <div className={`text-xs font-medium ${isCurrentMonth ? "text-foreground" : "text-muted-foreground"}`}>
+                        <div
+                          className={`text-xs font-medium ${isCurrentMonth ? "text-foreground" : "text-muted-foreground"}`}
+                        >
                           {format(day, "d")}
                         </div>
 
                         <div className="mt-1 space-y-1">
                           {daySessions.slice(0, 2).map((s) => (
-                            <Link key={s.id} href={`/dashboard/sessions/${s.id}?src=sessions_hub_calendar_day`}>
-<div className="truncate rounded bg-purple-600/20 px-1.5 py-0.5 text-[10px] text-purple-300 hover:bg-purple-600/30">
+                            <Link
+                              key={s.id}
+                              href={`/dashboard/sessions/${s.id}?src=sessions_hub_calendar_day`}
+                            >
+                              <div className="truncate rounded bg-purple-600/20 px-1.5 py-0.5 text-[10px] text-purple-300 hover:bg-purple-600/30">
                                 {formatSessionTime(new Date(s.scheduledAt))} • {s.title}
                               </div>
                             </Link>
                           ))}
                           {daySessions.length > 2 && (
-                            <div className="text-[10px] text-muted-foreground">+{daySessions.length - 2} more</div>
+                            <div className="text-[10px] text-muted-foreground">
+                              +{daySessions.length - 2} more
+                            </div>
                           )}
                         </div>
                       </div>
@@ -797,25 +974,35 @@ const sessionDate = new Date(s.scheduledAt);
               </div>
 
               <div className="rounded-xl border border-border bg-card p-5">
-                <h3 className="mb-4 text-sm font-semibold text-foreground">Upcoming in this month</h3>
+                <h3 className="mb-4 text-sm font-semibold text-foreground">
+                  Upcoming in this month
+                </h3>
                 {sessionsThisMonth.filter((s) => new Date(s.scheduledAt) >= now).length === 0 ? (
                   <p className="text-sm text-muted-foreground">No upcoming sessions this month.</p>
                 ) : (
                   <div className="space-y-2">
                     {sessionsThisMonth
                       .filter((s) => new Date(s.scheduledAt) >= now)
-                      .sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime())
+                      .sort(
+                        (a, b) =>
+                          new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime()
+                      )
                       .slice(0, 8)
                       .map((s) => (
-                        <Link key={s.id} href={`/dashboard/sessions/${s.id}?src=sessions_hub_calendar_list`}>
-<div className="flex items-center justify-between rounded-lg border border-border bg-background px-3 py-2 hover:border-border">
+                        <Link
+                          key={s.id}
+                          href={`/dashboard/sessions/${s.id}?src=sessions_hub_calendar_list`}
+                        >
+                          <div className="flex items-center justify-between rounded-lg border border-border bg-background px-3 py-2 hover:border-border">
                             <div>
                               <p className="text-sm font-medium text-foreground">{s.title}</p>
                               <p className="text-xs text-muted-foreground">
                                 {format(new Date(s.scheduledAt), "EEE, MMM d • h:mm a")}
                               </p>
                             </div>
-                            <Badge className="bg-muted text-foreground">{s.duration || 60} min</Badge>
+                            <Badge className="bg-muted text-foreground">
+                              {s.duration || 60} min
+                            </Badge>
                           </div>
                         </Link>
                       ))}
@@ -830,10 +1017,10 @@ const sessionDate = new Date(s.scheduledAt);
   } catch (error) {
     console.error("Error in CommunitySessionsPage:", error);
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center p-8">
-          <h1 className="text-xl font-semibold text-foreground mb-2">Something went wrong</h1>
-          <p className="text-muted-foreground mb-4">Unable to load sessions</p>
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="p-8 text-center">
+          <h1 className="mb-2 text-xl font-semibold text-foreground">Something went wrong</h1>
+          <p className="mb-4 text-muted-foreground">Unable to load sessions</p>
           <Link href="/dashboard/communities">
             <Button variant="outline" className="border-border text-foreground">
               Back to Communities

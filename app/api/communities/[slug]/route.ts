@@ -32,10 +32,7 @@ export async function GET(_request: NextRequest, props: { params: Promise<{ slug
     });
 
     if (!community) {
-      return NextResponse.json(
-        { error: "Community not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Community not found" }, { status: 404 });
     }
 
     // Membership lookup uses session-derived userId only.
@@ -62,10 +59,7 @@ export async function GET(_request: NextRequest, props: { params: Promise<{ slug
       const isActiveMember = membership?.status === "ACTIVE";
       const isOwner = sessionUserId !== null && community.ownerId === sessionUserId;
       if (!isActiveMember && !isOwner) {
-        return NextResponse.json(
-          { error: "Community not found" },
-          { status: 404 }
-        );
+        return NextResponse.json({ error: "Community not found" }, { status: 404 });
       }
     }
 
@@ -92,10 +86,7 @@ export async function GET(_request: NextRequest, props: { params: Promise<{ slug
     });
   } catch (error) {
     console.error("Error fetching community:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch community" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch community" }, { status: 500 });
   }
 }
 
@@ -129,8 +120,7 @@ export async function PATCH(request: NextRequest, props: { params: Promise<{ slu
 
     const canEdit =
       community.ownerId === userId ||
-      (membership?.status === "ACTIVE" &&
-        ["OWNER", "ADMIN"].includes(membership.role));
+      (membership?.status === "ACTIVE" && ["OWNER", "ADMIN"].includes(membership.role));
 
     if (!canEdit) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -182,10 +172,7 @@ export async function PATCH(request: NextRequest, props: { params: Promise<{ slu
     }
 
     if (Object.keys(data).length === 0) {
-      return NextResponse.json(
-        { error: "No valid fields to update" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "No valid fields to update" }, { status: 400 });
     }
 
     const updated = await prisma.community.update({
@@ -206,9 +193,6 @@ export async function PATCH(request: NextRequest, props: { params: Promise<{ slu
     return NextResponse.json({ success: true, community: updated });
   } catch (error) {
     console.error("Error updating community:", error);
-    return NextResponse.json(
-      { error: "Failed to update community" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to update community" }, { status: 500 });
   }
 }

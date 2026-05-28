@@ -1,14 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Plus,
-  Trash2,
-  GripVertical,
-  Save,
-  Loader2,
-  CheckCircle,
-} from "lucide-react";
+import { Plus, Trash2, GripVertical, Save, Loader2, CheckCircle } from "lucide-react";
 import { createQuiz, addQuizQuestion } from "@/app/actions/quizzes";
 
 interface BuilderOption {
@@ -73,9 +66,7 @@ export function QuizBuilder({ lessonId, onSaved, onCancel }: QuizBuilderProps) {
   const [maxAttempts, setMaxAttempts] = useState<number | undefined>(undefined);
   const [timeLimit, setTimeLimit] = useState<number | undefined>(undefined);
   const [shuffleQuestions, setShuffleQuestions] = useState(false);
-  const [questions, setQuestions] = useState<BuilderQuestion[]>([
-    createEmptyQuestion(),
-  ]);
+  const [questions, setQuestions] = useState<BuilderQuestion[]>([createEmptyQuestion()]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -99,9 +90,7 @@ export function QuizBuilder({ lessonId, onSaved, onCancel }: QuizBuilderProps) {
     field: keyof BuilderQuestion,
     value: string | number | BuilderOption[]
   ) => {
-    setQuestions((prev) =>
-      prev.map((q) => (q.localId === localId ? { ...q, [field]: value } : q))
-    );
+    setQuestions((prev) => prev.map((q) => (q.localId === localId ? { ...q, [field]: value } : q)));
   };
 
   const updateOption = (
@@ -116,11 +105,7 @@ export function QuizBuilder({ lessonId, onSaved, onCancel }: QuizBuilderProps) {
         const updated = q.options.map((o) => {
           if (o.id === optionId) return { ...o, [field]: value };
           // For single-select, uncheck others when marking one correct
-          if (
-            field === "isCorrect" &&
-            value === true &&
-            q.type !== "MULTI_SELECT"
-          ) {
+          if (field === "isCorrect" && value === true && q.type !== "MULTI_SELECT") {
             return { ...o, isCorrect: false };
           }
           return o;
@@ -136,10 +121,7 @@ export function QuizBuilder({ lessonId, onSaved, onCancel }: QuizBuilderProps) {
         if (q.localId !== questionLocalId) return q;
         return {
           ...q,
-          options: [
-            ...q.options,
-            { id: generateId(), text: "", isCorrect: false },
-          ],
+          options: [...q.options, { id: generateId(), text: "", isCorrect: false }],
         };
       })
     );
@@ -239,23 +221,19 @@ export function QuizBuilder({ lessonId, onSaved, onCancel }: QuizBuilderProps) {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm text-zinc-400">
-              Description
-            </label>
+            <label className="mb-1 block text-sm text-zinc-400">Description</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={2}
               placeholder="Optional quiz description..."
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 focus:border-purple-500 focus:outline-none resize-none"
+              className="w-full resize-none rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 focus:border-purple-500 focus:outline-none"
             />
           </div>
 
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="mb-1 block text-sm text-zinc-400">
-                Passing Score (%)
-              </label>
+              <label className="mb-1 block text-sm text-zinc-400">Passing Score (%)</label>
               <input
                 type="number"
                 min={0}
@@ -266,35 +244,25 @@ export function QuizBuilder({ lessonId, onSaved, onCancel }: QuizBuilderProps) {
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm text-zinc-400">
-                Max Attempts
-              </label>
+              <label className="mb-1 block text-sm text-zinc-400">Max Attempts</label>
               <input
                 type="number"
                 min={1}
                 value={maxAttempts || ""}
                 onChange={(e) =>
-                  setMaxAttempts(
-                    e.target.value ? Number(e.target.value) : undefined
-                  )
+                  setMaxAttempts(e.target.value ? Number(e.target.value) : undefined)
                 }
                 placeholder="Unlimited"
                 className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 focus:border-purple-500 focus:outline-none"
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm text-zinc-400">
-                Time Limit (min)
-              </label>
+              <label className="mb-1 block text-sm text-zinc-400">Time Limit (min)</label>
               <input
                 type="number"
                 min={1}
                 value={timeLimit || ""}
-                onChange={(e) =>
-                  setTimeLimit(
-                    e.target.value ? Number(e.target.value) : undefined
-                  )
-                }
+                onChange={(e) => setTimeLimit(e.target.value ? Number(e.target.value) : undefined)}
                 placeholder="None"
                 className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 focus:border-purple-500 focus:outline-none"
               />
@@ -315,16 +283,11 @@ export function QuizBuilder({ lessonId, onSaved, onCancel }: QuizBuilderProps) {
 
       {/* Questions */}
       {questions.map((q, idx) => (
-        <div
-          key={q.localId}
-          className="rounded-xl border border-zinc-800 bg-zinc-900/80 p-5"
-        >
+        <div key={q.localId} className="rounded-xl border border-zinc-800 bg-zinc-900/80 p-5">
           <div className="mb-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <GripVertical className="h-4 w-4 text-zinc-600" />
-              <span className="text-sm font-medium text-zinc-400">
-                Question {idx + 1}
-              </span>
+              <span className="text-sm font-medium text-zinc-400">Question {idx + 1}</span>
             </div>
             <div className="flex items-center gap-2">
               <select
@@ -358,9 +321,7 @@ export function QuizBuilder({ lessonId, onSaved, onCancel }: QuizBuilderProps) {
           <input
             type="text"
             value={q.question}
-            onChange={(e) =>
-              updateQuestion(q.localId, "question", e.target.value)
-            }
+            onChange={(e) => updateQuestion(q.localId, "question", e.target.value)}
             placeholder="Enter your question..."
             className="mb-4 w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 focus:border-purple-500 focus:outline-none"
           />
@@ -370,9 +331,7 @@ export function QuizBuilder({ lessonId, onSaved, onCancel }: QuizBuilderProps) {
             {q.options.map((opt) => (
               <div key={opt.id} className="flex items-center gap-2">
                 <button
-                  onClick={() =>
-                    updateOption(q.localId, opt.id, "isCorrect", !opt.isCorrect)
-                  }
+                  onClick={() => updateOption(q.localId, opt.id, "isCorrect", !opt.isCorrect)}
                   className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-${
                     q.type === "MULTI_SELECT" ? "md" : "full"
                   } border transition-colors ${
@@ -381,16 +340,12 @@ export function QuizBuilder({ lessonId, onSaved, onCancel }: QuizBuilderProps) {
                       : "border-zinc-600 hover:border-zinc-500"
                   }`}
                 >
-                  {opt.isCorrect && (
-                    <CheckCircle className="h-3 w-3 text-white" />
-                  )}
+                  {opt.isCorrect && <CheckCircle className="h-3 w-3 text-white" />}
                 </button>
                 <input
                   type="text"
                   value={opt.text}
-                  onChange={(e) =>
-                    updateOption(q.localId, opt.id, "text", e.target.value)
-                  }
+                  onChange={(e) => updateOption(q.localId, opt.id, "text", e.target.value)}
                   placeholder="Option text..."
                   disabled={q.type === "TRUE_FALSE"}
                   className="flex-1 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-sm text-white placeholder-zinc-500 focus:border-purple-500 focus:outline-none disabled:opacity-60"
@@ -422,9 +377,7 @@ export function QuizBuilder({ lessonId, onSaved, onCancel }: QuizBuilderProps) {
               <input
                 type="text"
                 value={q.explanation}
-                onChange={(e) =>
-                  updateQuestion(q.localId, "explanation", e.target.value)
-                }
+                onChange={(e) => updateQuestion(q.localId, "explanation", e.target.value)}
                 placeholder="Explanation (shown after answering)"
                 className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-xs text-white placeholder-zinc-500 focus:border-purple-500 focus:outline-none"
               />
@@ -434,14 +387,10 @@ export function QuizBuilder({ lessonId, onSaved, onCancel }: QuizBuilderProps) {
                 type="number"
                 min={1}
                 value={q.points}
-                onChange={(e) =>
-                  updateQuestion(q.localId, "points", Number(e.target.value))
-                }
+                onChange={(e) => updateQuestion(q.localId, "points", Number(e.target.value))}
                 className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-2 py-1.5 text-center text-xs text-white focus:border-purple-500 focus:outline-none"
               />
-              <p className="mt-0.5 text-center text-[10px] text-zinc-600">
-                points
-              </p>
+              <p className="mt-0.5 text-center text-[10px] text-zinc-600">points</p>
             </div>
           </div>
         </div>
@@ -486,11 +435,7 @@ export function QuizBuilder({ lessonId, onSaved, onCancel }: QuizBuilderProps) {
           disabled={saving}
           className="flex items-center gap-2 rounded-lg bg-purple-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-purple-500 disabled:opacity-50"
         >
-          {saving ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Save className="h-4 w-4" />
-          )}
+          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
           {saving ? "Saving..." : "Save Quiz"}
         </button>
         {onCancel && (

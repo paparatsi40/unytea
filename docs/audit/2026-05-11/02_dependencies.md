@@ -11,23 +11,23 @@
 
 ## Versiones clave (de `package.json`)
 
-| Paquete | Versión declarada | Instalada | Latest | Distancia |
-|---|---|---|---|---|
-| `next` | `^14.2.28` | 14.2.28 | 16.2.6 | 2 majors |
-| `react` | `^18.3.1` | 18.3.1 | 19.2.x | 1 major |
-| `react-dom` | `^18.3.1` | 18.3.1 | 19.2.x | 1 major |
-| `typescript` (devDep) | `^5.6.3` | 5.6.x | 5.x latest | OK |
-| `prisma` (devDep) | `^5.22.0` | 5.22.0 | 7.8.0 | 2 majors |
-| `@prisma/client` | `^5.22.0` | 5.22.0 | 7.8.0 | 2 majors |
-| `next-auth` | `^5.0.0-beta.25` | 5.0.0-beta.25 | 5.0.0-beta.x | **beta** |
-| `@auth/prisma-adapter` | `^2.7.2` | 2.7.2 | 2.11.2 | menor |
-| `next-intl` | `^4.8.3` | — | — | (no en outdated list) |
-| `stripe` | `^17.3.1` | — | — | reciente |
-| `@stripe/stripe-js` | `^4.8.0` | 4.10.0 | 9.4.0 | **5 majors** |
-| `eslint` (devDep) | `^8.57.0` | **9.39.1** | 10.3.0 | **drift!** |
-| `eslint-config-next` (devDep) | `^14.2.28` | **16.0.6** | 16.2.6 | **drift!** |
-| `vitest` (devDep) | `^4.1.3` | 4.1.3 | latest | OK |
-| `@playwright/test` (devDep) | `^1.48.0` | — | — | recent |
+| Paquete                       | Versión declarada | Instalada     | Latest       | Distancia             |
+| ----------------------------- | ----------------- | ------------- | ------------ | --------------------- |
+| `next`                        | `^14.2.28`        | 14.2.28       | 16.2.6       | 2 majors              |
+| `react`                       | `^18.3.1`         | 18.3.1        | 19.2.x       | 1 major               |
+| `react-dom`                   | `^18.3.1`         | 18.3.1        | 19.2.x       | 1 major               |
+| `typescript` (devDep)         | `^5.6.3`          | 5.6.x         | 5.x latest   | OK                    |
+| `prisma` (devDep)             | `^5.22.0`         | 5.22.0        | 7.8.0        | 2 majors              |
+| `@prisma/client`              | `^5.22.0`         | 5.22.0        | 7.8.0        | 2 majors              |
+| `next-auth`                   | `^5.0.0-beta.25`  | 5.0.0-beta.25 | 5.0.0-beta.x | **beta**              |
+| `@auth/prisma-adapter`        | `^2.7.2`          | 2.7.2         | 2.11.2       | menor                 |
+| `next-intl`                   | `^4.8.3`          | —             | —            | (no en outdated list) |
+| `stripe`                      | `^17.3.1`         | —             | —            | reciente              |
+| `@stripe/stripe-js`           | `^4.8.0`          | 4.10.0        | 9.4.0        | **5 majors**          |
+| `eslint` (devDep)             | `^8.57.0`         | **9.39.1**    | 10.3.0       | **drift!**            |
+| `eslint-config-next` (devDep) | `^14.2.28`        | **16.0.6**    | 16.2.6       | **drift!**            |
+| `vitest` (devDep)             | `^4.1.3`          | 4.1.3         | latest       | OK                    |
+| `@playwright/test` (devDep)   | `^1.48.0`         | —             | —            | recent                |
 
 `engines.node = "20.x"` — coincide con Vercel default y con CI (`node-version: "20.x"`). No hay `.nvmrc` — recomendable añadirlo.
 
@@ -35,19 +35,19 @@
 
 Total: **11 vulnerabilities (1 low, 2 moderate, 8 high)**.
 
-| Paquete | Severidad | Vía | CVE / Issue | Fix |
-|---|---|---|---|---|
-| `next` | **HIGH** (×6 advisories) | direct | Information exposure dev server (GHSA-3h52-269p-cp9r), cache poisoning, SSRF, etc. | `next@16.2.6` (breaking) |
-| `glob` | high | `@next/eslint-plugin-next` → glob | GHSA-5j98-mcp5-4vw2 (command injection vía `-c/--cmd`) | upgrade eslint-config-next |
-| `@next/eslint-plugin-next` | high | dev-only (transitive) | hereda glob | `eslint-config-next@16.2.6` |
-| `eslint-config-next` | high | dev | idem | idem |
-| `@uploadthing/react` | high | direct | hereda effect | `@uploadthing/react@6.6.0` (breaking) |
-| `@uploadthing/shared` | high | transitive | idem | idem |
-| `effect` | high | via uploadthing | GHSA-38f7-945m-qr2g (AsyncLocalStorage contamination bajo carga) | upgrade uploadthing |
-| `uploadthing` | high | direct | idem | upgrade |
-| `postcss` | moderate | via next | GHSA-qx2v-qp2m-jg93 (XSS via `</style>`) | upgrade next |
-| `icu-minify` | low | transitive (probable next-intl) | GHSA-r27j-894h-3w3p (DoS via prototype) | auto fix disponible |
-| (otro moderate) | moderate | — | — | — |
+| Paquete                    | Severidad                | Vía                               | CVE / Issue                                                                        | Fix                                   |
+| -------------------------- | ------------------------ | --------------------------------- | ---------------------------------------------------------------------------------- | ------------------------------------- |
+| `next`                     | **HIGH** (×6 advisories) | direct                            | Information exposure dev server (GHSA-3h52-269p-cp9r), cache poisoning, SSRF, etc. | `next@16.2.6` (breaking)              |
+| `glob`                     | high                     | `@next/eslint-plugin-next` → glob | GHSA-5j98-mcp5-4vw2 (command injection vía `-c/--cmd`)                             | upgrade eslint-config-next            |
+| `@next/eslint-plugin-next` | high                     | dev-only (transitive)             | hereda glob                                                                        | `eslint-config-next@16.2.6`           |
+| `eslint-config-next`       | high                     | dev                               | idem                                                                               | idem                                  |
+| `@uploadthing/react`       | high                     | direct                            | hereda effect                                                                      | `@uploadthing/react@6.6.0` (breaking) |
+| `@uploadthing/shared`      | high                     | transitive                        | idem                                                                               | idem                                  |
+| `effect`                   | high                     | via uploadthing                   | GHSA-38f7-945m-qr2g (AsyncLocalStorage contamination bajo carga)                   | upgrade uploadthing                   |
+| `uploadthing`              | high                     | direct                            | idem                                                                               | upgrade                               |
+| `postcss`                  | moderate                 | via next                          | GHSA-qx2v-qp2m-jg93 (XSS via `</style>`)                                           | upgrade next                          |
+| `icu-minify`               | low                      | transitive (probable next-intl)   | GHSA-r27j-894h-3w3p (DoS via prototype)                                            | auto fix disponible                   |
+| (otro moderate)            | moderate                 | —                                 | —                                                                                  | —                                     |
 
 `npm audit fix` (sin `--force`) resolvería al menos el low. El resto requiere `npm audit fix --force` que upgradea `next` a 16 (breaking) y `uploadthing` a 6 (breaking). **No correr en este audit**.
 
@@ -56,6 +56,7 @@ Total: **11 vulnerabilities (1 low, 2 moderate, 8 high)**.
 Highlights (categorías):
 
 **Mayors atrasados (riesgo de breaking si se actualizan, pero crítico)**:
+
 - `next` 14.2.28 → 16.2.6
 - `react`, `react-dom`, `@types/react`, `@types/react-dom` → 19.x
 - `prisma`, `@prisma/client` 5.22.0 → 7.8.0
@@ -67,6 +68,7 @@ Highlights (categorías):
 - `zustand` 5.0.9 → 5.0.13 (minor — fácil)
 
 **Patches/minors faciles (sin breaking)**:
+
 - `@livekit/components-react` → 2.9.21 (patch)
 - `@tanstack/react-query` → 5.100.10 (minor)
 - `@auth/prisma-adapter` → 2.11.2 (minor)
@@ -80,25 +82,25 @@ Highlights (categorías):
 
 Búsqueda: `grep -rln "from [\"']<pkg>"` excluyendo `node_modules`, `.next`, `.git`, `web`.
 
-| Paquete | Hits | Razón posible |
-|---|---|---|
-| `@trpc/server` | **0** | tRPC nunca fue conectado al proyecto |
-| `@trpc/client` | **0** | idem |
-| `@trpc/next` | **0** | idem |
-| `@trpc/react-query` | **0** | idem |
-| `svix` | **0** | Webhook signature lib — probablemente intentado pero nunca usado |
-| `superjson` | **0** | Suele acompañar tRPC — huérfano |
+| Paquete             | Hits  | Razón posible                                                      |
+| ------------------- | ----- | ------------------------------------------------------------------ |
+| `@trpc/server`      | **0** | tRPC nunca fue conectado al proyecto                               |
+| `@trpc/client`      | **0** | idem                                                               |
+| `@trpc/next`        | **0** | idem                                                               |
+| `@trpc/react-query` | **0** | idem                                                               |
+| `svix`              | **0** | Webhook signature lib — probablemente intentado pero nunca usado   |
+| `superjson`         | **0** | Suele acompañar tRPC — huérfano                                    |
 | `@hello-pangea/dnd` | **0** | El proyecto usa `@dnd-kit/*` en su lugar — DUPLICATE drag-and-drop |
 
 Eliminar los 7 ahorra **~4 MB** de `node_modules` y elimina superficie de ataque. Verificar antes de borrar: pueden estar usados en algún archivo .mjs/.cjs o config.
 
 Sospechosos que conviene verificar (encontró 1 hit cada uno, puede ser un archivo único o puede ser legacy):
 
-| Paquete | Hits | Verificar |
-|---|---|---|
-| `html-to-image` | 1 | Probablemente usado en `components/dashboard/ShareableMetrics.tsx` — OK |
-| `lottie-react` | (no testeado, verificar) | Si solo se usa para una animación, evaluar dynamic import |
-| `excalidraw` | (verificar) | Componente colaborativo de pizarra — confirmar que está activo |
+| Paquete         | Hits                     | Verificar                                                               |
+| --------------- | ------------------------ | ----------------------------------------------------------------------- |
+| `html-to-image` | 1                        | Probablemente usado en `components/dashboard/ShareableMetrics.tsx` — OK |
+| `lottie-react`  | (no testeado, verificar) | Si solo se usa para una animación, evaluar dynamic import               |
+| `excalidraw`    | (verificar)              | Componente colaborativo de pizarra — confirmar que está activo          |
 
 ## Lockfile health
 
@@ -108,7 +110,7 @@ Sospechosos que conviene verificar (encontró 1 hit cada uno, puede ser un archi
 - ⚠️ **Drift entre `package.json` y lockfile**:
   - `eslint` declarado `^8.57.0`, lockfile/instalado `9.39.1` — ¡major mismatch!
   - `eslint-config-next` declarado `^14.2.28`, instalado `16.0.6` — major mismatch.
-  Esto significa que alguien corrió `npm install eslint@latest` o `npm install eslint-config-next@latest` sin actualizar `package.json`. **`npm ci` en CI puede comportarse distinto que `npm install` local** dependiendo del estado del lockfile.
+    Esto significa que alguien corrió `npm install eslint@latest` o `npm install eslint-config-next@latest` sin actualizar `package.json`. **`npm ci` en CI puede comportarse distinto que `npm install` local** dependiendo del estado del lockfile.
 
 ## Análisis de imports en código vs `package.json`
 

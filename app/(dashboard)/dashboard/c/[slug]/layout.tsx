@@ -36,9 +36,7 @@ async function getMembership(communityId: string, userId: string) {
 export default async function CommunityLayout(props: LayoutProps) {
   const params = await props.params;
 
-  const {
-    children
-  } = props;
+  const { children } = props;
 
   const session = await auth();
   const community = await getCommunity(params.slug);

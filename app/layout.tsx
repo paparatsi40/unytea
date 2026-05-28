@@ -87,8 +87,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Unytea — Where Communities Unite",
-    description:
-      "The community platform for creators with more than one audience.",
+    description: "The community platform for creators with more than one audience.",
     creator: "@unytea",
     site: "@unytea",
     images: ["/og"],
@@ -166,9 +165,7 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${GeistSans.variable} ${GeistMono.variable} font-sans antialiased`}
-      >
+      <body className={`${GeistSans.variable} ${GeistMono.variable} font-sans antialiased`}>
         {/* JSON-LD structured data para SEO / rich snippets en Google */}
         <script
           type="application/ld+json"
@@ -204,14 +201,14 @@ export default async function RootLayout({
             toastOptions={{
               duration: 4000,
               style: {
-                background: 'hsl(224 71% 4%)',
-                color: 'hsl(213 31% 91%)',
-                border: '1px solid hsl(215 27.9% 16.9%)',
+                background: "hsl(224 71% 4%)",
+                color: "hsl(213 31% 91%)",
+                border: "1px solid hsl(215 27.9% 16.9%)",
               },
               success: {
                 iconTheme: {
-                  primary: 'hsl(263 70% 50%)',
-                  secondary: 'white',
+                  primary: "hsl(263 70% 50%)",
+                  secondary: "white",
                 },
               },
             }}

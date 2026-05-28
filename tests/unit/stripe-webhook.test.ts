@@ -419,10 +419,10 @@ describe("Stripe webhook — invoice.payment_succeeded (platform subscription)",
       cancelAtPeriodEnd: false,
     });
     expect((upsertCall!.create as { currentPeriodStart: Date }).currentPeriodStart.getTime()).toBe(
-      1_700_000_000 * 1000,
+      1_700_000_000 * 1000
     );
     expect((upsertCall!.create as { currentPeriodEnd: Date }).currentPeriodEnd.getTime()).toBe(
-      1_702_592_000 * 1000,
+      1_702_592_000 * 1000
     );
     expect(upsertCall!.update).toMatchObject({ status: "ACTIVE", cancelAtPeriodEnd: false });
   });

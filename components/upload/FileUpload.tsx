@@ -112,7 +112,7 @@ export function FileUpload({
                 <div className="flex-shrink-0">{getFileIcon(file.url)}</div>
 
                 {/* File Info */}
-                <div className="flex-1 min-w-0">
+                <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-gray-900">
                     {getFileName(file.url)}
                   </p>
@@ -154,9 +154,7 @@ export function FileUpload({
 
       {/* Max files reached */}
       {files.length >= maxFiles && (
-        <p className="text-sm text-gray-500">
-          Maximum number of files reached ({maxFiles})
-        </p>
+        <p className="text-sm text-gray-500">Maximum number of files reached ({maxFiles})</p>
       )}
     </div>
   );

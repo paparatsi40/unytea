@@ -20,9 +20,9 @@ export function HeaderAuthCTA({ locale }: { locale: string }) {
     return (
       <Link
         href="/dashboard"
-        className="btn-hover-lift px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium shadow-smooth flex items-center gap-2"
+        className="btn-hover-lift flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-smooth"
       >
-        <LayoutDashboard className="w-4 h-4" />
+        <LayoutDashboard className="h-4 w-4" />
         {t("nav.goToDashboard")}
       </Link>
     );
@@ -32,16 +32,16 @@ export function HeaderAuthCTA({ locale }: { locale: string }) {
     <>
       <Link
         href={`/${locale}/auth/signin`}
-        className="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors"
+        className="hidden items-center gap-2 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:text-primary sm:flex"
       >
-        <LogIn className="w-4 h-4" />
+        <LogIn className="h-4 w-4" />
         {authT("signIn")}
       </Link>
       <Link
         href={`/${locale}/auth/signup`}
-        className="btn-hover-lift px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium shadow-smooth flex items-center gap-2"
+        className="btn-hover-lift flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-smooth"
       >
-        <UserPlus className="w-4 h-4" />
+        <UserPlus className="h-4 w-4" />
         {authT("signUp")}
       </Link>
     </>

@@ -16,18 +16,29 @@ import { sanitizeHTML } from "@/lib/sanitize";
  * with product requirements, design proper CSS sanitization at that time.
  */
 const themeUpdateSchema = z.object({
-  primaryColor: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Invalid hex color").optional(),
-  secondaryColor: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Invalid hex color").optional(),
-  accentColor: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Invalid hex color").optional(),
+  primaryColor: z
+    .string()
+    .regex(/^#[0-9a-fA-F]{6}$/, "Invalid hex color")
+    .optional(),
+  secondaryColor: z
+    .string()
+    .regex(/^#[0-9a-fA-F]{6}$/, "Invalid hex color")
+    .optional(),
+  accentColor: z
+    .string()
+    .regex(/^#[0-9a-fA-F]{6}$/, "Invalid hex color")
+    .optional(),
   fontFamily: z.string().max(100).optional(),
   heroTitle: z.string().max(200).optional(),
   heroSubtitle: z.string().max(500).optional(),
   heroCTA: z.string().max(50).optional(),
-  heroCTALink: z.union([
-    z.string().url(),
-    z.string().regex(/^\/[^\s]*$/, "Must be a relative path starting with /"),
-    z.literal(""),
-  ]).optional(),
+  heroCTALink: z
+    .union([
+      z.string().url(),
+      z.string().regex(/^\/[^\s]*$/, "Must be a relative path starting with /"),
+      z.literal(""),
+    ])
+    .optional(),
   aboutSection: z.string().max(50000).optional(),
   showStats: z.boolean().optional(),
   showMembers: z.boolean().optional(),
@@ -37,21 +48,24 @@ const themeUpdateSchema = z.object({
 /**
  * Update community theme (colors, fonts, hero)
  */
-export async function updateCommunityTheme(communityId: string, data: {
-  primaryColor?: string;
-  secondaryColor?: string;
-  accentColor?: string;
-  fontFamily?: string;
-  heroTitle?: string;
-  heroSubtitle?: string;
-  heroCTA?: string;
-  heroCTALink?: string;
-  aboutSection?: string;
-  showStats?: boolean;
-  showMembers?: boolean;
-  showCourses?: boolean;
-  // customCSS removed in Phase 2c.5 — see schema docstring above
-}) {
+export async function updateCommunityTheme(
+  communityId: string,
+  data: {
+    primaryColor?: string;
+    secondaryColor?: string;
+    accentColor?: string;
+    fontFamily?: string;
+    heroTitle?: string;
+    heroSubtitle?: string;
+    heroCTA?: string;
+    heroCTALink?: string;
+    aboutSection?: string;
+    showStats?: boolean;
+    showMembers?: boolean;
+    showCourses?: boolean;
+    // customCSS removed in Phase 2c.5 — see schema docstring above
+  }
+) {
   try {
     const userId = await getCurrentUserId();
     if (!userId) {
@@ -85,9 +99,8 @@ export async function updateCommunityTheme(communityId: string, data: {
     // Sanitize HTML in aboutSection (Tiptap WYSIWYG output → DOMPurify allowlist)
     const sanitized = {
       ...parsed.data,
-      aboutSection: parsed.data.aboutSection !== undefined
-        ? sanitizeHTML(parsed.data.aboutSection)
-        : undefined,
+      aboutSection:
+        parsed.data.aboutSection !== undefined ? sanitizeHTML(parsed.data.aboutSection) : undefined,
     };
 
     const community = await prisma.community.update({
@@ -149,14 +162,17 @@ export async function updateCommunityLayout(
 /**
  * Create a new section for community page
  */
-export async function createCommunitySection(communityId: string, data: {
-  type: string;
-  title?: string;
-  content?: any;
-  position?: number;
-  isVisible?: boolean;
-  settings?: any;
-}) {
+export async function createCommunitySection(
+  communityId: string,
+  data: {
+    type: string;
+    title?: string;
+    content?: any;
+    position?: number;
+    isVisible?: boolean;
+    settings?: any;
+  }
+) {
   try {
     const userId = await getCurrentUserId();
     if (!userId) {
@@ -314,10 +330,7 @@ export async function deleteCommunitySection(sectionId: string) {
 /**
  * Reorder sections
  */
-export async function reorderCommunitySections(
-  communityId: string,
-  sectionIds: string[]
-) {
+export async function reorderCommunitySections(communityId: string, sectionIds: string[]) {
   try {
     const userId = await getCurrentUserId();
     if (!userId) {
@@ -368,7 +381,7 @@ export async function reorderCommunitySections(
 export async function getCommunityWithSections(slug: string) {
   try {
     console.log("🔍 getCommunityWithSections - Looking for slug:", slug);
-    
+
     const community = await prisma.community.findUnique({
       where: { slug },
       include: {

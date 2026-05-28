@@ -1,7 +1,14 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { Prisma, SessionStatus, SessionMode, SessionFrequency, SessionEventType, RecordingStatus } from "@prisma/client";
+import {
+  Prisma,
+  SessionStatus,
+  SessionMode,
+  SessionFrequency,
+  SessionEventType,
+  RecordingStatus,
+} from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { nanoid } from "nanoid";
 
@@ -16,7 +23,7 @@ function generateSessionSlug(title: string): string {
     .replace(/[^\w\s-]/g, "") // Remove special chars
     .replace(/\s+/g, "-") // Replace spaces with hyphens
     .substring(0, 60); // Max 60 chars
-  
+
   const uniqueId = nanoid(6);
   return `${base}-${uniqueId}`;
 }
@@ -82,7 +89,10 @@ export async function logSessionEvent(params: {
       sessionId: params.sessionId,
       communityId: params.communityId,
       type: params.type,
-      payload: params.payload as Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput | undefined,
+      payload: params.payload as
+        | Prisma.InputJsonValue
+        | Prisma.NullableJsonNullValueInput
+        | undefined,
     },
   });
 }
@@ -161,15 +171,9 @@ export async function createSessionOrSeries(input: CreateSessionOrSeriesInput) {
   const autoPostToFeed = input.autoPostToFeed ?? true;
   const interval = input.interval ?? 1;
 
-  const startsAt =
-    input.timing === "now"
-      ? new Date()
-      : new Date(input.startsAt as Date);
+  const startsAt = input.timing === "now" ? new Date() : new Date(input.startsAt as Date);
 
-  const defaultGenerateCount =
-    input.repeat === "weekly" ? 8 :
-    input.repeat === "monthly" ? 6 :
-    1;
+  const defaultGenerateCount = input.repeat === "weekly" ? 8 : input.repeat === "monthly" ? 6 : 1;
 
   const generateCount = input.generateCount ?? defaultGenerateCount;
 
@@ -297,10 +301,7 @@ export async function createSessionOrSeries(input: CreateSessionOrSeriesInput) {
   }
 
   // SCHEDULED + RECURRING -> series + future sessions
-  const frequency =
-    input.repeat === "weekly"
-      ? SessionFrequency.WEEKLY
-      : SessionFrequency.MONTHLY;
+  const frequency = input.repeat === "weekly" ? SessionFrequency.WEEKLY : SessionFrequency.MONTHLY;
 
   // Extract start time as HH:mm
   const startTime = `${String(startsAt.getHours()).padStart(2, "0")}:${String(startsAt.getMinutes()).padStart(2, "0")}`;
@@ -335,7 +336,7 @@ export async function createSessionOrSeries(input: CreateSessionOrSeriesInput) {
 
   // Create all sessions with unique slugs
   const createdSessions: { id: string; scheduledAt: Date; slug: string }[] = [];
-  
+
   for (const date of dates) {
     const slug = generateSessionSlug(`${input.title}-${date.toISOString().slice(0, 10)}`);
     const session = await prisma.mentorSession.create({
@@ -548,11 +549,7 @@ export async function endSession(sessionId: string, userId: string) {
 /**
  * Mark recording as ready (called by recording service/webhook)
  */
-export async function markRecordingReady(
-  sessionId: string,
-  url: string,
-  durationSeconds: number
-) {
+export async function markRecordingReady(sessionId: string, url: string, durationSeconds: number) {
   const session = await prisma.mentorSession.findUnique({
     where: { id: sessionId },
     include: {

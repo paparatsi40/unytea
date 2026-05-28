@@ -75,9 +75,7 @@ export default function VideoTestPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Video Call Test</h1>
-          <p className="mt-2 text-muted-foreground">
-            Test LiveKit video calls integration
-          </p>
+          <p className="mt-2 text-muted-foreground">Test LiveKit video calls integration</p>
         </div>
         <Button variant="ghost" onClick={() => router.push("/dashboard")}>
           <ArrowLeft className="mr-2 h-4 w-4" />
@@ -93,9 +91,7 @@ export default function VideoTestPage() {
           </div>
           <div>
             <h2 className="text-lg font-semibold">Join Video Call</h2>
-            <p className="text-sm text-muted-foreground">
-              Enter room details to start testing
-            </p>
+            <p className="text-sm text-muted-foreground">Enter room details to start testing</p>
           </div>
         </div>
 
@@ -125,11 +121,7 @@ export default function VideoTestPage() {
             />
           </div>
 
-          <Button
-            onClick={handleJoinCall}
-            className="w-full"
-            size="lg"
-          >
+          <Button onClick={handleJoinCall} className="w-full" size="lg">
             <Video className="mr-2 h-5 w-5" />
             Join Call
           </Button>
@@ -145,18 +137,32 @@ export default function VideoTestPage() {
             <div className="mt-2 space-y-2 text-xs text-yellow-700">
               <p>Before testing, make sure you have:</p>
               <ol className="ml-4 list-decimal space-y-1">
-                <li>Created a LiveKit Cloud account at <code className="rounded bg-yellow-100 px-1 py-0.5">https://cloud.livekit.io/</code></li>
-                <li>Added credentials to <code className="rounded bg-yellow-100 px-1 py-0.5">.env.local</code>:
+                <li>
+                  Created a LiveKit Cloud account at{" "}
+                  <code className="rounded bg-yellow-100 px-1 py-0.5">
+                    https://cloud.livekit.io/
+                  </code>
+                </li>
+                <li>
+                  Added credentials to{" "}
+                  <code className="rounded bg-yellow-100 px-1 py-0.5">.env.local</code>:
                   <ul className="ml-4 mt-1 list-disc">
-                    <li><code>LIVEKIT_URL</code></li>
-                    <li><code>LIVEKIT_API_KEY</code></li>
-                    <li><code>LIVEKIT_API_SECRET</code></li>
+                    <li>
+                      <code>LIVEKIT_URL</code>
+                    </li>
+                    <li>
+                      <code>LIVEKIT_API_KEY</code>
+                    </li>
+                    <li>
+                      <code>LIVEKIT_API_SECRET</code>
+                    </li>
                   </ul>
                 </li>
                 <li>Restarted the development server</li>
               </ol>
               <p className="mt-2">
-                See <code className="rounded bg-yellow-100 px-1 py-0.5">web/LIVEKIT_SETUP.md</code> for detailed instructions.
+                See <code className="rounded bg-yellow-100 px-1 py-0.5">web/LIVEKIT_SETUP.md</code>{" "}
+                for detailed instructions.
               </p>
             </div>
           </div>

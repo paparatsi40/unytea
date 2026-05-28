@@ -58,15 +58,15 @@ function AudioStage({
       <div className="flex max-w-md flex-col items-center gap-6 rounded-2xl border border-zinc-800 bg-zinc-900/80 px-10 py-12 text-center shadow-2xl">
         {/* Audio avatar / waveform visualization */}
         <div className="relative">
-          <div className={cn(
-            "flex h-24 w-24 items-center justify-center rounded-full transition-all duration-500",
-            isMicrophoneEnabled 
-              ? "bg-blue-600 shadow-lg shadow-blue-500/30" 
-              : "bg-zinc-700"
-          )}>
+          <div
+            className={cn(
+              "flex h-24 w-24 items-center justify-center rounded-full transition-all duration-500",
+              isMicrophoneEnabled ? "bg-blue-600 shadow-lg shadow-blue-500/30" : "bg-zinc-700"
+            )}
+          >
             <Headphones className="h-12 w-12 text-white" />
           </div>
-          
+
           {/* Pulse animation when mic is on */}
           {isMicrophoneEnabled && (
             <div className="absolute inset-0 flex items-center justify-center">
@@ -74,23 +74,21 @@ function AudioStage({
             </div>
           )}
         </div>
-        
+
         <div>
           <p className="text-xl font-semibold text-white">{participantName}</p>
           <p className="mt-2 text-sm text-zinc-400">
-            {isMicrophoneEnabled 
-              ? "Speaking..." 
-              : "Microphone is muted"}
+            {isMicrophoneEnabled ? "Speaking..." : "Microphone is muted"}
           </p>
         </div>
 
         {/* Audio indicator bars */}
         {isMicrophoneEnabled && (
-          <div className="flex items-end gap-1 h-8">
+          <div className="flex h-8 items-end gap-1">
             {[1, 2, 3, 4, 5].map((i) => (
               <div
                 key={i}
-                className="w-1.5 bg-blue-500 rounded-full animate-pulse"
+                className="w-1.5 animate-pulse rounded-full bg-blue-500"
                 style={{
                   height: `${Math.random() * 24 + 8}px`,
                   animationDelay: `${i * 100}ms`,
@@ -113,29 +111,29 @@ export function MainStage({
 }: MainStageProps) {
   const isAudioOnly = sessionMode === "audio";
   const { localParticipant } = useLocalParticipant();
-  
+
   // Access track states from localParticipant
   const isCameraEnabled = localParticipant.isCameraEnabled;
   const isMicrophoneEnabled = localParticipant.isMicrophoneEnabled;
-  const cameraTrack = localParticipant.getTrackPublication(Track.Source.Camera)?.track as LocalTrack | undefined;
+  const cameraTrack = localParticipant.getTrackPublication(Track.Source.Camera)?.track as
+    | LocalTrack
+    | undefined;
   const cameraTracks = useTracks([Track.Source.Camera]);
   const screenTracks = useTracks([Track.Source.ScreenShare]);
 
   // local camera track first, otherwise first available camera track
   const mainCameraTrack = useMemo(() => {
     return (
-      cameraTracks.find(
-        (t) => t.participant.identity === localParticipant.identity,
-      ) ?? cameraTracks[0]
+      cameraTracks.find((t) => t.participant.identity === localParticipant.identity) ??
+      cameraTracks[0]
     );
   }, [cameraTracks, localParticipant.identity]);
 
   // local screen share first, otherwise first available screen track
   const mainScreenTrack = useMemo(() => {
     return (
-      screenTracks.find(
-        (t) => t.participant.identity === localParticipant.identity,
-      ) ?? screenTracks[0]
+      screenTracks.find((t) => t.participant.identity === localParticipant.identity) ??
+      screenTracks[0]
     );
   }, [screenTracks, localParticipant.identity]);
 
@@ -146,15 +144,13 @@ export function MainStage({
     : mainCameraTrack?.participant.identity;
 
   const speakerStripTracks = useMemo(() => {
-    return cameraTracks
-      .filter((t) => t.participant.identity !== displayedMainIdentity)
-      .slice(0, 4);
+    return cameraTracks.filter((t) => t.participant.identity !== displayedMainIdentity).slice(0, 4);
   }, [cameraTracks, displayedMainIdentity]);
 
   // For audio-only sessions in "screen" mode, show audio stage
   if (isAudioOnly && mode !== "whiteboard" && mode !== "screen") {
     return (
-      <AudioStage 
+      <AudioStage
         isMicrophoneEnabled={isMicrophoneEnabled}
         participantName={localParticipant.identity}
       />
@@ -167,7 +163,11 @@ export function MainStage({
       <div className="relative flex-1 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950">
         {mode === "whiteboard" ? (
           sessionId ? (
-            <SessionWhiteboard embedded sessionId={sessionId} onClose={() => onModeChange?.(isAudioOnly ? "screen" : "video")} />
+            <SessionWhiteboard
+              embedded
+              sessionId={sessionId}
+              onClose={() => onModeChange?.(isAudioOnly ? "screen" : "video")}
+            />
           ) : (
             <EmptyStage
               icon={Pencil}
@@ -178,14 +178,11 @@ export function MainStage({
         ) : mode === "screen" ? (
           mainScreenTrack ? (
             <div className="h-full w-full bg-black">
-              <VideoTrack
-                className="h-full w-full object-contain"
-                trackRef={mainScreenTrack}
-              />
+              <VideoTrack className="h-full w-full object-contain" trackRef={mainScreenTrack} />
             </div>
           ) : isAudioOnly ? (
             // For audio-only sessions, show audio stage when screen is not shared
-            <AudioStage 
+            <AudioStage
               isMicrophoneEnabled={isMicrophoneEnabled}
               participantName={localParticipant.identity}
             />
@@ -204,16 +201,17 @@ export function MainStage({
           />
         ) : mainCameraTrack ? (
           <div className="h-full w-full bg-black">
-            <VideoTrack
-              className="h-full w-full object-cover"
-              trackRef={mainCameraTrack}
-            />
+            <VideoTrack className="h-full w-full object-cover" trackRef={mainCameraTrack} />
           </div>
         ) : (
           <EmptyStage
             icon={Video}
             title="No camera video available"
-            description={isCameraEnabled ? "Waiting for video track…" : "Turn on your camera or wait for another participant's camera."}
+            description={
+              isCameraEnabled
+                ? "Waiting for video track…"
+                : "Turn on your camera or wait for another participant's camera."
+            }
           />
         )}
       </div>

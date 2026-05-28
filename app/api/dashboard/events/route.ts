@@ -8,10 +8,7 @@ export async function GET() {
   try {
     const session = await auth();
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const userId = session.user.id;
@@ -49,7 +46,7 @@ export async function GET() {
     const events = sessions.map((session) => ({
       id: session.id,
       title: session.title,
-      type: session.status === "IN_PROGRESS" ? "live" : "session" as const,
+      type: session.status === "IN_PROGRESS" ? "live" : ("session" as const),
       time: formatTime(session.scheduledAt),
       community: session.mentee?.name || "Session",
       attendees: session.participations.length,
@@ -58,10 +55,7 @@ export async function GET() {
     return NextResponse.json({ events });
   } catch (error) {
     console.error("Error fetching dashboard events:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch events" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch events" }, { status: 500 });
   }
 }
 

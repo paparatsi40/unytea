@@ -18,10 +18,7 @@ interface CertificateViewProps {
   showVerifyLink?: boolean;
 }
 
-export function CertificateView({
-  certificate,
-  showVerifyLink = true,
-}: CertificateViewProps) {
+export function CertificateView({ certificate, showVerifyLink = true }: CertificateViewProps) {
   const completionDate = new Date(certificate.completionDate);
   const formattedDate = completionDate.toLocaleDateString("en-US", {
     year: "numeric",
@@ -53,22 +50,14 @@ export function CertificateView({
 
         {/* Recipient */}
         <p className="mb-1 text-sm text-zinc-500">This certifies that</p>
-        <p className="mb-4 text-2xl font-bold text-white">
-          {certificate.userName}
-        </p>
+        <p className="mb-4 text-2xl font-bold text-white">{certificate.userName}</p>
 
         {/* Course */}
-        <p className="mb-1 text-sm text-zinc-500">
-          has successfully completed
-        </p>
-        <p className="mb-2 text-xl font-semibold text-purple-300">
-          {certificate.courseName}
-        </p>
+        <p className="mb-1 text-sm text-zinc-500">has successfully completed</p>
+        <p className="mb-2 text-xl font-semibold text-purple-300">{certificate.courseName}</p>
 
         {certificate.communityName && (
-          <p className="mb-4 text-sm text-zinc-500">
-            by {certificate.communityName}
-          </p>
+          <p className="mb-4 text-sm text-zinc-500">by {certificate.communityName}</p>
         )}
 
         {/* Score */}
@@ -124,11 +113,7 @@ export function CertificateView({
 }
 
 // ── Compact Certificate Card (for lists) ─────────────────────────────
-export function CertificateCard({
-  certificate,
-}: {
-  certificate: CertificateData;
-}) {
+export function CertificateCard({ certificate }: { certificate: CertificateData }) {
   const completionDate = new Date(certificate.completionDate);
   const formattedDate = completionDate.toLocaleDateString("en-US", {
     month: "short",
@@ -142,9 +127,7 @@ export function CertificateCard({
         <Award className="h-5 w-5 text-white" />
       </div>
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium text-white">
-          {certificate.courseName}
-        </p>
+        <p className="truncate text-sm font-medium text-white">{certificate.courseName}</p>
         <p className="text-xs text-zinc-500">
           {formattedDate}
           {certificate.score !== null &&

@@ -15,6 +15,7 @@ The app has **3 locale files** (en.json, es.json, fr.json) with existing keys bu
 ## 🔴 Priority 1: Landing Page & Auth Pages
 
 ### File: `app/[locale]/page.tsx` (Main Landing Page)
+
 **Impact**: First user impression, critical conversion funnel  
 **Status**: Mostly hardcoded, minimal translation usage
 
@@ -22,33 +23,33 @@ The app has **3 locale files** (en.json, es.json, fr.json) with existing keys bu
 
 ```typescript
 // Navigation
-"Explore communities"          // Line 57
-"Features"                      // Line 60
-"vs Skool"                      // Line 63
-"Pricing"                       // Line 66
-"Go to Dashboard"              // Line 77 (hardcoded, not using authT)
+"Explore communities"; // Line 57
+"Features"; // Line 60
+"vs Skool"; // Line 63
+"Pricing"; // Line 66
+"Go to Dashboard"; // Line 77 (hardcoded, not using authT)
 
 // Hero section
-"Trusted by creators, coaches, and educators worldwide"  // Line 109
-"Build a community that"        // Line 112
-"learns live"                   // Line 114
-"Host live sessions, courses, and community discussions — all in one place."  // Line 118
-"Create Your Community Free"    // Line 125
-"Explore communities"           // Line 133
-"Watch Demo"                    // Line 140
+"Trusted by creators, coaches, and educators worldwide"; // Line 109
+"Build a community that"; // Line 112
+"learns live"; // Line 114
+"Host live sessions, courses, and community discussions — all in one place."; // Line 118
+"Create Your Community Free"; // Line 125
+"Explore communities"; // Line 133
+"Watch Demo"; // Line 140
 
 // Feature bullets
-"Live sessions"                 // Line 241
-"Courses"                       // Line 247
-"Community discussions"         // Line 253
-"Built-in monetization"        // Line 259
+"Live sessions"; // Line 241
+"Courses"; // Line 247
+"Community discussions"; // Line 253
+"Built-in monetization"; // Line 259
 
 // Market problem section
-"Most community platforms are built like"  // Line 270
-"forums from 2010"             // Line 271
-"They focus on posts and discussions. But modern communities need more:"  // Line 274
-"Live interaction"             // Line 291
-"Missing real-time video, whiteboard, screen sharing"  // Line 292
+"Most community platforms are built like"; // Line 270
+"forums from 2010"; // Line 271
+"They focus on posts and discussions. But modern communities need more:"; // Line 274
+"Live interaction"; // Line 291
+"Missing real-time video, whiteboard, screen sharing"; // Line 292
 ```
 
 **Suggested Namespace**: `landing.page`
@@ -97,25 +98,27 @@ The app has **3 locale files** (en.json, es.json, fr.json) with existing keys bu
 ## 🔴 Priority 2: Dashboard Components
 
 ### File: `components/dashboard/sidebar.tsx`
+
 **Impact**: Core navigation, seen on every dashboard page  
 **Status**: Completely hardcoded
 
 #### Hardcoded Strings:
+
 ```typescript
-"Dashboard"                     // Line 21
-"Communities"                   // Line 22
-"Messages"                      // Line 23
-"Sessions"                      // Line 24
-"Recordings"                    // Line 25
-"Knowledge Library"             // Line 26
-"Courses"                       // Line 27
-"Analytics"                     // Line 28
-"Achievements"                  // Line 29
-"Notifications"                 // Line 30
-"Settings"                      // Line 31
-"Upgrade to Premium"            // Line 81
-"Unlock all features"           // Line 84
-"Upgrade Now"                   // Line 90
+"Dashboard"; // Line 21
+"Communities"; // Line 22
+"Messages"; // Line 23
+"Sessions"; // Line 24
+"Recordings"; // Line 25
+"Knowledge Library"; // Line 26
+"Courses"; // Line 27
+"Analytics"; // Line 28
+"Achievements"; // Line 29
+"Notifications"; // Line 30
+"Settings"; // Line 31
+"Upgrade to Premium"; // Line 81
+"Unlock all features"; // Line 84
+"Upgrade Now"; // Line 90
 ```
 
 **Suggested Namespace**: `navigation.sidebar`
@@ -146,10 +149,12 @@ The app has **3 locale files** (en.json, es.json, fr.json) with existing keys bu
 ```
 
 ### File: `components/dashboard/header.tsx`
+
 **Impact**: Header on every page, user profile area  
 **Status**: Partially localized (uses `t()` but some strings missing)
 
 #### Issues:
+
 - Line 45: Uses `t("common.search")` ✅ (Good)
 - Line 53: Uses `t("navigation.messages")` ✅ (Good)
 - Line 67: Uses `t("navigation.profile")` ✅ (Good)
@@ -163,14 +168,16 @@ The app has **3 locale files** (en.json, es.json, fr.json) with existing keys bu
 ## 🟠 Priority 3: Community & Feed Components
 
 ### File: `components/community/CommentSection.tsx`
+
 **Impact**: High visibility in community feed  
 **Status**: Partially hardcoded
 
 #### Hardcoded Strings:
+
 ```typescript
-"{comments.length} Comments"         // Line 78
-"No comments yet"                    // Line 113
-"Be the first to comment!"          // Line 114
+"{comments.length} Comments"; // Line 78
+"No comments yet"; // Line 113
+"Be the first to comment!"; // Line 114
 ```
 
 **Suggested Namespace**: `community.comments`
@@ -188,14 +195,16 @@ The app has **3 locale files** (en.json, es.json, fr.json) with existing keys bu
 ```
 
 ### File: `components/community/PremiumPostFeed.tsx`
+
 **Impact**: Core feed interaction  
 **Status**: Heavily hardcoded
 
 #### Hardcoded Strings:
+
 ```typescript
-"Failed to create post"              // Line 156, 200
-"Shared an attachment"              // Line 180
-"You"                               // Line 187
+"Failed to create post"; // Line 156, 200
+"Shared an attachment"; // Line 180
+"You"; // Line 187
 ```
 
 **Suggested Namespace**: `community.feed`
@@ -219,23 +228,25 @@ The app has **3 locale files** (en.json, es.json, fr.json) with existing keys bu
 ```
 
 ### File: `components/explore/ExploreFilters.tsx`
+
 **Impact**: Explore page filters  
 **Status**: Multiple hardcoded filter labels
 
 #### Hardcoded Strings:
+
 ```typescript
-"Search communities"                // Line 70
-"Free + Paid"                       // Line 79
-"Free"                              // Line 80
-"Paid"                              // Line 81
-"All languages"                     // Line 89
-"Any schedule"                      // Line 102
-"Sessions this week"               // Line 103
-"Trending"                         // Line 111
-"Most members"                     // Line 112
-"Newest"                           // Line 113
-"All Categories"                   // Line 120
-"filters fallback"                 // Line 140 (SR only)
+"Search communities"; // Line 70
+"Free + Paid"; // Line 79
+"Free"; // Line 80
+"Paid"; // Line 81
+"All languages"; // Line 89
+"Any schedule"; // Line 102
+"Sessions this week"; // Line 103
+"Trending"; // Line 111
+"Most members"; // Line 112
+"Newest"; // Line 113
+"All Categories"; // Line 120
+"filters fallback"; // Line 140 (SR only)
 ```
 
 **Suggested Namespace**: `explore.filters`
@@ -275,16 +286,18 @@ The app has **3 locale files** (en.json, es.json, fr.json) with existing keys bu
 ## 🟡 Priority 4: Messaging & Notifications
 
 ### File: `components/messages/MessageInput.tsx`
+
 **Impact**: Critical interaction point  
 **Status**: Partially hardcoded
 
 #### Hardcoded Strings:
+
 ```typescript
-"Write a message or add an attachment."  // Line 35
-`Message must be ${MAX_MESSAGE_LENGTH} characters or less.`  // Line 40
-"Type a message... (Shift+Enter for new line)"  // Line 175
-"Enter to send · Shift+Enter for new line"    // Line 243
-"Uploading..."                      // Line 244
+"Write a message or add an attachment." // Line 35
+`Message must be ${MAX_MESSAGE_LENGTH} characters or less.`; // Line 40
+("Type a message... (Shift+Enter for new line)"); // Line 175
+("Enter to send · Shift+Enter for new line"); // Line 243
+("Uploading..."); // Line 244
 ```
 
 **Note**: This component needs dynamic messages with character count. Consider using translation + interpolation.
@@ -314,10 +327,12 @@ The app has **3 locale files** (en.json, es.json, fr.json) with existing keys bu
 ```
 
 ### File: `components/notifications/NotificationCenter.tsx`
+
 **Impact**: Real-time notification display  
 **Status**: Mostly hardcoded
 
 #### Hardcoded Strings Found:
+
 - Notification type icons are hardcoded (MESSAGE, COMMENT, REACTION, NEW_POST, NEW_MEMBER, ACHIEVEMENT, SYSTEM)
 - Toast messages: "Marked as read" (NotificationItem.tsx:63)
 - Toast messages: "Notification deleted" (NotificationItem.tsx:78)
@@ -344,6 +359,7 @@ The app has **3 locale files** (en.json, es.json, fr.json) with existing keys bu
 ## 🟡 Priority 5: Live Session & Interaction Components
 
 ### File: `components/live-session/LivePoll.tsx`
+
 **Impact**: Interactive elements in live sessions  
 **Status**: No hardcoded user-facing text yet (but poll options will need translation keys)
 
@@ -363,10 +379,12 @@ The app has **3 locale files** (en.json, es.json, fr.json) with existing keys bu
 ```
 
 ### File: `components/sessions/CreateSessionDialog.tsx`
+
 **Impact**: Session creation flow  
 **Status**: Mostly hardcoded labels and UI text
 
 #### Hardcoded Strings:
+
 ```typescript
 "Create Session"                    // Line 56 (triggerText default)
 "Sun", "Mon", "Tue", etc.          // Lines 24-30
@@ -414,10 +432,12 @@ The app has **3 locale files** (en.json, es.json, fr.json) with existing keys bu
 ## 🟡 Priority 6: Library & Resources
 
 ### File: `components/library/ResourceCard.tsx`
+
 **Impact**: Knowledge library display  
 **Status**: No hardcoded user-facing text visible (mostly using icons)
 
 **Ensure** these computed values are translatable:
+
 - Duration format: `${hours}h ${mins % 60}m` / `${mins}m`
 
 **Suggested Namespace**: `library.resources`
@@ -441,33 +461,33 @@ The app has **3 locale files** (en.json, es.json, fr.json) with existing keys bu
 
 ### Scattered Toast Messages (High Priority):
 
-| Component | String | Line | Suggested Key |
-|-----------|--------|------|---|
-| `community/CommunityActions.tsx` | "Successfully joined!" | 45 | `community.actions.joinSuccess` |
-| `dashboard/ShareableMetrics.tsx` | "Failed to generate image. Please try again." | 47 | `dashboard.metrics.generateError` |
-| `dashboard/ShareableMetrics.tsx` | "Copied to clipboard! Share on X, LinkedIn, or Discord." | 58 | `dashboard.metrics.copied` |
-| `dashboard/ShareableMetrics.tsx` | "Generating..." / "Download Image" | 172 | `dashboard.metrics.generating` / `downloadImage` |
-| `ai/AIChatWidget.tsx` | "Failed to send message. Please try again." | 82 | `ai.errors.sendFailed` |
-| `community/PostCard.tsx` | "just now" | 47 | `common.time.justNow` |
-| `chat/PusherChat.tsx` | "just now" | 193 | `common.time.justNow` |
-| `buddy/BuddyDashboard.tsx` | "Goal title..." / "Description..." | 222, 228 | `buddy.placeholders.goalTitle` / `description` |
-| `editor/RichTextEditor.tsx` | "Start writing..." | 32 | `editor.placeholder` |
+| Component                        | String                                                   | Line     | Suggested Key                                    |
+| -------------------------------- | -------------------------------------------------------- | -------- | ------------------------------------------------ |
+| `community/CommunityActions.tsx` | "Successfully joined!"                                   | 45       | `community.actions.joinSuccess`                  |
+| `dashboard/ShareableMetrics.tsx` | "Failed to generate image. Please try again."            | 47       | `dashboard.metrics.generateError`                |
+| `dashboard/ShareableMetrics.tsx` | "Copied to clipboard! Share on X, LinkedIn, or Discord." | 58       | `dashboard.metrics.copied`                       |
+| `dashboard/ShareableMetrics.tsx` | "Generating..." / "Download Image"                       | 172      | `dashboard.metrics.generating` / `downloadImage` |
+| `ai/AIChatWidget.tsx`            | "Failed to send message. Please try again."              | 82       | `ai.errors.sendFailed`                           |
+| `community/PostCard.tsx`         | "just now"                                               | 47       | `common.time.justNow`                            |
+| `chat/PusherChat.tsx`            | "just now"                                               | 193      | `common.time.justNow`                            |
+| `buddy/BuddyDashboard.tsx`       | "Goal title..." / "Description..."                       | 222, 228 | `buddy.placeholders.goalTitle` / `description`   |
+| `editor/RichTextEditor.tsx`      | "Start writing..."                                       | 32       | `editor.placeholder`                             |
 
 ---
 
 ## 📊 Summary by Category
 
-| Category | Count | Files | Priority |
-|----------|-------|-------|----------|
-| **Navigation & UI** | 20+ | sidebar, header, dashboard | 🔴 P1 |
-| **Landing Page** | 30+ | page.tsx | 🔴 P1 |
-| **Comments & Feed** | 8+ | CommentSection, PostFeed | 🟠 P2 |
-| **Filters & Explore** | 12+ | ExploreFilters | 🟠 P2 |
-| **Messages** | 8+ | MessageInput, ConversationList | 🟡 P3 |
-| **Notifications** | 6+ | NotificationCenter, NotificationItem | 🟡 P3 |
-| **Sessions & Live** | 10+ | CreateSessionDialog, LivePoll | 🟡 P3 |
-| **Toast & Errors** | 10+ | Scattered | 🟢 P4 |
-| **Resources & Library** | 4+ | ResourceCard, CategorySidebar | 🟢 P4 |
+| Category                | Count | Files                                | Priority |
+| ----------------------- | ----- | ------------------------------------ | -------- |
+| **Navigation & UI**     | 20+   | sidebar, header, dashboard           | 🔴 P1    |
+| **Landing Page**        | 30+   | page.tsx                             | 🔴 P1    |
+| **Comments & Feed**     | 8+    | CommentSection, PostFeed             | 🟠 P2    |
+| **Filters & Explore**   | 12+   | ExploreFilters                       | 🟠 P2    |
+| **Messages**            | 8+    | MessageInput, ConversationList       | 🟡 P3    |
+| **Notifications**       | 6+    | NotificationCenter, NotificationItem | 🟡 P3    |
+| **Sessions & Live**     | 10+   | CreateSessionDialog, LivePoll        | 🟡 P3    |
+| **Toast & Errors**      | 10+   | Scattered                            | 🟢 P4    |
+| **Resources & Library** | 4+    | ResourceCard, CategorySidebar        | 🟢 P4    |
 
 **Total Hardcoded Strings**: ~120+
 

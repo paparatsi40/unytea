@@ -224,10 +224,7 @@ export async function canAccessCommunity(
 /**
  * Check if user can send message to recipient
  */
-export async function canSendMessage(
-  userId: string,
-  recipientId: string
-): Promise<boolean> {
+export async function canSendMessage(userId: string, recipientId: string): Promise<boolean> {
   if (userId === recipientId) {
     return false;
   }

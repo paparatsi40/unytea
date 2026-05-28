@@ -99,29 +99,29 @@ Cuando navegues a una página que tenga Clerk, verás un error. En ese momento:
 
 ```typescript
 // Busca esto:
-import { useUser } from "@clerk/nextjs"
-const { user } = useUser()
+import { useUser } from "@clerk/nextjs";
+const { user } = useUser();
 
 // Reemplázalo por:
-import { useCurrentUser } from "@/hooks/use-current-user"
-const { user } = useCurrentUser()
+import { useCurrentUser } from "@/hooks/use-current-user";
+const { user } = useCurrentUser();
 ```
 
 3. Actualiza campos de usuario:
 
 ```typescript
 // Viejo:
-user?.id // Clerk ID
-user?.firstName
-user?.lastName
-user?.imageUrl
-user?.emailAddresses[0].emailAddress
+user?.id; // Clerk ID
+user?.firstName;
+user?.lastName;
+user?.imageUrl;
+user?.emailAddresses[0].emailAddress;
 
 // Nuevo:
-user?.id // Database ID
-user?.name
-user?.image
-user?.email
+user?.id; // Database ID
+user?.name;
+user?.image;
+user?.email;
 ```
 
 ### Opción 2: **Actualizarlos todos ahora** (2-3 horas más)
@@ -133,17 +133,17 @@ arriba.
 
 ## 📊 COMPARACIÓN: ANTES vs DESPUÉS
 
-| Aspecto | Con Clerk | Con NextAuth |
-|---------|-----------|--------------|
-| **Costo mensual** | $25-50 | $0 |
-| **UI Control** | ❌ Limitado | ✅ 100% custom |
-| **Sign In/Up** | ⚠️ Componentes Clerk | ✅ Premium glassmorphism |
-| **Avatar** | ⚠️ UserButton | ✅ Custom dropdown |
-| **Sesiones** | ✅ Funciona | ✅ Funciona |
-| **OAuth** | ✅ Setup | ⏳ Config pendiente |
-| **Type Safety** | ⚠️ Parcial | ✅ 100% |
-| **Server Components** | ⚠️ Problemas | ✅ Nativo |
-| **Vendor Lock-in** | ❌ Sí | ✅ No |
+| Aspecto               | Con Clerk            | Con NextAuth             |
+| --------------------- | -------------------- | ------------------------ |
+| **Costo mensual**     | $25-50               | $0                       |
+| **UI Control**        | ❌ Limitado          | ✅ 100% custom           |
+| **Sign In/Up**        | ⚠️ Componentes Clerk | ✅ Premium glassmorphism |
+| **Avatar**            | ⚠️ UserButton        | ✅ Custom dropdown       |
+| **Sesiones**          | ✅ Funciona          | ✅ Funciona              |
+| **OAuth**             | ✅ Setup             | ⏳ Config pendiente      |
+| **Type Safety**       | ⚠️ Parcial           | ✅ 100%                  |
+| **Server Components** | ⚠️ Problemas         | ✅ Nativo                |
+| **Vendor Lock-in**    | ❌ Sí                | ✅ No                    |
 
 ---
 
@@ -291,7 +291,7 @@ Y eso sin contar:
 
 **¡FELICIDADES POR COMPLETAR LA MIGRACIÓN! 🚀🎉**
 
-*Este es el tipo de trabajo que diferencia un proyecto amateur de uno profesional.*
+_Este es el tipo de trabajo que diferencia un proyecto amateur de uno profesional._
 
 ---
 

@@ -43,10 +43,7 @@ export async function getDashboardMetrics() {
 
     const sessionsThisWeek = await prisma.mentorSession.count({
       where: {
-        OR: [
-          { mentorId: userId },
-          { communityId: { in: communityIds } },
-        ],
+        OR: [{ mentorId: userId }, { communityId: { in: communityIds } }],
         scheduledAt: {
           gte: weekStart,
         },
@@ -54,10 +51,7 @@ export async function getDashboardMetrics() {
     });
 
     // Get total members across all communities
-    const totalMembers = communities.reduce(
-      (sum, c) => sum + c._count.members,
-      0
-    );
+    const totalMembers = communities.reduce((sum, c) => sum + c._count.members, 0);
 
     // Get new members this week
     const newMembersThisWeek = await prisma.member.count({
@@ -72,10 +66,7 @@ export async function getDashboardMetrics() {
     // Get average attendance rate (from completed sessions)
     const completedSessions = await prisma.mentorSession.findMany({
       where: {
-        OR: [
-          { mentorId: userId },
-          { communityId: { in: communityIds } },
-        ],
+        OR: [{ mentorId: userId }, { communityId: { in: communityIds } }],
         status: "COMPLETED",
       },
       select: {
@@ -240,9 +231,7 @@ export async function getActivationEngineSnapshot() {
       activation: {
         hasAttendedFirstSession,
         timeToFirstSessionHours,
-        target24h: hasAttendedFirstSession
-          ? (timeToFirstSessionHours ?? 999) <= 24
-          : false,
+        target24h: hasAttendedFirstSession ? (timeToFirstSessionHours ?? 999) <= 24 : false,
         nextSession: nextSessionPayload,
         rsvpStatus,
         missedSession,
@@ -263,67 +252,68 @@ export async function getUserIdentitySnapshot(limitCommunities: number = 6) {
 
     const now = new Date();
 
-    const [user, memberships, sessionsAttended, sessionsHosted, postsCreated, commentsCreated] = await Promise.all([
-      prisma.user.findUnique({
-        where: { id: userId },
-        select: {
-          id: true,
-          name: true,
-          username: true,
-          email: true,
-          image: true,
-          bio: true,
-          tagline: true,
-          interests: true,
-          skills: true,
-          location: true,
-          createdAt: true,
-        },
-      }),
-      prisma.member.findMany({
-        where: { userId, status: "ACTIVE" },
-        include: {
-          community: {
-            select: {
-              id: true,
-              name: true,
-              slug: true,
-              imageUrl: true,
-              isPaid: true,
-              _count: { select: { members: true } },
-              sessions: {
-                where: {
-                  status: "SCHEDULED",
-                  scheduledAt: { gte: now },
-                },
-                orderBy: { scheduledAt: "asc" },
-                take: 1,
-                select: {
-                  id: true,
-                  title: true,
-                  scheduledAt: true,
+    const [user, memberships, sessionsAttended, sessionsHosted, postsCreated, commentsCreated] =
+      await Promise.all([
+        prisma.user.findUnique({
+          where: { id: userId },
+          select: {
+            id: true,
+            name: true,
+            username: true,
+            email: true,
+            image: true,
+            bio: true,
+            tagline: true,
+            interests: true,
+            skills: true,
+            location: true,
+            createdAt: true,
+          },
+        }),
+        prisma.member.findMany({
+          where: { userId, status: "ACTIVE" },
+          include: {
+            community: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+                imageUrl: true,
+                isPaid: true,
+                _count: { select: { members: true } },
+                sessions: {
+                  where: {
+                    status: "SCHEDULED",
+                    scheduledAt: { gte: now },
+                  },
+                  orderBy: { scheduledAt: "asc" },
+                  take: 1,
+                  select: {
+                    id: true,
+                    title: true,
+                    scheduledAt: true,
+                  },
                 },
               },
             },
           },
-        },
-        orderBy: { joinedAt: "desc" },
-        take: limitCommunities,
-      }),
-      prisma.sessionParticipation.count({
-        where: {
-          userId,
-        },
-      }),
-      prisma.mentorSession.count({
-        where: {
-          mentorId: userId,
-          status: "COMPLETED",
-        },
-      }),
-      prisma.post.count({ where: { authorId: userId } }),
-      prisma.comment.count({ where: { authorId: userId } }),
-    ]);
+          orderBy: { joinedAt: "desc" },
+          take: limitCommunities,
+        }),
+        prisma.sessionParticipation.count({
+          where: {
+            userId,
+          },
+        }),
+        prisma.mentorSession.count({
+          where: {
+            mentorId: userId,
+            status: "COMPLETED",
+          },
+        }),
+        prisma.post.count({ where: { authorId: userId } }),
+        prisma.comment.count({ where: { authorId: userId } }),
+      ]);
 
     if (!user) {
       return { success: false, error: "User not found" };
@@ -656,10 +646,7 @@ export async function getPerformanceSnapshot() {
     // Sessions hosted
     const sessionsHosted = await prisma.mentorSession.count({
       where: {
-        OR: [
-          { mentorId: userId },
-          { communityId: { in: communityIds } },
-        ],
+        OR: [{ mentorId: userId }, { communityId: { in: communityIds } }],
         startedAt: {
           gte: weekStart,
         },
@@ -703,9 +690,7 @@ export async function getPerformanceSnapshot() {
     const growthRate =
       previousMembers === 0
         ? 100
-        : Math.round(
-            ((newMembersThisWeek - previousMembers) / previousMembers) * 100
-          );
+        : Math.round(((newMembersThisWeek - previousMembers) / previousMembers) * 100);
 
     return {
       success: true,
@@ -810,7 +795,8 @@ export async function getHostAnalyticsV1() {
       0
     );
 
-    const rsvpToAttendanceRate = totalRsvps > 0 ? Math.round((totalAttended / totalRsvps) * 100) : 0;
+    const rsvpToAttendanceRate =
+      totalRsvps > 0 ? Math.round((totalAttended / totalRsvps) * 100) : 0;
 
     return {
       success: true,
@@ -828,7 +814,6 @@ export async function getHostAnalyticsV1() {
     return { success: false, error: "Failed to load host analytics" };
   }
 }
-
 
 export async function getAIPlaybookRecommendations() {
   try {
@@ -852,56 +837,62 @@ export async function getAIPlaybookRecommendations() {
 
     const communityIds = hostMemberships.map((m) => m.communityId);
 
-    const [completedSessions, upcomingSessions, postsLast7d, newMembersLast7d, recordingViewsAgg, activeMembers] =
-      await Promise.all([
-        prisma.mentorSession.findMany({
-          where: {
-            OR: [{ mentorId: userId }, { communityId: { in: communityIds } }],
-            status: "COMPLETED",
-            endedAt: { gte: last14Days },
-          },
-          select: {
-            attendeeCount: true,
-            participations: { select: { id: true, eventsData: true } },
-            endedAt: true,
-          },
-          orderBy: { endedAt: "desc" },
-          take: 50,
-        }),
-        prisma.mentorSession.count({
-          where: {
-            OR: [{ mentorId: userId }, { communityId: { in: communityIds } }],
-            status: { in: ["SCHEDULED", "IN_PROGRESS"] },
-            scheduledAt: { gte: now, lte: next7Days },
-          },
-        }),
-        prisma.post.count({
-          where: {
-            communityId: { in: communityIds },
-            createdAt: { gte: last7Days },
-          },
-        }),
-        prisma.member.count({
-          where: {
-            communityId: { in: communityIds },
-            joinedAt: { gte: last7Days },
-          },
-        }),
-        prisma.post.aggregate({
-          where: {
-            communityId: { in: communityIds },
-            contentType: "SESSION_ANNOUNCEMENT",
-            createdAt: { gte: last14Days },
-          },
-          _sum: { viewCount: true },
-        }),
-        prisma.member.count({
-          where: {
-            communityId: { in: communityIds },
-            status: "ACTIVE",
-          },
-        }),
-      ]);
+    const [
+      completedSessions,
+      upcomingSessions,
+      postsLast7d,
+      newMembersLast7d,
+      recordingViewsAgg,
+      activeMembers,
+    ] = await Promise.all([
+      prisma.mentorSession.findMany({
+        where: {
+          OR: [{ mentorId: userId }, { communityId: { in: communityIds } }],
+          status: "COMPLETED",
+          endedAt: { gte: last14Days },
+        },
+        select: {
+          attendeeCount: true,
+          participations: { select: { id: true, eventsData: true } },
+          endedAt: true,
+        },
+        orderBy: { endedAt: "desc" },
+        take: 50,
+      }),
+      prisma.mentorSession.count({
+        where: {
+          OR: [{ mentorId: userId }, { communityId: { in: communityIds } }],
+          status: { in: ["SCHEDULED", "IN_PROGRESS"] },
+          scheduledAt: { gte: now, lte: next7Days },
+        },
+      }),
+      prisma.post.count({
+        where: {
+          communityId: { in: communityIds },
+          createdAt: { gte: last7Days },
+        },
+      }),
+      prisma.member.count({
+        where: {
+          communityId: { in: communityIds },
+          joinedAt: { gte: last7Days },
+        },
+      }),
+      prisma.post.aggregate({
+        where: {
+          communityId: { in: communityIds },
+          contentType: "SESSION_ANNOUNCEMENT",
+          createdAt: { gte: last14Days },
+        },
+        _sum: { viewCount: true },
+      }),
+      prisma.member.count({
+        where: {
+          communityId: { in: communityIds },
+          status: "ACTIVE",
+        },
+      }),
+    ]);
 
     const totalRsvps = completedSessions.reduce((sum, session) => {
       const count = session.participations.filter((p: any) => {
@@ -989,7 +980,8 @@ export async function getAIPlaybookRecommendations() {
         priority: "high",
         title: "Attendance is low",
         problem: "Your live attendance is below healthy benchmarks.",
-        action: "Ask members for questions before the session and trigger reminders 1h and 10m before live.",
+        action:
+          "Ask members for questions before the session and trigger reminders 1h and 10m before live.",
         cta: "Create question post",
         href: "/dashboard/communities",
         explainability: `Last session: ${signals.lastSessionAttended} attendees · Your attendance rate: ${Math.round(
@@ -1037,7 +1029,10 @@ export async function getAIPlaybookRecommendations() {
       });
     }
 
-    if (recommendations.length === 0 || (signals.attendanceRate > 0.25 && signals.sessionsPerWeek >= 2)) {
+    if (
+      recommendations.length === 0 ||
+      (signals.attendanceRate > 0.25 && signals.sessionsPerWeek >= 2)
+    ) {
       recommendations.push({
         id: "strong-performance",
         priority: "low",
@@ -1185,37 +1180,38 @@ export async function getHostAlerts() {
     };
 
     for (const community of communities) {
-      const [upcomingCount, recentSessions, previousSessions, completedLast30Days] = await Promise.all([
-        prisma.mentorSession.count({
-          where: {
-            mentorId: userId,
-            communityId: community.id,
-            status: { in: ["SCHEDULED", "IN_PROGRESS"] },
-            scheduledAt: { gte: now, lte: in14Days },
-          },
-        }),
-        prisma.mentorSession.findMany({
-          where: { mentorId: userId, communityId: community.id, status: "COMPLETED" },
-          select: { attendeeCount: true, participations: { select: { id: true } } },
-          orderBy: { endedAt: "desc" },
-          take: 3,
-        }),
-        prisma.mentorSession.findMany({
-          where: { mentorId: userId, communityId: community.id, status: "COMPLETED" },
-          select: { attendeeCount: true, participations: { select: { id: true } } },
-          orderBy: { endedAt: "desc" },
-          skip: 3,
-          take: 3,
-        }),
-        prisma.mentorSession.count({
-          where: {
-            mentorId: userId,
-            communityId: community.id,
-            status: "COMPLETED",
-            endedAt: { gte: last30Days },
-          },
-        }),
-      ]);
+      const [upcomingCount, recentSessions, previousSessions, completedLast30Days] =
+        await Promise.all([
+          prisma.mentorSession.count({
+            where: {
+              mentorId: userId,
+              communityId: community.id,
+              status: { in: ["SCHEDULED", "IN_PROGRESS"] },
+              scheduledAt: { gte: now, lte: in14Days },
+            },
+          }),
+          prisma.mentorSession.findMany({
+            where: { mentorId: userId, communityId: community.id, status: "COMPLETED" },
+            select: { attendeeCount: true, participations: { select: { id: true } } },
+            orderBy: { endedAt: "desc" },
+            take: 3,
+          }),
+          prisma.mentorSession.findMany({
+            where: { mentorId: userId, communityId: community.id, status: "COMPLETED" },
+            select: { attendeeCount: true, participations: { select: { id: true } } },
+            orderBy: { endedAt: "desc" },
+            skip: 3,
+            take: 3,
+          }),
+          prisma.mentorSession.count({
+            where: {
+              mentorId: userId,
+              communityId: community.id,
+              status: "COMPLETED",
+              endedAt: { gte: last30Days },
+            },
+          }),
+        ]);
 
       if (upcomingCount === 0) {
         alerts.push({
@@ -1305,7 +1301,15 @@ export async function getCommunityOSSnapshot() {
 
     const communityIds = hostCommunities.map((m) => m.communityId);
 
-    const [weeklySessions, questionsSubmitted, recapPosts, recordingViews, weeklyHostedSessions, lastCompletedSession, activeMembers] = await Promise.all([
+    const [
+      weeklySessions,
+      questionsSubmitted,
+      recapPosts,
+      recordingViews,
+      weeklyHostedSessions,
+      lastCompletedSession,
+      activeMembers,
+    ] = await Promise.all([
       prisma.mentorSession.findMany({
         where: {
           communityId: { in: communityIds },
@@ -1445,28 +1449,28 @@ export async function getCommunityOSSnapshot() {
           href: "/dashboard/sessions/create",
         }
       : lowAttendance
-      ? {
-          icon: "⚠️",
-          title: "Low attendance in your last session",
-          description: "Ask questions before live and push reminders to recover attendance.",
-          cta: "Create question post",
-          href: "/dashboard/communities",
-        }
-      : newCommunity
-      ? {
-          icon: "🌱",
-          title: "Grow your first members",
-          description: "Invite 5 members and share your upcoming session link.",
-          cta: "Invite members",
-          href: "/dashboard/communities",
-        }
-      : {
-          icon: "✅",
-          title: "You’re on track this week",
-          description: "Keep following your weekly playbook to maintain momentum.",
-          cta: "View sessions",
-          href: "/dashboard/sessions",
-        };
+        ? {
+            icon: "⚠️",
+            title: "Low attendance in your last session",
+            description: "Ask questions before live and push reminders to recover attendance.",
+            cta: "Create question post",
+            href: "/dashboard/communities",
+          }
+        : newCommunity
+          ? {
+              icon: "🌱",
+              title: "Grow your first members",
+              description: "Invite 5 members and share your upcoming session link.",
+              cta: "Invite members",
+              href: "/dashboard/communities",
+            }
+          : {
+              icon: "✅",
+              title: "You’re on track this week",
+              description: "Keep following your weekly playbook to maintain momentum.",
+              cta: "View sessions",
+              href: "/dashboard/sessions",
+            };
 
     const completedSteps = baseSteps.filter((s) => s.completed).length;
 
@@ -1503,7 +1507,6 @@ export async function getCommunityOSSnapshot() {
     return { success: false, error: "Failed to load community OS snapshot" };
   }
 }
-
 
 export async function getDashboardSnapshot() {
   try {

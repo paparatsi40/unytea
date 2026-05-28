@@ -5,7 +5,7 @@
 - **49 modelos** en `prisma/schema.prisma` (1450 líneas). **26 enums**. Provider PostgreSQL en Neon (`url` pooled + `directUrl` directo).
 - 20 carpetas de migrations + 4 SQL sueltos en `prisma/migrations/`. **3 archivos UNTRACKED críticos**: dos migration folders y un `.sql` stray.
 - ⚠️ **`script: "build"` corre `prisma db push --skip-generate`** en cada deploy a Vercel — **NO usa migrations** en prod. Cualquier divergencia local en `schema.prisma` se push-ea silenciosamente. Alto riesgo de drift / pérdida de datos por columnas droppeadas.
-- ⚠️ **Conflicto entre `20251210173306_add_recording_transcription` (untracked) y el schema actual**: la migration crea tablas `session_recordings`/`session_transcriptions` con estructura *distinta* a los modelos `Recording` (table `recordings`) y `SessionNote` (table `session_notes`) que están en `schema.prisma`. Si se aplica, rompe.
+- ⚠️ **Conflicto entre `20251210173306_add_recording_transcription` (untracked) y el schema actual**: la migration crea tablas `session_recordings`/`session_transcriptions` con estructura _distinta_ a los modelos `Recording` (table `recordings`) y `SessionNote` (table `session_notes`) que están en `schema.prisma`. Si se aplica, rompe.
 - ⚠️ **Migration tracked `20260306082705_add_welcome_message`** referencia tabla `"Community"` (PascalCase) pero la tabla real es `"communities"` (mapped). **Esa migration está rota** — si se reaplica falla, y probablemente quedó al ejecutar contra una DB nueva (que `prisma db push` ya había sincronizado, escondiendo el error).
 - No hay evidencia de RLS de Postgres (Neon no lo hace por default y no veo `pgRLS` extension activada). Hay triggers/funciones también — no evidentes.
 
@@ -26,29 +26,30 @@ datasource db {
 
 Carpetas en `prisma/migrations/`:
 
-| # | Fecha | Nombre | Estado | Tracked |
-|---|---|---|---|---|
-| 1 | 2025-03-13 | `202503130116_add_community_id_to_mentor_session` | Aplicada | ✅ |
-| 2 | 2025-12-05 | `20251205012223_add_community_page_builder` | Aplicada | ✅ |
-| 3 | 2025-12-08 | `20251208160126_add_owner_bio_and_custom_content` | Aplicada | ✅ |
-| 4 | 2025-12-09 | `20251209212656_add_landing_layout` | Aplicada | ✅ |
-| 5 | 2025-12-09 | `20251209231417_add_video_room_name_to_mentor_sessions` | Aplicada | ✅ |
-| 6 | 2025-12-09 | `20251209232740_add_session_participation_gamification` | Aplicada | ✅ |
-| 7 | 2025-12-09 | `20251209233754_add_session_feedback` | Aplicada | ✅ |
-| 8 | **2025-12-10** | **`20251210173306_add_recording_transcription/`** | ❌ **UNTRACKED** | ❌ |
-| 9 | **2025-12-16** | **`20251216_add_welcome_message/`** | ❌ **UNTRACKED** | ❌ |
-| 10 | 2026-03-06 | `20260306082705_add_welcome_message` | Aplicada (rota: ver findings) | ✅ |
-| 11 | 2026-03-12 | `20260312000000_add_session_series` | Aplicada | ✅ |
-| 12 | 2026-03-12 | `20260312000001_add_session_mode` | Aplicada | ✅ |
-| 13 | 2026-03-12 | `20260312000002_add_recording_and_events` | Aplicada | ✅ |
-| 14 | 2026-03-12 | `20260312000003_add_visibility_role_resources` | Aplicada | ✅ |
-| 15 | 2026-04-07 | `20260407000000_add_streaks_and_daily_activity` | Aplicada | ✅ |
-| 16 | 2026-04-07 | `20260407100000_add_quizzes_and_certificates` | Aplicada | ✅ |
-| 17 | 2026-04-07 | `20260407200000_add_push_subscriptions` | Aplicada | ✅ |
-| 18 | 2026-04-08 | `20260408010000_add_password_reset_tokens` | Aplicada | ✅ |
-| 19 | 2026-04-08 | `20260408020000_add_deleted_at_columns` | Aplicada | ✅ |
+| #   | Fecha          | Nombre                                                  | Estado                        | Tracked |
+| --- | -------------- | ------------------------------------------------------- | ----------------------------- | ------- |
+| 1   | 2025-03-13     | `202503130116_add_community_id_to_mentor_session`       | Aplicada                      | ✅      |
+| 2   | 2025-12-05     | `20251205012223_add_community_page_builder`             | Aplicada                      | ✅      |
+| 3   | 2025-12-08     | `20251208160126_add_owner_bio_and_custom_content`       | Aplicada                      | ✅      |
+| 4   | 2025-12-09     | `20251209212656_add_landing_layout`                     | Aplicada                      | ✅      |
+| 5   | 2025-12-09     | `20251209231417_add_video_room_name_to_mentor_sessions` | Aplicada                      | ✅      |
+| 6   | 2025-12-09     | `20251209232740_add_session_participation_gamification` | Aplicada                      | ✅      |
+| 7   | 2025-12-09     | `20251209233754_add_session_feedback`                   | Aplicada                      | ✅      |
+| 8   | **2025-12-10** | **`20251210173306_add_recording_transcription/`**       | ❌ **UNTRACKED**              | ❌      |
+| 9   | **2025-12-16** | **`20251216_add_welcome_message/`**                     | ❌ **UNTRACKED**              | ❌      |
+| 10  | 2026-03-06     | `20260306082705_add_welcome_message`                    | Aplicada (rota: ver findings) | ✅      |
+| 11  | 2026-03-12     | `20260312000000_add_session_series`                     | Aplicada                      | ✅      |
+| 12  | 2026-03-12     | `20260312000001_add_session_mode`                       | Aplicada                      | ✅      |
+| 13  | 2026-03-12     | `20260312000002_add_recording_and_events`               | Aplicada                      | ✅      |
+| 14  | 2026-03-12     | `20260312000003_add_visibility_role_resources`          | Aplicada                      | ✅      |
+| 15  | 2026-04-07     | `20260407000000_add_streaks_and_daily_activity`         | Aplicada                      | ✅      |
+| 16  | 2026-04-07     | `20260407100000_add_quizzes_and_certificates`           | Aplicada                      | ✅      |
+| 17  | 2026-04-07     | `20260407200000_add_push_subscriptions`                 | Aplicada                      | ✅      |
+| 18  | 2026-04-08     | `20260408010000_add_password_reset_tokens`              | Aplicada                      | ✅      |
+| 19  | 2026-04-08     | `20260408020000_add_deleted_at_columns`                 | Aplicada                      | ✅      |
 
 Más 4 archivos SQL sueltos (NO son migrations Prisma estándar):
+
 - `add_resource_library.sql` (7 KB) — tracked, parece data/setup script
 - `add_social_hub_layout.sql` (125 B) — **UNTRACKED** — ver abajo
 - `check_resource_library.sql` (759 B) — tracked, query de verificación
@@ -60,6 +61,7 @@ Más 4 archivos SQL sueltos (NO son migrations Prisma estándar):
 ### `20251210173306_add_recording_transcription/migration.sql` — ⚠️ CONFLICTO
 
 Crea 3 tablas nuevas:
+
 - `session_recordings` con columnas `id, sessionId, recordingUrl, thumbnailUrl, duration, fileSize, status (RecordingStatus), startedAt, completedAt, egressId, roomId, processingError, retryCount, createdAt, updatedAt`. FK a `mentor_sessions(id)`.
 - `session_transcriptions` con `id, recordingId, fullText, segments(JSONB), summary, keyPoints, actionItems, topics, language, confidence, wordCount, status, processingError, ...`. FK a `session_recordings(id)`.
 - `session_notes` con `id, sessionId, userId, content, timestamp, isShared, ...`. FK a `mentor_sessions(id)` y `users(id)`.
@@ -67,6 +69,7 @@ Crea 3 tablas nuevas:
 - Define enum `RecordingStatus` (PROCESSING/READY/ERROR).
 
 **Conflictos con `schema.prisma` actual:**
+
 - `schema.prisma` define `Recording` con `@@map("recordings")` — table **`recordings`** singular distinta de **`session_recordings`** de la migration.
 - `schema.prisma`.`Recording` tiene columnas DIFERENTES: `url, durationSeconds, egressId @unique, fileSize, storageProvider, storageBucket, storageKey, processingStartedAt, processingEndedAt, errorMessage`. La migration tiene `recordingUrl, duration, thumbnailUrl, retryCount, roomId, processingError`.
 - `schema.prisma`.`SessionNote` con `@@map("session_notes")` tiene **columnas distintas**: `content, summary, keyInsights, resources, lastEditedBy` (rich-text notes). La migration crea una tabla `session_notes` para notas con `timestamp` y `isShared` (más bien notas en-vivo por participante).
@@ -92,6 +95,7 @@ ALTER TABLE "Community" ADD COLUMN "welcomeMessage" TEXT;
 ```
 
 **Diferencias**:
+
 - Migration de Diciembre añade **3 columnas** (`welcomeMessage`, `showWelcomeMessage`, `welcomeMessageSeen`) en 2 tablas.
 - Migration de Marzo añade **solo `welcomeMessage`** en 1 tabla.
 - Schema actual tiene **solo `welcomeMessage` en `Community`** (línea 184) — coincide con la de Marzo.
@@ -145,6 +149,7 @@ Agrupados por dominio. La lista completa está en `schema.prisma`. Highlights:
 `PlatformPlan`, `MemberRole`, `MemberStatus`, `PostContentType`, `SessionStatus`, `SessionMode`, `SessionFrequency`, `RecordingStatus`, `SessionEventType`, `SessionVisibility`, `ParticipationRole`, `SessionResourceType`, `LessonContentType`, `BillingInterval`, `SubscriptionStatus`, `ReactionType`, `NotificationType`, `BuddyStatus`, `CommunityLayoutType`, `CommunitySectionType`, `ResourceType`, `ResourceStatus`, `QuizQuestionType`, `ReportReason`, `ReportStatus`, `ReportTargetType`.
 
 ⚠️ **Casing inconsistente** entre enums:
+
 - `SessionMode { VIDEO, AUDIO }` — SCREAMING_SNAKE
 - `SessionVisibility { community, public, unlisted }` — lowercase
 - `ParticipationRole { host, speaker, listener }` — lowercase
@@ -161,6 +166,7 @@ No detecto triggers/functions declarados via Prisma (raw SQL en migrations no es
 ## Drift entre código TS y schema
 
 Spot-check rápido:
+
 - `Member.points`, `Member.level` — usados en gamification: OK.
 - `User.points`, `User.level`, `User.currentStreak`, `User.longestStreak` — OK.
 - `User.role` aparece en `Session.user.role` (en `lib/auth.ts:17`) pero **NO existe en `User` model**. ⚠️ — el callback session no popula `role` realmente, pero el tipo lo declara. Tipo mentiroso.
@@ -178,7 +184,7 @@ Spot-check rápido:
 
 ## Findings
 
-1. **[P0] `prisma db push` en cada build de prod**: `package.json` línea 7: `"build": "prisma generate && prisma db push --skip-generate && next build"`. Esto **sincroniza el schema de prod silenciosamente** sin migrations. Cualquier cambio local en `schema.prisma` (incluyendo *drops de columna*) se aplicaría a prod en el siguiente push. **Cambiar a `prisma migrate deploy`** y dejar `db push` solo para dev local. Es un P0 crítico para una DB con datos reales.
+1. **[P0] `prisma db push` en cada build de prod**: `package.json` línea 7: `"build": "prisma generate && prisma db push --skip-generate && next build"`. Esto **sincroniza el schema de prod silenciosamente** sin migrations. Cualquier cambio local en `schema.prisma` (incluyendo _drops de columna_) se aplicaría a prod en el siguiente push. **Cambiar a `prisma migrate deploy`** y dejar `db push` solo para dev local. Es un P0 crítico para una DB con datos reales.
 2. **[P0] Migration tracked `20260306082705_add_welcome_message` está rota**: usa `"Community"` (PascalCase) en lugar de `"communities"` (mapeada). Si alguien corre `prisma migrate reset` falla. Regenerar migration limpia.
 3. **[P0] 3 archivos untracked en `prisma/migrations/`**: ver análisis arriba. Decisión: descartar las 2 untracked, decidir destino de `add_social_hub_layout.sql`.
 4. **[P0] Tipo `Session.user.role` declarado en NextAuth augmentation pero el campo `role` NO existe en `User` model**: cualquier código que lea `session.user.role` lee `undefined` y puede bypassear checks. Verificar callers de `role` y, o bien, añadir el campo al modelo o eliminar del tipo augmentation.

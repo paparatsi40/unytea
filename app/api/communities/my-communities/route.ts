@@ -3,17 +3,14 @@ import { getCurrentUserId } from "@/lib/auth-utils";
 import { prisma } from "@/lib/prisma";
 
 // Force dynamic rendering - uses headers/cookies via auth()
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
     const userId = await getCurrentUserId();
 
     if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Get all communities where user is the owner OR a member
@@ -66,9 +63,6 @@ export async function GET() {
     });
   } catch (error) {
     console.error("Error fetching communities:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch communities" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch communities" }, { status: 500 });
   }
 }

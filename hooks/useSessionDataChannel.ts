@@ -79,10 +79,7 @@ export function useSessionDataChannel() {
 
   // ── Incoming data handler ───────────────────────────────────────────
   useEffect(() => {
-    const handleData = (
-      payload: Uint8Array,
-      _participant?: RemoteParticipant
-    ) => {
+    const handleData = (payload: Uint8Array, _participant?: RemoteParticipant) => {
       try {
         const raw = decoder.current.decode(payload);
         const event: DataChannelEvent = JSON.parse(raw);
@@ -104,17 +101,13 @@ export function useSessionDataChannel() {
                 ];
               });
             } else {
-              setRaisedHands((prev) =>
-                prev.filter((h) => h.identity !== event.identity)
-              );
+              setRaisedHands((prev) => prev.filter((h) => h.identity !== event.identity));
             }
             break;
           }
 
           case "hand_clear": {
-            setRaisedHands((prev) =>
-              prev.filter((h) => h.identity !== event.identity)
-            );
+            setRaisedHands((prev) => prev.filter((h) => h.identity !== event.identity));
             // If it was our hand that got cleared
             if (event.identity === room.localParticipant.identity) {
               setHasRaisedHand(false);
@@ -129,9 +122,7 @@ export function useSessionDataChannel() {
               setTimeout(() => setInvitedToSpeak(false), 30000);
             }
             // Remove from raised hands queue
-            setRaisedHands((prev) =>
-              prev.filter((h) => h.identity !== event.identity)
-            );
+            setRaisedHands((prev) => prev.filter((h) => h.identity !== event.identity));
             break;
           }
 
@@ -170,9 +161,7 @@ export function useSessionDataChannel() {
               prev.map((poll) => {
                 if (poll.id !== event.pollId) return poll;
                 // Already voted check
-                const alreadyVoted = poll.options.some((o) =>
-                  o.voters.includes(event.voterId)
-                );
+                const alreadyVoted = poll.options.some((o) => o.voters.includes(event.voterId));
                 if (alreadyVoted) return poll;
 
                 return {
@@ -196,9 +185,7 @@ export function useSessionDataChannel() {
           case "poll_close": {
             setActivePolls((prev) =>
               prev.map((poll) =>
-                poll.id === event.pollId
-                  ? { ...poll, isActive: false, showResults: true }
-                  : poll
+                poll.id === event.pollId ? { ...poll, isActive: false, showResults: true } : poll
               )
             );
             break;
@@ -223,9 +210,7 @@ export function useSessionDataChannel() {
   // Clean up hands when participants leave
   useEffect(() => {
     const handleDisconnect = (participant: RemoteParticipant) => {
-      setRaisedHands((prev) =>
-        prev.filter((h) => h.identity !== participant.identity)
-      );
+      setRaisedHands((prev) => prev.filter((h) => h.identity !== participant.identity));
     };
 
     room.on(RoomEvent.ParticipantDisconnected, handleDisconnect);
@@ -260,9 +245,7 @@ export function useSessionDataChannel() {
         },
       ]);
     } else {
-      setRaisedHands((prev) =>
-        prev.filter((h) => h.identity !== room.localParticipant.identity)
-      );
+      setRaisedHands((prev) => prev.filter((h) => h.identity !== room.localParticipant.identity));
     }
 
     publish(event);
@@ -354,18 +337,14 @@ export function useSessionDataChannel() {
       setActivePolls((prev) =>
         prev.map((poll) => {
           if (poll.id !== pollId) return poll;
-          const alreadyVoted = poll.options.some((o) =>
-            o.voters.includes(voterId)
-          );
+          const alreadyVoted = poll.options.some((o) => o.voters.includes(voterId));
           if (alreadyVoted) return poll;
 
           return {
             ...poll,
             totalVotes: poll.totalVotes + 1,
             options: poll.options.map((o) =>
-              o.id === optionId
-                ? { ...o, votes: o.votes + 1, voters: [...o.voters, voterId] }
-                : o
+              o.id === optionId ? { ...o, votes: o.votes + 1, voters: [...o.voters, voterId] } : o
             ),
           };
         })
@@ -381,9 +360,7 @@ export function useSessionDataChannel() {
     (pollId: string) => {
       setActivePolls((prev) =>
         prev.map((poll) =>
-          poll.id === pollId
-            ? { ...poll, isActive: false, showResults: true }
-            : poll
+          poll.id === pollId ? { ...poll, isActive: false, showResults: true } : poll
         )
       );
       publish({ type: "poll_close", pollId });

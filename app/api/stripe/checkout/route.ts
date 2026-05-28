@@ -7,21 +7,15 @@ export const dynamic = "force-dynamic";
 export async function POST(request: Request) {
   try {
     const session = await auth();
-    
+
     if (!session?.user?.id || !session?.user?.email) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { priceId } = await request.json();
 
     if (!priceId) {
-      return NextResponse.json(
-        { error: "Price ID is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Price ID is required" }, { status: 400 });
     }
 
     // Get or create Stripe customer (ensures customer exists in Stripe)
@@ -41,9 +35,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ url: checkoutSession.url });
   } catch (error) {
     console.error("Error creating checkout session:", error);
-    return NextResponse.json(
-      { error: "Failed to create checkout session" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to create checkout session" }, { status: 500 });
   }
 }

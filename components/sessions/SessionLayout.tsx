@@ -17,17 +17,9 @@ export function SessionLayout({ children, className }: SessionLayoutProps) {
 }
 
 export function SessionMain({ children, className }: SessionLayoutProps) {
-  return (
-    <div className={cn("flex flex-1 flex-col gap-4", className)}>
-      {children}
-    </div>
-  );
+  return <div className={cn("flex flex-1 flex-col gap-4", className)}>{children}</div>;
 }
 
 export function SessionSidebar({ children, className }: SessionLayoutProps) {
-  return (
-    <div className={cn("flex w-80 flex-col gap-4", className)}>
-      {children}
-    </div>
-  );
+  return <div className={cn("flex w-80 flex-col gap-4", className)}>{children}</div>;
 }

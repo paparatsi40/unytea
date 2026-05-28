@@ -26,9 +26,7 @@ export default async function NotificationsPage() {
           <h2 className="mb-2 text-xl font-semibold text-foreground">
             Failed to load notifications
           </h2>
-          <p className="text-muted-foreground">
-            {result.error || "An error occurred"}
-          </p>
+          <p className="text-muted-foreground">{result.error || "An error occurred"}</p>
         </div>
       </div>
     );

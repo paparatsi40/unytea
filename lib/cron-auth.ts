@@ -19,13 +19,8 @@ export function verifyCronAuth(request: NextRequest): NextResponse | null {
   const expectedSecret = process.env.CRON_SECRET;
 
   if (!expectedSecret) {
-    console.error(
-      "[cron-auth] CRON_SECRET is not configured — cron endpoints are unreachable"
-    );
-    return NextResponse.json(
-      { success: false, error: "Server misconfigured" },
-      { status: 500 }
-    );
+    console.error("[cron-auth] CRON_SECRET is not configured — cron endpoints are unreachable");
+    return NextResponse.json({ success: false, error: "Server misconfigured" }, { status: 500 });
   }
 
   const providedSecret =
@@ -42,10 +37,7 @@ export function verifyCronAuth(request: NextRequest): NextResponse | null {
     expectedBuffer.length !== providedBuffer.length ||
     !crypto.timingSafeEqual(expectedBuffer, providedBuffer)
   ) {
-    return NextResponse.json(
-      { success: false, error: "Unauthorized" },
-      { status: 401 }
-    );
+    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
   }
 
   return null;

@@ -42,20 +42,14 @@ export async function POST(req: Request) {
     const session = await auth();
 
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const userId = session.user.id;
     const { courseId } = await req.json();
 
     if (!courseId) {
-      return NextResponse.json(
-        { error: "Course ID is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Course ID is required" }, { status: 400 });
     }
 
     // Get course with community owner info
@@ -76,18 +70,12 @@ export async function POST(req: Request) {
     });
 
     if (!course) {
-      return NextResponse.json(
-        { error: "Course not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Course not found" }, { status: 404 });
     }
 
     // Check if course is paid
     if (!course.isPaid || !course.price) {
-      return NextResponse.json(
-        { error: "This course is free" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "This course is free" }, { status: 400 });
     }
 
     // Check if user already purchased this course
@@ -109,7 +97,7 @@ export async function POST(req: Request) {
 
     // Check if community owner has Stripe Connect
     const ownerStripeAccountId = course.community.owner.stripeConnectAccountId;
-    
+
     if (!ownerStripeAccountId) {
       return NextResponse.json(
         { error: "Course owner has not set up payments yet" },
@@ -184,7 +172,7 @@ export async function POST(req: Request) {
   } catch (error: any) {
     console.error("Error creating course checkout:", error);
     return NextResponse.json(
-      { 
+      {
         error: "Failed to create checkout session",
         details: error?.message || "Unknown error",
       },

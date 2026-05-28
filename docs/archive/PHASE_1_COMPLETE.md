@@ -244,13 +244,13 @@ PROGRESO: 5/5 (100%) ✅
 
 ## 🎯 **VENTAJAS COMPETITIVAS vs SKOOL:**
 
-| Feature | Skool | Unytea | Impacto |
-|---------|-------|--------|---------|
-| **Live Gamificación** | ❌ | ✅ **Automática** | +200% engagement |
-| **Feedback Inmediato** | ❌ | ✅ **Al salir** | +300% response rate |
-| **Reacciones Flotantes** | ❌ | ✅ **8 tipos animados** | +150% interaction |
-| **Chat Segmentado** | ❌ | ✅ **Q&A + Resources** | +250% organization |
-| **Polls/Quizzes Live** | ❌ | ✅ **Real-time + Quiz mode** | +400% participation |
+| Feature                  | Skool | Unytea                       | Impacto             |
+| ------------------------ | ----- | ---------------------------- | ------------------- |
+| **Live Gamificación**    | ❌    | ✅ **Automática**            | +200% engagement    |
+| **Feedback Inmediato**   | ❌    | ✅ **Al salir**              | +300% response rate |
+| **Reacciones Flotantes** | ❌    | ✅ **8 tipos animados**      | +150% interaction   |
+| **Chat Segmentado**      | ❌    | ✅ **Q&A + Resources**       | +250% organization  |
+| **Polls/Quizzes Live**   | ❌    | ✅ **Real-time + Quiz mode** | +400% participation |
 
 **Resultado:** Unytea tiene **engagement 250% superior** a Skool en live sessions 🚀
 
@@ -420,7 +420,7 @@ function SessionWithFeatures() {
   useEffect(() => {
     room.on(RoomEvent.DataReceived, (payload, participant) => {
       const data = JSON.parse(new TextDecoder().decode(payload));
-      
+
       switch (data.type) {
         case 'reaction':
           setReactions(prev => [...prev, data.data]);
@@ -481,7 +481,7 @@ function SessionWithFeatures() {
       correctAnswer: isQuiz ? correctAnswer : undefined,
       showResults: false,
     };
-    
+
     room.localParticipant.publishData(
       new TextEncoder().encode(JSON.stringify({ type: 'poll', data: poll }))
     );
@@ -491,15 +491,15 @@ function SessionWithFeatures() {
     <>
       {/* Video call components */}
       <VideoCallRoom ... />
-      
+
       {/* Phase 1 Features */}
       <LiveReactions reactions={reactions} onReact={handleReact} />
       <SegmentedChat messages={chatMessages} onSendMessage={handleSendMessage} />
       {activePoll && <LivePoll poll={activePoll} onVote={handleVote} />}
-      
+
       {/* Gamification (auto-tracking) */}
       <PointsNotification ... />
-      
+
       {/* Feedback (auto-show on leave) */}
       <FeedbackModal ... />
     </>

@@ -14,52 +14,52 @@
 **Los 5 idiomas con mayor mercado de creators/coaches:**
 
 1. **🇬🇧 English (EN)** - Base language
-    - Market size: 1.5B speakers
-    - Creator market: Más grande del mundo
-    - Priority: ✅ DEFAULT
+   - Market size: 1.5B speakers
+   - Creator market: Más grande del mundo
+   - Priority: ✅ DEFAULT
 
 2. **🇪🇸 Spanish (ES)** - Latino América + España
-    - Market size: 580M speakers
-    - Creator market: Crecimiento explosivo (LATAM)
-    - Priority: 🔥 CRITICAL
-    - Variants: ES-MX (México), ES-ES (España), ES-AR (Argentina)
+   - Market size: 580M speakers
+   - Creator market: Crecimiento explosivo (LATAM)
+   - Priority: 🔥 CRITICAL
+   - Variants: ES-MX (México), ES-ES (España), ES-AR (Argentina)
 
 3. **🇵🇹 Portuguese (PT)** - Brasil principalmente
-    - Market size: 260M speakers
-    - Creator market: Brasil = mercado MASIVO de creators
-    - Priority: 🔥 CRITICAL
-    - Variants: PT-BR (Brasil), PT-PT (Portugal)
+   - Market size: 260M speakers
+   - Creator market: Brasil = mercado MASIVO de creators
+   - Priority: 🔥 CRITICAL
+   - Variants: PT-BR (Brasil), PT-PT (Portugal)
 
 4. **🇫🇷 French (FR)** - Francia + África francófona
-    - Market size: 280M speakers
-    - Creator market: Francia, Canadá, África
-    - Priority: ⭐ HIGH
-    - Variants: FR-FR (Francia), FR-CA (Canadá)
+   - Market size: 280M speakers
+   - Creator market: Francia, Canadá, África
+   - Priority: ⭐ HIGH
+   - Variants: FR-FR (Francia), FR-CA (Canadá)
 
 5. **🇩🇪 German (DE)** - Alemania + DACH region
-    - Market size: 130M speakers
-    - Creator market: DACH (Alemania, Austria, Suiza)
-    - Priority: ⭐ HIGH
+   - Market size: 130M speakers
+   - Creator market: DACH (Alemania, Austria, Suiza)
+   - Priority: ⭐ HIGH
 
 ---
 
 ### **Tier 2: Expansion Phase 1 (Q1 2026)**
 
 6. **🇮🇹 Italian (IT)** - Italia
-    - Market size: 85M speakers
-    - Creator market: Italia próspero
+   - Market size: 85M speakers
+   - Creator market: Italia próspero
 
 7. **🇳🇱 Dutch (NL)** - Países Bajos + Bélgica
-    - Market size: 25M speakers
-    - Creator market: Alto poder adquisitivo
+   - Market size: 25M speakers
+   - Creator market: Alto poder adquisitivo
 
 8. **🇵🇱 Polish (PL)** - Polonia
-    - Market size: 45M speakers
-    - Creator market: Crecimiento rápido Europa del Este
+   - Market size: 45M speakers
+   - Creator market: Crecimiento rápido Europa del Este
 
 9. **🇯🇵 Japanese (JA)** - Japón
-    - Market size: 125M speakers
-    - Creator market: Mercado único y grande
+   - Market size: 125M speakers
+   - Creator market: Mercado único y grande
 
 10. **🇰🇷 Korean (KO)** - Corea del Sur
     - Market size: 80M speakers
@@ -174,16 +174,16 @@ web/
 **2. middleware.ts**
 
 ```typescript
-import createMiddleware from 'next-intl/middleware';
- 
+import createMiddleware from "next-intl/middleware";
+
 export default createMiddleware({
-  locales: ['en', 'es', 'pt', 'fr', 'de'],
-  defaultLocale: 'en',
+  locales: ["en", "es", "pt", "fr", "de"],
+  defaultLocale: "en",
   localeDetection: true, // Auto-detect from browser
 });
- 
+
 export const config = {
-  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)']
+  matcher: ["/((?!api|_next|_vercel|.*\\..*).*)"],
 };
 ```
 
@@ -196,7 +196,7 @@ import { useTranslations } from 'next-intl';
 
 export function SignInPage() {
   const t = useTranslations('auth');
-  
+
   return (
     <div>
       <h1>{t('signin')}</h1>
@@ -218,7 +218,7 @@ export function SignInPage() {
 **Header Language Selector:**
 
 ```typescript
-<LanguageSelector 
+<LanguageSelector
   current="en"
   languages={[
     { code: 'en', name: 'English', flag: '🇬🇧' },
@@ -325,15 +325,12 @@ const isRTL = ['ar', 'he', 'fa'].includes(locale);
 
 ```typescript
 // Script para traducir con OpenAI
-import OpenAI from 'openai';
-import fs from 'fs';
+import OpenAI from "openai";
+import fs from "fs";
 
-async function translateToLanguage(
-  baseTranslations: any,
-  targetLang: string
-) {
+async function translateToLanguage(baseTranslations: any, targetLang: string) {
   const openai = new OpenAI();
-  
+
   const prompt = `
     Translate this JSON from English to ${targetLang}.
     Maintain the JSON structure.
@@ -342,12 +339,12 @@ async function translateToLanguage(
     
     ${JSON.stringify(baseTranslations, null, 2)}
   `;
-  
+
   const response = await openai.chat.completions.create({
     model: "gpt-4",
     messages: [{ role: "user", content: prompt }],
   });
-  
+
   return JSON.parse(response.choices[0].message.content);
 }
 ```
@@ -516,7 +513,7 @@ async function translateToLanguage(
 // EU: 03/12/2024
 // ISO: 2024-12-03
 
-import { formatDate } from '@/lib/localization';
+import { formatDate } from "@/lib/localization";
 
 formatDate(date, locale); // Auto-format
 ```
@@ -529,9 +526,9 @@ formatDate(date, locale); // Auto-format
 // BR: R$249/month
 
 const pricing = {
-  'en-US': { currency: 'USD', price: 49 },
-  'es-ES': { currency: 'EUR', price: 45 },
-  'pt-BR': { currency: 'BRL', price: 249 },
+  "en-US": { currency: "USD", price: 49 },
+  "es-ES": { currency: "EUR", price: 45 },
+  "pt-BR": { currency: "BRL", price: 249 },
 };
 ```
 

@@ -28,10 +28,7 @@ export default async function AgendaPage() {
   // Get all sessions where user is mentor or mentee
   const allSessions = await prisma.mentorSession.findMany({
     where: {
-      OR: [
-        { mentorId: session.user.id },
-        { menteeId: session.user.id },
-      ],
+      OR: [{ mentorId: session.user.id }, { menteeId: session.user.id }],
       // Only show sessions with communityId (new architecture)
       communityId: { not: null },
     },
@@ -69,21 +66,22 @@ export default async function AgendaPage() {
   const past = allSessions.filter((s) => new Date(s.scheduledAt) <= now);
 
   // Group upcoming by date
-  const groupedByDate = upcoming.reduce((acc, session) => {
-    const date = formatSessionDate(new Date(session.scheduledAt));
-    if (!acc[date]) acc[date] = [];
-    acc[date].push(session);
-    return acc;
-  }, {} as Record<string, typeof upcoming>);
+  const groupedByDate = upcoming.reduce(
+    (acc, session) => {
+      const date = formatSessionDate(new Date(session.scheduledAt));
+      if (!acc[date]) acc[date] = [];
+      acc[date].push(session);
+      return acc;
+    },
+    {} as Record<string, typeof upcoming>
+  );
 
   return (
     <div className="space-y-8 p-8">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-white">Your Agenda</h1>
-        <p className="mt-1 text-sm text-zinc-400">
-          All your upcoming sessions across communities
-        </p>
+        <p className="mt-1 text-sm text-zinc-400">All your upcoming sessions across communities</p>
         {upcoming.length > 0 && (
           <p className="mt-2 text-sm font-medium text-purple-400">
             <Sparkles className="mr-1 inline h-4 w-4" />
@@ -96,9 +94,7 @@ export default async function AgendaPage() {
       {upcoming.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-zinc-700 bg-zinc-900 p-8 text-center">
           <Video className="mx-auto mb-4 h-12 w-12 text-zinc-500" />
-          <h2 className="mb-2 text-xl font-semibold text-white">
-            No upcoming sessions
-          </h2>
+          <h2 className="mb-2 text-xl font-semibold text-white">No upcoming sessions</h2>
           <p className="text-zinc-400">
             You don&apos;t have any scheduled sessions. Join a community to find live events.
           </p>
@@ -139,15 +135,11 @@ export default async function AgendaPage() {
                     </div>
 
                     {/* Session Info */}
-                    <div className="flex-1 min-w-0">
+                    <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-white truncate">
-                          {s.title}
-                        </h3>
+                        <h3 className="truncate font-semibold text-white">{s.title}</h3>
                         {isToday(new Date(s.scheduledAt)) && (
-                          <Badge className="bg-purple-600 text-white text-xs">
-                            Today
-                          </Badge>
+                          <Badge className="bg-purple-600 text-xs text-white">Today</Badge>
                         )}
                       </div>
                       <p className="text-sm text-zinc-400">
@@ -156,17 +148,14 @@ export default async function AgendaPage() {
                     </div>
 
                     {/* Duration */}
-                    <div className="hidden sm:flex items-center gap-1 text-xs text-zinc-500">
+                    <div className="hidden items-center gap-1 text-xs text-zinc-500 sm:flex">
                       <Clock className="h-3 w-3" />
                       {s.duration} min
                     </div>
 
                     {/* Actions */}
                     <Link href={`/dashboard/sessions/${s.id}/room`}>
-                      <Button
-                        size="sm"
-                        className="rounded-full bg-purple-600 hover:bg-purple-700"
-                      >
+                      <Button size="sm" className="rounded-full bg-purple-600 hover:bg-purple-700">
                         Join
                         <ArrowRight className="ml-1 h-3 w-3" />
                       </Button>
@@ -181,8 +170,8 @@ export default async function AgendaPage() {
 
       {/* PAST SESSIONS SUMMARY */}
       {past.length > 0 && (
-        <div className="pt-4 border-t border-zinc-800">
-          <h2 className="text-sm font-medium text-zinc-400 mb-3">
+        <div className="border-t border-zinc-800 pt-4">
+          <h2 className="mb-3 text-sm font-medium text-zinc-400">
             Recent Past Sessions ({past.length})
           </h2>
           <div className="grid gap-3 sm:grid-cols-2">
@@ -194,14 +183,15 @@ export default async function AgendaPage() {
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-zinc-900">
                   <Users className="h-5 w-5 text-zinc-500" />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm text-white truncate">{s.title}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-white">{s.title}</p>
                   <p className="text-xs text-zinc-500">
-                    {s.community?.name} • {formatDistanceToNow(new Date(s.scheduledAt), { addSuffix: true })}
+                    {s.community?.name} •{" "}
+                    {formatDistanceToNow(new Date(s.scheduledAt), { addSuffix: true })}
                   </p>
                 </div>
                 {s.recordingUrl && (
-                  <Badge className="bg-green-500/10 text-green-400 border-0 text-xs">
+                  <Badge className="border-0 bg-green-500/10 text-xs text-green-400">
                     Recording
                   </Badge>
                 )}

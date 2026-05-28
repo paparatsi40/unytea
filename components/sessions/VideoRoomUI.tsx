@@ -1,11 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import {
-  useLocalParticipant,
-  useParticipants,
-  useRoomContext,
-} from "@livekit/components-react";
+import { useLocalParticipant, useParticipants, useRoomContext } from "@livekit/components-react";
 import { cn } from "@/lib/utils";
 import {
   ArrowLeft,
@@ -206,13 +202,18 @@ export function VideoRoomUI({
         console.error("Failed to switch camera device:", e);
       }
     },
-    [room],
+    [room]
   );
 
   // Toggle microphone
   const toggleMicrophone = useCallback(async () => {
     try {
-      console.log("[LiveKit] Toggling mic. Currently enabled:", isMicrophoneEnabled, "| Will enable:", !isMicrophoneEnabled);
+      console.log(
+        "[LiveKit] Toggling mic. Currently enabled:",
+        isMicrophoneEnabled,
+        "| Will enable:",
+        !isMicrophoneEnabled
+      );
       console.log("[LiveKit] Local participant permissions:", localParticipant.permissions);
       await localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled);
       console.log("[LiveKit] Mic toggled successfully");
@@ -290,8 +291,8 @@ export function VideoRoomUI({
   };
 
   // Get current active poll (most recent active one)
-  const currentPoll = activePolls.filter((p) => p.isActive).slice(-1)[0] ||
-    activePolls.slice(-1)[0];
+  const currentPoll =
+    activePolls.filter((p) => p.isActive).slice(-1)[0] || activePolls.slice(-1)[0];
 
   return (
     <div className="flex h-screen flex-col bg-zinc-950">
@@ -450,10 +451,7 @@ export function VideoRoomUI({
             >
               Enable Mic
             </button>
-            <button
-              onClick={clearSpeakerInvite}
-              className="text-zinc-400 hover:text-zinc-200"
-            >
+            <button onClick={clearSpeakerInvite} className="text-zinc-400 hover:text-zinc-200">
               <X className="h-4 w-4" />
             </button>
           </div>
@@ -477,19 +475,17 @@ export function VideoRoomUI({
             <span className="text-xs text-zinc-500">Auto-saved</span>
           </div>
           <div className="flex-1 overflow-hidden">
-            <SessionNotesEditor
-              sessionId={sessionId || ""}
-            />
+            <SessionNotesEditor sessionId={sessionId || ""} />
           </div>
         </div>
 
         {/* CENTER: Stage + Chat */}
-        <div className="flex flex-1 flex-col min-w-0">
+        <div className="flex min-w-0 flex-1 flex-col">
           {/* Pinned Question Banner */}
           {pinnedQuestion && (
             <div className="flex items-start gap-3 border-b border-zinc-800 bg-amber-500/5 px-4 py-3">
               <Pin className="h-4 w-4 shrink-0 text-amber-400" />
-              <div className="flex-1 min-w-0">
+              <div className="min-w-0 flex-1">
                 <p className="text-sm text-amber-200">
                   <span className="font-medium">{pinnedQuestion.author}:</span>{" "}
                   {pinnedQuestion.content}
@@ -526,12 +522,12 @@ export function VideoRoomUI({
           )}
 
           {/* Stage */}
-          <div className="flex-1 min-h-0 p-4">
+          <div className="min-h-0 flex-1 p-4">
             <MainStage
-            mode={isScreenShareEnabled ? "screen" : stageMode}
-            sessionMode={sessionMode}
-            sessionId={sessionId}
-          />
+              mode={isScreenShareEnabled ? "screen" : stageMode}
+              sessionMode={sessionMode}
+              sessionId={sessionId}
+            />
           </div>
 
           {/* Chat Panel (below stage on desktop, or replace stage on mobile) */}
@@ -602,13 +598,13 @@ export function VideoRoomUI({
                 {raisedHands.map((hand) => (
                   <div
                     key={hand.id}
-                    className="flex items-center gap-3 rounded-lg bg-amber-500/10 px-3 py-2 mb-1"
+                    className="mb-1 flex items-center gap-3 rounded-lg bg-amber-500/10 px-3 py-2"
                   >
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500/30 text-sm font-medium text-amber-200">
                       {hand.name.charAt(0)}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-amber-200 truncate">{hand.name}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-amber-200">{hand.name}</p>
                       <p className="text-xs text-zinc-500">{formatTimeAgo(hand.timestamp)}</p>
                     </div>
                     {isHost && (
@@ -638,8 +634,8 @@ export function VideoRoomUI({
             <div className="mb-4">
               <p className="mb-2 px-2 text-xs font-medium uppercase text-zinc-500">Speakers</p>
               {participants
-                .filter(p => p.identity !== localParticipant.identity)
-                .map(p => (
+                .filter((p) => p.identity !== localParticipant.identity)
+                .map((p) => (
                   <div
                     key={p.identity}
                     className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-zinc-800/50"
@@ -648,8 +644,8 @@ export function VideoRoomUI({
                       {p.name?.charAt(0) || "?"}
                     </div>
                     <span className="text-sm text-zinc-300">{p.name || "Unknown"}</span>
-                    {raisedHands.some(h => h.identity === p.identity) && (
-                      <Hand className="ml-auto h-3.5 w-3.5 text-amber-400 animate-bounce" />
+                    {raisedHands.some((h) => h.identity === p.identity) && (
+                      <Hand className="ml-auto h-3.5 w-3.5 animate-bounce text-amber-400" />
                     )}
                     {p.isMicrophoneEnabled && (
                       <div className="ml-auto flex items-center gap-1">
@@ -658,18 +654,17 @@ export function VideoRoomUI({
                     )}
                   </div>
                 ))}
-              {participants.filter(p => p.identity !== localParticipant.identity).length === 0 && (
-                <p className="px-2 text-sm text-zinc-500">No speakers yet</p>
-              )}
+              {participants.filter((p) => p.identity !== localParticipant.identity).length ===
+                0 && <p className="px-2 text-sm text-zinc-500">No speakers yet</p>}
             </div>
 
             {/* Audience Section */}
             <div>
               <p className="mb-2 px-2 text-xs font-medium uppercase text-zinc-500">Audience</p>
               {participants
-                .filter(p => p.identity === localParticipant.identity)
+                .filter((p) => p.identity === localParticipant.identity)
                 .slice(0, 10)
-                .map(p => (
+                .map((p) => (
                   <div
                     key={p.identity}
                     className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-zinc-800/50"
@@ -680,9 +675,11 @@ export function VideoRoomUI({
                     <span className="text-sm text-zinc-400">{p.name || "Unknown"}</span>
                   </div>
                 ))}
-              {participants.filter(p => p.identity === localParticipant.identity).length > 10 && (
+              {participants.filter((p) => p.identity === localParticipant.identity).length > 10 && (
                 <p className="px-2 text-sm text-zinc-500">
-                  +{participants.filter(p => p.identity === localParticipant.identity).length - 10} more
+                  +
+                  {participants.filter((p) => p.identity === localParticipant.identity).length - 10}{" "}
+                  more
                 </p>
               )}
             </div>
@@ -768,11 +765,7 @@ export function VideoRoomUI({
                 : "bg-red-500/20 text-red-400 hover:bg-red-500/30"
             )}
           >
-            {isMicrophoneEnabled ? (
-              <Mic className="h-5 w-5" />
-            ) : (
-              <MicOff className="h-5 w-5" />
-            )}
+            {isMicrophoneEnabled ? <Mic className="h-5 w-5" /> : <MicOff className="h-5 w-5" />}
           </button>
 
           {/* Camera (video mode only) */}
@@ -788,11 +781,7 @@ export function VideoRoomUI({
                     : "bg-red-500/20 text-red-400 hover:bg-red-500/30"
                 )}
               >
-                {isCameraEnabled ? (
-                  <Video className="h-5 w-5" />
-                ) : (
-                  <VideoOff className="h-5 w-5" />
-                )}
+                {isCameraEnabled ? <Video className="h-5 w-5" /> : <VideoOff className="h-5 w-5" />}
               </button>
 
               {videoInputs.length > 1 && (
@@ -803,7 +792,10 @@ export function VideoRoomUI({
                   title="Select camera"
                 >
                   {videoInputs.map((device, index) => (
-                    <option key={device.deviceId || `${device.label}-${index}`} value={device.deviceId}>
+                    <option
+                      key={device.deviceId || `${device.label}-${index}`}
+                      value={device.deviceId}
+                    >
                       {device.label || `Camera ${index + 1}`}
                     </option>
                   ))}
@@ -869,7 +861,7 @@ export function VideoRoomUI({
         </div>
 
         {/* Center: Session Info (mobile only) */}
-        <div className="hidden md:block text-center">
+        <div className="hidden text-center md:block">
           <p className="text-sm text-zinc-400">{elapsedTime}</p>
         </div>
 
@@ -905,7 +897,11 @@ export function VideoRoomUI({
             title={showAllPanels ? "Hide panels" : "Show panels"}
             className="hidden h-12 w-12 items-center justify-center rounded-full bg-zinc-800 text-white transition-all hover:bg-zinc-700 md:flex"
           >
-            {showAllPanels ? <ChevronDown className="h-5 w-5" /> : <ChevronUp className="h-5 w-5" />}
+            {showAllPanels ? (
+              <ChevronDown className="h-5 w-5" />
+            ) : (
+              <ChevronUp className="h-5 w-5" />
+            )}
           </button>
 
           {/* Leave / End */}

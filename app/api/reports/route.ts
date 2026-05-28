@@ -1,32 +1,28 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { rateLimiters } from '@/lib/rate-limit';
-import { requireAdmin } from '@/lib/authorization';
-import { handleApiError } from '@/lib/api-error-handler';
-import { z } from 'zod';
-import {
-  ReportReason,
-  ReportTargetType,
-  ReportStatus,
-} from '@prisma/client';
+import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { rateLimiters } from "@/lib/rate-limit";
+import { requireAdmin } from "@/lib/authorization";
+import { handleApiError } from "@/lib/api-error-handler";
+import { z } from "zod";
+import { ReportReason, ReportTargetType, ReportStatus } from "@prisma/client";
 
 // ============================================
 // VALIDATION SCHEMAS
 // ============================================
 
 const createReportSchema = z.object({
-  targetType: z.enum(['POST', 'COMMENT', 'USER', 'MESSAGE']),
+  targetType: z.enum(["POST", "COMMENT", "USER", "MESSAGE"]),
   reason: z.enum([
-    'SPAM',
-    'HARASSMENT',
-    'HATE_SPEECH',
-    'MISINFORMATION',
-    'INAPPROPRIATE_CONTENT',
-    'SELF_HARM',
-    'VIOLENCE',
-    'COPYRIGHT',
-    'OTHER',
+    "SPAM",
+    "HARASSMENT",
+    "HATE_SPEECH",
+    "MISINFORMATION",
+    "INAPPROPRIATE_CONTENT",
+    "SELF_HARM",
+    "VIOLENCE",
+    "COPYRIGHT",
+    "OTHER",
   ]),
   postId: z.string().optional(),
   commentId: z.string().optional(),
@@ -45,10 +41,7 @@ export async function POST(request: NextRequest) {
     const session = await auth();
 
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized - you must be logged in' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized - you must be logged in" }, { status: 401 });
     }
 
     const userId = session.user.id;
@@ -60,7 +53,7 @@ export async function POST(request: NextRequest) {
     if (!rateLimitResult.success) {
       return NextResponse.json(
         {
-          error: 'Rate limit exceeded. Please try again later.',
+          error: "Rate limit exceeded. Please try again later.",
           resetTime: rateLimitResult.resetTime,
         },
         { status: 429 }
@@ -76,24 +69,20 @@ export async function POST(request: NextRequest) {
       if (error instanceof z.ZodError) {
         return NextResponse.json(
           {
-            error: 'Invalid request data',
+            error: "Invalid request data",
             details: error.errors,
           },
           { status: 400 }
         );
       }
-      return NextResponse.json(
-        { error: 'Invalid request body' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
     }
 
     // Validate that at least one target is specified
-    const hasTarget =
-      data.postId || data.commentId || data.userId || data.messageId;
+    const hasTarget = data.postId || data.commentId || data.userId || data.messageId;
     if (!hasTarget) {
       return NextResponse.json(
-        { error: 'You must specify what you are reporting' },
+        { error: "You must specify what you are reporting" },
         { status: 400 }
       );
     }
@@ -108,14 +97,14 @@ export async function POST(request: NextRequest) {
         userId: data.userId || undefined,
         messageId: data.messageId || undefined,
         status: {
-          in: ['PENDING', 'REVIEWING'],
+          in: ["PENDING", "REVIEWING"],
         },
       },
     });
 
     if (existingReport) {
       return NextResponse.json(
-        { error: 'You have already reported this content' },
+        { error: "You have already reported this content" },
         { status: 409 }
       );
     }
@@ -142,11 +131,8 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error('[POST /api/reports] Error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    console.error("[POST /api/reports] Error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
@@ -162,7 +148,7 @@ export async function GET(request: NextRequest) {
 
     // Get query parameters
     const url = new URL(request.url);
-    const status = url.searchParams.get('status');
+    const status = url.searchParams.get("status");
 
     // Fetch reports
     const reports = await prisma.report.findMany({
@@ -170,7 +156,7 @@ export async function GET(request: NextRequest) {
         ...(status && { status: status as ReportStatus }),
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
       take: 100, // Limit to 100 reports
     });

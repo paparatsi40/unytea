@@ -18,7 +18,7 @@ type Channel = {
 export default function CommunityChat() {
   const params = useParams();
   const slug = (params?.slug as string) || "";
-  
+
   const [channels, setChannels] = useState<Channel[]>([]);
   const [activeChannelId, setActiveChannelId] = useState<string>("");
   const [activeChannelName, setActiveChannelName] = useState<string>("");
@@ -49,11 +49,11 @@ export default function CommunityChat() {
 
   const loadChannels = async () => {
     setIsLoading(true);
-    
+
     // First get community ID from slug
     const response = await fetch(`/api/communities/${slug}`);
     const data = await response.json();
-    
+
     if (!data || !data.id) {
       setIsLoading(false);
       return;
@@ -61,14 +61,14 @@ export default function CommunityChat() {
 
     // Get or create channels
     const result = await getOrCreateDefaultChannels(data.id);
-    
+
     if (result.success && result.channels.length > 0) {
       const loadedChannels = result.channels as Channel[];
       setChannels(loadedChannels);
       setActiveChannelId(loadedChannels[0].id);
       setActiveChannelName(loadedChannels[0].name);
     }
-    
+
     setIsLoading(false);
   };
 
@@ -113,9 +113,7 @@ export default function CommunityChat() {
         <button
           onClick={() => setViewMode("chat")}
           className={`flex items-center space-x-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-            viewMode === "chat"
-              ? "bg-purple-600 text-white"
-              : "text-gray-600 hover:bg-gray-50"
+            viewMode === "chat" ? "bg-purple-600 text-white" : "text-gray-600 hover:bg-gray-50"
           }`}
         >
           <LayoutList className="h-4 w-4" />
@@ -154,10 +152,7 @@ export default function CommunityChat() {
       {/* Content */}
       {viewMode === "chat" ? (
         <div className="h-full pt-16">
-          <PusherChat
-            channelId={activeChannelId}
-            channelName={currentChannelName}
-          />
+          <PusherChat channelId={activeChannelId} channelName={currentChannelName} />
         </div>
       ) : (
         <div className="min-h-screen bg-gray-50 p-8">

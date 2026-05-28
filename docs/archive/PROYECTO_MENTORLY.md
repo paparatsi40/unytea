@@ -65,18 +65,18 @@ El mercado de comunidades online está creciendo exponencialmente:
 
 ### **Análisis Competitivo**
 
-| Feature | Skool | Circle | Kajabi | **Mentorly** |
-|---------|-------|--------|--------|--------------|
-| **Comunidades** | ✅ | ✅ | ⚠️ | ✅ |
-| **Cursos** | ⚠️ | ❌ | ✅ | ✅ |
-| **Video Calls 1-on-1** | ❌ | ❌ | ❌ | ✅ |
-| **Gamification** | ⚠️ | ❌ | ❌ | ✅ |
-| **AI Features** | ❌ | ❌ | ❌ | ✅ |
-| **Custom Domains** | 1 | 1 | Ilimitados ($$$) | ✅ Ilimitados |
-| **Precio/mes** | $99 | $89+ | $149+ | **$49-99** |
-| **White Label** | ❌ | ⚠️ | ✅ | ✅ |
-| **API Pública** | ❌ | ⚠️ | ✅ | ✅ |
-| **Analytics Avanzado** | ⚠️ | ⚠️ | ✅ | ✅ |
+| Feature                | Skool | Circle | Kajabi           | **Mentorly**  |
+| ---------------------- | ----- | ------ | ---------------- | ------------- |
+| **Comunidades**        | ✅    | ✅     | ⚠️               | ✅            |
+| **Cursos**             | ⚠️    | ❌     | ✅               | ✅            |
+| **Video Calls 1-on-1** | ❌    | ❌     | ❌               | ✅            |
+| **Gamification**       | ⚠️    | ❌     | ❌               | ✅            |
+| **AI Features**        | ❌    | ❌     | ❌               | ✅            |
+| **Custom Domains**     | 1     | 1      | Ilimitados ($$$) | ✅ Ilimitados |
+| **Precio/mes**         | $99   | $89+   | $149+            | **$49-99**    |
+| **White Label**        | ❌    | ⚠️     | ✅               | ✅            |
+| **API Pública**        | ❌    | ⚠️     | ✅               | ✅            |
+| **Analytics Avanzado** | ⚠️    | ⚠️     | ✅               | ✅            |
 
 ### **Nuestros Diferenciadores Clave**
 
@@ -93,22 +93,22 @@ El mercado de comunidades online está creciendo exponencialmente:
 
 - Skool: Solo "Classroom" básico con PDFs
 - Nosotros:
-    - Video player avanzado
-    - Progress tracking detallado
-    - Quizzes interactivos
-    - Assignments con feedback
-    - Certificados automáticos
-    - Drip content (liberar por fechas)
+  - Video player avanzado
+  - Progress tracking detallado
+  - Quizzes interactivos
+  - Assignments con feedback
+  - Certificados automáticos
+  - Drip content (liberar por fechas)
 
 #### **3. Gamification Avanzada**
 
 - Skool: Solo niveles básicos
 - Nosotros:
-    - Sistema de puntos completo
-    - Badges personalizables
-    - Leaderboards por comunidad
-    - Achievements desbloqueables
-    - Rewards tangibles (acceso exclusivo, descuentos)
+  - Sistema de puntos completo
+  - Badges personalizables
+  - Leaderboards por comunidad
+  - Achievements desbloqueables
+  - Rewards tangibles (acceso exclusivo, descuentos)
 
 #### **4. AI Features**
 
@@ -129,9 +129,9 @@ El mercado de comunidades online está creciendo exponencialmente:
 
 - **Skool:** $99/mes (1 comunidad)
 - **Nosotros:**
-    - **Starter:** $49/mes (3 comunidades, 100 miembros)
-    - **Pro:** $99/mes (10 comunidades, 1000 miembros, video calls)
-    - **Enterprise:** $299/mes (ilimitado + white label + API)
+  - **Starter:** $49/mes (3 comunidades, 100 miembros)
+  - **Pro:** $99/mes (10 comunidades, 1000 miembros, video calls)
+  - **Enterprise:** $299/mes (ilimitado + white label + API)
 
 #### **7. Developer-Friendly**
 
@@ -178,9 +178,9 @@ Caching:       Redis (planned)
 ### **Authentication**
 
 ```typescript
-Provider:      Clerk
-Strategy:      JWT + Sessions
-MFA:           Optional (Email, SMS, Authenticator)
+Provider: Clerk;
+Strategy: JWT + Sessions;
+MFA: Optional(Email, SMS, Authenticator);
 ```
 
 ### **Storage**
@@ -210,8 +210,8 @@ Vector DB:     Pinecone (planned)
 ### **Payments**
 
 ```typescript
-Provider:      Stripe
-Features:      Subscriptions, One-time, Connect (payouts)
+Provider: Stripe;
+Features: (Subscriptions, One - time, Connect(payouts));
 ```
 
 ### **Infrastructure**
@@ -596,29 +596,29 @@ Update UI (setState)
 
 ### **Por Componente**
 
-| Componente | Horas | Estado |
-|------------|-------|--------|
-| **Infraestructura** | 4h | ✅ Done |
-| **Landing Page** | 3h | ✅ Done |
-| **Dashboard** | 6h | ✅ Done |
-| **Communities (básico)** | 8h | ✅ Done |
-| **Posts Feed** | 4h | ✅ Done |
-| **Reactions/Likes** | 3h | 🚧 Next |
-| **Comments** | 6h | ⬜ Todo |
-| **Channels** | 4h | ⬜ Todo |
-| **DMs** | 8h | ⬜ Todo |
-| **Notifications** | 6h | ⬜ Todo |
-| **Search** | 4h | ⬜ Todo |
-| **Member Management** | 6h | ⬜ Todo |
-| **Stripe Integration** | 12h | ⬜ Todo |
-| **Video Calls** | 20h | ⬜ Todo |
-| **Courses Platform** | 30h | ⬜ Todo |
-| **Gamification** | 15h | ⬜ Todo |
-| **AI Features** | 20h | ⬜ Todo |
-| **Analytics** | 12h | ⬜ Todo |
-| **Mobile App** | 60h | ⬜ Todo |
-| **Testing + Bugs** | 30h | ⬜ Todo |
-| **Total** | **~261h** | **45% (117h)** |
+| Componente               | Horas     | Estado         |
+| ------------------------ | --------- | -------------- |
+| **Infraestructura**      | 4h        | ✅ Done        |
+| **Landing Page**         | 3h        | ✅ Done        |
+| **Dashboard**            | 6h        | ✅ Done        |
+| **Communities (básico)** | 8h        | ✅ Done        |
+| **Posts Feed**           | 4h        | ✅ Done        |
+| **Reactions/Likes**      | 3h        | 🚧 Next        |
+| **Comments**             | 6h        | ⬜ Todo        |
+| **Channels**             | 4h        | ⬜ Todo        |
+| **DMs**                  | 8h        | ⬜ Todo        |
+| **Notifications**        | 6h        | ⬜ Todo        |
+| **Search**               | 4h        | ⬜ Todo        |
+| **Member Management**    | 6h        | ⬜ Todo        |
+| **Stripe Integration**   | 12h       | ⬜ Todo        |
+| **Video Calls**          | 20h       | ⬜ Todo        |
+| **Courses Platform**     | 30h       | ⬜ Todo        |
+| **Gamification**         | 15h       | ⬜ Todo        |
+| **AI Features**          | 20h       | ⬜ Todo        |
+| **Analytics**            | 12h       | ⬜ Todo        |
+| **Mobile App**           | 60h       | ⬜ Todo        |
+| **Testing + Bugs**       | 30h       | ⬜ Todo        |
+| **Total**                | **~261h** | **45% (117h)** |
 
 ### **Milestones**
 

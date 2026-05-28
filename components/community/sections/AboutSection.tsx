@@ -18,17 +18,14 @@ export function AboutSection({
   const primaryColor = theme?.primaryColor || "#0ea5e9";
 
   return (
-    <section className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+    <section className="rounded-2xl border border-gray-100 bg-white p-8 shadow-sm">
       {/* Title */}
-      <h2 
-        className="text-3xl font-bold mb-6"
-        style={{ color: primaryColor }}
-      >
+      <h2 className="mb-6 text-3xl font-bold" style={{ color: primaryColor }}>
         {title}
       </h2>
 
       {/* Content */}
-      <div 
+      <div
         className="prose prose-lg max-w-none text-gray-700"
         dangerouslySetInnerHTML={{ __html: content }}
       />

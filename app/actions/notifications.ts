@@ -59,7 +59,7 @@ export async function notifyUser(params: {
 export async function getUserNotifications(limit = 20) {
   try {
     const userId = await getCurrentUserId();
-    
+
     if (!userId) {
       return { success: false, error: "Not authenticated" };
     }
@@ -91,7 +91,7 @@ export async function getUserNotifications(limit = 20) {
 export async function getUnreadCount() {
   try {
     const userId = await getCurrentUserId();
-    
+
     if (!userId) {
       return { success: false, count: 0 };
     }
@@ -113,7 +113,7 @@ export async function getUnreadCount() {
 export async function markNotificationAsRead(notificationId: string) {
   try {
     const userId = await getCurrentUserId();
-    
+
     if (!userId) {
       return { success: false, error: "Unauthorized" };
     }
@@ -145,7 +145,7 @@ export async function markNotificationAsRead(notificationId: string) {
 export async function markAllNotificationsAsRead() {
   try {
     const userId = await getCurrentUserId();
-    
+
     if (!userId) {
       return { success: false, error: "Unauthorized" };
     }
@@ -169,7 +169,7 @@ export async function markAllNotificationsAsRead() {
 export async function deleteNotification(notificationId: string) {
   try {
     const userId = await getCurrentUserId();
-    
+
     if (!userId) {
       return { success: false, error: "Unauthorized" };
     }
@@ -200,7 +200,7 @@ export async function deleteNotification(notificationId: string) {
 export async function deleteAllReadNotifications() {
   try {
     const userId = await getCurrentUserId();
-    
+
     if (!userId) {
       return { success: false, error: "Unauthorized" };
     }

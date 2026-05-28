@@ -44,31 +44,24 @@ export function FeaturedPostsSection({
   return (
     <section>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h2 
-          className="text-2xl font-bold"
-          style={{ color: primaryColor }}
-        >
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-2xl font-bold" style={{ color: primaryColor }}>
           {title}
         </h2>
-        <a 
-          href="#" 
-          className="text-sm hover:underline"
-          style={{ color: primaryColor }}
-        >
+        <a href="#" className="text-sm hover:underline" style={{ color: primaryColor }}>
           View all →
         </a>
       </div>
 
       {/* Posts Grid */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {posts.slice(0, 6).map((post) => (
           <article
             key={post.id}
-            className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all hover:-translate-y-1 cursor-pointer"
+            className="cursor-pointer rounded-xl border border-gray-100 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
           >
             {/* Author */}
-            <div className="flex items-center gap-3 mb-4">
+            <div className="mb-4 flex items-center gap-3">
               {post.author.image ? (
                 <Image
                   src={post.author.image}
@@ -78,14 +71,12 @@ export function FeaturedPostsSection({
                   className="rounded-full"
                 />
               ) : (
-                <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200">
                   <User className="h-5 w-5 text-gray-500" />
                 </div>
               )}
               <div>
-                <div className="font-medium text-gray-900">
-                  {post.author.name || "Anonymous"}
-                </div>
+                <div className="font-medium text-gray-900">{post.author.name || "Anonymous"}</div>
                 <div className="text-xs text-gray-500">
                   {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
                 </div>
@@ -94,15 +85,13 @@ export function FeaturedPostsSection({
 
             {/* Title */}
             {post.title && (
-              <h3 className="font-semibold text-lg text-gray-900 mb-2 line-clamp-2">
+              <h3 className="mb-2 line-clamp-2 text-lg font-semibold text-gray-900">
                 {post.title}
               </h3>
             )}
 
             {/* Content Preview */}
-            <p className="text-gray-600 text-sm line-clamp-3 mb-4">
-              {post.content}
-            </p>
+            <p className="mb-4 line-clamp-3 text-sm text-gray-600">{post.content}</p>
 
             {/* Stats */}
             <div className="flex items-center gap-4 text-sm text-gray-500">

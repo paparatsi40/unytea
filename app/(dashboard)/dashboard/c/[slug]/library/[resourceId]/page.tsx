@@ -27,11 +27,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  getResourceById,
-  toggleResourceLike,
-  deleteResource,
-} from "@/app/actions/resources";
+import { getResourceById, toggleResourceLike, deleteResource } from "@/app/actions/resources";
 import type { ResourceType } from "@prisma/client";
 
 const resourceTypeIcons: Record<ResourceType, typeof FileText> = {
@@ -142,9 +138,9 @@ export default function ResourceDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-background to-muted/20">
         <div className="text-center">
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 animate-pulse mx-auto mb-4" />
+          <div className="mx-auto mb-4 h-12 w-12 animate-pulse rounded-full bg-gradient-to-br from-purple-500 to-pink-500" />
           <p className="text-muted-foreground">Cargando recurso...</p>
         </div>
       </div>
@@ -153,16 +149,16 @@ export default function ResourceDetailPage() {
 
   if (!resource) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-background to-muted/20">
         <div className="text-center">
-          <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Recurso no encontrado</h2>
-          <p className="text-muted-foreground mb-4">
+          <FileText className="mx-auto mb-4 h-16 w-16 text-gray-300" />
+          <h2 className="mb-2 text-xl font-semibold text-gray-900">Recurso no encontrado</h2>
+          <p className="mb-4 text-muted-foreground">
             El recurso que buscas no existe o no tienes acceso a él.
           </p>
           <Link href={`/dashboard/c/${communitySlug}/library`}>
             <Button variant="outline">
-              <ArrowLeft className="w-4 h-4 mr-2" />
+              <ArrowLeft className="mr-2 h-4 w-4" />
               Volver a la biblioteca
             </Button>
           </Link>
@@ -172,7 +168,8 @@ export default function ResourceDetailPage() {
   }
 
   const TypeIcon = resourceTypeIcons[resource.type as ResourceType] || FileText;
-  const typeColor = resourceTypeColors[resource.type as ResourceType] || "from-gray-500 to-gray-600";
+  const typeColor =
+    resourceTypeColors[resource.type as ResourceType] || "from-gray-500 to-gray-600";
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
@@ -183,7 +180,7 @@ export default function ResourceDetailPage() {
             <div className="flex items-center gap-4">
               <Link href={`/dashboard/c/${communitySlug}/library`}>
                 <Button variant="ghost" size="sm" className="gap-2">
-                  <ArrowLeft className="w-4 h-4" />
+                  <ArrowLeft className="h-4 w-4" />
                   Volver
                 </Button>
               </Link>
@@ -191,7 +188,7 @@ export default function ResourceDetailPage() {
               <nav className="flex items-center gap-2 text-sm text-muted-foreground">
                 <span>Biblioteca</span>
                 <span>/</span>
-                <span className="text-foreground font-medium truncate max-w-[200px] md:max-w-md">
+                <span className="max-w-[200px] truncate font-medium text-foreground md:max-w-md">
                   {resource.title}
                 </span>
               </nav>
@@ -204,12 +201,14 @@ export default function ResourceDetailPage() {
                 onClick={handleLike}
                 className={resource.likes?.length > 0 ? "text-red-500" : ""}
               >
-                <Heart className={`w-4 h-4 mr-2 ${resource.likes?.length > 0 ? "fill-current" : ""}`} />
+                <Heart
+                  className={`mr-2 h-4 w-4 ${resource.likes?.length > 0 ? "fill-current" : ""}`}
+                />
                 {resource._count?.likes || 0}
               </Button>
 
               <Button variant="outline" size="sm" onClick={handleShare}>
-                <Share2 className="w-4 h-4 mr-2" />
+                <Share2 className="mr-2 h-4 w-4" />
                 Compartir
               </Button>
 
@@ -217,13 +216,13 @@ export default function ResourceDetailPage() {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="sm">
-                      <MoreVertical className="w-4 h-4" />
+                      <MoreVertical className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     {resource.canEdit && (
                       <DropdownMenuItem>
-                        <Edit className="w-4 h-4 mr-2" />
+                        <Edit className="mr-2 h-4 w-4" />
                         Editar
                       </DropdownMenuItem>
                     )}
@@ -233,7 +232,7 @@ export default function ResourceDetailPage() {
                         disabled={isDeleting}
                         className="text-red-600"
                       >
-                        <Trash2 className="w-4 h-4 mr-2" />
+                        <Trash2 className="mr-2 h-4 w-4" />
                         {isDeleting ? "Eliminando..." : "Eliminar"}
                       </DropdownMenuItem>
                     )}
@@ -247,24 +246,24 @@ export default function ResourceDetailPage() {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
+        <div className="mx-auto max-w-4xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
           >
             {/* Resource Header Card */}
-            <div className="bg-white rounded-2xl shadow-sm border p-6 mb-6">
+            <div className="mb-6 rounded-2xl border bg-white p-6 shadow-sm">
               <div className="flex items-start gap-4">
                 <div
-                  className={`w-16 h-16 rounded-xl bg-gradient-to-br ${typeColor} flex items-center justify-center text-white shadow-lg flex-shrink-0`}
+                  className={`h-16 w-16 rounded-xl bg-gradient-to-br ${typeColor} flex flex-shrink-0 items-center justify-center text-white shadow-lg`}
                 >
-                  <TypeIcon className="w-8 h-8" />
+                  <TypeIcon className="h-8 w-8" />
                 </div>
 
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                <div className="min-w-0 flex-1">
+                  <div className="mb-1 flex items-center gap-2">
+                    <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                       {resourceTypeLabels[resource.type as ResourceType]}
                     </span>
                     {resource.category && (
@@ -277,21 +276,21 @@ export default function ResourceDetailPage() {
                     )}
                   </div>
 
-                  <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+                  <h1 className="mb-2 text-2xl font-bold text-gray-900 md:text-3xl">
                     {resource.title}
                   </h1>
 
                   {resource.description && (
-                    <p className="text-muted-foreground mb-4">{resource.description}</p>
+                    <p className="mb-4 text-muted-foreground">{resource.description}</p>
                   )}
 
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <div className="flex items-center gap-2">
-                      <Eye className="w-4 h-4" />
+                      <Eye className="h-4 w-4" />
                       <span>{resource.viewCount || 0} vistas</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4" />
+                      <Clock className="h-4 w-4" />
                       <span>
                         {new Date(resource.createdAt).toLocaleDateString("es-ES", {
                           year: "numeric",
@@ -312,13 +311,13 @@ export default function ResourceDetailPage() {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-wrap gap-3 mb-6">
+            <div className="mb-6 flex flex-wrap gap-3">
               {resource.fileUrl && (
                 <Button
                   onClick={handleDownload}
                   className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
                 >
-                  <Download className="w-4 h-4 mr-2" />
+                  <Download className="mr-2 h-4 w-4" />
                   Descargar / Ver recurso
                 </Button>
               )}
@@ -326,11 +325,11 @@ export default function ResourceDetailPage() {
 
             {/* Media Players */}
             {resource.type === "VIDEO" && resource.fileUrl && (
-              <div className="w-full bg-black rounded-xl overflow-hidden aspect-video mb-6">
+              <div className="mb-6 aspect-video w-full overflow-hidden rounded-xl bg-black">
                 <video
                   src={resource.fileUrl}
                   controls
-                  className="w-full h-full"
+                  className="h-full w-full"
                   poster="/video-poster.png"
                 >
                   Tu navegador no soporta el elemento video.
@@ -339,7 +338,7 @@ export default function ResourceDetailPage() {
             )}
 
             {resource.type === "AUDIO" && resource.fileUrl && (
-              <div className="w-full bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 mb-6">
+              <div className="mb-6 w-full rounded-xl bg-gradient-to-br from-green-50 to-green-100 p-6">
                 <audio src={resource.fileUrl} controls className="w-full">
                   Tu navegador no soporta el elemento audio.
                 </audio>
@@ -347,13 +346,13 @@ export default function ResourceDetailPage() {
             )}
 
             {resource.type === "LINK" && resource.fileUrl && (
-              <div className="w-full bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-6 mb-6">
-                <p className="text-sm text-muted-foreground mb-2">Enlace externo:</p>
+              <div className="mb-6 w-full rounded-xl bg-gradient-to-br from-orange-50 to-orange-100 p-6">
+                <p className="mb-2 text-sm text-muted-foreground">Enlace externo:</p>
                 <a
                   href={resource.fileUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-orange-600 hover:underline break-all"
+                  className="break-all text-orange-600 hover:underline"
                 >
                   {resource.fileUrl}
                 </a>
@@ -361,13 +360,13 @@ export default function ResourceDetailPage() {
             )}
 
             {resource.type === "DOCUMENT" && resource.fileUrl && (
-              <div className="w-full bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 mb-6">
-                <p className="text-sm text-muted-foreground mb-2">Archivo de documento</p>
+              <div className="mb-6 w-full rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 p-6">
+                <p className="mb-2 text-sm text-muted-foreground">Archivo de documento</p>
                 <a
                   href={resource.fileUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline break-all"
+                  className="break-all text-blue-600 hover:underline"
                 >
                   {resource.fileUrl}
                 </a>
@@ -376,13 +375,13 @@ export default function ResourceDetailPage() {
 
             {/* Additional Info */}
             {resource.tags && resource.tags.length > 0 && (
-              <div className="bg-white rounded-xl shadow-sm border p-4">
-                <h3 className="text-sm font-medium text-muted-foreground mb-2">Etiquetas</h3>
+              <div className="rounded-xl border bg-white p-4 shadow-sm">
+                <h3 className="mb-2 text-sm font-medium text-muted-foreground">Etiquetas</h3>
                 <div className="flex flex-wrap gap-2">
                   {resource.tags.map((tag: string) => (
                     <span
                       key={tag}
-                      className="px-3 py-1 bg-muted rounded-full text-sm text-muted-foreground"
+                      className="rounded-full bg-muted px-3 py-1 text-sm text-muted-foreground"
                     >
                       {tag}
                     </span>

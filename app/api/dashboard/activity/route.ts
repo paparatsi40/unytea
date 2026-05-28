@@ -8,10 +8,7 @@ export async function GET() {
   try {
     const session = await auth();
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const userId = session.user.id;
@@ -93,7 +90,7 @@ export async function GET() {
     });
 
     // Get user names for completions
-    const userIds = recentCompletions.map(c => c.userId);
+    const userIds = recentCompletions.map((c) => c.userId);
     const users = await prisma.user.findMany({
       where: {
         id: {
@@ -105,7 +102,7 @@ export async function GET() {
         name: true,
       },
     });
-    const userMap = new Map(users.map(u => [u.id, u.name]));
+    const userMap = new Map(users.map((u) => [u.id, u.name]));
 
     // Combine and format activities
     const activities = [
@@ -127,18 +124,17 @@ export async function GET() {
         description: `${userMap.get(enrollment.userId) || "Someone"} completed ${enrollment.course.title}`,
         time: formatTime(enrollment.updatedAt),
       })),
-    ].sort((a, b) => {
-      // Sort by time (most recent first)
-      return new Date(b.time).getTime() - new Date(a.time).getTime();
-    }).slice(0, 5);
+    ]
+      .sort((a, b) => {
+        // Sort by time (most recent first)
+        return new Date(b.time).getTime() - new Date(a.time).getTime();
+      })
+      .slice(0, 5);
 
     return NextResponse.json({ activities });
   } catch (error) {
     console.error("Error fetching dashboard activity:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch activity" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch activity" }, { status: 500 });
   }
 }
 

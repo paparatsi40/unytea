@@ -29,7 +29,11 @@ type CommentSectionProps = {
   onCountChange?: (count: number) => void;
 };
 
-export function CommentSection({ postId, initialComments = [], onCountChange }: CommentSectionProps) {
+export function CommentSection({
+  postId,
+  initialComments = [],
+  onCountChange,
+}: CommentSectionProps) {
   const [comments, setComments] = useState<Comment[]>(initialComments);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -77,7 +81,9 @@ export function CommentSection({ postId, initialComments = [], onCountChange }: 
         {/* Header */}
         <div className="flex items-center space-x-2 text-sm font-semibold text-gray-900">
           <MessageCircle className="h-4 w-4" />
-          <span>{comments.length} {t("commentsLabel")}</span>
+          <span>
+            {comments.length} {t("commentsLabel")}
+          </span>
         </div>
 
         {/* Loading State */}
@@ -88,11 +94,7 @@ export function CommentSection({ postId, initialComments = [], onCountChange }: 
         )}
 
         {/* Error State */}
-        {error && (
-          <div className="rounded-lg bg-red-50 p-4 text-sm text-red-600">
-            {error}
-          </div>
-        )}
+        {error && <div className="rounded-lg bg-red-50 p-4 text-sm text-red-600">{error}</div>}
 
         {/* Comments */}
         {!isLoading && !error && comments.length > 0 && (

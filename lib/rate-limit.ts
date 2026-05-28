@@ -78,21 +78,20 @@ const memoryStore: Record<string, MemoryEntry> = {};
 
 // Clean up expired entries every 5 minutes
 if (typeof setInterval !== "undefined") {
-  setInterval(() => {
-    const now = Date.now();
-    for (const key of Object.keys(memoryStore)) {
-      if (memoryStore[key].resetTime < now) {
-        delete memoryStore[key];
+  setInterval(
+    () => {
+      const now = Date.now();
+      for (const key of Object.keys(memoryStore)) {
+        if (memoryStore[key].resetTime < now) {
+          delete memoryStore[key];
+        }
       }
-    }
-  }, 5 * 60 * 1000);
+    },
+    5 * 60 * 1000
+  );
 }
 
-function memoryIncrement(
-  key: string,
-  intervalMs: number,
-  limit: number
-): RateLimitResult {
+function memoryIncrement(key: string, intervalMs: number, limit: number): RateLimitResult {
   const now = Date.now();
 
   if (!memoryStore[key] || memoryStore[key].resetTime < now) {
@@ -114,9 +113,7 @@ function memoryIncrement(
 
 // ── Rate Limiter Factory ────────────────────────────────────────────
 
-const useRedis = !!(
-  process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
-);
+const useRedis = !!(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN);
 
 export function rateLimit(config: RateLimitConfig) {
   return {

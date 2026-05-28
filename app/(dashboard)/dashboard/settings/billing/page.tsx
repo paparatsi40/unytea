@@ -1,16 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  CreditCard,
-  Check,
-  Sparkles,
-  Zap,
-  Crown,
-  Loader2,
-  ExternalLink,
-  Lock,
-} from "lucide-react";
+import { CreditCard, Check, Sparkles, Zap, Crown, Loader2, ExternalLink, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -199,15 +190,13 @@ export default function BillingPage() {
       {/* Header */}
       <div className="flex flex-col gap-2">
         <h2 className="text-3xl font-bold tracking-tight">Facturación</h2>
-        <p className="text-muted-foreground">
-          Administra tu plan y suscripción de Unytea
-        </p>
+        <p className="text-muted-foreground">Administra tu plan y suscripción de Unytea</p>
       </div>
 
       {/* Current Plan Banner */}
       <Card className="border-primary/20 bg-primary/5">
         <CardHeader>
-          <div className="flex items-center justify-between flex-wrap gap-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <Crown className="h-5 w-5 text-primary" />
               <CardTitle>
@@ -250,10 +239,7 @@ export default function BillingPage() {
                     {subscription.status}
                   </span>
                 </p>
-                <p>
-                  Renews:{" "}
-                  {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
-                </p>
+                <p>Renews: {new Date(subscription.currentPeriodEnd).toLocaleDateString()}</p>
                 {subscription.cancelAtPeriodEnd && (
                   <p className="text-red-600">Will cancel at period end</p>
                 )}
@@ -266,30 +252,33 @@ export default function BillingPage() {
       </Card>
 
       {/* Pricing Grid */}
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {plans.map((plan) => {
           const state = getButtonState(plan);
           return (
             <Card
               key={plan.key}
-              className={`flex flex-col relative ${
+              className={`relative flex flex-col ${
                 plan.key === platformPlan
-                  ? "border-primary ring-2 ring-primary shadow-lg"
+                  ? "border-primary shadow-lg ring-2 ring-primary"
                   : plan.popular
-                  ? "border-primary/50 shadow-md"
-                  : ""
+                    ? "border-primary/50 shadow-md"
+                    : ""
               }`}
             >
               {/* Badges */}
               <div className="absolute -top-3 left-4 flex gap-2">
                 {plan.key === platformPlan && (
-                  <Badge className="bg-primary text-primary-foreground text-xs">
+                  <Badge className="bg-primary text-xs text-primary-foreground">
                     <Check className="mr-1 h-3 w-3" />
                     Tu plan
                   </Badge>
                 )}
                 {plan.popular && plan.key !== platformPlan && (
-                  <Badge variant="outline" className="border-primary text-primary text-xs bg-background">
+                  <Badge
+                    variant="outline"
+                    className="border-primary bg-background text-xs text-primary"
+                  >
                     <Sparkles className="mr-1 h-3 w-3" />
                     Popular
                   </Badge>
@@ -301,7 +290,7 @@ export default function BillingPage() {
                 <CardDescription>{plan.description}</CardDescription>
                 <div className="mt-3 flex items-baseline gap-1">
                   <span className="text-3xl font-bold">{plan.price}</span>
-                  <span className="text-muted-foreground text-sm">{plan.period}</span>
+                  <span className="text-sm text-muted-foreground">{plan.period}</span>
                 </div>
               </CardHeader>
 

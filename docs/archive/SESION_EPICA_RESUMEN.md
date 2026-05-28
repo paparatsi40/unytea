@@ -64,11 +64,11 @@
 ### **Database Updates:**
 
 - Agregados campos a `User`:
-    - `skills` (String[])
-    - `interests` (String[])
-    - `tagline` (String)
-    - `availabilityStatus` (Enum)
-    - `lastActiveAt` (DateTime)
+  - `skills` (String[])
+  - `interests` (String[])
+  - `tagline` (String)
+  - `availabilityStatus` (Enum)
+  - `lastActiveAt` (DateTime)
 
 ### **Server Actions (5):**
 
@@ -213,8 +213,8 @@ Posicionamiento automático:
 ```typescript
 // Único por usuario
 hue = hashCode(userId) % 360
-gradient = linear-gradient(135deg, 
-  hsl(hue, 70%, 60%), 
+gradient = linear-gradient(135deg,
+  hsl(hue, 70%, 60%),
   hsl((hue + 60) % 360, 70%, 60%)
 )
 ```

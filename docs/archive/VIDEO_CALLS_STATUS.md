@@ -56,14 +56,14 @@ npm install livekit-client livekit-server-sdk @livekit/components-react
 - ✅ Video/Audio habilitados por defecto
 - ✅ Callback `onDisconnect` cuando sale del call
 - ✅ Usa componentes pre-hechos de LiveKit:
-    - `<VideoConference />` - UI completa con controles
-    - `<RoomAudioRenderer />` - Renderiza audio de participantes
+  - `<VideoConference />` - UI completa con controles
+  - `<RoomAudioRenderer />` - Renderiza audio de participantes
 
 **Props:**
 
 ```typescript
 interface VideoCallRoomProps {
-  roomName: string;        // Nombre del room (ej: "mentor-session-123")
+  roomName: string; // Nombre del room (ej: "mentor-session-123")
   participantName: string; // Nombre visible del participante
   onDisconnect?: () => void; // Callback cuando se desconecta
 }
@@ -106,9 +106,9 @@ interface VideoCallRoomProps {
 1. Crear cuenta en https://cloud.livekit.io/
 2. Crear proyecto "Unytea"
 3. Copiar credenciales:
-    - `LIVEKIT_URL` (wss://...)
-    - `LIVEKIT_API_KEY`
-    - `LIVEKIT_API_SECRET`
+   - `LIVEKIT_URL` (wss://...)
+   - `LIVEKIT_API_KEY`
+   - `LIVEKIT_API_SECRET`
 4. Agregar a `.env.local`
 5. Reiniciar servidor
 
@@ -139,7 +139,7 @@ En `web/app/actions/sessions.ts`:
 const roomName = `session-${session.id}`;
 await prisma.mentorSession.update({
   where: { id: session.id },
-  data: { videoRoomName: roomName }
+  data: { videoRoomName: roomName },
 });
 ```
 
@@ -247,26 +247,26 @@ Mostrar:
 
 ## 📊 **ESTADO DE FEATURES:**
 
-| Feature | Estado | Notas |
-|---------|--------|-------|
-| **Dependencias** | ✅ Instaladas | livekit-client, livekit-server-sdk |
-| **API Token** | ✅ Implementado | /api/livekit/token |
-| **VideoCallRoom** | ✅ Implementado | Componente funcional |
-| **Página de Testing** | ✅ Implementado | /dashboard/video-test |
-| **LiveKit Config** | 🔴 Pendiente | Necesita credenciales |
-| **Mentor Sessions** | 🔴 Pendiente | Integración falta |
-| **Recording** | 🔴 No implementado | Requiere plan paid |
-| **Chat en video** | 🔴 No implementado | Feature adicional |
+| Feature               | Estado             | Notas                              |
+| --------------------- | ------------------ | ---------------------------------- |
+| **Dependencias**      | ✅ Instaladas      | livekit-client, livekit-server-sdk |
+| **API Token**         | ✅ Implementado    | /api/livekit/token                 |
+| **VideoCallRoom**     | ✅ Implementado    | Componente funcional               |
+| **Página de Testing** | ✅ Implementado    | /dashboard/video-test              |
+| **LiveKit Config**    | 🔴 Pendiente       | Necesita credenciales              |
+| **Mentor Sessions**   | 🔴 Pendiente       | Integración falta                  |
+| **Recording**         | 🔴 No implementado | Requiere plan paid                 |
+| **Chat en video**     | 🔴 No implementado | Feature adicional                  |
 
 ---
 
 ## 💰 **COSTOS:**
 
-| Plan | Precio | Minutos | Notas |
-|------|--------|---------|-------|
-| **Free** | $0/mes | 10,000 | ✅ Suficiente para MVP |
-| **Starter** | $29/mes | 15,000 | Para growth |
-| **Pro** | $99/mes | 50,000 | Para scale |
+| Plan        | Precio  | Minutos | Notas                  |
+| ----------- | ------- | ------- | ---------------------- |
+| **Free**    | $0/mes  | 10,000  | ✅ Suficiente para MVP |
+| **Starter** | $29/mes | 15,000  | Para growth            |
+| **Pro**     | $99/mes | 50,000  | Para scale             |
 
 **Para referencia:**
 
@@ -279,19 +279,19 @@ Mostrar:
 ## 🚀 **PRÓXIMOS PASOS:**
 
 1. **TÚ:** Configurar LiveKit Cloud (10 mins)
-    - Ver `LIVEKIT_SETUP.md`
-    - Copiar credenciales a `.env.local`
-    - Reiniciar servidor
+   - Ver `LIVEKIT_SETUP.md`
+   - Copiar credenciales a `.env.local`
+   - Reiniciar servidor
 
 2. **YO:** Integrar con Mentor Sessions (2-3 horas)
-    - Agregar campo videoRoomName
-    - Crear página de video para sesiones
-    - Botón "Join Call" en sesiones
+   - Agregar campo videoRoomName
+   - Crear página de video para sesiones
+   - Botón "Join Call" en sesiones
 
 3. **TESTING:** Probar end-to-end (30 mins)
-    - Crear sesión de mentoría
-    - Iniciar video call
-    - Verificar que funciona
+   - Crear sesión de mentoría
+   - Iniciar video call
+   - Verificar que funciona
 
 ---
 

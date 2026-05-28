@@ -4,14 +4,14 @@ export default function AuditoriumTest() {
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="mx-auto max-w-4xl">
-        <h1 className="text-2xl font-bold mb-4">🧪 SVG Position Test</h1>
+        <h1 className="mb-4 text-2xl font-bold">🧪 SVG Position Test</h1>
         <p className="mb-4">You should see 2 separate circles: RED on left, BLUE on right</p>
-        
-        <div className="bg-white rounded-lg p-8 border">
+
+        <div className="rounded-lg border bg-white p-8">
           <svg
             viewBox="0 0 1300 600"
             className="w-full border border-gray-300"
-            style={{ height: '500px' }}
+            style={{ height: "500px" }}
           >
             {/* RED Circle - Position 1 */}
             <g transform="translate(200, 280)">
@@ -52,13 +52,37 @@ export default function AuditoriumTest() {
             </g>
 
             {/* Grid lines for reference */}
-            <line x1="0" y1="280" x2="1300" y2="280" stroke="gray" strokeWidth="1" strokeDasharray="5,5" />
-            <line x1="200" y1="0" x2="200" y2="600" stroke="gray" strokeWidth="1" strokeDasharray="5,5" />
-            <line x1="450" y1="0" x2="450" y2="600" stroke="gray" strokeWidth="1" strokeDasharray="5,5" />
+            <line
+              x1="0"
+              y1="280"
+              x2="1300"
+              y2="280"
+              stroke="gray"
+              strokeWidth="1"
+              strokeDasharray="5,5"
+            />
+            <line
+              x1="200"
+              y1="0"
+              x2="200"
+              y2="600"
+              stroke="gray"
+              strokeWidth="1"
+              strokeDasharray="5,5"
+            />
+            <line
+              x1="450"
+              y1="0"
+              x2="450"
+              y2="600"
+              stroke="gray"
+              strokeWidth="1"
+              strokeDasharray="5,5"
+            />
           </svg>
         </div>
 
-        <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded">
+        <div className="mt-4 rounded border border-yellow-200 bg-yellow-50 p-4">
           <p className="font-bold">Expected Result:</p>
           <p>🔴 RED circle at x=200</p>
           <p>🔵 BLUE circle at x=450</p>

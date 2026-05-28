@@ -8,14 +8,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: [
-          "/api/",
-          "/dashboard/",
-          "/onboarding/",
-          "/auth/",
-          "/_next/",
-          "/*?*",
-        ],
+        disallow: ["/api/", "/dashboard/", "/onboarding/", "/auth/", "/_next/", "/*?*"],
       },
       {
         // Bloquear scrapers de IA conocidos por defecto.

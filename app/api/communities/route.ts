@@ -3,11 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUserId, canCreateCommunity } from "@/lib/auth-utils";
 import { rateLimiters } from "@/lib/rate-limit";
 import { handleApiError } from "@/lib/api-error-handler";
-import {
-  UnauthorizedError,
-  ForbiddenError,
-  requireUserId,
-} from "@/lib/authorization";
+import { UnauthorizedError, ForbiddenError, requireUserId } from "@/lib/authorization";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";
@@ -48,9 +44,7 @@ export async function POST(req: NextRequest) {
     // 4. Plan limit (delegates to auth-utils — single source of truth)
     const allowedByPlan = await canCreateCommunity(userId);
     if (!allowedByPlan) {
-      throw new ForbiddenError(
-        "Plan limit reached: upgrade to create more communities"
-      );
+      throw new ForbiddenError("Plan limit reached: upgrade to create more communities");
     }
 
     // 5. Generate unique slug from name (collision-safe)
@@ -160,74 +154,75 @@ export async function GET() {
       weeklySessionStats,
       weeklyAttendanceStats,
       postsThisWeekStats,
-    ] = communityIds.length === 0
-      ? [[], [], [], [], [], []]
-      : await Promise.all([
-          // 1. Next upcoming session per community
-          prisma.mentorSession.findMany({
-            where: {
-              communityId: { in: communityIds },
-              status: { in: ["SCHEDULED", "IN_PROGRESS"] },
-            },
-            orderBy: [{ communityId: "asc" }, { scheduledAt: "asc" }],
-            distinct: ["communityId"],
-            select: {
-              id: true,
-              title: true,
-              scheduledAt: true,
-              status: true,
-              attendeeCount: true,
-              communityId: true,
-            },
-          }),
-          // 2. Last past/ongoing session per community
-          prisma.mentorSession.findMany({
-            where: {
-              communityId: { in: communityIds },
-              status: { in: ["COMPLETED", "IN_PROGRESS", "CANCELLED"] },
-            },
-            orderBy: [{ communityId: "asc" }, { scheduledAt: "desc" }],
-            distinct: ["communityId"],
-            select: { communityId: true, scheduledAt: true },
-          }),
-          // 3. Last post per community
-          prisma.post.findMany({
-            where: { communityId: { in: communityIds } },
-            orderBy: [{ communityId: "asc" }, { createdAt: "desc" }],
-            distinct: ["communityId"],
-            select: { communityId: true, createdAt: true },
-          }),
-          // 4. Weekly session count per community
-          prisma.mentorSession.groupBy({
-            by: ["communityId"],
-            where: {
-              communityId: { in: communityIds },
-              scheduledAt: { gte: startOfWeek },
-              status: { in: ["SCHEDULED", "IN_PROGRESS", "COMPLETED"] },
-            },
-            _count: { _all: true },
-          }),
-          // 5. Weekly attendance avg/sum per community
-          prisma.mentorSession.groupBy({
-            by: ["communityId"],
-            where: {
-              communityId: { in: communityIds },
-              scheduledAt: { gte: startOfWeek },
-              status: { in: ["IN_PROGRESS", "COMPLETED"] },
-            },
-            _avg: { attendeeCount: true },
-            _sum: { attendeeCount: true },
-          }),
-          // 6. Weekly post count per community
-          prisma.post.groupBy({
-            by: ["communityId"],
-            where: {
-              communityId: { in: communityIds },
-              createdAt: { gte: startOfWeek },
-            },
-            _count: { _all: true },
-          }),
-        ]);
+    ] =
+      communityIds.length === 0
+        ? [[], [], [], [], [], []]
+        : await Promise.all([
+            // 1. Next upcoming session per community
+            prisma.mentorSession.findMany({
+              where: {
+                communityId: { in: communityIds },
+                status: { in: ["SCHEDULED", "IN_PROGRESS"] },
+              },
+              orderBy: [{ communityId: "asc" }, { scheduledAt: "asc" }],
+              distinct: ["communityId"],
+              select: {
+                id: true,
+                title: true,
+                scheduledAt: true,
+                status: true,
+                attendeeCount: true,
+                communityId: true,
+              },
+            }),
+            // 2. Last past/ongoing session per community
+            prisma.mentorSession.findMany({
+              where: {
+                communityId: { in: communityIds },
+                status: { in: ["COMPLETED", "IN_PROGRESS", "CANCELLED"] },
+              },
+              orderBy: [{ communityId: "asc" }, { scheduledAt: "desc" }],
+              distinct: ["communityId"],
+              select: { communityId: true, scheduledAt: true },
+            }),
+            // 3. Last post per community
+            prisma.post.findMany({
+              where: { communityId: { in: communityIds } },
+              orderBy: [{ communityId: "asc" }, { createdAt: "desc" }],
+              distinct: ["communityId"],
+              select: { communityId: true, createdAt: true },
+            }),
+            // 4. Weekly session count per community
+            prisma.mentorSession.groupBy({
+              by: ["communityId"],
+              where: {
+                communityId: { in: communityIds },
+                scheduledAt: { gte: startOfWeek },
+                status: { in: ["SCHEDULED", "IN_PROGRESS", "COMPLETED"] },
+              },
+              _count: { _all: true },
+            }),
+            // 5. Weekly attendance avg/sum per community
+            prisma.mentorSession.groupBy({
+              by: ["communityId"],
+              where: {
+                communityId: { in: communityIds },
+                scheduledAt: { gte: startOfWeek },
+                status: { in: ["IN_PROGRESS", "COMPLETED"] },
+              },
+              _avg: { attendeeCount: true },
+              _sum: { attendeeCount: true },
+            }),
+            // 6. Weekly post count per community
+            prisma.post.groupBy({
+              by: ["communityId"],
+              where: {
+                communityId: { in: communityIds },
+                createdAt: { gte: startOfWeek },
+              },
+              _count: { _all: true },
+            }),
+          ]);
 
     // Build in-memory lookup maps keyed by communityId
     const nextSessionByCommunity = new Map(
@@ -245,9 +240,7 @@ export async function GET() {
     const lastSessionAtByCommunity = new Map(
       lastSessionRows.map((s) => [s.communityId, s.scheduledAt])
     );
-    const lastPostAtByCommunity = new Map(
-      lastPostRows.map((p) => [p.communityId, p.createdAt])
-    );
+    const lastPostAtByCommunity = new Map(lastPostRows.map((p) => [p.communityId, p.createdAt]));
     const weeklySessionsByCommunity = new Map(
       weeklySessionStats.map((s) => [s.communityId, s._count._all])
     );

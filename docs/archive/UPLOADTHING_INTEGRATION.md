@@ -212,7 +212,7 @@ Monthly bandwidth (if all images viewed 100 times):
 = 100 communities × 600KB × 100 views
 = 6GB
 
-Cost: FREE tier sufficient for 100+ communities! 
+Cost: FREE tier sufficient for 100+ communities!
 ```
 
 ---
@@ -358,7 +358,7 @@ SKOOL:
 ⚠️ No URL option
 ⚠️ Smaller file limits
 
-RESULT: BETTER UX 
+RESULT: BETTER UX
 ```
 
 ---
@@ -422,7 +422,7 @@ CODE: ~200 lines
 VALUE: $500-1,000
 QUALITY: 10/10
 
-READY TO USE! 
+READY TO USE!
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 

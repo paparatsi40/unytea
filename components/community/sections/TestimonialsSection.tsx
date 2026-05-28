@@ -35,42 +35,28 @@ export function TestimonialsSection({
 
   return (
     <section>
-      <h2 
-        className="text-2xl font-bold mb-8 text-center"
-        style={{ color: primaryColor }}
-      >
+      <h2 className="mb-8 text-center text-2xl font-bold" style={{ color: primaryColor }}>
         {title}
       </h2>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {testimonials.map((testimonial) => (
           <div
             key={testimonial.id}
-            className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 relative"
+            className="relative rounded-xl border border-gray-100 bg-white p-6 shadow-sm"
           >
-            <Quote 
-              className="h-8 w-8 mb-4 opacity-20"
-              style={{ color: primaryColor }}
-            />
-            
-            <p className="text-gray-700 mb-6">
-              {testimonial.content}
-            </p>
+            <Quote className="mb-4 h-8 w-8 opacity-20" style={{ color: primaryColor }} />
+
+            <p className="mb-6 text-gray-700">{testimonial.content}</p>
 
             {testimonial.rating && (
-              <div className="flex gap-1 mb-4">
+              <div className="mb-4 flex gap-1">
                 {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}
-                    className={`h-4 w-4 ${
-                      i < testimonial.rating! 
-                        ? 'fill-current' 
-                        : ''
-                    }`}
-                    style={{ 
-                      color: i < testimonial.rating! 
-                        ? primaryColor 
-                        : '#d1d5db' 
+                    className={`h-4 w-4 ${i < testimonial.rating! ? "fill-current" : ""}`}
+                    style={{
+                      color: i < testimonial.rating! ? primaryColor : "#d1d5db",
                     }}
                   />
                 ))}
@@ -88,13 +74,9 @@ export function TestimonialsSection({
                 />
               )}
               <div>
-                <div className="font-medium text-gray-900">
-                  {testimonial.author.name}
-                </div>
+                <div className="font-medium text-gray-900">{testimonial.author.name}</div>
                 {testimonial.author.role && (
-                  <div className="text-sm text-gray-500">
-                    {testimonial.author.role}
-                  </div>
+                  <div className="text-sm text-gray-500">{testimonial.author.role}</div>
                 )}
               </div>
             </div>

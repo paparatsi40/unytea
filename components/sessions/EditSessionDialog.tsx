@@ -24,11 +24,7 @@ interface EditSessionDialogProps {
   onSuccess?: () => void;
 }
 
-export function EditSessionDialog({
-  session,
-  trigger,
-  onSuccess,
-}: EditSessionDialogProps) {
+export function EditSessionDialog({ session, trigger, onSuccess }: EditSessionDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [scope, setScope] = useState<EditScope>("this");
@@ -105,9 +101,7 @@ export function EditSessionDialog({
             <h4 className="font-medium text-amber-200">
               This session is part of a recurring series
             </h4>
-            <p className="mt-1 text-sm text-amber-300/80">
-              Choose how to apply your changes:
-            </p>
+            <p className="mt-1 text-sm text-amber-300/80">Choose how to apply your changes:</p>
 
             <div className="mt-3 space-y-2">
               <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-amber-500/20 bg-black/20 p-3 transition-colors hover:bg-black/30">
@@ -137,9 +131,7 @@ export function EditSessionDialog({
                   className="mt-1 h-4 w-4 accent-amber-500"
                 />
                 <div>
-                  <span className="font-medium text-white">
-                    This and future sessions
-                  </span>
+                  <span className="font-medium text-white">This and future sessions</span>
                   <p className="text-sm text-zinc-400">
                     Update series rules and regenerate all future sessions from this point.
                   </p>
@@ -175,7 +167,7 @@ export function EditSessionDialog({
           onClick={() => !isLoading && setIsOpen(false)}
         >
           <div
-            className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl border border-zinc-800 bg-zinc-950 p-6 shadow-2xl"
+            className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-zinc-800 bg-zinc-950 p-6 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-6">
@@ -260,9 +252,7 @@ export function EditSessionDialog({
 
               {/* Timezone */}
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-zinc-300">
-                  Timezone
-                </label>
+                <label className="mb-1.5 block text-sm font-medium text-zinc-300">Timezone</label>
                 <input
                   type="text"
                   value={timezone}
@@ -275,8 +265,8 @@ export function EditSessionDialog({
               {/* Info for recurring sessions */}
               {isRecurring && scope === "this" && (
                 <p className="text-xs text-zinc-500">
-                  This change will only affect this specific session. The rest
-                  of the series will continue as scheduled.
+                  This change will only affect this specific session. The rest of the series will
+                  continue as scheduled.
                 </p>
               )}
 

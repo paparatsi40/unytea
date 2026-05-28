@@ -5,10 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ConversationList } from "@/components/messages/ConversationList";
 import { MessageThread } from "@/components/messages/MessageThread";
-import {
-  getOrCreateConversation,
-  getSharedMessageContext,
-} from "@/app/actions/messages";
+import { getOrCreateConversation, getSharedMessageContext } from "@/app/actions/messages";
 
 interface OtherUser {
   id: string;
@@ -153,15 +150,17 @@ export default function MessagesPage() {
                     {activeOtherUser.firstName || activeOtherUser.name || "User"}
                   </p>
                   {activeOtherUser.username && (
-                    <p className="truncate text-xs text-gray-500">
-                      @{activeOtherUser.username}
-                    </p>
+                    <p className="truncate text-xs text-gray-500">@{activeOtherUser.username}</p>
                   )}
                 </div>
               </div>
 
               <Link
-                href={activeOtherUser.username ? `/u/${activeOtherUser.username}` : "/dashboard/messages"}
+                href={
+                  activeOtherUser.username
+                    ? `/u/${activeOtherUser.username}`
+                    : "/dashboard/messages"
+                }
                 className={`mt-3 inline-flex rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
                   activeOtherUser.username
                     ? "border-gray-300 text-gray-700 hover:bg-gray-50"
@@ -177,9 +176,7 @@ export default function MessagesPage() {
             <div className="rounded-xl border border-gray-200 bg-gray-50 p-3.5">
               <p className="text-xs uppercase tracking-wide text-gray-500">Context</p>
               <p className="mt-2 text-sm font-medium text-gray-900">Direct conversation</p>
-              <p className="mt-1 text-xs text-gray-500">
-                Started from community members.
-              </p>
+              <p className="mt-1 text-xs text-gray-500">Started from community members.</p>
 
               <div className="mt-3 rounded-lg border border-gray-200 bg-white p-2.5">
                 <p className="text-[11px] uppercase tracking-wide text-gray-500">
@@ -204,9 +201,7 @@ export default function MessagesPage() {
                     ) : null}
                   </div>
                 ) : (
-                  <p className="mt-2 text-xs text-gray-500">
-                    No active shared communities found.
-                  </p>
+                  <p className="mt-2 text-xs text-gray-500">No active shared communities found.</p>
                 )}
               </div>
             </div>
@@ -214,9 +209,7 @@ export default function MessagesPage() {
             <div className="rounded-xl border border-purple-200 bg-purple-50 p-3.5">
               <p className="text-xs uppercase tracking-wide text-purple-700">Unread</p>
               <p className="mt-2 text-2xl font-bold text-purple-900">{unreadTotal}</p>
-              <p className="text-xs text-purple-700/80">
-                total unread messages in your inbox
-              </p>
+              <p className="text-xs text-purple-700/80">total unread messages in your inbox</p>
             </div>
           </aside>
         </>
@@ -227,13 +220,10 @@ export default function MessagesPage() {
               <span className="text-4xl">💬</span>
             </div>
 
-            <h2 className="text-2xl font-bold tracking-tight text-gray-900">
-              Your Messages
-            </h2>
+            <h2 className="text-2xl font-bold tracking-tight text-gray-900">Your Messages</h2>
             <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-gray-600">
-              Select a conversation from the left to view it. To start a new
-              conversation, open a community member directory and use the
-              Message button there.
+              Select a conversation from the left to view it. To start a new conversation, open a
+              community member directory and use the Message button there.
             </p>
           </div>
         </div>

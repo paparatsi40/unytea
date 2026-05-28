@@ -25,22 +25,22 @@
  * Phase 2c (route audit) will determine which to wire up. Until then, both
  * libraries are kept intact.
  */
-import { auth } from "@/lib/auth"
-import { redirect } from "next/navigation"
-import { prisma } from "@/lib/prisma"
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma";
 
 /**
  * Server-side: Require authentication and redirect if not authenticated
  * Use in Server Components and Server Actions
  */
 export async function requireAuth() {
-  const session = await auth()
-  
+  const session = await auth();
+
   if (!session?.user) {
-    redirect("/auth/signin")
+    redirect("/auth/signin");
   }
-  
-  return session
+
+  return session;
 }
 
 /**
@@ -48,36 +48,36 @@ export async function requireAuth() {
  * Use in Server Components and Server Actions
  */
 export async function getCurrentUser() {
-  const session = await auth()
-  return session?.user ?? null
+  const session = await auth();
+  return session?.user ?? null;
 }
 
 /**
  * Server-side: Get current user ID or null
  */
 export async function getCurrentUserId() {
-  const session = await auth()
-  return session?.user?.id ?? null
+  const session = await auth();
+  return session?.user?.id ?? null;
 }
 
 /**
  * Server-side: Check if user is authenticated
  */
 export async function isAuthenticated() {
-  const session = await auth()
-  return !!session?.user
+  const session = await auth();
+  return !!session?.user;
 }
 
 /**
  * Server-side: Get full user data from database
  */
 export async function getFullUser() {
-  const session = await auth()
-  
+  const session = await auth();
+
   if (!session?.user?.id) {
-    return null
+    return null;
   }
-  
+
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
     include: {
@@ -88,22 +88,22 @@ export async function getFullUser() {
       },
       ownedCommunities: true,
     },
-  })
-  
-  return user
+  });
+
+  return user;
 }
 
 /**
  * Server-side: Require onboarded user
  */
 export async function requireOnboarded() {
-  const session = await requireAuth()
-  
+  const session = await requireAuth();
+
   if (!session.user.isOnboarded) {
-    redirect("/onboarding")
+    redirect("/onboarding");
   }
-  
-  return session
+
+  return session;
 }
 
 /**
@@ -179,7 +179,7 @@ export async function canCreateCommunity(userId?: string | null) {
 
   // Get user's subscription
   const subscription = await getUserSubscription(userId);
-  
+
   if (!subscription || subscription.status !== "ACTIVE") {
     // Free plan: max 1 community
     return ownedCommunities < 1;
@@ -187,7 +187,7 @@ export async function canCreateCommunity(userId?: string | null) {
 
   // Check plan limits
   const planName = subscription.plan.name.toLowerCase();
-  
+
   if (planName.includes("starter")) {
     return ownedCommunities < 1;
   } else if (planName.includes("pro")) {
@@ -199,12 +199,12 @@ export async function canCreateCommunity(userId?: string | null) {
   return false;
 }
 export async function isMemberOfCommunity(communityId: string) {
-  const userId = await getCurrentUserId()
-  
+  const userId = await getCurrentUserId();
+
   if (!userId) {
-    return false
+    return false;
   }
-  
+
   const member = await prisma.member.findUnique({
     where: {
       userId_communityId: {
@@ -212,39 +212,39 @@ export async function isMemberOfCommunity(communityId: string) {
         communityId,
       },
     },
-  })
-  
-  return !!member
+  });
+
+  return !!member;
 }
 
 /**
  * Check if user is owner of a community
  */
 export async function isOwnerOfCommunity(communityId: string) {
-  const userId = await getCurrentUserId()
-  
+  const userId = await getCurrentUserId();
+
   if (!userId) {
-    return false
+    return false;
   }
-  
+
   const community = await prisma.community.findUnique({
     where: { id: communityId },
     select: { ownerId: true },
-  })
-  
-  return community?.ownerId === userId
+  });
+
+  return community?.ownerId === userId;
 }
 
 /**
  * Get user's role in a community
  */
 export async function getUserRoleInCommunity(communityId: string) {
-  const userId = await getCurrentUserId()
-  
+  const userId = await getCurrentUserId();
+
   if (!userId) {
-    return null
+    return null;
   }
-  
+
   const member = await prisma.member.findUnique({
     where: {
       userId_communityId: {
@@ -253,7 +253,7 @@ export async function getUserRoleInCommunity(communityId: string) {
       },
     },
     select: { role: true },
-  })
-  
-  return member?.role ?? null
+  });
+
+  return member?.role ?? null;
 }

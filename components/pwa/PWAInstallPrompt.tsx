@@ -10,8 +10,7 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export function PWAInstallPrompt() {
-  const [deferredPrompt, setDeferredPrompt] =
-    useState<BeforeInstallPromptEvent | null>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showBanner, setShowBanner] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
 
@@ -75,7 +74,7 @@ export function PWAInstallPrompt() {
     <div
       className={cn(
         "fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-lg",
-        "animate-in slide-in-from-bottom-5 fade-in duration-500"
+        "duration-500 animate-in fade-in slide-in-from-bottom-5"
       )}
     >
       <div className="overflow-hidden rounded-2xl border border-zinc-700 bg-zinc-900/95 shadow-2xl backdrop-blur">
@@ -86,13 +85,10 @@ export function PWAInstallPrompt() {
           </div>
 
           {/* Content */}
-          <div className="flex-1 min-w-0">
-            <h3 className="text-sm font-semibold text-white">
-              Install Unytea
-            </h3>
+          <div className="min-w-0 flex-1">
+            <h3 className="text-sm font-semibold text-white">Install Unytea</h3>
             <p className="mt-1 text-xs text-zinc-400">
-              Get the full app experience — faster access, push notifications,
-              and offline support.
+              Get the full app experience — faster access, push notifications, and offline support.
             </p>
 
             {/* Actions */}
@@ -114,10 +110,7 @@ export function PWAInstallPrompt() {
           </div>
 
           {/* Close */}
-          <button
-            onClick={handleDismiss}
-            className="shrink-0 text-zinc-500 hover:text-zinc-300"
-          >
+          <button onClick={handleDismiss} className="shrink-0 text-zinc-500 hover:text-zinc-300">
             <X className="h-4 w-4" />
           </button>
         </div>

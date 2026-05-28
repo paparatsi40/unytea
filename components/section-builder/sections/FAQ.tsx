@@ -6,37 +6,35 @@ import { ChevronDown } from "lucide-react";
 
 export const FAQRender = (props: Record<string, any>) => {
   const { title, q1, a1, q2, a2, q3, a3, q4, a4, q5, a5 } = props;
-  
+
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  
+
   const faqs = [
     { q: q1, a: a1 },
     { q: q2, a: a2 },
     { q: q3, a: a3 },
     { q: q4, a: a4 },
     { q: q5, a: a5 },
-  ].filter(faq => faq.q);
-  
+  ].filter((faq) => faq.q);
+
   return (
     <section className="rounded-2xl border border-border bg-white p-8 md:p-16">
       <div className="mx-auto max-w-3xl">
-        <div className="text-center mb-12">
+        <div className="mb-12 text-center">
           <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">
             {title || "Frequently Asked Questions"}
           </h2>
         </div>
-        
+
         <div className="space-y-4">
           {faqs.map((faq, i) => (
-            <div key={i} className="rounded-lg border border-gray-200 overflow-hidden">
+            <div key={i} className="overflow-hidden rounded-lg border border-gray-200">
               <button
                 onClick={() => setOpenIndex(openIndex === i ? null : i)}
                 className="flex w-full items-center justify-between p-6 text-left transition-colors hover:bg-gray-50"
               >
-                <span className="text-lg font-semibold text-gray-900">
-                  {faq.q}
-                </span>
-                <ChevronDown 
+                <span className="text-lg font-semibold text-gray-900">{faq.q}</span>
+                <ChevronDown
                   className={`h-5 w-5 text-gray-500 transition-transform ${
                     openIndex === i ? "rotate-180" : ""
                   }`}
@@ -76,7 +74,12 @@ export const FAQSchema: SectionSchema = {
   },
   fields: [
     { key: "title", label: "Title", kind: "text", placeholder: "Frequently Asked Questions" },
-    { key: "q1", label: "Question 1", kind: "text", placeholder: "e.g., What is this community about?" },
+    {
+      key: "q1",
+      label: "Question 1",
+      kind: "text",
+      placeholder: "e.g., What is this community about?",
+    },
     { key: "a1", label: "Answer 1", kind: "textarea", placeholder: "Enter your answer here..." },
     { key: "q2", label: "Question 2", kind: "text", placeholder: "e.g., How can I join?" },
     { key: "a2", label: "Answer 2", kind: "textarea", placeholder: "Enter your answer here..." },

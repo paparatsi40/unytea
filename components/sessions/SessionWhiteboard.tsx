@@ -10,21 +10,17 @@ import dynamic from "next/dynamic";
 // color panel, and library button render unstyled (effectively invisible).
 import "@excalidraw/excalidraw/index.css";
 
-
-const Excalidraw = dynamic(
-  async () => (await import("@excalidraw/excalidraw")).Excalidraw,
-  {
-    ssr: false,
-    loading: () => (
-      <div className="flex h-full items-center justify-center">
-        <div className="text-center">
-          <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-purple-600 border-t-transparent" />
-          <p className="text-sm text-gray-600">Loading whiteboard...</p>
-        </div>
+const Excalidraw = dynamic(async () => (await import("@excalidraw/excalidraw")).Excalidraw, {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-full items-center justify-center">
+      <div className="text-center">
+        <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-purple-600 border-t-transparent" />
+        <p className="text-sm text-gray-600">Loading whiteboard...</p>
       </div>
-    ),
-  }
-);
+    </div>
+  ),
+});
 
 interface SessionWhiteboardProps {
   onClose: () => void;
@@ -32,7 +28,11 @@ interface SessionWhiteboardProps {
   embedded?: boolean;
 }
 
-export function SessionWhiteboard({ onClose, sessionId, embedded = false }: SessionWhiteboardProps) {
+export function SessionWhiteboard({
+  onClose,
+  sessionId,
+  embedded = false,
+}: SessionWhiteboardProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [excalidrawAPI, setExcalidrawAPI] = useState<any>(null);
 

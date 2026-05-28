@@ -160,34 +160,34 @@ cualquier plataforma moderna de chat.
 
 ### **vs Skool**
 
-| Feature | Skool | Mentorly |
-|---------|-------|----------|
-| **Direct Messages** | ❌ No | ✅ Yes |
-| **Read Receipts** | N/A | ✅ Yes |
-| **Attachments** | N/A | ✅ Yes |
-| **Search Messages** | N/A | ✅ Yes |
-| **Block Users** | N/A | ✅ Yes |
-| **Modern UI** | N/A | ✅ Yes |
+| Feature             | Skool | Mentorly |
+| ------------------- | ----- | -------- |
+| **Direct Messages** | ❌ No | ✅ Yes   |
+| **Read Receipts**   | N/A   | ✅ Yes   |
+| **Attachments**     | N/A   | ✅ Yes   |
+| **Search Messages** | N/A   | ✅ Yes   |
+| **Block Users**     | N/A   | ✅ Yes   |
+| **Modern UI**       | N/A   | ✅ Yes   |
 
 **Skool NO tiene DMs.** 🎯
 
 ### **vs Discord**
 
-| Feature | Discord | Mentorly |
-|---------|---------|----------|
-| **DMs** | ✅ Yes | ✅ Yes |
-| **Read Receipts** | ✅ Yes | ✅ Yes |
-| **Attachments** | ✅ Yes | ✅ Yes (ready) |
-| **Search** | ✅ Yes | ✅ Yes |
-| **UI Quality** | 8/10 | 9/10 ⭐ |
+| Feature           | Discord | Mentorly       |
+| ----------------- | ------- | -------------- |
+| **DMs**           | ✅ Yes  | ✅ Yes         |
+| **Read Receipts** | ✅ Yes  | ✅ Yes         |
+| **Attachments**   | ✅ Yes  | ✅ Yes (ready) |
+| **Search**        | ✅ Yes  | ✅ Yes         |
+| **UI Quality**    | 8/10    | 9/10 ⭐        |
 
 ### **vs Circle**
 
-| Feature | Circle | Mentorly |
-|---------|--------|----------|
-| **DMs** | ✅ Yes | ✅ Yes |
-| **Modern UI** | 7/10 | 9/10 ⭐ |
-| **Speed** | Slow | Fast ⭐ |
+| Feature       | Circle | Mentorly |
+| ------------- | ------ | -------- |
+| **DMs**       | ✅ Yes | ✅ Yes   |
+| **Modern UI** | 7/10   | 9/10 ⭐  |
+| **Speed**     | Slow   | Fast ⭐  |
 
 ---
 
@@ -337,10 +337,10 @@ web/
 
 ### **Development Time**
 
-| Platform | DM System | Time Estimate |
-|----------|-----------|---------------|
-| **Discord** | Full featured | 6+ months (team) |
-| **Slack** | Enterprise-grade | 12+ months (team) |
+| Platform     | DM System        | Time Estimate        |
+| ------------ | ---------------- | -------------------- |
+| **Discord**  | Full featured    | 6+ months (team)     |
+| **Slack**    | Enterprise-grade | 12+ months (team)    |
 | **Mentorly** | Production-ready | 45 minutes (solo) 🎯 |
 
 ### **Feature Completeness**

@@ -2,14 +2,14 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { 
-  FileText, 
-  Save, 
-  Clock, 
-  Sparkles, 
-  BookOpen, 
+import {
+  FileText,
+  Save,
+  Clock,
+  Sparkles,
+  BookOpen,
   Link as LinkIcon,
-  Lightbulb
+  Lightbulb,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -155,7 +155,7 @@ export function SessionNotesEditor({ sessionId, isHost }: SessionNotesEditorProp
 
   if (isLoading) {
     return (
-      <div className="h-full flex items-center justify-center bg-zinc-900 rounded-xl border border-zinc-800">
+      <div className="flex h-full items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900">
         <div className="flex items-center gap-2 text-zinc-500">
           <Clock className="h-5 w-5 animate-spin" />
           <span>Loading notes...</span>
@@ -168,21 +168,21 @@ export function SessionNotesEditor({ sessionId, isHost }: SessionNotesEditorProp
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="h-full flex flex-col bg-zinc-900 rounded-xl border border-zinc-800 overflow-hidden"
+      className="flex h-full flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900"
     >
-      <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800 bg-zinc-950">
+      <div className="flex items-center justify-between border-b border-zinc-800 bg-zinc-950 px-4 py-3">
         <div className="flex items-center gap-2">
           <FileText className="h-4 w-4 text-purple-500" />
           <span className="font-medium text-white">Session Notes</span>
           {isHost && (
-            <Badge variant="secondary" className="bg-purple-500/20 text-purple-400 text-xs">
+            <Badge variant="secondary" className="bg-purple-500/20 text-xs text-purple-400">
               Host
             </Badge>
           )}
         </div>
         <div className="flex items-center gap-2">
           {lastSaved && (
-            <span className="text-xs text-zinc-500 flex items-center gap-1">
+            <span className="flex items-center gap-1 text-xs text-zinc-500">
               <Clock className="h-3 w-3" />
               Saved {formatDistanceToNow(lastSaved, { addSuffix: true })}
             </span>
@@ -191,9 +191,9 @@ export function SessionNotesEditor({ sessionId, isHost }: SessionNotesEditorProp
             size="sm"
             onClick={handleManualSave}
             disabled={isSaving}
-            className="bg-purple-600 hover:bg-purple-700 text-white"
+            className="bg-purple-600 text-white hover:bg-purple-700"
           >
-            <Save className="h-4 w-4 mr-1" />
+            <Save className="mr-1 h-4 w-4" />
             {isSaving ? "Saving..." : "Save"}
           </Button>
         </div>
@@ -203,9 +203,9 @@ export function SessionNotesEditor({ sessionId, isHost }: SessionNotesEditorProp
       <div className="flex border-b border-zinc-800 bg-zinc-900/50">
         <button
           onClick={() => setActiveSection("notes")}
-          className={`flex-1 px-4 py-2 text-sm font-medium transition-colors flex items-center justify-center gap-2 ${
+          className={`flex flex-1 items-center justify-center gap-2 px-4 py-2 text-sm font-medium transition-colors ${
             activeSection === "notes"
-              ? "text-purple-400 border-b-2 border-purple-500 bg-zinc-800/50"
+              ? "border-b-2 border-purple-500 bg-zinc-800/50 text-purple-400"
               : "text-zinc-400 hover:text-zinc-200"
           }`}
         >
@@ -214,9 +214,9 @@ export function SessionNotesEditor({ sessionId, isHost }: SessionNotesEditorProp
         </button>
         <button
           onClick={() => setActiveSection("insights")}
-          className={`flex-1 px-4 py-2 text-sm font-medium transition-colors flex items-center justify-center gap-2 ${
+          className={`flex flex-1 items-center justify-center gap-2 px-4 py-2 text-sm font-medium transition-colors ${
             activeSection === "insights"
-              ? "text-yellow-400 border-b-2 border-yellow-500 bg-zinc-800/50"
+              ? "border-b-2 border-yellow-500 bg-zinc-800/50 text-yellow-400"
               : "text-zinc-400 hover:text-zinc-200"
           }`}
         >
@@ -225,9 +225,9 @@ export function SessionNotesEditor({ sessionId, isHost }: SessionNotesEditorProp
         </button>
         <button
           onClick={() => setActiveSection("resources")}
-          className={`flex-1 px-4 py-2 text-sm font-medium transition-colors flex items-center justify-center gap-2 ${
+          className={`flex flex-1 items-center justify-center gap-2 px-4 py-2 text-sm font-medium transition-colors ${
             activeSection === "resources"
-              ? "text-green-400 border-b-2 border-green-500 bg-zinc-800/50"
+              ? "border-b-2 border-green-500 bg-zinc-800/50 text-green-400"
               : "text-zinc-400 hover:text-zinc-200"
           }`}
         >
@@ -241,8 +241,8 @@ export function SessionNotesEditor({ sessionId, isHost }: SessionNotesEditorProp
         <div className="p-4">
           {activeSection === "notes" && (
             <div className="space-y-3">
-              <div className="text-sm text-zinc-400 mb-2">
-                <Sparkles className="h-4 w-4 inline mr-1" />
+              <div className="mb-2 text-sm text-zinc-400">
+                <Sparkles className="mr-1 inline h-4 w-4" />
                 Capture key points, decisions, and action items
               </div>
               <textarea
@@ -258,18 +258,18 @@ Action items:
 
 Questions to follow up:
 • `}
-                className="w-full min-h-[300px] bg-zinc-950 border border-zinc-700 rounded-lg p-3 text-white placeholder:text-zinc-600 resize-none focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                className="min-h-[300px] w-full resize-none rounded-lg border border-zinc-700 bg-zinc-950 p-3 text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
               />
             </div>
           )}
 
           {activeSection === "insights" && (
             <div className="space-y-3">
-              <div className="text-sm text-zinc-400 mb-2">
-                <Lightbulb className="h-4 w-4 inline mr-1" />
+              <div className="mb-2 text-sm text-zinc-400">
+                <Lightbulb className="mr-1 inline h-4 w-4" />
                 Key insights and learnings from this session
               </div>
-              
+
               {/* Add new insight */}
               <div className="flex gap-2">
                 <input
@@ -277,10 +277,14 @@ Questions to follow up:
                   value={newInsight}
                   onChange={(e) => setNewInsight(e.target.value)}
                   placeholder="Add a key insight..."
-                  className="flex-1 px-3 py-2 bg-zinc-950 border border-zinc-700 rounded-md text-white placeholder:text-zinc-600 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500/50"
+                  className="flex-1 rounded-md border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-yellow-500/50"
                   onKeyDown={(e) => e.key === "Enter" && addInsight()}
                 />
-                <Button onClick={addInsight} size="sm" className="bg-yellow-600 hover:bg-yellow-700">
+                <Button
+                  onClick={addInsight}
+                  size="sm"
+                  className="bg-yellow-600 hover:bg-yellow-700"
+                >
                   Add
                 </Button>
               </div>
@@ -288,20 +292,20 @@ Questions to follow up:
               {/* Insights list */}
               <div className="space-y-2">
                 {insights.length === 0 ? (
-                  <div className="text-center py-8 text-zinc-500">
+                  <div className="py-8 text-center text-zinc-500">
                     No insights yet. Add key learnings from this session.
                   </div>
                 ) : (
                   insights.map((insight, index) => (
                     <div
                       key={index}
-                      className="flex items-start gap-2 p-3 bg-zinc-950 rounded-lg border border-zinc-800 group"
+                      className="group flex items-start gap-2 rounded-lg border border-zinc-800 bg-zinc-950 p-3"
                     >
-                      <Lightbulb className="h-4 w-4 text-yellow-500 mt-0.5 flex-shrink-0" />
-                      <span className="text-sm text-zinc-300 flex-1">{insight}</span>
+                      <Lightbulb className="mt-0.5 h-4 w-4 flex-shrink-0 text-yellow-500" />
+                      <span className="flex-1 text-sm text-zinc-300">{insight}</span>
                       <button
                         onClick={() => removeInsight(index)}
-                        className="text-zinc-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="text-zinc-500 opacity-0 transition-opacity hover:text-red-400 group-hover:opacity-100"
                       >
                         ×
                       </button>
@@ -314,11 +318,11 @@ Questions to follow up:
 
           {activeSection === "resources" && (
             <div className="space-y-3">
-              <div className="text-sm text-zinc-400 mb-2">
-                <LinkIcon className="h-4 w-4 inline mr-1" />
+              <div className="mb-2 text-sm text-zinc-400">
+                <LinkIcon className="mr-1 inline h-4 w-4" />
                 Links, tools, and resources shared during the session
               </div>
-              
+
               {/* Add new resource */}
               <div className="flex gap-2">
                 <input
@@ -326,7 +330,7 @@ Questions to follow up:
                   value={newResource}
                   onChange={(e) => setNewResource(e.target.value)}
                   placeholder="https://example.com or resource name"
-                  className="flex-1 px-3 py-2 bg-zinc-950 border border-zinc-700 rounded-md text-white placeholder:text-zinc-600 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/50"
+                  className="flex-1 rounded-md border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-green-500/50"
                   onKeyDown={(e) => e.key === "Enter" && addResource()}
                 />
                 <Button onClick={addResource} size="sm" className="bg-green-600 hover:bg-green-700">
@@ -337,27 +341,27 @@ Questions to follow up:
               {/* Resources list */}
               <div className="space-y-2">
                 {resources.length === 0 ? (
-                  <div className="text-center py-8 text-zinc-500">
+                  <div className="py-8 text-center text-zinc-500">
                     No resources yet. Add links and tools shared.
                   </div>
                 ) : (
                   resources.map((resource, index) => (
                     <div
                       key={index}
-                      className="flex items-start gap-2 p-3 bg-zinc-950 rounded-lg border border-zinc-800 group"
+                      className="group flex items-start gap-2 rounded-lg border border-zinc-800 bg-zinc-950 p-3"
                     >
-                      <LinkIcon className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <LinkIcon className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-500" />
                       <a
                         href={resource.startsWith("http") ? resource : `https://${resource}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-green-400 hover:text-green-300 flex-1 truncate"
+                        className="flex-1 truncate text-sm text-green-400 hover:text-green-300"
                       >
                         {resource}
                       </a>
                       <button
                         onClick={() => removeResource(index)}
-                        className="text-zinc-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="text-zinc-500 opacity-0 transition-opacity hover:text-red-400 group-hover:opacity-100"
                       >
                         ×
                       </button>

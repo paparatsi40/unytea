@@ -32,7 +32,7 @@ const fallbackMessages: Messages = {
     comingSoon: "Coming soon",
     featureInDevelopment: "Feature in Development",
     needHelp: "Need help?",
-    contactSupport: "Contact our support team for assistance."
+    contactSupport: "Contact our support team for assistance.",
   },
   navigation: {
     dashboard: "Dashboard",
@@ -43,7 +43,7 @@ const fallbackMessages: Messages = {
     signIn: "Sign In",
     signUp: "Sign Up",
     signup: "Sign Up",
-    back: "Back"
+    back: "Back",
   },
   communities: {
     stepBasicInfo: "Basic Information",
@@ -56,11 +56,12 @@ const fallbackMessages: Messages = {
     stepSettingsDesc: "Configure access and privacy",
     stepPreview: "Preview",
     stepPreviewDesc: "Review before publishing",
-    descriptionPlaceholder: "Describe your community, what members will learn, and why they should join...",
+    descriptionPlaceholder:
+      "Describe your community, what members will learn, and why they should join...",
     backToCommunities: "Back to Communities",
     communityName: "Community Name",
-    continue: "Continue"
-  }
+    continue: "Continue",
+  },
 };
 
 async function loadMessages(locale: string): Promise<Messages> {
@@ -77,11 +78,7 @@ async function loadMessages(locale: string): Promise<Messages> {
   }
 }
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [locale, setLocale] = useState("en");
   const [messages, setMessages] = useState<Messages>(fallbackMessages);
   const [isLoading, setIsLoading] = useState(true);
@@ -89,12 +86,12 @@ export default function DashboardLayout({
 
   useEffect(() => {
     let mounted = true;
-    
+
     async function initialize() {
       try {
         // Load locale from localStorage or default to 'en'
         const savedLocale = localStorage.getItem("locale") || "en";
-        
+
         if (mounted) {
           setLocale(savedLocale);
           const loadedMessages = await loadMessages(savedLocale);
@@ -113,9 +110,9 @@ export default function DashboardLayout({
         }
       }
     }
-    
+
     initialize();
-    
+
     return () => {
       mounted = false;
     };
@@ -123,7 +120,7 @@ export default function DashboardLayout({
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="animate-pulse text-muted-foreground">Loading...</div>
       </div>
     );
@@ -131,12 +128,12 @@ export default function DashboardLayout({
 
   if (error) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center">
-          <p className="text-red-500 mb-4">{error}</p>
-          <button 
+          <p className="mb-4 text-red-500">{error}</p>
+          <button
             onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-primary text-white rounded-lg"
+            className="rounded-lg bg-primary px-4 py-2 text-white"
           >
             Retry
           </button>
@@ -150,11 +147,9 @@ export default function DashboardLayout({
       <div className="min-h-screen bg-background">
         <DashboardSidebar />
         <DashboardHeader />
-        
+
         <main className="ml-64 pt-16">
-          <div className="p-6">
-            {children}
-          </div>
+          <div className="p-6">{children}</div>
         </main>
       </div>
     </NextIntlClientProvider>

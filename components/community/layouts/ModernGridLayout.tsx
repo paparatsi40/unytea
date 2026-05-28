@@ -123,23 +123,20 @@ export function ModernGridLayout({
               >
                 <div className="rounded-2xl bg-white/80 p-6 shadow-lg backdrop-blur">
                   <Users className="mx-auto mb-2 h-8 w-8" style={{ color: primaryColor }} />
-                  <div className="text-3xl font-bold text-gray-900">
-                    {community._count.members}
-                  </div>
+                  <div className="text-3xl font-bold text-gray-900">{community._count.members}</div>
                   <div className="text-sm text-gray-600">Members</div>
                 </div>
                 <div className="rounded-2xl bg-white/80 p-6 shadow-lg backdrop-blur">
-                  <MessageSquare className="mx-auto mb-2 h-8 w-8" style={{ color: secondaryColor }} />
-                  <div className="text-3xl font-bold text-gray-900">
-                    {community._count.posts}
-                  </div>
+                  <MessageSquare
+                    className="mx-auto mb-2 h-8 w-8"
+                    style={{ color: secondaryColor }}
+                  />
+                  <div className="text-3xl font-bold text-gray-900">{community._count.posts}</div>
                   <div className="text-sm text-gray-600">Posts</div>
                 </div>
                 <div className="rounded-2xl bg-white/80 p-6 shadow-lg backdrop-blur">
                   <BookOpen className="mx-auto mb-2 h-8 w-8" style={{ color: accentColor }} />
-                  <div className="text-3xl font-bold text-gray-900">
-                    {community._count.courses}
-                  </div>
+                  <div className="text-3xl font-bold text-gray-900">{community._count.courses}</div>
                   <div className="text-sm text-gray-600">Courses</div>
                 </div>
               </motion.div>
@@ -189,9 +186,7 @@ export function ModernGridLayout({
                       />
                     )}
                     <div className="flex-1">
-                      <div className="text-sm font-semibold text-gray-900">
-                        {post.author?.name}
-                      </div>
+                      <div className="text-sm font-semibold text-gray-900">{post.author?.name}</div>
                       <div className="text-xs text-gray-500">
                         {new Date(post.createdAt).toLocaleDateString()}
                       </div>
@@ -200,9 +195,7 @@ export function ModernGridLayout({
                   <h3 className="mb-2 text-lg font-bold text-gray-900 group-hover:text-[var(--primary)]">
                     {post.title || "Untitled Post"}
                   </h3>
-                  <p className="line-clamp-3 text-sm text-gray-600">
-                    {post.content}
-                  </p>
+                  <p className="line-clamp-3 text-sm text-gray-600">{post.content}</p>
                   {post._count && (
                     <div className="mt-4 flex items-center gap-4 text-sm text-gray-500">
                       <span className="flex items-center gap-1">
@@ -221,57 +214,53 @@ export function ModernGridLayout({
           ))}
 
           {/* Featured Courses */}
-          {community.showCourses && courses.slice(0, 3).map((course, index) => (
-            <motion.div
-              key={course.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: (posts.length + index) * 0.1 }}
-              className="group overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 p-6 text-white shadow-lg transition-all hover:shadow-2xl"
-            >
-              <Link href={`/dashboard/c/${community.slug}/courses/${course.slug}`}>
-                <BookOpen className="mb-4 h-12 w-12" />
-                <h3 className="mb-2 text-xl font-bold">{course.title}</h3>
-                <p className="mb-4 text-sm opacity-90">
-                  {course.description}
-                </p>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-semibold">
-                    {course.enrollmentCount} enrolled
-                  </span>
-                  {course.isPaid && (
-                    <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-semibold">
-                      ${course.price}
-                    </span>
-                  )}
-                </div>
-              </Link>
-            </motion.div>
-          ))}
+          {community.showCourses &&
+            courses.slice(0, 3).map((course, index) => (
+              <motion.div
+                key={course.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: (posts.length + index) * 0.1 }}
+                className="group overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 p-6 text-white shadow-lg transition-all hover:shadow-2xl"
+              >
+                <Link href={`/dashboard/c/${community.slug}/courses/${course.slug}`}>
+                  <BookOpen className="mb-4 h-12 w-12" />
+                  <h3 className="mb-2 text-xl font-bold">{course.title}</h3>
+                  <p className="mb-4 text-sm opacity-90">{course.description}</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold">{course.enrollmentCount} enrolled</span>
+                    {course.isPaid && (
+                      <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-semibold">
+                        ${course.price}
+                      </span>
+                    )}
+                  </div>
+                </Link>
+              </motion.div>
+            ))}
 
           {/* Member Highlights */}
-          {community.showMembers && members.slice(0, 3).map((member, index) => (
-            <motion.div
-              key={member.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: (posts.length + courses.length + index) * 0.1 }}
-              className="rounded-2xl bg-white p-6 text-center shadow-lg"
-            >
-              {member.user?.image && (
-                <Image
-                  src={member.user.image}
-                  alt={member.user.name || "Member"}
-                  width={80}
-                  height={80}
-                  className="mx-auto mb-4 rounded-full ring-4 ring-purple-100"
-                />
-              )}
-              <h3 className="mb-1 text-lg font-bold text-gray-900">
-                {member.user?.name}
-              </h3>
-            </motion.div>
-          ))}
+          {community.showMembers &&
+            members.slice(0, 3).map((member, index) => (
+              <motion.div
+                key={member.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: (posts.length + courses.length + index) * 0.1 }}
+                className="rounded-2xl bg-white p-6 text-center shadow-lg"
+              >
+                {member.user?.image && (
+                  <Image
+                    src={member.user.image}
+                    alt={member.user.name || "Member"}
+                    width={80}
+                    height={80}
+                    className="mx-auto mb-4 rounded-full ring-4 ring-purple-100"
+                  />
+                )}
+                <h3 className="mb-1 text-lg font-bold text-gray-900">{member.user?.name}</h3>
+              </motion.div>
+            ))}
         </div>
       </div>
 

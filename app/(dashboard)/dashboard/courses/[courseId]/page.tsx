@@ -2,7 +2,16 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { BookOpen, Lock, CheckCircle, CreditCard, Loader2, Users, Clock, ArrowLeft } from "lucide-react";
+import {
+  BookOpen,
+  Lock,
+  CheckCircle,
+  CreditCard,
+  Loader2,
+  Users,
+  Clock,
+  ArrowLeft,
+} from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -136,10 +145,7 @@ export default function CourseDetailPage() {
     );
   }
 
-  const totalLessons = course.modules.reduce(
-    (acc, module) => acc + module.lessons.length,
-    0
-  );
+  const totalLessons = course.modules.reduce((acc, module) => acc + module.lessons.length, 0);
 
   const hasAccess = purchaseStatus?.hasAccess || false;
   const isPaid = course.isPaid && course.price && course.price > 0;
@@ -156,12 +162,12 @@ export default function CourseDetailPage() {
         Back to courses
       </Link>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-6 lg:col-span-2">
           {/* Header */}
           <div>
-            <div className="flex items-center gap-3 mb-4">
+            <div className="mb-4 flex items-center gap-3">
               <Badge variant="secondary">{course.community.name}</Badge>
               {isPaid ? (
                 <Badge className="bg-green-100 text-green-800">Paid Course</Badge>
@@ -179,27 +185,25 @@ export default function CourseDetailPage() {
           {needsPurchase ? (
             <Card className="border-amber-200 bg-amber-50">
               <CardContent className="p-8 text-center">
-                <Lock className="mx-auto h-12 w-12 text-amber-600 mb-4" />
-                <h3 className="text-xl font-semibold text-amber-900 mb-2">
-                  Purchase Required
-                </h3>
-                <p className="text-amber-700 mb-6">
+                <Lock className="mx-auto mb-4 h-12 w-12 text-amber-600" />
+                <h3 className="mb-2 text-xl font-semibold text-amber-900">Purchase Required</h3>
+                <p className="mb-6 text-amber-700">
                   This course requires a one-time purchase to access all content.
                 </p>
                 <Button
                   onClick={handlePurchase}
                   disabled={isPurchasing}
-                  className="bg-[#635BFF] hover:bg-[#4f48cc] text-white"
+                  className="bg-[#635BFF] text-white hover:bg-[#4f48cc]"
                   size="lg"
                 >
                   {isPurchasing ? (
                     <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Processing...
                     </>
                   ) : (
                     <>
-                      <CreditCard className="h-4 w-4 mr-2" />
+                      <CreditCard className="mr-2 h-4 w-4" />
                       Buy Course - ${course.price}
                     </>
                   )}
@@ -224,23 +228,25 @@ export default function CourseDetailPage() {
                         {module.lessons.map((lesson, lessonIndex) => (
                           <li
                             key={lesson.id}
-                            className="flex items-center justify-between p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                            className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100"
                           >
                             <div className="flex items-center gap-3">
-                              <span className="text-sm text-gray-400 font-medium">
+                              <span className="text-sm font-medium text-gray-400">
                                 {lessonIndex + 1}
                               </span>
                               <span className="font-medium">{lesson.title}</span>
                             </div>
                             <div className="flex items-center gap-2">
                               {lesson.duration && (
-                                <span className="text-sm text-gray-500 flex items-center gap-1">
+                                <span className="flex items-center gap-1 text-sm text-gray-500">
                                   <Clock className="h-3 w-3" />
                                   {lesson.duration} min
                                 </span>
                               )}
                               {lesson.isFree && (
-                                <Badge variant="outline" className="text-xs">Free</Badge>
+                                <Badge variant="outline" className="text-xs">
+                                  Free
+                                </Badge>
                               )}
                             </div>
                           </li>
@@ -258,23 +264,23 @@ export default function CourseDetailPage() {
         <div className="space-y-6">
           {/* Course Stats */}
           <Card>
-            <CardContent className="p-6 space-y-4">
+            <CardContent className="space-y-4 p-6">
               <div className="flex items-center justify-between">
-                <span className="text-gray-500 flex items-center gap-2">
+                <span className="flex items-center gap-2 text-gray-500">
                   <Users className="h-4 w-4" />
                   Enrolled
                 </span>
                 <span className="font-semibold">{course.enrollmentCount}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-gray-500 flex items-center gap-2">
+                <span className="flex items-center gap-2 text-gray-500">
                   <BookOpen className="h-4 w-4" />
                   Lessons
                 </span>
                 <span className="font-semibold">{totalLessons}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-gray-500 flex items-center gap-2">
+                <span className="flex items-center gap-2 text-gray-500">
                   <Clock className="h-4 w-4" />
                   Modules
                 </span>
@@ -303,7 +309,7 @@ export default function CourseDetailPage() {
           {/* Community Link */}
           <Card>
             <CardContent className="p-6">
-              <p className="text-sm text-gray-500 mb-3">Offered by</p>
+              <p className="mb-3 text-sm text-gray-500">Offered by</p>
               <Link
                 href={`/dashboard/c/${course.community.slug}`}
                 className="font-semibold text-blue-600 hover:underline"

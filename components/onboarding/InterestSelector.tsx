@@ -17,36 +17,15 @@ const INTEREST_CATEGORIES = [
   },
   {
     label: "Technology",
-    items: [
-      "Web Development",
-      "AI/ML",
-      "Design",
-      "Data Science",
-      "Mobile Dev",
-      "DevOps",
-    ],
+    items: ["Web Development", "AI/ML", "Design", "Data Science", "Mobile Dev", "DevOps"],
   },
   {
     label: "Creative",
-    items: [
-      "Writing",
-      "Photography",
-      "Video Production",
-      "Music",
-      "Graphic Design",
-      "Animation",
-    ],
+    items: ["Writing", "Photography", "Video Production", "Music", "Graphic Design", "Animation"],
   },
   {
     label: "Lifestyle",
-    items: [
-      "Fitness",
-      "Mindfulness",
-      "Cooking",
-      "Travel",
-      "Personal Finance",
-      "Languages",
-    ],
+    items: ["Fitness", "Mindfulness", "Cooking", "Travel", "Personal Finance", "Languages"],
   },
   {
     label: "Education",
@@ -67,11 +46,7 @@ interface InterestSelectorProps {
   maxSelections?: number;
 }
 
-export function InterestSelector({
-  selected,
-  onChange,
-  maxSelections = 8,
-}: InterestSelectorProps) {
+export function InterestSelector({ selected, onChange, maxSelections = 8 }: InterestSelectorProps) {
   const [search, setSearch] = useState("");
 
   const toggleInterest = (interest: string) => {
@@ -85,9 +60,7 @@ export function InterestSelector({
   const filteredCategories = search
     ? INTEREST_CATEGORIES.map((cat) => ({
         ...cat,
-        items: cat.items.filter((i) =>
-          i.toLowerCase().includes(search.toLowerCase())
-        ),
+        items: cat.items.filter((i) => i.toLowerCase().includes(search.toLowerCase())),
       })).filter((cat) => cat.items.length > 0)
     : INTEREST_CATEGORIES;
 
@@ -122,8 +95,8 @@ export function InterestSelector({
                     disabled={!isSelected && selected.length >= maxSelections}
                     className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
                       isSelected
-                        ? "bg-purple-500/20 text-purple-300 border border-purple-500/30"
-                        : "bg-zinc-800 text-zinc-400 border border-zinc-700 hover:border-zinc-600 disabled:opacity-30"
+                        ? "border border-purple-500/30 bg-purple-500/20 text-purple-300"
+                        : "border border-zinc-700 bg-zinc-800 text-zinc-400 hover:border-zinc-600 disabled:opacity-30"
                     }`}
                   >
                     {isSelected && <Check className="h-3 w-3" />}

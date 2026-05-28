@@ -69,9 +69,7 @@ export async function sendPushToUser(
       const statusCode = (error as { statusCode?: number }).statusCode;
       // 410 Gone or 404 Not Found means subscription expired
       if (statusCode === 410 || statusCode === 404) {
-        await prisma.pushSubscription
-          .delete({ where: { id: sub.id } })
-          .catch(() => {});
+        await prisma.pushSubscription.delete({ where: { id: sub.id } }).catch(() => {});
       }
       failed++;
     }
@@ -91,9 +89,7 @@ export async function sendPushToUsers(
   // Process in batches of 50
   for (let i = 0; i < userIds.length; i += 50) {
     const batch = userIds.slice(i, i + 50);
-    const results = await Promise.all(
-      batch.map((uid) => sendPushToUser(uid, payload))
-    );
+    const results = await Promise.all(batch.map((uid) => sendPushToUser(uid, payload)));
     for (const r of results) {
       totalSent += r.sent;
       totalFailed += r.failed;
@@ -126,7 +122,11 @@ export async function sendPushToCommunity(
 
 // ── Notification Templates ───────────────────────────────────────────
 export const pushTemplates = {
-  sessionStarting: (sessionTitle: string, communityName: string, sessionId: string): PushPayload => ({
+  sessionStarting: (
+    sessionTitle: string,
+    communityName: string,
+    sessionId: string
+  ): PushPayload => ({
     title: "Session starting soon!",
     body: `${sessionTitle} in ${communityName} is starting in 10 minutes`,
     url: `/dashboard/sessions/${sessionId}`,

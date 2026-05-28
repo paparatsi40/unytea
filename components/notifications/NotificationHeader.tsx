@@ -1,7 +1,10 @@
 "use client";
 
 import { Bell, CheckCheck, Trash2 } from "lucide-react";
-import { markAllNotificationsAsRead, deleteAllReadNotifications } from "@/app/actions/notifications";
+import {
+  markAllNotificationsAsRead,
+  deleteAllReadNotifications,
+} from "@/app/actions/notifications";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -15,7 +18,7 @@ export function NotificationHeader({ unreadCount }: NotificationHeaderProps) {
   const handleMarkAllAsRead = async () => {
     setIsLoading(true);
     const result = await markAllNotificationsAsRead();
-    
+
     if (result.success) {
       toast.success("All notifications marked as read");
       window.location.reload();
@@ -28,7 +31,7 @@ export function NotificationHeader({ unreadCount }: NotificationHeaderProps) {
   const handleDeleteAllRead = async () => {
     setIsLoading(true);
     const result = await deleteAllReadNotifications();
-    
+
     if (result.success) {
       toast.success("All read notifications deleted");
       window.location.reload();

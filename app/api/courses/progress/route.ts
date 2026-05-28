@@ -13,10 +13,7 @@ export async function GET() {
     const session = await auth();
 
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const userId = session.user.id;
@@ -81,9 +78,6 @@ export async function GET() {
     return NextResponse.json({ courses });
   } catch (error: any) {
     console.error("Error fetching course progress:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch course progress" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch course progress" }, { status: 500 });
   }
 }

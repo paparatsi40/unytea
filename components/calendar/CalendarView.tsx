@@ -73,8 +73,7 @@ export function CalendarView({ sessions, onSessionClick }: CalendarViewProps) {
     if (!selectedDate) return [];
     const key = format(selectedDate, "yyyy-MM-dd");
     return (sessionsByDate.get(key) || []).sort(
-      (a, b) =>
-        new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime()
+      (a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime()
     );
   }, [selectedDate, sessionsByDate]);
 
@@ -83,7 +82,10 @@ export function CalendarView({ sessions, onSessionClick }: CalendarViewProps) {
     const start = new Date(session.scheduledAt);
     const end = new Date(start.getTime() + session.duration * 60 * 1000);
     const formatICSDate = (d: Date) =>
-      d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+      d
+        .toISOString()
+        .replace(/[-:]/g, "")
+        .replace(/\.\d{3}/, "");
 
     const ics = [
       "BEGIN:VCALENDAR",
@@ -113,7 +115,10 @@ export function CalendarView({ sessions, onSessionClick }: CalendarViewProps) {
     const start = new Date(session.scheduledAt);
     const end = new Date(start.getTime() + session.duration * 60 * 1000);
     const fmt = (d: Date) =>
-      d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+      d
+        .toISOString()
+        .replace(/[-:]/g, "")
+        .replace(/\.\d{3}/, "");
     const params = new URLSearchParams({
       action: "TEMPLATE",
       text: session.title,
@@ -129,9 +134,7 @@ export function CalendarView({ sessions, onSessionClick }: CalendarViewProps) {
       <div className="flex-1">
         {/* Month Navigation */}
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-white">
-            {format(currentMonth, "MMMM yyyy")}
-          </h2>
+          <h2 className="text-lg font-semibold text-white">{format(currentMonth, "MMMM yyyy")}</h2>
           <div className="flex items-center gap-1">
             <button
               onClick={() => {
@@ -160,10 +163,7 @@ export function CalendarView({ sessions, onSessionClick }: CalendarViewProps) {
         {/* Day Headers */}
         <div className="mb-2 grid grid-cols-7 gap-1">
           {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-            <div
-              key={day}
-              className="py-2 text-center text-xs font-medium text-zinc-500"
-            >
+            <div key={day} className="py-2 text-center text-xs font-medium text-zinc-500">
               {day}
             </div>
           ))}
@@ -184,21 +184,12 @@ export function CalendarView({ sessions, onSessionClick }: CalendarViewProps) {
                 onClick={() => setSelectedDate(day)}
                 className={cn(
                   "relative flex h-12 flex-col items-center justify-center rounded-lg transition-all",
-                  isCurrentMonth
-                    ? "text-zinc-200"
-                    : "text-zinc-600",
-                  isSelected
-                    ? "bg-purple-600/20 ring-1 ring-purple-500"
-                    : "hover:bg-zinc-800/80",
+                  isCurrentMonth ? "text-zinc-200" : "text-zinc-600",
+                  isSelected ? "bg-purple-600/20 ring-1 ring-purple-500" : "hover:bg-zinc-800/80",
                   isToday(day) && !isSelected && "bg-zinc-800"
                 )}
               >
-                <span
-                  className={cn(
-                    "text-sm",
-                    isToday(day) && "font-bold text-purple-400"
-                  )}
-                >
+                <span className={cn("text-sm", isToday(day) && "font-bold text-purple-400")}>
                   {format(day, "d")}
                 </span>
                 {hasEvents && (
@@ -208,11 +199,7 @@ export function CalendarView({ sessions, onSessionClick }: CalendarViewProps) {
                         key={i}
                         className={cn(
                           "h-1 w-1 rounded-full",
-                          i === 0
-                            ? "bg-purple-400"
-                            : i === 1
-                            ? "bg-blue-400"
-                            : "bg-emerald-400"
+                          i === 0 ? "bg-purple-400" : i === 1 ? "bg-blue-400" : "bg-emerald-400"
                         )}
                       />
                     ))}
@@ -254,29 +241,23 @@ export function CalendarView({ sessions, onSessionClick }: CalendarViewProps) {
                     <span className="text-xs font-medium text-purple-300">
                       {format(new Date(session.scheduledAt), "h:mm a")}
                     </span>
-                    <span className="text-xs text-zinc-600">
-                      {session.duration}min
-                    </span>
+                    <span className="text-xs text-zinc-600">{session.duration}min</span>
                     <span
                       className={cn(
                         "ml-auto rounded-full px-2 py-0.5 text-xs font-medium",
                         session.status === "SCHEDULED"
                           ? "bg-blue-500/10 text-blue-400"
                           : session.status === "IN_PROGRESS"
-                          ? "bg-green-500/10 text-green-400"
-                          : "bg-zinc-700 text-zinc-400"
+                            ? "bg-green-500/10 text-green-400"
+                            : "bg-zinc-700 text-zinc-400"
                       )}
                     >
-                      {session.status === "IN_PROGRESS"
-                        ? "Live"
-                        : session.status.toLowerCase()}
+                      {session.status === "IN_PROGRESS" ? "Live" : session.status.toLowerCase()}
                     </span>
                   </div>
 
                   {/* Title */}
-                  <p className="mb-1 text-sm font-medium text-white">
-                    {session.title}
-                  </p>
+                  <p className="mb-1 text-sm font-medium text-white">{session.title}</p>
 
                   {/* Meta */}
                   <div className="flex items-center gap-3 text-xs text-zinc-500">
@@ -286,9 +267,7 @@ export function CalendarView({ sessions, onSessionClick }: CalendarViewProps) {
                         {session.communityName}
                       </span>
                     )}
-                    {session.hostName && (
-                      <span>by {session.hostName}</span>
-                    )}
+                    {session.hostName && <span>by {session.hostName}</span>}
                   </div>
 
                   {/* Export buttons (visible on hover) */}

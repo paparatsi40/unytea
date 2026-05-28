@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import {
-  sendWelcomeEmail,
-  sendCommunityInviteEmail,
-  sendSessionRecapEmail,
-} from "@/lib/email";
+import { sendWelcomeEmail, sendCommunityInviteEmail, sendSessionRecapEmail } from "@/lib/email";
 
 /**
  * POST /api/email/send
@@ -23,10 +19,7 @@ export async function POST(request: NextRequest) {
     const { type, to, data } = body;
 
     if (!type || !to) {
-      return NextResponse.json(
-        { error: "Missing required fields: type, to" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Missing required fields: type, to" }, { status: 400 });
     }
 
     let result;
@@ -74,25 +67,16 @@ export async function POST(request: NextRequest) {
         break;
 
       default:
-        return NextResponse.json(
-          { error: `Unknown email type: ${type}` },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: `Unknown email type: ${type}` }, { status: 400 });
     }
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error || "Failed to send email" },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: result.error || "Failed to send email" }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, id: result.id });
   } catch (error) {
     console.error("[/api/email/send] Error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

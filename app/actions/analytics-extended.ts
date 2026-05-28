@@ -17,8 +17,7 @@ export async function getSessionAnalytics(communityId?: string) {
     const allIds = ownedCommunities.map((c: { id: string }) => c.id);
     if (allIds.length === 0) return { success: true, data: null };
 
-    const communityIds =
-      communityId && allIds.includes(communityId) ? [communityId] : allIds;
+    const communityIds = communityId && allIds.includes(communityId) ? [communityId] : allIds;
 
     const last30Days = subDays(new Date(), 30);
 
@@ -48,8 +47,7 @@ export async function getSessionAnalytics(communityId?: string) {
       orderBy: { scheduledAt: "asc" },
     });
 
-    const dailyMap: Record<string, { sessions: number; attendees: number }> =
-      {};
+    const dailyMap: Record<string, { sessions: number; attendees: number }> = {};
     for (let i = 0; i < 30; i++) {
       const day = format(subDays(new Date(), 29 - i), "yyyy-MM-dd");
       dailyMap[day] = { sessions: 0, attendees: 0 };
@@ -70,16 +68,12 @@ export async function getSessionAnalytics(communityId?: string) {
     }));
 
     // Average attendance
-    const completedSessions = recentSessions.filter(
-      (s) => s.status === "COMPLETED"
-    );
+    const completedSessions = recentSessions.filter((s) => s.status === "COMPLETED");
     const avgAttendance =
       completedSessions.length > 0
         ? Math.round(
-            completedSessions.reduce(
-              (sum, s) => sum + (s.attendeeCount || 0),
-              0
-            ) / completedSessions.length
+            completedSessions.reduce((sum, s) => sum + (s.attendeeCount || 0), 0) /
+              completedSessions.length
           )
         : 0;
 
@@ -100,9 +94,7 @@ export async function getSessionAnalytics(communityId?: string) {
         scheduled,
         live,
         avgAttendance,
-        avgRating: feedback._avg.rating
-          ? Number(feedback._avg.rating.toFixed(1))
-          : null,
+        avgRating: feedback._avg.rating ? Number(feedback._avg.rating.toFixed(1)) : null,
         totalFeedback: feedback._count,
         dailyChart,
       },
@@ -126,8 +118,7 @@ export async function getCourseAnalytics(communityId?: string) {
     const allIds = ownedCommunities.map((c: { id: string }) => c.id);
     if (allIds.length === 0) return { success: true, data: null };
 
-    const communityIds =
-      communityId && allIds.includes(communityId) ? [communityId] : allIds;
+    const communityIds = communityId && allIds.includes(communityId) ? [communityId] : allIds;
 
     // Course counts
     const courses = await prisma.course.findMany({
@@ -143,29 +134,22 @@ export async function getCourseAnalytics(communityId?: string) {
     });
 
     const totalCourses = courses.length;
-    const totalEnrollments = courses.reduce(
-      (sum, c) => sum + c._count.enrollments,
-      0
-    );
+    const totalEnrollments = courses.reduce((sum, c) => sum + c._count.enrollments, 0);
     const completedEnrollments = courses.reduce(
       (sum, c) =>
-        sum + c.enrollments.filter((e: { completedAt: Date | null }) => e.completedAt !== null).length,
+        sum +
+        c.enrollments.filter((e: { completedAt: Date | null }) => e.completedAt !== null).length,
       0
     );
     const completionRate =
-      totalEnrollments > 0
-        ? Math.round((completedEnrollments / totalEnrollments) * 100)
-        : 0;
+      totalEnrollments > 0 ? Math.round((completedEnrollments / totalEnrollments) * 100) : 0;
     const avgProgress =
       totalEnrollments > 0
         ? Math.round(
             courses.reduce(
               (sum, c) =>
                 sum +
-                c.enrollments.reduce(
-                  (s: number, e: { progress: number }) => s + e.progress,
-                  0
-                ),
+                c.enrollments.reduce((s: number, e: { progress: number }) => s + e.progress, 0),
               0
             ) / totalEnrollments
           )
@@ -180,7 +164,8 @@ export async function getCourseAnalytics(communityId?: string) {
       completionRate:
         c._count.enrollments > 0
           ? Math.round(
-              (c.enrollments.filter((e: { completedAt: Date | null }) => e.completedAt !== null).length /
+              (c.enrollments.filter((e: { completedAt: Date | null }) => e.completedAt !== null)
+                .length /
                 c._count.enrollments) *
                 100
             )
@@ -188,10 +173,8 @@ export async function getCourseAnalytics(communityId?: string) {
       avgProgress:
         c._count.enrollments > 0
           ? Math.round(
-              c.enrollments.reduce(
-                (s: number, e: { progress: number }) => s + e.progress,
-                0
-              ) / c._count.enrollments
+              c.enrollments.reduce((s: number, e: { progress: number }) => s + e.progress, 0) /
+                c._count.enrollments
             )
           : 0,
     }));
@@ -218,13 +201,11 @@ export async function getCourseAnalytics(communityId?: string) {
         enrollmentDailyMap[day]++;
       }
     }
-    const enrollmentChart = Object.entries(enrollmentDailyMap).map(
-      ([date, count]) => ({
-        date,
-        label: format(new Date(date), "MMM d"),
-        enrollments: count,
-      })
-    );
+    const enrollmentChart = Object.entries(enrollmentDailyMap).map(([date, count]) => ({
+      date,
+      label: format(new Date(date), "MMM d"),
+      enrollments: count,
+    }));
 
     // Certificate count
     const certificateCount = await prisma.certificate.count({
@@ -267,8 +248,7 @@ export async function getRevenueAnalytics(communityId?: string) {
     const allIds = ownedCommunities.map((c: { id: string }) => c.id);
     if (allIds.length === 0) return { success: true, data: null };
 
-    const communityIds =
-      communityId && allIds.includes(communityId) ? [communityId] : allIds;
+    const communityIds = communityId && allIds.includes(communityId) ? [communityId] : allIds;
 
     // Paid course enrollments as revenue proxy
     const paidCourses = await prisma.course.findMany({

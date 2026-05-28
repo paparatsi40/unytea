@@ -80,7 +80,7 @@ Cada community auto-crea 4 canales:
 
 ```
 💬 General - General discussions
-📢 Announcements - Important updates  
+📢 Announcements - Important updates
 ❓ Questions - Ask anything
 🎲 Random - Off-topic chat
 ```
@@ -162,14 +162,14 @@ Lv10+:  🥇 Gold
 
 ## 🎯 **VENTAJA COMPETITIVA:**
 
-| Feature | Skool | Discord | Mentorly |
-|---------|-------|---------|----------|
-| **Live Chat** | ❌ | ✅ | ✅ |
-| **Posts Feed** | ✅ | ❌ | ✅ |
-| **Typing Indicators** | ❌ | ✅ | ✅ |
-| **Level System** | ✅ | ❌ | ✅ |
-| **Presence** | ❌ | ✅ | ✅ |
-| **Course Integration** | ✅ | ❌ | 🔜 |
+| Feature                | Skool | Discord | Mentorly |
+| ---------------------- | ----- | ------- | -------- |
+| **Live Chat**          | ❌    | ✅      | ✅       |
+| **Posts Feed**         | ✅    | ❌      | ✅       |
+| **Typing Indicators**  | ❌    | ✅      | ✅       |
+| **Level System**       | ✅    | ❌      | ✅       |
+| **Presence**           | ❌    | ✅      | ✅       |
+| **Course Integration** | ✅    | ❌      | 🔜       |
 
 **Mentorly = Skool + Discord** 🔥
 
@@ -186,7 +186,7 @@ import { getOrCreateDefaultChannels } from "@/app/actions/channels";
 const channels = await getOrCreateDefaultChannels(communityId);
 
 // Client component
-<ChatContainer 
+<ChatContainer
   channels={channels}
   activeChannelId={channels[0].id}
   communitySlug={slug}

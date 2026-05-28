@@ -38,7 +38,7 @@ export function ReactionsBar() {
         <button
           key={reaction.label}
           onClick={() => sendReaction(reaction.emoji, reaction.label)}
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-100 text-lg transition-all hover:bg-zinc-200 hover:scale-110"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-100 text-lg transition-all hover:scale-110 hover:bg-zinc-200"
           title={reaction.label}
         >
           <span className="sr-only">{reaction.label}</span>

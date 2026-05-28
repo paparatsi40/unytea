@@ -88,7 +88,7 @@ Luego navegar a: `/dashboard/c/[slug]/settings/landing` → Tab "Visual Builder 
 - ✅ Los usuarios pueden crear landing pages personalizadas
 - ✅ Código más simple y mantenible
 
-**Prioridad:**  **COMPLETADO** ✅
+**Prioridad:** **COMPLETADO** ✅
 
 ---
 
@@ -186,57 +186,57 @@ Luego navegar a: `/dashboard/c/[slug]/settings/landing` → Tab "Visual Builder 
 
 - ✅ **Dual column layout** (Form + Preview)
 - ✅ **Owner Bio section:**
-    - Bio textarea editable
-    - Owner Title input (ej: "Founder & Lead Instructor")
-    - Social Links manager (agregar/eliminar múltiples links)
+  - Bio textarea editable
+  - Owner Title input (ej: "Founder & Lead Instructor")
+  - Social Links manager (agregar/eliminar múltiples links)
 - ✅ **Custom Images Gallery:**
-    - Agregar hasta 4 imágenes
-    - Dual mode: Upload desde PC o Paste URL
-    - Preview automático
-    - Título y descripción por imagen
-    - Hover to delete
+  - Agregar hasta 4 imágenes
+  - Dual mode: Upload desde PC o Paste URL
+  - Preview automático
+  - Título y descripción por imagen
+  - Hover to delete
 - ✅ **Welcome Message** textarea
 - ✅ **Preview en tiempo real** (columna derecha)
-    - Actualiza mientras escribes
-    - Muestra avatar del owner
-    - Bio formateada con saltos de línea
-    - Links sociales clickeables
-    - Galería 2x2 con hover effects
-    - Empty states cuando no hay contenido
+  - Actualiza mientras escribes
+  - Muestra avatar del owner
+  - Bio formateada con saltos de línea
+  - Links sociales clickeables
+  - Galería 2x2 con hover effects
+  - Empty states cuando no hay contenido
 - ✅ **ImageUploader component:**
-    - Upload desde PC con UploadThing
-    - Paste URL alternativo
-    - Loading spinner durante upload
-    - Preview de imagen
-    - Error handling con placeholder
-    - Max 4MB por imagen
+  - Upload desde PC con UploadThing
+  - Paste URL alternativo
+  - Loading spinner durante upload
+  - Preview de imagen
+  - Error handling con placeholder
+  - Max 4MB por imagen
 
 #### **B. Visual Builder** ✅ (100% - FUNCIONAL)
 
 - ✅ **Tabs para cambiar modo** (Simple Editor / Visual Builder)
 - ✅ **3 panel layout:**
-    - Panel izquierdo: Elements palette
-    - Canvas central: Área de diseño (1000x1400px)
-    - Panel derecho: Properties panel
+  - Panel izquierdo: Elements palette
+  - Canvas central: Área de diseño (1000x1400px)
+  - Panel derecho: Properties panel
 - ✅ **Drag & drop nativo HTML5:**
-    - Drag elementos desde sidebar
-    - Drop en canvas con posición exacta
-    - Drag dentro del canvas para mover
-    - Límites del canvas (no se sale)
+  - Drag elementos desde sidebar
+  - Drop en canvas con posición exacta
+  - Drag dentro del canvas para mover
+  - Límites del canvas (no se sale)
 - ✅ **5 tipos de elementos:**
-    - Owner Bio (avatar + bio + title)
-    - Image (placeholder + upload)
-    - Text Block (editable)
-    - CTA Button (customizable)
-    - Stats (métricas)
+  - Owner Bio (avatar + bio + title)
+  - Image (placeholder + upload)
+  - Text Block (editable)
+  - CTA Button (customizable)
+  - Stats (métricas)
 - ✅ **Resize functionality:**
-    - 6 handles: 4 esquinas + 2 bordes
-    - Mínimo 50px de ancho/alto
-    - Cursores correctos (se-resize, ne-resize, etc.)
+  - 6 handles: 4 esquinas + 2 bordes
+  - Mínimo 50px de ancho/alto
+  - Cursores correctos (se-resize, ne-resize, etc.)
 - ✅ **Selection system:**
-    - Ring azul alrededor del elemento seleccionado
-    - Click para seleccionar
-    - Click en canvas para deseleccionar
+  - Ring azul alrededor del elemento seleccionado
+  - Click para seleccionar
+  - Click en canvas para deseleccionar
 - ✅ **Layers panel** mostrando todos los elementos
 - ✅ **Properties Panel funcional** (edición en tiempo real)
 - ✅ **Elementos editables** (texto, imagen, botón)
@@ -262,11 +262,11 @@ Luego navegar a: `/dashboard/c/[slug]/settings/landing` → Tab "Visual Builder 
 **Completado:**
 
 - ✅ **5 Layouts profesionales:**
-    1. **Modern Grid** - Pinterest-style con masonry
-    2. **Classic Forum** - Reddit-style con threads
-    3. **Academy** - Cursos-focused con sidebar
-    4. **Dashboard** - Analytics-visible con stats
-    5. **Minimalist** - Notion-style limpio
+  1. **Modern Grid** - Pinterest-style con masonry
+  2. **Classic Forum** - Reddit-style con threads
+  3. **Academy** - Cursos-focused con sidebar
+  4. **Dashboard** - Analytics-visible con stats
+  5. **Minimalist** - Notion-style limpio
 - ✅ Selector de layout en settings/appearance
 - ✅ Preview thumbnail de cada layout
 - ✅ Apply layout con reload
@@ -283,21 +283,21 @@ Luego navegar a: `/dashboard/c/[slug]/settings/landing` → Tab "Visual Builder 
 **Completado:**
 
 - ✅ **Theme colors:**
-    - Primary color picker
-    - Secondary color picker
-    - Accent color picker
-    - 6 color presets (Ocean, Forest, Sunset, etc.)
+  - Primary color picker
+  - Secondary color picker
+  - Accent color picker
+  - 6 color presets (Ocean, Forest, Sunset, etc.)
 - ✅ **Typography:**
-    - Font selector (Inter, Roboto, Playfair, Montserrat, Poppins)
-    - Font size controls
+  - Font selector (Inter, Roboto, Playfair, Montserrat, Poppins)
+  - Font size controls
 - ✅ **Hero section:**
-    - Title editable
-    - Subtitle editable
-    - CTA button text
+  - Title editable
+  - Subtitle editable
+  - CTA button text
 - ✅ **Logo & Cover:**
-    - Logo upload (UploadThing CDN)
-    - Cover image upload
-    - Preview en tiempo real
+  - Logo upload (UploadThing CDN)
+  - Cover image upload
+  - Preview en tiempo real
 - ✅ **Custom CSS** textarea (opcional)
 - ✅ **Save & Preview** buttons
 
@@ -629,6 +629,7 @@ Luego navegar a: `/dashboard/c/[slug]/settings/landing` → Tab "Visual Builder 
 ### **9. SEO Y MARKETING** 🔍
 
 **Pendiente:**
+
 - [ ] Meta tags dinámicos
 - [ ] OG images personalizados por comunidad
 - [ ] Sitemap.xml
@@ -682,20 +683,20 @@ Luego navegar a: `/dashboard/c/[slug]/settings/landing` → Tab "Visual Builder 
 ## 📊 **PROGRESO POR MÓDULOS**
 
 | Módulo          | Completado | En Progreso | Pendiente | Estado |
-|-----------------|------------|-------------|-----------|--------|
-| Auth & Users    | 100%       | 0%          | 0%        | ✅      |
-| Communities     | 95%        | 5%          | 0%        | ✅      |
-| Carrusel 3D     | 100%       | 0%          | 0%        | ✅      |
-| Landing Pages   | 90%        | 0%          | 10%       | ✅      |
-| Visual Builder  | 100%       | 0%          | 0%        | ✅      |
-| Simple Editor   | 100%       | 0%          | 0%        | ✅      |
-| Layouts         | 100%       | 0%          | 0%        | ✅      |
-| Posts & Content | 100%       | 0%          | 0%        | ✅      |
-| Courses         | 90%        | 0%          | 10%       | ✅      |
+| --------------- | ---------- | ----------- | --------- | ------ |
+| Auth & Users    | 100%       | 0%          | 0%        | ✅     |
+| Communities     | 95%        | 5%          | 0%        | ✅     |
+| Carrusel 3D     | 100%       | 0%          | 0%        | ✅     |
+| Landing Pages   | 90%        | 0%          | 10%       | ✅     |
+| Visual Builder  | 100%       | 0%          | 0%        | ✅     |
+| Simple Editor   | 100%       | 0%          | 0%        | ✅     |
+| Layouts         | 100%       | 0%          | 0%        | ✅     |
+| Posts & Content | 100%       | 0%          | 0%        | ✅     |
+| Courses         | 90%        | 0%          | 10%       | ✅     |
 | Messaging       | 80%        | 0%          | 20%       | 🟡     |
-| Mentoring       | 90%        | 0%          | 10%       | ✅      |
-| Gamification    | 100%       | 0%          | 0%        | ✅      |
-| Buddy System    | 100%       | 0%          | 0%        | ✅      |
+| Mentoring       | 90%        | 0%          | 10%       | ✅     |
+| Gamification    | 100%       | 0%          | 0%        | ✅     |
+| Buddy System    | 100%       | 0%          | 0%        | ✅     |
 | Video Calls     | 0%         | 0%          | 100%      | 🔴     |
 | AI Assistant    | 0%         | 0%          | 100%      | 🔴     |
 | Real-time Chat  | 0%         | 0%          | 100%      | 🔴     |
@@ -823,19 +824,19 @@ web/
 
 ## 🏆 **VENTAJAS COMPETITIVAS vs SKOOL**
 
-| Feature                  | Skool     | Unytea                           | Estado |
-|--------------------------|-----------|----------------------------------|--------|
-| Comunidades              | ✅ Básico  | ✅ Avanzado                       | ✅      |
-| Carrusel 3D              | ❌         | ✅ 6 categorías animadas          | ✅      |
-| Page Builder             | ❌         | ✅ Simple Editor + Visual Builder | ✅      |
-| 5 Layouts                | ❌         | ✅ Customizable                   | ✅      |
-| Owner Bio Personalizable | ❌         | ✅ Bio + Links + Images           | ✅      |
-| Buddy System             | ❌         | ✅ Matching inteligente           | ✅      |
-| Achievements             | ✅ Básico  | ✅ 26 achievements                | ✅      |
-| Video Calls              | ✅ Zoom    | 🔴 LiveKit (pendiente)           | 🔴     |
-| AI Assistant             | ❌         | 🔴 OpenAI (pendiente)            | 🔴     |
-| Real-time Chat           | ✅         | 🔴 WebSockets (pendiente)        | 🔴     |
-| Theme Customization      | ❌ Limited | ✅ Completo                       | ✅      |
+| Feature                  | Skool      | Unytea                            | Estado |
+| ------------------------ | ---------- | --------------------------------- | ------ |
+| Comunidades              | ✅ Básico  | ✅ Avanzado                       | ✅     |
+| Carrusel 3D              | ❌         | ✅ 6 categorías animadas          | ✅     |
+| Page Builder             | ❌         | ✅ Simple Editor + Visual Builder | ✅     |
+| 5 Layouts                | ❌         | ✅ Customizable                   | ✅     |
+| Owner Bio Personalizable | ❌         | ✅ Bio + Links + Images           | ✅     |
+| Buddy System             | ❌         | ✅ Matching inteligente           | ✅     |
+| Achievements             | ✅ Básico  | ✅ 26 achievements                | ✅     |
+| Video Calls              | ✅ Zoom    | 🔴 LiveKit (pendiente)            | 🔴     |
+| AI Assistant             | ❌         | 🔴 OpenAI (pendiente)             | 🔴     |
+| Real-time Chat           | ✅         | 🔴 WebSockets (pendiente)         | 🔴     |
+| Theme Customization      | ❌ Limited | ✅ Completo                       | ✅     |
 
 **UNYTEA TIENE:**
 
@@ -849,7 +850,7 @@ web/
 ### **Servicios Externos:**
 
 | Servicio      | Plan      | Costo | Incluye                            |
-|---------------|-----------|-------|------------------------------------|
+| ------------- | --------- | ----- | ---------------------------------- |
 | Vercel        | Hobby     | $0    | Hosting (límites: 100GB bandwidth) |
 | Vercel        | Pro       | $20   | Si necesitas más                   |
 | Supabase/Neon | Free      | $0    | PostgreSQL (500MB, 1GB egress)     |
@@ -872,61 +873,61 @@ web/
 **Prioridad CRÍTICA:**
 
 1. 📝 **INTEGRAR LANDING PAGE PERSONALIZADA** (2-3 horas)
-    - Mostrar owner bio en `/c/[slug]`
-    - Renderizar custom images
-    - Welcome message visible
-    - Social links
+   - Mostrar owner bio en `/c/[slug]`
+   - Renderizar custom images
+   - Welcome message visible
+   - Social links
 
 2. 🎨 **POLISH UI** (2 horas)
-    - Arreglar preview en Simple Editor
-    - Loading states consistentes
-    - Error states elegantes
+   - Arreglar preview en Simple Editor
+   - Loading states consistentes
+   - Error states elegantes
 
 ---
 
 ### **SPRINT 2 (3-5 días)**
 
 1. 🎥 **VIDEO CALLS - LiveKit** (6-8 horas)
-    - SDK integration
-    - 1-on-1 calls
-    - Group calls básicos
-    - Screen sharing
+   - SDK integration
+   - 1-on-1 calls
+   - Group calls básicos
+   - Screen sharing
 
 2. 📧 **EMAIL NOTIFICATIONS** (4-5 horas)
-    - Templates HTML
-    - Transactional emails
-    - Welcome email
-    - Weekly digest
+   - Templates HTML
+   - Transactional emails
+   - Welcome email
+   - Weekly digest
 
 3. 💬 **REAL-TIME CHAT** (5-6 horas)
-    - Socket.io setup
-    - Real-time messaging
-    - Typing indicators
-    - Online status
+   - Socket.io setup
+   - Real-time messaging
+   - Typing indicators
+   - Online status
 
 ---
 
 ### **SPRINT 3 (1 semana)**
 
 1. 🤖 **AI ASSISTANT** (4-5 horas)
-    - OpenAI integration
-    - Chat widget
-    - Context-aware responses
+   - OpenAI integration
+   - Chat widget
+   - Context-aware responses
 
 2. 📱 **MOBILE OPTIMIZATION** (6-8 horas)
-    - Responsive fixes
-    - Touch gestures
-    - Mobile navigation
+   - Responsive fixes
+   - Touch gestures
+   - Mobile navigation
 
 3. 🔍 **SEO & MARKETING** (3-4 horas)
-    - Meta tags
-    - OG images
-    - Sitemap
+   - Meta tags
+   - OG images
+   - Sitemap
 
 4. 🧪 **TESTING** (10-15 horas)
-    - Unit tests
-    - E2E tests
-    - Manual QA
+   - Unit tests
+   - E2E tests
+   - Manual QA
 
 ---
 
@@ -1082,4 +1083,3 @@ Tu plataforma está **90% completa** con:
 **Acción inmediata recomendada:** Integrar landing page personalizada y seguir con el roadmap.
 
 🚀 **¡Estás muy cerca del lanzamiento!**
-

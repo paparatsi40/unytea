@@ -9,11 +9,9 @@ const META = {
   description: "Insights and tactical guides for creators and community operators.",
 };
 
-export async function generateMetadata(
-  props: {
-    params: Promise<{ locale: string }>;
-  }
-): Promise<Metadata> {
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
   const params = await props.params;
   return {
     title: META.title,
@@ -41,7 +39,7 @@ export default async function BlogPage(props: { params: Promise<{ locale: string
     <main className="min-h-screen bg-background">
       <section className="border-b bg-muted/20">
         <div className="container mx-auto px-4 py-12">
-          <p className="text-sm text-muted-foreground mb-2">Resources</p>
+          <p className="mb-2 text-sm text-muted-foreground">Resources</p>
           <h1 className="text-4xl font-bold tracking-tight">Blog</h1>
           <p className="mt-3 max-w-3xl text-muted-foreground">
             Insights and tactical guides for creators and community operators.
@@ -66,11 +64,11 @@ export default async function BlogPage(props: { params: Promise<{ locale: string
               </Link>
 
               <div className="p-6">
-                <p className="text-xs text-muted-foreground mb-2">
+                <p className="mb-2 text-xs text-muted-foreground">
                   {post.date} · {post.readTime} · {post.author}
                 </p>
-                <h2 className="text-xl font-semibold mb-2">{post.title}</h2>
-                <p className="text-muted-foreground mb-4">{post.excerpt}</p>
+                <h2 className="mb-2 text-xl font-semibold">{post.title}</h2>
+                <p className="mb-4 text-muted-foreground">{post.excerpt}</p>
                 <Link
                   href={`/${locale}/blog/${post.slug}`}
                   className="text-sm font-medium text-primary hover:underline"

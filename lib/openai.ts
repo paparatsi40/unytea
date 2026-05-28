@@ -87,9 +87,7 @@ export interface ChatCompletionOptions {
 /**
  * Generate a chat completion using OpenAI
  */
-export async function generateChatCompletion(
-  options: ChatCompletionOptions
-): Promise<string> {
+export async function generateChatCompletion(options: ChatCompletionOptions): Promise<string> {
   try {
     const response = await openai.chat.completions.create({
       model: options.model || AI_CONFIG.model,
@@ -118,7 +116,7 @@ export async function moderateContent(content: string): Promise<{
     });
 
     const result = response.results[0];
-    
+
     const flaggedCategories = Object.entries(result.categories)
       .filter(([_, flagged]) => flagged)
       .map(([category]) => category);

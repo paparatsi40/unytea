@@ -2,16 +2,16 @@
 
 import { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
-import { 
-  MessageSquare, 
-  Heart, 
-  AtSign, 
-  FileText, 
-  Users, 
+import {
+  MessageSquare,
+  Heart,
+  AtSign,
+  FileText,
+  Users,
   Calendar,
   Sparkles,
   Info,
-  X
+  X,
 } from "lucide-react";
 import { markNotificationAsRead, deleteNotification } from "@/app/actions/notifications";
 import { toast } from "sonner";
@@ -108,7 +108,7 @@ export function NotificationItem({ notification, onUpdate }: NotificationItemPro
       {/* Avatar or Icon */}
       <div className="flex-shrink-0 pl-4">
         {notification.sender?.image ? (
-          <div className="h-10 w-10 rounded-full bg-white/5 flex items-center justify-center">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/5">
             <Image
               src={notification.sender.image}
               alt={notification.sender.name || "Notification sender"}
@@ -146,7 +146,14 @@ export function NotificationItem({ notification, onUpdate }: NotificationItemPro
             className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-50"
             title="Mark as read"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </button>

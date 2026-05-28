@@ -11,7 +11,7 @@ import { sendPushToUser, pushTemplates } from "@/lib/push";
 
 /**
  * Session Jobs - Background tasks for recurring sessions
- * 
+ *
  * These functions should be called by a cron job or scheduler.
  * In Vercel, you can use Vercel Cron Jobs or a external scheduler like Upstash QStash.
  */
@@ -115,7 +115,7 @@ export async function autoPostUpcomingSessions() {
 /**
  * Job: Ensure future sessions exist for active series
  * Should run daily
- * 
+ *
  * For each active series, check if we have enough future sessions.
  * If not, generate more instances.
  */
@@ -133,10 +133,7 @@ export async function ensureFutureSessions() {
     const activeSeries = await prisma.sessionSeries.findMany({
       where: {
         isActive: true,
-        OR: [
-          { endsAt: null },
-          { endsAt: { gt: now } },
-        ],
+        OR: [{ endsAt: null }, { endsAt: { gt: now } }],
       },
       include: {
         instances: {
@@ -238,7 +235,7 @@ export async function ensureFutureSessions() {
 /**
  * Job: Send session reminders
  * Should run every hour
- * 
+ *
  * Sends reminders at:
  * - 1 hour before
  * - 10 minutes before
@@ -424,7 +421,7 @@ export async function runSessionJobs() {
 /**
  * Generate Session Recap - Auto-create feed post after session ends
  * This converts a live session into a permanent community asset
- * 
+ *
  * Features:
  * - Creates feed post with session recording
  * - Includes key takeaways from notes
@@ -475,10 +472,16 @@ export async function generateSessionRecap(sessionId: string) {
 
     let keyTakeaways = "";
     if (parsedInsights.length > 0) {
-      keyTakeaways = parsedInsights.slice(0, 5).map((item) => `• ${item}`).join("\n");
+      keyTakeaways = parsedInsights
+        .slice(0, 5)
+        .map((item) => `• ${item}`)
+        .join("\n");
     } else if (session.notes?.content) {
       const lines = session.notes.content.split("\n").filter((l: string) => l.trim());
-      keyTakeaways = lines.slice(0, 5).map((l: string) => `• ${l}`).join("\n");
+      keyTakeaways = lines
+        .slice(0, 5)
+        .map((l: string) => `• ${l}`)
+        .join("\n");
     }
 
     const chaptersBlock = parsedChapters.length
@@ -545,7 +548,7 @@ Share your thoughts below or ask follow-up questions.
 
 /**
  * End Session - Complete session lifecycle
- * 
+ *
  * 1. Mark session as completed
  * 2. Stop recording
  * 3. Generate session recap post

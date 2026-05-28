@@ -22,9 +22,27 @@ export async function getOrCreateDefaultChannels(communityId: string) {
 
     // Create default channels
     const defaultChannels = [
-      { name: "General", slug: "general", emoji: "💬", position: 0, description: "General discussions" },
-      { name: "Announcements", slug: "announcements", emoji: "📢", position: 1, description: "Important updates" },
-      { name: "Questions", slug: "questions", emoji: "❓", position: 2, description: "Ask anything" },
+      {
+        name: "General",
+        slug: "general",
+        emoji: "💬",
+        position: 0,
+        description: "General discussions",
+      },
+      {
+        name: "Announcements",
+        slug: "announcements",
+        emoji: "📢",
+        position: 1,
+        description: "Important updates",
+      },
+      {
+        name: "Questions",
+        slug: "questions",
+        emoji: "❓",
+        position: 2,
+        description: "Ask anything",
+      },
       { name: "Random", slug: "random", emoji: "🎲", position: 3, description: "Off-topic chat" },
     ];
 
@@ -76,7 +94,11 @@ export async function getChannelMessages(channelId: string, limit = 50) {
 /**
  * Send a message to a channel
  */
-export async function sendChannelMessage(channelId: string, content: string, attachments?: unknown) {
+export async function sendChannelMessage(
+  channelId: string,
+  content: string,
+  attachments?: unknown
+) {
   try {
     const userId = await getCurrentUserId();
 
@@ -245,7 +267,7 @@ export async function getChannelOnlineMembers(channelId: string) {
   try {
     // Consider online if seen in last 10 seconds
     const onlineThreshold = new Date(Date.now() - 10000);
-    
+
     const members = await prisma.channelMember.findMany({
       where: {
         channelId,
@@ -294,7 +316,7 @@ export async function getTypingUsers(channelId: string) {
       },
     });
 
-    return { success: true, users: typingMembers.map(m => m.user) };
+    return { success: true, users: typingMembers.map((m) => m.user) };
   } catch (error) {
     console.error("Error getting typing users:", error);
     return { success: false, error: "Failed to get typing users", users: [] };

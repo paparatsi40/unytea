@@ -142,45 +142,45 @@ Estos archivos AÚN tienen código de Clerk PERO no causan problemas porque:
 
 ```typescript
 // BUSCA ESTO:
-import { useUser } from "@clerk/nextjs"
-const { user } = useUser()
+import { useUser } from "@clerk/nextjs";
+const { user } = useUser();
 
 // REEMPLAZA CON:
-import { useCurrentUser } from "@/hooks/use-current-user"
-const { user } = useCurrentUser()
+import { useCurrentUser } from "@/hooks/use-current-user";
+const { user } = useCurrentUser();
 ```
 
 #### Campos de Usuario:
 
 ```typescript
 // VIEJO (Clerk):
-user?.id // Clerk ID
-user?.firstName
-user?.lastName
-user?.imageUrl
-user?.emailAddresses[0].emailAddress
+user?.id; // Clerk ID
+user?.firstName;
+user?.lastName;
+user?.imageUrl;
+user?.emailAddresses[0].emailAddress;
 
 // NUEVO (NextAuth):
-user?.id // Database ID
-user?.name
-user?.image
-user?.email
+user?.id; // Database ID
+user?.name;
+user?.image;
+user?.email;
 ```
 
 #### En Server Components:
 
 ```typescript
 // BUSCA ESTO:
-import { auth } from "@clerk/nextjs/server"
-const { userId } = await auth()
+import { auth } from "@clerk/nextjs/server";
+const { userId } = await auth();
 
 const user = await prisma.user.findUnique({
-  where: { clerkId: userId }
-})
+  where: { clerkId: userId },
+});
 
 // REEMPLAZA CON:
-import { getCurrentUserId } from "@/lib/auth-utils"
-const userId = await getCurrentUserId()
+import { getCurrentUserId } from "@/lib/auth-utils";
+const userId = await getCurrentUserId();
 
 // userId ya ES el ID de la base de datos, no necesitas lookup
 ```
@@ -229,9 +229,9 @@ AHORRO TOTAL: $600/año + sin límites de usuarios
 
 1. **Usa la app normalmente**
 2. **Si encuentras un error de Clerk:**
-    - Abre el archivo que da error
-    - Aplica el pattern de arriba (buscar/reemplazar)
-    - Guarda y recarga
+   - Abre el archivo que da error
+   - Aplica el pattern de arriba (buscar/reemplazar)
+   - Guarda y recarga
 3. **Continúa con tus features**
 
 ### Opción B: Actualizar Todo Ahora (2-3 horas más)
@@ -382,18 +382,18 @@ npm run db:generate
 
 ## 🔥 COMPARACIÓN FINAL
 
-| Aspecto | Antes (Clerk) | Después (NextAuth) |
-|---------|---------------|-------------------|
-| **Costo** | $50/mes | $0/mes |
-| **Límite usuarios** | 10K (luego pagar más) | Ilimitados |
-| **UI Control** | ❌ Limitado | ✅ 100% |
-| **Sign In/Up** | Componentes Clerk | ✅ Premium custom |
-| **Avatar** | UserButton | ✅ Custom dropdown |
-| **Server Components** | ⚠️ Problemas | ✅ Nativo |
-| **Type Safety** | ⚠️ Parcial | ✅ 100% |
-| **Vendor Lock-in** | ❌ Sí | ✅ No |
-| **Performance** | ⚠️ Bueno | ✅ Mejor (JWT) |
-| **Debugging** | ⚠️ Difícil | ✅ Fácil |
+| Aspecto               | Antes (Clerk)         | Después (NextAuth) |
+| --------------------- | --------------------- | ------------------ |
+| **Costo**             | $50/mes               | $0/mes             |
+| **Límite usuarios**   | 10K (luego pagar más) | Ilimitados         |
+| **UI Control**        | ❌ Limitado           | ✅ 100%            |
+| **Sign In/Up**        | Componentes Clerk     | ✅ Premium custom  |
+| **Avatar**            | UserButton            | ✅ Custom dropdown |
+| **Server Components** | ⚠️ Problemas          | ✅ Nativo          |
+| **Type Safety**       | ⚠️ Parcial            | ✅ 100%            |
+| **Vendor Lock-in**    | ❌ Sí                 | ✅ No              |
+| **Performance**       | ⚠️ Bueno              | ✅ Mejor (JWT)     |
+| **Debugging**         | ⚠️ Difícil            | ✅ Fácil           |
 
 ---
 
@@ -469,14 +469,14 @@ Esto es **arquitectura enterprise-grade** que puede escalar a millones de usuari
 
 ```typescript
 // Viejo
-const { user } = useUser()
-user?.firstName
-user?.imageUrl
+const { user } = useUser();
+user?.firstName;
+user?.imageUrl;
 
 // Nuevo
-const { user } = useCurrentUser()
-user?.name
-user?.image
+const { user } = useCurrentUser();
+user?.name;
+user?.image;
 ```
 
 ---
@@ -495,9 +495,9 @@ user?.image
 
 ---
 
-*Migración completada con éxito el 3 de Diciembre, 2024*  
-*Sin atajos. Sin parches. Calidad premium.*  
-*Preparado para producción.*
+_Migración completada con éxito el 3 de Diciembre, 2024_  
+_Sin atajos. Sin parches. Calidad premium._  
+_Preparado para producción._
 
 ---
 

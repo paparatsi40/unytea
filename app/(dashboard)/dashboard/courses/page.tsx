@@ -23,12 +23,8 @@ export default async function CoursesPage() {
       <div className="flex min-h-[600px] items-center justify-center">
         <div className="text-center">
           <BookOpen className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
-          <h2 className="mb-2 text-xl font-semibold text-foreground">
-            Failed to load courses
-          </h2>
-          <p className="text-muted-foreground">
-            {result.error || "An error occurred"}
-          </p>
+          <h2 className="mb-2 text-xl font-semibold text-foreground">Failed to load courses</h2>
+          <p className="text-muted-foreground">{result.error || "An error occurred"}</p>
         </div>
       </div>
     );
@@ -50,9 +46,7 @@ export default async function CoursesPage() {
             </div>
             <div>
               <h1 className="text-3xl font-bold text-foreground">Courses</h1>
-              <p className="text-muted-foreground">
-                Learn and grow with structured content
-              </p>
+              <p className="text-muted-foreground">Learn and grow with structured content</p>
             </div>
           </div>
         </div>
@@ -135,11 +129,7 @@ export default async function CoursesPage() {
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {notStarted.map((enrollment) => (
-              <CourseCard
-                key={enrollment.id}
-                course={enrollment.course}
-                progress={0}
-              />
+              <CourseCard key={enrollment.id} course={enrollment.course} progress={0} />
             ))}
           </div>
         </div>
@@ -155,12 +145,7 @@ export default async function CoursesPage() {
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {completed.map((enrollment) => (
-              <CourseCard
-                key={enrollment.id}
-                course={enrollment.course}
-                progress={100}
-                completed
-              />
+              <CourseCard key={enrollment.id} course={enrollment.course} progress={100} completed />
             ))}
           </div>
         </div>
@@ -170,9 +155,7 @@ export default async function CoursesPage() {
       {enrollments.length === 0 && (
         <div className="rounded-xl border border-border/50 bg-card/50 p-12 text-center">
           <GraduationCap className="mx-auto mb-4 h-16 w-16 text-muted-foreground" />
-          <h3 className="mb-2 text-xl font-semibold text-foreground">
-            No courses yet
-          </h3>
+          <h3 className="mb-2 text-xl font-semibold text-foreground">No courses yet</h3>
           <p className="mb-6 text-muted-foreground">
             Browse available courses and start learning today
           </p>

@@ -8,11 +8,7 @@ export type ReactionType = "LIKE" | "LOVE" | "CELEBRATE" | "FIRE" | "IDEA" | "CL
 /**
  * Toggle reaction on a post
  */
-export async function toggleReaction(
-  userId: string,
-  postId: string,
-  reactionType: ReactionType
-) {
+export async function toggleReaction(userId: string, postId: string, reactionType: ReactionType) {
   try {
     // Check if reaction already exists
     const existingReaction = await prisma.reaction.findFirst({
@@ -69,25 +65,35 @@ export async function getPostReactions(postId: string, currentUserId?: string) {
     });
 
     // Group by type
-    const grouped = reactions.reduce((acc, reaction) => {
-      if (!acc[reaction.type]) {
-        acc[reaction.type] = {
-          count: 0,
-          users: [],
-          userReacted: false,
-        };
-      }
-      acc[reaction.type].count++;
-      acc[reaction.type].users.push({
-        id: reaction.user.id,
-        name: reaction.user.name || "Unknown",
-        imageUrl: reaction.user.image,
-      });
-      if (currentUserId && reaction.userId === currentUserId) {
-        acc[reaction.type].userReacted = true;
-      }
-      return acc;
-    }, {} as Record<string, { count: number; users: Array<{ id: string; name: string; imageUrl: string | null }>; userReacted: boolean }>);
+    const grouped = reactions.reduce(
+      (acc, reaction) => {
+        if (!acc[reaction.type]) {
+          acc[reaction.type] = {
+            count: 0,
+            users: [],
+            userReacted: false,
+          };
+        }
+        acc[reaction.type].count++;
+        acc[reaction.type].users.push({
+          id: reaction.user.id,
+          name: reaction.user.name || "Unknown",
+          imageUrl: reaction.user.image,
+        });
+        if (currentUserId && reaction.userId === currentUserId) {
+          acc[reaction.type].userReacted = true;
+        }
+        return acc;
+      },
+      {} as Record<
+        string,
+        {
+          count: number;
+          users: Array<{ id: string; name: string; imageUrl: string | null }>;
+          userReacted: boolean;
+        }
+      >
+    );
 
     const totalCount = reactions.length;
 

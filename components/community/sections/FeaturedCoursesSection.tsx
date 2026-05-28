@@ -58,38 +58,26 @@ export function FeaturedCoursesSection({
   return (
     <section>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h2 
-          className="text-2xl font-bold"
-          style={{ color: primaryColor }}
-        >
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-2xl font-bold" style={{ color: primaryColor }}>
           {title}
         </h2>
-        <a 
-          href="#" 
-          className="text-sm hover:underline"
-          style={{ color: primaryColor }}
-        >
+        <a href="#" className="text-sm hover:underline" style={{ color: primaryColor }}>
           View all courses →
         </a>
       </div>
 
       {/* Courses Grid */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {courses.slice(0, 6).map((course) => (
           <article
             key={course.id}
-            className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all hover:-translate-y-1 cursor-pointer"
+            className="cursor-pointer overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
           >
             {/* Course Image */}
             <div className="relative h-48 bg-gradient-to-br from-sky-100 to-purple-100">
               {course.imageUrl ? (
-                <Image
-                  src={course.imageUrl}
-                  alt={course.title}
-                  fill
-                  className="object-cover"
-                />
+                <Image src={course.imageUrl} alt={course.title} fill className="object-cover" />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center">
                   <BookOpen className="h-16 w-16 text-sky-500 opacity-50" />
@@ -97,14 +85,16 @@ export function FeaturedCoursesSection({
               )}
 
               {/* Play Icon Overlay */}
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity bg-black/20">
+              <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition-opacity hover:opacity-100">
                 <PlayCircle className="h-16 w-16 text-white" />
               </div>
 
               {/* Level Badge */}
               {course.level && (
-                <div className="absolute top-3 left-3">
-                  <span className={`text-xs px-2 py-1 rounded-full font-medium ${getLevelColor(course.level)}`}>
+                <div className="absolute left-3 top-3">
+                  <span
+                    className={`rounded-full px-2 py-1 text-xs font-medium ${getLevelColor(course.level)}`}
+                  >
                     {course.level}
                   </span>
                 </div>
@@ -112,8 +102,8 @@ export function FeaturedCoursesSection({
 
               {/* Price Badge */}
               {course.price !== undefined && (
-                <div 
-                  className="absolute top-3 right-3 px-3 py-1 rounded-full text-sm font-bold text-white"
+                <div
+                  className="absolute right-3 top-3 rounded-full px-3 py-1 text-sm font-bold text-white"
                   style={{ backgroundColor: primaryColor }}
                 >
                   {course.price === 0 ? "FREE" : `$${course.price}`}
@@ -123,25 +113,23 @@ export function FeaturedCoursesSection({
 
             {/* Course Info */}
             <div className="p-6">
-              <h3 className="font-semibold text-lg text-gray-900 mb-2 line-clamp-2">
+              <h3 className="mb-2 line-clamp-2 text-lg font-semibold text-gray-900">
                 {course.title}
               </h3>
 
               {course.description && (
-                <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                  {course.description}
-                </p>
+                <p className="mb-4 line-clamp-2 text-sm text-gray-600">{course.description}</p>
               )}
 
               {/* Course Stats */}
-              <div className="flex flex-wrap gap-3 text-xs text-gray-500 mb-4">
+              <div className="mb-4 flex flex-wrap gap-3 text-xs text-gray-500">
                 {course.lessonsCount && (
                   <div className="flex items-center gap-1">
                     <BookOpen className="h-3 w-3" />
                     <span>{course.lessonsCount} lessons</span>
                   </div>
                 )}
-                
+
                 {course.duration && (
                   <div className="flex items-center gap-1">
                     <Clock className="h-3 w-3" />
@@ -166,7 +154,7 @@ export function FeaturedCoursesSection({
 
               {/* Instructor */}
               {course.instructor && (
-                <div className="flex items-center gap-2 mb-4 pb-4 border-b border-gray-100">
+                <div className="mb-4 flex items-center gap-2 border-b border-gray-100 pb-4">
                   {course.instructor.image ? (
                     <Image
                       src={course.instructor.image}
@@ -178,18 +166,12 @@ export function FeaturedCoursesSection({
                   ) : (
                     <div className="h-6 w-6 rounded-full bg-gray-200" />
                   )}
-                  <span className="text-xs text-gray-600">
-                    {course.instructor.name}
-                  </span>
+                  <span className="text-xs text-gray-600">{course.instructor.name}</span>
                 </div>
               )}
 
               {/* CTA */}
-              <Button
-                size="sm"
-                className="w-full"
-                style={{ backgroundColor: primaryColor }}
-              >
+              <Button size="sm" className="w-full" style={{ backgroundColor: primaryColor }}>
                 Enroll Now
               </Button>
             </div>

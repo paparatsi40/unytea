@@ -56,8 +56,7 @@ export function MessageThread({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { onMessage } = usePusher(conversationId, user?.id || "");
 
-  const displayName =
-    otherUser.firstName || otherUser.name || otherUser.username || "User";
+  const displayName = otherUser.firstName || otherUser.name || otherUser.username || "User";
 
   const loadMessages = useCallback(async () => {
     const result = await getConversationMessages(conversationId);
@@ -152,9 +151,7 @@ export function MessageThread({
             </div>
 
             <div className="min-w-0">
-              <h2 className="truncate text-lg font-semibold text-gray-900">
-                {displayName}
-              </h2>
+              <h2 className="truncate text-lg font-semibold text-gray-900">{displayName}</h2>
               <p className="truncate text-sm text-gray-500">{subtitle}</p>
             </div>
           </div>
@@ -170,7 +167,7 @@ export function MessageThread({
       </div>
 
       <div
-        className={`flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-5 pb-4 ${
+        className={`min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-5 pb-4 ${
           isLowVolumeThread ? "bg-white pt-1" : "bg-gray-50 pt-3"
         }`}
       >
@@ -196,9 +193,7 @@ export function MessageThread({
             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20">
               <span className="text-3xl">💬</span>
             </div>
-            <h3 className="mb-2 text-lg font-semibold text-gray-900">
-              Start the conversation
-            </h3>
+            <h3 className="mb-2 text-lg font-semibold text-gray-900">Start the conversation</h3>
             <p className="max-w-sm text-gray-600">
               Say hi to {displayName}! Send your first message below.
             </p>
@@ -208,23 +203,22 @@ export function MessageThread({
             <div
               className={`mt-auto ${
                 isLowVolumeThread
-                  ? "mx-auto w-full max-w-[760px] rounded-2xl border border-gray-200/80 bg-gray-50/90 px-4 py-3 shadow-sm space-y-1.5"
+                  ? "mx-auto w-full max-w-[760px] space-y-1.5 rounded-2xl border border-gray-200/80 bg-gray-50/90 px-4 py-3 shadow-sm"
                   : "space-y-2 pb-4"
               }`}
             >
               {messages.map((message, index) => {
                 const currentDay = new Date(message.createdAt).toDateString();
                 const previousDay =
-                  index > 0
-                    ? new Date(messages[index - 1].createdAt).toDateString()
-                    : null;
-                const showDaySeparator =
-                  index === 0 || currentDay !== previousDay;
+                  index > 0 ? new Date(messages[index - 1].createdAt).toDateString() : null;
+                const showDaySeparator = index === 0 || currentDay !== previousDay;
 
                 return (
                   <div key={message.id} className="space-y-1">
                     {showDaySeparator && (
-                      <div className={`flex justify-center ${isLowVolumeThread ? "py-0" : "py-0.5"}`}>
+                      <div
+                        className={`flex justify-center ${isLowVolumeThread ? "py-0" : "py-0.5"}`}
+                      >
                         <span className="rounded-full bg-white px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 shadow-sm ring-1 ring-gray-200">
                           {formatDayLabel(message.createdAt)}
                         </span>
@@ -247,10 +241,7 @@ export function MessageThread({
       </div>
 
       <div className="border-t border-gray-200 bg-white/95 backdrop-blur-sm">
-        <MessageInput
-          conversationId={conversationId}
-          onMessageSent={handleMessageSent}
-        />
+        <MessageInput conversationId={conversationId} onMessageSent={handleMessageSent} />
       </div>
     </div>
   );

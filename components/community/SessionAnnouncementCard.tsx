@@ -96,9 +96,17 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
       ? `${sessionState.recordingUrl}${sessionState.recordingUrl.includes("?") ? "&" : "?"}src=feed_session_recording`
       : `/dashboard/sessions/${sessionData.sessionId}/room?src=feed_session_card`;
 
-  const ctaLabel = isLive ? "Join live" : hasRecording ? "Watch recording" : isUpcoming ? "Join session" : "View session";
+  const ctaLabel = isLive
+    ? "Join live"
+    : hasRecording
+      ? "Watch recording"
+      : isUpcoming
+        ? "Join session"
+        : "View session";
 
-  const sharedByLabel = post.author.name ? `${post.author.name} shared a session` : "Shared session";
+  const sharedByLabel = post.author.name
+    ? `${post.author.name} shared a session`
+    : "Shared session";
 
   const contextLine = hasRecording
     ? "Session recap and follow-up questions from the recording."
@@ -126,9 +134,13 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
         <p className="text-xs font-medium text-gray-600">{sharedByLabel}</p>
       </div>
 
-      <h3 className="text-sm font-semibold text-gray-900">{sessionData.sessionTitle || post.title || "Live session"}</h3>
+      <h3 className="text-sm font-semibold text-gray-900">
+        {sessionData.sessionTitle || post.title || "Live session"}
+      </h3>
 
-      {contextLine ? <p className="mt-1 text-xs text-gray-600 line-clamp-1">{contextLine}</p> : null}
+      {contextLine ? (
+        <p className="mt-1 line-clamp-1 text-xs text-gray-600">{contextLine}</p>
+      ) : null}
 
       {metaParts.length > 0 ? (
         <p className="mt-2 text-xs text-gray-600">{metaParts.join(" · ")}</p>

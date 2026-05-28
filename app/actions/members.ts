@@ -50,9 +50,7 @@ export async function getCommunityMembers(
     const members = await prisma.member.findMany({
       where,
       select: memberSelect,
-      orderBy: filters?.sortBy === "recent"
-        ? { joinedAt: "desc" }
-        : { user: { name: "asc" } },
+      orderBy: filters?.sortBy === "recent" ? { joinedAt: "desc" } : { user: { name: "asc" } },
     });
 
     // Apply client-side filters
@@ -60,17 +58,18 @@ export async function getCommunityMembers(
 
     if (filters?.search) {
       const searchLower = filters.search.toLowerCase();
-      filteredMembers = filteredMembers.filter(m =>
-        m.user.name?.toLowerCase().includes(searchLower) ||
-        m.user.bio?.toLowerCase().includes(searchLower) ||
-        m.user.tagline?.toLowerCase().includes(searchLower) ||
-        m.user.skills?.some(s => s.toLowerCase().includes(searchLower)) ||
-        m.user.interests?.some(i => i.toLowerCase().includes(searchLower))
+      filteredMembers = filteredMembers.filter(
+        (m) =>
+          m.user.name?.toLowerCase().includes(searchLower) ||
+          m.user.bio?.toLowerCase().includes(searchLower) ||
+          m.user.tagline?.toLowerCase().includes(searchLower) ||
+          m.user.skills?.some((s) => s.toLowerCase().includes(searchLower)) ||
+          m.user.interests?.some((i) => i.toLowerCase().includes(searchLower))
       );
     }
 
     if (filters?.status) {
-      filteredMembers = filteredMembers.filter(m => m.user.availabilityStatus === filters.status);
+      filteredMembers = filteredMembers.filter((m) => m.user.availabilityStatus === filters.status);
     }
 
     return { success: true, members: filteredMembers };

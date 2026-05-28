@@ -90,11 +90,7 @@ function MiniBarChart({
         const val = (d[dataKey] as number) || 0;
         const h = (val / max) * 100;
         return (
-          <div
-            key={d.date}
-            className="group relative flex-1 min-w-0"
-            title={`${d.label}: ${val}`}
-          >
+          <div key={d.date} className="group relative min-w-0 flex-1" title={`${d.label}: ${val}`}>
             <div
               className={`w-full rounded-t-sm ${color} transition-all hover:opacity-80`}
               style={{ height: `${Math.max(h, 2)}%` }}
@@ -119,10 +115,7 @@ function ProgressBar({
   const pct = Math.min((value / max) * 100, 100);
   return (
     <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100">
-      <div
-        className={`h-full rounded-full ${color} transition-all`}
-        style={{ width: `${pct}%` }}
-      />
+      <div className={`h-full rounded-full ${color} transition-all`} style={{ width: `${pct}%` }} />
     </div>
   );
 }
@@ -154,11 +147,7 @@ function StatBox({
 }
 
 // ── Main Component ───────────────────────────────────────────────────
-export function AnalyticsCharts({
-  sessions,
-  courses,
-  revenue,
-}: AnalyticsChartsProps) {
+export function AnalyticsCharts({ sessions, courses, revenue }: AnalyticsChartsProps) {
   const [tab, setTab] = useState<TabId>("sessions");
 
   const tabs: { id: TabId; label: string; icon: React.ElementType }[] = [
@@ -197,8 +186,18 @@ export function AnalyticsCharts({
             {sessions ? (
               <div className="space-y-6">
                 <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-                  <StatBox icon={PlayCircle} label="Total Sessions" value={sessions.total} color="text-blue-500" />
-                  <StatBox icon={Users} label="Avg Attendance" value={sessions.avgAttendance} color="text-emerald-500" />
+                  <StatBox
+                    icon={PlayCircle}
+                    label="Total Sessions"
+                    value={sessions.total}
+                    color="text-blue-500"
+                  />
+                  <StatBox
+                    icon={Users}
+                    label="Avg Attendance"
+                    value={sessions.avgAttendance}
+                    color="text-emerald-500"
+                  />
                   <StatBox
                     icon={Star}
                     label="Avg Rating"
@@ -229,9 +228,7 @@ export function AnalyticsCharts({
                     />
                     <div className="mt-2 flex justify-between text-[10px] text-gray-400">
                       <span>{sessions.dailyChart[0]?.label}</span>
-                      <span>
-                        {sessions.dailyChart[sessions.dailyChart.length - 1]?.label}
-                      </span>
+                      <span>{sessions.dailyChart[sessions.dailyChart.length - 1]?.label}</span>
                     </div>
                   </div>
                 </div>
@@ -248,8 +245,18 @@ export function AnalyticsCharts({
             {courses ? (
               <div className="space-y-6">
                 <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-                  <StatBox icon={BookOpen} label="Total Courses" value={courses.totalCourses} color="text-blue-500" />
-                  <StatBox icon={Users} label="Enrollments" value={courses.totalEnrollments} color="text-emerald-500" />
+                  <StatBox
+                    icon={BookOpen}
+                    label="Total Courses"
+                    value={courses.totalCourses}
+                    color="text-blue-500"
+                  />
+                  <StatBox
+                    icon={Users}
+                    label="Enrollments"
+                    value={courses.totalEnrollments}
+                    color="text-emerald-500"
+                  />
                   <StatBox
                     icon={TrendingUp}
                     label="Completion Rate"
@@ -257,7 +264,12 @@ export function AnalyticsCharts({
                     sub={`${courses.completedEnrollments} completed`}
                     color="text-purple-500"
                   />
-                  <StatBox icon={Award} label="Certificates" value={courses.certificateCount} color="text-amber-500" />
+                  <StatBox
+                    icon={Award}
+                    label="Certificates"
+                    value={courses.certificateCount}
+                    color="text-amber-500"
+                  />
                 </div>
 
                 {/* Enrollments chart */}
@@ -284,9 +296,7 @@ export function AnalyticsCharts({
                 {/* Course breakdown table */}
                 {courses.courseBreakdown.length > 0 && (
                   <div>
-                    <h4 className="mb-3 text-sm font-medium text-gray-500">
-                      Course Performance
-                    </h4>
+                    <h4 className="mb-3 text-sm font-medium text-gray-500">Course Performance</h4>
                     <div className="space-y-2">
                       {courses.courseBreakdown.map((c) => (
                         <div
@@ -294,19 +304,12 @@ export function AnalyticsCharts({
                           className="rounded-xl border border-gray-100 bg-gray-50 p-3"
                         >
                           <div className="mb-2 flex items-center justify-between">
-                            <span className="text-sm font-medium text-gray-900">
-                              {c.title}
-                            </span>
-                            <span className="text-xs text-gray-500">
-                              {c.enrollments} enrolled
-                            </span>
+                            <span className="text-sm font-medium text-gray-900">{c.title}</span>
+                            <span className="text-xs text-gray-500">{c.enrollments} enrolled</span>
                           </div>
                           <div className="flex items-center gap-3">
                             <div className="flex-1">
-                              <ProgressBar
-                                value={c.avgProgress}
-                                color="bg-purple-500"
-                              />
+                              <ProgressBar value={c.avgProgress} color="bg-purple-500" />
                             </div>
                             <span className="w-12 text-right text-xs text-gray-500">
                               {c.avgProgress}%
@@ -357,9 +360,7 @@ export function AnalyticsCharts({
                 {/* Course revenue breakdown */}
                 {revenue.courseBreakdown.length > 0 && (
                   <div>
-                    <h4 className="mb-3 text-sm font-medium text-gray-500">
-                      Revenue by Course
-                    </h4>
+                    <h4 className="mb-3 text-sm font-medium text-gray-500">Revenue by Course</h4>
                     <div className="space-y-2">
                       {revenue.courseBreakdown.map((c, i) => (
                         <div
@@ -395,7 +396,6 @@ export function AnalyticsCharts({
             )}
           </>
         )}
-
       </div>
     </div>
   );

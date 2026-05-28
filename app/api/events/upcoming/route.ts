@@ -13,10 +13,7 @@ export async function GET() {
     const session = await auth();
 
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const userId = session.user.id;
@@ -54,7 +51,7 @@ export async function GET() {
 
     // Combine and format events
     const allSessions = [...mentorSessions, ...menteeSessions];
-    
+
     const events = allSessions.map((s) => {
       const startTime = new Date(s.scheduledAt);
       const diff = startTime.getTime() - now.getTime();
@@ -67,9 +64,18 @@ export async function GET() {
       } else if (hours < 24) {
         timeLabel = `In ${hours}h`;
       } else if (days < 7) {
-        timeLabel = startTime.toLocaleDateString("en-US", { weekday: "short", hour: "numeric", minute: "2-digit" });
+        timeLabel = startTime.toLocaleDateString("en-US", {
+          weekday: "short",
+          hour: "numeric",
+          minute: "2-digit",
+        });
       } else {
-        timeLabel = startTime.toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+        timeLabel = startTime.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          hour: "numeric",
+          minute: "2-digit",
+        });
       }
 
       return {
@@ -84,9 +90,6 @@ export async function GET() {
     return NextResponse.json({ events });
   } catch (error: any) {
     console.error("Error fetching upcoming events:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch events" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch events" }, { status: 500 });
   }
 }

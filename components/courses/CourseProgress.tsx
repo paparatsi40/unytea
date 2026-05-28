@@ -67,10 +67,7 @@ export function CourseProgress({
   };
 
   const totalLessons = modules.reduce((sum, m) => sum + m.totalCount, 0);
-  const completedLessons = modules.reduce(
-    (sum, m) => sum + m.completedCount,
-    0
-  );
+  const completedLessons = modules.reduce((sum, m) => sum + m.completedCount, 0);
 
   return (
     <div className="space-y-4">
@@ -93,9 +90,7 @@ export function CourseProgress({
               style={{ width: `${overallProgress}%` }}
             />
           </div>
-          <p className="text-xs text-zinc-500">
-            {Math.round(overallProgress)}% complete
-          </p>
+          <p className="text-xs text-zinc-500">{Math.round(overallProgress)}% complete</p>
 
           {/* Certificate CTA */}
           {overallProgress === 100 && !certificateEarned && (
@@ -109,11 +104,9 @@ export function CourseProgress({
           )}
 
           {certificateEarned && (
-            <div className="mt-3 flex items-center justify-center gap-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 p-2.5">
+            <div className="mt-3 flex items-center justify-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-2.5">
               <Award className="h-4 w-4 text-emerald-400" />
-              <span className="text-sm text-emerald-400">
-                Certificate Earned!
-              </span>
+              <span className="text-sm text-emerald-400">Certificate Earned!</span>
             </div>
           )}
         </div>
@@ -123,14 +116,12 @@ export function CourseProgress({
       {modules.map((mod) => {
         const isExpanded = expandedModules.has(mod.id);
         const moduleProgress =
-          mod.totalCount > 0
-            ? Math.round((mod.completedCount / mod.totalCount) * 100)
-            : 0;
+          mod.totalCount > 0 ? Math.round((mod.completedCount / mod.totalCount) * 100) : 0;
 
         return (
           <div
             key={mod.id}
-            className="rounded-xl border border-zinc-800 bg-zinc-900/50 overflow-hidden"
+            className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50"
           >
             {/* Module Header */}
             <button
@@ -145,9 +136,7 @@ export function CourseProgress({
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium text-white">{mod.title}</p>
                 {mod.description && (
-                  <p className="truncate text-xs text-zinc-500">
-                    {mod.description}
-                  </p>
+                  <p className="truncate text-xs text-zinc-500">{mod.description}</p>
                 )}
               </div>
               {isEnrolled && (
@@ -175,15 +164,13 @@ export function CourseProgress({
                   return (
                     <button
                       key={lesson.id}
-                      onClick={() =>
-                        canAccess && onLessonClick?.(lesson.id)
-                      }
+                      onClick={() => canAccess && onLessonClick?.(lesson.id)}
                       disabled={!canAccess}
                       className={`flex w-full items-center gap-3 px-4 py-3 text-left transition-colors ${
                         isCurrent
-                          ? "bg-purple-500/10 border-l-2 border-purple-500"
-                          : "hover:bg-zinc-800/30 border-l-2 border-transparent"
-                      } ${!canAccess ? "opacity-50 cursor-not-allowed" : ""}`}
+                          ? "border-l-2 border-purple-500 bg-purple-500/10"
+                          : "border-l-2 border-transparent hover:bg-zinc-800/30"
+                      } ${!canAccess ? "cursor-not-allowed opacity-50" : ""}`}
                     >
                       {/* Status icon */}
                       <div className="shrink-0">
@@ -205,7 +192,7 @@ export function CourseProgress({
                             lesson.isCompleted
                               ? "text-zinc-400"
                               : isCurrent
-                                ? "text-white font-medium"
+                                ? "font-medium text-white"
                                 : "text-zinc-300"
                           }`}
                         >
@@ -224,21 +211,15 @@ export function CourseProgress({
                               Text
                             </span>
                           )}
-                          {lesson.duration && (
-                            <span>{lesson.duration} min</span>
-                          )}
+                          {lesson.duration && <span>{lesson.duration} min</span>}
                           {lesson.hasQuiz && (
                             <span
                               className={`flex items-center gap-0.5 ${
-                                lesson.quizPassed
-                                  ? "text-emerald-500"
-                                  : "text-amber-500"
+                                lesson.quizPassed ? "text-emerald-500" : "text-amber-500"
                               }`}
                             >
                               Quiz
-                              {lesson.quizPassed && (
-                                <CheckCircle className="h-3 w-3" />
-                              )}
+                              {lesson.quizPassed && <CheckCircle className="h-3 w-3" />}
                             </span>
                           )}
                           {lesson.isFree && !hasAccess && (

@@ -5,12 +5,12 @@ import Image from "next/image";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { PremiumPostCard } from "@/components/community/PremiumPostCard";
 import { createPost } from "@/app/actions/posts";
-import { 
-  Sparkles, 
-  Send, 
-  Smile, 
-  AtSign, 
-  Loader2, 
+import {
+  Sparkles,
+  Send,
+  Smile,
+  AtSign,
+  Loader2,
   CheckCircle2,
   MessageCircle,
   Trophy,
@@ -80,14 +80,14 @@ type UpcomingSession = {
   status?: "SCHEDULED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED" | "NO_SHOW";
 };
 
-export function PremiumPostFeed({ 
-  posts: initialPosts, 
+export function PremiumPostFeed({
+  posts: initialPosts,
   communityId,
   upcomingSession,
   hotTopics,
   canModeratePosts = false,
-}: { 
-  posts: Post[]; 
+}: {
+  posts: Post[];
   communityId: string;
   upcomingSession?: UpcomingSession | null;
   hotTopics?: { id: string; title: string; commentCount: number }[];
@@ -171,7 +171,10 @@ export function PremiumPostFeed({
       setAttachments([]);
 
       if (result.post) {
-        const postFromAction = result.post as Partial<Post> & { id: string; createdAt?: string | Date };
+        const postFromAction = result.post as Partial<Post> & {
+          id: string;
+          createdAt?: string | Date;
+        };
 
         const optimisticPost: Post = {
           id: postFromAction.id,
@@ -180,7 +183,8 @@ export function PremiumPostFeed({
             postFromAction.content ??
             (content.trim() || (attachments.length > 0 ? "Shared an attachment" : "")),
           contentType: postFromAction.contentType ?? contentType,
-          attachments: (postFromAction.attachments as PostAttachment[] | null | undefined) ?? attachments,
+          attachments:
+            (postFromAction.attachments as PostAttachment[] | null | undefined) ?? attachments,
           isPinned: Boolean(postFromAction.isPinned),
           createdAt: postFromAction.createdAt ? new Date(postFromAction.createdAt) : new Date(),
           author: {
@@ -266,7 +270,7 @@ export function PremiumPostFeed({
     }
   };
 
-  const userFullName = user ? (user.name || "") : "";
+  const userFullName = user ? user.name || "" : "";
 
   const filteredPosts = useMemo(() => {
     const visible = posts.filter((post) => {
@@ -291,7 +295,7 @@ export function PremiumPostFeed({
     const diffMs = sessionTime.getTime() - now.getTime();
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffDays = Math.floor(diffHours / 24);
-    
+
     if (diffDays > 0) return `${diffDays}d ${diffHours % 24}h`;
     if (diffHours > 0) return `${diffHours}h`;
     return "Soon";
@@ -314,24 +318,23 @@ export function PremiumPostFeed({
         <div className="mb-6 rounded-xl border border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 p-5">
           <div className="flex items-start gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-100">
-              <Radio className="h-6 w-6 text-amber-600 animate-pulse" />
+              <Radio className="h-6 w-6 animate-pulse text-amber-600" />
             </div>
             <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <Badge className="bg-amber-100 text-amber-700 border-amber-200">
+              <div className="mb-1 flex items-center gap-2">
+                <Badge className="border-amber-200 bg-amber-100 text-amber-700">
                   LIVE IN {getTimeUntil(upcomingSession.scheduledAt).toUpperCase()}
                 </Badge>
               </div>
-              <h3 className="font-semibold text-gray-900 text-lg">
-                {upcomingSession.title}
-              </h3>
-              <p className="text-sm text-gray-600 mt-1">
-                Hosted by {upcomingSession.mentorName || "the host"} • {upcomingSession.duration} min • {upcomingSession.attendeeCount} attending
+              <h3 className="text-lg font-semibold text-gray-900">{upcomingSession.title}</h3>
+              <p className="mt-1 text-sm text-gray-600">
+                Hosted by {upcomingSession.mentorName || "the host"} • {upcomingSession.duration}{" "}
+                min • {upcomingSession.attendeeCount} attending
               </p>
-              
+
               {/* Pre-session discussion prompt */}
-              <div className="mt-4 p-4 rounded-lg bg-white/60 border border-amber-200/50">
-                <p className="text-sm font-medium text-gray-800 mb-2">
+              <div className="mt-4 rounded-lg border border-amber-200/50 bg-white/60 p-4">
+                <p className="mb-2 text-sm font-medium text-gray-800">
                   💬 Drop your questions for the host 👇
                 </p>
                 <p className="text-xs text-gray-500">
@@ -339,24 +342,24 @@ export function PremiumPostFeed({
                 </p>
               </div>
 
-              <div className="flex items-center gap-3 mt-3">
+              <div className="mt-3 flex items-center gap-3">
                 {upcomingSession.roomId ? (
                   <Link href={`/dashboard/sessions/${upcomingSession.id}/room`}>
-                    <Button size="sm" className="bg-amber-600 hover:bg-amber-700 text-white">
-                      <Play className="h-4 w-4 mr-1.5" />
+                    <Button size="sm" className="bg-amber-600 text-white hover:bg-amber-700">
+                      <Play className="mr-1.5 h-4 w-4" />
                       {upcomingSession.status === "IN_PROGRESS" ? "Join now" : "Open room"}
                     </Button>
                   </Link>
                 ) : (
                   <Link href="/dashboard/sessions">
-                    <Button size="sm" className="bg-amber-600 hover:bg-amber-700 text-white">
-                      <Clock className="h-4 w-4 mr-1.5" />
+                    <Button size="sm" className="bg-amber-600 text-white hover:bg-amber-700">
+                      <Clock className="mr-1.5 h-4 w-4" />
                       Open sessions
                     </Button>
                   </Link>
                 )}
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="sm"
                   onClick={() => {
                     setComposerMode("question");
@@ -364,7 +367,7 @@ export function PremiumPostFeed({
                   }}
                   className="border-amber-300 hover:bg-amber-100"
                 >
-                  <HelpCircle className="h-4 w-4 mr-1.5" />
+                  <HelpCircle className="mr-1.5 h-4 w-4" />
                   Ask a Question
                 </Button>
               </div>
@@ -376,16 +379,16 @@ export function PremiumPostFeed({
       {/* HOT DISCUSSIONS */}
       {hotTopics && hotTopics.length > 0 && (
         <div className="mb-6 rounded-xl border border-purple-100 bg-white p-4 shadow-sm">
-          <div className="flex items-center gap-2 mb-3">
+          <div className="mb-3 flex items-center gap-2">
             <Flame className="h-5 w-5 text-orange-500" />
             <h3 className="font-semibold text-gray-900">🔥 Hot Discussions</h3>
           </div>
           <div className="space-y-2">
             {hotTopics.slice(0, 3).map((topic) => (
-              <Link 
-                key={topic.id} 
+              <Link
+                key={topic.id}
                 href={`#post-${topic.id}`}
-                className="flex items-center justify-between p-3 rounded-lg hover:bg-purple-50 transition-colors group"
+                className="group flex items-center justify-between rounded-lg p-3 transition-colors hover:bg-purple-50"
               >
                 <div className="flex items-center gap-3">
                   <MessageCircle className="h-4 w-4 text-purple-400" />
@@ -403,15 +406,17 @@ export function PremiumPostFeed({
       )}
 
       {/* GUIDED COMPOSER */}
-      <div className={`mb-5 overflow-hidden rounded-xl border ${focused ? 'border-purple-200 shadow-md' : 'border-gray-200'} bg-white transition-all`}>
+      <div
+        className={`mb-5 overflow-hidden rounded-xl border ${focused ? "border-purple-200 shadow-md" : "border-gray-200"} bg-white transition-all`}
+      >
         {/* Composer Mode Selector - creation intents */}
-        <div className="flex items-center gap-1 p-1.5 border-b border-gray-100 bg-gray-50/60 overflow-x-auto">
+        <div className="flex items-center gap-1 overflow-x-auto border-b border-gray-100 bg-gray-50/60 p-1.5">
           <button
             type="button"
             onClick={() => setComposerMode("default")}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap ${
-              composerMode === "default" 
-                ? "bg-gray-100 text-gray-900" 
+            className={`flex items-center gap-1.5 whitespace-nowrap rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
+              composerMode === "default"
+                ? "bg-gray-100 text-gray-900"
                 : "text-gray-500 hover:bg-gray-50"
             }`}
           >
@@ -421,9 +426,9 @@ export function PremiumPostFeed({
           <button
             type="button"
             onClick={() => setComposerMode("question")}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap ${
-              composerMode === "question" 
-                ? "bg-blue-100 text-blue-700" 
+            className={`flex items-center gap-1.5 whitespace-nowrap rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
+              composerMode === "question"
+                ? "bg-blue-100 text-blue-700"
                 : "text-gray-500 hover:bg-gray-50"
             }`}
           >
@@ -433,9 +438,9 @@ export function PremiumPostFeed({
           <button
             type="button"
             onClick={() => setComposerMode("win")}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap ${
-              composerMode === "win" 
-                ? "bg-amber-100 text-amber-700" 
+            className={`flex items-center gap-1.5 whitespace-nowrap rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
+              composerMode === "win"
+                ? "bg-amber-100 text-amber-700"
                 : "text-gray-500 hover:bg-gray-50"
             }`}
           >
@@ -445,9 +450,9 @@ export function PremiumPostFeed({
           <button
             type="button"
             onClick={() => setComposerMode("resource")}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap ${
-              composerMode === "resource" 
-                ? "bg-green-100 text-green-700" 
+            className={`flex items-center gap-1.5 whitespace-nowrap rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
+              composerMode === "resource"
+                ? "bg-green-100 text-green-700"
                 : "text-gray-500 hover:bg-gray-50"
             }`}
           >
@@ -457,9 +462,9 @@ export function PremiumPostFeed({
           <button
             type="button"
             onClick={() => setComposerMode("discussion")}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap ${
-              composerMode === "discussion" 
-                ? "bg-purple-100 text-purple-700" 
+            className={`flex items-center gap-1.5 whitespace-nowrap rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
+              composerMode === "discussion"
+                ? "bg-purple-100 text-purple-700"
                 : "text-gray-500 hover:bg-gray-50"
             }`}
           >
@@ -506,11 +511,15 @@ export function PremiumPostFeed({
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder={
-                  composerMode === "question" ? "What's your question?" :
-                  composerMode === "win" ? "What did you achieve?" :
-                  composerMode === "resource" ? "What are you sharing?" :
-                  composerMode === "discussion" ? "What do you want to discuss?" :
-                  "Add a title (optional)"
+                  composerMode === "question"
+                    ? "What's your question?"
+                    : composerMode === "win"
+                      ? "What did you achieve?"
+                      : composerMode === "resource"
+                        ? "What are you sharing?"
+                        : composerMode === "discussion"
+                          ? "What do you want to discuss?"
+                          : "Add a title (optional)"
                 }
                 className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm font-medium text-gray-900 placeholder-gray-400 transition-colors focus:border-purple-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-100"
               />
@@ -547,7 +556,7 @@ export function PremiumPostFeed({
               className="w-full resize-none rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm leading-relaxed text-gray-900 placeholder-gray-400 transition-all focus:border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-100"
               rows={focused ? 4 : 2}
             />
-            
+
             {/* Character Count */}
             {focused && (
               <div className="absolute bottom-3 right-3 text-sm text-gray-400">
@@ -566,7 +575,11 @@ export function PremiumPostFeed({
                 title="Add attachment"
                 disabled={isUploadingAttachment}
               >
-                {isUploadingAttachment ? <Loader2 className="h-4 w-4 animate-spin" /> : <Paperclip className="h-4 w-4" />}
+                {isUploadingAttachment ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Paperclip className="h-4 w-4" />
+                )}
               </button>
               <input
                 ref={fileInputRef}
@@ -609,7 +622,11 @@ export function PremiumPostFeed({
               </button>
               <button
                 type="submit"
-                disabled={isSubmitting || isUploadingAttachment || (!content.trim() && attachments.length === 0)}
+                disabled={
+                  isSubmitting ||
+                  isUploadingAttachment ||
+                  (!content.trim() && attachments.length === 0)
+                }
                 className="flex items-center space-x-2 rounded-lg bg-purple-600 px-4 py-1.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-purple-700 disabled:opacity-50 disabled:hover:bg-purple-600"
               >
                 {isSubmitting ? (
@@ -621,11 +638,15 @@ export function PremiumPostFeed({
                   <>
                     <Send className="h-4 w-4" />
                     <span>
-                      {composerMode === "question" ? "Ask" :
-                       composerMode === "win" ? "Share Win" :
-                       composerMode === "resource" ? "Share" :
-                       composerMode === "discussion" ? "Discuss" :
-                       "Post"}
+                      {composerMode === "question"
+                        ? "Ask"
+                        : composerMode === "win"
+                          ? "Share Win"
+                          : composerMode === "resource"
+                            ? "Share"
+                            : composerMode === "discussion"
+                              ? "Discuss"
+                              : "Post"}
                     </span>
                   </>
                 )}
@@ -640,7 +661,9 @@ export function PremiumPostFeed({
           type="button"
           onClick={() => setActiveFilter("all")}
           className={`rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors ${
-            activeFilter === "all" ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+            activeFilter === "all"
+              ? "bg-gray-900 text-white"
+              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
           }`}
         >
           All
@@ -649,7 +672,9 @@ export function PremiumPostFeed({
           type="button"
           onClick={() => setActiveFilter("updates")}
           className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors ${
-            activeFilter === "updates" ? "bg-blue-600 text-white" : "bg-blue-50 text-blue-700 hover:bg-blue-100"
+            activeFilter === "updates"
+              ? "bg-blue-600 text-white"
+              : "bg-blue-50 text-blue-700 hover:bg-blue-100"
           }`}
         >
           <Clock className="h-3.5 w-3.5" /> Updates
@@ -658,7 +683,9 @@ export function PremiumPostFeed({
           type="button"
           onClick={() => setActiveFilter("questions")}
           className={`rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors ${
-            activeFilter === "questions" ? "bg-purple-600 text-white" : "bg-purple-50 text-purple-700 hover:bg-purple-100"
+            activeFilter === "questions"
+              ? "bg-purple-600 text-white"
+              : "bg-purple-50 text-purple-700 hover:bg-purple-100"
           }`}
         >
           Questions
@@ -667,7 +694,9 @@ export function PremiumPostFeed({
           type="button"
           onClick={() => setActiveFilter("resources")}
           className={`rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors ${
-            activeFilter === "resources" ? "bg-green-600 text-white" : "bg-green-50 text-green-700 hover:bg-green-100"
+            activeFilter === "resources"
+              ? "bg-green-600 text-white"
+              : "bg-green-50 text-green-700 hover:bg-green-100"
           }`}
         >
           Resources
@@ -676,7 +705,9 @@ export function PremiumPostFeed({
           type="button"
           onClick={() => setActiveFilter("discussion")}
           className={`rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors ${
-            activeFilter === "discussion" ? "bg-amber-600 text-white" : "bg-amber-50 text-amber-700 hover:bg-amber-100"
+            activeFilter === "discussion"
+              ? "bg-amber-600 text-white"
+              : "bg-amber-50 text-amber-700 hover:bg-amber-100"
           }`}
         >
           Discussion
@@ -712,30 +743,30 @@ export function PremiumPostFeed({
 
           {/* Feature Highlights */}
           <div className="mx-auto grid max-w-lg grid-cols-2 gap-3">
-            <button 
+            <button
               onClick={() => setComposerMode("question")}
-              className="rounded-lg bg-blue-50 p-3 hover:bg-blue-100 transition-colors text-left"
+              className="rounded-lg bg-blue-50 p-3 text-left transition-colors hover:bg-blue-100"
             >
               <div className="mb-1 text-xl">❓</div>
               <p className="text-xs font-medium text-blue-700">Ask a Question</p>
             </button>
-            <button 
+            <button
               onClick={() => setComposerMode("win")}
-              className="rounded-lg bg-amber-50 p-3 hover:bg-amber-100 transition-colors text-left"
+              className="rounded-lg bg-amber-50 p-3 text-left transition-colors hover:bg-amber-100"
             >
               <div className="mb-1 text-xl">🏆</div>
               <p className="text-xs font-medium text-amber-700">Share a Win</p>
             </button>
-            <button 
+            <button
               onClick={() => setComposerMode("resource")}
-              className="rounded-lg bg-green-50 p-3 hover:bg-green-100 transition-colors text-left"
+              className="rounded-lg bg-green-50 p-3 text-left transition-colors hover:bg-green-100"
             >
               <div className="mb-1 text-xl">📚</div>
               <p className="text-xs font-medium text-green-700">Share Resource</p>
             </button>
-            <button 
+            <button
               onClick={() => setComposerMode("discussion")}
-              className="rounded-lg bg-purple-50 p-3 hover:bg-purple-100 transition-colors text-left"
+              className="rounded-lg bg-purple-50 p-3 text-left transition-colors hover:bg-purple-100"
             >
               <div className="mb-1 text-xl">💬</div>
               <p className="text-xs font-medium text-purple-700">Start Discussion</p>

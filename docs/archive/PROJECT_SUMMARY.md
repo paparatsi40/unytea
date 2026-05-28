@@ -230,12 +230,12 @@ mentorly/
 
 ### Pricing Tiers
 
-| Tier | Price | Target |
-|------|-------|--------|
-| **Free** | $0 | Trial users, small communities |
-| **Professional** | $49/mo | Core customers (vs Skool's $99) |
-| **Premium** | $149/mo | Power users, multiple communities |
-| **Enterprise** | Custom | Large organizations, white-label |
+| Tier             | Price   | Target                            |
+| ---------------- | ------- | --------------------------------- |
+| **Free**         | $0      | Trial users, small communities    |
+| **Professional** | $49/mo  | Core customers (vs Skool's $99)   |
+| **Premium**      | $149/mo | Power users, multiple communities |
+| **Enterprise**   | Custom  | Large organizations, white-label  |
 
 ### Revenue Projections (Conservative)
 
@@ -376,7 +376,7 @@ mentorly/
 ### For Mentors
 
 > "Schedule, host, and record 1-on-1 sessions without juggling Calendly and Zoom. Everything in one
-place."
+> place."
 
 ### For Course Creators
 
@@ -517,5 +517,5 @@ place."
 
 ---
 
-*Last Updated: December 2024*
-*Version: 0.1.0 (Foundation Complete)*
+_Last Updated: December 2024_
+_Version: 0.1.0 (Foundation Complete)_

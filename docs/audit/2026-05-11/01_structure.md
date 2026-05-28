@@ -65,35 +65,35 @@
 
 ### Archivos UNTRACKED detectados (`git status`)
 
-| Archivo | Tamaño | Propósito | Acción sugerida |
-|---|---|---|---|
-| `COMO_MAPEAR_CAPITULOS.md` | 8.3 KB | Doc en español sobre mapear capítulos (probablemente video editing) | Mover a `docs/internal/` o eliminar si es scratch |
-| `GUIA_PRODUCCION_VIDEOS.md` | 15.8 KB | Guía de producción de videos | Idem — no es código del producto |
-| `app/[locale]/dashboard/camera-test/page.tsx` | 8 KB / 203 líneas | Página de debug que llama `navigator.mediaDevices.getUserMedia` — para probar permisos de cámara/micrófono | **Mover a `app/dashboard/test-video/` o `(debug)/` y proteger con env flag, o eliminar (las páginas `ai-test`, `test-video`, `video-test` ya están en dashboard)** |
-| `prisma/migrations/20251210173306_add_recording_transcription/` | migration.sql | Ver reporte 04 — **CONFLICTO con schema actual** | Decidir: aplicar/descartar |
-| `prisma/migrations/20251216_add_welcome_message/` | migration.sql | Ver reporte 04 — superseded parcialmente | Descartar |
-| `prisma/migrations/add_social_hub_layout.sql` | 125 B | SQL stray fuera del esquema de migrations | Ver reporte 04 |
+| Archivo                                                         | Tamaño            | Propósito                                                                                                  | Acción sugerida                                                                                                                                                    |
+| --------------------------------------------------------------- | ----------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `COMO_MAPEAR_CAPITULOS.md`                                      | 8.3 KB            | Doc en español sobre mapear capítulos (probablemente video editing)                                        | Mover a `docs/internal/` o eliminar si es scratch                                                                                                                  |
+| `GUIA_PRODUCCION_VIDEOS.md`                                     | 15.8 KB           | Guía de producción de videos                                                                               | Idem — no es código del producto                                                                                                                                   |
+| `app/[locale]/dashboard/camera-test/page.tsx`                   | 8 KB / 203 líneas | Página de debug que llama `navigator.mediaDevices.getUserMedia` — para probar permisos de cámara/micrófono | **Mover a `app/dashboard/test-video/` o `(debug)/` y proteger con env flag, o eliminar (las páginas `ai-test`, `test-video`, `video-test` ya están en dashboard)** |
+| `prisma/migrations/20251210173306_add_recording_transcription/` | migration.sql     | Ver reporte 04 — **CONFLICTO con schema actual**                                                           | Decidir: aplicar/descartar                                                                                                                                         |
+| `prisma/migrations/20251216_add_welcome_message/`               | migration.sql     | Ver reporte 04 — superseded parcialmente                                                                   | Descartar                                                                                                                                                          |
+| `prisma/migrations/add_social_hub_layout.sql`                   | 125 B             | SQL stray fuera del esquema de migrations                                                                  | Ver reporte 04                                                                                                                                                     |
 
 ### Archivos commiteados que NO deberían estar versionados
 
-| Archivo | Tamaño | Por qué |
-|---|---|---|
-| `lint-after.txt` | 42 KB | Output de `next lint` capturado a archivo — debería ser efímero |
-| `lint-errors.txt` | 47 KB | Idem |
-| `BANNER.txt` | 8.5 KB | ASCII art / banner para terminal — uso desconocido, no referenciado |
-| `CLAUDE.md` | 0 B | Vacío — eliminar o llenar con instrucciones para Claude Code |
-| `check-file.js` | 307 B | Script trivial de 7 líneas para imprimir las primeras 10 líneas de la landing — herramienta one-off |
+| Archivo                | Tamaño | Por qué                                                                                                                                    |
+| ---------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `lint-after.txt`       | 42 KB  | Output de `next lint` capturado a archivo — debería ser efímero                                                                            |
+| `lint-errors.txt`      | 47 KB  | Idem                                                                                                                                       |
+| `BANNER.txt`           | 8.5 KB | ASCII art / banner para terminal — uso desconocido, no referenciado                                                                        |
+| `CLAUDE.md`            | 0 B    | Vacío — eliminar o llenar con instrucciones para Claude Code                                                                               |
+| `check-file.js`        | 307 B  | Script trivial de 7 líneas para imprimir las primeras 10 líneas de la landing — herramienta one-off                                        |
 | `tsconfig.tsbuildinfo` | 3.4 MB | Build cache de TypeScript — `.gitignore` lo ignora con `*.tsbuildinfo` pero ya estaba commiteado antes del rule (verificar `git ls-files`) |
 
 ### Scripts en root (verificar propósito)
 
-| Script | Plataforma | Propósito | Hardcoded creds? |
-|---|---|---|---|
-| `clean-restart.ps1` | PowerShell | Mata Node, borra `.next`, `node_modules/.cache`, `tsbuildinfo`, arranca `npm run dev` | No |
-| `restart-clean.bat` | CMD | Mismo que arriba pero en `.bat` | No |
-| `reset-postgres-password.ps1` | PowerShell (admin) | Resetea password de PostgreSQL local modificando `pg_hba.conf` | No (es para Postgres local del dev) — **pero referencia el path legacy `C:\Users\calfaro\AndroidStudioProjects\Mentorly\web`** |
-| `check_translations.py` | Python | Imprime keys del namespace `landing` de `en.json` | No |
-| `generate_landing.py` | Python (17 KB) | **Genera `app/[locale]/page.tsx` desde plantilla** — escribe la landing en disco con `f.write(...)` | No — pero es un workflow inusual: la landing del producto se "compila" de Python. **Investigar si esto sigue siendo la fuente de verdad o quedó obsoleto** |
+| Script                        | Plataforma         | Propósito                                                                                           | Hardcoded creds?                                                                                                                                           |
+| ----------------------------- | ------------------ | --------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `clean-restart.ps1`           | PowerShell         | Mata Node, borra `.next`, `node_modules/.cache`, `tsbuildinfo`, arranca `npm run dev`               | No                                                                                                                                                         |
+| `restart-clean.bat`           | CMD                | Mismo que arriba pero en `.bat`                                                                     | No                                                                                                                                                         |
+| `reset-postgres-password.ps1` | PowerShell (admin) | Resetea password de PostgreSQL local modificando `pg_hba.conf`                                      | No (es para Postgres local del dev) — **pero referencia el path legacy `C:\Users\calfaro\AndroidStudioProjects\Mentorly\web`**                             |
+| `check_translations.py`       | Python             | Imprime keys del namespace `landing` de `en.json`                                                   | No                                                                                                                                                         |
+| `generate_landing.py`         | Python (17 KB)     | **Genera `app/[locale]/page.tsx` desde plantilla** — escribe la landing en disco con `f.write(...)` | No — pero es un workflow inusual: la landing del producto se "compila" de Python. **Investigar si esto sigue siendo la fuente de verdad o quedó obsoleto** |
 
 ## La carpeta `/web/` (raíz)
 
@@ -107,6 +107,7 @@ web/
 ```
 
 `web/package.json` lista dependencies aisladas:
+
 - `@livekit/components-react ^2.9.17`, `livekit-client ^2.16.0`, `livekit-server-sdk ^2.14.2`
 - `@radix-ui/react-label ^2.1.8`
 - `express-rate-limit ^8.2.1`, `helmet ^8.1.0`, `joi ^18.0.2` ← **estas NO se usan en el proyecto principal**
@@ -117,6 +118,7 @@ Interpretación más probable: vestigio de un intento de monorepo o backend Expr
 ## Referencias legacy a "Mentorly"
 
 `grep -r "Mentorly|mentorly"` con extensiones de código y docs (excluyendo `node_modules`, `.git`, `.next`, `web`):
+
 - **166 hits totales** en 41 archivos.
 - **38 archivos están en `docs/archive/`** — históricos, OK ignorarlos.
 - **3 docs en raíz** (`ARCHITECTURE.md`, `LOCALIZATION_AUDIT.md`, `QUICKSTART.md`) — visibles en repo público, dan impresión de proyecto inconsistente.

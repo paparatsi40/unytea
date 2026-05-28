@@ -42,17 +42,14 @@ export async function createSession(data: {
       mentorId: userId,
       menteeId: userId,
     };
-    
+
     // Assign communityId — fall back to user's first community if not provided
     if (data.communityId) {
       sessionData.communityId = data.communityId;
     } else {
       const fallbackCommunity = await prisma.community.findFirst({
         where: {
-          OR: [
-            { ownerId: userId },
-            { members: { some: { userId, status: "ACTIVE" } } },
-          ],
+          OR: [{ ownerId: userId }, { members: { some: { userId, status: "ACTIVE" } } }],
         },
         select: { id: true },
         orderBy: { createdAt: "asc" },
@@ -104,7 +101,7 @@ export async function createSession(data: {
 
         // Also revalidate the community feed
         revalidatePath(`/dashboard/communities/${data.communityId}/sessions`);
-        
+
         // Try to get community slug for feed revalidation if communityId exists
         try {
           const community = await prisma.community.findUnique({
@@ -159,9 +156,7 @@ export async function getUserSessions() {
           { mentorId: userId },
           { menteeId: userId },
           // Include community sessions where user is an active member
-          ...(memberCommunityIds.length > 0
-            ? [{ communityId: { in: memberCommunityIds } }]
-            : []),
+          ...(memberCommunityIds.length > 0 ? [{ communityId: { in: memberCommunityIds } }] : []),
         ],
       },
       select: {
@@ -477,10 +472,11 @@ export async function getCommunityAttendanceMetrics(communityId: string, days: n
       });
 
       const rsvpToJoinRate = uniqueRsvps > 0 ? (totalAttendance / uniqueRsvps) * 100 : 0;
-      const replayRate = completedSessions.length > 0 ? (completedWithReplay / completedSessions.length) * 100 : 0;
+      const replayRate =
+        completedSessions.length > 0 ? (completedWithReplay / completedSessions.length) * 100 : 0;
 
       return {
-totalSessions: sessions.length,
+        totalSessions: sessions.length,
         scheduledSessions: scheduledSessions.length,
         completedSessions: completedSessions.length,
         totalAttendance,
@@ -489,7 +485,7 @@ totalSessions: sessions.length,
         rsvpToJoinRate: Number(Math.min(100, rsvpToJoinRate).toFixed(1)),
         replayRate: Number(Math.min(100, replayRate).toFixed(1)),
       };
-};
+    };
 
     const [currentMetrics, previousMetrics] = await Promise.all([
       computeMetrics(sessionsCurrent, since),
@@ -497,8 +493,12 @@ totalSessions: sessions.length,
     ]);
 
     const trend = {
-      avgAttendanceDelta: Number((currentMetrics.avgAttendance - previousMetrics.avgAttendance).toFixed(1)),
-      rsvpToJoinRateDelta: Number((currentMetrics.rsvpToJoinRate - previousMetrics.rsvpToJoinRate).toFixed(1)),
+      avgAttendanceDelta: Number(
+        (currentMetrics.avgAttendance - previousMetrics.avgAttendance).toFixed(1)
+      ),
+      rsvpToJoinRateDelta: Number(
+        (currentMetrics.rsvpToJoinRate - previousMetrics.rsvpToJoinRate).toFixed(1)
+      ),
       remindersSentDelta: currentMetrics.remindersSent - previousMetrics.remindersSent,
       completedSessionsDelta: currentMetrics.completedSessions - previousMetrics.completedSessions,
       replayRateDelta: Number((currentMetrics.replayRate - previousMetrics.replayRate).toFixed(1)),
@@ -613,7 +613,9 @@ export async function createSessionOrSeries(data: CreateSessionOrSeriesInput) {
 /**
  * Create a single one-time session
  */
-async function createSingleSession(data: CreateSessionOrSeriesInput & { mentorId: string; menteeId: string }) {
+async function createSingleSession(
+  data: CreateSessionOrSeriesInput & { mentorId: string; menteeId: string }
+) {
   const roomId = `session-${nanoid(12)}`;
 
   const sessionData: any = {
@@ -709,7 +711,7 @@ async function createRecurringSeries(
   const createdSessions = await Promise.all(
     instances.map(async (instanceData, index) => {
       const roomId = `session-${nanoid(12)}`;
-      
+
       const session = await prisma.mentorSession.create({
         data: {
           title: data.title,
@@ -778,24 +780,32 @@ export async function generateUpcomingSessions(
   count: number
 ): Promise<Array<{ scheduledAt: Date; endsAt: Date }>> {
   const instances: Array<{ scheduledAt: Date; endsAt: Date }> = [];
-  
+
   let currentDate = new Date(series.startsAt);
-  
+
   for (let i = 0; i < count; i++) {
     // Calculate next occurrence
-    if (series.frequency === "WEEKLY" && series.dayOfWeek !== null && series.dayOfWeek !== undefined) {
+    if (
+      series.frequency === "WEEKLY" &&
+      series.dayOfWeek !== null &&
+      series.dayOfWeek !== undefined
+    ) {
       // Set to the correct day of week
       const dayDiff = series.dayOfWeek - currentDate.getDay();
       currentDate.setDate(currentDate.getDate() + dayDiff);
-      
+
       // If we've passed this day this week, move to next week
       if (dayDiff < 0 || (dayDiff === 0 && i > 0)) {
         currentDate.setDate(currentDate.getDate() + 7 * series.interval);
       }
-    } else if (series.frequency === "MONTHLY" && series.dayOfMonth !== null && series.dayOfMonth !== undefined) {
+    } else if (
+      series.frequency === "MONTHLY" &&
+      series.dayOfMonth !== null &&
+      series.dayOfMonth !== undefined
+    ) {
       // Set to the correct day of month
       currentDate.setDate(series.dayOfMonth);
-      
+
       // Move to next month if needed
       if (i > 0) {
         currentDate.setMonth(currentDate.getMonth() + series.interval);
@@ -964,7 +974,7 @@ export async function editSeriesFromSession(
 
     if (updatedSeries) {
       const futureInstances = await generateUpcomingSessions(updatedSeries, 8);
-      
+
       await Promise.all(
         futureInstances.map((instance) =>
           prisma.mentorSession.create({

@@ -19,10 +19,7 @@ export async function getConvertibleSessions(communityId?: string) {
     const whereClause: any = {
       mentorId: userId,
       status: "COMPLETED",
-      OR: [
-        { recordingUrl: { not: null } },
-        { recording: { url: { not: null } } },
-      ],
+      OR: [{ recordingUrl: { not: null } }, { recording: { url: { not: null } } }],
     };
 
     if (communityId) {
@@ -75,29 +72,29 @@ export async function getConvertibleSessions(communityId?: string) {
  */
 function calculateEngagementScore(session: any): number {
   let score = 0;
-  
+
   // Attendance (max 40 points)
   const attendeeCount = session._count?.participations || 0;
   score += Math.min(attendeeCount * 2, 40);
-  
+
   // Duration (max 20 points) - longer sessions = more content
   score += Math.min(session.duration / 3, 20);
-  
+
   // Has notes (15 points)
   if (session.notes?.content) {
     score += 15;
   }
-  
+
   // Has resources (15 points)
   if (session._count?.resources > 0) {
     score += 15;
   }
-  
+
   // Is part of series (10 points) - indicates structured content
   if (session.seriesId) {
     score += 10;
   }
-  
+
   return Math.round(score);
 }
 
@@ -122,7 +119,7 @@ export async function analyzeCoursePotential(communityId?: string) {
 
     // Group sessions by potential topics (simple keyword matching)
     const groups = groupSessionsByTopic(sessions);
-    
+
     // Calculate potential for each group
     const suggestions = groups
       .filter((group) => group.sessions.length >= 2) // Need at least 2 sessions
@@ -131,10 +128,14 @@ export async function analyzeCoursePotential(communityId?: string) {
         sessionCount: group.sessions.length,
         sessions: group.sessions,
         totalDuration: group.sessions.reduce((sum: number, s: any) => sum + s.duration, 0),
-        totalAttendees: group.sessions.reduce((sum: number, s: any) => sum + (s._count?.participations || 0), 0),
+        totalAttendees: group.sessions.reduce(
+          (sum: number, s: any) => sum + (s._count?.participations || 0),
+          0
+        ),
         potentialStudents: estimatePotentialStudents(group.sessions),
         avgEngagement: Math.round(
-          group.sessions.reduce((sum: number, s: any) => sum + (s.engagementScore || 0), 0) / group.sessions.length
+          group.sessions.reduce((sum: number, s: any) => sum + (s.engagementScore || 0), 0) /
+            group.sessions.length
         ),
       }))
       .sort((a, b) => b.potentialStudents - a.potentialStudents) // Sort by potential
@@ -152,35 +153,54 @@ export async function analyzeCoursePotential(communityId?: string) {
  */
 function groupSessionsByTopic(sessions: any[]) {
   const groups: { title: string; sessions: any[] }[] = [];
-  
+
   // Define topic keywords and their variations
   const topicKeywords: { [key: string]: string[] } = {
-    "Marketing": ["marketing", "growth", "ads", "facebook", "google", "seo", "email", "funnel", "conversion", "acquisition"],
-    "Sales": ["sales", "selling", "closing", "prospecting", "negotiation", "deal", "revenue"],
-    "Product": ["product", "ux", "design", "user research", "feature", "roadmap", "pm"],
-    "Engineering": ["engineering", "coding", "development", "architecture", "tech", "software", "dev"],
-    "Leadership": ["leadership", "management", "team", "hiring", "culture", "lead", "executive"],
-    "Finance": ["finance", "fundraising", "investment", "money", "accounting", "revenue", "profit"],
-    "Strategy": ["strategy", "business model", "planning", "vision", "mission", "goals"],
-    "Operations": ["ops", "operations", "process", "efficiency", "systems", "automation"],
+    Marketing: [
+      "marketing",
+      "growth",
+      "ads",
+      "facebook",
+      "google",
+      "seo",
+      "email",
+      "funnel",
+      "conversion",
+      "acquisition",
+    ],
+    Sales: ["sales", "selling", "closing", "prospecting", "negotiation", "deal", "revenue"],
+    Product: ["product", "ux", "design", "user research", "feature", "roadmap", "pm"],
+    Engineering: [
+      "engineering",
+      "coding",
+      "development",
+      "architecture",
+      "tech",
+      "software",
+      "dev",
+    ],
+    Leadership: ["leadership", "management", "team", "hiring", "culture", "lead", "executive"],
+    Finance: ["finance", "fundraising", "investment", "money", "accounting", "revenue", "profit"],
+    Strategy: ["strategy", "business model", "planning", "vision", "mission", "goals"],
+    Operations: ["ops", "operations", "process", "efficiency", "systems", "automation"],
   };
-  
+
   // Track assigned sessions
   const assignedSessionIds = new Set<string>();
-  
+
   // Try to match sessions to topics
   for (const [topicName, keywords] of Object.entries(topicKeywords)) {
     const matchedSessions = sessions.filter((session) => {
       if (assignedSessionIds.has(session.id)) return false;
-      
+
       const titleLower = session.title.toLowerCase();
       const descLower = (session.description || "").toLowerCase();
-      
-      return keywords.some((keyword) => 
-        titleLower.includes(keyword) || descLower.includes(keyword)
+
+      return keywords.some(
+        (keyword) => titleLower.includes(keyword) || descLower.includes(keyword)
       );
     });
-    
+
     if (matchedSessions.length >= 2) {
       groups.push({
         title: `${topicName} Mastery`,
@@ -189,7 +209,7 @@ function groupSessionsByTopic(sessions: any[]) {
       matchedSessions.forEach((s) => assignedSessionIds.add(s.id));
     }
   }
-  
+
   // Group remaining sessions by series
   const remainingBySeries: { [key: string]: any[] } = {};
   sessions.forEach((session) => {
@@ -200,7 +220,7 @@ function groupSessionsByTopic(sessions: any[]) {
       remainingBySeries[session.seriesId].push(session);
     }
   });
-  
+
   for (const [_seriesId, seriesSessions] of Object.entries(remainingBySeries)) {
     if (seriesSessions.length >= 2) {
       const seriesTitle = seriesSessions[0].series?.title || "Series";
@@ -211,7 +231,7 @@ function groupSessionsByTopic(sessions: any[]) {
       seriesSessions.forEach((s) => assignedSessionIds.add(s.id));
     }
   }
-  
+
   return groups;
 }
 
@@ -222,14 +242,14 @@ function estimatePotentialStudents(sessions: any[]): number {
   // Average unique attendees across sessions
   const uniqueAttendees = new Set<string>();
   let totalAttendees = 0;
-  
+
   sessions.forEach((session) => {
     session.participations?.forEach((p: any) => {
       uniqueAttendees.add(p.userId);
     });
     totalAttendees += session._count?.participations || 0;
   });
-  
+
   // Estimate: unique attendees + 20% of total (for people who missed but are interested)
   const estimate = uniqueAttendees.size + Math.floor(totalAttendees * 0.2);
   return Math.max(estimate, sessions.length * 5); // Minimum 5 per session
@@ -271,10 +291,7 @@ export async function getKnowledgeImpact(communityId?: string) {
       where: {
         createdById: userId,
         type: "video",
-        OR: [
-          { title: { contains: "course" } },
-          { title: { contains: "Course" } },
-        ],
+        OR: [{ title: { contains: "course" } }, { title: { contains: "Course" } }],
       },
       select: {
         sessionId: true,
@@ -306,12 +323,13 @@ export async function getKnowledgeImpact(communityId?: string) {
     const totalSessions = sessions.length;
     const completedSessions = sessions.filter((s) => s.status === "COMPLETED").length;
     const totalAttendees = sessions.reduce((sum, s) => sum + (s._count?.participations || 0), 0);
-    
+
     const totalCourses = userCourses.length;
     const coursesFromSessionsCount = coursesFromSessions.length;
     const totalEnrollments = userCourses.reduce((sum, c) => sum + (c._count?.enrollments || 0), 0);
-    const totalLessons = userCourses.reduce((sum, c) => 
-      sum + c.modules.reduce((mSum, m) => mSum + m.lessons.length, 0), 0
+    const totalLessons = userCourses.reduce(
+      (sum, c) => sum + c.modules.reduce((mSum, m) => mSum + m.lessons.length, 0),
+      0
     );
 
     return {
@@ -324,7 +342,8 @@ export async function getKnowledgeImpact(communityId?: string) {
         coursesFromSessions: coursesFromSessionsCount,
         totalEnrollments,
         totalLessons,
-        conversionRate: totalSessions > 0 ? Math.round((coursesFromSessionsCount / totalSessions) * 100) : 0,
+        conversionRate:
+          totalSessions > 0 ? Math.round((coursesFromSessionsCount / totalSessions) * 100) : 0,
       },
     };
   } catch (error) {
@@ -392,7 +411,10 @@ export async function createCourseFromSessions(
     }
 
     // Generate unique slug
-    const baseSlug = courseData.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    const baseSlug = courseData.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
     const uniqueSlug = `${baseSlug}-${Date.now()}`;
 
     // Create course
@@ -400,7 +422,8 @@ export async function createCourseFromSessions(
       data: {
         title: courseData.title,
         slug: uniqueSlug,
-        description: courseData.description || `Course created from ${sessions.length} live sessions`,
+        description:
+          courseData.description || `Course created from ${sessions.length} live sessions`,
         communityId: courseData.communityId,
         isPaid: courseData.isPaid || false,
         price: courseData.price || 0,

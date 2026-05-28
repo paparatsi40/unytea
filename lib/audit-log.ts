@@ -96,8 +96,7 @@ export const AuditLog = {
   userLogin: (userId: string, metadata?: Record<string, any>) =>
     createAuditLog({ action: "USER_LOGIN", userId, metadata }),
 
-  userLogout: (userId: string) =>
-    createAuditLog({ action: "USER_LOGOUT", userId }),
+  userLogout: (userId: string) => createAuditLog({ action: "USER_LOGOUT", userId }),
 
   userRegister: (userId: string, metadata?: Record<string, any>) =>
     createAuditLog({ action: "USER_REGISTER", userId, metadata }),
@@ -155,12 +154,7 @@ export const AuditLog = {
       communityId,
     }),
 
-  memberBan: (
-    adminId: string,
-    userId: string,
-    communityId: string,
-    reason?: string
-  ) =>
+  memberBan: (adminId: string, userId: string, communityId: string, reason?: string) =>
     createAuditLog({
       action: "MEMBER_BAN",
       userId: adminId,

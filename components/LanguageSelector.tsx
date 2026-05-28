@@ -26,7 +26,7 @@ export function LanguageSelector() {
   useEffect(() => {
     setMounted(true);
     // Detect current locale from pathname or localStorage
-    const pathLocale = locales.find(l => pathname.startsWith(`/${l.code}`));
+    const pathLocale = locales.find((l) => pathname.startsWith(`/${l.code}`));
     if (pathLocale) {
       setCurrentLocale(pathLocale.code);
     } else {
@@ -38,10 +38,10 @@ export function LanguageSelector() {
   const handleLocaleChange = (newLocale: string) => {
     localStorage.setItem("locale", newLocale);
     setCurrentLocale(newLocale);
-    
+
     // Check if we're on an i18n route
-    const isI18nRoute = locales.some(l => pathname.startsWith(`/${l.code}`));
-    
+    const isI18nRoute = locales.some((l) => pathname.startsWith(`/${l.code}`));
+
     if (isI18nRoute) {
       // Replace current locale in pathname with new one and navigate
       const newPathname = pathname.replace(/^\/(en|es|fr)/, `/${newLocale}`);
@@ -59,7 +59,7 @@ export function LanguageSelector() {
     return (
       <Button variant="ghost" size="sm" className="gap-2">
         <Globe className="h-4 w-4" />
-        <span className="uppercase text-xs">EN</span>
+        <span className="text-xs uppercase">EN</span>
       </Button>
     );
   }
@@ -70,7 +70,7 @@ export function LanguageSelector() {
         <Button variant="ghost" size="sm" className="gap-2">
           <Globe className="h-4 w-4" />
           <span className="hidden sm:inline">{currentLocaleData?.flag}</span>
-          <span className="uppercase text-xs">{currentLocale}</span>
+          <span className="text-xs uppercase">{currentLocale}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

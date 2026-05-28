@@ -175,31 +175,31 @@
 ### **16. SETTINGS**
 
 - [ ] **Profile Settings**
-    - [ ] Update name
-    - [ ] Update username
-    - [ ] Update bio
-    - [ ] Save changes
+  - [ ] Update name
+  - [ ] Update username
+  - [ ] Update bio
+  - [ ] Save changes
 
 - [ ] **Notifications Settings**
-    - [ ] Toggle notifications
-    - [ ] Save preferences
-    - [ ] Settings persist
+  - [ ] Toggle notifications
+  - [ ] Save preferences
+  - [ ] Settings persist
 
 - [ ] **Privacy Settings**
-    - [ ] Change visibility
-    - [ ] Message settings
-    - [ ] Save privacy settings
+  - [ ] Change visibility
+  - [ ] Message settings
+  - [ ] Save privacy settings
 
 - [ ] **Appearance Settings**
-    - [ ] Select Light theme
-    - [ ] Select Dark theme
-    - [ ] Select System theme
-    - [ ] Save appearance
+  - [ ] Select Light theme
+  - [ ] Select Dark theme
+  - [ ] Select System theme
+  - [ ] Save appearance
 
 - [ ] **Account Settings**
-    - [ ] Change timezone
-    - [ ] Save account settings
-    - [ ] Danger zone visible
+  - [ ] Change timezone
+  - [ ] Save account settings
+  - [ ] Danger zone visible
 
 ### **17. MOBILE RESPONSIVE**
 
@@ -291,8 +291,8 @@
 
 ---
 
-**Tested By:** _________________  
-**Date:** _________________  
+**Tested By:** **\*\*\*\***\_**\*\*\*\***  
+**Date:** **\*\*\*\***\_**\*\*\*\***  
 **Approved for Production:** ☐ YES ☐ NO
 
 ---

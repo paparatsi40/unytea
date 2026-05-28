@@ -14,10 +14,7 @@ export async function POST() {
     const session = await auth();
 
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const userId = session.user.id;
@@ -31,14 +28,14 @@ export async function POST() {
     // Create Stripe Connect account if doesn't exist
     if (!user?.stripeConnectAccountId) {
       const email = user?.email || session.user.email;
-      
+
       if (!email) {
         return NextResponse.json(
           { error: "User email is required for Stripe Connect" },
           { status: 400 }
         );
       }
-      
+
       const account = await stripe.accounts.create({
         type: "standard",
         email,
@@ -87,9 +84,6 @@ export async function POST() {
     });
   } catch (error) {
     console.error("Error creating Stripe Connect onboarding:", error);
-    return NextResponse.json(
-      { error: "Failed to create onboarding link" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to create onboarding link" }, { status: 500 });
   }
 }

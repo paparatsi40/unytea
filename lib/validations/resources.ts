@@ -1,6 +1,6 @@
 /**
  * Resource Library - Validaciones Zod
- * 
+ *
  * Validaciones estrictas y type-safe para el Resource Library.
  * Todas las validaciones incluyen mensajes de error descriptivos.
  */
@@ -35,11 +35,7 @@ export const resourceCategorySchema = z.object({
     .max(500, "La descripción no puede exceder 500 caracteres")
     .optional()
     .nullable(),
-  icon: z
-    .string()
-    .max(50, "El icono no puede exceder 50 caracteres")
-    .optional()
-    .nullable(),
+  icon: z.string().max(50, "El icono no puede exceder 50 caracteres").optional().nullable(),
   color: z
     .string()
     .regex(/^#[0-9A-Fa-f]{6}$/, "El color debe ser un HEX válido (ej: #8B5CF6)")
@@ -65,12 +61,12 @@ export const createResourceSchema = z.object({
     .nullable(),
   type: ResourceTypeEnum,
   categoryId: z.string().cuid().optional().nullable(),
-  
+
   // Content fields - validación condicional según tipo
   fileUrl: z.string().url("URL de archivo inválida").optional().nullable(),
   externalUrl: z.string().url("URL externa inválida").optional().nullable(),
   thumbnailUrl: z.string().url("URL de thumbnail inválida").optional().nullable(),
-  
+
   // Metadata
   duration: z.number().int().min(0).optional().nullable(), // segundos
   fileSize: z.number().int().min(0).optional().nullable(), // bytes
@@ -79,11 +75,11 @@ export const createResourceSchema = z.object({
     .array(z.string().max(50, "Cada tag no puede exceder 50 caracteres"))
     .max(20, "No pueden haber más de 20 tags")
     .default([]),
-  
+
   // Access control
   isPublic: z.boolean().default(false),
   requiredLevel: z.number().int().min(1).optional().nullable(),
-  
+
   // Publishing
   status: ResourceStatusEnum.default("DRAFT"),
   publishedAt: z.date().optional().nullable(),

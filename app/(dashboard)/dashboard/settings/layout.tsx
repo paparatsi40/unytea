@@ -40,11 +40,7 @@ const settingsNav = [
   },
 ];
 
-export default function SettingsLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function SettingsLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   return (
@@ -56,9 +52,7 @@ export default function SettingsLayout({
         </div>
         <div>
           <h1 className="text-3xl font-bold text-foreground">Settings</h1>
-          <p className="text-muted-foreground">
-            Manage your account and preferences
-          </p>
+          <p className="text-muted-foreground">Manage your account and preferences</p>
         </div>
       </div>
 
@@ -70,7 +64,7 @@ export default function SettingsLayout({
             {settingsNav.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
-              
+
               return (
                 <Link
                   key={item.href}

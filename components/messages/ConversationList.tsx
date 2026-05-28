@@ -75,7 +75,8 @@ export function ConversationList({
 
           if (currentUnread > previousUnread) {
             const otherUser = getOtherUser(conv);
-            const displayName = otherUser.firstName || otherUser.name || otherUser.username || "User";
+            const displayName =
+              otherUser.firstName || otherUser.name || otherUser.username || "User";
             const diff = currentUnread - previousUnread;
 
             toast({
@@ -117,9 +118,7 @@ export function ConversationList({
         const username = (otherUser.username || "").toLowerCase();
 
         return (
-          fullName.toLowerCase().includes(query) ||
-          name.includes(query) ||
-          username.includes(query)
+          fullName.toLowerCase().includes(query) || name.includes(query) || username.includes(query)
         );
       });
     }
@@ -127,10 +126,7 @@ export function ConversationList({
     setFilteredConversations(next);
   }, [searchQuery, conversations, filter]);
 
-  const unreadTotal = conversations.reduce(
-    (sum, conv) => sum + getUnreadCount(conv),
-    0
-  );
+  const unreadTotal = conversations.reduce((sum, conv) => sum + getUnreadCount(conv), 0);
 
   return (
     <div className="flex w-full flex-col border-r border-gray-200 bg-white md:w-[310px]">
@@ -138,9 +134,7 @@ export function ConversationList({
       <div className="border-b border-gray-200 px-4 py-5">
         <div className="mb-4 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <h1 className="text-[2rem] font-semibold tracking-tight text-gray-950">
-              Messages
-            </h1>
+            <h1 className="text-[2rem] font-semibold tracking-tight text-gray-950">Messages</h1>
             {unreadTotal > 0 && (
               <span className="rounded-full bg-purple-600 px-2 py-0.5 text-xs font-semibold text-white">
                 {unreadTotal > 99 ? "99+" : unreadTotal}

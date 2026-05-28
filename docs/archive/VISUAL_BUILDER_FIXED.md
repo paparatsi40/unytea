@@ -13,6 +13,7 @@
 El Visual Builder anterior tenía **re-renders infinitos** causados por:
 
 1. **useCallback con dependencias incorrectas**
+
    ```tsx
    // ❌ ANTES: Closure problemático
    const updateElement = useCallback((id: string, updates) => {
@@ -21,9 +22,9 @@ El Visual Builder anterior tenía **re-renders infinitos** causados por:
    ```
 
 2. **memo en componentes hijos**
-    - El `memo` esperaba props estables
-    - Las funciones se recreaban en cada render
-    - El hijo se re-renderizaba de todos modos
+   - El `memo` esperaba props estables
+   - Las funciones se recreaban en cada render
+   - El hijo se re-renderizaba de todos modos
 
 3. **Estado complejo** con resize, drag, selection todo mezclado
 
@@ -42,7 +43,7 @@ const [selectedId, setSelectedId] = useState<string | null>(null);
 
 // Función simple, sin useCallback
 function updateElement(id: string, updates: Partial<CanvasElement>) {
-  setElements(elements.map(el => el.id === id ? { ...el, ...updates } : el));
+  setElements(elements.map((el) => (el.id === id ? { ...el, ...updates } : el)));
 }
 ```
 
@@ -141,23 +142,23 @@ Esto hará:
 #### **A. Agregar elementos** ✅
 
 1. **Arrastra "Text Block"** desde el panel izquierdo al canvas blanco
-    - Debería aparecer un cuadro con texto
+   - Debería aparecer un cuadro con texto
 
 2. **Arrastra "Button"** al canvas
-    - Debería aparecer un botón púrpura
+   - Debería aparecer un botón púrpura
 
 3. **Arrastra "Image"** al canvas
-    - Debería aparecer un placeholder de imagen
+   - Debería aparecer un placeholder de imagen
 
 #### **B. Seleccionar elementos** ✅
 
 1. **Click en cualquier elemento** en el canvas
-    - Debería aparecer un **ring azul** alrededor
-    - El panel derecho debería mostrar las propiedades
+   - Debería aparecer un **ring azul** alrededor
+   - El panel derecho debería mostrar las propiedades
 
 2. **Click fuera de los elementos** (en el canvas blanco)
-    - La selección se debería limpiar
-    - El panel derecho debería decir "Select an element to edit"
+   - La selección se debería limpiar
+   - El panel derecho debería decir "Select an element to edit"
 
 #### **C. Editar propiedades** ✅
 
@@ -184,18 +185,18 @@ Esto hará:
 #### **D. Mover y redimensionar** ✅
 
 1. **Position (X, Y):**
-    - Cambia los valores numéricos
-    - El elemento se debería mover
+   - Cambia los valores numéricos
+   - El elemento se debería mover
 
 2. **Size (W, H):**
-    - Cambia los valores numéricos
-    - El elemento se debería redimensionar
+   - Cambia los valores numéricos
+   - El elemento se debería redimensionar
 
 #### **E. Eliminar elementos** ✅
 
 1. Selecciona un elemento
 2. Click en el **botón rojo "Delete Element"** en el panel derecho
-    - **O** click en el **icono de basura (🗑️)** en la esquina del elemento
+   - **O** click en el **icono de basura (🗑️)** en la esquina del elemento
 3. El elemento debería desaparecer
 
 #### **F. Ver capas** ✅
@@ -242,17 +243,17 @@ URL debería ser: `http://localhost:3000/dashboard/c/[slug]/settings/landing`
 
 ## 📊 **COMPARACIÓN: ANTES vs AHORA**
 
-| Aspecto | Antes ❌ | Ahora ✅ |
-|---------|---------|----------|
-| Lines of code | ~750 | ~300 |
-| useCallback | 5+ | 0 |
-| useMemo | 2+ | 0 |
-| memo | 1 | 0 |
-| console.logs | 10+ | 0 |
-| State complexity | Alta | Baja |
-| Re-renders | Infinitos | Normales |
-| Funciona | ❌ NO | ✅ SÍ |
-| Fácil de mantener | ❌ NO | ✅ SÍ |
+| Aspecto           | Antes ❌  | Ahora ✅ |
+| ----------------- | --------- | -------- |
+| Lines of code     | ~750      | ~300     |
+| useCallback       | 5+        | 0        |
+| useMemo           | 2+        | 0        |
+| memo              | 1         | 0        |
+| console.logs      | 10+       | 0        |
+| State complexity  | Alta      | Baja     |
+| Re-renders        | Infinitos | Normales |
+| Funciona          | ❌ NO     | ✅ SÍ    |
+| Fácil de mantener | ❌ NO     | ✅ SÍ    |
 
 ---
 
@@ -261,31 +262,31 @@ URL debería ser: `http://localhost:3000/dashboard/c/[slug]/settings/landing`
 ### **Por qué batallamos 2 días:**
 
 1. **Optimización prematura**
-    - Agregamos `useCallback`, `memo`, etc. antes de que hubiera un problema de performance
-    - Estos causaron **más problemas** de los que resolvieron
+   - Agregamos `useCallback`, `memo`, etc. antes de que hubiera un problema de performance
+   - Estos causaron **más problemas** de los que resolvieron
 
 2. **Debugging a ciegas**
-    - Sin screenshots, era difícil ver qué estaba pasando
-    - Agregamos console.logs que empeoraron el problema
+   - Sin screenshots, era difícil ver qué estaba pasando
+   - Agregamos console.logs que empeoraron el problema
 
 3. **Caché corrupto**
-    - El `.next` folder tenía builds antiguos
-    - Hot reload no funcionaba correctamente
+   - El `.next` folder tenía builds antiguos
+   - Hot reload no funcionaba correctamente
 
 4. **Complejidad innecesaria**
-    - El componente tenía drag, resize, selection, todo en uno
-    - Debimos empezar simple y agregar features gradualmente
+   - El componente tenía drag, resize, selection, todo en uno
+   - Debimos empezar simple y agregar features gradualmente
 
 ### **Reglas de React que violamos:**
 
 1. ❌ **"Make it work, then make it fast"**
-    - Intentamos optimizar antes de que funcionara
+   - Intentamos optimizar antes de que funcionara
 
 2. ❌ **"Simple is better than complex"**
-    - El código era demasiado complejo para lo que hacía
+   - El código era demasiado complejo para lo que hacía
 
 3. ❌ **"Premature optimization is the root of all evil"**
-    - `useCallback` sin razón → closures problemáticos
+   - `useCallback` sin razón → closures problemáticos
 
 ### **La solución correcta era:**
 
@@ -303,29 +304,29 @@ Una vez que confirmes que **TODO FUNCIONA**, podemos agregar:
 ### **Features adicionales:**
 
 1. **Drag & drop dentro del canvas**
-    - Mover elementos arrastrándolos (no solo con inputs numéricos)
+   - Mover elementos arrastrándolos (no solo con inputs numéricos)
 
 2. **Resize handles**
-    - Esquinas/bordes para redimensionar visualmente
+   - Esquinas/bordes para redimensionar visualmente
 
 3. **Guardar/Cargar layouts**
-    - API endpoint para persistir en la base de datos
-    - Botón "Save" y "Load"
+   - API endpoint para persistir en la base de datos
+   - Botón "Save" y "Load"
 
 4. **Undo/Redo**
-    - Stack de history para deshacer cambios
+   - Stack de history para deshacer cambios
 
 5. **Copy/Paste**
-    - Duplicar elementos
+   - Duplicar elementos
 
 6. **Layers reorder**
-    - Drag & drop en la lista de layers
-    - Bring to front / Send to back
+   - Drag & drop en la lista de layers
+   - Bring to front / Send to back
 
 7. **Más elementos:**
-    - Owner Bio (avatar + bio)
-    - Stats (métricas)
-    - Custom sections
+   - Owner Bio (avatar + bio)
+   - Stats (métricas)
+   - Custom sections
 
 ### **Optimizaciones (solo SI HAY PROBLEMAS):**
 

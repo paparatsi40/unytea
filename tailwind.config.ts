@@ -120,7 +120,7 @@ const config: Config = {
         mono: ["var(--font-geist-mono)", "monospace"],
       },
       boxShadow: {
-        "smooth": "0 2px 8px 0 rgba(0, 0, 0, 0.08)",
+        smooth: "0 2px 8px 0 rgba(0, 0, 0, 0.08)",
         "smooth-lg": "0 4px 16px 0 rgba(0, 0, 0, 0.12)",
         "smooth-xl": "0 8px 32px 0 rgba(0, 0, 0, 0.16)",
       },

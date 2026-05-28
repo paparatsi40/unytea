@@ -38,11 +38,9 @@ function trackPublicLibraryEvent(params: {
   });
 }
 
-export async function generateMetadata(
-  props: {
-    params: Promise<{ locale: string }>;
-  }
-): Promise<Metadata> {
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
   const params = await props.params;
   const canonical = `https://www.unytea.com/${params.locale}/library`;
   const title = "Knowledge Library | Unytea";
@@ -71,12 +69,10 @@ export async function generateMetadata(
   };
 }
 
-export default async function PublicLibraryPage(
-  props: {
-    params: Promise<{ locale: string }>;
-    searchParams?: Promise<{ src?: string }>;
-  }
-) {
+export default async function PublicLibraryPage(props: {
+  params: Promise<{ locale: string }>;
+  searchParams?: Promise<{ src?: string }>;
+}) {
   const searchParams = await props.searchParams;
   const params = await props.params;
   const locale = params.locale || "en";
@@ -106,34 +102,37 @@ export default async function PublicLibraryPage(
   });
 
   const keyTopics = Object.entries(
-    sessions.reduce((acc, session) => {
-      const sourceText = [
-        session.title,
-        session.description || "",
-        ...parseInsights(session.notes?.keyInsights || null),
-      ]
-        .join(" ")
-        .toLowerCase();
+    sessions.reduce(
+      (acc, session) => {
+        const sourceText = [
+          session.title,
+          session.description || "",
+          ...parseInsights(session.notes?.keyInsights || null),
+        ]
+          .join(" ")
+          .toLowerCase();
 
-      const candidates = [
-        "ai",
-        "marketing",
-        "sales",
-        "product",
-        "engineering",
-        "leadership",
-        "finance",
-        "strategy",
-      ];
+        const candidates = [
+          "ai",
+          "marketing",
+          "sales",
+          "product",
+          "engineering",
+          "leadership",
+          "finance",
+          "strategy",
+        ];
 
-      for (const topic of candidates) {
-        if (sourceText.includes(topic)) {
-          acc[topic] = (acc[topic] || 0) + 1;
+        for (const topic of candidates) {
+          if (sourceText.includes(topic)) {
+            acc[topic] = (acc[topic] || 0) + 1;
+          }
         }
-      }
 
-      return acc;
-    }, {} as Record<string, number>)
+        return acc;
+      },
+      {} as Record<string, number>
+    )
   )
     .sort((a, b) => b[1] - a[1])
     .slice(0, 8);
@@ -157,7 +156,7 @@ export default async function PublicLibraryPage(
       <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
         <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
+            <h1 className="flex items-center gap-2 text-3xl font-bold text-foreground">
               <BookOpen className="h-7 w-7 text-primary" />
               Knowledge Library
             </h1>
@@ -169,7 +168,7 @@ export default async function PublicLibraryPage(
 
         {keyTopics.length > 0 && (
           <section className="mb-8 rounded-xl border border-border bg-card p-5">
-            <h2 className="mb-3 text-lg font-semibold text-foreground flex items-center gap-2">
+            <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold text-foreground">
               <TrendingUp className="h-5 w-5 text-emerald-500" />
               Key Topics
             </h2>
@@ -184,7 +183,7 @@ export default async function PublicLibraryPage(
         )}
 
         <section>
-          <h2 className="mb-4 text-lg font-semibold text-foreground flex items-center gap-2">
+          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-foreground">
             <Sparkles className="h-5 w-5 text-amber-500" />
             Curated Recordings
           </h2>
@@ -203,7 +202,9 @@ export default async function PublicLibraryPage(
                 >
                   <div className="mb-3 flex items-center justify-between">
                     <Badge variant="outline">Replay</Badge>
-                    <span className="text-xs text-muted-foreground">{formatDate(session.scheduledAt)}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {formatDate(session.scheduledAt)}
+                    </span>
                   </div>
 
                   <h3 className="line-clamp-2 font-semibold text-foreground">{session.title}</h3>

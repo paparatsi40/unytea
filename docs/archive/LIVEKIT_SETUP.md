@@ -33,9 +33,9 @@ https://cloud.livekit.io/
 
 - Click en **"Sign Up"**
 - Puedes usar:
-    - GitHub (recomendado)
-    - Google
-    - Email
+  - GitHub (recomendado)
+  - Google
+  - Email
 
 ### **1.3 Crear un proyecto:**
 
@@ -71,13 +71,13 @@ xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 Necesitas estos 3 valores:
 
 1. **LIVEKIT_URL** (WebSocket URL)
-    - Ejemplo: `wss://unytea-xxxxx.livekit.cloud`
+   - Ejemplo: `wss://unytea-xxxxx.livekit.cloud`
 
 2. **LIVEKIT_API_KEY** (API Key)
-    - Ejemplo: `APIxxxxxxxxxxxxxxxxx`
+   - Ejemplo: `APIxxxxxxxxxxxxxxxxx`
 
 3. **LIVEKIT_API_SECRET** (API Secret)
-    - Ejemplo: `xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
+   - Ejemplo: `xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
 
 ---
 
@@ -150,13 +150,13 @@ Esto verifica que tu cuenta funciona correctamente.
 
 ## 📊 **LÍMITES DEL PLAN GRATUITO:**
 
-| Recurso | Límite Gratuito |
-|---------|-----------------|
-| **Minutos de video** | 10,000/mes |
-| **Participantes simultáneos** | Ilimitados |
-| **Rooms simultáneos** | Ilimitados |
-| **Storage (recording)** | No incluido (upgrade a $9/mes) |
-| **Bandwidth** | Ilimitado |
+| Recurso                       | Límite Gratuito                |
+| ----------------------------- | ------------------------------ |
+| **Minutos de video**          | 10,000/mes                     |
+| **Participantes simultáneos** | Ilimitados                     |
+| **Rooms simultáneos**         | Ilimitados                     |
+| **Storage (recording)**       | No incluido (upgrade a $9/mes) |
+| **Bandwidth**                 | Ilimitado                      |
 
 **Para referencia:**
 
@@ -168,12 +168,12 @@ Esto verifica que tu cuenta funciona correctamente.
 
 ## 💰 **PLANES PAGOS (si creces):**
 
-| Plan | Precio | Minutos |
-|------|--------|---------|
-| **Free** | $0/mes | 10,000 |
-| **Starter** | $29/mes | 15,000 + $0.002/min adicional |
-| **Pro** | $99/mes | 50,000 + $0.0015/min adicional |
-| **Enterprise** | Custom | Custom |
+| Plan           | Precio  | Minutos                        |
+| -------------- | ------- | ------------------------------ |
+| **Free**       | $0/mes  | 10,000                         |
+| **Starter**    | $29/mes | 15,000 + $0.002/min adicional  |
+| **Pro**        | $99/mes | 50,000 + $0.0015/min adicional |
+| **Enterprise** | Custom  | Custom                         |
 
 ---
 

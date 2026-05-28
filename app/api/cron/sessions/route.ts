@@ -22,10 +22,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(results);
   } catch (error) {
     console.error("Error in cron session jobs:", error);
-    return NextResponse.json(
-      { success: false, error: String(error) },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: String(error) }, { status: 500 });
   }
 }
 

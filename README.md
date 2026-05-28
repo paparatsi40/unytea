@@ -18,17 +18,17 @@ features they're missing. Half the price, better features, infinite soul.
 
 ### **Why Unytea Beats Skool**
 
-| Feature             | Skool             | Unytea                          |
-|---------------------|-------------------|---------------------------------|
-| **Price**           | $99/month         | **$49/month** ☕                 |
+| Feature             | Skool              | Unytea                           |
+| ------------------- | ------------------ | -------------------------------- |
+| **Price**           | $99/month          | **$49/month** ☕                 |
 | **Video Calls**     | ❌ External (Zoom) | ✅ **Built-in (Livekit)**        |
 | **Buddy System**    | ❌ None            | ✅ **Unique matching system** 🌟 |
 | **Auditorium View** | ❌ None            | ✅ **Real-time presence** 🌟     |
 | **Custom Branding** | ❌ Logo only       | ✅ **Complete theming**          |
 | **Custom Domain**   | ❌ Subdomain only  | ✅ **Full custom domains**       |
-| **Performance**     | ⭐⭐⭐               | ⭐⭐⭐⭐⭐ **WebSockets 0ms**        |
-| **Design**          | 2015 style        | **2024 Glassmorphism** ✨        |
-| **Analytics**       | Basic stats       | **Advanced dashboards**         |
+| **Performance**     | ⭐⭐⭐             | ⭐⭐⭐⭐⭐ **WebSockets 0ms**    |
+| **Design**          | 2015 style         | **2024 Glassmorphism** ✨        |
+| **Analytics**       | Basic stats        | **Advanced dashboards**          |
 | **White Label**     | ❌ Not available   | ✅ **Premium tier**              |
 
 **2 Features NOBODY ELSE HAS:**
@@ -226,6 +226,7 @@ features they're missing. Half the price, better features, infinite soul.
 ## 🛠️ **Tech Stack**
 
 ### **Frontend**
+
 - **Framework**: Next.js 14 (App Router)
 - **Language**: TypeScript (strict mode)
 - **Styling**: Tailwind CSS + shadcn/ui
@@ -259,6 +260,7 @@ features they're missing. Half the price, better features, infinite soul.
 ## 🚀 **Getting Started**
 
 ### **Prerequisites**
+
 - Node.js 18+ and npm
 - PostgreSQL database
 - NextAuth setup
@@ -266,22 +268,26 @@ features they're missing. Half the price, better features, infinite soul.
 ### **Installation**
 
 1. **Clone the repository**
+
 ```bash
 git clone https://github.com/yourusername/unytea.git
 cd unytea/web
 ```
 
 2. **Install dependencies**
+
 ```bash
 npm install
 ```
 
 3. **Set up environment variables**
+
 ```bash
 cp .env.example .env
 ```
 
 Edit `.env` and add your credentials:
+
 ```env
 DATABASE_URL="postgresql://..."
 NEXTAUTH_URL="http://localhost:3000"
@@ -289,11 +295,13 @@ NEXTAUTH_SECRET="your-secret-here"
 ```
 
 4. **Set up the database**
+
 ```bash
 npm run db:push
 ```
 
 5. **Run the development server**
+
 ```bash
 npm run dev
 ```
@@ -349,6 +357,7 @@ Open [http://localhost:3000](http://localhost:3000) ☕
 ---
 
 ## 📊 **Performance Targets**
+
 - **Lighthouse Score**: 95+ on all metrics
 - **LCP**: < 1.5s
 - **FID**: < 100ms
@@ -358,6 +367,7 @@ Open [http://localhost:3000](http://localhost:3000) ☕
 ---
 
 ## 🔒 **Security**
+
 - ✅ OWASP Top 10 addressed
 - ✅ Rate limiting planned
 - ✅ CSRF protection
@@ -412,4 +422,3 @@ Let's build something warm together. ☕
 - [Documentation](https://docs.unytea.com) (Coming soon)
 - [Changelog](./CHANGELOG.md) (Coming soon)
 - [API Reference](https://api.unytea.com) (Coming soon)
-

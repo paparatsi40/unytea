@@ -34,20 +34,23 @@ export function NotificationList({ notifications }: NotificationListProps) {
   );
 
   // Group notifications by date
-  const groupedNotifications = filteredNotifications.reduce((acc, notif) => {
-    const date = new Date(notif.createdAt).toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
+  const groupedNotifications = filteredNotifications.reduce(
+    (acc, notif) => {
+      const date = new Date(notif.createdAt).toLocaleDateString("en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
 
-    if (!acc[date]) {
-      acc[date] = [];
-    }
-    acc[date].push(notif);
-    return acc;
-  }, {} as Record<string, Notification[]>);
+      if (!acc[date]) {
+        acc[date] = [];
+      }
+      acc[date].push(notif);
+      return acc;
+    },
+    {} as Record<string, Notification[]>
+  );
 
   return (
     <Tabs value={filter} onValueChange={(v) => setFilter(v as "all" | "unread")}>
@@ -62,9 +65,7 @@ export function NotificationList({ notifications }: NotificationListProps) {
         {filteredNotifications.length === 0 ? (
           <div className="flex min-h-[400px] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-muted/20 p-12">
             <Bell className="mb-4 h-16 w-16 text-muted-foreground/40" />
-            <h3 className="mb-2 text-lg font-semibold text-foreground">
-              No notifications
-            </h3>
+            <h3 className="mb-2 text-lg font-semibold text-foreground">No notifications</h3>
             <p className="text-center text-sm text-muted-foreground">
               {filter === "unread"
                 ? "You're all caught up! No unread notifications."
@@ -74,15 +75,10 @@ export function NotificationList({ notifications }: NotificationListProps) {
         ) : (
           Object.entries(groupedNotifications).map(([date, notifs]) => (
             <div key={date} className="space-y-3">
-              <h3 className="text-sm font-semibold text-muted-foreground">
-                {date}
-              </h3>
+              <h3 className="text-sm font-semibold text-muted-foreground">{date}</h3>
               <div className="space-y-2">
                 {notifs.map((notification) => (
-                  <NotificationItem
-                    key={notification.id}
-                    notification={notification}
-                  />
+                  <NotificationItem key={notification.id} notification={notification} />
                 ))}
               </div>
             </div>

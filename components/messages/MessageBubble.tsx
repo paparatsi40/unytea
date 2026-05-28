@@ -3,13 +3,7 @@
 import { useState } from "react";
 import NextImage from "next/image";
 import { formatDistanceToNow } from "date-fns";
-import {
-  Check,
-  CheckCheck,
-  MoreVertical,
-  Trash2,
-  Image as ImageIcon,
-} from "lucide-react";
+import { Check, CheckCheck, MoreVertical, Trash2, Image as ImageIcon } from "lucide-react";
 import { deleteMessage } from "@/app/actions/messages";
 import { useToast } from "@/hooks/use-toast";
 
@@ -31,11 +25,7 @@ interface MessageBubbleProps {
   onDelete?: () => void;
 }
 
-export function MessageBubble({
-  message,
-  isOwnMessage,
-  onDelete,
-}: MessageBubbleProps) {
+export function MessageBubble({ message, isOwnMessage, onDelete }: MessageBubbleProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -79,9 +69,7 @@ export function MessageBubble({
   ).toUpperCase();
 
   return (
-    <div
-      className={`group flex items-end gap-2 ${isOwnMessage ? "justify-end" : "justify-start"}`}
-    >
+    <div className={`group flex items-end gap-2 ${isOwnMessage ? "justify-end" : "justify-start"}`}>
       {!isOwnMessage && (
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-pink-500 text-sm font-semibold text-white shadow-sm">
           {message.sender.image ? (
@@ -147,15 +135,9 @@ export function MessageBubble({
             }`}
           >
             {message.content ? (
-              <p className="whitespace-pre-wrap break-words text-sm leading-6">
-                {message.content}
-              </p>
+              <p className="whitespace-pre-wrap break-words text-sm leading-6">{message.content}</p>
             ) : (
-              <p
-                className={`text-xs italic ${
-                  isOwnMessage ? "text-white/80" : "text-gray-500"
-                }`}
-              >
+              <p className={`text-xs italic ${isOwnMessage ? "text-white/80" : "text-gray-500"}`}>
                 Attachment
               </p>
             )}
@@ -212,9 +194,7 @@ export function MessageBubble({
 
         {showDeleteConfirm && (
           <div className="mt-2 w-full max-w-xs rounded-2xl border border-red-200 bg-red-50 p-3 shadow-sm">
-            <p className="text-xs text-red-700">
-              Delete this message permanently?
-            </p>
+            <p className="text-xs text-red-700">Delete this message permanently?</p>
 
             <div className="mt-2 flex justify-end gap-2">
               <button

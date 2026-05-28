@@ -37,7 +37,7 @@ export const dynamic = "force-dynamic";
  * Create checkout session for community membership
  * POST /api/stripe/community-checkout
  * Body: { communityId: string, priceId: string }
- * 
+ *
  * Creates a checkout with platform fee (5%) and transfer to community owner (95%)
  */
 export async function POST(req: Request) {
@@ -45,19 +45,13 @@ export async function POST(req: Request) {
     const session = await auth();
 
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { communityId, priceId } = await req.json();
 
     if (!communityId || !priceId) {
-      return NextResponse.json(
-        { error: "Missing communityId or priceId" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Missing communityId or priceId" }, { status: 400 });
     }
 
     // Get community details with owner
@@ -72,17 +66,11 @@ export async function POST(req: Request) {
     });
 
     if (!community) {
-      return NextResponse.json(
-        { error: "Community not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Community not found" }, { status: 404 });
     }
 
     if (!community.isPaid) {
-      return NextResponse.json(
-        { error: "This community is free" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "This community is free" }, { status: 400 });
     }
 
     // Check if user is already a member
@@ -95,10 +83,7 @@ export async function POST(req: Request) {
     });
 
     if (existingMembership) {
-      return NextResponse.json(
-        { error: "Already a member of this community" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Already a member of this community" }, { status: 400 });
     }
 
     // Get or create Stripe customer for user
@@ -158,9 +143,6 @@ export async function POST(req: Request) {
     });
   } catch (error) {
     console.error("Error creating community checkout:", error);
-    return NextResponse.json(
-      { error: "Failed to create checkout session" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to create checkout session" }, { status: 500 });
   }
 }

@@ -25,20 +25,20 @@ export function FeatureCard({
 
   return (
     <div
-      className={`group relative p-6 rounded-xl border transition-all duration-300 hover:shadow-xl hover:scale-[1.02] overflow-hidden ${
+      className={`group relative overflow-hidden rounded-xl border p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl ${
         highlighted
           ? "border-primary bg-gradient-to-br from-primary/10 to-purple-100"
           : "bg-gradient-to-br from-white to-gray-50"
-      } ${large ? "h-full flex flex-col" : ""}`}
+      } ${large ? "flex h-full flex-col" : ""}`}
     >
       <div
-        className={`absolute top-0 right-0 w-32 h-32 opacity-10 rounded-full -translate-y-1/2 translate-x-1/2 transition-transform group-hover:scale-150 ${
+        className={`absolute right-0 top-0 h-32 w-32 -translate-y-1/2 translate-x-1/2 rounded-full opacity-10 transition-transform group-hover:scale-150 ${
           highlighted ? "bg-primary" : "bg-gray-400"
         }`}
       />
 
       <div
-        className={`relative w-full rounded-xl mb-4 overflow-hidden shadow-md ${
+        className={`relative mb-4 w-full overflow-hidden rounded-xl shadow-md ${
           large ? "h-48" : "h-32"
         } ${imgError ? "bg-gradient-to-br from-gray-200 to-gray-300" : ""}`}
       >
@@ -53,17 +53,13 @@ export function FeatureCard({
           />
         )}
         {imgError && (
-          <div className="w-full h-full flex items-center justify-center">
+          <div className="flex h-full w-full items-center justify-center">
             <div
-              className={`w-12 h-12 rounded-full flex items-center justify-center ${
+              className={`flex h-12 w-12 items-center justify-center rounded-full ${
                 highlighted ? "bg-primary/20" : "bg-gray-300"
               }`}
             >
-              <Sparkles
-                className={`w-6 h-6 ${
-                  highlighted ? "text-primary" : "text-gray-500"
-                }`}
-              />
+              <Sparkles className={`h-6 w-6 ${highlighted ? "text-primary" : "text-gray-500"}`} />
             </div>
           </div>
         )}
@@ -71,18 +67,8 @@ export function FeatureCard({
           <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent" />
         )}
       </div>
-      <h3
-        className={`relative font-semibold mb-2 ${
-          large ? "text-xl" : "text-lg"
-        }`}
-      >
-        {title}
-      </h3>
-      <p
-        className={`relative text-muted-foreground ${
-          large ? "text-base flex-grow" : "text-sm"
-        }`}
-      >
+      <h3 className={`relative mb-2 font-semibold ${large ? "text-xl" : "text-lg"}`}>{title}</h3>
+      <p className={`relative text-muted-foreground ${large ? "flex-grow text-base" : "text-sm"}`}>
         {description}
       </p>
     </div>

@@ -28,7 +28,8 @@ export async function generateMetadata(props: PublicSessionRouteProps): Promise<
   const communityName = session.community.name;
 
   const title = `${session.title} | ${hostName} | ${communityName}`;
-  const description = session.description || 
+  const description =
+    session.description ||
     `Watch this session from ${communityName} hosted by ${hostName}. Join the community to access more live sessions and recordings.`;
 
   const isIndexable = session.visibility === "public";
@@ -36,7 +37,14 @@ export async function generateMetadata(props: PublicSessionRouteProps): Promise<
   return {
     title,
     description,
-    keywords: [session.title, hostName, communityName, "live session", "recording", "community learning"],
+    keywords: [
+      session.title,
+      hostName,
+      communityName,
+      "live session",
+      "recording",
+      "community learning",
+    ],
     authors: [{ name: hostName }],
     robots: isIndexable
       ? { index: true, follow: true }
@@ -85,11 +93,7 @@ export default async function PublicSessionRoute(props: PublicSessionRouteProps)
 
   const session = sessionResult.session;
 
-  const relatedResult = await getRelatedSessions(
-    session.community.id,
-    session.id,
-    3
-  );
+  const relatedResult = await getRelatedSessions(session.community.id, session.id, 3);
 
   const [nextSessionResult, relatedCommunitiesResult] = await Promise.all([
     getNextCommunitySession(session.community.id),
@@ -101,8 +105,10 @@ export default async function PublicSessionRoute(props: PublicSessionRouteProps)
       session={session}
       locale="en"
       relatedSessions={relatedResult.success ? relatedResult.sessions || [] : []}
-      relatedCommunities={relatedCommunitiesResult.success ? relatedCommunitiesResult.communities || [] : []}
-      nextSession={nextSessionResult.success ? nextSessionResult.session ?? null : null}
+      relatedCommunities={
+        relatedCommunitiesResult.success ? relatedCommunitiesResult.communities || [] : []
+      }
+      nextSession={nextSessionResult.success ? (nextSessionResult.session ?? null) : null}
     />
   );
 }

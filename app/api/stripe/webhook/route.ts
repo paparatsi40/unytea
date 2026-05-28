@@ -12,10 +12,7 @@ export async function POST(request: Request) {
     const signature = (await headers()).get("stripe-signature");
 
     if (!signature) {
-      return NextResponse.json(
-        { error: "Missing stripe-signature header" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Missing stripe-signature header" }, { status: 400 });
     }
 
     let event;
@@ -24,10 +21,7 @@ export async function POST(request: Request) {
       event = stripe.webhooks.constructEvent(payload, signature, webhookSecret);
     } catch (err: any) {
       console.error(`Webhook signature verification failed:`, err.message);
-      return NextResponse.json(
-        { error: `Webhook Error: ${err.message}` },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: `Webhook Error: ${err.message}` }, { status: 400 });
     }
 
     try {
@@ -40,10 +34,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ received: true, duplicate: true });
       }
       console.error(`[stripe-webhook] DB error recording event:`, err);
-      return NextResponse.json(
-        { error: "Failed to record event" },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: "Failed to record event" }, { status: 500 });
     }
 
     console.log(`Webhook received: ${event.type}`);
@@ -84,7 +75,9 @@ export async function POST(request: Request) {
           }
         }
 
-        console.log(`Checkout completed for user ${userId}, customer ${customerId}, type: ${type || "platform"}`);
+        console.log(
+          `Checkout completed for user ${userId}, customer ${customerId}, type: ${type || "platform"}`
+        );
         break;
       }
 
@@ -120,7 +113,9 @@ export async function POST(request: Request) {
             });
           }
 
-          console.log(`Community membership created for user ${userId} in community ${communityId}`);
+          console.log(
+            `Community membership created for user ${userId} in community ${communityId}`
+          );
         } else {
           // ── PLATFORM PLAN CHECK (Creator / Business / Pro) ──────────────
           const platformPlan = getPlanFromPriceId(priceId ?? "");
@@ -141,9 +136,13 @@ export async function POST(request: Request) {
                 where: { id: resolvedUserId },
                 data: { platformPlan },
               });
-              console.log(`[stripe-webhook] Platform plan updated: user ${resolvedUserId} → ${platformPlan}`);
+              console.log(
+                `[stripe-webhook] Platform plan updated: user ${resolvedUserId} → ${platformPlan}`
+              );
             } else {
-              console.error(`[stripe-webhook] Cannot resolve userId for platform plan. Customer: ${customerId}`);
+              console.error(
+                `[stripe-webhook] Cannot resolve userId for platform plan. Customer: ${customerId}`
+              );
             }
             break;
           }
@@ -221,9 +220,7 @@ export async function POST(request: Request) {
             currentPeriodStart: new Date(subscription.current_period_start * 1000),
             currentPeriodEnd: new Date(subscription.current_period_end * 1000),
             cancelAtPeriodEnd: subscription.cancel_at_period_end,
-            canceledAt: subscription.canceled_at
-              ? new Date(subscription.canceled_at * 1000)
-              : null,
+            canceledAt: subscription.canceled_at ? new Date(subscription.canceled_at * 1000) : null,
           },
         });
 
@@ -270,9 +267,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ received: true });
   } catch (error) {
     console.error("Webhook error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

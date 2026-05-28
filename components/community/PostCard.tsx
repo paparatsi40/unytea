@@ -54,31 +54,37 @@ export function PostCard({ post, index = 0 }: PostCardProps) {
 
   return (
     <div
-      className="group relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-card via-card to-card/80 shadow-lg transition-all hover:border-primary/20 hover:shadow-2xl animate-in fade-in slide-in-from-bottom-8 duration-500"
+      className="group relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-card via-card to-card/80 shadow-lg transition-all duration-500 animate-in fade-in slide-in-from-bottom-8 hover:border-primary/20 hover:shadow-2xl"
       style={{ animationDelay: `${index * 100}ms` }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Animated Background Gradient */}
       <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-      
+
       {/* Sparkle Effects with CSS */}
       {isHovered && (
         <>
-          <div className="absolute top-4 right-4 animate-ping">
+          <div className="absolute right-4 top-4 animate-ping">
             <Sparkles className="h-6 w-6 text-amber-400 opacity-60" />
           </div>
-          <div className="absolute bottom-6 left-6 animate-pulse" style={{ animationDelay: '200ms' }}>
+          <div
+            className="absolute bottom-6 left-6 animate-pulse"
+            style={{ animationDelay: "200ms" }}
+          >
             <Sparkles className="h-4 w-4 text-blue-400 opacity-40" />
           </div>
-          <div className="absolute top-1/2 right-12 animate-bounce" style={{ animationDelay: '400ms', animationDuration: '2s' }}>
+          <div
+            className="absolute right-12 top-1/2 animate-bounce"
+            style={{ animationDelay: "400ms", animationDuration: "2s" }}
+          >
             <Sparkles className="h-4 w-4 text-purple-400 opacity-50" />
           </div>
         </>
       )}
 
       {/* Shimmer Effect */}
-      <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+      <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />
 
       <div className="relative p-8">
         {/* Post Header */}
@@ -93,7 +99,7 @@ export function PostCard({ post, index = 0 }: PostCardProps) {
                   height={48}
                   className={cn(
                     "h-12 w-12 rounded-2xl border-2 border-primary/10 object-cover shadow-lg ring-2 ring-primary/5 transition-all duration-300",
-                    isHovered && "scale-110 ring-primary/20 shadow-2xl"
+                    isHovered && "scale-110 shadow-2xl ring-primary/20"
                   )}
                 />
                 {/* Online indicator with pulse */}
@@ -105,25 +111,27 @@ export function PostCard({ post, index = 0 }: PostCardProps) {
                 </div>
               </div>
             ) : (
-              <div className={cn(
-                "flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-primary/10 bg-gradient-to-br from-primary/20 to-primary/10 shadow-lg transition-all duration-300",
-                isHovered && "scale-110 shadow-2xl"
-              )}>
+              <div
+                className={cn(
+                  "flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-primary/10 bg-gradient-to-br from-primary/20 to-primary/10 shadow-lg transition-all duration-300",
+                  isHovered && "scale-110 shadow-2xl"
+                )}
+              >
                 <span className="text-sm font-bold text-primary">
                   {post.author.firstName?.[0] || "U"}
                 </span>
               </div>
             )}
             <div>
-              <p className={cn(
-                "font-bold text-foreground transition-colors duration-300",
-                isHovered && "text-primary"
-              )}>
+              <p
+                className={cn(
+                  "font-bold text-foreground transition-colors duration-300",
+                  isHovered && "text-primary"
+                )}
+              >
                 {getAuthorName(post.author)}
               </p>
-              <p className="text-xs text-muted-foreground">
-                {formatTime(post.createdAt)}
-              </p>
+              <p className="text-xs text-muted-foreground">{formatTime(post.createdAt)}</p>
             </div>
           </div>
           <button className="rounded-xl p-2.5 text-muted-foreground opacity-0 transition-all hover:bg-accent hover:text-foreground active:scale-95 group-hover:opacity-100">
@@ -137,7 +145,7 @@ export function PostCard({ post, index = 0 }: PostCardProps) {
             {post.title}
           </h3>
         )}
-        <p className="mb-6 whitespace-pre-wrap text-foreground/90 leading-relaxed text-[15px]">
+        <p className="mb-6 whitespace-pre-wrap text-[15px] leading-relaxed text-foreground/90">
           {post.content}
         </p>
 
@@ -145,26 +153,29 @@ export function PostCard({ post, index = 0 }: PostCardProps) {
         <div className="flex items-center justify-between rounded-2xl border border-border/50 bg-accent/30 p-4 backdrop-blur-sm transition-all duration-300 group-hover:border-primary/20 group-hover:bg-accent/50">
           <div className="flex items-center space-x-4">
             {/* Reactions Component with stagger animation */}
-            <div className="animate-in fade-in slide-in-from-left-4 duration-300" style={{ animationDelay: `${index * 100 + 100}ms` }}>
+            <div
+              className="duration-300 animate-in fade-in slide-in-from-left-4"
+              style={{ animationDelay: `${index * 100 + 100}ms` }}
+            >
               <PostReactions postId={post.id} />
             </div>
 
             {/* Comments Button */}
-            <button 
-              className="group/btn flex items-center space-x-2 rounded-xl px-4 py-2.5 text-sm font-medium text-muted-foreground transition-all hover:bg-blue-500/10 hover:text-blue-500 active:scale-95 animate-in fade-in slide-in-from-left-4 duration-300"
+            <button
+              className="group/btn flex items-center space-x-2 rounded-xl px-4 py-2.5 text-sm font-medium text-muted-foreground transition-all duration-300 animate-in fade-in slide-in-from-left-4 hover:bg-blue-500/10 hover:text-blue-500 active:scale-95"
               style={{ animationDelay: `${index * 100 + 200}ms` }}
             >
-              <MessageSquare className="h-5 w-5 transition-transform group-hover/btn:scale-125 duration-300" />
+              <MessageSquare className="h-5 w-5 transition-transform duration-300 group-hover/btn:scale-125" />
               <span className="font-semibold">{post._count?.comments || 0}</span>
             </button>
           </div>
 
           {/* Share Button */}
-          <button 
-            className="group/btn flex items-center space-x-2 rounded-xl px-4 py-2.5 text-sm font-medium text-muted-foreground transition-all hover:bg-primary/10 hover:text-primary active:scale-95 animate-in fade-in slide-in-from-right-4 duration-300"
+          <button
+            className="group/btn flex items-center space-x-2 rounded-xl px-4 py-2.5 text-sm font-medium text-muted-foreground transition-all duration-300 animate-in fade-in slide-in-from-right-4 hover:bg-primary/10 hover:text-primary active:scale-95"
             style={{ animationDelay: `${index * 100 + 300}ms` }}
           >
-            <Share2 className="h-4 w-4 transition-transform group-hover/btn:rotate-12 group-hover/btn:scale-110 duration-300" />
+            <Share2 className="h-4 w-4 transition-transform duration-300 group-hover/btn:rotate-12 group-hover/btn:scale-110" />
             <span className="font-semibold">Share</span>
           </button>
         </div>

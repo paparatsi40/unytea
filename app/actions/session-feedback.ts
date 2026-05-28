@@ -7,11 +7,7 @@ import { revalidatePath } from "next/cache";
 /**
  * Submit feedback for a session
  */
-export async function submitSessionFeedback(
-  sessionId: string,
-  rating: number,
-  comment?: string
-) {
+export async function submitSessionFeedback(sessionId: string, rating: number, comment?: string) {
   const session = await auth();
   if (!session?.user?.id) {
     throw new Error("Unauthorized");
@@ -119,9 +115,7 @@ export async function getSessionFeedback(sessionId: string) {
   // Calculate statistics
   const totalFeedback = feedback.length;
   const averageRating =
-    totalFeedback > 0
-      ? feedback.reduce((sum, f) => sum + f.rating, 0) / totalFeedback
-      : 0;
+    totalFeedback > 0 ? feedback.reduce((sum, f) => sum + f.rating, 0) / totalFeedback : 0;
 
   const ratingDistribution = [1, 2, 3, 4, 5].map((rating) => ({
     rating,

@@ -103,32 +103,30 @@ export function ResourceCard({
         <Link
           href={`/dashboard/c/${communitySlug}/library/${resource.id}`}
           className={cn(
-            "flex items-center gap-3 p-3 rounded-xl transition-all duration-200",
-            "hover:shadow-md border border-transparent hover:border-border/50",
+            "flex items-center gap-3 rounded-xl p-3 transition-all duration-200",
+            "border border-transparent hover:border-border/50 hover:shadow-md",
             typeBgColors[resource.type]
           )}
         >
           <div
             className={cn(
-              "flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center",
+              "flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg",
               "bg-gradient-to-br text-white",
               typeColors[resource.type]
             )}
           >
-            <Icon className="w-5 h-5" />
+            <Icon className="h-5 w-5" />
           </div>
-          <div className="flex-1 min-w-0">
-            <h4 className="font-medium text-sm truncate">{resource.title}</h4>
+          <div className="min-w-0 flex-1">
+            <h4 className="truncate text-sm font-medium">{resource.title}</h4>
             {resource.duration && (
-              <p className="text-xs text-muted-foreground flex items-center gap-1">
-                <Clock className="w-3 h-3" />
+              <p className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Clock className="h-3 w-3" />
                 {formatDuration(resource.duration)}
               </p>
             )}
           </div>
-          {isCompleted && (
-            <CheckCircle2 className="w-4 h-4 text-green-500" />
-          )}
+          {isCompleted && <CheckCircle2 className="h-4 w-4 text-green-500" />}
         </Link>
       </motion.div>
     );
@@ -145,7 +143,7 @@ export function ResourceCard({
       <Link
         href={`/dashboard/c/${communitySlug}/library/${resource.id}`}
         className={cn(
-          "block rounded-2xl overflow-hidden transition-all duration-300",
+          "block overflow-hidden rounded-2xl transition-all duration-300",
           "bg-white dark:bg-gray-900/50",
           "border border-border/50 hover:border-border",
           "shadow-sm hover:shadow-xl",
@@ -169,24 +167,21 @@ export function ResourceCard({
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center">
-              <Icon className="w-16 h-16 text-white/40" />
+              <Icon className="h-16 w-16 text-white/40" />
             </div>
           )}
 
           {/* Type Badge */}
-          <div className="absolute top-3 left-3">
-            <Badge
-              variant="secondary"
-              className="bg-white/90 dark:bg-black/50 backdrop-blur-sm"
-            >
-              <Icon className="w-3 h-3 mr-1" />
+          <div className="absolute left-3 top-3">
+            <Badge variant="secondary" className="bg-white/90 backdrop-blur-sm dark:bg-black/50">
+              <Icon className="mr-1 h-3 w-3" />
               {resource.type}
             </Badge>
           </div>
 
           {/* Category Badge */}
           {resource.category && (
-            <div className="absolute top-3 right-3">
+            <div className="absolute right-3 top-3">
               <Badge
                 style={{
                   backgroundColor: resource.category.color || undefined,
@@ -199,14 +194,14 @@ export function ResourceCard({
           )}
 
           {/* Play Overlay */}
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors duration-300 group-hover:bg-black/30">
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               whileHover={{ scale: 1.1 }}
-              className="opacity-0 group-hover:opacity-100 transition-opacity"
+              className="opacity-0 transition-opacity group-hover:opacity-100"
             >
-              <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center shadow-lg">
-                <Play className="w-6 h-6 text-gray-900 ml-1" fill="currentColor" />
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/90 shadow-lg">
+                <Play className="ml-1 h-6 w-6 text-gray-900" fill="currentColor" />
               </div>
             </motion.div>
           </div>
@@ -214,10 +209,7 @@ export function ResourceCard({
           {/* Duration Badge */}
           {resource.duration && (
             <div className="absolute bottom-3 right-3">
-              <Badge
-                variant="secondary"
-                className="bg-black/70 text-white border-0"
-              >
+              <Badge variant="secondary" className="border-0 bg-black/70 text-white">
                 {formatDuration(resource.duration)}
               </Badge>
             </div>
@@ -236,8 +228,8 @@ export function ResourceCard({
           {/* Completed Checkmark */}
           {isCompleted && (
             <div className="absolute bottom-3 left-3">
-              <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
-                <CheckCircle2 className="w-5 h-5 text-white" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-500">
+                <CheckCircle2 className="h-5 w-5 text-white" />
               </div>
             </div>
           )}
@@ -246,12 +238,12 @@ export function ResourceCard({
         {/* Content */}
         <div className="p-4">
           <div className="flex items-start justify-between gap-2">
-            <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-lg leading-tight line-clamp-2 group-hover:text-primary transition-colors">
+            <div className="min-w-0 flex-1">
+              <h3 className="line-clamp-2 text-lg font-semibold leading-tight transition-colors group-hover:text-primary">
                 {resource.title}
               </h3>
               {resource.description && (
-                <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
                   {resource.description}
                 </p>
               )}
@@ -263,15 +255,13 @@ export function ResourceCard({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="h-8 w-8 opacity-0 transition-opacity group-hover:opacity-100"
                   >
                     <MoreVertical className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={(e) => e.preventDefault()}>
-                    Editar
-                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={(e) => e.preventDefault()}>Editar</DropdownMenuItem>
                   <DropdownMenuItem
                     className="text-red-600"
                     onClick={(e) => {
@@ -288,18 +278,14 @@ export function ResourceCard({
 
           {/* Tags */}
           {resource.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1 mt-3">
+            <div className="mt-3 flex flex-wrap gap-1">
               {resource.tags.slice(0, 3).map((tag) => (
-                <Badge
-                  key={tag}
-                  variant="outline"
-                  className="text-xs px-2 py-0.5"
-                >
+                <Badge key={tag} variant="outline" className="px-2 py-0.5 text-xs">
                   #{tag}
                 </Badge>
               ))}
               {resource.tags.length > 3 && (
-                <Badge variant="outline" className="text-xs px-2 py-0.5">
+                <Badge variant="outline" className="px-2 py-0.5 text-xs">
                   +{resource.tags.length - 3}
                 </Badge>
               )}
@@ -307,7 +293,7 @@ export function ResourceCard({
           )}
 
           {/* Footer */}
-          <div className="flex items-center justify-between mt-4 pt-3 border-t border-border/50">
+          <div className="mt-4 flex items-center justify-between border-t border-border/50 pt-3">
             <div className="flex items-center gap-3">
               {resource.author.image ? (
                 <Image
@@ -318,16 +304,14 @@ export function ResourceCard({
                   className="rounded-full"
                 />
               ) : (
-                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-400 to-pink-400" />
+                <div className="h-6 w-6 rounded-full bg-gradient-to-br from-purple-400 to-pink-400" />
               )}
-              <span className="text-sm text-muted-foreground">
-                {resource.author.name}
-              </span>
+              <span className="text-sm text-muted-foreground">{resource.author.name}</span>
             </div>
 
             <div className="flex items-center gap-3 text-muted-foreground">
               <span className="flex items-center gap-1 text-sm">
-                <Eye className="w-4 h-4" />
+                <Eye className="h-4 w-4" />
                 {resource.viewCount.toLocaleString()}
               </span>
               <button
@@ -335,9 +319,9 @@ export function ResourceCard({
                   e.preventDefault();
                   onLike?.();
                 }}
-                className="flex items-center gap-1 text-sm hover:text-red-500 transition-colors"
+                className="flex items-center gap-1 text-sm transition-colors hover:text-red-500"
               >
-                <Heart className="w-4 h-4" />
+                <Heart className="h-4 w-4" />
                 {resource._count.likes.toLocaleString()}
               </button>
             </div>

@@ -33,7 +33,7 @@ model SessionParticipation {
   leftAt        DateTime?
   pointsEarned  Int      @default(0)
   eventsData    Json?    // Track specific events
-  
+
   @@unique([sessionId, userId])
 }
 ```
@@ -52,18 +52,18 @@ model SessionParticipation {
 
 #### **Puntos por acción:**
 
-| Acción | Puntos | Condición |
-|--------|--------|-----------|
-| Unirse a sesión | 10 | Automático |
-| Unirse temprano (+5min) | +5 | Bonus |
-| Hacer pregunta | 20 | Primera pregunta +10 bonus |
-| Responder pregunta | 15 | - |
-| Subir al escenario | 50 | Primera vez +20 bonus |
-| Completar poll | 5 | - |
-| Completar tarea | 25 | - |
-| Compartir recurso | 10 | - |
-| Reaccionar | 2 | Max 20/sesión |
-| Quedarse completo | 30 | >=90% duración |
+| Acción                  | Puntos | Condición                  |
+| ----------------------- | ------ | -------------------------- |
+| Unirse a sesión         | 10     | Automático                 |
+| Unirse temprano (+5min) | +5     | Bonus                      |
+| Hacer pregunta          | 20     | Primera pregunta +10 bonus |
+| Responder pregunta      | 15     | -                          |
+| Subir al escenario      | 50     | Primera vez +20 bonus      |
+| Completar poll          | 5      | -                          |
+| Completar tarea         | 25     | -                          |
+| Compartir recurso       | 10     | -                          |
+| Reaccionar              | 2      | Max 20/sesión              |
+| Quedarse completo       | 30     | >=90% duración             |
 
 #### **Características:**
 
@@ -179,7 +179,7 @@ Sistema listo para unlock de 10 achievements:
 9. **Early Bird** - 10 sesiones con llegada temprana
 10. **Engaged Participant** - 500+ puntos en una sesión
 
-*Nota: Triggers ya programados, solo falta integración con sistema de achievements existente*
+_Nota: Triggers ya programados, solo falta integración con sistema de achievements existente_
 
 ---
 
@@ -190,23 +190,23 @@ Sistema listo para unlock de 10 achievements:
 **Juan (mentee) se une a sesión con María (mentor):**
 
 1. **10:00 AM** - Click "Join Video Call"
-    - ✅ +10 puntos (join)
-    - ✅ +5 puntos (early bird - llegó 2 mins antes)
-    - 📱 Notification: "👋 Welcome! You earned 15 points"
+   - ✅ +10 puntos (join)
+   - ✅ +5 puntos (early bird - llegó 2 mins antes)
+   - 📱 Notification: "👋 Welcome! You earned 15 points"
 
 2. **10:15 AM** - Hace una pregunta en chat
-    - ✅ +20 puntos (first question)
-    - ✅ +10 puntos (first question bonus)
-    - 📱 Notification: "❓ Great question! +30 points"
+   - ✅ +20 puntos (first question)
+   - ✅ +10 puntos (first question bonus)
+   - 📱 Notification: "❓ Great question! +30 points"
 
 3. **10:45 AM** - Completa un poll del mentor
-    - ✅ +5 puntos
-    - 📱 Notification: "📊 Poll completed! +5 points"
+   - ✅ +5 puntos
+   - 📱 Notification: "📊 Poll completed! +5 points"
 
 4. **11:00 AM** - Sesión termina, click "Leave Call"
-    - ✅ Estuvo 60 mins de 60 mins (100%)
-    - ✅ +30 puntos (full attendance)
-    - 📱 Notification: "⭐ Fully engaged! +30 points"
+   - ✅ Estuvo 60 mins de 60 mins (100%)
+   - ✅ +30 puntos (full attendance)
+   - 📱 Notification: "⭐ Fully engaged! +30 points"
 
 **Total ganado:** 80 puntos en una sesión 🎉
 
@@ -217,35 +217,40 @@ Sistema listo para unlock de 10 achievements:
 ### **Test básico:**
 
 1. **Crear una sesión de mentoría:**
-    - Usa Prisma Studio o la UI
-    - Asegúrate de tener mentor y mentee definidos
+   - Usa Prisma Studio o la UI
+   - Asegúrate de tener mentor y mentee definidos
 
 2. **Como participante, ve a:**
+
    ```
    /dashboard/sessions/[sessionId]/video
    ```
 
 3. **Click "Join Video Call":**
-    - Deberías ver notification con "+10 points"
-    - Si llegas dentro de 5 mins del scheduledAt: "+15 points"
+   - Deberías ver notification con "+10 points"
+   - Si llegas dentro de 5 mins del scheduledAt: "+15 points"
 
 4. **Espera al menos 1 minuto**
 
 5. **Click "Leave Call":**
-    - Si la sesión dura 60 mins y estuviste 54+ mins:
-    - Deberías ver "+30 points" bonus
+   - Si la sesión dura 60 mins y estuviste 54+ mins:
+   - Deberías ver "+30 points" bonus
 
 6. **Verifica en DB:**
+
    ```sql
    SELECT * FROM session_participations WHERE userId = 'tu-id';
    ```
-    - Deberías ver el registro con pointsEarned
+
+   - Deberías ver el registro con pointsEarned
 
 7. **Verifica user points:**
+
    ```sql
    SELECT points FROM users WHERE id = 'tu-id';
    ```
-    - Puntos deberían haberse incrementado
+
+   - Puntos deberían haberse incrementado
 
 ---
 
@@ -356,20 +361,20 @@ Feature #1 de FASE 1 TERMINADA! 🚀
 ### **3 Features mayores implementadas:**
 
 1. ✅ **Section Builder** (100%) - 2-3h
-    - 8+ secciones pre-diseñadas
-    - Editor intuitivo
-    - Landing pública funcionando
+   - 8+ secciones pre-diseñadas
+   - Editor intuitivo
+   - Landing pública funcionando
 
 2. ✅ **Video Calls + Mentor Sessions** (100%) - 2-3h
-    - LiveKit integrado
-    - Sesiones con video
-    - Seguridad triple capa
+   - LiveKit integrado
+   - Sesiones con video
+   - Seguridad triple capa
 
 3. ✅ **Live Gamification** (100%) - 3-4h
-    - Sistema de puntos automático
-    - 9 tipos de eventos
-    - Notificaciones animadas
-    - Achievements ready
+   - Sistema de puntos automático
+   - 9 tipos de eventos
+   - Notificaciones animadas
+   - Achievements ready
 
 **Total:** ~8-10 horas  
 **Código:** ~3500+ líneas  

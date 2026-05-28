@@ -84,10 +84,10 @@ async function main() {
 
   if (!systemCommunity) {
     console.log("🏗️  Creating system community for subscription plans...");
-    
+
     // Find any user to be the owner
     const firstUser = await prisma.user.findFirst();
-    
+
     if (!firstUser) {
       console.error("❌ No users found. Please create a user first.");
       process.exit(1);
@@ -127,7 +127,9 @@ async function main() {
       },
     });
 
-    console.log(`✅ Created plan: ${plan.name} ($${(plan.price / 100).toFixed(2)}/${plan.interval})`);
+    console.log(
+      `✅ Created plan: ${plan.name} ($${(plan.price / 100).toFixed(2)}/${plan.interval})`
+    );
   }
 
   console.log("\n🎉 Subscription plans seeded successfully!");

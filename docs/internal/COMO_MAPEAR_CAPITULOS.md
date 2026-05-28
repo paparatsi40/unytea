@@ -65,6 +65,7 @@ Módulo 1: Fundamentos - Tu Primera Comunidad
 ```
 
 **Ventajas:**
+
 - ✅ Más organizado y fluido
 - ✅ Menos lecciones (3 en vez de 12)
 - ✅ Mejor experiencia de estudiante
@@ -73,6 +74,7 @@ Módulo 1: Fundamentos - Tu Primera Comunidad
 **Cómo crearlas:**
 
 1. **Crear lección en Unytea:**
+
    ```
    Title: 1.1 - Bienvenida y Visión General
    Type: TEXT
@@ -80,37 +82,39 @@ Módulo 1: Fundamentos - Tu Primera Comunidad
    ```
 
 2. **El contenido sería algo así:**
+
    ```markdown
    # Bienvenida y Visión General
-   
+
    En esta lección vamos a cubrir los fundamentos de unytea.
-   
+
    ## 1. ¿Qué es unytea y qué lo hace único?
-   
+
    Unytea es una plataforma todo-en-uno para crear y escalar comunidades online. A diferencia de Skool o Circle...
-   
+
    [Contenido completo aquí]
-   
+
    ## 2. Comparativa con Skool, Circle y otras plataformas
-   
-   | Feature | Unytea | Skool | Circle |
-   |---------|--------|-------|--------|
-   | Cursos | ✅ | ✅ | ✅ |
-   | Live Sessions | ✅ | ❌ | ❌ |
+
+   | Feature       | Unytea | Skool | Circle |
+   | ------------- | ------ | ----- | ------ |
+   | Cursos        | ✅     | ✅    | ✅     |
+   | Live Sessions | ✅     | ❌    | ❌     |
+
    ...
-   
+
    ## 3. Casos de uso exitosos
-   
+
    - **Comunidad de Coaches:** 500 miembros en 3 meses
    - **Comunidad de Developers:** $5K MRR
-   ...
-   
+     ...
+
    ## 4. Tu roadmap de comunidad
-   
+
    [Contenido del roadmap]
-   
+
    ---
-   
+
    **Siguiente:** En la próxima lección configuraremos tu cuenta...
    ```
 
@@ -138,12 +142,14 @@ Módulo 1: Fundamentos - Tu Primera Comunidad
 ```
 
 **Ventajas:**
+
 - ✅ Más granular
 - ✅ Estudiante avanza más rápido
 - ✅ Sensación de progreso constante
 - ✅ Fácil consumir en sesiones cortas
 
 **Desventajas:**
+
 - ⚠️ Muchas lecciones (más trabajo de producción)
 - ⚠️ Puede sentirse fragmentado
 
@@ -202,6 +208,7 @@ Módulo 1: Fundamentos - Tu Primera Comunidad
 ### **Para Lecciones de VIDEO:**
 
 **1. Crea la lección:**
+
 ```
 Title: 1.1 - Bienvenida al Curso
 Type: VIDEO
@@ -217,6 +224,7 @@ Free Preview: ✅ (para lección 1.1)
 ### **Para Lecciones de TEXT:**
 
 **1. Crea la lección:**
+
 ```
 Title: 1.3 - Casos de Uso Exitosos
 Type: TEXT
@@ -269,9 +277,11 @@ Content:
 En vez de "Capítulo 1.1", usa títulos que vendan el beneficio:
 
 **Menos atractivo:**
+
 - ❌ Capítulo 1.1: Bienvenida
 
 **Más atractivo:**
+
 - ✅ Bienvenida: Tu Roadmap de 0 a Comunidad Exitosa
 - ✅ La Fórmula: Por Qué Unytea Gana vs Skool
 - ✅ 5 Comunidades Que Ganaron $10K+ (Casos Reales)
@@ -283,6 +293,7 @@ En vez de "Capítulo 1.1", usa títulos que vendan el beneficio:
 ## ⚡ En ~3 Minutos (Cuando Deploy Termine):
 
 **La duración se arreglará:**
+
 - ❌ Antes: 5 minutos → guardaba como 5 segundos → mostraba 0.08 min
 - ✅ Ahora: 5 minutos → guarda como 300 segundos → muestra 5 min
 

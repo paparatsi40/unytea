@@ -141,18 +141,21 @@ UI capabilities.
 ### Core Models (49 total)
 
 #### User Management
+
 - **User**: Central entity with profile, preferences, gamification data
 - **Account**: NextAuth account records
 - **Session**: NextAuth session management
 - **Buddy**: Buddy system connections between users
 
 #### Communities
+
 - **Community**: Main container with custom branding, theme configuration
 - **Member**: User-community junction with roles and permissions
 - **MemberRole**: Flexible role definitions
 - **Invitation**: Community invitations with custom codes
 
 #### Content
+
 - **Post**: Rich text posts with mentions and reactions
 - **Comment**: Nested threaded comments
 - **Course**: Learning content structure
@@ -162,6 +165,7 @@ UI capabilities.
 - **Resource**: Shared learning resources
 
 #### Learning & Gamification
+
 - **UserProgress**: Course and lesson progress tracking
 - **Point**: Gamification points system
 - **Level**: User level progression
@@ -170,18 +174,21 @@ UI capabilities.
 - **Leaderboard**: Community leaderboard entries
 
 #### Sessions & Interactions
+
 - **Session**: 1-on-1 mentoring sessions with LiveKit integration
 - **Recording**: Session recordings with transcriptions
 - **Message**: Direct and group messaging
 - **Notification**: User notifications
 
 #### Commerce
+
 - **Subscription**: Community subscription plans
 - **Invoice**: Payment invoices
 - **Payment**: Payment records linked to Stripe
 - **StripeEvent**: Stripe webhook event tracking
 
 #### Content Building
+
 - **SectionBuilder**: Custom landing page sections
 - **Section**: Individual section instances
 

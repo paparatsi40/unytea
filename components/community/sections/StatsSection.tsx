@@ -34,46 +34,42 @@ export function StatsSection({ stats, theme }: StatsSectionProps) {
   const primaryColor = theme?.primaryColor || "#0ea5e9";
 
   return (
-    <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+    <section className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
       {stats.map((stat, index) => {
         const Icon = stat.icon ? ICON_MAP[stat.icon] : Users;
-        
+
         return (
           <div
             key={index}
-            className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+            className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
           >
             {/* Icon */}
-            <div 
-              className="h-12 w-12 rounded-lg flex items-center justify-center mb-4"
-              style={{ 
+            <div
+              className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg"
+              style={{
                 backgroundColor: `${primaryColor}15`,
-                color: primaryColor 
+                color: primaryColor,
               }}
             >
               <Icon className="h-6 w-6" />
             </div>
 
             {/* Value */}
-            <div className="text-3xl font-bold text-gray-900 mb-1">
-              {typeof stat.value === 'number' 
-                ? stat.value.toLocaleString() 
-                : stat.value}
+            <div className="mb-1 text-3xl font-bold text-gray-900">
+              {typeof stat.value === "number" ? stat.value.toLocaleString() : stat.value}
             </div>
 
             {/* Label */}
-            <div className="text-sm text-gray-500">
-              {stat.label}
-            </div>
+            <div className="text-sm text-gray-500">{stat.label}</div>
 
             {/* Trend */}
             {stat.trend && (
-              <div 
-                className={`text-xs mt-2 font-medium ${
-                  stat.trend.positive ? 'text-green-600' : 'text-red-600'
+              <div
+                className={`mt-2 text-xs font-medium ${
+                  stat.trend.positive ? "text-green-600" : "text-red-600"
                 }`}
               >
-                {stat.trend.positive ? '↑' : '↓'} {stat.trend.value}%
+                {stat.trend.positive ? "↑" : "↓"} {stat.trend.value}%
               </div>
             )}
           </div>

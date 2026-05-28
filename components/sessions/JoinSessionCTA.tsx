@@ -41,24 +41,22 @@ export function JoinSessionCTA({ session }: Props) {
       <Button
         onClick={handleJoin}
         className={`${
-          isLive
-            ? "bg-red-500 hover:bg-red-600 animate-pulse"
-            : "bg-violet-600 hover:bg-violet-700"
+          isLive ? "animate-pulse bg-red-500 hover:bg-red-600" : "bg-violet-600 hover:bg-violet-700"
         } text-white`}
       >
         {isLive ? (
           <>
-            <span className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse" />
+            <span className="mr-2 h-2 w-2 animate-pulse rounded-full bg-white" />
             Join Live
           </>
         ) : isUpcoming ? (
           <>
-            <Sparkles className="w-4 h-4 mr-2" />
+            <Sparkles className="mr-2 h-4 w-4" />
             RSVP Free
           </>
         ) : (
           <>
-            <LogIn className="w-4 h-4 mr-2" />
+            <LogIn className="mr-2 h-4 w-4" />
             Watch Replay
           </>
         )}
@@ -68,7 +66,11 @@ export function JoinSessionCTA({ session }: Props) {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-center">
-              {isLive ? "🔴 Session is Live!" : isUpcoming ? "Reserve Your Spot" : "Watch the Replay"}
+              {isLive
+                ? "🔴 Session is Live!"
+                : isUpcoming
+                  ? "Reserve Your Spot"
+                  : "Watch the Replay"}
             </DialogTitle>
             <DialogDescription className="text-center">
               {isLive
@@ -79,36 +81,32 @@ export function JoinSessionCTA({ session }: Props) {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4 mt-4">
+          <div className="mt-4 space-y-4">
             {/* Session preview */}
-            <div className="bg-gray-50 rounded-lg p-4">
+            <div className="rounded-lg bg-gray-50 p-4">
               <h4 className="font-semibold text-gray-900">{session.title}</h4>
-              <p className="text-sm text-gray-500 mt-1">
-                with {session.host.name || "our expert"}
-              </p>
+              <p className="mt-1 text-sm text-gray-500">with {session.host.name || "our expert"}</p>
               {session.community && (
-                <p className="text-sm text-violet-600 mt-1">
-                  in {session.community.name}
-                </p>
+                <p className="mt-1 text-sm text-violet-600">in {session.community.name}</p>
               )}
             </div>
 
             {/* Value props */}
             <ul className="space-y-2 text-sm text-gray-600">
               <li className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-xs">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-green-100 text-xs text-green-600">
                   ✓
                 </span>
                 Free to join - no credit card required
               </li>
               <li className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-xs">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-green-100 text-xs text-green-600">
                   ✓
                 </span>
                 Access full transcript & resources
               </li>
               <li className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-xs">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-green-100 text-xs text-green-600">
                   ✓
                 </span>
                 Join {session.attendeeCount} others learning together
@@ -118,14 +116,14 @@ export function JoinSessionCTA({ session }: Props) {
             {/* CTA buttons */}
             <div className="space-y-2 pt-2">
               <Button
-                className="w-full bg-violet-600 hover:bg-violet-700 text-white"
+                className="w-full bg-violet-600 text-white hover:bg-violet-700"
                 onClick={() =>
                   router.push(
                     `/signup?redirect=/dashboard/sessions/${session.id}${isLive ? "/room" : ""}`
                   )
                 }
               >
-                <UserPlus className="w-4 h-4 mr-2" />
+                <UserPlus className="mr-2 h-4 w-4" />
                 Create Free Account
               </Button>
 
@@ -138,12 +136,12 @@ export function JoinSessionCTA({ session }: Props) {
                   )
                 }
               >
-                <LogIn className="w-4 h-4 mr-2" />
+                <LogIn className="mr-2 h-4 w-4" />
                 Already have an account? Sign in
               </Button>
             </div>
 
-            <p className="text-xs text-center text-gray-500">
+            <p className="text-center text-xs text-gray-500">
               By joining, you agree to our Terms and Privacy Policy.
             </p>
           </div>

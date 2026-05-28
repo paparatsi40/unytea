@@ -25,7 +25,7 @@ authentication is failing.
 1. Open **pgAdmin 4** (should be installed with PostgreSQL)
 2. Connect to localhost
 3. Right-click on `PostgreSQL 18` server
-4. Select **"Properties"** →  **"Connection"**
+4. Select **"Properties"** → **"Connection"**
 5. Note the current password or reset it
 6. Update `.env.local` with the correct password
 
@@ -36,13 +36,14 @@ authentication is failing.
 The password might be in one of these places:
 
 1. **Check pgpass file:**
+
    ```powershell
    cat $env:APPDATA\postgresql\pgpass.conf
    ```
 
 2. **Check installation notes:**
-    - Look for `postgresql_install_log.txt` in Program Files
-    - Password might be documented there
+   - Look for `postgresql_install_log.txt` in Program Files
+   - Password might be documented there
 
 3. **Try common passwords:**
    ```
@@ -58,38 +59,43 @@ The password might be in one of these places:
 ### Solution 3: Reset Password via pg_hba.conf (ADVANCED)
 
 1. **Locate pg_hba.conf:**
+
    ```
    C:\Program Files\PostgreSQL\18\data\pg_hba.conf
    ```
 
 2. **Backup the file:**
+
    ```powershell
    Copy-Item "C:\Program Files\PostgreSQL\18\data\pg_hba.conf" "C:\Program Files\PostgreSQL\18\data\pg_hba.conf.backup"
    ```
 
 3. **Edit pg_hba.conf** (as Administrator):
-    - Find the line: `host all all 127.0.0.1/32 scram-sha-256`
-    - Change to: `host all all 127.0.0.1/32 trust`
+   - Find the line: `host all all 127.0.0.1/32 scram-sha-256`
+   - Change to: `host all all 127.0.0.1/32 trust`
 
 4. **Restart PostgreSQL:**
+
    ```powershell
    Restart-Service postgresql-x64-18
    ```
 
 5. **Connect and reset password:**
+
    ```powershell
    & "C:\Program Files\PostgreSQL\18\bin\psql.exe" -U postgres -p 5433
    ```
 
    Then in psql:
+
    ```sql
    ALTER USER postgres WITH PASSWORD 'postgres';
    \q
    ```
 
 6. **Revert pg_hba.conf:**
-    - Change `trust` back to `scram-sha-256`
-    - Restart service again
+   - Change `trust` back to `scram-sha-256`
+   - Restart service again
 
 ---
 
@@ -98,6 +104,7 @@ The password might be in one of these places:
 If PostgreSQL 16 is accessible with correct password:
 
 1. **Check if database exists in PG 16:**
+
    ```powershell
    & "C:\Program Files\PostgreSQL\16\bin\psql.exe" -U postgres -p 5433 -l
    ```
@@ -109,6 +116,7 @@ If PostgreSQL 16 is accessible with correct password:
 ### Solution 5: Create New PostgreSQL User (RECOMMENDED)
 
 1. **Connect to PostgreSQL** (once you have access):
+
    ```sql
    CREATE USER mentorly_user WITH PASSWORD 'mentorly_secure_password_2024';
    CREATE DATABASE mentorly OWNER mentorly_user;
@@ -145,7 +153,7 @@ npm run dev
 
 New tables created:
 - accounts
-- sessions  
+- sessions
 - verification_tokens
 
 Updated tables:
@@ -174,6 +182,7 @@ Once database is working:
 After fixing:
 
 1. **Change default password:**
+
    ```sql
    ALTER USER postgres WITH PASSWORD 'very-secure-random-password';
    ```
@@ -189,19 +198,21 @@ After fixing:
 If nothing works:
 
 1. **Check if mentorly database exists:**
+
    ```powershell
    & "C:\Program Files\PostgreSQL\18\bin\psql.exe" -U postgres -p 5433 -c "\l"
    ```
 
 2. **Check if you can connect at all:**
+
    ```powershell
    & "C:\Program Files\PostgreSQL\18\bin\psql.exe" -U postgres -p 5433 postgres
    ```
 
 3. **Last resort - Reinstall PostgreSQL:**
-    - Uninstall PostgreSQL 18
-    - Reinstall and note the password
-    - Update `.env.local`
+   - Uninstall PostgreSQL 18
+   - Reinstall and note the password
+   - Update `.env.local`
 
 ---
 

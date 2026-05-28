@@ -110,6 +110,7 @@ WEBHOOK_SECRET=whsec_YOUR_ACTUAL_SECRET_HERE
 ### Step 4: Test It!
 
 1. Start your dev server:
+
    ```bash
    npm run dev
    ```
@@ -117,11 +118,13 @@ WEBHOOK_SECRET=whsec_YOUR_ACTUAL_SECRET_HERE
 2. Sign up a new user via your app
 
 3. Check your terminal - you should see:
+
    ```
    ✅ User created: user@example.com
    ```
 
 4. Check PostgreSQL:
+
    ```bash
    npm run db:studio
    ```
@@ -204,14 +207,14 @@ await deleteUserFromDB("user_xxx");
 
 ### Settings Navigation:
 
-| Section | Path | Status |
-|---------|------|--------|
-| Profile | `/dashboard/settings/profile` | ✅ Built |
-| Notifications | `/dashboard/settings/notifications` | 🔄 Next |
-| Security | `/dashboard/settings/security` | 🔄 Next |
-| Billing | `/dashboard/settings/billing` | 🔄 Next |
-| Appearance | `/dashboard/settings/appearance` | 🔄 Next |
-| Integrations | `/dashboard/settings/integrations` | 🔄 Next |
+| Section       | Path                                | Status   |
+| ------------- | ----------------------------------- | -------- |
+| Profile       | `/dashboard/settings/profile`       | ✅ Built |
+| Notifications | `/dashboard/settings/notifications` | 🔄 Next  |
+| Security      | `/dashboard/settings/security`      | 🔄 Next  |
+| Billing       | `/dashboard/settings/billing`       | 🔄 Next  |
+| Appearance    | `/dashboard/settings/appearance`    | 🔄 Next  |
+| Integrations  | `/dashboard/settings/integrations`  | 🔄 Next  |
 
 ---
 
@@ -239,7 +242,7 @@ const user = await prisma.user.create({
     clerkId: "user_xxx",
     email: "user@example.com",
     // ... autocomplete works perfectly
-  }
+  },
 });
 ```
 
@@ -269,7 +272,7 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   lastActiveAt  DateTime?
-  
+
   // Relations ready for:
   ownedCommunities    Community[]
   memberships         Member[]
@@ -303,22 +306,22 @@ model User {
 With user sync in place, you can now:
 
 1. **Communities CRUD** (Coming up!)
-    - Users create communities
-    - Communities have owners
-    - Members join communities
+   - Users create communities
+   - Communities have owners
+   - Members join communities
 
 2. **Posts & Comments**
-    - Authors are linked to users
-    - Tracking who posted what
+   - Authors are linked to users
+   - Tracking who posted what
 
 3. **Permissions & Roles**
-    - Owner, Admin, Moderator, Member
-    - Based on database relationships
+   - Owner, Admin, Moderator, Member
+   - Based on database relationships
 
 4. **Gamification**
-    - Points and levels
-    - Achievements
-    - All stored in user record
+   - Points and levels
+   - Achievements
+   - All stored in user record
 
 ---
 
@@ -338,20 +341,20 @@ Progress: 55% (User Sync + Profile complete!)
 
 ### What Changed:
 
-| Feature | Before | After |
-|---------|--------|-------|
-| **User Sync** | ❌ None | ✅ Webhook working |
-| **Database Users** | ❌ Empty | ✅ Auto-synced |
-| **Profile Page** | ❌ None | ✅ Editable |
-| **Settings Layout** | ❌ None | ✅ With navigation |
-| **Onboarding Saves** | ❌ Client only | ✅ Saves to DB |
+| Feature              | Before         | After              |
+| -------------------- | -------------- | ------------------ |
+| **User Sync**        | ❌ None        | ✅ Webhook working |
+| **Database Users**   | ❌ Empty       | ✅ Auto-synced     |
+| **Profile Page**     | ❌ None        | ✅ Editable        |
+| **Settings Layout**  | ❌ None        | ✅ With navigation |
+| **Onboarding Saves** | ❌ Client only | ✅ Saves to DB     |
 
 ---
 
 ## 🎯 The Big Picture
 
 ```
-✅ Landing Page      
+✅ Landing Page
 ✅ PostgreSQL (18 tables)
 ✅ Authentication (Clerk)
 ✅ Dashboard UI
@@ -382,7 +385,7 @@ const globalForPrisma = globalThis as unknown as {
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
-    log: ['query', 'error', 'warn'], // Development logging
+    log: ["query", "error", "warn"], // Development logging
   });
 ```
 
@@ -393,8 +396,12 @@ The sync function uses `upsert` to handle both create and update:
 ```typescript
 const user = await prisma.user.upsert({
   where: { clerkId: clerkUser.id },
-  create: { /* user data */ },
-  update: { /* updated fields */ },
+  create: {
+    /* user data */
+  },
+  update: {
+    /* updated fields */
+  },
 });
 ```
 

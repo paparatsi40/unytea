@@ -20,39 +20,39 @@
 
 - Added NextAuth models: `Account`, `Session`, `VerificationToken`
 - Updated `User` model:
-    - Removed: `clerkId`
-    - Added: `password`, `emailVerified` (DateTime), `accounts[]`, `sessions[]`
-    - Renamed: `imageUrl` → `image`
+  - Removed: `clerkId`
+  - Added: `password`, `emailVerified` (DateTime), `accounts[]`, `sessions[]`
+  - Renamed: `imageUrl` → `image`
 - Renamed: `Session` model → `MentorSession` (to avoid conflicts)
 
 #### ✅ **Core Auth Configuration**
 
 - Created `/lib/auth.ts` - NextAuth configuration with:
-    - Google OAuth provider
-    - GitHub OAuth provider
-    - Credentials provider (email/password)
-    - JWT strategy for sessions
-    - Custom callbacks for user data
-    - Type-safe session extensions
+  - Google OAuth provider
+  - GitHub OAuth provider
+  - Credentials provider (email/password)
+  - JWT strategy for sessions
+  - Custom callbacks for user data
+  - Type-safe session extensions
 
 #### ✅ **Auth Utilities**
 
 - Created `/lib/auth-utils.ts` with server-side helpers:
-    - `requireAuth()` - Redirect if not authenticated
-    - `getCurrentUser()` - Get current user or null
-    - `getCurrentUserId()` - Get user ID or null
-    - `isAuthenticated()` - Check auth status
-    - `getFullUser()` - Get full user with relations
-    - `requireOnboarded()` - Ensure user completed onboarding
-    - `isMemberOfCommunity()` - Check membership
-    - `isOwnerOfCommunity()` - Check ownership
-    - `getUserRoleInCommunity()` - Get user role
+  - `requireAuth()` - Redirect if not authenticated
+  - `getCurrentUser()` - Get current user or null
+  - `getCurrentUserId()` - Get user ID or null
+  - `isAuthenticated()` - Check auth status
+  - `getFullUser()` - Get full user with relations
+  - `requireOnboarded()` - Ensure user completed onboarding
+  - `isMemberOfCommunity()` - Check membership
+  - `isOwnerOfCommunity()` - Check ownership
+  - `getUserRoleInCommunity()` - Get user role
 
 #### ✅ **Client-Side Hook**
 
 - Created `/hooks/use-current-user.ts`:
-    - `useCurrentUser()` - Access session in Client Components
-    - Returns: `user`, `isLoading`, `isAuthenticated`, `update()`
+  - `useCurrentUser()` - Access session in Client Components
+  - Returns: `user`, `isLoading`, `isAuthenticated`, `update()`
 
 #### ✅ **API Routes**
 
@@ -62,52 +62,52 @@
 #### ✅ **Premium UI Pages**
 
 - Created `/app/auth/signin/page.tsx`:
-    - Glassmorphism design
-    - Google & GitHub OAuth buttons
-    - Email/password form
-    - Loading states
-    - Error handling
-    - Professional animations
+  - Glassmorphism design
+  - Google & GitHub OAuth buttons
+  - Email/password form
+  - Loading states
+  - Error handling
+  - Professional animations
 
 - Created `/app/auth/signup/page.tsx`:
-    - Same premium design
-    - Multi-field validation
-    - Password strength indicator
-    - Confirm password check
-    - Terms & privacy links
+  - Same premium design
+  - Multi-field validation
+  - Password strength indicator
+  - Confirm password check
+  - Terms & privacy links
 
 #### ✅ **Middleware**
 
 - Updated `/middleware.ts`:
-    - Replaced `clerkMiddleware()` with NextAuth `auth()`
-    - Protected routes: `/dashboard`, `/c/*`, `/onboarding`
-    - Public routes: `/`, `/auth/*`, `/api/auth/*`
-    - Auto-redirect logic
+  - Replaced `clerkMiddleware()` with NextAuth `auth()`
+  - Protected routes: `/dashboard`, `/c/*`, `/onboarding`
+  - Public routes: `/`, `/auth/*`, `/api/auth/*`
+  - Auto-redirect logic
 
 #### ✅ **Root Layout**
 
 - Updated `/app/layout.tsx`:
-    - Removed `ClerkProvider`
-    - Added `SessionProvider`
-    - Simplified configuration
+  - Removed `ClerkProvider`
+  - Added `SessionProvider`
+  - Simplified configuration
 
 #### ✅ **Environment Variables**
 
 - Updated `.env.local`:
-    - Removed Clerk keys
-    - Added:
-        - `NEXTAUTH_URL=http://localhost:3000`
-        - `NEXTAUTH_SECRET=<generated-secure-key>`
-        - `GOOGLE_CLIENT_ID=your-google-client-id`
-        - `GOOGLE_CLIENT_SECRET=your-google-client-secret`
-        - `GITHUB_CLIENT_ID=your-github-client-id`
-        - `GITHUB_CLIENT_SECRET=your-github-client-secret`
+  - Removed Clerk keys
+  - Added:
+    - `NEXTAUTH_URL=http://localhost:3000`
+    - `NEXTAUTH_SECRET=<generated-secure-key>`
+    - `GOOGLE_CLIENT_ID=your-google-client-id`
+    - `GOOGLE_CLIENT_SECRET=your-google-client-secret`
+    - `GITHUB_CLIENT_ID=your-github-client-id`
+    - `GITHUB_CLIENT_SECRET=your-github-client-secret`
 
 #### ✅ **Landing Page**
 
 - Updated `/app/page.tsx`:
-    - Changed all `/sign-in` → `/auth/signin`
-    - Changed all `/sign-up` → `/auth/signup`
+  - Changed all `/sign-in` → `/auth/signin`
+  - Changed all `/sign-up` → `/auth/signup`
 
 #### ✅ **Cleanup**
 
@@ -262,44 +262,44 @@ Test all flows:
 
 ```typescript
 // OLD (Clerk)
-import { auth } from "@clerk/nextjs/server"
-const { userId } = await auth()
+import { auth } from "@clerk/nextjs/server";
+const { userId } = await auth();
 
 // NEW (NextAuth)
-import { getCurrentUserId } from "@/lib/auth-utils"
-const userId = await getCurrentUserId()
+import { getCurrentUserId } from "@/lib/auth-utils";
+const userId = await getCurrentUserId();
 ```
 
 ```typescript
 // OLD (Clerk Client)
-import { useUser } from "@clerk/nextjs"
-const { user } = useUser()
+import { useUser } from "@clerk/nextjs";
+const { user } = useUser();
 
 // NEW (NextAuth Client)
-import { useCurrentUser } from "@/hooks/use-current-user"
-const { user } = useCurrentUser()
+import { useCurrentUser } from "@/hooks/use-current-user";
+const { user } = useCurrentUser();
 ```
 
 ---
 
 ## 📈 COMPARISON: BEFORE vs AFTER
 
-| Aspect | Clerk | NextAuth |
-|--------|-------|----------|
-| **Setup Time** | 1 hour | 2 hours |
-| **Monthly Cost** | $25-50 | $0 |
-| **UI Control** | ❌ Limited | ✅ Complete |
-| **Type Safety** | ⚠️ Partial | ✅ 100% |
-| **Server Components** | ⚠️ Hacky | ✅ Native |
-| **Customization** | ⚠️ Limited | ✅ Unlimited |
-| **OAuth Providers** | ✅ Many | ✅ Many |
-| **Magic Links** | ✅ Built-in | ⚠️ Need setup |
-| **User Management** | ✅ Dashboard | ❌ Build own |
-| **Webhooks** | ✅ Built-in | ⚠️ Manual |
-| **Vendor Lock-in** | ❌ Yes | ✅ No |
-| **Performance** | ✅ Good | ✅ Better |
-| **Documentation** | ⚠️ OK | ✅ Excellent |
-| **Community** | ⚠️ Medium | ✅ Huge |
+| Aspect                | Clerk        | NextAuth      |
+| --------------------- | ------------ | ------------- |
+| **Setup Time**        | 1 hour       | 2 hours       |
+| **Monthly Cost**      | $25-50       | $0            |
+| **UI Control**        | ❌ Limited   | ✅ Complete   |
+| **Type Safety**       | ⚠️ Partial   | ✅ 100%       |
+| **Server Components** | ⚠️ Hacky     | ✅ Native     |
+| **Customization**     | ⚠️ Limited   | ✅ Unlimited  |
+| **OAuth Providers**   | ✅ Many      | ✅ Many       |
+| **Magic Links**       | ✅ Built-in  | ⚠️ Need setup |
+| **User Management**   | ✅ Dashboard | ❌ Build own  |
+| **Webhooks**          | ✅ Built-in  | ⚠️ Manual     |
+| **Vendor Lock-in**    | ❌ Yes       | ✅ No         |
+| **Performance**       | ✅ Good      | ✅ Better     |
+| **Documentation**     | ⚠️ OK        | ✅ Excellent  |
+| **Community**         | ⚠️ Medium    | ✅ Huge       |
 
 **Winner:** NextAuth ✅
 
@@ -338,25 +338,28 @@ const { user } = useCurrentUser()
 ### To Make This Work RIGHT NOW:
 
 1. **Fix PostgreSQL** (5-10 min)
+
    ```powershell
    # Check which port PostgreSQL 18 is using
    netstat -ano | findstr :5432
-   
+
    # OR start PostgreSQL 16
    Start-Service postgresql-x64-16
    ```
 
 2. **Push Database Schema** (1 min)
+
    ```bash
    npm run db:push
    ```
 
 3. **Setup OAuth Apps** (20 min)
-    - Google OAuth
-    - GitHub OAuth
-    - Update `.env.local`
+   - Google OAuth
+   - GitHub OAuth
+   - Update `.env.local`
 
 4. **Test Sign Up Flow** (5 min)
+
    ```bash
    npm run dev
    # Go to http://localhost:3000/auth/signup
@@ -364,10 +367,10 @@ const { user } = useCurrentUser()
    ```
 
 5. **Update Dashboard Pages** (1 hour)
-    - Replace all Clerk imports
-    - Test communities
-    - Test posts
-    - Test reactions
+   - Replace all Clerk imports
+   - Test communities
+   - Test posts
+   - Test reactions
 
 ---
 
@@ -415,9 +418,9 @@ Migration is complete when:
 
 ---
 
-*Migration completed by: AI Assistant*  
-*Date: December 3, 2024*  
-*Next Review: After database is working*
+_Migration completed by: AI Assistant_  
+_Date: December 3, 2024_  
+_Next Review: After database is working_
 
 ---
 

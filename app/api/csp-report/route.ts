@@ -74,9 +74,10 @@ export async function POST(request: NextRequest) {
     } else if (body && typeof body === "object") {
       // Some clients send plain application/json — accept either envelope.
       const maybeWrapped = (body as { "csp-report"?: unknown })["csp-report"];
-      report = maybeWrapped && typeof maybeWrapped === "object"
-        ? (maybeWrapped as Record<string, unknown>)
-        : (body as Record<string, unknown>);
+      report =
+        maybeWrapped && typeof maybeWrapped === "object"
+          ? (maybeWrapped as Record<string, unknown>)
+          : (body as Record<string, unknown>);
     }
 
     if (!report) {
@@ -84,7 +85,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Legacy keys use dashes; Reporting API keys are camelCase. Accept both.
-    const directive = clip(report["violated-directive"] ?? report["effective-directive"] ?? report.effectiveDirective, MAX_DIRECTIVE_LEN) ?? "unknown";
+    const directive =
+      clip(
+        report["violated-directive"] ?? report["effective-directive"] ?? report.effectiveDirective,
+        MAX_DIRECTIVE_LEN
+      ) ?? "unknown";
     const blockedUri = clip(report["blocked-uri"] ?? report.blockedURL, MAX_BLOCKED_URI_LEN) ?? "";
     const documentUri = clip(report["document-uri"] ?? report.documentURL, MAX_DOCUMENT_URI_LEN);
     const sourceFile = clip(report["source-file"] ?? report.sourceFile, MAX_SOURCE_FILE_LEN);

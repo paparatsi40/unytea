@@ -1,8 +1,5 @@
 import { NextResponse } from "next/server";
-import {
-  UnauthorizedError,
-  ForbiddenError,
-} from "@/lib/authorization";
+import { UnauthorizedError, ForbiddenError } from "@/lib/authorization";
 
 /**
  * Centralized API error handler for route handlers.
@@ -23,23 +20,14 @@ import {
  */
 export function handleApiError(error: unknown): NextResponse {
   if (error instanceof UnauthorizedError) {
-    return NextResponse.json(
-      { error: error.message },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: error.message }, { status: 401 });
   }
 
   if (error instanceof ForbiddenError) {
-    return NextResponse.json(
-      { error: error.message },
-      { status: 403 }
-    );
+    return NextResponse.json({ error: error.message }, { status: 403 });
   }
 
   // Unexpected error — log full details for debugging, return generic message
   console.error("[api-error-handler] Unexpected error:", error);
-  return NextResponse.json(
-    { error: "Internal server error" },
-    { status: 500 }
-  );
+  return NextResponse.json({ error: "Internal server error" }, { status: 500 });
 }

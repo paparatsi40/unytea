@@ -7,9 +7,7 @@ function getResend(): Resend {
   if (!_resend) {
     const key = process.env.RESEND_API_KEY;
     if (!key) {
-      throw new Error(
-        "RESEND_API_KEY is not set. Add it to your environment variables."
-      );
+      throw new Error("RESEND_API_KEY is not set. Add it to your environment variables.");
     }
     _resend = new Resend(key);
   }
@@ -129,10 +127,7 @@ export async function sendWelcomeEmail(to: string, data: WelcomeEmailData) {
 }
 
 // ── Template: Session Reminder ────────────────────────────────────────
-export async function sendSessionReminderEmail(
-  to: string,
-  data: SessionReminderData
-) {
+export async function sendSessionReminderEmail(to: string, data: SessionReminderData) {
   const urgencyMap = {
     "24h": { label: "tomorrow", color: "#3b82f6" },
     "1h": { label: "in 1 hour", color: "#f59e0b" },
@@ -171,10 +166,7 @@ export async function sendSessionReminderEmail(
 }
 
 // ── Template: Community Invite ────────────────────────────────────────
-export async function sendCommunityInviteEmail(
-  to: string,
-  data: CommunityInviteData
-) {
+export async function sendCommunityInviteEmail(to: string, data: CommunityInviteData) {
   return sendEmail({
     to,
     subject: `${data.inviterName} invited you to join ${data.communityName}`,
@@ -202,10 +194,7 @@ export async function sendCommunityInviteEmail(
 }
 
 // ── Template: Session Recap ───────────────────────────────────────────
-export async function sendSessionRecapEmail(
-  to: string,
-  data: SessionRecapData
-) {
+export async function sendSessionRecapEmail(to: string, data: SessionRecapData) {
   const insightsList = data.keyInsights?.length
     ? `<ul style="color: #d4d4d8; font-size: 14px; line-height: 2; padding-left: 20px; margin: 0 0 24px 0;">
         ${data.keyInsights.map((i) => `<li>${i}</li>`).join("")}

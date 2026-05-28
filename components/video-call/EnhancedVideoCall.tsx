@@ -11,7 +11,11 @@ import "@livekit/components-styles";
 import { Loader2, MessageSquare, BarChart3, X } from "lucide-react";
 import { RoomEvent } from "livekit-client";
 import { LiveReactions } from "@/components/live-session/LiveReactions";
-import { SegmentedChat, ChatMessage, ChatMessageType } from "@/components/live-session/SegmentedChat";
+import {
+  SegmentedChat,
+  ChatMessage,
+  ChatMessageType,
+} from "@/components/live-session/SegmentedChat";
 import { LivePoll, PollCreator, Poll } from "@/components/live-session/LivePoll";
 import { Reaction, ReactionType, createReaction } from "@/lib/live-reactions";
 import { motion, AnimatePresence } from "framer-motion";
@@ -138,11 +142,7 @@ interface VideoCallInterfaceProps {
   isModerator: boolean;
 }
 
-function VideoCallInterface({
-  participantName,
-  userId,
-  isModerator,
-}: VideoCallInterfaceProps) {
+function VideoCallInterface({ participantName, userId, isModerator }: VideoCallInterfaceProps) {
   const room = useRoomContext();
 
   // State for Phase 1 features
@@ -160,11 +160,7 @@ function VideoCallInterface({
   useEffect(() => {
     if (!room) return;
 
-    const handleDataReceived = (
-      payload: Uint8Array,
-      _participant: any,
-      _kind: any
-    ) => {
+    const handleDataReceived = (payload: Uint8Array, _participant: any, _kind: any) => {
       try {
         const decoder = new TextDecoder();
         const message = JSON.parse(decoder.decode(payload));
@@ -204,11 +200,14 @@ function VideoCallInterface({
   // Handle incoming messages
   const handleReactionReceived = (reaction: Reaction) => {
     setReactions((prev) => [...prev, reaction]);
-    
+
     // Auto-cleanup after 5 minutes
-    setTimeout(() => {
-      setReactions((prev) => prev.filter((r) => r.id !== reaction.id));
-    }, 5 * 60 * 1000);
+    setTimeout(
+      () => {
+        setReactions((prev) => prev.filter((r) => r.id !== reaction.id));
+      },
+      5 * 60 * 1000
+    );
   };
 
   const handleChatMessageReceived = (message: ChatMessage) => {
@@ -246,25 +245,19 @@ function VideoCallInterface({
 
   const handlePinMessage = (messageId: string) => {
     _setPinnedMessages((prev: Set<string>) => new Set(prev).add(messageId));
-    
+
     // Update message in state
     setChatMessages((prev) =>
-      prev.map((msg) =>
-        msg.id === messageId ? { ...msg, isPinned: true } : msg
-      )
+      prev.map((msg) => (msg.id === messageId ? { ...msg, isPinned: true } : msg))
     );
   };
 
   const handleMarkAnswered = (messageId: string, answeredBy: string) => {
     _setAnsweredQuestions((prev: Set<string>) => new Set(prev).add(messageId));
-    
+
     // Update message in state
     setChatMessages((prev) =>
-      prev.map((msg) =>
-        msg.id === messageId
-          ? { ...msg, isAnswered: true, answeredBy }
-          : msg
-      )
+      prev.map((msg) => (msg.id === messageId ? { ...msg, isAnswered: true, answeredBy } : msg))
     );
   };
 
@@ -295,7 +288,7 @@ function VideoCallInterface({
       userName: participantName,
       timestamp: Date.now(),
     };
-    
+
     sendDataMessage("chat", message);
     handleChatMessageReceived(message); // Add locally immediately
   };
@@ -333,7 +326,7 @@ function VideoCallInterface({
 
   const handleVote = (pollId: string, optionId: string) => {
     sendDataMessage("vote", { pollId, optionId, userId });
-    
+
     // Update locally
     handleVoteReceived({ pollId, optionId, userId });
   };
@@ -357,21 +350,21 @@ function VideoCallInterface({
       </div>
 
       {/* Floating Action Buttons */}
-      <div className="absolute bottom-4 left-4 flex flex-col gap-2 z-50">
+      <div className="absolute bottom-4 left-4 z-50 flex flex-col gap-2">
         {/* Chat Toggle */}
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setShowChat(!showChat)}
-          className={`flex items-center gap-2 px-4 py-3 rounded-full shadow-lg transition-colors ${
+          className={`flex items-center gap-2 rounded-full px-4 py-3 shadow-lg transition-colors ${
             showChat
               ? "bg-purple-600 text-white"
-              : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+              : "bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-300"
           }`}
         >
-          <MessageSquare className="w-5 h-5" />
+          <MessageSquare className="h-5 w-5" />
           {chatMessages.length > 0 && !showChat && (
-            <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+            <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white">
               {chatMessages.length > 9 ? "9+" : chatMessages.length}
             </span>
           )}
@@ -383,9 +376,9 @@ function VideoCallInterface({
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setShowPollCreator(!showPollCreator)}
-            className="flex items-center gap-2 px-4 py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full shadow-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+            className="flex items-center gap-2 rounded-full bg-white px-4 py-3 text-gray-700 shadow-lg hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
           >
-            <BarChart3 className="w-5 h-5" />
+            <BarChart3 className="h-5 w-5" />
           </motion.button>
         )}
       </div>
@@ -402,7 +395,7 @@ function VideoCallInterface({
             initial={{ x: -400, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -400, opacity: 0 }}
-            className="absolute top-0 left-0 bottom-0 w-96 z-40"
+            className="absolute bottom-0 left-0 top-0 z-40 w-96"
           >
             <SegmentedChat
               messages={chatMessages}
@@ -419,7 +412,7 @@ function VideoCallInterface({
       {/* Active Poll Overlay */}
       <AnimatePresence>
         {activePoll && (
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
             <LivePoll
               poll={activePoll}
               currentUserId={userId}
@@ -433,7 +426,7 @@ function VideoCallInterface({
       {/* Poll Creator Modal */}
       <AnimatePresence>
         {showPollCreator && (
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
             <PollCreator
               onCreatePoll={handleCreatePoll}
               onClose={() => setShowPollCreator(false)}

@@ -2,10 +2,22 @@
 
 import { useState, useEffect } from "react";
 import { Bell, X, Check, MessageCircle, Users, Trophy, Heart, AlertCircle } from "lucide-react";
-import { getUserNotifications, markNotificationAsRead, markAllNotificationsAsRead, deleteNotification } from "@/app/actions/notifications";
+import {
+  getUserNotifications,
+  markNotificationAsRead,
+  markAllNotificationsAsRead,
+  deleteNotification,
+} from "@/app/actions/notifications";
 import { useCurrentUser } from "@/hooks/use-current-user";
 
-type NotificationType = "MESSAGE" | "COMMENT" | "REACTION" | "NEW_POST" | "NEW_MEMBER" | "ACHIEVEMENT" | "SYSTEM";
+type NotificationType =
+  | "MESSAGE"
+  | "COMMENT"
+  | "REACTION"
+  | "NEW_POST"
+  | "NEW_MEMBER"
+  | "ACHIEVEMENT"
+  | "SYSTEM";
 
 interface Notification {
   id: string;
@@ -27,10 +39,10 @@ export function NotificationCenter() {
   // Load notifications with polling
   useEffect(() => {
     loadNotifications();
-    
+
     // Poll every 30 seconds for new notifications
     const interval = setInterval(loadNotifications, 30000);
-    
+
     return () => clearInterval(interval);
   }, []);
 
@@ -107,11 +119,11 @@ export function NotificationCenter() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         aria-label={isOpen ? "Close notifications" : "Open notifications"}
-        className="relative rounded-full p-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+        className="relative rounded-full p-2 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
       >
         <Bell className="h-6 w-6" />
         {unreadCount > 0 && (
-          <span className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
+          <span className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
@@ -121,10 +133,7 @@ export function NotificationCenter() {
       {isOpen && (
         <>
           {/* Backdrop */}
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => setIsOpen(false)}
-          />
+          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
 
           {/* Panel */}
           <div className="absolute right-0 top-12 z-50 w-96 max-w-[calc(100vw-2rem)] rounded-lg border border-gray-200 bg-white shadow-xl">
@@ -164,25 +173,19 @@ export function NotificationCenter() {
                     >
                       <div className="flex gap-3">
                         {/* Icon */}
-                        <div className="flex-shrink-0">
-                          {getIcon(notification.type)}
-                        </div>
+                        <div className="flex-shrink-0">{getIcon(notification.type)}</div>
 
                         {/* Content */}
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900">
-                            {notification.title}
-                          </p>
-                          <p className="mt-1 text-sm text-gray-600">
-                            {notification.message}
-                          </p>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-gray-900">{notification.title}</p>
+                          <p className="mt-1 text-sm text-gray-600">{notification.message}</p>
                           <p className="mt-1 text-xs text-gray-400">
                             {formatTimestamp(notification.createdAt)}
                           </p>
                         </div>
 
                         {/* Actions */}
-                        <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex flex-col gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                           {!notification.isRead && (
                             <button
                               onClick={() => handleMarkAsRead(notification.id)}

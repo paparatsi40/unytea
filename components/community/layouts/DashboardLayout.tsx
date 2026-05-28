@@ -1,8 +1,16 @@
 "use client";
 
-import { 
-  BarChart3, TrendingUp, Users, MessageSquare, BookOpen, 
-  Activity, ArrowUp, ArrowDown, Eye, Heart
+import {
+  BarChart3,
+  TrendingUp,
+  Users,
+  MessageSquare,
+  BookOpen,
+  Activity,
+  ArrowUp,
+  ArrowDown,
+  Eye,
+  Heart,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -37,11 +45,7 @@ interface DashboardLayoutProps {
   };
 }
 
-export function DashboardLayout({
-  community,
-  posts = [],
-  analytics = {},
-}: DashboardLayoutProps) {
+export function DashboardLayout({ community, posts = [], analytics = {} }: DashboardLayoutProps) {
   const primaryColor = community.primaryColor || "#8B5CF6";
   const secondaryColor = community.secondaryColor || "#EC4899";
   const accentColor = community.accentColor || "#F59E0B";
@@ -155,7 +159,7 @@ export function DashboardLayout({
                   <option>Last 90 days</option>
                 </select>
               </div>
-              
+
               {/* Simple Bar Chart Visualization */}
               <div className="flex h-48 items-end justify-between gap-2">
                 {[65, 80, 70, 90, 75, 95, 85].map((height, i) => (
@@ -168,7 +172,7 @@ export function DashboardLayout({
                       }}
                     />
                     <span className="text-xs text-gray-500">
-                      {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][i]}
+                      {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][i]}
                     </span>
                   </div>
                 ))}
@@ -190,7 +194,7 @@ export function DashboardLayout({
                   >
                     <div
                       className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
-                      style={{ backgroundColor: index < 3 ? accentColor : '#9CA3AF' }}
+                      style={{ backgroundColor: index < 3 ? accentColor : "#9CA3AF" }}
                     >
                       {index + 1}
                     </div>
@@ -307,10 +311,7 @@ function MetricCard({
           <p className="mb-1 text-sm font-medium text-gray-600">{title}</p>
           <p className="text-3xl font-bold text-gray-900">{value.toLocaleString()}</p>
         </div>
-        <div
-          className="rounded-lg p-3"
-          style={{ backgroundColor: `${color}15` }}
-        >
+        <div className="rounded-lg p-3" style={{ backgroundColor: `${color}15` }}>
           <Icon className="h-6 w-6" style={{ color }} />
         </div>
       </div>
@@ -320,9 +321,7 @@ function MetricCard({
         ) : (
           <ArrowDown className="h-4 w-4 text-red-500" />
         )}
-        <span className={trend === "up" ? "text-green-600" : "text-red-600"}>
-          {change}%
-        </span>
+        <span className={trend === "up" ? "text-green-600" : "text-red-600"}>{change}%</span>
         <span className="text-gray-500">vs last month</span>
       </div>
     </motion.div>

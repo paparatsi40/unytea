@@ -76,6 +76,7 @@ Phase 3e note: Step 3 (Zustand migration) was NO-OP — dep declared in `package
 **Sanitization**: `sanitize-html ^2.17.4` (replaced `isomorphic-dompurify` in `c28f3d68`). Pure JS parser, no DOM environment. Eliminates entire jsdom chain.
 
 **Vulnerabilities** (snapshot 2026-05-14, post zustand uninstall): 11 (10 MODERATE, 1 HIGH). 8 HIGH closed during Sprint 2 deps phase. Remaining chains:
+
 - `postcss` <8.5.10 (MODERATE) transitive under `next` — requires Next 17 to clear, no advisory in app code path.
 - `nanoid` <5.0.9 (MODERATE) transitive under `@excalidraw/excalidraw@0.18.1` + `@excalidraw/mermaid-to-excalidraw`.
 - `lodash-es` <=4.17.23 (HIGH, Prototype Pollution) transitive under `@excalidraw/excalidraw@0.18.1 → @excalidraw/mermaid-to-excalidraw → @mermaid-js/parser → langium → chevrotain → lodash-es`. **New since 0.17.6 → 0.18.1 bump**; surface only reachable if mermaid-to-excalidraw runs on attacker-controlled mermaid source. Backlog: monitor Excalidraw releases for upstream lodash fix.
@@ -92,14 +93,15 @@ When extending the API surface, working on routes, or creating server actions, f
 
 `lib/authorization.ts` defines typed errors and helpers:
 
-| Helper | Returns | Throws |
-|--------|---------|--------|
-| `requireUserId()` | userId (string) | `UnauthorizedError` if no session |
-| `requireAdmin()` | userId (string) | `UnauthorizedError` or `ForbiddenError` |
-| `requireCommunityMember(communityId)` | member object | `ForbiddenError` if not active member |
-| `requireCommunityRole(communityId, roles[])` | member object | `ForbiddenError` if role not in allowed list |
+| Helper                                       | Returns         | Throws                                       |
+| -------------------------------------------- | --------------- | -------------------------------------------- |
+| `requireUserId()`                            | userId (string) | `UnauthorizedError` if no session            |
+| `requireAdmin()`                             | userId (string) | `UnauthorizedError` or `ForbiddenError`      |
+| `requireCommunityMember(communityId)`        | member object   | `ForbiddenError` if not active member        |
+| `requireCommunityRole(communityId, roles[])` | member object   | `ForbiddenError` if role not in allowed list |
 
 `lib/api-error-handler.ts` exports `handleApiError(error)` which maps:
+
 - `UnauthorizedError` → HTTP 401
 - `ForbiddenError` → HTTP 403
 - Unknown errors → HTTP 500 (logged to console)
@@ -144,7 +146,9 @@ Server actions and API routes validate inputs with zod schemas. Use `safeParse` 
 ```typescript
 import { z } from "zod";
 
-const schema = z.object({ /* ... */ });
+const schema = z.object({
+  /* ... */
+});
 
 try {
   const data = schema.parse(body);
@@ -209,9 +213,11 @@ git push origin --delete phase-<name>
 Workflow issues that have caused confusion before. Awareness saves debug cycles.
 
 ### 5.1 Corporate WiFi blocks port 5432
+
 Carlos's corporate network blocks outbound Postgres traffic. Symptom: `Can't reach database server at ep-purple-surf-...neon.tech:5432` when running `npm run dev`, `npx prisma migrate`, or any Prisma command locally. **First instinct when seeing DB connection errors locally: ask whether on corporate WiFi.** Workaround: switch to mobile hotspot.
 
 ### 5.2 Vercel preview deploys and auth flows — ✅ RESOLVED
+
 The Vercel project has `AUTH_URL` set project-wide to `https://www.unytea.com`. Preview deploys live on `*.vercel.app` subdomains, which historically caused NextAuth to reject the request because the actual Host header didn't match `AUTH_URL`.
 
 **Fix (already in code)**: `lib/auth.ts` has `trustHost: true` hardcoded in the NextAuth config (see the explained comment around the relevant line). This tells NextAuth to trust the `X-Forwarded-Host` header from Vercel's edge instead of validating against `AUTH_URL`. Preview deploys now sign in cleanly.
@@ -221,13 +227,17 @@ The Vercel project has `AUTH_URL` set project-wide to `https://www.unytea.com`. 
 The official NextAuth recommendation lists either approach (code config or env var) as valid; we keep the code-based config so it's visible in PRs and reviewable.
 
 ### 5.3 PowerShell `[slug]` paths
+
 PowerShell interprets square brackets as glob wildcards. Reading files at paths like `app/api/communities/[slug]/route.ts` requires `Get-Content -LiteralPath "..."` (not just `Get-Content "..."`, which fails silently with "path does not exist").
 
 ### 5.4 PWA install banner
+
 The site has a Progressive Web App manifest + Service Worker (via `web-push`). Browsers may show "Install Unytea" prompts. Intentional, not a bug. Also produces some console noise that can be filtered out when debugging.
 
 ### 5.5 Untracked files commonly present
+
 `git status` typically shows:
+
 - `.claude/` — Claude Code state, gitignored eventually but currently untracked
 - `.env.local.backup-*` — manual backups Carlos has made
 
@@ -275,6 +285,7 @@ These shape interaction style.
 `docs/internal/PRODUCT_DECISIONS_V1.md` v1 was completed on 2026-05-15. See that doc for the canonical decisions.
 
 The document encodes 7 sections of locked decisions:
+
 1. **Canonical Identity** — "comunidad de membresía live-first para creadores con audiencia propia"; live as architectural choice, not feature; library as memory layer; anti-Skool positioning.
 2. **Target User** — unified persona "Host Independiente" (online + offline creators with established audience); not everyone, not pure beginners.
 3. **v1 Features** — Minimum Lovable Product with 5 layers + integrations Tier 1+2.
@@ -308,6 +319,7 @@ Activation is a Sprint 3+ decision dependent on `PRODUCT_DECISIONS_V1.md`.
 Items accumulated during Sprint 1 + 2, organized by destination phase.
 
 ### Phase 3e — Cleanup — ✅ DONE (commits 0fe35241..b7297968)
+
 - ~~Remove `swcMinify` and `optimizeFonts` from `next.config.mjs`~~ done in `0fe35241`
 - ~~Custom Cache-Control header warning on `/_next/static/:path*`~~ done in `8764eef0`
 - ~~Zustand migration~~ NO-OP (0 imports in code; uninstall queued in Phase 5+)
@@ -359,6 +371,7 @@ Items accumulated during Sprint 1 + 2, organized by destination phase.
 **CSP actual está laxa, no rota.** 4b consiste en apretarla: eliminar `https:` wildcards en img/media/font/connect, eliminar `unsafe-eval` donde sea posible, mitigar `unsafe-inline` en `script-src` vía nonces o hashes (Tailwind requiere `unsafe-inline` en `style-src` — eso queda).
 
 **CSP actual (texto completo)**:
+
 ```
 default-src 'self'
 base-uri 'self'
@@ -385,11 +398,13 @@ connect-src 'self' https: ws: wss:
 - `font-src`: `'self'` + `data:` — sin Google Fonts CDN (proyecto usa Geist via `next/font`)
 
 **Deps que requieren `unsafe-eval`** (o equivalente):
+
 - `@excalidraw/excalidraw@^0.17.6` — usa WebAssembly + math expressions internas → recomendar `'wasm-unsafe-eval'` específicamente (CSP3 keyword, Chrome 97+/Firefox 110+/Safari 16+)
 - `recharts@^2.13.3` — media sospecha (animation paths via `react-smooth`)
 - `framer-motion@^11.18.2` — media sospecha (path transforms; v11 mayormente sin Function constructor, verificar en prod)
 
 **Deps que NO requieren eval** (confirmadas):
+
 - Tiptap stack instalado: starter-kit, react, image, link, placeholder (sin Mention/Suggestion que sí lo necesitarían)
 - DnD libs (`@dnd-kit/*`, `@hello-pangea/dnd`), `lottie-react`, `react-day-picker`, `html-to-image`
 
@@ -398,17 +413,20 @@ connect-src 'self' https: ws: wss:
 Pre-existing latent bug from Phase 3c (Next 14→16 upgrade) surfaced when `/dashboard/c/[slug]` was navigated in production for the first time post-upgrade. Phase 3c validation used `npm run dev` (Turbopack dev mode resolves modules differently than prod build), missing 4 ERR_REQUIRE_ESM bugs in jsdom's dep chain.
 
 **Bugs discovered (in order)**:
+
 - **Bug 1**: `html-encoding-sniffer@5+` requires `@exodus/bytes` (ESM-only)
 - **Bug 2**: `whatwg-url@16+` requires `@exodus/bytes` (different chain, same dep)
 - **Bug 3**: `jsdom@28+` itself requires `@exodus/bytes` directly (root cause)
 - **Bug 4**: `cssstyle` / `@asamuzakjp/css-color` requires `@csstools/css-calc` (different ESM module entirely)
 
 **Approach evolution**:
-- *Attempts 1-3*: defensive npm overrides (`479abe56`, `4d92581d`). Whack-a-mole — each fix surfaced the next bug.
-- *Attempt 4*: switch production build to `--webpack` (`cd7002d6`). Failed — stack trace changed from Turbopack runtime to Node native runtime, same `ERR_REQUIRE_ESM`. Confirmed the constraint is at Node level (CJS cannot `require()` ESM), not bundler-level. No bundler can resolve this.
-- *Definitive fix* (`c28f3d68`): **replace `isomorphic-dompurify` with `sanitize-html`**. Eliminates jsdom entirely from dep tree. Single file change to `lib/sanitize.ts`, ports allowlist + `rel="noopener noreferrer"` hook faithfully. Removed defensive overrides (h-e-s, whatwg-url, jsdom) — no longer needed without jsdom.
+
+- _Attempts 1-3_: defensive npm overrides (`479abe56`, `4d92581d`). Whack-a-mole — each fix surfaced the next bug.
+- _Attempt 4_: switch production build to `--webpack` (`cd7002d6`). Failed — stack trace changed from Turbopack runtime to Node native runtime, same `ERR_REQUIRE_ESM`. Confirmed the constraint is at Node level (CJS cannot `require()` ESM), not bundler-level. No bundler can resolve this.
+- _Definitive fix_ (`c28f3d68`): **replace `isomorphic-dompurify` with `sanitize-html`**. Eliminates jsdom entirely from dep tree. Single file change to `lib/sanitize.ts`, ports allowlist + `rel="noopener noreferrer"` hook faithfully. Removed defensive overrides (h-e-s, whatwg-url, jsdom) — no longer needed without jsdom.
 
 **Validation**:
+
 - `npm ls jsdom` → empty
 - `npm ls @exodus/bytes` → empty
 - `npm ls @asamuzakjp/css-color` → empty
@@ -422,6 +440,7 @@ Pre-existing latent bug from Phase 3c (Next 14→16 upgrade) surfaced when `/das
 **Original symptom** (pre-fix): Excalidraw 0.17.6 read `React.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentOwner` at module-load time. React 19 (introduced in Phase 3c, May 12) removed that internal API. Result: navigating to `/dashboard/sessions/[id]/room` and opening whiteboard crashed with `Cannot read properties of undefined (reading 'ReactCurrentOwner')`. Chrome showed "This page couldn't load" (React tree fully crashed, no error boundary).
 
 **Diagnose** (Phase A, May 13): grep `node_modules/` for `ReactCurrentOwner` found 4 candidate packages. After analysis:
+
 - `@excalidraw/excalidraw@0.17.6` — peer dep `react ^17 || ^18` (no 19). **Root cause.**
 - `framer-motion@11` — declares `react ^18 || ^19`, code path guarded. Not a culprit.
 - `@effect/platform` — match was inside a JS string (vendored swagger-ui-bundle source), not executed.
@@ -430,6 +449,7 @@ Pre-existing latent bug from Phase 3c (Next 14→16 upgrade) surfaced when `/das
 **Fix** (Phase B, May 13, commit `c78b883e`): bump `@excalidraw/excalidraw` 0.17.6 → 0.18.1. The 0.18 release explicitly declares `peerDependencies: { react: '^17 || ^18 || ^19' }` and dropped the secret-internals reference (`grep ReactCurrentOwner` in 0.18.1 bundle = 0 matches). 0.18 went through 7 RCs before stable. Single user-code caller (`components/sessions/SessionWhiteboard.tsx`) — APIs used were stable cross-versions, **0 caller changes needed**.
 
 **Validation**:
+
 - Feature branch preview deploy verified green by Carlos (whiteboard mounts, console clean)
 - Merged to main `77e6c0b7`
 - Production validation: see Phase 4b monitoring period continues alongside this fix
@@ -449,6 +469,7 @@ Original symptoms (Prisma errors flooding Vercel runtime logs from `app/api/webh
 3. **P2002 race on `participant_joined`** — `livekitIdentity @unique` constraint hit during concurrent webhook delivery; both calls decided "row missing" and both inserted with the same identity.
 
 **Fixes (`5b3fac95`)**:
+
 - Additive migration `20260514154625_add_livekit_event_types_to_session_event_type` adding 8 enum values (`ALTER TYPE ADD VALUE × 8`).
 - `findUnique → log+ack-200` pattern in `handleRoomStarted` / `handleRoomFinished` (idempotent ack to LiveKit, no retry storm).
 - `try/catch P2002 → log+ack-200` around the participant_joined upsert.
@@ -457,10 +478,13 @@ Original symptoms (Prisma errors flooding Vercel runtime logs from `app/api/webh
 **Follow-up (`c30fa4da`)**: 400→401 signature distinction. `handleLiveKitWebhook` now returns a discriminated union with `reason: "config" | "signature" | "processing"`; route handler maps signature → 401 (Unauthorized, no retry), config + processing → 500. Eliminates LiveKit retry-storms on signature failures and logs non-sensitive request metadata (user-agent, content-length) for security forensics.
 
 Audit notes (out-of-scope of the fix, kept here for future awareness):
+
 - `app/actions/session-core.ts` has its own exported `logSessionEvent` with different signature (`(params: {...})`). 12 callsites, all using `SessionEventType.XXX` correctly — clean, not affected by the webhooks bug.
 
 ### Phase 5+ — React Compiler audit + Type hygiene (post Phase 3e)
+
 Surfaced when ESLint flat config (Phase 3e Step 4) re-enabled lint enforcement after `next lint` removal in Next 16. All currently downgraded to `warn` — backlog to actually fix.
+
 - 185 `@typescript-eslint/no-explicit-any` — typing pass (server actions + API routes + components con Prisma JSON fields)
 - 159 try/catch wrapping JSX → reemplazar con `<ErrorBoundary>` components (**BUGS LATENTES, alto-ROI** — React no catches rendering errors via try/catch)
 - 76 immutability / mixed state mutation
@@ -474,6 +498,7 @@ Surfaced when ESLint flat config (Phase 3e Step 4) re-enabled lint enforcement a
 - **Pre-requisito** antes de activar `experimental.reactCompiler` en `next.config.mjs`
 
 ### Phase 5+ — Env / dev cleanup
+
 - ~~`npm uninstall zustand`~~ done in `cf6b6886` (2026-05-14); transitive `zustand@4.5.7` remains under Excalidraw → tunnel-rat (not controllable, no impact).
 - **If Passkey/WebAuthn provider is activated in NextAuth**: decide between (a) pre-bundling `@simplewebauthn/browser` locally — requires fork or monkey-patch of `@auth/core` because the unpkg URL is hardcoded in its bundle; or (b) re-adding `unpkg.com` to `script-src` with strict subpath: `https://unpkg.com/@simplewebauthn/browser@*/dist/bundle/index.umd.min.js`. Surfaced when Phase 4a removed unpkg from CSP.
 - ~~Stale Clerk keys in `.env` (legacy auth, replaced by NextAuth in earlier work)~~ — **in-repo audit clean** (2026-05-15): 0 code imports, 0 deps, 0 `.env.example` lines, no `/api/webhooks/clerk/` route, `img.clerk.com` removed from `next.config.mjs:images.remotePatterns`. Defensive test in `tests/unit/auth-security.test.ts` asserts no `CLERK_` keys leak into env files. **Pending Carlos manual cleanup outside repo**: any `CLERK_*` env vars in Vercel dashboard + `.env.local` on his machine.
@@ -489,6 +514,7 @@ Surfaced when ESLint flat config (Phase 3e Step 4) re-enabled lint enforcement a
 - **SW cache name versioning**: `CACHE_NAME` in `public/sw.js` is hardcoded to `"unytea-v1"`. When precache list or cache strategy changes, version it with a build hash or env var to force refresh of stale caches. Prevention, not urgent.
 
 ### Product backlog (post-gate)
+
 - `customCSS` feature design + CSS sanitization (currently rejected from action input — see Sprint 1 closure §5.5)
 - Infinite scroll + announcement pinning architecture for community posts feed (Sprint 1 closure §5.4)
 - Autopilot activation (Section 8)
@@ -513,12 +539,13 @@ Surfaced when ESLint flat config (Phase 3e Step 4) re-enabled lint enforcement a
 When opening a fresh conversation, recommended kickoff from Carlos:
 
 ```
-"Sigamos con unytea. Estado actual: [phase 3e cleanup / phase 4 CSP / 
-otra cosa]. Leí docs/internal/CONTEXT_BRIEFING.md vía 
+"Sigamos con unytea. Estado actual: [phase 3e cleanup / phase 4 CSP /
+otra cosa]. Leí docs/internal/CONTEXT_BRIEFING.md vía
 https://raw.githubusercontent.com/paparatsi40/unytea/main/docs/internal/CONTEXT_BRIEFING.md"
 ```
 
 If you (Claude) receive a vague resumption like "let's continue with unytea" without this doc referenced:
+
 1. Fetch this briefing immediately via `web_fetch` on the raw GitHub URL.
 2. Confirm to user you have context loaded ("OK, leí el briefing — main está en c9b4af71, pendiente Phase 3e/4...").
 3. Then ask user what specifically they want to work on.
@@ -531,6 +558,7 @@ If you need recent commit history beyond what's in this doc, ask user to run `gi
 ## 12. Maintenance
 
 This doc must be updated at the end of each sprint or whenever:
+
 - Architectural patterns change
 - A new operational gotcha is identified
 - Working agreements with Carlos shift

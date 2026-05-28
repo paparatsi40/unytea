@@ -83,10 +83,16 @@ export default function ProfilePage() {
             </div>
           )}
           <div>
-            <h2 className="text-2xl font-bold text-foreground">{identity?.user.name || user.name || "User"}</h2>
-            <p className="text-muted-foreground">{identity?.user.username ? `@${identity.user.username}` : user.email}</p>
+            <h2 className="text-2xl font-bold text-foreground">
+              {identity?.user.name || user.name || "User"}
+            </h2>
+            <p className="text-muted-foreground">
+              {identity?.user.username ? `@${identity.user.username}` : user.email}
+            </p>
             {(identity?.user.tagline || identity?.user.bio) && (
-              <p className="mt-2 text-sm text-muted-foreground">{identity?.user.tagline || identity?.user.bio}</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {identity?.user.tagline || identity?.user.bio}
+              </p>
             )}
           </div>
         </div>
@@ -95,19 +101,27 @@ export default function ProfilePage() {
           <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div className="rounded-lg border border-border bg-background p-4">
               <p className="text-sm font-medium text-muted-foreground">Communities</p>
-              <p className="mt-1 text-2xl font-bold text-foreground">{identity.stats.communitiesJoined}</p>
+              <p className="mt-1 text-2xl font-bold text-foreground">
+                {identity.stats.communitiesJoined}
+              </p>
             </div>
             <div className="rounded-lg border border-border bg-background p-4">
               <p className="text-sm font-medium text-muted-foreground">Sessions attended</p>
-              <p className="mt-1 text-2xl font-bold text-foreground">{identity.stats.sessionsAttended}</p>
+              <p className="mt-1 text-2xl font-bold text-foreground">
+                {identity.stats.sessionsAttended}
+              </p>
             </div>
             <div className="rounded-lg border border-border bg-background p-4">
               <p className="text-sm font-medium text-muted-foreground">Sessions hosted</p>
-              <p className="mt-1 text-2xl font-bold text-foreground">{identity.stats.sessionsHosted}</p>
+              <p className="mt-1 text-2xl font-bold text-foreground">
+                {identity.stats.sessionsHosted}
+              </p>
             </div>
             <div className="rounded-lg border border-border bg-background p-4">
               <p className="text-sm font-medium text-muted-foreground">Contributions</p>
-              <p className="mt-1 text-2xl font-bold text-foreground">{identity.stats.contributions}</p>
+              <p className="mt-1 text-2xl font-bold text-foreground">
+                {identity.stats.contributions}
+              </p>
             </div>
           </div>
         )}
@@ -117,7 +131,9 @@ export default function ProfilePage() {
             <p className="mb-2 text-sm font-medium text-muted-foreground">Interests</p>
             <div className="flex flex-wrap gap-2">
               {identity.user.interests.slice(0, 8).map((interest) => (
-                <Badge key={interest} variant="outline">{interest}</Badge>
+                <Badge key={interest} variant="outline">
+                  {interest}
+                </Badge>
               ))}
             </div>
           </div>
@@ -128,7 +144,9 @@ export default function ProfilePage() {
             <div className="mb-2 flex items-center justify-between">
               <p className="text-sm font-medium text-muted-foreground">Your communities</p>
               <Link href="/dashboard/communities">
-                <Button variant="ghost" size="sm">Open communities</Button>
+                <Button variant="ghost" size="sm">
+                  Open communities
+                </Button>
               </Link>
             </div>
             <div className="grid gap-2 sm:grid-cols-2">
@@ -140,7 +158,8 @@ export default function ProfilePage() {
                 >
                   <p className="font-medium text-foreground">{membership.community.name}</p>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    {membership.community.membersCount} members · {membership.role} · {membership.community.isPaid ? "Paid" : "Free"}
+                    {membership.community.membersCount} members · {membership.role} ·{" "}
+                    {membership.community.isPaid ? "Paid" : "Free"}
                   </p>
                 </Link>
               ))}
@@ -157,10 +176,11 @@ export default function ProfilePage() {
             Manage password, authentication, and account safety options.
           </p>
           <Link href="/dashboard/settings/account">
-            <Button size="sm" variant="outline">Open security options</Button>
+            <Button size="sm" variant="outline">
+              Open security options
+            </Button>
           </Link>
         </div>
-
       </div>
     </div>
   );

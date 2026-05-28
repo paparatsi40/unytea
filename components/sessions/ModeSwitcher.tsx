@@ -30,7 +30,7 @@ export function ModeSwitcher({
   sessionMode = "video",
 }: ModeSwitcherProps) {
   const isAudioOnly = sessionMode === "audio";
-  const availableModes = isAudioOnly 
+  const availableModes = isAudioOnly
     ? AUDIO_MODES.filter((mode) => {
         if (mode.id === "whiteboard" && !hasWhiteboard) return false;
         return true;

@@ -24,8 +24,8 @@ export const ourFileRouter = {
   communityBranding: f({
     image: {
       maxFileSize: "8MB",
-      maxFileCount: 1
-    }
+      maxFileCount: 1,
+    },
   })
     .middleware(async () => {
       const userId = await getCurrentUserId();

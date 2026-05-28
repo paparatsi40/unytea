@@ -40,7 +40,7 @@ export function SessionChat({ sessionId: _sessionId, onPinQuestion }: SessionCha
   };
 
   const handleReaction = (messageId: string, emoji: string) => {
-    setMessageReactions(prev => ({
+    setMessageReactions((prev) => ({
       ...prev,
       [messageId]: [...(prev[messageId] || []), emoji],
     }));
@@ -59,13 +59,11 @@ export function SessionChat({ sessionId: _sessionId, onPinQuestion }: SessionCha
       <div className="flex items-center gap-2 border-b border-zinc-800 px-4 py-3">
         <MessageSquare className="h-4 w-4 text-blue-400" />
         <span className="text-sm font-medium text-zinc-300">Chat</span>
-        <span className="ml-auto text-xs text-zinc-500">
-          {chatMessages.length} messages
-        </span>
+        <span className="ml-auto text-xs text-zinc-500">{chatMessages.length} messages</span>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-3">
+      <div className="flex-1 space-y-3 overflow-y-auto p-3">
         {chatMessages.map((msg, idx) => {
           const isMe = msg.from?.identity === room.localParticipant.identity;
           const messageId = `${msg.from?.identity}-${idx}`;
@@ -74,18 +72,13 @@ export function SessionChat({ sessionId: _sessionId, onPinQuestion }: SessionCha
           return (
             <div
               key={idx}
-              className={cn(
-                "group flex flex-col",
-                isMe ? "items-end" : "items-start"
-              )}
+              className={cn("group flex flex-col", isMe ? "items-end" : "items-start")}
             >
               {/* Message Bubble */}
               <div
                 className={cn(
                   "relative max-w-[85%] rounded-lg px-3 py-2",
-                  isMe
-                    ? "bg-blue-600/90 text-white"
-                    : "bg-zinc-800 text-zinc-100"
+                  isMe ? "bg-blue-600/90 text-white" : "bg-zinc-800 text-zinc-100"
                 )}
               >
                 {/* Sender Name */}
@@ -113,7 +106,9 @@ export function SessionChat({ sessionId: _sessionId, onPinQuestion }: SessionCha
 
                   {/* Reaction Button */}
                   <button
-                    onClick={() => setShowReactionsFor(showReactionsFor === messageId ? null : messageId)}
+                    onClick={() =>
+                      setShowReactionsFor(showReactionsFor === messageId ? null : messageId)
+                    }
                     className="flex h-6 w-6 items-center justify-center rounded-full text-zinc-400 hover:bg-zinc-700 hover:text-white"
                   >
                     <Smile className="h-3 w-3" />
@@ -140,7 +135,9 @@ export function SessionChat({ sessionId: _sessionId, onPinQuestion }: SessionCha
               {reactions.length > 0 && (
                 <div className="mt-1 flex gap-1">
                   {reactions.map((reaction, i) => (
-                    <span key={i} className="text-sm">{reaction}</span>
+                    <span key={i} className="text-sm">
+                      {reaction}
+                    </span>
                   ))}
                 </div>
               )}

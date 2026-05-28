@@ -1,8 +1,8 @@
-import { test, expect, selectors } from './fixtures';
+import { test, expect, selectors } from "./fixtures";
 
-test.describe('Authentication Flow', () => {
-  test('signup page loads and shows form fields', async ({ page }) => {
-    await page.goto('/auth/signup');
+test.describe("Authentication Flow", () => {
+  test("signup page loads and shows form fields", async ({ page }) => {
+    await page.goto("/auth/signup");
 
     // Check page title
     await expect(page).toHaveTitle(/signup|register/i);
@@ -24,8 +24,8 @@ test.describe('Authentication Flow', () => {
     await expect(submitButton).toContainText(/sign up|register|create account/i);
   });
 
-  test('signin page loads with email/password fields', async ({ page }) => {
-    await page.goto('/auth/signin');
+  test("signin page loads with email/password fields", async ({ page }) => {
+    await page.goto("/auth/signin");
 
     // Check page title
     await expect(page).toHaveTitle(/sign in|login/i);
@@ -47,9 +47,9 @@ test.describe('Authentication Flow', () => {
     await expect(submitButton).toContainText(/sign in|login|continue/i);
   });
 
-  test('unauthenticated user gets redirected from /dashboard to /auth/signin', async ({ page }) => {
+  test("unauthenticated user gets redirected from /dashboard to /auth/signin", async ({ page }) => {
     // Navigate to protected dashboard page without auth
-    await page.goto('/dashboard', { waitUntil: 'networkidle' });
+    await page.goto("/dashboard", { waitUntil: "networkidle" });
 
     // Should be redirected to signin page
     await expect(page).toHaveURL(/\/auth\/signin/);
@@ -59,8 +59,8 @@ test.describe('Authentication Flow', () => {
     await expect(signInForm).toBeVisible();
   });
 
-  test('forgot password page loads', async ({ page }) => {
-    await page.goto('/auth/forgot-password');
+  test("forgot password page loads", async ({ page }) => {
+    await page.goto("/auth/forgot-password");
 
     // Check page title
     await expect(page).toHaveTitle(/forgot|reset|password/i);

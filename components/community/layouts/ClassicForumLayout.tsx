@@ -73,15 +73,11 @@ export function ClassicForumLayout({
             {community.showStats && community._count && (
               <div className="hidden items-center gap-6 md:flex">
                 <div className="text-center">
-                  <div className="text-xl font-bold text-gray-900">
-                    {community._count.members}
-                  </div>
+                  <div className="text-xl font-bold text-gray-900">{community._count.members}</div>
                   <div className="text-xs text-gray-500">Members</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-xl font-bold text-gray-900">
-                    {community._count.posts}
-                  </div>
+                  <div className="text-xl font-bold text-gray-900">{community._count.posts}</div>
                   <div className="text-xs text-gray-500">Posts</div>
                 </div>
               </div>
@@ -97,9 +93,7 @@ export function ClassicForumLayout({
             {/* About Section */}
             {community.aboutSection && (
               <div className="mb-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-                <h2 className="mb-3 text-lg font-semibold text-gray-900">
-                  About this community
-                </h2>
+                <h2 className="mb-3 text-lg font-semibold text-gray-900">About this community</h2>
                 <div
                   className="prose prose-sm max-w-none text-gray-600"
                   dangerouslySetInnerHTML={{ __html: community.aboutSection }}
@@ -143,9 +137,7 @@ export function ClassicForumLayout({
             {/* Load More */}
             {posts.length >= 20 && (
               <div className="mt-6 text-center">
-                <button
-                  className="rounded-lg border border-gray-300 bg-white px-6 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
-                >
+                <button className="rounded-lg border border-gray-300 bg-white px-6 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
                   Load more posts
                 </button>
               </div>
@@ -157,9 +149,7 @@ export function ClassicForumLayout({
             <div className="space-y-6 lg:sticky lg:top-6">
               {/* Community Stats */}
               <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
-                <h3 className="mb-4 text-sm font-semibold text-gray-900">
-                  Community Stats
-                </h3>
+                <h3 className="mb-4 text-sm font-semibold text-gray-900">Community Stats</h3>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">Members</span>
@@ -185,17 +175,15 @@ export function ClassicForumLayout({
               {/* Top Contributors */}
               {members.length > 0 && (
                 <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
-                  <h3 className="mb-4 text-sm font-semibold text-gray-900">
-                    Top Contributors
-                  </h3>
+                  <h3 className="mb-4 text-sm font-semibold text-gray-900">Top Contributors</h3>
                   <div className="space-y-3">
                     {members.slice(0, 5).map((member, index) => (
                       <div key={member.id} className="flex items-center gap-3">
                         <div
                           className="flex h-6 w-6 items-center justify-center rounded text-xs font-bold"
                           style={{
-                            backgroundColor: index < 3 ? accentColor : '#E5E7EB',
-                            color: index < 3 ? 'white' : '#6B7280',
+                            backgroundColor: index < 3 ? accentColor : "#E5E7EB",
+                            color: index < 3 ? "white" : "#6B7280",
                           }}
                         >
                           {index + 1}
@@ -222,9 +210,7 @@ export function ClassicForumLayout({
 
               {/* Quick Links */}
               <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
-                <h3 className="mb-4 text-sm font-semibold text-gray-900">
-                  Quick Links
-                </h3>
+                <h3 className="mb-4 text-sm font-semibold text-gray-900">Quick Links</h3>
                 <div className="space-y-2">
                   <Link
                     href={`/dashboard/c/${community.slug}/posts/new`}
@@ -270,7 +256,7 @@ function PostCard({
     <Link href={`/dashboard/c/${communitySlug}/posts/${post.id}`}>
       <div
         className={`group flex gap-4 rounded-lg border bg-white p-4 transition-all hover:border-gray-300 hover:shadow-md ${
-          isPinned ? 'border-amber-200 bg-amber-50' : 'border-gray-200'
+          isPinned ? "border-amber-200 bg-amber-50" : "border-gray-200"
         }`}
       >
         {/* Vote Section */}
@@ -281,9 +267,7 @@ function PostCard({
           >
             <ThumbsUp className="h-4 w-4 text-gray-400" />
           </button>
-          <span className="text-sm font-semibold text-gray-900">
-            {post._count?.reactions || 0}
-          </span>
+          <span className="text-sm font-semibold text-gray-900">{post._count?.reactions || 0}</span>
         </div>
 
         {/* Post Content */}
@@ -310,15 +294,13 @@ function PostCard({
           {/* Title */}
           <h3
             className="mb-1 text-base font-semibold text-gray-900 group-hover:underline"
-            style={{ color: post.title ? undefined : '#6B7280' }}
+            style={{ color: post.title ? undefined : "#6B7280" }}
           >
             {post.title || "Untitled Post"}
           </h3>
 
           {/* Preview */}
-          <p className="mb-3 line-clamp-2 text-sm text-gray-600">
-            {post.content}
-          </p>
+          <p className="mb-3 line-clamp-2 text-sm text-gray-600">{post.content}</p>
 
           {/* Footer Stats */}
           <div className="flex items-center gap-4 text-xs text-gray-500">

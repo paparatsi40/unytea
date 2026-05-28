@@ -32,11 +32,11 @@ Skool, Zoom y Clubhouse combinados**.
 **Qué hace:**
 
 - Otorga puntos automáticos por:
-    - Unirse a sesión en vivo (+10 pts)
-    - Hacer una pregunta (+20 pts)
-    - Responder pregunta (+15 pts)
-    - Subir al escenario (hablar) (+50 pts)
-    - Completar tarea en vivo (+25 pts)
+  - Unirse a sesión en vivo (+10 pts)
+  - Hacer una pregunta (+20 pts)
+  - Responder pregunta (+15 pts)
+  - Subir al escenario (hablar) (+50 pts)
+  - Completar tarea en vivo (+25 pts)
 - Desbloquea achievements específicos de live sessions
 - Muestra progress bar en tiempo real durante sesión
 
@@ -135,10 +135,10 @@ Skool, Zoom y Clubhouse combinados**.
 **Qué hace:**
 
 - 4 tabs en el chat:
-    1. **General** - Chat libre
-    2. **Q&A** - Preguntas para el host (upvote system)
-    3. **Resources** - Links y archivos compartidos
-    4. **Highlights** - Mensajes pinnados por moderadores
+  1. **General** - Chat libre
+  2. **Q&A** - Preguntas para el host (upvote system)
+  3. **Resources** - Links y archivos compartidos
+  4. **Highlights** - Mensajes pinnados por moderadores
 - Filtros y búsqueda
 - Mentions (@username)
 
@@ -172,9 +172,9 @@ Skool, Zoom y Clubhouse combinados**.
 **Qué hace:**
 
 - Host puede lanzar:
-    - Polls (votación múltiple)
-    - Quizzes (respuesta correcta)
-    - Tareas rápidas (checkbox)
+  - Polls (votación múltiple)
+  - Quizzes (respuesta correcta)
+  - Tareas rápidas (checkbox)
 - Participantes responden en tiempo real
 - Resultados visibles inmediatamente
 - Gráficos en vivo (chart.js)
@@ -203,13 +203,13 @@ Skool, Zoom y Clubhouse combinados**.
 
 ## 📊 **RESUMEN FASE 1:**
 
-| # | Feature | Tiempo | Estado |
-|---|---------|--------|--------|
-| 1 | Gamificación | 3-4h | 🔵 EN PROGRESO |
-| 2 | Feedback | 2-3h | 🔴 PENDIENTE |
-| 3 | Reacciones | 3-4h | 🔴 PENDIENTE |
-| 4 | Chat Segmentado | 4-5h | 🔴 PENDIENTE |
-| 5 | Polls/Quizzes | 5-6h | 🔴 PENDIENTE |
+| #   | Feature         | Tiempo | Estado         |
+| --- | --------------- | ------ | -------------- |
+| 1   | Gamificación    | 3-4h   | 🔵 EN PROGRESO |
+| 2   | Feedback        | 2-3h   | 🔴 PENDIENTE   |
+| 3   | Reacciones      | 3-4h   | 🔴 PENDIENTE   |
+| 4   | Chat Segmentado | 4-5h   | 🔴 PENDIENTE   |
+| 5   | Polls/Quizzes   | 5-6h   | 🔴 PENDIENTE   |
 
 **Total:** 17-22 horas  
 **Impacto:** 5 features que Skool NO tiene o hace peor
@@ -268,11 +268,11 @@ Skool, Zoom y Clubhouse combinados**.
 **Qué hace:**
 
 - 5 roles en sesión:
-    - **Owner** - Control total
-    - **Co-host** - Puede compartir pantalla, spotlight
-    - **Moderator** - Chat moderation, manage Q&A
-    - **Speaker** - Camera + mic habilitado
-    - **Attendee** - Listen only
+  - **Owner** - Control total
+  - **Co-host** - Puede compartir pantalla, spotlight
+  - **Moderator** - Chat moderation, manage Q&A
+  - **Speaker** - Camera + mic habilitado
+  - **Attendee** - Listen only
 - UI para asignar roles
 - Permisos granulares por rol
 
@@ -305,19 +305,19 @@ Skool, Zoom y Clubhouse combinados**.
 **Qué hace:**
 
 - **Recordatorios automáticos:**
-    - 24h antes (email + notification)
-    - 1h antes (notification push)
-    - 5 min antes (notification urgente)
+  - 24h antes (email + notification)
+  - 1h antes (notification push)
+  - 5 min antes (notification urgente)
 - **Sugerencias de eventos:**
-    - AI recomienda próximas sesiones según perfil
-    - Based on interests, past attendance, engagement
+  - AI recomienda próximas sesiones según perfil
+  - Based on interests, past attendance, engagement
 - **Resumen post-evento:**
-    - Email automático con:
-        - Key takeaways
-        - Links útiles
-        - Tareas asignadas
-        - Próxima sesión recomendada
-        - Recording link (si aplica)
+  - Email automático con:
+    - Key takeaways
+    - Links útiles
+    - Tareas asignadas
+    - Próxima sesión recomendada
+    - Recording link (si aplica)
 
 **Implementación:**
 
@@ -352,25 +352,25 @@ Skool, Zoom y Clubhouse combinados**.
 **Qué hace:**
 
 - **Grabación automática:**
-    - Recording de video + audio (LiveKit)
-    - Upload a S3/storage
+  - Recording de video + audio (LiveKit)
+  - Upload a S3/storage
 - **Transcripción con IA:**
-    - OpenAI Whisper
-    - Timestamps precisos
-    - Speaker identification
+  - OpenAI Whisper
+  - Timestamps precisos
+  - Speaker identification
 - **Summary automático:**
-    - GPT-4 genera resumen ejecutivo
-    - Key points destacados
-    - Action items extraídos
-    - Quotes relevantes
+  - GPT-4 genera resumen ejecutivo
+  - Key points destacados
+  - Action items extraídos
+  - Quotes relevantes
 - **Búsqueda inteligente:**
-    - Search por keywords en transcripción
-    - Jump to moment en video
-    - Capítulos automáticos
+  - Search por keywords en transcripción
+  - Jump to moment en video
+  - Capítulos automáticos
 - **Reutilización de contenido:**
-    - Sugerencias de clips destacados
-    - Social media snippets
-    - Blog post draft
+  - Sugerencias de clips destacados
+  - Social media snippets
+  - Blog post draft
 
 **Implementación:**
 
@@ -412,12 +412,12 @@ Skool, Zoom y Clubhouse combinados**.
 
 ## 📊 **RESUMEN FASE 2:**
 
-| # | Feature | Tiempo | Costo | Estado |
-|---|---------|--------|-------|--------|
-| 6 | Notas Colaborativas | 5-6h | $0 | 🔴 PENDIENTE |
-| 7 | Co-presentadores | 4-5h | $0 | 🔴 PENDIENTE |
-| 8 | Automatización IA | 6-8h | ~$5/mo | 🔴 PENDIENTE |
-| 9 | Grabación + IA | 12-15h | ~$50/mo | 🔴 PENDIENTE |
+| #   | Feature             | Tiempo | Costo   | Estado       |
+| --- | ------------------- | ------ | ------- | ------------ |
+| 6   | Notas Colaborativas | 5-6h   | $0      | 🔴 PENDIENTE |
+| 7   | Co-presentadores    | 4-5h   | $0      | 🔴 PENDIENTE |
+| 8   | Automatización IA   | 6-8h   | ~$5/mo  | 🔴 PENDIENTE |
+| 9   | Grabación + IA      | 12-15h | ~$50/mo | 🔴 PENDIENTE |
 
 **Total:** 27-34 horas  
 **Costo recurrente:** ~$55/mo para 50+ sesiones/mes
@@ -443,9 +443,9 @@ Skool, Zoom y Clubhouse combinados**.
 - Host aprueba/rechaza requests
 - Queue de solicitudes visible para host
 - Cuando aprobado:
-    - Camera + mic se habilitan
-    - Spotlight en UI (tile más grande)
-    - +50 puntos de gamificación
+  - Camera + mic se habilitan
+  - Spotlight en UI (tile más grande)
+  - +50 puntos de gamificación
 - Host puede remover a speaker
 
 **Implementación:**
@@ -515,10 +515,10 @@ Skool, Zoom y Clubhouse combinados**.
 
 ## 📊 **RESUMEN FASE 3:**
 
-| # | Feature | Tiempo | Estado |
-|---|---------|--------|--------|
-| 10 | Spotlight/Stage | 6-8h | 🔴 PENDIENTE |
-| 11 | Breakout Rooms | 10-12h | 🔴 PENDIENTE |
+| #   | Feature         | Tiempo | Estado       |
+| --- | --------------- | ------ | ------------ |
+| 10  | Spotlight/Stage | 6-8h   | 🔴 PENDIENTE |
+| 11  | Breakout Rooms  | 10-12h | 🔴 PENDIENTE |
 
 **Total:** 16-20 horas
 
@@ -556,13 +556,13 @@ Tiempo total: 60-80 horas
 
 ## 💰 **ANÁLISIS DE COSTOS TOTAL:**
 
-| Item | Costo Mensual |
-|------|---------------|
-| Features 1-7, 10-11 | $0 |
-| Automatización (emails) | ~$5 |
-| LiveKit Recording | $9 base |
+| Item                     | Costo Mensual         |
+| ------------------------ | --------------------- |
+| Features 1-7, 10-11      | $0                    |
+| Automatización (emails)  | ~$5                   |
+| LiveKit Recording        | $9 base               |
 | OpenAI (Whisper + GPT-4) | ~$40 para 50 sesiones |
-| **TOTAL** | **~$55/mo** |
+| **TOTAL**                | **~$55/mo**           |
 
 **Para escala (500 sesiones/mes):**
 
@@ -606,18 +606,18 @@ Tiempo total: 60-80 horas
 
 Con TODAS estas features implementadas, Unytea tendría:
 
-| Feature | Skool | Zoom | Unytea |
-|---------|-------|------|--------|
-| Video integrado | ❌ | ✅ | ✅ |
-| Chat segmentado | ❌ | ❌ | ✅ |
-| Reacciones live | ❌ | ❌ | ✅ |
-| Gamificación | 🟡 | ❌ | ✅ |
-| Polls en vivo | ❌ | 🟡 | ✅ |
-| Notas colaborativas | ❌ | ❌ | ✅ |
-| **Grabación + IA** | ❌ | ❌ | ✅ |
-| Automatización IA | ❌ | ❌ | ✅ |
-| Breakout rooms | ❌ | ✅ | ✅ |
-| Spotlight | ❌ | ✅ | ✅ |
+| Feature             | Skool | Zoom | Unytea |
+| ------------------- | ----- | ---- | ------ |
+| Video integrado     | ❌    | ✅   | ✅     |
+| Chat segmentado     | ❌    | ❌   | ✅     |
+| Reacciones live     | ❌    | ❌   | ✅     |
+| Gamificación        | 🟡    | ❌   | ✅     |
+| Polls en vivo       | ❌    | 🟡   | ✅     |
+| Notas colaborativas | ❌    | ❌   | ✅     |
+| **Grabación + IA**  | ❌    | ❌   | ✅     |
+| Automatización IA   | ❌    | ❌   | ✅     |
+| Breakout rooms      | ❌    | ✅   | ✅     |
+| Spotlight           | ❌    | ✅   | ✅     |
 
 **Resultado:** Unytea = Skool + Zoom + IA + Gamification
 

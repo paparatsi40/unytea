@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 @layer base {
   :root {
     /* Design Tokens - Light Mode */
@@ -12,7 +11,7 @@
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    
+
     /* Primary - Vibrant & Modern */
     --primary: 262 83% 58%;
     --primary-foreground: 210 40% 98%;
@@ -26,7 +25,7 @@
     --primary-700: 262 72% 42%;
     --primary-800: 263 69% 34%;
     --primary-900: 263 67% 28%;
-    
+
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
     --muted: 210 40% 96.1%;
@@ -49,7 +48,7 @@
     --card-foreground: 210 40% 98%;
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-    
+
     /* Primary - Adjusted for dark mode */
     --primary: 263 70% 60%;
     --primary-foreground: 222.2 47.4% 11.2%;
@@ -63,7 +62,7 @@
     --primary-700: 269 100% 92%;
     --primary-800: 269 100% 95%;
     --primary-900: 270 100% 98%;
-    
+
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
     --muted: 217.2 32.6% 17.5%;
@@ -82,37 +81,39 @@
   * {
     @apply border-border;
   }
-  
+
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-  
+
   /* Custom Scrollbar */
   ::-webkit-scrollbar {
     width: 10px;
     height: 10px;
   }
-  
+
   ::-webkit-scrollbar-track {
     @apply bg-muted/30;
   }
-  
+
   ::-webkit-scrollbar-thumb {
-    @apply bg-muted-foreground/30 rounded-lg;
+    @apply rounded-lg bg-muted-foreground/30;
   }
-  
+
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-muted-foreground/50;
   }
-  
+
   /* Selection */
   ::selection {
     @apply bg-primary/20 text-primary-foreground;
   }
-  
+
   /* Focus visible - Premium ring */
   *:focus-visible {
     @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
@@ -209,7 +210,8 @@
 
   /* Pulse animation */
   @keyframes pulse-subtle {
-    0%, 100% {
+    0%,
+    100% {
       opacity: 1;
     }
     50% {
@@ -269,12 +271,16 @@
 
   /* Hover effects */
   .hover-lift {
-    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+    transition:
+      transform 0.2s ease-out,
+      box-shadow 0.2s ease-out;
   }
 
   .hover-lift:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    box-shadow:
+      0 10px 25px -5px rgba(0, 0, 0, 0.1),
+      0 8px 10px -6px rgba(0, 0, 0, 0.1);
   }
 
   /* Gradient animations */
@@ -306,13 +312,7 @@
   }
 
   .animate-shimmer {
-    background: linear-gradient(
-      to right,
-      #f0f0f0 0%,
-      #e0e0e0 20%,
-      #f0f0f0 40%,
-      #f0f0f0 100%
-    );
+    background: linear-gradient(to right, #f0f0f0 0%, #e0e0e0 20%, #f0f0f0 40%, #f0f0f0 100%);
     background-size: 1000px 100%;
     animation: shimmer 2s infinite linear;
   }
@@ -328,78 +328,73 @@
 
   /* Glass morphism effects */
   .glass {
-    @apply bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-white/20 dark:border-gray-800/50;
+    @apply border border-white/20 bg-white/80 backdrop-blur-xl dark:border-gray-800/50 dark:bg-gray-900/80;
   }
-  
+
   .glass-strong {
-    @apply bg-white/90 dark:bg-gray-900/90 backdrop-blur-2xl border border-white/30 dark:border-gray-800/70;
+    @apply border border-white/30 bg-white/90 backdrop-blur-2xl dark:border-gray-800/70 dark:bg-gray-900/90;
   }
-  
+
   /* Smooth shadows */
   .shadow-smooth {
     box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
   }
-  
+
   .shadow-smooth-lg {
     box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.12);
   }
-  
+
   .shadow-smooth-xl {
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.16);
   }
-  
+
   /* Gradient text */
   .gradient-text {
     @apply bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent;
   }
-  
+
   /* Animate on scroll */
   .animate-on-scroll {
-    @apply opacity-0 translate-y-4 transition-all duration-700 ease-out;
+    @apply translate-y-4 opacity-0 transition-all duration-700 ease-out;
   }
-  
+
   .animate-on-scroll.visible {
-    @apply opacity-100 translate-y-0;
+    @apply translate-y-0 opacity-100;
   }
-  
+
   /* Premium button hover effects */
   .btn-hover-lift {
     @apply transition-all duration-200 hover:-translate-y-0.5 hover:shadow-smooth-lg active:translate-y-0;
   }
-  
+
   /* Shimmer loading effect */
   .shimmer {
     @apply relative overflow-hidden;
   }
-  
+
   .shimmer::after {
     @apply absolute inset-0 -translate-x-full;
     content: "";
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.1),
-      transparent
-    );
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
     animation: shimmer 2s infinite;
   }
-  
+
   /* Card hover effects */
   .card-hover {
-    @apply transition-all duration-300 hover:shadow-smooth-lg hover:-translate-y-1;
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-smooth-lg;
   }
-  
+
   /* Text shimmer effect */
   .text-shimmer {
     @apply bg-gradient-to-r from-primary via-purple-400 to-primary bg-[length:200%_auto] bg-clip-text text-transparent;
     animation: text-shimmer 3s linear infinite;
   }
-  
+
   /* Smooth fade in */
   .fade-in {
     animation: fadeIn 0.3s ease-out;
   }
-  
+
   /* Slide up fade in */
   .slide-up-fade {
     animation: slideUpFade 0.4s ease-out;
@@ -445,24 +440,24 @@
 
 .ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
-  @apply text-gray-400 pointer-events-none float-left h-0;
+  @apply pointer-events-none float-left h-0 text-gray-400;
 }
 
 .ProseMirror h1 {
-  @apply text-2xl font-bold mt-4 mb-2;
+  @apply mb-2 mt-4 text-2xl font-bold;
 }
 
 .ProseMirror h2 {
-  @apply text-xl font-bold mt-3 mb-2;
+  @apply mb-2 mt-3 text-xl font-bold;
 }
 
 .ProseMirror h3 {
-  @apply text-lg font-bold mt-2 mb-1;
+  @apply mb-1 mt-2 text-lg font-bold;
 }
 
 .ProseMirror ul,
 .ProseMirror ol {
-  @apply pl-6 my-2;
+  @apply my-2 pl-6;
 }
 
 .ProseMirror ul {
@@ -478,27 +473,27 @@
 }
 
 .ProseMirror blockquote {
-  @apply border-l-4 border-gray-300 pl-4 italic my-3 text-gray-700;
+  @apply my-3 border-l-4 border-gray-300 pl-4 italic text-gray-700;
 }
 
 .ProseMirror code {
-  @apply bg-gray-100 rounded px-1 py-0.5 text-sm font-mono text-pink-600;
+  @apply rounded bg-gray-100 px-1 py-0.5 font-mono text-sm text-pink-600;
 }
 
 .ProseMirror pre {
-  @apply bg-gray-900 text-gray-100 rounded-lg p-4 my-3 overflow-x-auto;
+  @apply my-3 overflow-x-auto rounded-lg bg-gray-900 p-4 text-gray-100;
 }
 
 .ProseMirror pre code {
-  @apply bg-transparent text-gray-100 p-0;
+  @apply bg-transparent p-0 text-gray-100;
 }
 
 .ProseMirror a {
-  @apply text-purple-600 hover:text-purple-700 underline cursor-pointer;
+  @apply cursor-pointer text-purple-600 underline hover:text-purple-700;
 }
 
 .ProseMirror hr {
-  @apply border-gray-300 my-4;
+  @apply my-4 border-gray-300;
 }
 
 .ProseMirror p {

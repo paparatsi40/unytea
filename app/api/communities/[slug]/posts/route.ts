@@ -24,10 +24,7 @@ export async function GET(request: NextRequest, props: { params: Promise<{ slug:
     const userId = await getCurrentUserId();
 
     if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized - Please sign in" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized - Please sign in" }, { status: 401 });
     }
 
     const limit = parseLimit(request.nextUrl.searchParams.get("limit"));
@@ -39,10 +36,7 @@ export async function GET(request: NextRequest, props: { params: Promise<{ slug:
     });
 
     if (!community) {
-      return NextResponse.json(
-        { error: "Community not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Community not found" }, { status: 404 });
     }
 
     // Check membership if private
@@ -58,10 +52,7 @@ export async function GET(request: NextRequest, props: { params: Promise<{ slug:
       });
 
       if (!membership || membership.status !== "ACTIVE") {
-        return NextResponse.json(
-          { error: "Access denied" },
-          { status: 403 }
-        );
+        return NextResponse.json({ error: "Access denied" }, { status: 403 });
       }
     }
 
@@ -143,10 +134,6 @@ export async function GET(request: NextRequest, props: { params: Promise<{ slug:
     return NextResponse.json(prioritizedPosts);
   } catch (error) {
     console.error("❌ API Error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch posts" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch posts" }, { status: 500 });
   }
 }
-

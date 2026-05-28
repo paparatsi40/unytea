@@ -115,16 +115,27 @@ export async function getQuiz(quizId: string) {
     // For the student view, strip correct answers if showResults is false and they haven't completed
     const hasPassedAttempt = quiz.attempts.some((a: { passed: boolean }) => a.passed);
 
-    const sanitizedQuestions = quiz.questions.map((q: { id: string; question: string; type: string; options: unknown; explanation: string | null; points: number; position: number }) => {
-      const options = q.options as unknown as QuizQuestionOption[];
-      return {
-        ...q,
-        options: hasPassedAttempt || quiz.showResults
-          ? options
-          : options.map((o) => ({ ...o, isCorrect: undefined })),
-        explanation: hasPassedAttempt ? q.explanation : undefined,
-      };
-    });
+    const sanitizedQuestions = quiz.questions.map(
+      (q: {
+        id: string;
+        question: string;
+        type: string;
+        options: unknown;
+        explanation: string | null;
+        points: number;
+        position: number;
+      }) => {
+        const options = q.options as unknown as QuizQuestionOption[];
+        return {
+          ...q,
+          options:
+            hasPassedAttempt || quiz.showResults
+              ? options
+              : options.map((o) => ({ ...o, isCorrect: undefined })),
+          explanation: hasPassedAttempt ? q.explanation : undefined,
+        };
+      }
+    );
 
     return {
       success: true,
@@ -132,9 +143,10 @@ export async function getQuiz(quizId: string) {
         ...quiz,
         questions: sanitizedQuestions,
         attemptsUsed: quiz.attempts.length,
-        bestScore: quiz.attempts.length > 0
-          ? Math.max(...quiz.attempts.map((a: { score: number }) => a.score))
-          : null,
+        bestScore:
+          quiz.attempts.length > 0
+            ? Math.max(...quiz.attempts.map((a: { score: number }) => a.score))
+            : null,
         hasPassed: hasPassedAttempt,
       },
     };
@@ -165,18 +177,29 @@ export async function getLessonQuizzes(lessonId: string) {
 
     return {
       success: true,
-      quizzes: quizzes.map((q: { id: string; title: string; description: string | null; passingScore: number; maxAttempts: number | null; timeLimit: number | null; _count: { questions: number; attempts: number }; attempts: { score: number; passed: boolean }[] }) => ({
-        id: q.id,
-        title: q.title,
-        description: q.description,
-        passingScore: q.passingScore,
-        questionCount: q._count.questions,
-        totalAttempts: q._count.attempts,
-        bestScore: q.attempts[0]?.score ?? null,
-        hasPassed: q.attempts[0]?.passed ?? false,
-        maxAttempts: q.maxAttempts,
-        timeLimit: q.timeLimit,
-      })),
+      quizzes: quizzes.map(
+        (q: {
+          id: string;
+          title: string;
+          description: string | null;
+          passingScore: number;
+          maxAttempts: number | null;
+          timeLimit: number | null;
+          _count: { questions: number; attempts: number };
+          attempts: { score: number; passed: boolean }[];
+        }) => ({
+          id: q.id,
+          title: q.title,
+          description: q.description,
+          passingScore: q.passingScore,
+          questionCount: q._count.questions,
+          totalAttempts: q._count.attempts,
+          bestScore: q.attempts[0]?.score ?? null,
+          hasPassed: q.attempts[0]?.passed ?? false,
+          maxAttempts: q.maxAttempts,
+          timeLimit: q.timeLimit,
+        })
+      ),
     };
   } catch (error) {
     console.error("[getLessonQuizzes] Error:", error);
@@ -217,16 +240,16 @@ export async function submitQuizAttempt(data: {
     let totalPoints = 0;
 
     const gradedAnswers: QuizAnswer[] = data.answers.map((answer) => {
-      const question = quiz.questions.find((q: { id: string; options: unknown; points: number }) => q.id === answer.questionId);
+      const question = quiz.questions.find(
+        (q: { id: string; options: unknown; points: number }) => q.id === answer.questionId
+      );
       if (!question) {
         return { ...answer, isCorrect: false };
       }
 
       totalPoints += question.points;
       const options = question.options as unknown as QuizQuestionOption[];
-      const correctOptionIds = options
-        .filter((o) => o.isCorrect)
-        .map((o) => o.id);
+      const correctOptionIds = options.filter((o) => o.isCorrect).map((o) => o.id);
 
       // Check if the answer is correct
       const isCorrect =

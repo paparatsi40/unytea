@@ -3,7 +3,7 @@
 ## Resumen
 
 - **47 API routes** (`route.ts`) + **44 server actions** (archivos con `"use server"`).
-- De los 47 endpoints: **~30 chequean auth** (auth() / requireAuth / getCurrentUser), **17 no chequean** (la mayoría legítimas: webhooks, cron, signup, login, public discovery). 
+- De los 47 endpoints: **~30 chequean auth** (auth() / requireAuth / getCurrentUser), **17 no chequean** (la mayoría legítimas: webhooks, cron, signup, login, public discovery).
 - ⚠️ **`/api/sessions/[sessionId]/route.ts` está VACÍO** (solo tiene `export const dynamic = 'force-dynamic'` sin handlers GET/POST/etc.). Endpoint muerto.
 - ⚠️ **`/api/admin/make-super-admin/` es una carpeta vacía** (sin `route.ts`). Endpoint admin nunca implementado.
 - ⚠️ **`/api/cron/autopilot/` declarada como cron pero NO listada en `vercel.json`** (sólo `/sessions` y `/session-reminders` lo están). O se trigerea externamente, o se olvidó.
@@ -16,66 +16,66 @@ Formato: `auth-check | métodos | ruta | observaciones`
 
 ### Pública intencional (legítimas sin auth)
 
-| Auth | Métodos | Ruta | OK |
-|---|---|---|---|
-| – | (handlers) | `/api/auth/[...nextauth]` | NextAuth maneja todo ✅ |
-| – | POST | `/api/auth/signup` | Rate-limit + zod + email enumeration prevention ✅ |
-| – | POST | `/api/auth/forgot-password` | (no inspeccionado en detalle — verificar rate limit) ⚠️ |
-| – | POST | `/api/auth/reset-password` | (idem) ⚠️ |
-| – | GET | `/api/push/vapid` | Retorna `NEXT_PUBLIC_VAPID_PUBLIC_KEY` (pública por diseño) ✅ |
-| – | POST | `/api/stripe/webhook` | Signature verify (asumido, no auditado) ⚠️ |
-| – | GET, POST | `/api/webhooks/livekit` | LiveKit signature verify (asumido) ⚠️ |
-| – | (handlers) | `/api/uploadthing` | uploadthing maneja auth internamente ✅ |
-| – | GET, POST | `/api/cron/sessions` | CRON_SECRET check (con fallback peligroso — ver reporte 03) ⚠️ |
-| – | GET, POST | `/api/cron/session-reminders` | Idem ⚠️ |
-| – | GET, POST | `/api/cron/autopilot` | Idem + **no listado en `vercel.json`** ⚠️ |
-| – | GET | `/api/explore/feed` | Discovery público de comunidades ✅ |
-| – | POST | `/api/explore/events` | **Analytics endpoint público** — solo loguea con `console.info` y retorna success. Sin persistencia ni queue. ⚠️ |
+| Auth | Métodos    | Ruta                          | OK                                                                                                               |
+| ---- | ---------- | ----------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| –    | (handlers) | `/api/auth/[...nextauth]`     | NextAuth maneja todo ✅                                                                                          |
+| –    | POST       | `/api/auth/signup`            | Rate-limit + zod + email enumeration prevention ✅                                                               |
+| –    | POST       | `/api/auth/forgot-password`   | (no inspeccionado en detalle — verificar rate limit) ⚠️                                                          |
+| –    | POST       | `/api/auth/reset-password`    | (idem) ⚠️                                                                                                        |
+| –    | GET        | `/api/push/vapid`             | Retorna `NEXT_PUBLIC_VAPID_PUBLIC_KEY` (pública por diseño) ✅                                                   |
+| –    | POST       | `/api/stripe/webhook`         | Signature verify (asumido, no auditado) ⚠️                                                                       |
+| –    | GET, POST  | `/api/webhooks/livekit`       | LiveKit signature verify (asumido) ⚠️                                                                            |
+| –    | (handlers) | `/api/uploadthing`            | uploadthing maneja auth internamente ✅                                                                          |
+| –    | GET, POST  | `/api/cron/sessions`          | CRON_SECRET check (con fallback peligroso — ver reporte 03) ⚠️                                                   |
+| –    | GET, POST  | `/api/cron/session-reminders` | Idem ⚠️                                                                                                          |
+| –    | GET, POST  | `/api/cron/autopilot`         | Idem + **no listado en `vercel.json`** ⚠️                                                                        |
+| –    | GET        | `/api/explore/feed`           | Discovery público de comunidades ✅                                                                              |
+| –    | POST       | `/api/explore/events`         | **Analytics endpoint público** — solo loguea con `console.info` y retorna success. Sin persistencia ni queue. ⚠️ |
 
 ### Auth-protected (con `auth()`/`requireAuth`)
 
-| Métodos | Ruta | Validación zod | Rate limit |
-|---|---|---|---|
-| GET | `/api/achievements/recent` | – | – |
-| POST | `/api/ai/chat` | – | – ⚠️ (LLM call sin rate limit) |
-| GET, POST | `/api/communities` | – | – |
-| GET | `/api/communities/my-communities` | – | – |
-| GET, PATCH | `/api/communities/[slug]` | – | – |
-| GET, PATCH | `/api/communities/[slug]/landing` | – | – |
-| GET, PUT | `/api/communities/[slug]/payments` | – | – |
-| GET | `/api/communities/[slug]/posts` | – | – |
-| GET | `/api/courses/[courseId]` | – | – |
-| GET | `/api/courses/[courseId]/purchase-status` | – | – |
-| GET | `/api/courses/progress` | – | – |
-| GET | `/api/dashboard/activity` | – | – |
-| GET | `/api/dashboard/events` | – | – |
-| GET | `/api/dashboard/metrics` | – | – |
-| POST | `/api/email/send` | – | – ⚠️ (puede enviar spam si no rate-limit) |
-| GET | `/api/events/upcoming` | – | – |
-| GET | `/api/feed/posts` | – | – |
-| POST | `/api/livekit/token` | – | – |
-| DELETE, POST | `/api/push/subscribe` | – | – |
-| POST, PUT | `/api/pusher` | – | – |
-| GET, POST | `/api/reports` | – | – |
-| GET | `/api/search` | – | – |
-| POST | `/api/stripe/checkout` | – | – |
-| POST | `/api/stripe/community-checkout` | – | – |
-| GET | `/api/stripe/community-checkout-start` | – | – |
-| POST | `/api/stripe/connect/onboard` | – | – |
-| GET | `/api/stripe/connect/status` | – | – |
-| POST | `/api/stripe/course-checkout` | – | – |
-| POST | `/api/stripe/portal` | – | – |
-| GET | `/api/user/gamification-stats` | – | – |
-| POST | `/api/user/onboarding` | – | – |
-| GET | `/api/user/streak` | – | – |
-| GET | `/api/user/subscription` | – | – |
+| Métodos      | Ruta                                      | Validación zod | Rate limit                                |
+| ------------ | ----------------------------------------- | -------------- | ----------------------------------------- |
+| GET          | `/api/achievements/recent`                | –              | –                                         |
+| POST         | `/api/ai/chat`                            | –              | – ⚠️ (LLM call sin rate limit)            |
+| GET, POST    | `/api/communities`                        | –              | –                                         |
+| GET          | `/api/communities/my-communities`         | –              | –                                         |
+| GET, PATCH   | `/api/communities/[slug]`                 | –              | –                                         |
+| GET, PATCH   | `/api/communities/[slug]/landing`         | –              | –                                         |
+| GET, PUT     | `/api/communities/[slug]/payments`        | –              | –                                         |
+| GET          | `/api/communities/[slug]/posts`           | –              | –                                         |
+| GET          | `/api/courses/[courseId]`                 | –              | –                                         |
+| GET          | `/api/courses/[courseId]/purchase-status` | –              | –                                         |
+| GET          | `/api/courses/progress`                   | –              | –                                         |
+| GET          | `/api/dashboard/activity`                 | –              | –                                         |
+| GET          | `/api/dashboard/events`                   | –              | –                                         |
+| GET          | `/api/dashboard/metrics`                  | –              | –                                         |
+| POST         | `/api/email/send`                         | –              | – ⚠️ (puede enviar spam si no rate-limit) |
+| GET          | `/api/events/upcoming`                    | –              | –                                         |
+| GET          | `/api/feed/posts`                         | –              | –                                         |
+| POST         | `/api/livekit/token`                      | –              | –                                         |
+| DELETE, POST | `/api/push/subscribe`                     | –              | –                                         |
+| POST, PUT    | `/api/pusher`                             | –              | –                                         |
+| GET, POST    | `/api/reports`                            | –              | –                                         |
+| GET          | `/api/search`                             | –              | –                                         |
+| POST         | `/api/stripe/checkout`                    | –              | –                                         |
+| POST         | `/api/stripe/community-checkout`          | –              | –                                         |
+| GET          | `/api/stripe/community-checkout-start`    | –              | –                                         |
+| POST         | `/api/stripe/connect/onboard`             | –              | –                                         |
+| GET          | `/api/stripe/connect/status`              | –              | –                                         |
+| POST         | `/api/stripe/course-checkout`             | –              | –                                         |
+| POST         | `/api/stripe/portal`                      | –              | –                                         |
+| GET          | `/api/user/gamification-stats`            | –              | –                                         |
+| POST         | `/api/user/onboarding`                    | –              | –                                         |
+| GET          | `/api/user/streak`                        | –              | –                                         |
+| GET          | `/api/user/subscription`                  | –              | –                                         |
 
 ### Rotas / Vacías
 
-| Estado | Ruta | Acción |
-|---|---|---|
-| **EMPTY** | `/api/sessions/[sessionId]/route.ts` | Archivo tiene solo `export const dynamic = 'force-dynamic'` — sin GET/POST/etc. **Borrar** o terminar la implementación. |
-| **EMPTY FOLDER** | `/api/admin/make-super-admin/` | Carpeta sin `route.ts`. **Borrar** o implementar (riesgo de seguridad si se implementa: requeriría validación estricta). |
+| Estado           | Ruta                                 | Acción                                                                                                                   |
+| ---------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| **EMPTY**        | `/api/sessions/[sessionId]/route.ts` | Archivo tiene solo `export const dynamic = 'force-dynamic'` — sin GET/POST/etc. **Borrar** o terminar la implementación. |
+| **EMPTY FOLDER** | `/api/admin/make-super-admin/`       | Carpeta sin `route.ts`. **Borrar** o implementar (riesgo de seguridad si se implementa: requeriría validación estricta). |
 
 ### Webhooks
 
@@ -128,6 +128,7 @@ Búsqueda rápida: `grep -l "requireAuth\|getCurrentUserId\|auth()"` en `app/act
 - `/dashboard/camera-test` (en `[locale]/dashboard`) — untracked
 
 **No están protegidas por env flag**. Cualquier user logueado puede llegar. Riesgo:
+
 - Costos: si `ai-test` invoca `/api/ai/chat` sin restricción, un usuario malicioso puede gastar tokens de OpenAI.
 - Recursos: `camera-test` activa cámara/mic.
 

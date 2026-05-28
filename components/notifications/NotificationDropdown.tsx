@@ -17,11 +17,11 @@ export function NotificationDropdown() {
 
   const loadNotifications = async () => {
     const result = await getUserNotifications(20);
-    
+
     if (result.success && result.notifications) {
       setNotifications(result.notifications);
     }
-    
+
     setIsLoading(false);
   };
 
@@ -58,11 +58,11 @@ export function NotificationDropdown() {
       {/* Trigger button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 rounded-lg hover:bg-white/10 transition-colors"
+        className="relative rounded-lg p-2 transition-colors hover:bg-white/10"
       >
-        <Bell className="w-5 h-5 text-white/80 hover:text-white" />
+        <Bell className="h-5 w-5 text-white/80 hover:text-white" />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center text-xs font-bold text-white">
+          <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-purple-500 text-xs font-bold text-white">
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
@@ -72,32 +72,27 @@ export function NotificationDropdown() {
       {isOpen && (
         <>
           {/* Backdrop */}
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => setIsOpen(false)}
-          />
+          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
 
           {/* Dropdown content */}
-          <div className="absolute right-0 mt-2 w-96 bg-zinc-900 border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden">
+          <div className="absolute right-0 z-50 mt-2 w-96 overflow-hidden rounded-xl border border-white/10 bg-zinc-900 shadow-2xl">
             {/* Header */}
-            <div className="p-4 border-b border-white/10 bg-zinc-900/50 backdrop-blur-sm">
+            <div className="border-b border-white/10 bg-zinc-900/50 p-4 backdrop-blur-sm">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-white">
                   Notifications
                   {unreadCount > 0 && (
-                    <span className="ml-2 text-sm text-white/60">
-                      ({unreadCount} new)
-                    </span>
+                    <span className="ml-2 text-sm text-white/60">({unreadCount} new)</span>
                   )}
                 </h3>
-                
+
                 {unreadCount > 0 && (
                   <button
                     onClick={handleMarkAllRead}
                     disabled={isMarkingAllRead}
-                    className="flex items-center gap-2 px-3 py-1 text-sm text-purple-400 hover:text-purple-300 hover:bg-purple-500/10 rounded-lg transition-colors disabled:opacity-50"
+                    className="flex items-center gap-2 rounded-lg px-3 py-1 text-sm text-purple-400 transition-colors hover:bg-purple-500/10 hover:text-purple-300 disabled:opacity-50"
                   >
-                    <Check className="w-4 h-4" />
+                    <Check className="h-4 w-4" />
                     Mark all read
                   </button>
                 )}
@@ -108,19 +103,15 @@ export function NotificationDropdown() {
             <div className="max-h-[500px] overflow-y-auto">
               {isLoading ? (
                 <div className="flex items-center justify-center p-12">
-                  <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+                  <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
                 </div>
               ) : notifications.length === 0 ? (
                 <div className="flex flex-col items-center justify-center p-12 text-center">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center mb-4">
-                    <Bell className="w-8 h-8 text-purple-500" />
+                  <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20">
+                    <Bell className="h-8 w-8 text-purple-500" />
                   </div>
-                  <h4 className="text-lg font-semibold text-white mb-2">
-                    All caught up!
-                  </h4>
-                  <p className="text-sm text-white/60">
-                    You have no new notifications
-                  </p>
+                  <h4 className="mb-2 text-lg font-semibold text-white">All caught up!</h4>
+                  <p className="text-sm text-white/60">You have no new notifications</p>
                 </div>
               ) : (
                 <div className="divide-y divide-white/5">
@@ -137,18 +128,18 @@ export function NotificationDropdown() {
 
             {/* Footer */}
             {notifications.length > 0 && (
-              <div className="p-3 border-t border-white/10 bg-zinc-900/50 backdrop-blur-sm flex items-center justify-between">
+              <div className="flex items-center justify-between border-t border-white/10 bg-zinc-900/50 p-3 backdrop-blur-sm">
                 <button
                   onClick={handleClearRead}
-                  className="flex items-center gap-2 px-3 py-2 text-sm text-white/60 hover:text-white/90 hover:bg-white/5 rounded-lg transition-colors"
+                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/60 transition-colors hover:bg-white/5 hover:text-white/90"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="h-4 w-4" />
                   Clear read
                 </button>
-                
+
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="text-sm text-purple-400 hover:text-purple-300 px-3 py-2 hover:bg-purple-500/10 rounded-lg transition-colors"
+                  className="rounded-lg px-3 py-2 text-sm text-purple-400 transition-colors hover:bg-purple-500/10 hover:text-purple-300"
                 >
                   Close
                 </button>

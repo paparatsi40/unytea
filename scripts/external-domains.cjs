@@ -9,10 +9,10 @@ const EXCLUDED_DIRS = new Set([
   "dist",
   "build",
   ".git",
-  "public",     // bundled vendor assets like excalidraw-assets — out of scope
-  "docs",       // docs reference URLs textually, not loaded at runtime
-  "scripts",    // tooling
-  "tests",      // out of runtime path
+  "public", // bundled vendor assets like excalidraw-assets — out of scope
+  "docs", // docs reference URLs textually, not loaded at runtime
+  "scripts", // tooling
+  "tests", // out of runtime path
 ]);
 const EXCLUDED_FILE_EXT = new Set([".md", ".txt", ".log", ".json"]);
 const TARGET_EXT = new Set([".ts", ".tsx", ".mjs", ".js", ".cjs"]);
@@ -28,7 +28,11 @@ function isExcludedDir(name) {
 
 function walk(dir) {
   let entries;
-  try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch { return; }
+  try {
+    entries = fs.readdirSync(dir, { withFileTypes: true });
+  } catch {
+    return;
+  }
   for (const e of entries) {
     if (e.isDirectory()) {
       if (!isExcludedDir(e.name)) walk(path.join(dir, e.name));

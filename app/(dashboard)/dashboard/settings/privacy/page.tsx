@@ -18,7 +18,7 @@ export default function PrivacyPage() {
   const handleSave = async () => {
     setLoading(true);
     const result = await updatePrivacySettings(settings);
-    
+
     if (result.success) {
       toast.success("Privacy settings saved!");
     } else {
@@ -30,16 +30,12 @@ export default function PrivacyPage() {
   return (
     <div className="space-y-6">
       <div className="rounded-xl border border-border bg-card p-6">
-        <h2 className="mb-4 text-xl font-bold text-foreground">
-          Privacy Settings
-        </h2>
+        <h2 className="mb-4 text-xl font-bold text-foreground">Privacy Settings</h2>
 
         <div className="space-y-6">
           {/* Profile Visibility */}
           <div>
-            <label className="mb-2 block font-medium text-foreground">
-              Profile Visibility
-            </label>
+            <label className="mb-2 block font-medium text-foreground">Profile Visibility</label>
             <select
               value={settings.profileVisibility}
               onChange={(e) =>
@@ -90,9 +86,7 @@ export default function PrivacyPage() {
                 <input
                   type="checkbox"
                   checked={settings.showEmail}
-                  onChange={(e) =>
-                    setSettings({ ...settings, showEmail: e.target.checked })
-                  }
+                  onChange={(e) => setSettings({ ...settings, showEmail: e.target.checked })}
                   className="peer sr-only"
                 />
                 <div className="peer h-6 w-11 rounded-full bg-muted after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-border after:bg-background after:transition-all peer-checked:bg-primary peer-checked:after:translate-x-full"></div>
@@ -102,23 +96,18 @@ export default function PrivacyPage() {
             <div className="flex items-center justify-between rounded-lg border border-border p-4">
               <div>
                 <p className="font-medium text-foreground">Show Activity</p>
-                <p className="text-sm text-muted-foreground">
-                  Display your recent activity
-                </p>
+                <p className="text-sm text-muted-foreground">Display your recent activity</p>
               </div>
               <label className="relative inline-flex cursor-pointer items-center">
                 <input
                   type="checkbox"
                   checked={settings.showActivity}
-                  onChange={(e) =>
-                    setSettings({ ...settings, showActivity: e.target.checked })
-                  }
+                  onChange={(e) => setSettings({ ...settings, showActivity: e.target.checked })}
                   className="peer sr-only"
                 />
                 <div className="peer h-6 w-11 rounded-full bg-muted after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-border after:bg-background after:transition-all peer-checked:bg-primary peer-checked:after:translate-x-full"></div>
               </label>
             </div>
-
           </div>
         </div>
 

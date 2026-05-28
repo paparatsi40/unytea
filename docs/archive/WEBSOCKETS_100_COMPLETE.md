@@ -206,14 +206,14 @@ notification:new    - New notification
 
 ### **User Experience:**
 
-| Feature | Antes | Ahora | Mejora |
-|---------|-------|-------|--------|
-| Chat messages | 2-3s | 0ms | **100%** |
-| Typing indicators | 2-3s | 0ms | **100%** |
-| Presence updates | 3s | 0ms | **100%** |
-| Notifications | 30s | 0ms | **99.99%** |
-| Server load | HIGH | LOW | **90%** |
-| Battery usage | HIGH | LOW | **60%** |
+| Feature           | Antes | Ahora | Mejora     |
+| ----------------- | ----- | ----- | ---------- |
+| Chat messages     | 2-3s  | 0ms   | **100%**   |
+| Typing indicators | 2-3s  | 0ms   | **100%**   |
+| Presence updates  | 3s    | 0ms   | **100%**   |
+| Notifications     | 30s   | 0ms   | **99.99%** |
+| Server load       | HIGH  | LOW   | **90%**    |
+| Battery usage     | HIGH  | LOW   | **60%**    |
 
 ### **Production Quality:**
 

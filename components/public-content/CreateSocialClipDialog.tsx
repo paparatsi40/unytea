@@ -146,32 +146,26 @@ export function CreateSocialClipDialog({
 
   async function shareToTwitter() {
     if (!clip) return;
-    
+
     await trackClipShare(clip.id, "twitter");
-    
+
     const text = encodeURIComponent(clip.shareText);
     const url = encodeURIComponent(clip.clipUrl);
-    window.open(
-      `https://twitter.com/intent/tweet?text=${text}&url=${url}`,
-      "_blank"
-    );
+    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, "_blank");
   }
 
   async function shareToLinkedIn() {
     if (!clip) return;
-    
+
     await trackClipShare(clip.id, "linkedin");
-    
+
     const url = encodeURIComponent(clip.clipUrl);
-    window.open(
-      `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
-      "_blank"
-    );
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, "_blank");
   }
 
   async function copyLink() {
     if (!clip) return;
-    
+
     await trackClipShare(clip.id, "copy");
     await navigator.clipboard.writeText(clip.clipUrl);
     setCopied(true);
@@ -182,9 +176,9 @@ export function CreateSocialClipDialog({
   if (loading) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="bg-zinc-900 border-zinc-800 text-white max-w-2xl">
+        <DialogContent className="max-w-2xl border-zinc-800 bg-zinc-900 text-white">
           <div className="flex flex-col items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-purple-500 mb-4" />
+            <Loader2 className="mb-4 h-8 w-8 animate-spin text-purple-500" />
             <p className="text-zinc-400">Analyzing session for viral moments...</p>
           </div>
         </DialogContent>
@@ -194,9 +188,9 @@ export function CreateSocialClipDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-zinc-900 border-zinc-800 text-white max-w-2xl max-h-[90vh] overflow-hidden">
+      <DialogContent className="max-h-[90vh] max-w-2xl overflow-hidden border-zinc-800 bg-zinc-900 text-white">
         <DialogHeader>
-          <DialogTitle className="text-xl flex items-center gap-2">
+          <DialogTitle className="flex items-center gap-2 text-xl">
             <Sparkles className="h-5 w-5 text-amber-500" />
             Create Social Clip
           </DialogTitle>
@@ -209,9 +203,9 @@ export function CreateSocialClipDialog({
           <div className="space-y-6 py-4">
             {/* Session Info */}
             {session && (
-              <div className="bg-zinc-800/50 rounded-lg p-4">
+              <div className="rounded-lg bg-zinc-800/50 p-4">
                 <h3 className="font-semibold text-white">{session.title}</h3>
-                <p className="text-sm text-zinc-400 mt-1">
+                <p className="mt-1 text-sm text-zinc-400">
                   {session.mentor?.name} • {session.community?.name}
                 </p>
               </div>
@@ -219,28 +213,29 @@ export function CreateSocialClipDialog({
 
             {/* Selected Moment Preview */}
             {selectedMoment && !clip && (
-              <Card className="bg-zinc-800 border-zinc-700">
+              <Card className="border-zinc-700 bg-zinc-800">
                 <CardContent className="p-4">
                   <div className="flex items-start gap-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-purple-500/10 text-purple-500 shrink-0">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-purple-500/10 text-purple-500">
                       <Play className="h-6 w-6" />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <Badge variant="secondary" className="bg-amber-500/10 text-amber-400">
-                          <TrendingUp className="h-3 w-3 mr-1" />
+                          <TrendingUp className="mr-1 h-3 w-3" />
                           {selectedMoment.score}/100
                         </Badge>
                         <span className="text-sm text-zinc-400">
-                          <Clock className="h-3 w-3 inline mr-1" />
-                          {formatTime(selectedMoment.startTime)} - {formatTime(selectedMoment.endTime)}
+                          <Clock className="mr-1 inline h-3 w-3" />
+                          {formatTime(selectedMoment.startTime)} -{" "}
+                          {formatTime(selectedMoment.endTime)}
                         </span>
                       </div>
-                      <h4 className="font-medium text-white mt-2">{selectedMoment.label}</h4>
-                      <p className="text-sm text-zinc-400 mt-1 line-clamp-2">
+                      <h4 className="mt-2 font-medium text-white">{selectedMoment.label}</h4>
+                      <p className="mt-1 line-clamp-2 text-sm text-zinc-400">
                         {selectedMoment.context}
                       </p>
-                      <p className="text-sm text-zinc-500 mt-2">
+                      <p className="mt-2 text-sm text-zinc-500">
                         Duration: {formatTime(selectedMoment.endTime - selectedMoment.startTime)}
                       </p>
                     </div>
@@ -252,15 +247,15 @@ export function CreateSocialClipDialog({
             {/* Generated Clip */}
             {clip && (
               <div className="space-y-4">
-                <Card className="bg-gradient-to-br from-zinc-800 to-zinc-900 border-zinc-700">
+                <Card className="border-zinc-700 bg-gradient-to-br from-zinc-800 to-zinc-900">
                   <CardContent className="p-6">
-                    <div className="flex items-center gap-2 text-amber-500 mb-4">
+                    <div className="mb-4 flex items-center gap-2 text-amber-500">
                       <Sparkles className="h-5 w-5" />
                       <span className="font-semibold">Your Clip is Ready!</span>
                     </div>
-                    
+
                     {/* Video Preview Placeholder */}
-                    <div className="aspect-video bg-zinc-950 rounded-lg flex items-center justify-center mb-4 relative overflow-hidden">
+                    <div className="relative mb-4 flex aspect-video items-center justify-center overflow-hidden rounded-lg bg-zinc-950">
                       {clip.thumbnailUrl ? (
                         <Image
                           src={clip.thumbnailUrl}
@@ -271,22 +266,22 @@ export function CreateSocialClipDialog({
                         />
                       ) : (
                         <div className="flex flex-col items-center text-zinc-500">
-                          <Play className="h-12 w-12 mb-2" />
+                          <Play className="mb-2 h-12 w-12" />
                           <span className="text-sm">Video Preview</span>
                         </div>
                       )}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                       <div className="absolute bottom-4 left-4 right-4">
-                        <p className="text-white font-medium line-clamp-2">{clip.previewText}</p>
-                        <p className="text-zinc-300 text-sm mt-1">
+                        <p className="line-clamp-2 font-medium text-white">{clip.previewText}</p>
+                        <p className="mt-1 text-sm text-zinc-300">
                           {formatTime(clip.duration)} • Watch full session on Unytea
                         </p>
                       </div>
                     </div>
 
                     {/* Share Text Preview */}
-                    <div className="bg-zinc-950 rounded-lg p-4">
-                      <p className="text-sm text-zinc-300 whitespace-pre-wrap">{clip.shareText}</p>
+                    <div className="rounded-lg bg-zinc-950 p-4">
+                      <p className="whitespace-pre-wrap text-sm text-zinc-300">{clip.shareText}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -295,31 +290,27 @@ export function CreateSocialClipDialog({
                 <div className="grid grid-cols-3 gap-3">
                   <Button
                     onClick={shareToTwitter}
-                    className="bg-[#1DA1F2] hover:bg-[#1a91da] text-white"
+                    className="bg-[#1DA1F2] text-white hover:bg-[#1a91da]"
                   >
-                    <Twitter className="h-4 w-4 mr-2" />
+                    <Twitter className="mr-2 h-4 w-4" />
                     Twitter
                   </Button>
                   <Button
                     onClick={shareToLinkedIn}
-                    className="bg-[#0A66C2] hover:bg-[#0958a8] text-white"
+                    className="bg-[#0A66C2] text-white hover:bg-[#0958a8]"
                   >
-                    <Linkedin className="h-4 w-4 mr-2" />
+                    <Linkedin className="mr-2 h-4 w-4" />
                     LinkedIn
                   </Button>
-                  <Button
-                    onClick={copyLink}
-                    variant="outline"
-                    className="border-zinc-700"
-                  >
+                  <Button onClick={copyLink} variant="outline" className="border-zinc-700">
                     {copied ? (
                       <>
-                        <Check className="h-4 w-4 mr-2 text-green-500" />
+                        <Check className="mr-2 h-4 w-4 text-green-500" />
                         Copied!
                       </>
                     ) : (
                       <>
-                        <Link className="h-4 w-4 mr-2" />
+                        <Link className="mr-2 h-4 w-4" />
                         Copy Link
                       </>
                     )}
@@ -331,11 +322,11 @@ export function CreateSocialClipDialog({
             {/* Moment Selection */}
             {!clip && moments.length > 0 && (
               <div className="space-y-3">
-                <h3 className="text-sm font-medium text-zinc-300 flex items-center gap-2">
+                <h3 className="flex items-center gap-2 text-sm font-medium text-zinc-300">
                   <TrendingUp className="h-4 w-4" />
                   AI-Detected Viral Moments ({moments.length})
                 </h3>
-                
+
                 {moments.map((moment, index) => (
                   <Card
                     key={index}
@@ -353,12 +344,11 @@ export function CreateSocialClipDialog({
                           {moment.type === "question" && "❓"}
                           {moment.type === "insight" && "💡"}
                         </span>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-white text-sm truncate">
-                            {moment.label}
-                          </p>
-                          <p className="text-xs text-zinc-400 truncate">
-                            {formatTime(moment.startTime)} - {formatTime(moment.endTime)} • {moment.context.substring(0, 50)}...
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-medium text-white">{moment.label}</p>
+                          <p className="truncate text-xs text-zinc-400">
+                            {formatTime(moment.startTime)} - {formatTime(moment.endTime)} •{" "}
+                            {moment.context.substring(0, 50)}...
                           </p>
                         </div>
                         <Badge
@@ -367,8 +357,8 @@ export function CreateSocialClipDialog({
                             moment.score >= 80
                               ? "bg-green-500/10 text-green-400"
                               : moment.score >= 60
-                              ? "bg-amber-500/10 text-amber-400"
-                              : "bg-zinc-700 text-zinc-400"
+                                ? "bg-amber-500/10 text-amber-400"
+                                : "bg-zinc-700 text-zinc-400"
                           }`}
                         >
                           {moment.score}
@@ -385,16 +375,16 @@ export function CreateSocialClipDialog({
               <Button
                 onClick={generateClip}
                 disabled={generating}
-                className="w-full bg-purple-600 hover:bg-purple-700 h-12"
+                className="h-12 w-full bg-purple-600 hover:bg-purple-700"
               >
                 {generating ? (
                   <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Generating Clip...
                   </>
                 ) : (
                   <>
-                    <Sparkles className="h-4 w-4 mr-2" />
+                    <Sparkles className="mr-2 h-4 w-4" />
                     Generate Clip from This Moment
                   </>
                 )}
@@ -403,10 +393,10 @@ export function CreateSocialClipDialog({
 
             {/* No Moments */}
             {!loading && moments.length === 0 && (
-              <div className="text-center py-8">
-                <TrendingUp className="h-12 w-12 text-zinc-600 mx-auto mb-4" />
+              <div className="py-8 text-center">
+                <TrendingUp className="mx-auto mb-4 h-12 w-12 text-zinc-600" />
                 <h3 className="text-lg font-medium text-white">No viral moments detected</h3>
-                <p className="text-zinc-400 mt-2">
+                <p className="mt-2 text-zinc-400">
                   This session needs more engagement data. Share it with your community first!
                 </p>
               </div>

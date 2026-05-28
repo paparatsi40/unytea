@@ -27,8 +27,7 @@ const COPY: Record<
   en: {
     eyebrow: "Contact",
     heading: "Get in touch",
-    body:
-      "Have a question, feedback, or a partnership idea? We read every message and reply within one business day.",
+    body: "Have a question, feedback, or a partnership idea? We read every message and reply within one business day.",
     emailLabel: "Email us at",
     metaTitle: "Contact Unytea",
     metaDescription:
@@ -37,8 +36,7 @@ const COPY: Record<
   es: {
     eyebrow: "Contacto",
     heading: "Hablemos",
-    body:
-      "¿Tienes una pregunta, comentario o idea de colaboración? Leemos cada mensaje y respondemos en un día hábil.",
+    body: "¿Tienes una pregunta, comentario o idea de colaboración? Leemos cada mensaje y respondemos en un día hábil.",
     emailLabel: "Escríbenos a",
     metaTitle: "Contacto · Unytea",
     metaDescription:
@@ -47,8 +45,7 @@ const COPY: Record<
   fr: {
     eyebrow: "Contact",
     heading: "Discutons",
-    body:
-      "Une question, un retour, ou une idée de partenariat ? Nous lisons chaque message et répondons sous un jour ouvré.",
+    body: "Une question, un retour, ou une idée de partenariat ? Nous lisons chaque message et répondons sous un jour ouvré.",
     emailLabel: "Écrivez-nous à",
     metaTitle: "Contact · Unytea",
     metaDescription:
@@ -66,11 +63,9 @@ export function generateStaticParams() {
   return SUPPORTED_LOCALES.map((locale) => ({ locale }));
 }
 
-export async function generateMetadata(
-  props: {
-    params: Promise<{ locale: string }>;
-  }
-): Promise<Metadata> {
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
   const params = await props.params;
   const locale = resolveLocale(params.locale);
   const t = COPY[locale];
@@ -83,9 +78,7 @@ export async function generateMetadata(
     description: t.metaDescription,
     alternates: {
       canonical: `${baseUrl}/${locale}${path}`,
-      languages: Object.fromEntries(
-        SUPPORTED_LOCALES.map((l) => [l, `${baseUrl}/${l}${path}`])
-      ),
+      languages: Object.fromEntries(SUPPORTED_LOCALES.map((l) => [l, `${baseUrl}/${l}${path}`])),
     },
     openGraph: {
       title: t.metaTitle,
@@ -96,11 +89,7 @@ export async function generateMetadata(
   };
 }
 
-export default async function ContactPage(
-  props: {
-    params: Promise<{ locale: string }>;
-  }
-) {
+export default async function ContactPage(props: { params: Promise<{ locale: string }> }) {
   const params = await props.params;
   const locale = resolveLocale(params.locale);
   setRequestLocale(locale);
@@ -110,7 +99,7 @@ export default async function ContactPage(
     <main className="min-h-screen bg-background">
       <section className="border-b bg-muted/20">
         <div className="container mx-auto px-4 py-10">
-          <p className="text-sm text-muted-foreground mb-2">{t.eyebrow}</p>
+          <p className="mb-2 text-sm text-muted-foreground">{t.eyebrow}</p>
           <h1 className="text-4xl font-bold tracking-tight">{t.heading}</h1>
           <p className="mt-3 max-w-2xl text-muted-foreground">{t.body}</p>
         </div>

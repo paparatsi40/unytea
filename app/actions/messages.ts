@@ -184,11 +184,7 @@ export async function getOrCreateConversation(otherUserId: string, communityId: 
 /**
  * Send a message in a conversation
  */
-export async function sendMessage(
-  conversationId: string,
-  content: string,
-  attachments?: string[]
-) {
+export async function sendMessage(conversationId: string, content: string, attachments?: string[]) {
   try {
     const currentUserId = await getCurrentUserId();
     if (!currentUserId) {
@@ -199,10 +195,7 @@ export async function sendMessage(
     const conversation = await prisma.conversation.findFirst({
       where: {
         id: conversationId,
-        OR: [
-          { participant1Id: currentUserId },
-          { participant2Id: currentUserId },
-        ],
+        OR: [{ participant1Id: currentUserId }, { participant2Id: currentUserId }],
       },
     });
 
@@ -216,9 +209,10 @@ export async function sendMessage(
     }
 
     // Determine receiver
-    const receiverId = conversation.participant1Id === currentUserId 
-      ? conversation.participant2Id 
-      : conversation.participant1Id;
+    const receiverId =
+      conversation.participant1Id === currentUserId
+        ? conversation.participant2Id
+        : conversation.participant1Id;
 
     // Create message
     const message = await prisma.directMessage.create({
@@ -328,10 +322,7 @@ export async function getUserConversations() {
 
     const conversations = await prisma.conversation.findMany({
       where: {
-        OR: [
-          { participant1Id: currentUserId },
-          { participant2Id: currentUserId },
-        ],
+        OR: [{ participant1Id: currentUserId }, { participant2Id: currentUserId }],
       },
       include: {
         participant1: {
@@ -411,10 +402,7 @@ export async function getUserConversations() {
     ]);
 
     const myRoleByCommunity = new Map(myMemberships.map((m) => [m.communityId, m.role]));
-    const otherMembershipsByUser = new Map<
-      string,
-      Array<{ communityId: string; role: string }>
-    >();
+    const otherMembershipsByUser = new Map<string, Array<{ communityId: string; role: string }>>();
     for (const om of otherMemberships) {
       const list = otherMembershipsByUser.get(om.userId) ?? [];
       list.push({ communityId: om.communityId, role: om.role });
@@ -422,8 +410,7 @@ export async function getUserConversations() {
     }
 
     const filteredConversations = conversations.filter((c) => {
-      const otherUserId =
-        c.participant1Id === currentUserId ? c.participant2Id : c.participant1Id;
+      const otherUserId = c.participant1Id === currentUserId ? c.participant2Id : c.participant1Id;
       const others = otherMembershipsByUser.get(otherUserId) ?? [];
       return others.some((om) => {
         const myRole = myRoleByCommunity.get(om.communityId);
@@ -509,10 +496,7 @@ export async function getConversationMessages(conversationId: string, cursor?: s
     const conversation = await prisma.conversation.findFirst({
       where: {
         id: conversationId,
-        OR: [
-          { participant1Id: currentUserId },
-          { participant2Id: currentUserId },
-        ],
+        OR: [{ participant1Id: currentUserId }, { participant2Id: currentUserId }],
       },
     });
 
@@ -546,8 +530,8 @@ export async function getConversationMessages(conversationId: string, cursor?: s
       },
     });
 
-    return { 
-      success: true, 
+    return {
+      success: true,
       messages: messages.reverse(), // Return in chronological order
       hasMore: messages.length === 50,
       nextCursor: messages.length > 0 ? messages[0].id : null,
@@ -606,10 +590,7 @@ export async function toggleBlockConversation(conversationId: string) {
     const conversation = await prisma.conversation.findFirst({
       where: {
         id: conversationId,
-        OR: [
-          { participant1Id: currentUserId },
-          { participant2Id: currentUserId },
-        ],
+        OR: [{ participant1Id: currentUserId }, { participant2Id: currentUserId }],
       },
     });
 

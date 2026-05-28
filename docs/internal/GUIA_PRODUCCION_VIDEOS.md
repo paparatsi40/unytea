@@ -10,17 +10,20 @@
 ### **Herramientas Necesarias:**
 
 **1. Grabación de Pantalla:**
+
 - ✅ **OBS Studio** (GRATIS) - https://obsproject.com/
 - ✅ **Loom** (Gratis hasta 5 min, $8/mes ilimitado) - https://loom.com/
 - ✅ **ShareX** (Gratis para Windows) - https://getsharex.com/
 - ✅ **Windows Game Bar** (Ya incluido en Windows 10/11) - Presiona `Win + G`
 
 **2. Edición Básica:**
+
 - ✅ **DaVinci Resolve** (GRATIS, profesional) - https://www.blackmagicdesign.com/products/davinciresolve
 - ✅ **CapCut** (Gratis, fácil) - https://www.capcut.com/
 - ✅ **Clipchamp** (Gratis, online) - https://clipchamp.com/
 
 **3. Micrófono:**
+
 - ✅ **Audífonos con micrófono** (lo que ya tienes)
 - ⭐ **Blue Yeti** (~$100) - Si quieres invertir
 - ⭐ **Micrófono de celular** (sorprendentemente bueno)
@@ -32,15 +35,18 @@
 ### **PASO 1: Preparación (15-30 min por video)**
 
 **A. Escribe el script:**
+
 - Ya lo tienes en `CURSO_MODULO_1_SCRIPTS.md` ✅
 - Imprime o ten abierto en segunda pantalla
 
 **B. Prepara la demo:**
+
 - Abre Unytea en una pestaña limpia
 - Login a tu comunidad
 - Ten todo listo para mostrar
 
 **C. Setup técnico:**
+
 - Cierra pestañas innecesarias
 - Activa modo "No molestar"
 - Verifica que el mic funcione
@@ -110,6 +116,7 @@
 7. **Se sube automáticamente** ✅
 
 **Limitación:**
+
 - Plan gratis: 5 min max por video
 - Plan Creator ($8/mes): Videos ilimitados
 
@@ -126,11 +133,13 @@
 5. **Video se guarda en:** `Videos/Captures`
 
 **Ventajas:**
+
 - ✅ No instalar nada
 - ✅ Ultra rápido
 - ✅ Gratis
 
 **Desventajas:**
+
 - ⚠️ No puedes ver preview mientras grabas
 - ⚠️ Menos opciones de configuración
 
@@ -141,19 +150,23 @@
 #### **Con DaVinci Resolve (Profesional, Gratis):**
 
 **1. Import:**
+
 - File → Import Media → Selecciona tu video grabado
 
 **2. Edits Básicos:**
+
 - **Cut:** Corta intro/outro innecesarios
 - **Trim:** Elimina pausas largas o errores
 - **Speed:** Acelera secciones aburridas a 1.2x
 
 **3. Mejoras:**
+
 - **Audio:** Normalize audio levels
 - **Títulos:** Agrega texto overlay con títulos
 - **Zoom:** Zoom in en partes importantes
 
 **4. Export:**
+
 - Deliver → Render Settings:
   - Format: MP4
   - Codec: H.264
@@ -169,11 +182,13 @@
 **1. Import video**
 
 **2. Edits Simples:**
+
 - **Cut:** Arrastra los bordes para cortar
 - **Text:** Agrega títulos/subtítulos
 - **Music:** Background music suave (opcional)
 
 **3. Export:**
+
 - 1080p, 30fps
 - Save to computer
 
@@ -188,6 +203,7 @@
 **3. Configuración del Video:**
 
 **Detalles:**
+
 ```
 Title: Módulo 1.1 - Bienvenida a Unytea Academy
 Description:
@@ -205,6 +221,7 @@ En esta lección aprenderás:
 ```
 
 **Visibility:**
+
 - ✅ **Unlisted** (recomendado para cursos)
   - No aparece en búsquedas
   - Solo accesible con link
@@ -213,6 +230,7 @@ En esta lección aprenderás:
 - O **Public** (si quieres SEO/marketing)
 
 **Audience:**
+
 - No es para niños
 
 **4. Click "Next" → "Next" → "Publish"**
@@ -220,6 +238,7 @@ En esta lección aprenderás:
 **5. Espera a que procese (1-5 min)**
 
 **6. Copia la URL:**
+
 ```
 https://youtube.com/watch?v=abc123xyz
 ```
@@ -231,6 +250,7 @@ https://youtube.com/watch?v=abc123xyz
 **En la interfaz de edición:**
 
 **Para lección tipo VIDEO:**
+
 ```
 Title: 1.1 - Bienvenida y Visión General
 Type: VIDEO
@@ -256,13 +276,14 @@ Aprende las estrategias probadas para construir tu comunidad inicial.
 
 <iframe width="100%" height="400" src="https://www.youtube.com/embed/TU_VIDEO_ID" frameborder="0" allowfullscreen></iframe>
 
-*Video: 8 minutos - Tutorial completo de invitación de miembros*
+_Video: 8 minutos - Tutorial completo de invitación de miembros_
 
 ---
 
 ## Resumen del Video
 
 En el video viste:
+
 - ✅ Las 3 estrategias principales
 - ✅ Demo del sistema de invitations
 - ✅ Cómo crear links personalizados
@@ -272,6 +293,7 @@ Ahora vamos más profundo...
 ## 1. Estrategia #1: Invitación Directa
 
 **Primeros 10 miembros:**
+
 - Amigos que ya conoces
 - Contactos de LinkedIn/Twitter
 - Personas que te han preguntado sobre el tema
@@ -279,18 +301,20 @@ Ahora vamos más profundo...
 
 **Template de mensaje:**
 ```
+
 Hey [Nombre],
 
 Estoy lanzando una comunidad sobre [tema] y pensé en ti.
 
 Es completamente gratis al inicio, y creo que te encantaría porque [razón específica].
 
-¿Te gustaría unirte? 
+¿Te gustaría unirte?
 
 Link: [tu-link]
 
 Saludos,
 [Tu nombre]
+
 ```
 
 ## 2. Estrategia #2: Sistema de Invitations
@@ -325,22 +349,27 @@ Saludos,
 ### **Semana 1: Módulo 1 Completo**
 
 **Lunes:**
+
 - 🎥 Video 1.1: Bienvenida (5 min)
 - 📝 Agregarlo a Unytea
 
 **Martes:**
+
 - 🎥 Video 1.2: Configuración Inicial (25 min)
 - 📝 Agregarlo a Unytea
 
 **Miércoles:**
+
 - 📝 Lección 1.3: Invitación (TEXT con ejemplos)
 - No requiere video (solo texto)
 
 **Jueves:**
+
 - 🎥 Video BONUS: Tour Avanzado (15 min)
 - O día de descanso
 
 **Viernes:**
+
 - 📝 Review y pulir todo
 - ✨ Publicar Módulo 1
 - 🎉 Celebrar!
@@ -352,11 +381,13 @@ Saludos,
 ### **Para Grabar Más Rápido:**
 
 **1. No busques perfección en primer take:**
+
 - ✅ Graba completo aunque te equivoques
 - ✅ Corta errores en edición
 - ✅ 2-3 takes máximo
 
 **2. Usa un "intro template":**
+
 ```
 "Hola, soy [tu nombre] y en esta lección vamos a aprender [tema específico].
 Al final de esta lección, tú podrás [resultado específico].
@@ -364,6 +395,7 @@ Vamos a ello!"
 ```
 
 **3. Usa un "outro template":**
+
 ```
 "¡Excelente! Ahora ya sabes [recap rápido].
 En la siguiente lección vamos a ver [preview].
@@ -371,6 +403,7 @@ Nos vemos ahí!"
 ```
 
 **4. Script en post-its:**
+
 - Puntos clave en post-its alrededor de tu pantalla
 - NO leas palabra por palabra
 - Habla natural siguiendo los puntos
@@ -380,18 +413,21 @@ Nos vemos ahí!"
 ## 🎨 Calidad de Video:
 
 ### **Mínimo Aceptable:**
+
 - ✅ 720p (1280x720) - Suficiente para cursos
 - ✅ Audio claro (más importante que video)
 - ✅ Sin ruido de fondo
 - ✅ Pantalla legible
 
 ### **Ideal:**
+
 - ⭐ 1080p (1920x1080)
 - ⭐ 30 fps
 - ⭐ Audio normalizado
 - ⭐ Intro/outro con branding
 
 **No necesitas:**
+
 - ❌ 4K (overkill para cursos)
 - ❌ Animaciones complejas
 - ❌ Aparecer en cámara (opcional)
@@ -404,15 +440,18 @@ Nos vemos ahí!"
 **Si no tienes buena cámara en PC:**
 
 **1. Graba con celular:**
+
 - Modo horizontal (landscape)
 - Buena luz (frente a ventana)
 - Trípode o apoyado en algo estable
 
 **2. Para screen recordings:**
+
 - Usa app de screen record en Android/iOS
 - O graba la pantalla del PC con tu celular (si es demo rápido)
 
 **3. Transfer a PC:**
+
 - AirDrop, Google Drive, o cable USB
 - Edita en PC
 - Upload a YouTube
@@ -426,17 +465,20 @@ Nos vemos ahí!"
 ### **Tips:**
 
 **1. Ambiente:**
+
 - ✅ Cuarto silencioso
 - ✅ Cierra ventanas (ruido exterior)
 - ✅ Apaga ventiladores/AC
 - ✅ Avisa a familia "grabando 30 min"
 
 **2. Micrófono:**
+
 - ✅ Usa audífonos con mic (mejor que mic de laptop)
 - ✅ Habla a 15-20cm del mic
 - ✅ Habla claro pero natural
 
 **3. Post-producción:**
+
 - ✅ Normalize audio en edición
 - ✅ Remove background noise (DaVinci/CapCut tienen esta feature)
 - ✅ Compressor para igualar volumen
@@ -450,6 +492,7 @@ Nos vemos ahí!"
 **1. Instala Loom** (5 min una vez)
 
 **2. Por cada video:**
+
 ```
 00:00  Click Loom → Start Recording
 00:01  Grabas siguiendo script (8 min)
@@ -462,6 +505,7 @@ Nos vemos ahí!"
 **Total:** **12 minutos por video** (sin edición)
 
 **Loom te da:**
+
 - ✅ URL directa (funciona en Unytea)
 - ✅ Thumbnail auto-generado
 - ✅ Player embebido
@@ -469,6 +513,7 @@ Nos vemos ahí!"
 - ✅ Comentarios por timestamp
 
 **Limitación:**
+
 - Plan gratis: 5 min max
 - Plan Creator $8/mes: Ilimitado
 
@@ -508,15 +553,17 @@ En la siguiente lección vamos a ver [preview].
 ### **Script Simplificado:**
 
 **INTRO (30 seg):**
+
 ```
-"Hola! En esta lección vamos a configurar tu primera comunidad en Unytea 
-desde cero. Al final de estos 10 minutos, tendrás tu comunidad completamente 
+"Hola! En esta lección vamos a configurar tu primera comunidad en Unytea
+desde cero. Al final de estos 10 minutos, tendrás tu comunidad completamente
 configurada y lista para invitar miembros. Vamos a ello!"
 ```
 
 **DEMO PARTE 1 (3 min):**
+
 ```
-"Primero, vamos a crear la cuenta. 
+"Primero, vamos a crear la cuenta.
 [Muestra pantalla de signup]
 Como ves, el proceso es super simple...
 [Completa el signup mostrando cada paso]
@@ -524,6 +571,7 @@ Y listo, ya tienes tu cuenta."
 ```
 
 **DEMO PARTE 2 (3 min):**
+
 ```
 "Ahora vamos a crear tu primera comunidad.
 [Click en Create Community]
@@ -532,6 +580,7 @@ Y le damos crear. Boom! Ya tienes tu comunidad."
 ```
 
 **DEMO PARTE 3 (3 min):**
+
 ```
 "Ahora hagamos un tour rápido del dashboard...
 [Muestra cada sección]
@@ -539,6 +588,7 @@ Aquí están los miembros, aquí los canales, aquí las configuraciones..."
 ```
 
 **OUTRO (1 min):**
+
 ```
 "Perfecto! Ya tienes tu comunidad configurada.
 Lo siguiente que debes hacer es personalizar tu perfil y agregar una descripción.
@@ -553,9 +603,11 @@ En la siguiente lección vamos a ver cómo invitar a tus primeros 10 miembros.
 ### **Después de editar:**
 
 **1. Export video:**
+
 - MP4, 1080p, H.264
 
 **2. YouTube Studio:**
+
 - Upload
 - Title: "Módulo 1.2 - Configuración Inicial | Unytea Academy"
 - Description: Resumen + links
@@ -563,6 +615,7 @@ En la siguiente lección vamos a ver cómo invitar a tus primeros 10 miembros.
 - Publish
 
 **3. Obtener URL:**
+
 ```
 Opción 1: URL normal
 https://youtube.com/watch?v=abc123
@@ -572,6 +625,7 @@ https://youtu.be/abc123
 ```
 
 **4. Agregar a Unytea:**
+
 - Pega la URL en el formulario
 - Duration: 10 (minutos)
 - Create Lesson ✅
@@ -583,6 +637,7 @@ https://youtu.be/abc123
 ### **Setup Recomendado (Primera Vez):**
 
 **1. Gratis Total:**
+
 - OBS Studio (grabación)
 - DaVinci Resolve (edición)
 - YouTube (hosting)
@@ -590,6 +645,7 @@ https://youtu.be/abc123
 - **Tiempo setup:** 30 min
 
 **2. Rápido y Fácil:**
+
 - Loom ($8/mes)
 - CapCut (gratis)
 - YouTube (hosting)
@@ -597,6 +653,7 @@ https://youtu.be/abc123
 - **Tiempo setup:** 5 min
 
 **3. Ultra Minimalista:**
+
 - Windows Game Bar (grabación)
 - Sin edición
 - YouTube (hosting)
@@ -610,12 +667,14 @@ https://youtu.be/abc123
 ### **Empieza con Loom o Windows Game Bar:**
 
 **Razones:**
+
 - ✅ Setup instantáneo
 - ✅ Grabas y subes en minutos
 - ✅ Puedes iterar rápido
 - ✅ Calidad suficiente para MVP
 
 **Después, si quieres mejorar:**
+
 - Aprende OBS + DaVinci
 - Agrega intro/outro con branding
 - Mejora audio con Audacity
@@ -626,14 +685,17 @@ https://youtu.be/abc123
 ## 📚 RECURSOS:
 
 ### **Tutoriales de OBS:**
+
 - YouTube: "OBS Tutorial para principiantes"
 - 15-20 min de video = listo para grabar
 
 ### **Tutoriales de DaVinci Resolve:**
+
 - YouTube: "DaVinci Resolve tutorial básico"
 - 30 min = sabes lo esencial
 
 ### **Scripts de tus videos:**
+
 - ✅ Ya los tienes en `CURSO_MODULO_1_SCRIPTS.md`
 - Solo sigue el guión y graba
 
@@ -668,6 +730,7 @@ https://youtu.be/abc123
 ## 💪 ¿Listo Para Grabar?
 
 **Empieza con video 1.1 (5 min):**
+
 - Usa Loom o Game Bar
 - Sigue tu script
 - Sube a YouTube

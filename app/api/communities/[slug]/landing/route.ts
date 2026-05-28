@@ -72,16 +72,11 @@ export async function GET(_request: NextRequest, props: { params: Promise<{ slug
     return NextResponse.json({
       success: true,
       community,
-      landingLayout: Array.isArray(community.landingLayout)
-        ? community.landingLayout
-        : [],
+      landingLayout: Array.isArray(community.landingLayout) ? community.landingLayout : [],
     });
   } catch (error) {
     console.error("Error fetching community landing layout:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch landing layout" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch landing layout" }, { status: 500 });
   }
 }
 

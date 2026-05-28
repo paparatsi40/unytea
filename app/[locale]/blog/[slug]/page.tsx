@@ -109,19 +109,19 @@ export default async function BlogPostPage({ params }: Props) {
 
   return (
     <main className="min-h-screen bg-background">
-      <article className="container mx-auto px-4 py-12 max-w-3xl">
+      <article className="container mx-auto max-w-3xl px-4 py-12">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
 
-        <p className="text-sm text-muted-foreground mb-3">Blog</p>
-        <h1 className="text-4xl font-bold tracking-tight mb-4">{post.title}</h1>
-        <p className="text-sm text-muted-foreground mb-6">
+        <p className="mb-3 text-sm text-muted-foreground">Blog</p>
+        <h1 className="mb-4 text-4xl font-bold tracking-tight">{post.title}</h1>
+        <p className="mb-6 text-sm text-muted-foreground">
           {post.date} · {post.readTime} · {post.author}
         </p>
 
-        <div className="relative h-72 md:h-96 w-full overflow-hidden rounded-xl border mb-8">
+        <div className="relative mb-8 h-72 w-full overflow-hidden rounded-xl border md:h-96">
           <Image
             src={post.featuredImage}
             alt={post.title}
@@ -137,19 +137,22 @@ export default async function BlogPostPage({ params }: Props) {
           ))}
         </div>
 
-        <div className="mt-12 rounded-2xl bg-primary/5 border border-primary/20 p-8 text-center">
-          <h2 className="text-2xl font-bold mb-2">Ready to build your virtual studio?</h2>
-          <p className="text-muted-foreground mb-6">Start free — no credit card required.</p>
+        <div className="mt-12 rounded-2xl border border-primary/20 bg-primary/5 p-8 text-center">
+          <h2 className="mb-2 text-2xl font-bold">Ready to build your virtual studio?</h2>
+          <p className="mb-6 text-muted-foreground">Start free — no credit card required.</p>
           <a
             href="https://www.unytea.com/en#pricing"
-            className="inline-block bg-primary text-primary-foreground font-semibold px-8 py-3 rounded-full hover:opacity-90 transition-opacity"
+            className="inline-block rounded-full bg-primary px-8 py-3 font-semibold text-primary-foreground transition-opacity hover:opacity-90"
           >
             Start Free
           </a>
         </div>
 
-        <div className="pt-8 flex gap-4">
-          <Link href={`/${locale}/blog`} className="text-sm font-medium text-primary hover:underline">
+        <div className="flex gap-4 pt-8">
+          <Link
+            href={`/${locale}/blog`}
+            className="text-sm font-medium text-primary hover:underline"
+          >
             ← Back to Blog
           </Link>
           <Link href={`/${locale}`} className="text-sm font-medium text-primary hover:underline">

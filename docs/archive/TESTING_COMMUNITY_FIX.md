@@ -28,17 +28,17 @@ Antes de comenzar el testing:
 1. Navegar a `/dashboard/communities`
 2. Click en "Create Community"
 3. **Step 1 - Basic Information:**
-    - Name: `Test Community 2025`
-    - Description: `This is a test community for bug fix verification`
-    - Category: `Technology & Programming`
-    - Click "Continue"
+   - Name: `Test Community 2025`
+   - Description: `This is a test community for bug fix verification`
+   - Category: `Technology & Programming`
+   - Click "Continue"
 4. **Step 2 - Appearance:**
-    - (Opcional) Subir logo o usar URL
-    - (Opcional) Subir cover image o usar URL
-    - Click "Continue"
+   - (Opcional) Subir logo o usar URL
+   - (Opcional) Subir cover image o usar URL
+   - Click "Continue"
 5. **Step 3 - Settings:**
-    - Dejar opciones por default (Public, No approval required)
-    - Click "Create Community"
+   - Dejar opciones por default (Public, No approval required)
+   - Click "Create Community"
 
 **Resultado Esperado:**
 
@@ -77,11 +77,11 @@ Antes de comenzar el testing:
 - ✅ NO hay error 404
 - ✅ Ves una página hermosa de "Join Community"
 - ✅ Muestra:
-    - Cover image (si existe)
-    - Logo de la comunidad
-    - Nombre: "Test Community 2025"
-    - Descripción
-    - Botón: "Join Community"
+  - Cover image (si existe)
+  - Logo de la comunidad
+  - Nombre: "Test Community 2025"
+  - Descripción
+  - Botón: "Join Community"
 - ✅ Back button funciona
 - ✅ NO ves el contenido de la comunidad
 
@@ -136,8 +136,8 @@ Antes de comenzar el testing:
 
 1. Iniciar sesión como User 1 (Owner)
 2. Crear NUEVA comunidad:
-    - Name: `Private Test Community`
-    - Settings: ✅ Require Approval for New Members
+   - Name: `Private Test Community`
+   - Settings: ✅ Require Approval for New Members
 3. Cerrar sesión
 4. Iniciar sesión como User 2
 5. Navegar a `/dashboard/c/private-test-community`
@@ -147,8 +147,8 @@ Antes de comenzar el testing:
 
 - ✅ Botón dice "Request to Join" (no "Join Community")
 - ✅ Después del click, ves mensaje:
-    - "Membership Pending"
-    - "Your request to join **Private Test Community** is pending approval..."
+  - "Membership Pending"
+  - "Your request to join **Private Test Community** is pending approval..."
 - ✅ NO puedes ver el contenido todavía
 - ✅ Back button funciona
 
@@ -187,9 +187,9 @@ Antes de comenzar el testing:
 **Pasos:**
 
 1. (Manual) Usando Prisma Studio:
-    - Abrir `Member` table
-    - Encontrar membresía de User 2 en Test Community 2025
-    - Cambiar status a "SUSPENDED"
+   - Abrir `Member` table
+   - Encontrar membresía de User 2 en Test Community 2025
+   - Cambiar status a "SUSPENDED"
 2. Como User 2, navegar a `/dashboard/c/test-community-2025`
 
 **Resultado Esperado:**
@@ -229,15 +229,15 @@ Antes de comenzar el testing:
 
 ## 📊 **MÉTRICAS DE ÉXITO**
 
-| Test | Status | Tiempo | Notas |
-|------|--------|--------|-------|
-| Test 1: Crear Comunidad | ⏳ Pending | - | - |
-| Test 2: No-Member UI | ⏳ Pending | - | - |
-| Test 3: Join Community | ⏳ Pending | - | - |
-| Test 4: Approval Required | ⏳ Pending | - | - |
-| Test 5: Race Condition | ⏳ Pending | - | - |
-| Test 6: Suspended Member | ⏳ Pending | - | - |
-| Test 7: Performance | ⏳ Pending | - | - |
+| Test                      | Status     | Tiempo | Notas |
+| ------------------------- | ---------- | ------ | ----- |
+| Test 1: Crear Comunidad   | ⏳ Pending | -      | -     |
+| Test 2: No-Member UI      | ⏳ Pending | -      | -     |
+| Test 3: Join Community    | ⏳ Pending | -      | -     |
+| Test 4: Approval Required | ⏳ Pending | -      | -     |
+| Test 5: Race Condition    | ⏳ Pending | -      | -     |
+| Test 6: Suspended Member  | ⏳ Pending | -      | -     |
+| Test 7: Performance       | ⏳ Pending | -      | -     |
 
 **Target:** 7/7 PASS ✅
 

@@ -38,9 +38,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     `Join ${session.mentor.name || "our expert"} for an interactive session on Unytea.`;
 
   const imageUrl =
-    session.community?.imageUrl ||
-    session.mentor.image ||
-    "https://www.unytea.com/og-image.png";
+    session.community?.imageUrl || session.mentor.image || "https://www.unytea.com/og-image.png";
 
   return {
     title,
@@ -103,8 +101,10 @@ export default async function Page(props: Props) {
         session={session}
         locale={params.locale}
         relatedSessions={relatedResult.success ? relatedResult.sessions || [] : []}
-        relatedCommunities={relatedCommunitiesResult.success ? relatedCommunitiesResult.communities || [] : []}
-        nextSession={nextSessionResult.success ? nextSessionResult.session ?? null : null}
+        relatedCommunities={
+          relatedCommunitiesResult.success ? relatedCommunitiesResult.communities || [] : []
+        }
+        nextSession={nextSessionResult.success ? (nextSessionResult.session ?? null) : null}
       />
     </>
   );

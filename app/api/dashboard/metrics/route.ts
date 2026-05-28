@@ -8,10 +8,7 @@ export async function GET() {
   try {
     const session = await auth();
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const userId = session.user.id;
@@ -50,8 +47,8 @@ export async function GET() {
       },
     });
 
-    const planIds = communityPlans.map(p => p.id);
-    
+    const planIds = communityPlans.map((p) => p.id);
+
     const subscriptions = await prisma.subscription.findMany({
       where: {
         planId: {
@@ -65,7 +62,7 @@ export async function GET() {
     });
 
     const revenue = subscriptions.reduce((total, sub) => {
-      const plan = communityPlans.find(p => p.id === sub.planId);
+      const plan = communityPlans.find((p) => p.id === sub.planId);
       return total + (plan?.price || 0);
     }, 0);
 
@@ -98,9 +95,8 @@ export async function GET() {
     });
 
     // Calculate engagement as percentage (posts + comments / members * 10)
-    const engagement = members > 0 
-      ? Math.min(Math.round(((recentPosts + recentComments) / members) * 10), 100)
-      : 0;
+    const engagement =
+      members > 0 ? Math.min(Math.round(((recentPosts + recentComments) / members) * 10), 100) : 0;
 
     return NextResponse.json({
       communities,
@@ -110,9 +106,6 @@ export async function GET() {
     });
   } catch (error) {
     console.error("Error fetching dashboard metrics:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch metrics" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch metrics" }, { status: 500 });
   }
 }

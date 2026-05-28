@@ -58,16 +58,16 @@
 
 ```typescript
 // OLD
-import { auth } from "@clerk/nextjs/server"
-const { userId } = await auth()
+import { auth } from "@clerk/nextjs/server";
+const { userId } = await auth();
 
 const user = await prisma.user.findUnique({
-  where: { clerkId: userId }
-})
+  where: { clerkId: userId },
+});
 
 // NEW
-import { getCurrentUserId } from "@/lib/auth-utils"
-const userId = await getCurrentUserId()
+import { getCurrentUserId } from "@/lib/auth-utils";
+const userId = await getCurrentUserId();
 
 // User ID is already the DB user ID, no need for lookup
 ```
@@ -76,14 +76,14 @@ const userId = await getCurrentUserId()
 
 ```typescript
 // OLD
-import { useUser } from "@clerk/nextjs"
-const { user } = useUser()
-const userId = user?.id // This is Clerk ID
+import { useUser } from "@clerk/nextjs";
+const { user } = useUser();
+const userId = user?.id; // This is Clerk ID
 
 // NEW
-import { useCurrentUser } from "@/hooks/use-current-user"
-const { user } = useCurrentUser()
-const userId = user?.id // This is DB user ID
+import { useCurrentUser } from "@/hooks/use-current-user";
+const { user } = useCurrentUser();
+const userId = user?.id; // This is DB user ID
 ```
 
 ### User Fields Mapping

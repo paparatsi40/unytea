@@ -11,6 +11,7 @@
 ## 🎯 **VISION:**
 
 Transform online sessions from flat 2D grids into **immersive 3D spatial experiences** where:
+
 - Avatars exist in 3D space
 - Proximity determines audio volume
 - Movement creates natural interactions
@@ -24,7 +25,7 @@ Transform online sessions from flat 2D grids into **immersive 3D spatial experie
 NOBODY ELSE HAS THIS IN COMMUNITY PLATFORMS
 
 Zoom       → 2D Grid
-Discord    → 2D Grid  
+Discord    → 2D Grid
 Gather     → 2D Pixelated (limited)
 UNYTEA     → FULL 3D SPATIAL 🌟
 ```
@@ -146,10 +147,10 @@ UNYTEA     → FULL 3D SPATIAL 🌟
 - [ ] Toggle 2D/3D view
 - [ ] Minimap with participant locations
 - [ ] Layout presets:
-    - Theater (auditorium seating)
-    - Roundtable (equal positioning)
-    - Classroom (rows)
-    - Networking (open space)
+  - Theater (auditorium seating)
+  - Roundtable (equal positioning)
+  - Classroom (rows)
+  - Networking (open space)
 - [ ] Accessibility mode (2D fallback for low-end devices)
 - [ ] Performance settings (quality presets)
 
@@ -168,36 +169,36 @@ UNYTEA     → FULL 3D SPATIAL 🌟
 ### **During Session:**
 
 1. **Free Movement:**
-    - Walk around to find conversations
-    - Approach people to hear them better
-    - Move away to reduce audio
+   - Walk around to find conversations
+   - Approach people to hear them better
+   - Move away to reduce audio
 
 2. **Stage Mode:**
-    - Speaker on elevated stage
-    - Everyone hears clearly
-    - Audience spatially positioned
+   - Speaker on elevated stage
+   - Everyone hears clearly
+   - Audience spatially positioned
 
 3. **Breakout Zones:**
-    - Designated areas for small groups
-    - Enter zone = join group audio
-    - Leave zone = audio fades
+   - Designated areas for small groups
+   - Enter zone = join group audio
+   - Leave zone = audio fades
 
 ### **Interactions:**
 
 1. **Proximity Chat:**
-    - Get close to someone
-    - Audio volume increases
-    - Video thumbnail appears
+   - Get close to someone
+   - Audio volume increases
+   - Video thumbnail appears
 
 2. **Reactions:**
-    - Click emoji
-    - Floats above avatar in 3D
-    - Visible to nearby participants
+   - Click emoji
+   - Floats above avatar in 3D
+   - Visible to nearby participants
 
 3. **Collaboration:**
-    - Approach whiteboard
-    - Everyone near it can interact
-    - Changes visible in real-time
+   - Approach whiteboard
+   - Everyone near it can interact
+   - Changes visible in real-time
 
 ---
 
@@ -428,7 +429,7 @@ Future:   Meet buddy in private 3D space
 
 ```
 Problem: 3D rendering + video = heavy
-Solution: 
+Solution:
   - Quality presets
   - LOD (Level of Detail)
   - 2D fallback option

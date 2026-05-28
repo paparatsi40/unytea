@@ -152,9 +152,7 @@ export async function batchModeratePostsInCommunity(communitySlug: string) {
       orderBy: { createdAt: "desc" },
     });
 
-    const results = await Promise.all(
-      posts.map((post) => moderatePost(post.id))
-    );
+    const results = await Promise.all(posts.map((post) => moderatePost(post.id)));
 
     const flagged = results.filter((r) => r.flagged);
     const blocked = results.filter((r) => r.action === "BLOCK");

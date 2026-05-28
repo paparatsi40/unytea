@@ -20,7 +20,7 @@ export default function NotificationsPage() {
   const handleSave = async () => {
     setLoading(true);
     const result = await updateNotificationPreferences(settings);
-    
+
     if (result.success) {
       toast.success("Preferences saved!");
     } else {
@@ -32,26 +32,20 @@ export default function NotificationsPage() {
   return (
     <div className="space-y-6">
       <div className="rounded-xl border border-border bg-card p-6">
-        <h2 className="mb-4 text-xl font-bold text-foreground">
-          Notification Preferences
-        </h2>
+        <h2 className="mb-4 text-xl font-bold text-foreground">Notification Preferences</h2>
 
         <div className="space-y-4">
           {/* Email Notifications */}
           <div className="flex items-center justify-between rounded-lg border border-border p-4">
             <div>
               <p className="font-medium text-foreground">Email Notifications</p>
-              <p className="text-sm text-muted-foreground">
-                Receive notifications via email
-              </p>
+              <p className="text-sm text-muted-foreground">Receive notifications via email</p>
             </div>
             <label className="relative inline-flex cursor-pointer items-center">
               <input
                 type="checkbox"
                 checked={settings.emailNotifications}
-                onChange={(e) =>
-                  setSettings({ ...settings, emailNotifications: e.target.checked })
-                }
+                onChange={(e) => setSettings({ ...settings, emailNotifications: e.target.checked })}
                 className="peer sr-only"
               />
               <div className="peer h-6 w-11 rounded-full bg-muted after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-border after:bg-background after:transition-all peer-checked:bg-primary peer-checked:after:translate-x-full"></div>
@@ -62,17 +56,13 @@ export default function NotificationsPage() {
           <div className="flex items-center justify-between rounded-lg border border-border p-4">
             <div>
               <p className="font-medium text-foreground">Comments</p>
-              <p className="text-sm text-muted-foreground">
-                When someone comments on your post
-              </p>
+              <p className="text-sm text-muted-foreground">When someone comments on your post</p>
             </div>
             <label className="relative inline-flex cursor-pointer items-center">
               <input
                 type="checkbox"
                 checked={settings.notifyOnComment}
-                onChange={(e) =>
-                  setSettings({ ...settings, notifyOnComment: e.target.checked })
-                }
+                onChange={(e) => setSettings({ ...settings, notifyOnComment: e.target.checked })}
                 className="peer sr-only"
               />
               <div className="peer h-6 w-11 rounded-full bg-muted after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-border after:bg-background after:transition-all peer-checked:bg-primary peer-checked:after:translate-x-full"></div>
@@ -83,17 +73,13 @@ export default function NotificationsPage() {
           <div className="flex items-center justify-between rounded-lg border border-border p-4">
             <div>
               <p className="font-medium text-foreground">Mentions</p>
-              <p className="text-sm text-muted-foreground">
-                When someone mentions you
-              </p>
+              <p className="text-sm text-muted-foreground">When someone mentions you</p>
             </div>
             <label className="relative inline-flex cursor-pointer items-center">
               <input
                 type="checkbox"
                 checked={settings.notifyOnMention}
-                onChange={(e) =>
-                  setSettings({ ...settings, notifyOnMention: e.target.checked })
-                }
+                onChange={(e) => setSettings({ ...settings, notifyOnMention: e.target.checked })}
                 className="peer sr-only"
               />
               <div className="peer h-6 w-11 rounded-full bg-muted after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-border after:bg-background after:transition-all peer-checked:bg-primary peer-checked:after:translate-x-full"></div>
@@ -104,17 +90,13 @@ export default function NotificationsPage() {
           <div className="flex items-center justify-between rounded-lg border border-border p-4">
             <div>
               <p className="font-medium text-foreground">Reactions</p>
-              <p className="text-sm text-muted-foreground">
-                When someone reacts to your content
-              </p>
+              <p className="text-sm text-muted-foreground">When someone reacts to your content</p>
             </div>
             <label className="relative inline-flex cursor-pointer items-center">
               <input
                 type="checkbox"
                 checked={settings.notifyOnReaction}
-                onChange={(e) =>
-                  setSettings({ ...settings, notifyOnReaction: e.target.checked })
-                }
+                onChange={(e) => setSettings({ ...settings, notifyOnReaction: e.target.checked })}
                 className="peer sr-only"
               />
               <div className="peer h-6 w-11 rounded-full bg-muted after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-border after:bg-background after:transition-all peer-checked:bg-primary peer-checked:after:translate-x-full"></div>
@@ -125,9 +107,7 @@ export default function NotificationsPage() {
           <div className="flex items-center justify-between rounded-lg border border-border p-4">
             <div>
               <p className="font-medium text-foreground">Buddy Requests</p>
-              <p className="text-sm text-muted-foreground">
-                When someone wants to be your buddy
-              </p>
+              <p className="text-sm text-muted-foreground">When someone wants to be your buddy</p>
             </div>
             <label className="relative inline-flex cursor-pointer items-center">
               <input

@@ -71,7 +71,10 @@ function sanitizeQuotes(value: unknown): Quote[] {
 function extractChaptersFromNotes(content?: string | null): Chapter[] {
   if (!content) return [];
 
-  const lines = content.split("\n").map((l) => l.trim()).filter(Boolean);
+  const lines = content
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
   const chapters: Chapter[] = [];
 
   for (const line of lines) {
@@ -142,7 +145,7 @@ function parseSummaryPayload(raw: string): {
 }
 
 export async function generateAISessionSummary(sessionId: string) {
-try {
+  try {
     const session = await prisma.mentorSession.findUnique({
       where: { id: sessionId },
       include: {

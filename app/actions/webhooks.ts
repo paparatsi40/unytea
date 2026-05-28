@@ -18,10 +18,7 @@ if (!LIVEKIT_API_KEY || !LIVEKIT_API_SECRET) {
   console.warn("LiveKit API credentials not configured. Webhook verification will fail.");
 }
 
-const receiver = new WebhookReceiver(
-  LIVEKIT_API_KEY,
-  LIVEKIT_API_SECRET
-);
+const receiver = new WebhookReceiver(LIVEKIT_API_KEY, LIVEKIT_API_SECRET);
 
 const AUTO_START_RECORDING = process.env.AUTO_START_RECORDING === "true";
 
@@ -228,9 +225,7 @@ async function handleRoomFinished(event: any) {
 
   const now = new Date();
   for (const participation of openParticipations) {
-    const durationSeconds = Math.floor(
-      (now.getTime() - participation.joinedAt.getTime()) / 1000
-    );
+    const durationSeconds = Math.floor((now.getTime() - participation.joinedAt.getTime()) / 1000);
 
     await prisma.sessionParticipation.update({
       where: { id: participation.id },
@@ -304,10 +299,7 @@ async function handleParticipantJoined(event: any) {
       },
     });
   } catch (error) {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === "P2002"
-    ) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
       console.info(
         `[livekit-webhook] participant_joined duplicate race ignored: session=${sessionId} user=${userId} identity=${identity}`
       );
@@ -581,11 +573,7 @@ function mapEgressStatus(egressStatus: string): "PROCESSING" | "READY" | "FAILED
 /**
  * Log session event for audit trail
  */
-async function logSessionEvent(
-  sessionId: string,
-  type: SessionEventType,
-  payload: any
-) {
+async function logSessionEvent(sessionId: string, type: SessionEventType, payload: any) {
   await prisma.sessionEvent.create({
     data: {
       sessionId,

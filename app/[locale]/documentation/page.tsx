@@ -22,11 +22,9 @@ const META = {
     "Guides and references for launching, growing, and operating your community on Unytea.",
 };
 
-export async function generateMetadata(
-  props: {
-    params: Promise<{ locale: string }>;
-  }
-): Promise<Metadata> {
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
   const params = await props.params;
   return {
     title: META.title,
@@ -62,8 +60,7 @@ const sections: DocSection[] = [
   {
     icon: Palette,
     title: "Community Branding",
-    description:
-      "Customize the look and feel of your community to match your brand identity.",
+    description: "Customize the look and feel of your community to match your brand identity.",
     topics: [
       "Community logo, banner, and color scheme",
       "Custom landing page for public visitors",
@@ -74,8 +71,7 @@ const sections: DocSection[] = [
   {
     icon: BookOpen,
     title: "Courses and Content",
-    description:
-      "Build structured learning paths with modules, lessons, and progress tracking.",
+    description: "Build structured learning paths with modules, lessons, and progress tracking.",
     topics: [
       "Creating courses with the module builder",
       "Rich text editing with TipTap (images, code, embeds)",
@@ -134,8 +130,7 @@ const sections: DocSection[] = [
   {
     icon: Users,
     title: "Member Management",
-    description:
-      "Manage your community members, roles, permissions, and engagement.",
+    description: "Manage your community members, roles, permissions, and engagement.",
     topics: [
       "Member onboarding and welcome flows",
       "Role assignment and permission levels",
@@ -146,8 +141,7 @@ const sections: DocSection[] = [
   {
     icon: ShieldCheck,
     title: "Moderation and Safety",
-    description:
-      "Keep your community safe with moderation tools, reporting, and content policies.",
+    description: "Keep your community safe with moderation tools, reporting, and content policies.",
     topics: [
       "Content reporting and review workflows",
       "Community guidelines and acceptable use policies",
@@ -158,8 +152,7 @@ const sections: DocSection[] = [
   {
     icon: Globe,
     title: "Internationalization",
-    description:
-      "Reach a global audience with multi-language support built into the platform.",
+    description: "Reach a global audience with multi-language support built into the platform.",
     topics: [
       "Supported languages: English, Spanish, French",
       "Locale-based routing and URL structure",
@@ -170,8 +163,7 @@ const sections: DocSection[] = [
   {
     icon: Zap,
     title: "API and Integrations",
-    description:
-      "Connect Unytea with your existing tools and workflows through our API.",
+    description: "Connect Unytea with your existing tools and workflows through our API.",
     topics: [
       "API authentication and rate limits",
       "Webhook events for community activity",
@@ -182,8 +174,7 @@ const sections: DocSection[] = [
   {
     icon: LifeBuoy,
     title: "Support",
-    description:
-      "Get help with your account, billing, or technical issues.",
+    description: "Get help with your account, billing, or technical issues.",
     topics: [
       "Frequently asked questions",
       "Account recovery and security",
@@ -193,11 +184,7 @@ const sections: DocSection[] = [
   },
 ];
 
-export default async function DocumentationPage(
-  props: {
-    params: Promise<{ locale: string }>;
-  }
-) {
+export default async function DocumentationPage(props: { params: Promise<{ locale: string }> }) {
   const params = await props.params;
   const { locale } = params;
 
@@ -205,38 +192,31 @@ export default async function DocumentationPage(
     <main className="min-h-screen bg-background">
       <section className="border-b bg-muted/20">
         <div className="container mx-auto px-4 py-12">
-          <p className="text-sm text-muted-foreground mb-2">Resources</p>
+          <p className="mb-2 text-sm text-muted-foreground">Resources</p>
           <h1 className="text-4xl font-bold tracking-tight">Documentation</h1>
           <p className="mt-3 max-w-3xl text-muted-foreground">
-            Everything you need to launch, grow, and manage your community on
-            Unytea. From first setup to advanced features.
+            Everything you need to launch, grow, and manage your community on Unytea. From first
+            setup to advanced features.
           </p>
         </div>
       </section>
 
       <section className="container mx-auto px-4 py-10">
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl">
+        <div className="grid max-w-6xl gap-6 md:grid-cols-2 lg:grid-cols-3">
           {sections.map((section) => {
             const Icon = section.icon;
             return (
               <div
                 key={section.title}
-                className="rounded-xl border bg-card p-6 hover:shadow-md transition-shadow"
+                className="rounded-xl border bg-card p-6 transition-shadow hover:shadow-md"
               >
-                <Icon className="w-5 h-5 text-primary mb-3" />
-                <h2 className="text-lg font-semibold mb-2">{section.title}</h2>
-                <p className="text-sm text-muted-foreground mb-4">
-                  {section.description}
-                </p>
+                <Icon className="mb-3 h-5 w-5 text-primary" />
+                <h2 className="mb-2 text-lg font-semibold">{section.title}</h2>
+                <p className="mb-4 text-sm text-muted-foreground">{section.description}</p>
                 <div className="space-y-1.5">
                   {section.topics.map((topic) => (
-                    <p
-                      key={topic}
-                      className="text-xs text-muted-foreground flex items-start gap-2"
-                    >
-                      <span className="text-primary mt-0.5 shrink-0">
-                        &bull;
-                      </span>
+                    <p key={topic} className="flex items-start gap-2 text-xs text-muted-foreground">
+                      <span className="mt-0.5 shrink-0 text-primary">&bull;</span>
                       {topic}
                     </p>
                   ))}
@@ -246,28 +226,23 @@ export default async function DocumentationPage(
           })}
         </div>
 
-        <div className="max-w-6xl mt-12 rounded-xl border bg-muted/30 p-8 text-center">
-          <h2 className="text-xl font-semibold mb-2">
-            Can&apos;t find what you need?
-          </h2>
-          <p className="text-muted-foreground mb-4">
-            Our support team is here to help. Reach out and we&apos;ll get back
-            to you within 24 hours.
+        <div className="mt-12 max-w-6xl rounded-xl border bg-muted/30 p-8 text-center">
+          <h2 className="mb-2 text-xl font-semibold">Can&apos;t find what you need?</h2>
+          <p className="mb-4 text-muted-foreground">
+            Our support team is here to help. Reach out and we&apos;ll get back to you within 24
+            hours.
           </p>
           <a
             href="mailto:support@unytea.com"
-            className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+            className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            <LifeBuoy className="w-4 h-4" />
+            <LifeBuoy className="h-4 w-4" />
             Contact Support
           </a>
         </div>
 
         <div className="pt-10">
-          <Link
-            href={`/${locale}`}
-            className="text-sm font-medium text-primary hover:underline"
-          >
+          <Link href={`/${locale}`} className="text-sm font-medium text-primary hover:underline">
             &larr; Back to Home
           </Link>
         </div>
