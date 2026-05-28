@@ -14,7 +14,7 @@ type CommunityCardProps = {
   priority?: boolean;
 };
 
-const CATEGORY_LABELS: Record<CommunityCategory, string> = {
+export const CATEGORY_LABELS: Record<CommunityCategory, string> = {
   BUSINESS_ENTREPRENEURSHIP: "Business & entrepreneurship",
   MARKETING_SALES: "Marketing & sales",
   TECH_PROGRAMMING: "Tech & programming",
