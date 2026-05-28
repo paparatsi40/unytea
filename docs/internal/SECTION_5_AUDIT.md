@@ -332,3 +332,57 @@ Conducted via `git grep` with case-insensitive patterns across `*.ts`, `*.tsx`, 
 ---
 
 **Document end.**
+
+---
+
+## 2026-05-27 — Cat E revision (post-pivot)
+
+This entry is appended after the document was originally closed. The audit body above is unchanged; what follows is a dated revision of the **Cat E** verdict only.
+
+### What the audit originally said about Cat E
+
+The 2026-05-15 audit (above, "Cat E — Marketplace Cannibalization → CRITICAL VIOLATION") presented three options and recommended decision-making in Sprint 3:
+
+- **A. Remove `/explore` entirely.**
+- **B. Keep `/explore` but reframe as marketing showcase.**
+- **C. Revise PD V1 §5 Cat E** — flagged at the time as *less likely* because "the rationale ('hosts own their relationship; unytea is not a marketplace') was solid."
+
+Sprint 3 chose **Option A — full removal**, executed in Phase 3.1 (commit `e8d7e2e0`). At the time the choice was internally consistent: PD V1 §2 specified a target user with pre-existing audience, so PD V1 §5 Cat E's cannibalization concern followed logically, and Option A was the strict-alignment path.
+
+### What changed on 2026-05-27
+
+In the 2026-05-27 strategy review, **PD V1 §2 itself was revised**. The primary target user is no longer the established host with 1k–30k audience; it is the *emerging creator with 0–500 followers monetizables or none*. See revised PD V1 §1 and §2 for the new framing.
+
+That change overturns the *premise* of Cat E's original reasoning. The Cat E reasoning was: "discovery cannibalizes hosts who bring their own audience." With no pre-existing audience to cannibalize, discovery is not a threat — it is the entry point. The platform's job for the §2 (revised) persona is to deliver the creator's first 30 members.
+
+Therefore, on 2026-05-27, PD V1 §5 Cat E was revised in place. See PD V1 §5 Cat E "REVISED 2026-05-27" for the new conclusion and the quality bar that gates listings. The original Cat E reasoning is preserved above it in PD V1, dated.
+
+### Audit logic vs. audit premise
+
+The audit's logic (Option A is the strict-alignment path given the doc as it stood on 2026-05-15) was correct then and is correct as a historical artifact. The audit's *premise* — that PD V1 §2 was stable and correct — turned out to be wrong eleven days later. The 2026-05-27 revision corrects the premise; the audit itself remains a faithful record of the doc-vs-code delta at the time it was performed.
+
+In other words: **the audit was right; the document it audited was wrong.**
+
+### This is documented, not a quiet rollback
+
+The Phase 3.1 implementation (commit `e8d7e2e0`) will be reverted under Sprint 3 Phase 3.5 (see `SPRINT_3_PLAN.md`). That revert is **not** a tacit admission that the original audit was flawed and **not** an organic "we changed our mind." It is the downstream consequence of an explicit, dated PD V1 revision:
+
+1. PD V1 §2 was revised first (target user).
+2. PD V1 §5 Cat E followed (premise removed).
+3. The code revert follows the doc, not the other way around.
+
+Future readers (and future audits) should treat the chain in that order: **doc → audit → code**, in both directions. If §2 ever swings back to "established host," Cat E swings back to anti-feature, and `/explore` goes away again. The mechanism is the same; only the premise moves.
+
+### What did NOT change in this revision
+
+- **Cat A (engagement extraction):** unchanged. The de-feat track stays.
+- **Cat B (member-to-member friction):** unchanged.
+- **Cat C, D, F, G, H:** unchanged.
+- **The audit's verdicts for all other categories:** unchanged.
+- **The discovery quality bar:** the four criteria in revised PD V1 §5 Cat E (live session in 7 days; ≥3 active members; description + cover image; ≥14 days old) are *new* gating that did **not** exist in the pre-removal `/explore`. The revert restores discovery as a surface; it does **not** restore the un-gated 2026-05-15-era `/explore`.
+
+### Implementation handoff
+
+Implementation of the revert and the quality-bar gating is tracked in `SPRINT_3_PLAN.md` Phase 3.5. This audit document is not the place for code changes — it records the audit, the original verdict, and now the dated revision.
+
+**End of 2026-05-27 revision entry.**

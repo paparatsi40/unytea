@@ -243,7 +243,53 @@ ETA: 0.5-1 day.
 
 ETA: 0.5 day. **Risk: medium** — destructive migration. Pre-launch (0 real users) makes this safe.
 
-### Phase 3.5 — Operational alongside
+### Phase 3.5 — Reverting Phase 3.1 /explore de-feat (planning entry, 2026-05-27)
+
+> **Status**: planning entry only. This section documents *what* and *why*. Implementation ships as a separate PR (code), not part of the doc-only revision that introduced this section.
+
+**Trigger.** PD V1 §1, §2, and §5 Cat E were revised on 2026-05-27 (emerging-creator pivot). The revised §5 Cat E re-opens the discovery surface, gated by a four-criterion quality bar. See PD V1 §5 Cat E "REVISED 2026-05-27" for the normative text. See also `SECTION_5_AUDIT.md` 2026-05-27 entry for the audit-side rationale.
+
+**What this phase does (high level).**
+
+1. Revert commit `e8d7e2e0` (the original Phase 3.1 de-feat) to restore:
+   - `app/[locale]/explore/page.tsx`
+   - `components/explore/*`
+   - The `/explore` entry in the sitemap
+   - Internal navigation links that referenced `/explore`
+2. Re-introduce quality-bar gating on the listing query, per revised PD V1 §5 Cat E:
+   - At least 1 live session scheduled in the next 7 days.
+   - At least 3 active members.
+   - Description + cover image set.
+   - Community is ≥14 days old.
+3. Add a community-level opt-OUT setting so creators can hide their community from public `/explore` listing (default: opt-IN, since the §2 persona benefits from discovery).
+4. Replace the original "trending" default sort with topical-match filters (filtros por especialidad), per revised Cat E risk mitigation.
+
+**What this phase does NOT do.**
+
+- Does not restore the dashboard `/dashboard/communities/explore` page exactly as it was, without first reviewing whether logged-in members need a different surface than logged-out prospects. That review happens before code lands.
+- Does not bring back "trending communities this week" surfaces in their generic form — those remain anti-feature per revised Cat E.
+- Does not introduce featured/paid placements; those are gated by §9 thresholds (≥1,000 creators + ≥50k unique monthly visitors).
+
+**Sequencing.**
+
+- This phase ships **after** Phase 3.4 (Cat A gamification removal) closes. The Cat A removal is invariant under the §2 revision and should not be blocked by it.
+- This phase ships in its **own PR** (code only). The PD V1 revision is doc-only and ships first.
+- Quality-bar code lives in the listing query layer, not at the page-render layer — so the same gating applies to any future surface that lists communities (XML sitemap entries, future API).
+
+**Definition of Done for Phase 3.5.**
+
+- Revert applied; `/explore` route resolves and renders.
+- Listing query gated by the four quality-bar criteria; verified by unit test (fixtures that fail each criterion are excluded; a fixture that meets all four is included).
+- Community opt-OUT setting wired through schema + settings UI + listing query.
+- Sort options: removed "trending," kept "newest" and added topical-match filters.
+- `npx next build` passes.
+- `SECTION_5_AUDIT.md` re-run on the relevant Cat E surface returns ZERO violations of the revised PD V1 §5 Cat E.
+
+**ETA.** Half a day to a day for the revert + gating + opt-OUT setting, assuming the original `/explore` UI is restorable as-is and only the query layer needs the new bar. Larger if community-card design needs refresh to match new marketing positioning (§7).
+
+---
+
+### Phase 3.6 — Operational alongside (formerly Phase 3.5)
 
 These run in parallel with the de-featurization work, NOT blocking:
 
@@ -251,7 +297,7 @@ These run in parallel with the de-featurization work, NOT blocking:
 2. **2026-05-22 (Thursday)** — Phase 4c re-recon día 7. Final decision on enforce switch.
 3. **Phase 4d nonces** — separate work, can start after Cat A is mostly done. Own sprint if scope grows.
 
-### Phase 3.6 — Deferred bugs (P2/P3)
+### Phase 3.7 — Deferred bugs (P2/P3) (formerly Phase 3.6)
 
 These fold into the natural sprint work where possible, but are not gating:
 
@@ -266,14 +312,15 @@ These fold into the natural sprint work where possible, but are not gating:
 | Phase | Scope | ETA |
 |---|---|---|
 | 3.0 Quick wins | 3 small fixes | 30-60 min |
-| 3.1 Cat E removal | /explore + trending | 30-60 min |
+| 3.1 Cat E removal | /explore + trending (executed; superseded by 3.5 revert) | 30-60 min |
 | 3.2 Cat F removal | AIChatWidget | 30-60 min |
 | 3.3 Cat B DM gating | Auth + UI | 2-4 hr |
 | 3.4 Cat A gamification | UI + actions + schema | 2-3 days |
-| 3.5 Phase 4c re-recon | Data check + decision | 1-2 hr (twice) |
-| 3.6 Bug investigation | Logout cache | 1-2 hr |
+| 3.5 Revert /explore de-feat | Revert + quality-bar gating + opt-out | 0.5-1 day |
+| 3.6 Phase 4c re-recon (was 3.5) | Data check + decision | 1-2 hr (twice) |
+| 3.7 Bug investigation (was 3.6) | Logout cache | 1-2 hr |
 
-**Total:** ~4-5 working days for de-featurization + Phase 4c operational closure.
+**Total:** ~5-6 working days for de-featurization + the /explore revert + Phase 4c operational closure.
 
 **Calendar:** if Carlos starts Monday 2026-05-18 and works ~4-5 hr/day, Sprint 3 closes around 2026-05-23 to 2026-05-25.
 
@@ -283,13 +330,14 @@ These fold into the natural sprint work where possible, but are not gating:
 
 Sprint 3 closes when:
 
-- [ ] All 4 Section 5 alignment phases (3.1-3.4) committed and deployed
-- [ ] `git grep` re-audit shows 0 hits in critical categories (Cat A, Cat E core terms)
+- [ ] All Section 5 alignment phases (3.1–3.4) committed and deployed
+- [ ] Phase 3.5 (/explore revert + quality-bar gating per revised PD V1 §5 Cat E) committed and deployed
+- [ ] `git grep` re-audit shows 0 hits in critical categories that remain anti-feature (Cat A) and in the *un-gated* surfaces that revised Cat E still excludes (cross-community member browsing, generic "trending" sort, peer ratings)
 - [ ] `npx next build` passes after each commit
 - [ ] Phase 4c CSP enforce switch decision made (enforce or extended wait)
 - [ ] `tests/unit/auth-security.test.ts` extended with DM authorization defensive test
 - [ ] CONTEXT_BRIEFING.md updated with Sprint 3 state
-- [ ] SECTION_5_AUDIT.md re-run (Phase 2 grep) to verify de-featurization complete
+- [ ] SECTION_5_AUDIT.md re-run (Phase 2 grep) to verify de-featurization complete on still-anti-feature categories
 - [ ] SPRINT_3_CLOSURE.md written (retro pattern from SPRINT_1_CLOSURE.md)
 
 ---
