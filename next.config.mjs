@@ -175,23 +175,6 @@ const nextConfig = {
     ];
   },
 
-  // Sprint 3 Phase 3.1 — Cat E removal: keep external backlinks alive by
-  // redirecting the removed /explore surface to platform marketing or
-  // dashboard root. Permanent (301) so Google updates its index.
-  async redirects() {
-    return [
-      {
-        source: "/:locale(en|es|fr)/explore",
-        destination: "/:locale",
-        permanent: true,
-      },
-      {
-        source: "/dashboard/communities/explore",
-        destination: "/dashboard",
-        permanent: true,
-      },
-    ];
-  },
 };
 
 export default withNextIntl(
