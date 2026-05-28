@@ -1,6 +1,6 @@
 # PRODUCT_DECISIONS_V1.md
 
-**Status**: Living document, version 1. Created 2026-05-15. Canonical source of truth for product decisions before Sprint 3+ implementation.
+**Status**: Living document, version 1. Created 2026-05-15. Revised 2026-05-27 (emerging-creator pivot). Canonical source of truth for product decisions before Sprint 3+ implementation.
 
 This document encodes the strategic decisions that unblock Sprint 3+ product work. It serves as the anchor that prevents future feature work from drifting away from unytea's core thesis.
 
@@ -9,9 +9,12 @@ This document encodes the strategic decisions that unblock Sprint 3+ product wor
 ## How to use this document
 
 1. Before building any feature → check Sections 1, 2, 3, 5
-2. Before discussing pricing or business model → check Section 4
-3. Before measuring success → check Section 6
-4. Before activating autopilot or adding any automation → check Section 7
+2. Before discussing pricing or business model → check **Section 6** (canonical). Section 4 is preserved but superseded.
+3. Before writing marketing copy or landing-page hero → check Section 7
+4. Before planning growth experiments or geo expansion → check Section 8
+5. Before agreeing to any ad placement, sponsorship, or "featured" slot → check Section 9
+6. Before measuring success → check Section 10
+7. Before activating autopilot or adding any automation → check Section 11
 
 If a proposed feature conflicts with this document, the document wins unless the document is explicitly revised first.
 
@@ -19,35 +22,89 @@ If a proposed feature conflicts with this document, the document wins unless the
 
 ## Section 1 — Canonical Identity
 
+> **REVISED 2026-05-27.** The original §1 framed unytea as a platform for "creadores con audiencia propia." That framing implicitly assumed the host arrives with an audience already attached, which then drove the §5 Cat E decision to remove cross-community discovery. With §2 revised to "creador emergente sin audiencia," §1 has to follow: discovery is now a primary job of the platform, not an optional surface. The canonical sentence below reflects that shift. The original §1 wording is preserved at the end of this section for traceability.
+
 ### The canonical sentence
 
-> unytea es una comunidad de membresía live-first para creadores con audiencia propia: convierte cada sesión en vivo en conocimiento accesible y pertenencia que perdura para sus miembros — los que estuvieron en vivo y los que llegan después por la biblioteca — para que esos creadores puedan construir un negocio recurrente basado en relación real, no en una máquina de engagement vacío.
+> unytea es la plataforma de lanzamiento e infraestructura para creadores emergentes que están construyendo un negocio de educación online: en su primera etapa, ayuda al creador a encontrar sus primeros miembros mediante una superficie de descubrimiento curada; en su etapa de tracción, sostiene la operación recurrente —sesiones en vivo, biblioteca, comunidad, cobros, dominio propio— para que ese negocio crezca con relación real, no con una máquina de engagement vacío. Los hosts con audiencia preexistente pueden migrar en cualquier momento, pero no son el usuario para el cual optimizamos.
 
 ### Anatomy
 
-- **Category**: "comunidad de membresía live-first" — existing category (Circle, Mighty) + unique modifier (live-first as architectural choice, not a feature)
-- **User**: "creadores con audiencia propia" — includes online creators (Instagram/YouTube origin) and offline practitioners (with established clients/students/patients)
-- **Action**: transforms live sessions into knowledge + belonging that persists, for both attendees and library viewers
-- **Outcome**: recurring business based on real relationship, NOT "máquina de engagement vacío"
+- **Category**: "plataforma de lanzamiento e infraestructura" — dual role. Not a marketplace, not a pure infrastructure tool. Discovery surface + business OS for the same creator across two stages.
+- **User**: emerging creator (see §2). Treat established hosts as a secondary, future segment — they can migrate, but we do not design around them.
+- **Stage (a) — Launchpad**: the creator's first 30 paid members come *through unytea's discovery surface*, not from a pre-existing follower base. This is the structural reason §5 Cat E's removal premise has been overturned.
+- **Stage (b) — Infrastructure**: once tracción exists, unytea is the recurring business OS — live sessions, library, monetization, custom domain (on paid tiers), branding.
+- **Outcome unchanged**: a recurring business based on real relationship, NOT "máquina de engagement vacío." The anti-Skool stance carries forward; the change is *who* we serve, not *how* we serve them.
 
 ### Key implications
 
-- Live sessions are the **unit of value**.
-- Library is the **memory layer**.
-- Courses are the **optional supplement**.
+- Live sessions remain the **unit of value**.
+- Library remains the **memory layer**.
+- Courses remain the **optional supplement**.
 - Recordings preserve live; they don't replace it.
-- Anti-Skool positioning: unytea is NOT "Skool with nicer copy" — structurally different (live-first vs forum-first).
-- The "alma" claim has structural foundation: live = real-time human presence, which cannot be faked.
+- Anti-Skool positioning is intact (live-first vs forum-first) — but the competitive comparison shifts: Skool's Hobby tier ($9/mo + 10% rev share) overlaps the emerging-creator segment, so the differentiator now reads as "live-first + Spanish-LATAM-native + transparent fees," not "premium infrastructure for established hosts."
+- Discovery is no longer optional. The /explore surface is the entry point for the primary persona, gated by quality bars (see §5 Cat E revised).
+- The "alma" claim still has structural foundation: live = real-time human presence, which cannot be faked.
+
+### Original §1 (preserved for traceability — superseded 2026-05-27)
+
+> unytea es una comunidad de membresía live-first para creadores con audiencia propia: convierte cada sesión en vivo en conocimiento accesible y pertenencia que perdura para sus miembros — los que estuvieron en vivo y los que llegan después por la biblioteca — para que esos creadores puedan construir un negocio recurrente basado en relación real, no en una máquina de engagement vacío.
 
 ---
 
 ## Section 2 — Target User
 
-### The Unified Persona: "Host Independiente"
+> **REVISED 2026-05-27.** The original §2 ("Host Independiente, 1k–30k audiencia preexistente") was overturned in a strategy review. The real target is the emerging creator with no monetizable audience. The original persona is preserved at the end of this section for traceability; it now describes a secondary, long-term segment, not the primary user.
+
+### The Primary Persona: "Creador Emergente"
+
+Profesional emergente con conocimiento enseñable. 0–500 followers monetizables o ninguno. Tiene skill, oficio, expertise, o experiencia profesional concreta. Quiere construir un negocio de educación online — no fama. Ejemplos: ingenieros, profesionales de salud, ex-ejecutivos, consultores, profesores particulares, coaches. NO es influencer puro (ya monetiza en redes). NO es host establecido (segmento secundario, futuro). Dispuesto a invertir 5–15 hrs/semana en contenido. Tiempo > dinero en arranque.
+
+### Concrete examples
+
+- Ingeniero senior que quiere enseñar arquitectura de sistemas.
+- Nutricionista armando grupo de clientes.
+- Ex-CFO con mentorías para founders early-stage.
+- Profesor particular profesionalizando su lista de alumnos.
+- Coach con expertise vertical (no lifestyle genérico).
+
+### Why this matters for product
+
+- **No audience → discovery is the platform's job.** The creator does not bring their first 30 members; unytea does, via the /explore surface (§5 Cat E revised) and SEO-friendly community landings (§5 Cat G).
+- **Time-rich, capital-poor.** Willing to invest 5–15 hrs/week. Pricing must reflect that the host is paying with time before paying with money — hence the §6 trial design (extensible to 28 days if <10 members) and the low entry tier ($15/mo Creator).
+- **Expertise, not entertainment.** Knowledge transfer, not lifestyle. This sustains the anti-Skool/anti-engagement-extraction stance in §5 Cat A — engagement metrics misread quiet expertise communities as "low quality."
+- **Business-owner mindset, not hobbyist.** The host is starting a business, not a passion project. Marketing positioning (§7) frames the host accordingly.
+
+### Secondary segment (not optimized for): "Host Establecido"
+
+Hosts with 1k–30k pre-existing reachable audience (the original §2 persona). They can migrate to unytea at any time and will benefit from the same infrastructure — but we do not build *for* them. Specifically:
+
+- Their needs (custom domain, white-label, advanced analytics) are covered by Business/Pro tiers in §6, not by special workflows.
+- They will not see /explore as the primary entry point — they will land on a community URL directly. That is fine; discovery is opt-in (Cat E revised).
+- Decisions never trade off "emerging creator activation" against "established host comfort." If a feature only matters to established hosts, it goes to a later sprint.
+
+### Marketing copy
+
+Replaces the old "Tu espacio propio fuera del algoritmo" / "Tu salón virtual" pair. See §7 for full positioning, including the primary message in Spanish and the rent-vs-platform comparison frame.
+
+### Shared pain points (primary persona)
+
+- Has expertise, no playbook for monetizing it.
+- Building an audience from zero on social is slow, algorithm-dependent, and orthogonal to actually teaching.
+- Existing tools (Hotmart, Teachable, Stripe + Zoom + WhatsApp duct-tape) assume the creator has demand; they do not generate it.
+- Charging is friction (manual transfers, awkward pricing conversations).
+- Material scattered across Drive/email/YouTube — no clear "home" for prospective members to land on.
+- No external validation that what they teach is "good enough to charge for" — the platform's quality signals (curated /explore, peer creators) double as confidence builders.
+
+### Original §2 (preserved for traceability — superseded 2026-05-27)
+
+The "Host Independiente" persona below was the canonical target through 2026-05-27. It is now the secondary segment described above.
+
+#### The Unified Persona: "Host Independiente"
 
 Someone who has been a reference for "their people" — students, trainees, consultees, attendees. Those people can come from IG/YouTube (online frame) or studio/practice/word-of-mouth (offline frame). **Same product, two entry doors.**
 
-### The 6 Dimensions
+#### The 6 Dimensions
 
 | Dimension | Spec |
 |-----------|------|
@@ -58,17 +115,15 @@ Someone who has been a reference for "their people" — students, trainees, cons
 | **Monetization stage** | Already monetizing somehow (loose courses, 1:1 calls, ad-hoc memberships, in-person clients). NOT for someone pre-monetization still exploring. |
 | **Psychographics** | Believes relationship is the asset, not reach. Prefers 30 committed members over 3000 cold followers. Wants to be teacher/guide, not influencer. Tired of overhead (algorithmic OR physical). Willing to pay to reduce operational friction. "Alma" / "intentionality" / "own space" are real values, not marketing. |
 
-### Marketing copy by frame
+#### Original marketing copy by frame
 
-Same persona, two entry points (same landing page can present both):
-
-**Creator-economy frame** (primary):
+**Creator-economy frame** (was primary):
 > "Tu espacio propio fuera del algoritmo."
 
-**Physical-replacement frame** (alternative / below-the-fold):
+**Physical-replacement frame** (was alternative):
 > "Tu salón virtual. Tu taller. Tu estudio. Tu gym. Tú eliges cómo llamarlo. Sin renta. Sin servicios. Sin empleados auxiliares."
 
-### Shared pain points (both sub-types)
+#### Original shared pain points
 
 - Time lost on logistics that isn't teaching/practicing
 - People scattered across 3+ platforms — no clear "home"
@@ -96,6 +151,12 @@ Same persona, two entry points (same landing page can present both):
 - Configurable pre-live notifications
 - Shareable joining link
 - Interactive whiteboard (Excalidraw) — unique differentiator
+
+> **REVISIT (2026-05-27):** Participant caps below were sized against the old
+> Founder/Practice/Studio ARPA ($99/$199/$399). With the new Creator/Business/Pro
+> pricing (§6), caps must be re-modeled against LiveKit cost per participant-minute
+> (~$0.015/min video). Treat current caps as placeholders. See §6 for tier economics
+> and §10 for the parallel Success Metrics revisit.
 
 **OUT v1:**
 - Polls in-session
@@ -178,7 +239,7 @@ Same persona, two entry points (same landing page can present both):
 
 **Tier-gating by plan:**
 
-| | Founder | Practice | Studio |
+| | Creator | Business | Pro |
 |---|---|---|---|
 | Calendar sync | ✓ | ✓ | ✓ |
 | Webhooks | 3 limited | 20 standard | Unlimited |
@@ -189,6 +250,8 @@ Same persona, two entry points (same landing page can present both):
 ---
 
 ## Section 4 — Revenue Model
+
+> **REVISED 2026-05-27 — SUPERSEDED BY §6.** The Founder/Practice/Studio tiering at $99/$199/$399/mo documented below was sized for the original §2 persona (established host with audience). With the pivot to the emerging creator (§2 revised), the entry price has been brought down and the tier names changed: see §6 "Pricing & Monetization" for the canonical pricing. The body of §4 is preserved below for traceability and to document the reasoning that was in force from 2026-05-15 to 2026-05-27. **New work follows §6.** When §4 and §6 disagree, §6 wins.
 
 ### Plan Structure
 
@@ -308,17 +371,47 @@ Pricing re-evaluated **quarterly post-launch** with real cost data per tier and 
 
 ### E. Marketplace Cannibalization
 
+#### Original decision (2026-05-15) — preserved for traceability
+
 - Cross-community discovery feed ("explore other communities")
 - Member browsing across communities within unytea
 - Public review/rating system between communities
 - "Communities like yours" recommendations
 - "Trending communities this week" surfaces
 
-**Why**: Hosts come to unytea to OWN their relationship. A public marketplace would let unytea (or other communities) steal members. The host's community is THEIR space, not a slot in unytea's marketplace.
+**Why** (original reasoning, 2026-05-15): Hosts come to unytea to OWN their relationship. A public marketplace would let unytea (or other communities) steal members. The host's community is THEIR space, not a slot in unytea's marketplace.
+
+This conclusion drove the SECTION_5_AUDIT.md verdict (Option A — full removal) and the Sprint 3 Phase 3.1 implementation: commit `e8d7e2e0` removed `/explore`, `components/explore/*`, the sitemap entry, and internal links.
+
+#### REVISED 2026-05-27
+
+The original premise — that discovery cannibalizes hosts' ownership of audience — assumed hosts brought their own audience (per old §2). With §2 revised to "creador emergente sin audiencia," the cannibalization risk is moot: there is no pre-existing relationship to cannibalize. Discovery becomes the entry point, not a threat.
+
+Risk mitigation for quality (replaces the removal decision):
+- Curated quality bar before listing in /explore (see below).
+- Creators can opt-OUT of public listing (community-level setting).
+- Discovery favors topical match (filtros por especialidad) over generic "trending," to reduce one-creator-eats-another dynamic.
+
+**Quality bar for /explore listing:**
+
+1. At least 1 live session scheduled in the next 7 days.
+2. At least 3 active members.
+3. Description + cover image set.
+4. Community is ≥14 days old.
+
+(These four criteria are normative — they will be implemented as gating logic when Phase 3.5 ships. Do not paraphrase when porting to code.)
+
+The discovery surface re-opens. The de-feat commit `e8d7e2e0` is scheduled to be reverted under Sprint 3 Phase 3.5 (a separate forthcoming change). The other surfaces originally bundled under Cat E remain reviewed individually:
+
+- **Cross-community discovery feed (/explore)** — REOPENED, gated by quality bar above.
+- **Member browsing across communities** — STILL ANTI-FEATURE. Members are not browsable across communities. Cat B's member-protection logic is unaffected.
+- **Public review/rating system between communities** — STILL ANTI-FEATURE. Discovery quality is upheld via the curated bar above, not via peer ratings, which would replicate Skool/marketplace dynamics.
+- **"Communities like yours" recommendations** — DEFERRED, not anti-feature. Acceptable if the recommendation is topical (same specialty filter) rather than algorithmic/behavioral. Not in MVP.
+- **"Trending communities this week"** — STILL ANTI-FEATURE in its generic form. Curated "Featured" placements are addressed in §9 (Advertising Roadmap).
 
 ### F. AI / Autopilot That Replaces Relationship
 
-(Corresponding pro-autopilot principles in Section 7.)
+(Corresponding pro-autopilot principles in Section 11.)
 
 - AI chatbots that respond AS the host
 - AI-generated content posted under host's name without approval
@@ -335,7 +428,7 @@ Pricing re-evaluated **quarterly post-launch** with real cost data per tier and 
 - Complete export of member data (CSV with emails, dates, metrics)
 - Complete content export (downloadable recordings, portable courses)
 - Migration tools / API for leaving unytea
-- Custom CSS only on Studio tier (control of presentation)
+- Custom CSS only on Pro tier (control of presentation)
 - Host owns their member list, not unytea
 - Notifications default opt-OUT for non-critical
 - Self-serve cancellation, no "are you sure?" 5 times
@@ -359,11 +452,199 @@ When a feature request arrives:
 
 1. Falls in Categories A–F or H → **REJECT** (anti-feature)
 2. Falls in Category G → **PRIORITIZE** (trust-building)
-3. Neither → evaluate against Section 3 (features) and Section 7 (autopilot)
+3. Neither → evaluate against Section 3 (features) and Section 11 (autopilot)
 
 ---
 
-## Section 6 — Success Metrics
+## Section 6 — Pricing & Monetization
+
+**Status**: Canonical pricing as of 2026-05-27. Supersedes §4. Reviewed in the same strategy session that revised §1, §2, and §5 Cat E.
+
+### Tier structure
+
+| | **Creator** | **Business** | **Pro** |
+|---|---|---|---|
+| Plan flat fee | $15 / mo | $49 / mo | $149 / mo |
+| Revenue share | 8% | 5% | 3% |
+| Communities | 1 | 3 | Unlimited |
+| Paid members | Unlimited | Unlimited | Unlimited |
+| Custom domain | — | ✓ | ✓ |
+| Branding controls | — | ✓ | ✓ White-label |
+| Analytics | Basic | Advanced | Advanced + API |
+| API access | — | — | ✓ |
+
+The Creator tier is the entry point for the §2 primary persona. Business is for emerging creators who have validated demand and want their own brand surface. Pro is for established hosts (the §2 secondary segment) and small studios with multiple programs.
+
+### Trial
+
+- **14 days** on Creator, no credit card required up front.
+- **One-click extension to 28 days total** if the creator has not yet reached 10 members at day 14. The button appears in-dashboard on day 14 if the threshold is unmet; no support ticket required.
+- Rationale: the emerging-creator persona (§2) is time-rich and capital-poor, and their first 30 members come through the platform's discovery surface — which itself takes time to convert. A rigid 14-day trial would punish exactly the user we are trying to activate.
+
+### Stripe fees — pass-through, not absorbed
+
+Stripe processing fees are passed through to the host transparently. Unytea does not absorb them. The host sees, on every transaction:
+
+- What the member paid.
+- What Stripe charged (network fee + Stripe %, exactly).
+- What unytea charged (the revenue share above).
+- Net amount the host receives.
+
+The flat plan fee covers infrastructure; the revenue share covers platform value; Stripe fees are Stripe's. Conflating them would either erode unit economics (if absorbed) or hide them in opaque "platform fees" (anti-alma, against the §5 Cat G transparency principle).
+
+### Revenue streams for unytea
+
+1. **Plan flat fee** (monthly).
+2. **Application fees** on host transactions (3–8% by tier).
+3. **Add-ons** — out of scope for v1; revisit when ≥30 paid hosts exist (same gate as §11 autopilot).
+4. **Advertising / Featured placements** — gated; see §9.
+
+### Anti-coupons (unchanged from old §4)
+
+Only "sabor sano" coupons: % off, fixed amount, expiration, redemption limit. No countdown timers, no "first N only," no fake scarcity. The principle survives the pricing pivot — see §5 Cat C and Cat D.
+
+### Re-evaluation cadence
+
+Pricing re-evaluated **quarterly post-launch** with real cost data per tier and conversion rates between tiers. The same rule applies as in §10: never raise thresholds to inflate numbers; adjust product, not definition.
+
+---
+
+## Section 7 — Marketing Positioning
+
+**Status**: Canonical positioning as of 2026-05-27. Replaces the §2 marketing copy ("Tu espacio propio fuera del algoritmo" / "Tu salón virtual"), which is preserved in §2 history.
+
+### Primary message (Spanish)
+
+> **"Construye tu negocio de educación online."**
+>
+> Sub-line: **"Tu academia online sin oficina ni desarrollo web."**
+
+This pair is the canonical hero. It frames the host as a *business owner*, not as a hobbyist, an influencer, or a "content creator" in the social-media sense.
+
+### Comparison frame: platform vs renting a physical aula
+
+The mental comp the customer should make is **not** "unytea vs Skool" or "unytea vs Hotmart" — it's **"unytea vs renting a physical classroom."**
+
+Concretely:
+
+- Renting an aula in a mid-tier LATAM city: roughly $300–$1,500/month, plus utilities, insurance, signage, scheduling overhead.
+- Building a basic website + payments + scheduling stack: weeks of work or a freelancer's invoice.
+- Business tier at $49/mo is a low cost of goods compared to either alternative.
+- Pro tier at $149/mo is *still* cheaper than the physical aula it replaces, while serving members worldwide.
+
+When a prospect hesitates at $49 or $149, the response is not "look how cheap we are vs other SaaS" — it's "what does your current operation cost you in rent, in tools, in the weekend you spent making a Squarespace?"
+
+### Host positioning
+
+The host is a **business owner**, not a hobbyist:
+
+- "Tu academia" not "tu canal."
+- "Tus alumnos" not "tu audiencia."
+- "Tu negocio recurrente" not "tu side project."
+- "Tu metodología" not "tu contenido."
+
+This vocabulary is intentional and should propagate to onboarding, dashboards, and email copy — it shapes how the host sees themselves on the platform, which shapes whether they treat the work seriously.
+
+### Anti-positioning (avoid)
+
+- "Conviértete en influencer" / "monetiza tu audiencia" — wrong frame for §2 persona; they don't have an audience and they don't want to be influencers.
+- "Crea tu comunidad apasionada" — pasiones don't pay rent; we sell a business, not a hobby.
+- "Como Skool pero…" — we are not Skool-with-better-copy. We are live-first business infrastructure with discovery built in.
+
+### Where this gets used
+
+- Marketing landing pages (`/`, locale-specific homes).
+- /explore page header copy.
+- Onboarding flow microcopy.
+- Outbound: blog, newsletter, partnerships.
+- Pitch decks and partner conversations (LATAM-first per §8).
+
+---
+
+## Section 8 — Go-To-Market
+
+**Status**: Canonical as of 2026-05-27.
+
+### Product: global. Marketing budget: LATAM-first.
+
+The product is multi-language (i18n already shipped) and can serve a creator anywhere. **Marketing spend, partnerships, and content concentrate on LATAM first.** This is a budget-allocation decision, not a product-scope decision.
+
+### Why LATAM-first
+
+1. **Purchasing-power-parity arbitrage.** Plan fees in USD ($15 / $49 / $149) are competitive in US/EU terms but feel premium-but-affordable in LATAM. The same fee that's "$15" is "$15 you keep most of" because the cost base (creator's living costs, member-side discretionary spend) is denominated locally.
+2. **Less-localized competition.** Skool, Mighty, Circle: English-first, US-payment-first, US-support-first. Their LATAM presence is residual.
+3. **Accessible partnerships.** LATAM creator-economy ecosystems (universities, professional associations, Spanish-language YouTubers in the education space) are addressable with smaller teams and smaller budgets than US equivalents.
+4. **Local payment processors.** Stripe coverage + local rails (OXXO, PIX, Mercado Pago via Stripe Connect) reduce friction for member payments.
+
+### Priority markets (in order)
+
+1. **México** — largest Spanish-speaking creator economy by absolute size, payment-rails mature.
+2. **Colombia** — strong professional/educational creator scene.
+3. **Argentina** — high-skill creator density; ARS volatility is real but workable via USD pricing.
+4. **Chile, Perú** — secondary, opportunistic.
+5. **España** — secondary, share Spanish but very different ARPA economics and a different competitive set.
+
+### What "LATAM-first marketing" looks like in practice
+
+- Hero/landing copy in Spanish (LATAM-neutral, not Spain Spanish).
+- Customer support primary language: Spanish, with English fallback.
+- Partner outreach prioritizes Spanish-LATAM creators and education orgs.
+- Paid acquisition (when it begins) targets MX/CO/AR geos.
+- US/EU creators who self-discover and sign up are **welcome and supported** — the product works for them — but we do not actively invest to acquire them in MVP.
+
+### Out of scope for GTM v1
+
+- Translated marketing for non-Spanish/English audiences.
+- Local entities / VAT compliance for individual EU countries.
+- LATAM country-specific landing pages (one Spanish-LATAM page first; localized variants if metrics justify).
+
+---
+
+## Section 9 — Advertising Roadmap
+
+**Status**: Canonical as of 2026-05-27. **Advertising is NOT MVP.**
+
+### Activation triggers
+
+Advertising and paid placements activate **only when both** thresholds are met:
+
+- **≥ 1,000 active creators** on the platform, AND
+- **≥ 50,000 unique monthly visitors** to public surfaces (`/`, `/explore`, community landings).
+
+Until both gates are crossed, no ad placements ship — including "small experiments." This is a hard gate, not a target.
+
+### Acceptable formats (once activated)
+
+1. **"Featured" paid placements in /explore.**
+   - Opt-in by other creators (paid by them, not by unytea).
+   - Clearly labeled as "Featured" / "Destacado."
+   - Subject to the same §5 Cat E quality bar as organic listings — featured ≠ unvetted.
+2. **Sponsored blog posts / newsletter.**
+   - Editorial review.
+   - Clearly labeled as sponsored.
+   - No paid coverage of competitors' anti-features (referrals, scarcity) to keep editorial line consistent with §5.
+3. **Optional side banners on community public landings.**
+   - Creator opt-IN at the community level (default off).
+   - Revenue share back to the creator (terms TBD when activated; floor: meaningful share, not a token).
+   - Hosted ads only — no third-party tracking pixels (§5 Cat H still applies).
+
+### Hard exclusions (even after activation)
+
+- In-product ads to logged-in members. Members pay for the experience; selling their attention is a §5 Cat A/D violation.
+- Pop-ups, interstitials, retargeting pixels.
+- Ads inside live sessions or session recordings.
+- "Sponsored" community recommendations that aren't visually distinguishable from organic.
+- Ad placements purchased by entities that violate §5 (MLM, get-rich-quick, scarcity-driven funnels).
+
+### Why this is gated, not opportunistic
+
+Until ≥1,000 creators and ≥50,000 visitors, ad inventory is too small to attract serious advertisers and too valuable to spend on weak ones. Burning the /explore surface with low-quality placements before the quality bar is in lived practice would undermine §5 Cat E's revised premise (discovery as a value-add for the emerging creator).
+
+---
+
+## Section 10 — Success Metrics
+
+> **Note 2026-05-27 — flagged for revisit, not yet revised.** The $5k Day-90 / $30k Month-12 Healthy MRR targets below were sized against the original §4 pricing ($99/$199/$399). The revised pricing in §6 (Creator $15, Business $49, Pro $149) implies materially different ARPA at the same host count. These targets are flagged for revisit in the next quarterly pricing review (§6 cadence). Until then, they remain on file as the prior baseline; the **Operating Principles** rule still binds — *never raise thresholds to inflate numbers* — and any change to these targets must be a documented decision, not a quiet adjustment. Healthy MRR's definitional criteria (the three boolean tests below) are unaffected by the pricing pivot.
 
 ### North Star: **Healthy MRR**
 
@@ -434,13 +715,13 @@ A host who fails any criterion: their revenue stays in raw MRR but exits Healthy
 
 ---
 
-## Section 7 — Autopilot Activation Strategy
+## Section 11 — Autopilot Activation Strategy
 
 ### Anchor Principle
 
 > **Autopilot no existe para aumentar actividad. Existe para devolverle tiempo al host sin degradar su voz, su criterio ni la calidad de la comunidad.**
 
-Everything that follows derives from this.
+Everything that follows derives from this. (Note: this section was §7 prior to 2026-05-27. References to "Section 7 — Autopilot" elsewhere in the doc have been updated to §11; if you find a stale reference, treat it as a doc bug, not a rename.)
 
 ### Activation Gate
 
@@ -545,11 +826,11 @@ Autopilot does NOT enter external rollout until ALL conditions are met:
 
 ## Maintenance
 
-This document is **versioned**. v1 is locked as of 2026-05-15.
+This document is **versioned**. v1 was locked 2026-05-15; revised 2026-05-27 (emerging-creator pivot — §1, §2, §5 Cat E, new §6–§9, §10 targets flagged for revisit). Future minor edits keep the v1 label; the next material framing change starts v2.
 
-- **Major revisions** (changes to Sections 1, 2, 5) require explicit deliberation and full rewrite of dependent sections.
-- **Minor revisions** (target adjustments in Section 6, new metrics) can be patched incrementally.
-- **Anti-features** (Section 5) can only be removed by explicit policy decision, documented in this file.
+- **Major revisions** (changes to Sections 1, 2, 5, 6, 7, 8, 9) require explicit deliberation and full rewrite of dependent sections. The 2026-05-27 revision (§1 thesis, §2 persona, §5 Cat E, new §6–§9) is the canonical worked example of this.
+- **Minor revisions** (target adjustments in Section 10, new metrics, pricing tweaks within §6 cadence) can be patched incrementally.
+- **Anti-features** (Section 5) can only be removed by explicit policy decision, documented in this file. The §5 Cat E re-opening is itself the worked example: original reasoning preserved, revision below it, dated.
 
 When a future Claude (or human collaborator) is asked to make decisions that would conflict with this document, the response is: *the document wins unless the document is revised first.*
 
