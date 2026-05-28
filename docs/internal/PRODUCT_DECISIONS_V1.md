@@ -428,7 +428,7 @@ The discovery surface re-opens. The de-feat commit `e8d7e2e0` is scheduled to be
 - Complete export of member data (CSV with emails, dates, metrics)
 - Complete content export (downloadable recordings, portable courses)
 - Migration tools / API for leaving unytea
-- Custom CSS only on Studio tier (control of presentation)
+- Custom CSS only on Pro tier (control of presentation)
 - Host owns their member list, not unytea
 - Notifications default opt-OUT for non-critical
 - Self-serve cancellation, no "are you sure?" 5 times
