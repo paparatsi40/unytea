@@ -407,6 +407,7 @@
   "sidebar": {
     "nav": {
       "dashboard": "Tableau de Bord",
+      "explore": "Explorer",
       "communities": "Communautés",
       "messages": "Messages",
       "sessions": "Sessions",

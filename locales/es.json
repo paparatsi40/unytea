@@ -408,6 +408,7 @@
   "sidebar": {
     "nav": {
       "dashboard": "Panel",
+      "explore": "Explorar",
       "communities": "Comunidades",
       "messages": "Mensajes",
       "sessions": "Sesiones",

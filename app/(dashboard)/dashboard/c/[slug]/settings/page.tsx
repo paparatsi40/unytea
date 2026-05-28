@@ -6,6 +6,10 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Loader2, Save, Trash2 } from "lucide-react";
 import { deleteCommunity } from "@/app/actions/communities";
+import { CATEGORY_LABELS } from "@/components/explore/CommunityCard";
+import type { CommunityCategory } from "@prisma/client";
+
+type FormCategory = CommunityCategory | "";
 
 export default function GeneralSettingsPage() {
   const params = useParams();
@@ -15,13 +19,22 @@ export default function GeneralSettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    description: string;
+    isPrivate: boolean;
+    requireApproval: boolean;
+    category: FormCategory;
+    language: string;
+    excludeFromExplore: boolean;
+  }>({
     name: "",
     description: "",
     isPrivate: false,
     requireApproval: false,
     category: "",
     language: "",
+    excludeFromExplore: false,
   });
 
   useEffect(() => {
@@ -35,19 +48,24 @@ export default function GeneralSettingsPage() {
           // a few flat fields (id, name, slug) at the top for backward compat.
           // Pull everything from `community` so toggles/description hydrate too.
           const community = data?.community ?? {};
-          const settings =
-            community.settings && typeof community.settings === "object"
-              ? (community.settings as Record<string, unknown>)
-              : {};
-          const category = typeof settings.category === "string" ? settings.category : "";
-          const language = typeof settings.language === "string" ? settings.language : "";
+          // category/language/excludeFromExplore now live in top-level typed
+          // columns (Commit 1 of feat/restore-explore). Pre-existing values
+          // stored as free strings in settings JSON are NOT auto-migrated —
+          // host must re-save to populate the typed columns. Dead JSON is
+          // harmless because read paths use the typed columns only.
+          const rawCategory = community.category;
+          const category: FormCategory =
+            typeof rawCategory === "string" && rawCategory in CATEGORY_LABELS
+              ? (rawCategory as CommunityCategory)
+              : "";
           setFormData({
             name: community.name ?? data.name ?? "",
             description: community.description ?? "",
             isPrivate: Boolean(community.isPrivate),
             requireApproval: Boolean(community.requireApproval),
             category,
-            language,
+            language: typeof community.language === "string" ? community.language : "",
+            excludeFromExplore: Boolean(community.excludeFromExplore),
           });
         }
       } catch (error) {
@@ -182,24 +200,20 @@ export default function GeneralSettingsPage() {
             <label className="mb-2 block text-sm font-medium text-gray-700">Category</label>
             <select
               value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  category: e.target.value as FormCategory,
+                })
+              }
               className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
             >
               <option value="">Select a category…</option>
-              <option value="AI">AI</option>
-              <option value="Startups">Startups</option>
-              <option value="Marketing">Marketing</option>
-              <option value="Business">Business</option>
-              <option value="Tech">Tech</option>
-              <option value="Programming">Programming</option>
-              <option value="Fitness">Fitness</option>
-              <option value="Health">Health</option>
-              <option value="Wellness">Wellness</option>
-              <option value="Personal Development">Personal Development</option>
-              <option value="Education">Education</option>
-              <option value="Creativity">Creativity</option>
-              <option value="Finance">Finance</option>
-              <option value="Other">Other</option>
+              {(Object.keys(CATEGORY_LABELS) as CommunityCategory[]).map((value) => (
+                <option key={value} value={value}>
+                  {CATEGORY_LABELS[value]}
+                </option>
+              ))}
             </select>
             <p className="mt-1 text-xs text-gray-500">
               Helps people find your community in Explore.
@@ -213,19 +227,44 @@ export default function GeneralSettingsPage() {
               onChange={(e) => setFormData({ ...formData, language: e.target.value })}
               className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
             >
-              <option value="">Any</option>
-              <option value="English">English</option>
-              <option value="Spanish">Spanish</option>
-              <option value="French">French</option>
-              <option value="Portuguese">Portuguese</option>
-              <option value="German">German</option>
-              <option value="Italian">Italian</option>
-              <option value="Other">Other</option>
+              <option value="">Select a language…</option>
+              <option value="en">English</option>
+              <option value="es">Español</option>
+              <option value="fr">Français</option>
+              <option value="pt">Português</option>
+              <option value="de">Deutsch</option>
             </select>
             <p className="mt-1 text-xs text-gray-500">
               The language most conversations and sessions happen in.
             </p>
           </div>
+        </div>
+
+        {/* Discovery */}
+        <div className="border-t border-gray-200 pt-6">
+          <h3 className="mb-1 text-sm font-medium text-gray-900">Discovery</h3>
+          <p className="mb-4 text-xs text-gray-500">
+            Control whether your community appears on Unytea's public /explore page.
+          </p>
+
+          <label className="flex cursor-pointer items-start gap-3">
+            <input
+              type="checkbox"
+              checked={!formData.excludeFromExplore}
+              onChange={(e) =>
+                setFormData({ ...formData, excludeFromExplore: !e.target.checked })
+              }
+              className="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+            />
+            <div>
+              <div className="text-sm font-medium text-gray-900">List on /explore</div>
+              <div className="text-xs text-gray-500">
+                When enabled, your community appears in public listings for the category and
+                language you&apos;ve selected, provided it meets quality criteria (≥3 active
+                members, ≥1 upcoming live session, description + cover image set, ≥14 days old).
+              </div>
+            </div>
+          </label>
         </div>
 
         {/* Privacy Settings */}

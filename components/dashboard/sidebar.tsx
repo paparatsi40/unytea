@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
 import {
   Home,
+  Compass,
   Users,
   MessageSquare,
   BookOpen,
@@ -18,6 +19,10 @@ import {
 
 const navigation = [
   { key: "dashboard", href: "/dashboard", icon: Home },
+  // Explore exits the dashboard to the marketing /explore surface (pattern
+  // matches Skool/Circle). Per PD V1 §5 Cat E REVISED, discovery is the
+  // platform's job for the §2 emerging-creator persona.
+  { key: "explore", href: "/explore", icon: Compass },
   { key: "communities", href: "/dashboard/communities", icon: Users },
   { key: "messages", href: "/dashboard/messages", icon: MessageSquare },
   { key: "recordings", href: "/dashboard/recordings", icon: Library },
