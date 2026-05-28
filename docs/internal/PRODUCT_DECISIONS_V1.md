@@ -152,6 +152,12 @@ Someone who has been a reference for "their people" — students, trainees, cons
 - Shareable joining link
 - Interactive whiteboard (Excalidraw) — unique differentiator
 
+> **REVISIT (2026-05-27):** Participant caps below were sized against the old
+> Founder/Practice/Studio ARPA ($99/$199/$399). With the new Creator/Business/Pro
+> pricing (§6), caps must be re-modeled against LiveKit cost per participant-minute
+> (~$0.015/min video). Treat current caps as placeholders. See §6 for tier economics
+> and §10 for the parallel Success Metrics revisit.
+
 **OUT v1:**
 - Polls in-session
 - Breakout rooms
@@ -233,7 +239,7 @@ Someone who has been a reference for "their people" — students, trainees, cons
 
 **Tier-gating by plan:**
 
-| | Founder | Practice | Studio |
+| | Creator | Business | Pro |
 |---|---|---|---|
 | Calendar sync | ✓ | ✓ | ✓ |
 | Webhooks | 3 limited | 20 standard | Unlimited |
