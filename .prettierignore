@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+
+# Build output
+.next/
+.vercel/
+out/
+build/
+dist/
+
+# Lockfiles (managed by package managers, not formatters)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Generated files
+.prisma/
+prisma/migrations/
+public/sw.js
+public/workbox-*.js
+*.min.js
+*.min.css
+
+# Test coverage
+coverage/
+
+# Editor / OS junk
+.DS_Store
+.idea/
+.vscode/settings.json
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Env files
+.env*
+
+# Sentry generated
+.sentryclirc
