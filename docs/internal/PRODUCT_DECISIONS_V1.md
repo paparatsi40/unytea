@@ -71,7 +71,7 @@ Profesional emergente con conocimiento enseñable. 0–500 followers monetizable
 ### Why this matters for product
 
 - **No audience → discovery is the platform's job.** The creator does not bring their first 30 members; unytea does, via the /explore surface (§5 Cat E revised) and SEO-friendly community landings (§5 Cat G).
-- **Time-rich, capital-poor.** Willing to invest 5–15 hrs/week. Pricing must reflect that the host is paying with time before paying with money — hence the §6 trial design (extensible to 28 days if <10 members) and the low entry tier ($15/mo Creator).
+- **Time-rich, capital-poor.** Willing to invest 5–15 hrs/week. Pricing must reflect that the host is paying with time before paying with money — hence the §6 trial design (14-day no-CC window with paywall lock at day 14; host can re-enable any time by adding payment, no second trial — one-time 7-day goodwill re-trial for hosts returning after 30+ days, per §6) and the low entry tier ($15/mo Creator).
 - **Expertise, not entertainment.** Knowledge transfer, not lifestyle. This sustains the anti-Skool/anti-engagement-extraction stance in §5 Cat A — engagement metrics misread quiet expertise communities as "low quality."
 - **Business-owner mindset, not hobbyist.** The host is starting a business, not a passion project. Marketing positioning (§7) frames the host accordingly.
 
@@ -227,7 +227,7 @@ Someone who has been a reference for "their people" — students, trainees, cons
 **IN v1:**
 
 - Tiered membership per community: free tier + 1–2 paid tiers
-- Monthly + Annual plans (~20% annual discount)
+- Monthly + Annual plans (16% annual discount, 2 months free): Creator $15/mo or $150/yr; Business $49/mo or $490/yr; Pro $149/mo or $1490/yr. See §6 Pricing for canonical prices and Annual billing rationale.
 - Stripe Checkout for subscriptions
 - Self-serve cancellation
 - One-off course purchases (separate from membership)
