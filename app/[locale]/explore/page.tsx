@@ -149,11 +149,7 @@ export default async function ExplorePage(props: Props) {
       <ExploreFiltersComponent currentFilters={filters} totalResults={initialData.total} />
 
       <div className="mt-6">
-        <ExploreInfiniteFeed
-          initialData={initialData}
-          currentFilters={filters}
-          locale={locale}
-        />
+        <ExploreInfiniteFeed initialData={initialData} currentFilters={filters} locale={locale} />
       </div>
     </div>
   );

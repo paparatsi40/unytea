@@ -8,10 +8,7 @@ export default function ExploreLoading() {
       <div className="mb-6 h-12 w-full animate-pulse rounded bg-muted" />
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {Array.from({ length: 8 }).map((_, i) => (
-          <div
-            key={i}
-            className="overflow-hidden rounded-xl border border-border/50 bg-card"
-          >
+          <div key={i} className="overflow-hidden rounded-xl border border-border/50 bg-card">
             <div className="h-32 animate-pulse bg-muted" />
             <div className="space-y-2 px-4 pb-3.5 pt-7">
               <div className="h-4 w-3/4 animate-pulse rounded bg-muted" />

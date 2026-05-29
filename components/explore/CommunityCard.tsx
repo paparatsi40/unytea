@@ -18,7 +18,8 @@ type CommunityCardProps = {
 };
 
 const CATEGORY_COLOR_CLASS: Record<CommunityCategory, string> = {
-  BUSINESS_ENTREPRENEURSHIP: "bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-200",
+  BUSINESS_ENTREPRENEURSHIP:
+    "bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-200",
   MARKETING_SALES: "bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-200",
   AI_DATA_SCIENCE: "bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-200",
   TECH_PROGRAMMING: "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200",

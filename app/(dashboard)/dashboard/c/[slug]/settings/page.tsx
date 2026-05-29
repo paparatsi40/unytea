@@ -262,9 +262,7 @@ export default function GeneralSettingsPage() {
             <input
               type="checkbox"
               checked={!formData.excludeFromExplore}
-              onChange={(e) =>
-                setFormData({ ...formData, excludeFromExplore: !e.target.checked })
-              }
+              onChange={(e) => setFormData({ ...formData, excludeFromExplore: !e.target.checked })}
               className="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
             />
             <div>

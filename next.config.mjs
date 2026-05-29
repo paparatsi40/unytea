@@ -174,7 +174,6 @@ const nextConfig = {
       },
     ];
   },
-
 };
 
 export default withNextIntl(

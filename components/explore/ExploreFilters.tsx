@@ -22,7 +22,10 @@ import type {
   ExploreType,
 } from "@/types/explore";
 
-const LANGUAGE_OPTIONS: { value: string; labelKey: "english" | "spanish" | "french" | "portuguese" | "german" }[] = [
+const LANGUAGE_OPTIONS: {
+  value: string;
+  labelKey: "english" | "spanish" | "french" | "portuguese" | "german";
+}[] = [
   { value: "en", labelKey: "english" },
   { value: "es", labelKey: "spanish" },
   { value: "fr", labelKey: "french" },
@@ -54,11 +57,11 @@ type ExploreFiltersProps = {
 function isFilterActive(filters: ExploreFiltersType): boolean {
   return Boolean(
     filters.category ||
-      filters.language ||
-      (filters.size && filters.size !== "all") ||
-      (filters.type && filters.type !== "all") ||
-      filters.search ||
-      (filters.sort && filters.sort !== "newest")
+    filters.language ||
+    (filters.size && filters.size !== "all") ||
+    (filters.type && filters.type !== "all") ||
+    filters.search ||
+    (filters.sort && filters.sort !== "newest")
   );
 }
 
@@ -75,8 +78,7 @@ export function ExploreFilters({ currentFilters, totalResults }: ExploreFiltersP
   // Map plain ExploreSize/Type/Sort enum values to translation keys.
   const sizeLabel = (v: ExploreSize) =>
     v === "all" ? t("allSizes") : t(v as "small" | "medium" | "large");
-  const typeLabel = (v: ExploreType) =>
-    v === "all" ? t("allTypes") : t(v as "free" | "paid");
+  const typeLabel = (v: ExploreType) => (v === "all" ? t("allTypes") : t(v as "free" | "paid"));
   const sortLabel = (v: ExploreSort) =>
     v === "newest" ? t("newest") : v === "most-members" ? t("mostMembers") : t("mostActive");
 
@@ -164,7 +166,7 @@ export function ExploreFilters({ currentFilters, totalResults }: ExploreFiltersP
           value={currentFilters.category ?? "all"}
           onValueChange={(v) => updateFilter("category", v === "all" ? null : v)}
         >
-          <SelectTrigger className="w-auto min-w-[180px] h-10">
+          <SelectTrigger className="h-10 w-auto min-w-[180px]">
             <SelectValue placeholder={t("allCategories")} />
           </SelectTrigger>
           <SelectContent>
@@ -181,7 +183,7 @@ export function ExploreFilters({ currentFilters, totalResults }: ExploreFiltersP
           value={currentFilters.language ?? "all"}
           onValueChange={(v) => updateFilter("language", v === "all" ? null : v)}
         >
-          <SelectTrigger className="w-auto min-w-[140px] h-10">
+          <SelectTrigger className="h-10 w-auto min-w-[140px]">
             <SelectValue placeholder={t("allLanguages")} />
           </SelectTrigger>
           <SelectContent>
@@ -234,7 +236,7 @@ export function ExploreFilters({ currentFilters, totalResults }: ExploreFiltersP
           value={currentFilters.sort ?? "newest"}
           onValueChange={(v) => updateFilter("sort", v === "newest" ? null : v)}
         >
-          <SelectTrigger className="w-auto min-w-[150px] h-10">
+          <SelectTrigger className="h-10 w-auto min-w-[150px]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

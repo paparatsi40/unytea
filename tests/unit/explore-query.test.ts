@@ -161,10 +161,7 @@ describe("getExploreCommunities — quality bar WHERE clause", () => {
     expect(where.category).toEqual({ not: null });
     expect(where.description).toEqual({ not: null });
     expect(where.coverImageUrl).toEqual({ not: null });
-    expect(where.AND).toEqual([
-      { description: { not: "" } },
-      { coverImageUrl: { not: "" } },
-    ]);
+    expect(where.AND).toEqual([{ description: { not: "" } }, { coverImageUrl: { not: "" } }]);
     // createdAt < (now - 14 days)
     const createdAtFilter = where.createdAt as { lt: Date };
     expect(createdAtFilter.lt.getTime()).toBe(subDays(NOW, 14).getTime());
@@ -384,10 +381,7 @@ describe("getExploreCommunities — sort", () => {
       },
     });
 
-    const result = await getExploreCommunities(
-      { sort: "most-active" },
-      { page: 1, pageSize: 24 }
-    );
+    const result = await getExploreCommunities({ sort: "most-active" }, { page: 1, pageSize: 24 });
 
     expect(result.communities.map((c) => c.id)).toEqual(["high", "low"]);
   });
@@ -467,7 +461,11 @@ describe("getExploreCommunities — response shape", () => {
     setup({ candidates: [makeCandidate({ ownerId })] });
     // Override: include the owner as the very first member, plus 5 non-owners.
     vi.mocked(prisma.member.findMany).mockResolvedValue([
-      { communityId: "qb-pass", userId: ownerId, user: { id: ownerId, name: "Owner", image: null } },
+      {
+        communityId: "qb-pass",
+        userId: ownerId,
+        user: { id: ownerId, name: "Owner", image: null },
+      },
       ...Array.from({ length: 5 }).map((_, i) => ({
         communityId: "qb-pass",
         userId: `non-owner-${i}`,

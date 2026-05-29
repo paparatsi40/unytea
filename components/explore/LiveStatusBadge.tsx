@@ -46,10 +46,7 @@ export function LiveStatusBadge({
   }
 
   return (
-    <div
-      className={cn(BASE_CLASSES, STATUS_CLASSES[status])}
-      title={nextSessionTitle ?? undefined}
-    >
+    <div className={cn(BASE_CLASSES, STATUS_CLASSES[status])} title={nextSessionTitle ?? undefined}>
       {status === "live_now" && (
         <span className="relative inline-flex h-1.5 w-1.5">
           <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75" />

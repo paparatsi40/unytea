@@ -166,10 +166,7 @@ export async function PATCH(request: NextRequest, props: { params: Promise<{ slu
       } else if (isCommunityCategory(body.category)) {
         data.category = body.category;
       } else {
-        return NextResponse.json(
-          { error: "Invalid category" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Invalid category" }, { status: 400 });
       }
     }
     if (body.language !== undefined) {
