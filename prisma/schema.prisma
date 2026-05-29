@@ -1141,6 +1141,7 @@ enum SubscriptionStatus {
   CANCELED
   UNPAID
   TRIALING
+  PAUSED // Stripe sends this when trial ends with missing_payment_method='pause'
 }
 
 enum ReactionType {

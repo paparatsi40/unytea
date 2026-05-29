@@ -30,7 +30,9 @@ vi.mock("@/lib/prisma", () => ({
     enrollment: { upsert: vi.fn() },
     course: { update: vi.fn() },
     member: { findFirst: vi.fn(), update: vi.fn(), create: vi.fn() },
-    community: { update: vi.fn() },
+    // Fase C Commit 4: setCommunitiesPaywallLocked uses updateMany; trial_will_end
+    // handler still uses single user lookup via user.findUnique.
+    community: { update: vi.fn(), updateMany: vi.fn() },
     subscription: {
       findFirst: vi.fn(),
       upsert: vi.fn(),
@@ -38,7 +40,7 @@ vi.mock("@/lib/prisma", () => ({
       update: vi.fn(),
     },
     subscriptionPlan: { findFirst: vi.fn() },
-    user: { update: vi.fn() },
+    user: { update: vi.fn(), findUnique: vi.fn() },
   },
 }));
 
@@ -66,6 +68,10 @@ beforeEach(() => {
   // Default: getPlanFromPriceId returns null so platform-plan shortcut
   // doesn't trigger unless the test explicitly enables it.
   mockGetPlanFromPriceId.mockReturnValue(null);
+  // Fase C Commit 4: setCommunitiesPaywallLocked reads result.count. Without
+  // a default resolution, the helper crashes with "Cannot read properties of
+  // undefined" whenever a webhook path goes through paywall toggling.
+  vi.mocked(prisma.community.updateMany).mockResolvedValue({ count: 0 } as never);
 });
 
 describe("Stripe webhook — signature verification & idempotency", () => {

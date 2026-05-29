@@ -6,6 +6,73 @@ import { getPlanFromPriceId } from "@/lib/plans";
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
+/**
+ * Sets paywallLocked state on all communities owned by a given user.
+ * Called by webhook handlers when host's platform subscription status
+ * changes (paused/canceled → locked; active/trialing → unlocked).
+ *
+ * Note: only affects communities where userId is the OWNER. Communities
+ * where the user is a MEMBER (not owner) are governed by their own
+ * host's subscription state, not this user's.
+ */
+async function setCommunitiesPaywallLocked(userId: string, locked: boolean) {
+  const result = await prisma.community.updateMany({
+    where: { ownerId: userId },
+    data: {
+      paywallLocked: locked,
+      paywallLockedAt: locked ? new Date() : null,
+    },
+  });
+  console.log(
+    `[stripe-webhook] paywallLocked=${locked} for ${result.count} communities of user ${userId}`
+  );
+  return result.count;
+}
+
+/**
+ * Maps Stripe subscription status string → Prisma enum string + paywall outcome.
+ *
+ * Stripe statuses we map:
+ *  - active, trialing → unlocked (paying or in-trial host)
+ *  - paused, past_due, unpaid, canceled, incomplete_expired → locked
+ *  - incomplete → past_due (Prisma has no INCOMPLETE value; treat as past_due
+ *    so it shows up as needing attention but doesn't permanently lock)
+ */
+function mapStripeStatusToPaywall(stripeStatus: string): {
+  prismaStatus:
+    | "ACTIVE"
+    | "PAST_DUE"
+    | "CANCELED"
+    | "UNPAID"
+    | "TRIALING"
+    | "PAUSED";
+  paywallLocked: boolean;
+} {
+  const upper = stripeStatus.toUpperCase();
+  const lockedStates = ["PAUSED", "PAST_DUE", "UNPAID", "CANCELED", "INCOMPLETE_EXPIRED"];
+  const isLocked = lockedStates.includes(upper);
+  let prismaStatus: ReturnType<typeof mapStripeStatusToPaywall>["prismaStatus"];
+  if (upper === "INCOMPLETE_EXPIRED") {
+    prismaStatus = "CANCELED";
+  } else if (upper === "INCOMPLETE") {
+    prismaStatus = "PAST_DUE";
+  } else if (
+    upper === "ACTIVE" ||
+    upper === "PAST_DUE" ||
+    upper === "CANCELED" ||
+    upper === "UNPAID" ||
+    upper === "TRIALING" ||
+    upper === "PAUSED"
+  ) {
+    prismaStatus = upper;
+  } else {
+    // Unknown Stripe status — log and default to PAST_DUE for safety
+    console.warn(`[stripe-webhook] Unknown Stripe status "${stripeStatus}", defaulting to PAST_DUE`);
+    prismaStatus = "PAST_DUE";
+  }
+  return { prismaStatus, paywallLocked: isLocked };
+}
+
 export async function POST(request: Request) {
   try {
     const payload = await request.text();
@@ -136,8 +203,12 @@ export async function POST(request: Request) {
                 where: { id: resolvedUserId },
                 data: { platformPlan },
               });
+              // Payment received — unlock communities if they were paywalled.
+              // Covers the case where host re-added a payment method after a
+              // trial-end pause, or after a past_due lapse.
+              await setCommunitiesPaywallLocked(resolvedUserId, false);
               console.log(
-                `[stripe-webhook] Platform plan updated: user ${resolvedUserId} → ${platformPlan}`
+                `[stripe-webhook] Platform plan updated: user ${resolvedUserId} → ${platformPlan} + paywall unlocked`
               );
             } else {
               console.error(
@@ -203,9 +274,18 @@ export async function POST(request: Request) {
             where: { stripeSubscriptionId: subscriptionId },
             data: { status: "PAST_DUE" },
           });
+
+          // Payment method declined — lock communities until host updates payment.
+          const subRecord = await prisma.subscription.findFirst({
+            where: { stripeSubscriptionId: subscriptionId },
+            select: { userId: true },
+          });
+          if (subRecord?.userId) {
+            await setCommunitiesPaywallLocked(subRecord.userId, true);
+          }
         }
 
-        console.log(`Payment failed for subscription ${subscriptionId}`);
+        console.log(`Payment failed for subscription ${subscriptionId}, communities locked`);
         break;
       }
 
@@ -213,10 +293,12 @@ export async function POST(request: Request) {
         const subscription = event.data.object as any;
         const subscriptionId = subscription.id;
 
+        const { prismaStatus, paywallLocked } = mapStripeStatusToPaywall(subscription.status);
+
         await prisma.subscription.updateMany({
           where: { stripeSubscriptionId: subscriptionId },
           data: {
-            status: subscription.status.toUpperCase(),
+            status: prismaStatus,
             currentPeriodStart: new Date(subscription.current_period_start * 1000),
             currentPeriodEnd: new Date(subscription.current_period_end * 1000),
             cancelAtPeriodEnd: subscription.cancel_at_period_end,
@@ -224,7 +306,22 @@ export async function POST(request: Request) {
           },
         });
 
-        console.log(`Subscription ${subscriptionId} updated`);
+        // Only platform subscriptions toggle paywall. Community-membership
+        // subscriptions have communityId in metadata; platform subs don't.
+        const isPlatformSub = !subscription.metadata?.communityId;
+        if (isPlatformSub) {
+          const subRecord = await prisma.subscription.findFirst({
+            where: { stripeSubscriptionId: subscriptionId },
+            select: { userId: true },
+          });
+          if (subRecord?.userId) {
+            await setCommunitiesPaywallLocked(subRecord.userId, paywallLocked);
+          }
+        }
+
+        console.log(
+          `[stripe-webhook] Subscription ${subscriptionId} → ${prismaStatus} (paywall=${paywallLocked})`
+        );
         break;
       }
 
@@ -251,12 +348,50 @@ export async function POST(request: Request) {
               where: { id: subRecord.userId },
               data: { platformPlan: "START" },
             });
-            console.log(`[stripe-webhook] Plan cancelled, user ${subRecord.userId} → START`);
+            // Plan canceled — lock all owned communities. Host can resubscribe
+            // any time to unlock; meanwhile data is preserved.
+            await setCommunitiesPaywallLocked(subRecord.userId, true);
+            console.log(
+              `[stripe-webhook] Plan cancelled, user ${subRecord.userId} → START + paywall locked`
+            );
           }
         }
         // ────────────────────────────────────────────────────────────────
 
         console.log(`Subscription ${subscriptionId} canceled`);
+        break;
+      }
+
+      case "customer.subscription.trial_will_end": {
+        const subscription = event.data.object as any;
+        const subscriptionId = subscription.id;
+        const trialEnd = subscription.trial_end
+          ? new Date(subscription.trial_end * 1000)
+          : null;
+
+        // Fires ~3 days before trial ends (Stripe-native).
+        // For our 14-day trial, that's day 11.
+        // TODO (Commit 7 or follow-up): trigger email reminder to host with payment-add CTA.
+        // For now, log only — email infrastructure exists (Resend) but the template +
+        // send logic is out of scope for this commit.
+        const subRecord = await prisma.subscription.findFirst({
+          where: { stripeSubscriptionId: subscriptionId },
+          select: { userId: true },
+        });
+
+        if (subRecord?.userId) {
+          // Subscription model has no `user` relation declared, so look up the
+          // host's email separately for the log entry / future email-send hook.
+          const host = await prisma.user.findUnique({
+            where: { id: subRecord.userId },
+            select: { email: true, name: true },
+          });
+          console.log(
+            `[stripe-webhook] TRIAL_WILL_END fired for user ${subRecord.userId} ` +
+              `(${host?.email}), trial ends ${trialEnd?.toISOString()}. ` +
+              `Email reminder TODO.`
+          );
+        }
         break;
       }
 
