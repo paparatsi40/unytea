@@ -15,10 +15,7 @@ vi.mock("@/lib/auth", () => ({
 
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
-import {
-  getCurrentSubscriptionState,
-  isCommunityPaywallLocked,
-} from "@/lib/subscription-state";
+import { getCurrentSubscriptionState, isCommunityPaywallLocked } from "@/lib/subscription-state";
 
 const NOW = new Date("2026-05-29T12:00:00Z");
 

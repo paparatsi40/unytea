@@ -18,9 +18,9 @@ Business, Pro), each with 2 prices (monthly + annual).
 1. Login to Stripe dashboard. Switch to TEST mode first for verification.
 2. Products → Add product
    a. **Creator** — Description: "Para creators emergentes lanzando su
-      primera comunidad"
+   primera comunidad"
    b. **Business** — Description: "Para hosts establecidos creciendo su
-      comunidad"
+   comunidad"
    c. **Pro** — Description: "Para teams scaling múltiples comunidades"
 3. For each product, add 2 prices:
    - Monthly: $15 / $49 / $149 (Creator / Business / Pro), recurring,

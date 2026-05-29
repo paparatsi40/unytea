@@ -77,10 +77,7 @@ async function ensurePrice(
     limit: 100,
   });
   const match = existing.data.find(
-    (p) =>
-      p.unit_amount === amount &&
-      p.recurring?.interval === interval &&
-      p.currency === "usd"
+    (p) => p.unit_amount === amount && p.recurring?.interval === interval && p.currency === "usd"
   );
   if (match) {
     console.log(`✓ Price "${label}" already exists: ${match.id}`);
@@ -118,9 +115,7 @@ async function verifyEnvVars() {
       const price = await stripe.prices.retrieve(value);
       const amount =
         typeof price.unit_amount === "number" ? (price.unit_amount / 100).toFixed(2) : "?";
-      console.log(
-        `  ✓ ${key}: ${price.id} ($${amount}/${price.recurring?.interval ?? "?"})`
-      );
+      console.log(`  ✓ ${key}: ${price.id} ($${amount}/${price.recurring?.interval ?? "?"})`);
     } catch {
       console.log(`  ✗ ${key}: invalid or revoked (${value})`);
       allValid = false;

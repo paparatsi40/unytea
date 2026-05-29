@@ -60,13 +60,7 @@ async function setCommunitiesPaywallLocked(userId: string, locked: boolean) {
  *    so it shows up as needing attention but doesn't permanently lock)
  */
 function mapStripeStatusToPaywall(stripeStatus: string): {
-  prismaStatus:
-    | "ACTIVE"
-    | "PAST_DUE"
-    | "CANCELED"
-    | "UNPAID"
-    | "TRIALING"
-    | "PAUSED";
+  prismaStatus: "ACTIVE" | "PAST_DUE" | "CANCELED" | "UNPAID" | "TRIALING" | "PAUSED";
   paywallLocked: boolean;
 } {
   const upper = stripeStatus.toUpperCase();
@@ -88,7 +82,9 @@ function mapStripeStatusToPaywall(stripeStatus: string): {
     prismaStatus = upper;
   } else {
     // Unknown Stripe status — log and default to PAST_DUE for safety
-    console.warn(`[stripe-webhook] Unknown Stripe status "${stripeStatus}", defaulting to PAST_DUE`);
+    console.warn(
+      `[stripe-webhook] Unknown Stripe status "${stripeStatus}", defaulting to PAST_DUE`
+    );
     prismaStatus = "PAST_DUE";
   }
   return { prismaStatus, paywallLocked: isLocked };
@@ -403,9 +399,7 @@ export async function POST(request: Request) {
       case "customer.subscription.trial_will_end": {
         const subscription = event.data.object as any;
         const subscriptionId = subscription.id;
-        const trialEnd = subscription.trial_end
-          ? new Date(subscription.trial_end * 1000)
-          : null;
+        const trialEnd = subscription.trial_end ? new Date(subscription.trial_end * 1000) : null;
 
         // Fires ~3 days before trial ends (Stripe-native).
         // For our 14-day trial, that's day 11.

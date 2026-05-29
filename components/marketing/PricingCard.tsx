@@ -121,10 +121,7 @@ export function PricingCard({
       <ul className="mb-6 flex-1 space-y-2.5">
         {features.map((feature) => (
           <li key={feature} className="flex items-start gap-2 text-sm">
-            <CheckCircle
-              className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-500"
-              aria-hidden
-            />
+            <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-500" aria-hidden />
             <span>{feature}</span>
           </li>
         ))}

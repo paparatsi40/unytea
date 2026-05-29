@@ -40,7 +40,10 @@ export async function getCurrentSubscriptionState(): Promise<SubscriptionState |
       const now = new Date();
       // Stripe sets currentPeriodEnd to trial_end for subscriptions in trial.
       const trialEndsAt = sub.currentPeriodEnd;
-      const daysRemaining = Math.max(0, Math.ceil((trialEndsAt.getTime() - now.getTime()) / DAY_MS));
+      const daysRemaining = Math.max(
+        0,
+        Math.ceil((trialEndsAt.getTime() - now.getTime()) / DAY_MS)
+      );
       return {
         status: "trialing",
         trialEndsAt,

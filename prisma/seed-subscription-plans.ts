@@ -58,8 +58,7 @@ const plans = [
       "Admins ilimitados",
       "Comisión 3% sobre membresías de members",
     ],
-    stripePriceId:
-      process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || "price_pro_monthly_placeholder",
+    stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || "price_pro_monthly_placeholder",
     communityId: "",
   },
   // Annual variants (16% discount = 2 months free)
@@ -74,8 +73,7 @@ const plans = [
       "Pago anual: $150 (en vez de $180 = $30 de ahorro)",
     ],
     stripePriceId:
-      process.env.NEXT_PUBLIC_STRIPE_CREATOR_PRICE_ID_YEARLY ||
-      "price_creator_yearly_placeholder",
+      process.env.NEXT_PUBLIC_STRIPE_CREATOR_PRICE_ID_YEARLY || "price_creator_yearly_placeholder",
     communityId: "",
   },
   {

@@ -91,9 +91,7 @@ beforeEach(() => {
 
 describe("webhook paywall state machine — customer.subscription.updated", () => {
   it("locks communities when subscription status becomes PAUSED", async () => {
-    mockConstructEvent.mockReturnValue(
-      makeSubscriptionUpdatedEvent({ status: "paused" })
-    );
+    mockConstructEvent.mockReturnValue(makeSubscriptionUpdatedEvent({ status: "paused" }));
     vi.mocked(prisma.subscription.findFirst).mockResolvedValue({
       userId: "host-1",
     } as never);
@@ -112,9 +110,7 @@ describe("webhook paywall state machine — customer.subscription.updated", () =
   });
 
   it("unlocks communities when subscription returns to ACTIVE", async () => {
-    mockConstructEvent.mockReturnValue(
-      makeSubscriptionUpdatedEvent({ status: "active" })
-    );
+    mockConstructEvent.mockReturnValue(makeSubscriptionUpdatedEvent({ status: "active" }));
     vi.mocked(prisma.subscription.findFirst).mockResolvedValue({
       userId: "host-1",
     } as never);
@@ -132,9 +128,7 @@ describe("webhook paywall state machine — customer.subscription.updated", () =
   });
 
   it("locks communities on PAST_DUE", async () => {
-    mockConstructEvent.mockReturnValue(
-      makeSubscriptionUpdatedEvent({ status: "past_due" })
-    );
+    mockConstructEvent.mockReturnValue(makeSubscriptionUpdatedEvent({ status: "past_due" }));
     vi.mocked(prisma.subscription.findFirst).mockResolvedValue({
       userId: "host-1",
     } as never);
