@@ -87,10 +87,14 @@ export default async function PublicCommunityPage(props: {
     notFound();
   }
 
-  // Paywall gate: when the community is paywallLocked, show the locked view
-  // to everyone visiting the public landing — including the owner. The owner
-  // manages the paywall state via the dashboard, not the public page.
-  if (community.paywallLocked) {
+  const session = await auth();
+  const isOwner = session?.user?.id === community.owner.id;
+
+  // Paywall gate with owner exception: non-owner visitors see the locked
+  // view. Owner passes through to their own landing so they can preview
+  // the page they'll show once payment is added. They manage the paywall
+  // state via the dashboard PaywallBanner (mounted in the dashboard layout).
+  if (community.paywallLocked && !isOwner) {
     return (
       <PaywallLockedView
         communityName={community.name}
@@ -99,9 +103,6 @@ export default async function PublicCommunityPage(props: {
       />
     );
   }
-
-  const session = await auth();
-  const isOwner = session?.user?.id === community.owner.id;
 
   // Parse landing layout
   const sections = Array.isArray(community.landingLayout)

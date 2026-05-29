@@ -114,18 +114,22 @@ export const getOrCreateStripeCustomer = async ({
   email: string;
   name?: string | null;
 }) => {
-  // Buscar cliente existente por metadata
-  const customers = await stripe.customers.list({
+  // Look up existing customer by metadata via the search API. The previous
+  // implementation did `stripe.customers.list({ limit: 1 })` and filtered
+  // in-memory, which only ever returned the most-recently-created customer
+  // on the account. Once Commit 3 switched the checkout flow to reference
+  // customers by id, every signup was creating a new Stripe Customer →
+  // hasPriorSubscription always returned false → unlimited trial reset.
+  // search with `metadata['userId']:'X'` returns the exact match if any.
+  const search = await stripe.customers.search({
+    query: `metadata['userId']:'${userId}'`,
     limit: 1,
   });
-
-  const existingCustomer = customers.data.find((customer) => customer.metadata?.userId === userId);
-
-  if (existingCustomer) {
-    return existingCustomer;
+  if (search.data.length > 0) {
+    return search.data[0];
   }
 
-  // Crear nuevo cliente
+  // Create new customer
   const customer = await stripe.customers.create({
     email,
     name: name || undefined,

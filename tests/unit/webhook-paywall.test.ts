@@ -22,7 +22,7 @@ vi.mock("@/lib/plans", () => ({
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
-    processedStripeEvent: { create: vi.fn() },
+    processedStripeEvent: { create: vi.fn(), findUnique: vi.fn() },
     coursePurchase: { updateMany: vi.fn() },
     enrollment: { upsert: vi.fn() },
     course: { update: vi.fn() },
@@ -78,6 +78,9 @@ function makeSubscriptionUpdatedEvent(overrides: {
 beforeEach(() => {
   vi.clearAllMocks();
   mockHeadersGet.mockReturnValue("t=1,v1=sig");
+  // FIX-B5 (Commit 8): findUnique at top, create at bottom. Default null = not
+  // a duplicate event; create succeeds.
+  vi.mocked(prisma.processedStripeEvent.findUnique).mockResolvedValue(null);
   vi.mocked(prisma.processedStripeEvent.create).mockResolvedValue({} as never);
   mockGetPlanFromPriceId.mockReturnValue(null);
   // setCommunitiesPaywallLocked reads result.count; default { count: 0 }.

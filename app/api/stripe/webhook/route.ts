@@ -7,6 +7,27 @@ import { getPlanFromPriceId } from "@/lib/plans";
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 /**
+ * Reads the subscription's current period start/end timestamps with backward
+ * compatibility for the Stripe API 2025-02-24.acacia migration that moved
+ * these fields from the subscription root to subscription.items.data[0].*.
+ * Accessing the root path on a newer payload returns undefined →
+ * `new Date(undefined * 1000)` → Invalid Date → Prisma rejection → 500.
+ * (FIX-B4 — closes the pending root cause of task #58.)
+ */
+function getPeriodDates(subscription: any): { start: Date; end: Date } {
+  const item = subscription.items?.data?.[0];
+  const start = item?.current_period_start ?? subscription.current_period_start;
+  const end = item?.current_period_end ?? subscription.current_period_end;
+  if (!start || !end) {
+    throw new Error(`Missing period dates on subscription ${subscription.id}`);
+  }
+  return {
+    start: new Date(start * 1000),
+    end: new Date(end * 1000),
+  };
+}
+
+/**
  * Sets paywallLocked state on all communities owned by a given user.
  * Called by webhook handlers when host's platform subscription status
  * changes (paused/canceled → locked; active/trialing → unlocked).
@@ -91,17 +112,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: `Webhook Error: ${err.message}` }, { status: 400 });
     }
 
-    try {
-      await prisma.processedStripeEvent.create({
-        data: { id: event.id, type: event.type },
-      });
-    } catch (err: any) {
-      if (err?.code === "P2002") {
-        console.log(`[stripe-webhook] event ${event.id} already processed, skipping`);
-        return NextResponse.json({ received: true, duplicate: true });
-      }
-      console.error(`[stripe-webhook] DB error recording event:`, err);
-      return NextResponse.json({ error: "Failed to record event" }, { status: 500 });
+    // FIX-B5: idempotency check BEFORE the handler runs (read-only).
+    // The record is persisted AFTER the handler succeeds (write below).
+    // Previously the create ran first, so handler failures left the event id
+    // recorded and Stripe retries hit the duplicate path → events dropped.
+    const alreadyProcessed = await prisma.processedStripeEvent.findUnique({
+      where: { id: event.id },
+    });
+    if (alreadyProcessed) {
+      console.log(`[stripe-webhook] event ${event.id} already processed, skipping`);
+      return NextResponse.json({ received: true, duplicate: true });
     }
 
     console.log(`Webhook received: ${event.type}`);
@@ -240,6 +260,7 @@ export async function POST(request: Request) {
             break;
           }
 
+          const { start: upsertStart, end: upsertEnd } = getPeriodDates(subscription);
           await prisma.subscription.upsert({
             where: { stripeSubscriptionId: subscriptionId },
             create: {
@@ -248,14 +269,14 @@ export async function POST(request: Request) {
               stripeSubscriptionId: subscriptionId,
               stripeCustomerId: customerId,
               status: "ACTIVE",
-              currentPeriodStart: new Date(subscription.current_period_start * 1000),
-              currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+              currentPeriodStart: upsertStart,
+              currentPeriodEnd: upsertEnd,
               cancelAtPeriodEnd: subscription.cancel_at_period_end,
             },
             update: {
               status: "ACTIVE",
-              currentPeriodStart: new Date(subscription.current_period_start * 1000),
-              currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+              currentPeriodStart: upsertStart,
+              currentPeriodEnd: upsertEnd,
               cancelAtPeriodEnd: subscription.cancel_at_period_end,
             },
           });
@@ -294,15 +315,32 @@ export async function POST(request: Request) {
         const subscriptionId = subscription.id;
 
         const { prismaStatus, paywallLocked } = mapStripeStatusToPaywall(subscription.status);
+        const { start: updStart, end: updEnd } = getPeriodDates(subscription);
+
+        // FIX-I4: when a user upgrades Creator → Business via Customer Portal,
+        // Stripe sends customer.subscription.updated with the new price id.
+        // Look up the matching SubscriptionPlan and relink planId so the
+        // user.subscription.plan relation reflects the current tier.
+        const newPriceId = subscription.items?.data?.[0]?.price?.id;
+        let newPlanId: string | undefined;
+        if (newPriceId) {
+          const plan = await prisma.subscriptionPlan.findFirst({
+            where: { stripePriceId: newPriceId },
+            select: { id: true },
+          });
+          if (plan) newPlanId = plan.id;
+        }
 
         await prisma.subscription.updateMany({
           where: { stripeSubscriptionId: subscriptionId },
           data: {
             status: prismaStatus,
-            currentPeriodStart: new Date(subscription.current_period_start * 1000),
-            currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+            currentPeriodStart: updStart,
+            currentPeriodEnd: updEnd,
             cancelAtPeriodEnd: subscription.cancel_at_period_end,
             canceledAt: subscription.canceled_at ? new Date(subscription.canceled_at * 1000) : null,
+            // Conditional relink — no-op when newPriceId is unknown (defensive).
+            ...(newPlanId ? { planId: newPlanId } : {}),
           },
         });
 
@@ -397,6 +435,29 @@ export async function POST(request: Request) {
 
       default:
         console.log(`Unhandled event type: ${event.type}`);
+    }
+
+    // FIX-B5: persist idempotency record AFTER handler success. A handler
+    // failure throws and skips this block, so Stripe's retry will re-attempt
+    // the handler instead of hitting the duplicate-skip path.
+    //
+    // Race window: another concurrent webhook request could pass the
+    // findUnique check above and reach here too. The P2002 catch absorbs
+    // that — both requests still succeed from Stripe's perspective; the
+    // handler ran twice (acceptable: handlers are idempotent at the data
+    // layer via upsert / updateMany).
+    try {
+      await prisma.processedStripeEvent.create({
+        data: { id: event.id, type: event.type },
+      });
+    } catch (err: any) {
+      if (err?.code === "P2002") {
+        console.log(`[stripe-webhook] race-condition duplicate ${event.id}`);
+      } else {
+        console.error("[stripe-webhook] failed to record event id:", err);
+        // Don't fail the webhook — Stripe got our success. Worst case: rare
+        // double-process on retry, mitigated by handler-layer idempotency.
+      }
     }
 
     return NextResponse.json({ received: true });
