@@ -2,6 +2,7 @@
 
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
 import { DashboardHeader } from "@/components/dashboard/header";
+import { SubscriptionBannerMount } from "@/components/dashboard/SubscriptionBannerMount";
 import { NextIntlClientProvider } from "next-intl";
 import { useEffect, useState } from "react";
 
@@ -149,6 +150,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <DashboardHeader />
 
         <main className="ml-64 pt-16">
+          <SubscriptionBannerMount />
           <div className="p-6">{children}</div>
         </main>
       </div>

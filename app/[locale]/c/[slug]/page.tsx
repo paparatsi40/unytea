@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { auth } from "@/lib/auth";
+import { PaywallLockedView } from "@/components/community/PaywallLockedView";
 
 async function getCommunity(slug: string) {
   const community = await prisma.community.findUnique({
@@ -76,12 +77,27 @@ function renderSection(section: SectionInstance, index: number) {
   }
 }
 
-export default async function PublicCommunityPage(props: { params: Promise<{ slug: string }> }) {
+export default async function PublicCommunityPage(props: {
+  params: Promise<{ locale: string; slug: string }>;
+}) {
   const params = await props.params;
   const community = await getCommunity(params.slug);
 
   if (!community) {
     notFound();
+  }
+
+  // Paywall gate: when the community is paywallLocked, show the locked view
+  // to everyone visiting the public landing — including the owner. The owner
+  // manages the paywall state via the dashboard, not the public page.
+  if (community.paywallLocked) {
+    return (
+      <PaywallLockedView
+        communityName={community.name}
+        communityImageUrl={community.imageUrl}
+        locale={params.locale}
+      />
+    );
   }
 
   const session = await auth();
