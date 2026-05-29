@@ -82,6 +82,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
   setRequestLocale(locale);
 
   const t = await getTranslations("landing");
+  const tBilling = await getTranslations("billing.pricing");
 
   return (
     <div className="min-h-screen bg-background">
@@ -655,24 +656,16 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
         <div className="container mx-auto px-4">
           <div className="mx-auto mb-16 max-w-4xl text-center">
             <Badge className="mb-4">Pricing</Badge>
-            <h2 className="mb-4 text-4xl font-bold">Simple pricing for community businesses</h2>
-            <p className="mb-2 text-lg text-muted-foreground">
-              14-day free trial. No credit card required to start.
-            </p>
-            <p className="text-base text-muted-foreground">
-              Hosts pay for the platform. Set your own pricing for members.
-            </p>
+            <h2 className="mb-4 text-4xl font-bold">{tBilling("headerTitle")}</h2>
+            <p className="mb-2 text-lg text-muted-foreground">{tBilling("headerSubtitle")}</p>
+            <p className="text-base text-muted-foreground">{tBilling("headerDetail")}</p>
           </div>
 
           <PricingSection locale={locale} />
 
           <div className="mx-auto mt-10 max-w-6xl rounded-2xl border bg-muted/20 p-6">
-            <h3 className="mb-2 text-lg font-semibold">Built for hosts, free for members.</h3>
-            <p className="text-sm text-muted-foreground">
-              Anyone can create an account, explore communities, and join for free. Hosts pay
-              Unytea a flat monthly fee plus a small commission (3-8%) on member subscriptions
-              they collect. No hidden fees.
-            </p>
+            <h3 className="mb-2 text-lg font-semibold">{tBilling("freeForMembersTitle")}</h3>
+            <p className="text-sm text-muted-foreground">{tBilling("freeForMembersBody")}</p>
           </div>
 
           <div className="mx-auto mt-8 grid max-w-6xl gap-4 md:grid-cols-2">

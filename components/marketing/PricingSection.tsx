@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import { PricingCard } from "./PricingCard";
+import { PricingCard, type TierKey } from "./PricingCard";
 
 type Interval = "monthly" | "annual";
 
@@ -10,67 +11,45 @@ interface PricingSectionProps {
   locale: string;
 }
 
-const TIERS = [
+const TIERS: ReadonlyArray<{
+  key: TierKey;
+  monthlyPrice: number;
+  annualPrice: number;
+  commissionPercent: number;
+  stripePriceIdMonthly: string;
+  stripePriceIdYearly: string;
+  featured?: boolean;
+}> = [
   {
-    name: "Creator",
-    description: "Para creators emergentes lanzando su primera comunidad",
+    key: "creator",
     monthlyPrice: 15,
     annualPrice: 150,
     commissionPercent: 8,
-    features: [
-      "Comunidad ilimitada de members",
-      "Live sessions hasta 100 participantes concurrentes",
-      "Cursos pagados",
-      "Community feed + library",
-      "Basic analytics",
-    ],
     stripePriceIdMonthly: process.env.NEXT_PUBLIC_STRIPE_CREATOR_PRICE_ID ?? "",
     stripePriceIdYearly: process.env.NEXT_PUBLIC_STRIPE_CREATOR_PRICE_ID_YEARLY ?? "",
   },
   {
-    name: "Business",
-    description: "Para hosts establecidos creciendo su comunidad",
+    key: "business",
     monthlyPrice: 49,
     annualPrice: 490,
     commissionPercent: 5,
-    features: [
-      "Todo lo de Creator",
-      "Live sessions hasta 300 participantes concurrentes",
-      "Dominio custom",
-      "Analytics avanzados",
-      "Hasta 5 admins",
-    ],
     stripePriceIdMonthly: process.env.NEXT_PUBLIC_STRIPE_BUSINESS_PRICE_ID ?? "",
     stripePriceIdYearly: process.env.NEXT_PUBLIC_STRIPE_BUSINESS_PRICE_ID_YEARLY ?? "",
     featured: true,
-    featuredLabel: "Most popular",
   },
   {
-    name: "Pro",
-    description: "Para teams scaling múltiples comunidades",
+    key: "pro",
     monthlyPrice: 149,
     annualPrice: 1490,
     commissionPercent: 3,
-    features: [
-      "Todo lo de Business",
-      "Live sessions hasta 1000 participantes concurrentes",
-      "White-label experience",
-      "API access",
-      "Admins ilimitados",
-    ],
     stripePriceIdMonthly: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID ?? "",
     stripePriceIdYearly: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID_YEARLY ?? "",
   },
-] as const;
-
-const STRINGS = {
-  monthly: "Monthly",
-  annual: "Annual",
-  saveBadge: "Save 16%",
-};
+];
 
 export function PricingSection({ locale }: PricingSectionProps) {
   const [interval, setInterval] = useState<Interval>("monthly");
+  const t = useTranslations("billing.pricing");
 
   return (
     <div>
@@ -87,7 +66,7 @@ export function PricingSection({ locale }: PricingSectionProps) {
             )}
             aria-pressed={interval === "monthly"}
           >
-            {STRINGS.monthly}
+            {t("toggleMonthly")}
           </button>
           <button
             type="button"
@@ -100,9 +79,9 @@ export function PricingSection({ locale }: PricingSectionProps) {
             )}
             aria-pressed={interval === "annual"}
           >
-            {STRINGS.annual}
+            {t("toggleAnnual")}
             <span className="ml-2 inline-flex items-center rounded-full bg-green-500/10 px-2 py-0.5 text-xs font-medium text-green-700 dark:text-green-400">
-              {STRINGS.saveBadge}
+              {t("annualSaveBadge")}
             </span>
           </button>
         </div>
@@ -111,17 +90,14 @@ export function PricingSection({ locale }: PricingSectionProps) {
       <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-3">
         {TIERS.map((tier) => (
           <PricingCard
-            key={tier.name}
-            name={tier.name}
-            description={tier.description}
+            key={tier.key}
+            tierKey={tier.key}
             monthlyPrice={tier.monthlyPrice}
             annualPrice={tier.annualPrice}
             commissionPercent={tier.commissionPercent}
-            features={[...tier.features]}
             stripePriceIdMonthly={tier.stripePriceIdMonthly}
             stripePriceIdYearly={tier.stripePriceIdYearly}
-            featured={"featured" in tier ? tier.featured : false}
-            featuredLabel={"featuredLabel" in tier ? tier.featuredLabel : undefined}
+            featured={tier.featured ?? false}
             interval={interval}
             locale={locale}
           />

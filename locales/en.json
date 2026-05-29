@@ -511,6 +511,90 @@
       "listToggleDescription": "When enabled, your community appears in public listings for the category and language you've selected, provided it meets quality criteria (≥3 active members, ≥1 upcoming live session, description + cover image set, ≥14 days old)."
     }
   },
+  "billing": {
+    "pricing": {
+      "headerTitle": "Simple pricing for community businesses",
+      "headerSubtitle": "14-day free trial. No credit card required to start.",
+      "headerDetail": "Hosts pay for the platform. Set your own pricing for members.",
+      "toggleMonthly": "Monthly",
+      "toggleAnnual": "Annual",
+      "annualSaveBadge": "Save 16%",
+      "perMonth": "/month",
+      "perYear": "/year",
+      "annualSavingsHint": "Save ${amount} vs monthly billing",
+      "commission": "+ {percent}% commission on member revenue",
+      "trialCta": "Start 14-day trial",
+      "trialNoCC": "No card required",
+      "featuredLabel": "Most popular",
+      "freeForMembersTitle": "Built for hosts, free for members.",
+      "freeForMembersBody": "Anyone can create an account, explore communities, and join for free. Hosts pay Unytea a flat monthly fee plus a small commission (3-8%) on member subscriptions they collect. No hidden fees."
+    },
+    "tiers": {
+      "creator": {
+        "name": "Creator",
+        "description": "For emerging creators launching their first community",
+        "features": [
+          "Unlimited members",
+          "Live sessions up to 100 concurrent participants",
+          "Paid courses",
+          "Community feed + library",
+          "Basic analytics"
+        ]
+      },
+      "business": {
+        "name": "Business",
+        "description": "For established hosts growing their community",
+        "features": [
+          "Everything in Creator",
+          "Live sessions up to 300 concurrent participants",
+          "Custom domain",
+          "Advanced analytics",
+          "Up to 5 admins"
+        ]
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "For teams scaling multiple communities",
+        "features": [
+          "Everything in Business",
+          "Live sessions up to 1000 concurrent participants",
+          "White-label experience",
+          "API access",
+          "Unlimited admins"
+        ]
+      }
+    },
+    "trial": {
+      "endsToday": "Trial ends today.",
+      "daysLeft": "{days, plural, =1 {1 day} other {# days}} left in your {plan} trial.",
+      "addPaymentCta": "Add payment",
+      "addPaymentPrompt": "Add payment to keep your community live after {date}."
+    },
+    "paywall": {
+      "banner": {
+        "paused": {
+          "title": "Your community is paused",
+          "body": "Your trial ended without payment. Add a card to reactivate — your community data is preserved.",
+          "cta": "Add payment"
+        },
+        "past_due": {
+          "title": "Payment needed",
+          "body": "We couldn't process your last payment. Update your payment method to reactivate your community.",
+          "cta": "Add payment"
+        },
+        "canceled": {
+          "title": "Subscription canceled",
+          "body": "Your subscription was canceled. Reactivate to bring your community back online.",
+          "cta": "Reactivate"
+        }
+      },
+      "lockedView": {
+        "title": "{name} is paused",
+        "body": "This community is temporarily unavailable. The host is working to bring it back online. Your membership and content are preserved.",
+        "browseLink": "Browse other communities"
+      }
+    }
+  },
   "exploreFilters": {
     "searchPlaceholder": "Search communities",
     "monetization": {

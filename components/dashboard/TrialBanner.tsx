@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Sparkles } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -11,19 +12,9 @@ interface TrialBannerProps {
   planName: string;
 }
 
-const STRINGS = {
-  daysLeftLabel: (days: number, plan: string) =>
-    `${days} day${days !== 1 ? "s" : ""} left in your ${plan} trial.`,
-  addPaymentDescription: (date: string) =>
-    `Add payment to keep your community live after ${date}.`,
-  endsToday: "Trial ends today.",
-  endsTodayDescription: "Add payment now to keep your community live tomorrow.",
-  addPayment: "Add payment",
-  opening: "Opening...",
-};
-
 export function TrialBanner({ daysRemaining, trialEndsAt, planName }: TrialBannerProps) {
   const [isOpening, setIsOpening] = useState(false);
+  const t = useTranslations("billing.trial");
 
   async function openPortal() {
     setIsOpening(true);
@@ -56,17 +47,14 @@ export function TrialBanner({ daysRemaining, trialEndsAt, planName }: TrialBanne
         <Sparkles className="h-5 w-5 shrink-0" aria-hidden />
         <div className="text-sm">
           {daysRemaining === 0 ? (
-            <>
-              <span className="font-medium">{STRINGS.endsToday}</span>
-              <span className="ml-1 text-muted-foreground">{STRINGS.endsTodayDescription}</span>
-            </>
+            <span className="font-medium">{t("endsToday")}</span>
           ) : (
             <>
               <span className="font-medium">
-                {STRINGS.daysLeftLabel(daysRemaining, planName)}
+                {t("daysLeft", { days: daysRemaining, plan: planName })}
               </span>
               <span className="ml-1 text-muted-foreground">
-                {STRINGS.addPaymentDescription(trialEndsAt.toLocaleDateString())}
+                {t("addPaymentPrompt", { date: trialEndsAt.toLocaleDateString() })}
               </span>
             </>
           )}
@@ -78,7 +66,7 @@ export function TrialBanner({ daysRemaining, trialEndsAt, planName }: TrialBanne
         size="sm"
         variant={isUrgent ? "default" : "outline"}
       >
-        {isOpening ? STRINGS.opening : STRINGS.addPayment}
+        {t("addPaymentCta")}
       </Button>
     </div>
   );
