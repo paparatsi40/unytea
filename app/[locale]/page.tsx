@@ -30,6 +30,7 @@ import { DemoVideoTrigger } from "./_home/DemoVideoTrigger";
 import { FeatureCard } from "./_home/FeatureCard";
 import { UseCaseCard } from "./_home/UseCaseCard";
 import { ProblemImage } from "./_home/ProblemImage";
+import { PricingSection } from "@/components/marketing/PricingSection";
 
 const META = {
   en: {
@@ -656,96 +657,21 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
             <Badge className="mb-4">Pricing</Badge>
             <h2 className="mb-4 text-4xl font-bold">Simple pricing for community businesses</h2>
             <p className="mb-2 text-lg text-muted-foreground">
-              Hosts pay for the platform. Members join for free.
+              14-day free trial. No credit card required to start.
             </p>
             <p className="text-base text-muted-foreground">
-              Run your community, live sessions, and courses in one place.
+              Hosts pay for the platform. Set your own pricing for members.
             </p>
           </div>
 
-          <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-2 lg:grid-cols-4">
-            <PricingCard
-              name="Start"
-              price={0}
-              description="Perfect for testing"
-              features={[
-                "1 community",
-                "Up to 50 members",
-                "Community feed",
-                "Simple live sessions",
-                "Basic library",
-                "Basic courses",
-                "Basic analytics",
-                "Unytea branding",
-                "8% transaction fee",
-              ]}
-              cta="Start free"
-              footnote="Validate your first community idea."
-              locale={locale}
-            />
-            <PricingCard
-              name="Creator"
-              price={49}
-              description="Best for launching and monetizing one community"
-              features={[
-                "Everything in Start, plus",
-                "Unlimited members",
-                "Live sessions",
-                "Full courses",
-                "Paid community access",
-                "Paid course sales",
-                "Basic growth tools",
-                "5% transaction fee",
-              ]}
-              cta="Choose Creator"
-              footnote="Launch, sell, and grow one community."
-              locale={locale}
-            />
-            <PricingCard
-              name="Business"
-              price={99}
-              description="Best for operators running one community business"
-              features={[
-                "Everything in Creator, plus",
-                "Custom domain",
-                "Advanced analytics",
-                "Up to 5 admins",
-                "Attendance insights",
-                "Session performance tools",
-                "Lower transaction fee",
-                "2% transaction fee",
-              ]}
-              cta="Choose Business"
-              popular
-              popularLabel="Recommended"
-              footnote="Run a serious community business with deeper insights."
-              locale={locale}
-            />
-            <PricingCard
-              name="Pro"
-              price={199}
-              description="Best for teams scaling multiple communities"
-              features={[
-                "Everything in Business, plus",
-                "Up to 3 communities",
-                "White-label experience",
-                "API access",
-                "Unlimited admins",
-                "Multi-community operations",
-                "0% transaction fee",
-              ]}
-              cta="Choose Pro"
-              footnote="Manage multiple communities at scale."
-              locale={locale}
-            />
-          </div>
+          <PricingSection locale={locale} />
 
           <div className="mx-auto mt-10 max-w-6xl rounded-2xl border bg-muted/20 p-6">
-            <h3 className="mb-2 text-lg font-semibold">Free for members. Built for hosts.</h3>
+            <h3 className="mb-2 text-lg font-semibold">Built for hosts, free for members.</h3>
             <p className="text-sm text-muted-foreground">
-              Anyone can create an account, explore communities, and join for free. Hosts pay for
-              Unytea to run their business, and transaction fees only apply when they sell paid
-              access or courses.
+              Anyone can create an account, explore communities, and join for free. Hosts pay
+              Unytea a flat monthly fee plus a small commission (3-8%) on member subscriptions
+              they collect. No hidden fees.
             </p>
           </div>
 
@@ -759,8 +685,8 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
               a="Transaction fees apply only when you sell paid community access or courses through Unytea."
             />
             <FaqItem
-              q="Can I start for free?"
-              a="Yes. The Start plan lets you launch one community, test demand, and validate your idea before upgrading."
+              q="Is there a free trial?"
+              a="Yes. Every plan starts with a 14-day free trial — no credit card required. At day 14, if you haven't added payment, your community is paywalled (your data stays safe, members just can't interact) until you add a card. You can come back any time."
             />
             <FaqItem
               q="Can I change plans later?"
@@ -1275,62 +1201,6 @@ function TestimonialCard({
           <div className="text-sm text-muted-foreground">{role}</div>
         </div>
       </div>
-    </div>
-  );
-}
-
-function PricingCard({
-  name,
-  price,
-  description,
-  features,
-  popular = false,
-  popularLabel = "Recommended",
-  cta,
-  footnote,
-  locale,
-}: {
-  name: string;
-  price: number;
-  description: string;
-  features: string[];
-  popular?: boolean;
-  popularLabel?: string;
-  cta: string;
-  footnote?: string;
-  locale: string;
-}) {
-  return (
-    <div
-      className={`relative rounded-xl border bg-white p-6 ${popular ? "border-primary ring-2 ring-primary/20" : "border-border"}`}
-    >
-      {popular && (
-        <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-white">
-          {popularLabel}
-        </Badge>
-      )}
-      <div className="mb-6 text-center">
-        <h3 className="text-lg font-semibold">{name}</h3>
-        <div className="mt-2">
-          <span className="text-4xl font-bold">${price}</span>
-          <span className="text-muted-foreground">/month</span>
-        </div>
-        <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-      </div>
-      <ul className="mb-6 space-y-2.5">
-        {features.map((feature, i) => (
-          <li key={i} className="flex items-start gap-2 text-sm">
-            <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-500" />
-            <span>{feature}</span>
-          </li>
-        ))}
-      </ul>
-      <Link href={`/${locale}/auth/signup`}>
-        <Button className="w-full" variant={popular ? "default" : "outline"}>
-          {cta}
-        </Button>
-      </Link>
-      {footnote ? <p className="mt-4 text-xs text-muted-foreground">{footnote}</p> : null}
     </div>
   );
 }
