@@ -150,16 +150,32 @@ Someone who has been a reference for "their people" — students, trainees, cons
 - LiveKit video/audio rooms, multi-participant
 - Live chat during sessions
 - Automatic recording
-- Capacity per tier (50 / 150 / 300 max participants)
+- Capacity per tier: 100 / 300 / 1000 participants per live session (Creator / Business / Pro)
 - Configurable pre-live notifications
 - Shareable joining link
 - Interactive whiteboard (Excalidraw) — unique differentiator
 
-> **REVISIT (2026-05-27):** Participant caps below were sized against the old
-> Founder/Practice/Studio ARPA ($99/$199/$399). With the new Creator/Business/Pro
-> pricing (§6), caps must be re-modeled against LiveKit cost per participant-minute
-> (~$0.015/min video). Treat current caps as placeholders. See §6 for tier economics
-> and §10 for the parallel Success Metrics revisit.
+> **RESOLVED 2026-05-28:** Participant caps re-modeled against LiveKit cost
+> (~$0.015/min per participant) and new Creator/Business/Pro economics (§6).
+> Per-tier caps below are now Carlos-approved (2026-05-28).
+>
+> **Cap model (industry-standard Zoom tier alignment):**
+>
+> - Creator tier: 100 concurrent participants per live session
+> - Business tier: 300 concurrent participants per live session
+> - Pro tier: 1000 concurrent participants per live session
+>
+> **Margin model assumes typical usage (not saturation):**
+> Average attendance of 20–30% of community size, 60-min session length, 4
+> sessions/month. Under those assumptions, Creator tier margin stays positive
+> (Unytea revenue from $15 platform fee + 8% commission on member subscriptions
+> exceeds LiveKit + Stripe + infra cost). If a host approaches saturation of
+> their tier cap, the expected behavior is tier upgrade (Business → Pro), not
+> continued operation at margin-negative scale.
+>
+> **Out of scope for v1:** dynamic overage charging when host hits cap. v1
+> enforces caps as hard limits — session refuses additional join attempts past
+> the cap. UX work for graceful upgrade prompt deferred to follow-up.
 
 **OUT v1:**
 
@@ -490,11 +506,57 @@ When a feature request arrives:
 
 The Creator tier is the entry point for the §2 primary persona. Business is for emerging creators who have validated demand and want their own brand surface. Pro is for established hosts (the §2 secondary segment) and small studios with multiple programs.
 
-### Trial
+### Trial (updated 2026-05-28)
 
-- **14 days** on Creator, no credit card required up front.
-- **One-click extension to 28 days total** if the creator has not yet reached 10 members at day 14. The button appears in-dashboard on day 14 if the threshold is unmet; no support ticket required.
-- Rationale: the emerging-creator persona (§2) is time-rich and capital-poor, and their first 30 members come through the platform's discovery surface — which itself takes time to convert. A rigid 14-day trial would punish exactly the user we are trying to activate.
+14-day free trial. NO credit card required at signup. Stripe Subscription
+created with `trial_period_days: 14` and no default payment method.
+
+**At day 14:** subscription transitions to `past_due` state. Webhook
+handler toggles the community to `paywall_locked` mode:
+
+- Host can still log in and see their community data
+- Members can no longer post, attend live sessions, or interact
+- Banner shows "Add payment to reactivate"
+- Host can come back any time, add card via Stripe Customer Portal,
+  subscription reactivates instantly
+
+**Email reminders:** day 11 + day 13 prompts to add payment before
+paywall lock. Day 15 confirmation of paywall state with reactivation CTA.
+
+**Re-trial policy:** a host who lets a community lapse to paywall_locked
+and reactivates within 30 days does NOT get a second trial — payment
+resumes immediately. A host whose community has been paywall_locked for
+30+ days and reactivates can get one additional 7-day trial as goodwill
+(one-time, not stackable). This handles the "I tried Unytea, life got
+busy, coming back later" scenario without enabling abuse.
+
+**Strategic rationale (decided 2026-05-28):**
+Carlos chose this hybrid model over standard SaaS card-upfront after
+considering:
+
+- Target persona (§2 emerging creator) is capital-poor, often LATAM-based
+  (~40% adult credit-card penetration in LATAM avg). Card-upfront kills
+  funnel at the most sensitive moment.
+- Pure no-CC + indefinite extension (the original 2026-05-27 policy) is
+  operationally complex (custom lifecycle states, not Stripe-native) and
+  attracts more freeloaders.
+- Hybrid: no-CC at signup (low friction, large funnel) + standard 14-day
+  trial (no gimmicks) + paywall lock (data preserved, host can return)
+  captures the persona advantage without operational overhead. Expected
+  conversion: 15–20% (vs ~30% for CC-upfront and ~10% for no-CC-extension).
+- Funnel math: napkin estimate of 300 signups × 20% = 60 paying vs 100
+  signups × 30% = 30 paying. Larger funnel wins despite lower conversion.
+
+**Implementation cost:** higher than Stripe-native CC-upfront trial.
+Requires custom webhook handling for `customer.subscription.updated` →
+community state machine. Estimated +1 commit in Fase C code PR scope.
+
+### Annual billing (added 2026-05-28)
+
+Per Carlos decision 2026-05-28: monthly plans + annual plans with 16%
+discount. Annual prices: Creator $150/year (vs $180 monthly), Business
+$490/year (vs $588 monthly), Pro $1490/year (vs $1788 monthly). Math =
+2 months free (Skool-style "save 16%" framing).
 
 ### Stripe fees — pass-through, not absorbed
 
@@ -521,6 +583,14 @@ Only "sabor sano" coupons: % off, fixed amount, expiration, redemption limit. No
 ### Re-evaluation cadence
 
 Pricing re-evaluated **quarterly post-launch** with real cost data per tier and conversion rates between tiers. The same rule applies as in §10: never raise thresholds to inflate numbers; adjust product, not definition.
+
+### Trial — original 2026-05-27 (superseded 2026-05-28)
+
+_Original rationale preserved for historical context. See updated Trial sub-section above for current policy._
+
+- **14 days** on Creator, no credit card required up front.
+- **One-click extension to 28 days total** if the creator has not yet reached 10 members at day 14. The button appears in-dashboard on day 14 if the threshold is unmet; no support ticket required.
+- Rationale: the emerging-creator persona (§2) is time-rich and capital-poor, and their first 30 members come through the platform's discovery surface — which itself takes time to convert. A rigid 14-day trial would punish exactly the user we are trying to activate.
 
 ---
 
@@ -659,7 +729,35 @@ Until ≥1,000 creators and ≥50,000 visitors, ad inventory is too small to att
 
 ## Section 10 — Success Metrics
 
-> **Note 2026-05-27 — flagged for revisit, not yet revised.** The $5k Day-90 / $30k Month-12 Healthy MRR targets below were sized against the original §4 pricing ($99/$199/$399). The revised pricing in §6 (Creator $15, Business $49, Pro $149) implies materially different ARPA at the same host count. These targets are flagged for revisit in the next quarterly pricing review (§6 cadence). Until then, they remain on file as the prior baseline; the **Operating Principles** rule still binds — _never raise thresholds to inflate numbers_ — and any change to these targets must be a documented decision, not a quiet adjustment. Healthy MRR's definitional criteria (the three boolean tests below) are unaffected by the pricing pivot.
+> **RESOLVED 2026-05-28:** Targets re-modeled against new ARPA assumption.
+>
+> **ARPA model:**
+> Expected mix: ~60% Creator ($15/mo), ~30% Business ($49/mo), ~10% Pro
+> ($149/mo). Weighted average: ~$38/mo platform fee per host. Plus
+> commission revenue on member subscriptions (variable, typically 50–100%
+> additional on platform fee for active hosts). Conservative ARPA used for
+> targets: $40/mo per paying host.
+>
+> **Day-90 target:** $5,000 MRR
+> Implies ~125 paying hosts active at Day-90. Assumes growth motion driven by
+> organic discovery (/explore page restored in Fase B) + emerging-creator
+> positioning + Skool comparison content.
+>
+> **Month-12 target:** $30,000 MRR
+> Implies ~750 paying hosts active at Month-12. Roughly 6× Day-90 (sustained
+> monthly compounding ~17%/mo net of churn).
+>
+> **Annual ARPA upside:** the 16% discount on annual plans (2 months free)
+> may pull a fraction of cohort to annual billing, which has higher LTV but
+> lower MRR (Stripe accounts annual as deferred revenue). Targets above
+> assume MRR view of monthly billers only; annual subscribers count toward
+> LTV but get amortized into MRR over their term. Revisit at Month-6 with
+> real cohort data.
+>
+> Healthy MRR's definitional criteria (the three boolean tests below) are
+> unaffected by the pricing pivot. The **Operating Principles** rule still
+> binds — _never raise thresholds to inflate numbers_ — and any change to
+> these targets must be a documented decision, not a quiet adjustment.
 
 ### North Star: **Healthy MRR**
 
