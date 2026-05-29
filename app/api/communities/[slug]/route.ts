@@ -1,6 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
+import { CommunityCategory } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/auth-utils";
+
+const LANGUAGE_PATTERN = /^[a-zA-Z-]{2,8}$/;
+// Object.values(enum) returns only own enumerable string values, so the Set
+// excludes prototype methods. `value in CommunityCategory` would have
+// returned true for "hasOwnProperty" → Prisma error → 500.
+const VALID_CATEGORIES = new Set<CommunityCategory>(
+  Object.values(CommunityCategory) as CommunityCategory[]
+);
+
+function isCommunityCategory(value: unknown): value is CommunityCategory {
+  return typeof value === "string" && VALID_CATEGORIES.has(value as CommunityCategory);
+}
 
 export async function GET(_request: NextRequest, props: { params: Promise<{ slug: string }> }) {
   const params = await props.params;
@@ -100,7 +113,7 @@ export async function PATCH(request: NextRequest, props: { params: Promise<{ slu
 
     const community = await prisma.community.findUnique({
       where: { slug: params.slug },
-      select: { id: true, ownerId: true, settings: true },
+      select: { id: true, ownerId: true },
     });
 
     if (!community) {
@@ -143,32 +156,33 @@ export async function PATCH(request: NextRequest, props: { params: Promise<{ slu
       data.requireApproval = body.requireApproval;
     }
 
-    // category + language live inside the settings JSON. Merge, don't overwrite.
-    const hasCategoryUpdate = typeof body.category === "string";
-    const hasLanguageUpdate = typeof body.language === "string";
-    if (hasCategoryUpdate || hasLanguageUpdate) {
-      const currentSettings =
-        community.settings && typeof community.settings === "object"
-          ? (community.settings as Record<string, unknown>)
-          : {};
-      const nextSettings = { ...currentSettings };
-      if (hasCategoryUpdate) {
-        const trimmed = (body.category as string).trim();
-        if (trimmed.length > 0) {
-          nextSettings.category = trimmed;
-        } else {
-          delete nextSettings.category;
-        }
+    // category / language / excludeFromExplore now live in top-level typed
+    // columns (Commit 1 of feat/restore-explore PR). Pre-existing values
+    // stored in the `settings` JSON are NOT touched here — they become dead
+    // JSON. No backfill: hosts re-save settings to populate the typed columns.
+    if (body.category !== undefined) {
+      if (body.category === "" || body.category === null) {
+        data.category = null;
+      } else if (isCommunityCategory(body.category)) {
+        data.category = body.category;
+      } else {
+        return NextResponse.json({ error: "Invalid category" }, { status: 400 });
       }
-      if (hasLanguageUpdate) {
-        const trimmed = (body.language as string).trim();
-        if (trimmed.length > 0) {
-          nextSettings.language = trimmed;
-        } else {
-          delete nextSettings.language;
-        }
+    }
+    if (body.language !== undefined) {
+      if (body.language === "" || body.language === null) {
+        data.language = null;
+      } else if (typeof body.language === "string" && LANGUAGE_PATTERN.test(body.language)) {
+        data.language = body.language;
+      } else {
+        return NextResponse.json(
+          { error: "Invalid language (expected ISO 639-1, 2-8 chars)" },
+          { status: 400 }
+        );
       }
-      data.settings = nextSettings;
+    }
+    if (body.excludeFromExplore !== undefined) {
+      data.excludeFromExplore = Boolean(body.excludeFromExplore);
     }
 
     if (Object.keys(data).length === 0) {
@@ -185,6 +199,9 @@ export async function PATCH(request: NextRequest, props: { params: Promise<{ slu
         description: true,
         isPrivate: true,
         requireApproval: true,
+        category: true,
+        language: true,
+        excludeFromExplore: true,
         settings: true,
         updatedAt: true,
       },

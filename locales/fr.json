@@ -46,6 +46,7 @@
   },
   "landing": {
     "nav": {
+      "explore": "Explorer",
       "features": "Fonctionnalités",
       "testimonials": "Témoignages",
       "pricing": "Tarifs",
@@ -404,9 +405,95 @@
       "cta": "Aller au Tableau de Bord"
     }
   },
+  "explore": {
+    "page": {
+      "title": "Explorer les communautés",
+      "description": "Découvrez des communautés live-first menées par des créateurs émergents.",
+      "metaTitle": "Explorer les communautés — Unytea",
+      "metaDescription": "Découvrez des communautés live-first menées par des créateurs émergents. Filtrez par catégorie, langue et thème. Trouvez votre prochaine communauté sur Unytea.",
+      "ogTitle": "Explorez les communautés sur Unytea",
+      "ogDescription": "Communautés live-first menées par des créateurs émergents."
+    },
+    "filters": {
+      "searchPlaceholder": "Rechercher des communautés...",
+      "allCategories": "Toutes les catégories",
+      "allLanguages": "Toutes les langues",
+      "allSizes": "Toutes",
+      "small": "Petite",
+      "medium": "Moyenne",
+      "large": "Grande",
+      "allTypes": "Toutes",
+      "free": "Gratuit",
+      "paid": "Payant",
+      "sortLabel": "Trier par",
+      "newest": "Plus récentes",
+      "mostMembers": "Plus de membres",
+      "mostActive": "Plus actives",
+      "clearAll": "Effacer les filtres",
+      "resultsCount": "{count, plural, =0 {Aucune communauté} =1 {1 communauté} other {# communautés}}"
+    },
+    "card": {
+      "free": "Gratuit",
+      "paid": "Payant",
+      "byOwner": "par {name}",
+      "byOwnerWithTitle": "par {name} · {title}",
+      "members": "{count, plural, =1 {1 membre} other {# membres}}",
+      "activityLabel": "Activité · 30 derniers jours",
+      "activityStatus": {
+        "very_active": "Très active",
+        "active": "Active",
+        "moderate": "Modérée",
+        "quiet": "Calme"
+      },
+      "liveStatus": {
+        "live_now": "En direct",
+        "live_soon": "Commence dans {time}",
+        "live_today": "Aujourd'hui {time}",
+        "live_this_week": "{day}"
+      }
+    },
+    "categories": {
+      "BUSINESS_ENTREPRENEURSHIP": "Business et entrepreneuriat",
+      "MARKETING_SALES": "Marketing et ventes",
+      "TECH_PROGRAMMING": "Tech et programmation",
+      "AI_DATA_SCIENCE": "IA et data science",
+      "HEALTH_WELLNESS": "Santé et bien-être",
+      "FITNESS_SPORTS": "Fitness et sport",
+      "COOKING_NUTRITION": "Cuisine et nutrition",
+      "PHOTOGRAPHY": "Photographie",
+      "ART_DESIGN": "Art et design",
+      "MUSIC": "Musique",
+      "WRITING_PUBLISHING": "Écriture et publication",
+      "EDUCATION_LANGUAGES": "Éducation et langues",
+      "PERSONAL_FINANCE": "Finances personnelles",
+      "TRAVEL": "Voyage",
+      "PARENTING_FAMILY": "Parentalité et famille",
+      "SPIRITUALITY_MINDFULNESS": "Spiritualité et pleine conscience",
+      "GAMING": "Gaming",
+      "CRAFTS_DIY": "Artisanat et DIY",
+      "BOOKS_READING": "Livres et lecture",
+      "OTHER": "Autre"
+    },
+    "feed": {
+      "emptyTitle": "Aucune communauté ne correspond",
+      "emptyDescription": "Ajustez les filtres pour voir plus de résultats.",
+      "loading": "Chargement...",
+      "endOfResults": "Vous avez atteint la fin",
+      "errorTitle": "Échec du chargement",
+      "errorDescription": "Essayez de rafraîchir la page.",
+      "retry": "Réessayer"
+    },
+    "settings": {
+      "discoveryHeader": "Découverte",
+      "discoveryDescription": "Contrôlez si votre communauté apparaît sur la page publique /explore d'Unytea.",
+      "listToggle": "Lister sur /explore",
+      "listToggleDescription": "Lorsque cette option est activée, votre communauté apparaît dans les listes publiques pour la catégorie et la langue que vous avez sélectionnées, à condition de remplir les critères de qualité (≥3 membres actifs, ≥1 session live à venir, description + image de couverture définies, ≥14 jours d'ancienneté)."
+    }
+  },
   "sidebar": {
     "nav": {
       "dashboard": "Tableau de Bord",
+      "explore": "Explorer",
       "communities": "Communautés",
       "messages": "Messages",
       "sessions": "Sessions",

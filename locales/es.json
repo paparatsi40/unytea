@@ -46,6 +46,7 @@
   },
   "landing": {
     "nav": {
+      "explore": "Explorar",
       "features": "Funcionalidades",
       "testimonials": "Testimonios",
       "pricing": "Precios",
@@ -405,9 +406,95 @@
       "cta": "Ir al Dashboard"
     }
   },
+  "explore": {
+    "page": {
+      "title": "Explorar comunidades",
+      "description": "Descubre comunidades live-first lideradas por creadores emergentes.",
+      "metaTitle": "Explorar comunidades — Unytea",
+      "metaDescription": "Descubre comunidades live-first lideradas por creadores emergentes. Filtra por categoría, idioma y tema. Encuentra tu próxima comunidad en Unytea.",
+      "ogTitle": "Explora comunidades en Unytea",
+      "ogDescription": "Comunidades live-first lideradas por creadores emergentes."
+    },
+    "filters": {
+      "searchPlaceholder": "Buscar comunidades...",
+      "allCategories": "Todas las categorías",
+      "allLanguages": "Todos los idiomas",
+      "allSizes": "Todos",
+      "small": "Pequeña",
+      "medium": "Mediana",
+      "large": "Grande",
+      "allTypes": "Todas",
+      "free": "Gratis",
+      "paid": "De pago",
+      "sortLabel": "Ordenar por",
+      "newest": "Más recientes",
+      "mostMembers": "Más miembros",
+      "mostActive": "Más activas",
+      "clearAll": "Limpiar filtros",
+      "resultsCount": "{count, plural, =0 {Sin comunidades} =1 {1 comunidad} other {# comunidades}}"
+    },
+    "card": {
+      "free": "Gratis",
+      "paid": "Pago",
+      "byOwner": "por {name}",
+      "byOwnerWithTitle": "por {name} · {title}",
+      "members": "{count, plural, =1 {1 miembro} other {# miembros}}",
+      "activityLabel": "Actividad · últimos 30 días",
+      "activityStatus": {
+        "very_active": "Muy activa",
+        "active": "Activa",
+        "moderate": "Moderada",
+        "quiet": "Tranquila"
+      },
+      "liveStatus": {
+        "live_now": "En vivo ahora",
+        "live_soon": "Empieza en {time}",
+        "live_today": "Hoy {time}",
+        "live_this_week": "{day}"
+      }
+    },
+    "categories": {
+      "BUSINESS_ENTREPRENEURSHIP": "Negocios y emprendimiento",
+      "MARKETING_SALES": "Marketing y ventas",
+      "TECH_PROGRAMMING": "Tecnología y programación",
+      "AI_DATA_SCIENCE": "IA y ciencia de datos",
+      "HEALTH_WELLNESS": "Salud y bienestar",
+      "FITNESS_SPORTS": "Fitness y deportes",
+      "COOKING_NUTRITION": "Cocina y nutrición",
+      "PHOTOGRAPHY": "Fotografía",
+      "ART_DESIGN": "Arte y diseño",
+      "MUSIC": "Música",
+      "WRITING_PUBLISHING": "Escritura y publicación",
+      "EDUCATION_LANGUAGES": "Educación e idiomas",
+      "PERSONAL_FINANCE": "Finanzas personales",
+      "TRAVEL": "Viajes",
+      "PARENTING_FAMILY": "Crianza y familia",
+      "SPIRITUALITY_MINDFULNESS": "Espiritualidad y mindfulness",
+      "GAMING": "Videojuegos",
+      "CRAFTS_DIY": "Manualidades y DIY",
+      "BOOKS_READING": "Libros y lectura",
+      "OTHER": "Otro"
+    },
+    "feed": {
+      "emptyTitle": "Sin comunidades que coincidan",
+      "emptyDescription": "Ajusta los filtros para ver más resultados.",
+      "loading": "Cargando más...",
+      "endOfResults": "Has llegado al final",
+      "errorTitle": "Error al cargar más",
+      "errorDescription": "Intenta refrescar la página.",
+      "retry": "Reintentar"
+    },
+    "settings": {
+      "discoveryHeader": "Descubrimiento",
+      "discoveryDescription": "Controla si tu comunidad aparece en la página pública /explore de Unytea.",
+      "listToggle": "Aparecer en /explore",
+      "listToggleDescription": "Cuando está activo, tu comunidad aparece en listados públicos de la categoría e idioma que elegiste, siempre que cumpla los criterios de calidad (≥3 miembros activos, ≥1 sesión en vivo próxima, descripción + imagen de portada definidas, ≥14 días de antigüedad)."
+    }
+  },
   "sidebar": {
     "nav": {
       "dashboard": "Panel",
+      "explore": "Explorar",
       "communities": "Comunidades",
       "messages": "Mensajes",
       "sessions": "Sesiones",

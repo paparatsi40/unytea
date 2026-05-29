@@ -179,6 +179,11 @@ model Community {
   // SECTION BUILDER (NEW - replaces Visual Builder)
   landingLayout Json? // Array of SectionInstance objects from Section Builder
 
+  // Discovery (/explore) fields
+  category           CommunityCategory? // null until host categorizes; required to appear in /explore
+  language           String?            @default("en") // ISO 639-1 (e.g., "en", "es", "fr", "pt", "de")
+  excludeFromExplore Boolean            @default(false) // host can opt-OUT of /explore listing
+
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   deletedAt         DateTime?
@@ -203,6 +208,9 @@ model Community {
   @@index([ownerId])
   @@index([customDomain])
   @@index([subdomain])
+  @@index([category])
+  @@index([language])
+  @@index([excludeFromExplore])
   @@map("communities")
 }
 
@@ -1180,6 +1188,29 @@ enum CommunitySectionType {
   CUSTOM_HTML // Custom content block
   EVENTS // Upcoming events
   LEADERBOARD // Top contributors
+}
+
+enum CommunityCategory {
+  BUSINESS_ENTREPRENEURSHIP
+  MARKETING_SALES
+  TECH_PROGRAMMING
+  AI_DATA_SCIENCE
+  HEALTH_WELLNESS
+  FITNESS_SPORTS
+  COOKING_NUTRITION
+  PHOTOGRAPHY
+  ART_DESIGN
+  MUSIC
+  WRITING_PUBLISHING
+  EDUCATION_LANGUAGES
+  PERSONAL_FINANCE
+  TRAVEL
+  PARENTING_FAMILY
+  SPIRITUALITY_MINDFULNESS
+  GAMING
+  CRAFTS_DIY
+  BOOKS_READING
+  OTHER
 }
 
 // ============================================
