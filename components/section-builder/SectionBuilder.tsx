@@ -13,7 +13,6 @@ import { FAQRender } from "./sections/FAQ";
 import { StatsRender } from "./sections/Stats";
 import { OwnerBioRender } from "./sections/OwnerBio";
 import { GalleryRender } from "./sections/Gallery";
-import { UpcomingSessionsRender } from "./sections/UpcomingSessions";
 import { PostsFeedRender } from "./sections/PostsFeed";
 import { MembershipTiersRender } from "./sections/MembershipTiers";
 import { ImageUploader } from "@/components/ui/image-uploader";
@@ -50,8 +49,20 @@ function renderSection(section: SectionInstance, t: ReturnType<typeof useTransla
       return <OwnerBioRender {...section.props} />;
     case "gallery":
       return <GalleryRender {...section.props} />;
-    case "upcomingSessions":
-      return <UpcomingSessionsRender {...section.props} />;
+    case "upcomingSessions": {
+      // UpcomingSessionsRender is an async Server Component that queries
+      // Prisma, so it cannot run inside this client builder. Show a static
+      // placeholder; live session data renders on the published page.
+      const title = section.props.title || "Upcoming sessions";
+      return (
+        <section className="rounded-2xl bg-white px-8 py-10 shadow-sm">
+          <h3 className="text-xl font-medium text-gray-900">{title}</h3>
+          <p className="mt-2 text-sm text-gray-500">
+            Live sessions from this community will appear here on the published page.
+          </p>
+        </section>
+      );
+    }
     case "postsFeed":
       return <PostsFeedRender {...section.props} />;
     case "membershipTiers":

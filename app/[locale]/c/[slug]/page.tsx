@@ -42,32 +42,40 @@ async function getCommunity(slug: string) {
   return community;
 }
 
-function renderSection(section: SectionInstance, index: number) {
+function renderSection(
+  section: SectionInstance,
+  index: number,
+  context: { communityId: string }
+) {
   const key = section.id || `section-${index}`;
+  // Inject page-level community context into host-configured props. Sections
+  // that need it (UpcomingSessions, and PostsFeed/MembershipTiers in later
+  // commits) read communityId; sections that don't simply ignore it.
+  const propsWithContext = { ...section.props, communityId: context.communityId };
 
   switch (section.type) {
     case "hero":
-      return <HeroRender key={key} {...section.props} />;
+      return <HeroRender key={key} {...propsWithContext} />;
     case "features":
-      return <FeaturesRender key={key} {...section.props} />;
+      return <FeaturesRender key={key} {...propsWithContext} />;
     case "cta":
-      return <CTARender key={key} {...section.props} />;
+      return <CTARender key={key} {...propsWithContext} />;
     case "testimonials":
-      return <TestimonialsRender key={key} {...section.props} />;
+      return <TestimonialsRender key={key} {...propsWithContext} />;
     case "faq":
-      return <FAQRender key={key} {...section.props} />;
+      return <FAQRender key={key} {...propsWithContext} />;
     case "stats":
-      return <StatsRender key={key} {...section.props} />;
+      return <StatsRender key={key} {...propsWithContext} />;
     case "ownerBio":
-      return <OwnerBioRender key={key} {...section.props} />;
+      return <OwnerBioRender key={key} {...propsWithContext} />;
     case "gallery":
-      return <GalleryRender key={key} {...section.props} />;
+      return <GalleryRender key={key} {...propsWithContext} />;
     case "upcomingSessions":
-      return <UpcomingSessionsRender key={key} {...section.props} />;
+      return <UpcomingSessionsRender key={key} {...propsWithContext} />;
     case "postsFeed":
-      return <PostsFeedRender key={key} {...section.props} />;
+      return <PostsFeedRender key={key} {...propsWithContext} />;
     case "membershipTiers":
-      return <MembershipTiersRender key={key} {...section.props} />;
+      return <MembershipTiersRender key={key} {...propsWithContext} />;
     case "pricing":
       return (
         <div key={key} className="p-8 text-center text-gray-500">
@@ -180,7 +188,9 @@ export default async function PublicCommunityPage(props: {
         ) : (
           // Render Sections
           <div className="mx-auto max-w-6xl space-y-12">
-            {sections.map((section, index) => renderSection(section, index))}
+            {sections.map((section, index) =>
+              renderSection(section, index, { communityId: community.id })
+            )}
             {/* Footer CTA if owner */}
             {isOwner && (
               <div className="mt-16 rounded-lg border border-blue-200 bg-blue-50 p-6 text-center">

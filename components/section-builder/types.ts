@@ -34,7 +34,9 @@ export interface SectionSchema {
   icon: string; // emoji
   fields: FieldDef[];
   defaultProps: Record<string, any>;
-  Render: (props: Record<string, any>) => JSX.Element;
+  // Render may be an async Server Component (e.g. data-driven sections like
+  // UpcomingSessions that fetch from Prisma), hence the Promise union.
+  Render: (props: Record<string, any>) => JSX.Element | Promise<JSX.Element>;
 }
 
 export interface SectionInstance {
