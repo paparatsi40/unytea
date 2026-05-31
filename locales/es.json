@@ -511,6 +511,90 @@
       "cta": "Actualizar ahora"
     }
   },
+  "billing": {
+    "pricing": {
+      "headerTitle": "Precios simples para community businesses",
+      "headerSubtitle": "14 días de prueba gratis. Sin tarjeta de crédito.",
+      "headerDetail": "Los hosts pagan por la plataforma. Tú decides el precio para tus members.",
+      "toggleMonthly": "Mensual",
+      "toggleAnnual": "Anual",
+      "annualSaveBadge": "Ahorra 16%",
+      "perMonth": "/mes",
+      "perYear": "/año",
+      "annualSavingsHint": "Ahorra ${amount} vs pago mensual",
+      "commission": "+ {percent}% de comisión sobre los ingresos de members",
+      "trialCta": "Empezar prueba de 14 días",
+      "trialNoCC": "Sin tarjeta requerida",
+      "featuredLabel": "Más popular",
+      "freeForMembersTitle": "Diseñado para hosts, gratis para members.",
+      "freeForMembersBody": "Cualquiera puede crear cuenta, explorar comunidades, y unirse gratis. Los hosts pagan a Unytea una mensualidad fija más una pequeña comisión (3-8%) sobre las membresías que cobran. Sin costos ocultos."
+    },
+    "tiers": {
+      "creator": {
+        "name": "Creator",
+        "description": "Para creators emergentes lanzando su primera comunidad",
+        "features": [
+          "Members ilimitados",
+          "Live sessions con hasta 100 participantes concurrentes",
+          "Cursos pagados",
+          "Feed de comunidad + biblioteca",
+          "Analytics básicos"
+        ]
+      },
+      "business": {
+        "name": "Business",
+        "description": "Para hosts establecidos creciendo su comunidad",
+        "features": [
+          "Todo lo de Creator",
+          "Live sessions con hasta 300 participantes concurrentes",
+          "Dominio custom",
+          "Analytics avanzados",
+          "Hasta 5 admins"
+        ]
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "Para teams escalando múltiples comunidades",
+        "features": [
+          "Todo lo de Business",
+          "Live sessions con hasta 1000 participantes concurrentes",
+          "Experiencia white-label",
+          "Acceso a API",
+          "Admins ilimitados"
+        ]
+      }
+    },
+    "trial": {
+      "endsToday": "Tu prueba termina hoy.",
+      "daysLeft": "{days, plural, =1 {1 día} other {# días}} restantes en tu prueba {plan}.",
+      "addPaymentCta": "Agregar pago",
+      "addPaymentPrompt": "Agrega pago para mantener tu comunidad activa después del {date}."
+    },
+    "paywall": {
+      "banner": {
+        "paused": {
+          "title": "Tu comunidad está pausada",
+          "body": "Tu prueba terminó sin pago. Agrega una tarjeta para reactivar — tus datos están preservados.",
+          "cta": "Agregar pago"
+        },
+        "past_due": {
+          "title": "Pago requerido",
+          "body": "No pudimos procesar tu último pago. Actualiza tu método de pago para reactivar tu comunidad.",
+          "cta": "Agregar pago"
+        },
+        "canceled": {
+          "title": "Suscripción cancelada",
+          "body": "Tu suscripción fue cancelada. Reactiva para que tu comunidad vuelva a estar en línea.",
+          "cta": "Reactivar"
+        }
+      },
+      "lockedView": {
+        "title": "{name} está pausada",
+        "body": "Esta comunidad está temporalmente fuera de línea. El host está trabajando para reactivarla. Tu membresía y contenido están preservados.",
+        "browseLink": "Explorar otras comunidades"
+      }
+    }
+  },
   "exploreFilters": {
     "searchPlaceholder": "Buscar comunidades",
     "monetization": {

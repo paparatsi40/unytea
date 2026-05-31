@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { getStripeSession, getOrCreateStripeCustomer } from "@/lib/stripe";
+import { getStripeSession } from "@/lib/stripe";
 
 export const dynamic = "force-dynamic";
 
@@ -18,18 +18,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Price ID is required" }, { status: 400 });
     }
 
-    // Get or create Stripe customer (ensures customer exists in Stripe)
-    await getOrCreateStripeCustomer({
-      userId: session.user.id,
-      email: session.user.email,
-      name: session.user.name,
-    });
-
-    // Create checkout session
+    // Trial eligibility auto-detected by getStripeSession via hasPriorSubscription
+    // check. New customers → 14-day no-CC trial (PD V1 §6).
+    // Returning customers (upgrades, re-activations after Stripe-pause) → no trial.
+    // getStripeSession also calls getOrCreateStripeCustomer internally, so we no
+    // longer need to ensure the customer exists here.
     const checkoutSession = await getStripeSession({
       priceId,
       userId: session.user.id,
       userEmail: session.user.email,
+      userName: session.user.name,
     });
 
     return NextResponse.json({ url: checkoutSession.url });

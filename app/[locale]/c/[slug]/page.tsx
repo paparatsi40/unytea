@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { auth } from "@/lib/auth";
+import { PaywallLockedView } from "@/components/community/PaywallLockedView";
 
 async function getCommunity(slug: string) {
   const community = await prisma.community.findUnique({
@@ -76,7 +77,9 @@ function renderSection(section: SectionInstance, index: number) {
   }
 }
 
-export default async function PublicCommunityPage(props: { params: Promise<{ slug: string }> }) {
+export default async function PublicCommunityPage(props: {
+  params: Promise<{ locale: string; slug: string }>;
+}) {
   const params = await props.params;
   const community = await getCommunity(params.slug);
 
@@ -86,6 +89,20 @@ export default async function PublicCommunityPage(props: { params: Promise<{ slu
 
   const session = await auth();
   const isOwner = session?.user?.id === community.owner.id;
+
+  // Paywall gate with owner exception: non-owner visitors see the locked
+  // view. Owner passes through to their own landing so they can preview
+  // the page they'll show once payment is added. They manage the paywall
+  // state via the dashboard PaywallBanner (mounted in the dashboard layout).
+  if (community.paywallLocked && !isOwner) {
+    return (
+      <PaywallLockedView
+        communityName={community.name}
+        communityImageUrl={community.imageUrl}
+        locale={params.locale}
+      />
+    );
+  }
 
   // Parse landing layout
   const sections = Array.isArray(community.landingLayout)

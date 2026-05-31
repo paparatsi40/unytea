@@ -184,6 +184,10 @@ model Community {
   language           String?            @default("en") // ISO 639-1 (e.g., "en", "es", "fr", "pt", "de")
   excludeFromExplore Boolean            @default(false) // host can opt-OUT of /explore listing
 
+  // Subscription gating (Fase C)
+  paywallLocked   Boolean   @default(false) // true when host's platform subscription is past_due or canceled
+  paywallLockedAt DateTime? // timestamp of last lock event (audit + email reminder timing)
+
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   deletedAt         DateTime?
@@ -211,6 +215,7 @@ model Community {
   @@index([category])
   @@index([language])
   @@index([excludeFromExplore])
+  @@index([paywallLocked])
   @@map("communities")
 }
 
@@ -1136,6 +1141,7 @@ enum SubscriptionStatus {
   CANCELED
   UNPAID
   TRIALING
+  PAUSED // Stripe sends this when trial ends with missing_payment_method='pause'
 }
 
 enum ReactionType {

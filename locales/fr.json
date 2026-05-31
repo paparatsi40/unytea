@@ -510,6 +510,90 @@
       "cta": "Mettre à niveau"
     }
   },
+  "billing": {
+    "pricing": {
+      "headerTitle": "Tarifs simples pour les community businesses",
+      "headerSubtitle": "Essai gratuit de 14 jours. Sans carte bancaire.",
+      "headerDetail": "Les hosts paient pour la plateforme. Vous décidez du prix pour vos members.",
+      "toggleMonthly": "Mensuel",
+      "toggleAnnual": "Annuel",
+      "annualSaveBadge": "Économisez 16%",
+      "perMonth": "/mois",
+      "perYear": "/an",
+      "annualSavingsHint": "Économisez ${amount} vs facturation mensuelle",
+      "commission": "+ {percent}% de commission sur les revenus des members",
+      "trialCta": "Commencer l'essai de 14 jours",
+      "trialNoCC": "Sans carte requise",
+      "featuredLabel": "Le plus populaire",
+      "freeForMembersTitle": "Conçu pour les hosts, gratuit pour les members.",
+      "freeForMembersBody": "Chacun peut créer un compte, explorer les communautés et rejoindre gratuitement. Les hosts paient à Unytea un forfait mensuel plus une petite commission (3-8%) sur les abonnements des members qu'ils collectent. Aucun frais caché."
+    },
+    "tiers": {
+      "creator": {
+        "name": "Creator",
+        "description": "Pour les créateurs émergents lançant leur première communauté",
+        "features": [
+          "Members illimités",
+          "Sessions live jusqu'à 100 participants simultanés",
+          "Cours payants",
+          "Feed de communauté + bibliothèque",
+          "Analytics basiques"
+        ]
+      },
+      "business": {
+        "name": "Business",
+        "description": "Pour les hosts établis qui font grandir leur communauté",
+        "features": [
+          "Tout ce qui est dans Creator",
+          "Sessions live jusqu'à 300 participants simultanés",
+          "Domaine personnalisé",
+          "Analytics avancés",
+          "Jusqu'à 5 admins"
+        ]
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "Pour les équipes qui font passer à l'échelle plusieurs communautés",
+        "features": [
+          "Tout ce qui est dans Business",
+          "Sessions live jusqu'à 1000 participants simultanés",
+          "Expérience white-label",
+          "Accès API",
+          "Admins illimités"
+        ]
+      }
+    },
+    "trial": {
+      "endsToday": "Votre essai se termine aujourd'hui.",
+      "daysLeft": "{days, plural, =1 {1 jour restant} other {# jours restants}} dans votre essai {plan}.",
+      "addPaymentCta": "Ajouter un paiement",
+      "addPaymentPrompt": "Ajoutez un paiement pour garder votre communauté en ligne après le {date}."
+    },
+    "paywall": {
+      "banner": {
+        "paused": {
+          "title": "Votre communauté est en pause",
+          "body": "Votre essai s'est terminé sans paiement. Ajoutez une carte pour réactiver — vos données sont préservées.",
+          "cta": "Ajouter un paiement"
+        },
+        "past_due": {
+          "title": "Paiement requis",
+          "body": "Nous n'avons pas pu traiter votre dernier paiement. Mettez à jour votre moyen de paiement pour réactiver votre communauté.",
+          "cta": "Ajouter un paiement"
+        },
+        "canceled": {
+          "title": "Abonnement annulé",
+          "body": "Votre abonnement a été annulé. Réactivez pour remettre votre communauté en ligne.",
+          "cta": "Réactiver"
+        }
+      },
+      "lockedView": {
+        "title": "{name} est en pause",
+        "body": "Cette communauté est temporairement indisponible. Le host travaille pour la remettre en ligne. Votre adhésion et votre contenu sont préservés.",
+        "browseLink": "Parcourir d'autres communautés"
+      }
+    }
+  },
   "exploreFilters": {
     "searchPlaceholder": "Rechercher des communautés",
     "monetization": {

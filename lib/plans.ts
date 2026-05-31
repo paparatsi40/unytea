@@ -65,11 +65,25 @@ export const PLAN_LIMITS: Record<PlatformPlan, PlanLimits> = {
 };
 
 export function getPlanFromPriceId(priceId: string): PlatformPlan | null {
-  const priceMap: Record<string, PlatformPlan> = {
-    [process.env.NEXT_PUBLIC_STRIPE_CREATOR_PRICE_ID ?? ""]: "CREATOR",
-    [process.env.NEXT_PUBLIC_STRIPE_BUSINESS_PRICE_ID ?? ""]: "BUSINESS",
-    [process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID ?? ""]: "PRO",
-  };
+  // Defensive construction: filter undefined/empty env vars before building
+  // the map. The previous `[env ?? ""]: "PLAN"` pattern would have collapsed
+  // every unset env var to the same `""` key, leaving the last `""` mapping
+  // win — and a lookup of "" would have returned a plan name.
+  const priceMap: Record<string, PlatformPlan> = {};
+  const entries: Array<[string | undefined, PlatformPlan]> = [
+    [process.env.NEXT_PUBLIC_STRIPE_CREATOR_PRICE_ID, "CREATOR"],
+    [process.env.NEXT_PUBLIC_STRIPE_BUSINESS_PRICE_ID, "BUSINESS"],
+    [process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID, "PRO"],
+    // Annual variants (added 2026-05-29 — Fase C pre-merge fix B1). Without
+    // these, invoice.payment_succeeded for annual subscribers never triggers
+    // the platformPlan update or paywall unlock shortcut.
+    [process.env.NEXT_PUBLIC_STRIPE_CREATOR_PRICE_ID_YEARLY, "CREATOR"],
+    [process.env.NEXT_PUBLIC_STRIPE_BUSINESS_PRICE_ID_YEARLY, "BUSINESS"],
+    [process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID_YEARLY, "PRO"],
+  ];
+  for (const [id, plan] of entries) {
+    if (id) priceMap[id] = plan;
+  }
   return priceMap[priceId] ?? null;
 }
 

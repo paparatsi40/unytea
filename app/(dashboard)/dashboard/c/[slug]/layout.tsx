@@ -1,7 +1,9 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
+import { getLocale } from "next-intl/server";
 import { PremiumCommunityHeader } from "@/components/community/PremiumCommunityHeader";
+import { PaywallLockedView } from "@/components/community/PaywallLockedView";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -51,8 +53,22 @@ export default async function CommunityLayout(props: LayoutProps) {
   }
 
   const isMember = membership?.status === "ACTIVE";
-  const isOwner = membership?.role === "OWNER";
+  const isOwner = membership?.role === "OWNER" || community.ownerId === session?.user?.id;
   const isPending = membership?.status === "PENDING";
+
+  // Paywall gate: non-owner viewers see the locked screen. Owner passes through
+  // to admin views (their dashboard route group will mount the PaywallBanner
+  // global banner above the page content).
+  if (community.paywallLocked && !isOwner) {
+    const locale = await getLocale();
+    return (
+      <PaywallLockedView
+        communityName={community.name}
+        communityImageUrl={community.imageUrl}
+        locale={locale}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

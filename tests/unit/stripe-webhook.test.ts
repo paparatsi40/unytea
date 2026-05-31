@@ -25,12 +25,14 @@ vi.mock("@/lib/plans", () => ({
 // stub in tests/setup.ts does not declare.
 vi.mock("@/lib/prisma", () => ({
   prisma: {
-    processedStripeEvent: { create: vi.fn() },
+    processedStripeEvent: { create: vi.fn(), findUnique: vi.fn() },
     coursePurchase: { updateMany: vi.fn() },
     enrollment: { upsert: vi.fn() },
     course: { update: vi.fn() },
     member: { findFirst: vi.fn(), update: vi.fn(), create: vi.fn() },
-    community: { update: vi.fn() },
+    // Fase C Commit 4: setCommunitiesPaywallLocked uses updateMany; trial_will_end
+    // handler still uses single user lookup via user.findUnique.
+    community: { update: vi.fn(), updateMany: vi.fn() },
     subscription: {
       findFirst: vi.fn(),
       upsert: vi.fn(),
@@ -38,7 +40,7 @@ vi.mock("@/lib/prisma", () => ({
       update: vi.fn(),
     },
     subscriptionPlan: { findFirst: vi.fn() },
-    user: { update: vi.fn() },
+    user: { update: vi.fn(), findUnique: vi.fn() },
   },
 }));
 
@@ -61,11 +63,18 @@ function loadPOST(): Promise<(req: Request) => Promise<Response>> {
 beforeEach(() => {
   vi.clearAllMocks();
   mockHeadersGet.mockReturnValue("t=1,v1=sig");
-  // Default: ProcessedStripeEvent insert succeeds (not a duplicate).
+  // Default: not a duplicate event (findUnique returns null) and the post-
+  // handler insert succeeds. FIX-B5 (Commit 8) reordered the idempotency
+  // record from "create at top" to "findUnique at top + create at end".
+  vi.mocked(prisma.processedStripeEvent.findUnique).mockResolvedValue(null);
   vi.mocked(prisma.processedStripeEvent.create).mockResolvedValue({} as never);
   // Default: getPlanFromPriceId returns null so platform-plan shortcut
   // doesn't trigger unless the test explicitly enables it.
   mockGetPlanFromPriceId.mockReturnValue(null);
+  // Fase C Commit 4: setCommunitiesPaywallLocked reads result.count. Without
+  // a default resolution, the helper crashes with "Cannot read properties of
+  // undefined" whenever a webhook path goes through paywall toggling.
+  vi.mocked(prisma.community.updateMany).mockResolvedValue({ count: 0 } as never);
 });
 
 describe("Stripe webhook — signature verification & idempotency", () => {
@@ -105,15 +114,23 @@ describe("Stripe webhook — signature verification & idempotency", () => {
     });
   });
 
-  it("returns 200 { duplicate: true } when ProcessedStripeEvent.create throws P2002", async () => {
+  it("returns 200 { duplicate: true } when findUnique sees the event was already processed", async () => {
+    // FIX-B5 (Commit 8): duplicate detection moved from create+P2002-catch to
+    // pre-handler findUnique. A non-null findUnique result means we've already
+    // processed this event id and short-circuits the handler.
     mockConstructEvent.mockReturnValue({
       id: "evt_dup",
       type: "checkout.session.completed",
       data: { object: { metadata: { userId: "u1" } } },
     });
-    vi.mocked(prisma.processedStripeEvent.create).mockRejectedValue({ code: "P2002" });
+    vi.mocked(prisma.processedStripeEvent.findUnique).mockResolvedValue({
+      id: "evt_dup",
+      type: "checkout.session.completed",
+    } as never);
+
     const POST = await loadPOST();
     const res = await POST(makeRequest());
+
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body).toEqual({ received: true, duplicate: true });
@@ -121,9 +138,15 @@ describe("Stripe webhook — signature verification & idempotency", () => {
     expect(prisma.coursePurchase.updateMany).not.toHaveBeenCalled();
     expect(prisma.enrollment.upsert).not.toHaveBeenCalled();
     expect(prisma.course.update).not.toHaveBeenCalled();
+    // And we never tried to insert the dedup row (the handler is what writes it).
+    expect(prisma.processedStripeEvent.create).not.toHaveBeenCalled();
   });
 
-  it("returns 500 when ProcessedStripeEvent.create throws non-P2002 DB error", async () => {
+  it("does not fail the webhook when the post-handler dedup insert errors", async () => {
+    // FIX-B5: the dedup record now persists AFTER the handler. If that write
+    // fails (e.g. DB connection blip, race with concurrent retry), we log
+    // and still return 200 — Stripe got our success and the handler is
+    // idempotent at the data layer, so worst case is a rare double-process.
     mockConstructEvent.mockReturnValue({
       id: "evt_dberr",
       type: "checkout.session.completed",
@@ -133,11 +156,12 @@ describe("Stripe webhook — signature verification & idempotency", () => {
       code: "P1001",
       message: "Connection error",
     });
+
     const POST = await loadPOST();
     const res = await POST(makeRequest());
-    expect(res.status).toBe(500);
-    const body = await res.json();
-    expect(body.error).toMatch(/Failed to record event/);
+
+    expect(res.status).toBe(200);
+    expect((await res.json()).received).toBe(true);
   });
 
   it("Stripe retry safety: same event.id processed twice never double-processes", async () => {
@@ -154,7 +178,7 @@ describe("Stripe webhook — signature verification & idempotency", () => {
     };
     mockConstructEvent.mockReturnValue(event);
 
-    // First delivery succeeds.
+    // First delivery succeeds and the handler runs the downstream Prisma writes.
     vi.mocked(prisma.coursePurchase.updateMany).mockResolvedValue({ count: 1 } as never);
     vi.mocked(prisma.enrollment.upsert).mockResolvedValue({} as never);
     vi.mocked(prisma.course.update).mockResolvedValue({} as never);
@@ -165,8 +189,12 @@ describe("Stripe webhook — signature verification & idempotency", () => {
     expect(prisma.enrollment.upsert).toHaveBeenCalledTimes(1);
     expect(prisma.course.update).toHaveBeenCalledTimes(1);
 
-    // Second delivery (retry): processedStripeEvent.create now hits P2002.
-    vi.mocked(prisma.processedStripeEvent.create).mockRejectedValueOnce({ code: "P2002" });
+    // Second delivery (retry): findUnique now returns the recorded event row,
+    // so the duplicate path triggers BEFORE the handler runs.
+    vi.mocked(prisma.processedStripeEvent.findUnique).mockResolvedValueOnce({
+      id: "evt_retry",
+      type: "checkout.session.completed",
+    } as never);
 
     const res2 = await POST(makeRequest());
     expect(res2.status).toBe(200);
