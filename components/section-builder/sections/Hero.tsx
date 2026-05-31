@@ -1,67 +1,96 @@
 "use client";
 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { SectionSchema } from "../types";
+import type { LandingCommunity } from "../types";
 
 export const HeroRender = (props: Record<string, any>) => {
-  const { title, subtitle, imageUrl, ctaLabel, ctaUrl, alignment = "left" } = props;
+  const { title, subtitle, imageUrl, ctaLabel, ctaUrl } = props;
+  const community = props.community as LandingCommunity | undefined;
+  const t = useTranslations("community.landing.hero");
 
-  const isLeft = alignment === "left";
+  // Host-configured props take precedence; community data fills the gaps so
+  // the same section works in the builder (no community) and on the live page.
+  const coverUrl = imageUrl || community?.coverImageUrl || "";
+  const logoUrl = community?.imageUrl || "";
+  const heading = title || community?.name || t("fallbackTitle");
+  const tagline = subtitle || community?.description || "";
+  const ownerName = community?.owner?.name;
+  const ownerImage = community?.owner?.image;
+  const ownerTitle = community?.ownerTitle;
+  const primary = community?.primaryColor || "#8B5CF6";
+  const secondary = community?.secondaryColor || "#EC4899";
+  // Empty ctaLabel (default-template) falls back to the localized CTA.
+  const ctaText = ctaLabel || t("fallbackCta");
 
   return (
-    <section className="relative overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-purple-50 to-white p-8 md:p-16">
-      <div
-        className={`grid gap-8 md:grid-cols-2 md:items-center ${!isLeft ? "md:flex-row-reverse" : ""}`}
-      >
-        <div className={isLeft ? "md:order-1" : "md:order-2"}>
-          <h1 className="text-3xl font-bold text-gray-900 md:text-5xl lg:text-6xl">
-            {title || "Welcome to our Community"}
-          </h1>
-          <p className="mt-4 text-base text-gray-600 md:text-lg lg:text-xl">
-            {subtitle || "Join thousands of members learning and growing together"}
-          </p>
-          {ctaLabel && (
-            <a
-              href={ctaUrl || "#"}
-              className="mt-6 inline-block rounded-lg bg-purple-600 px-8 py-3 text-base font-semibold text-white shadow-lg transition-all hover:bg-purple-700 hover:shadow-xl md:text-lg"
-            >
-              {ctaLabel}
-            </a>
-          )}
-        </div>
-        <div className={`${isLeft ? "md:order-2" : "md:order-1"}`}>
-          <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-gray-100 shadow-2xl">
-            {imageUrl ? (
+    <section className="overflow-hidden rounded-2xl border border-border bg-white">
+      {/* Cover */}
+      <div className="relative h-48 w-full md:h-56">
+        {coverUrl ? (
+          <Image src={coverUrl} alt="" fill unoptimized sizes="100vw" className="object-cover" />
+        ) : (
+          <div
+            className="h-full w-full"
+            style={{ backgroundImage: `linear-gradient(135deg, ${primary}, ${secondary})` }}
+          />
+        )}
+        {/* Logo, overlapping the cover bottom-left */}
+        <div className="absolute -bottom-8 left-6">
+          <div className="relative h-16 w-16 overflow-hidden rounded-2xl border-4 border-white bg-gray-100 shadow-md md:h-20 md:w-20">
+            {logoUrl ? (
               <Image
-                src={imageUrl}
-                alt="Hero"
+                src={logoUrl}
+                alt={heading}
                 fill
-                sizes="(min-width: 768px) 50vw, 100vw"
                 unoptimized
+                sizes="80px"
                 className="object-cover"
               />
             ) : (
-              <div className="flex h-full items-center justify-center text-gray-400">
-                <div className="text-center">
-                  <svg
-                    className="mx-auto mb-2 h-16 w-16"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
-                  <p className="text-sm">Add hero image</p>
-                </div>
+              <div className="flex h-full w-full items-center justify-center text-xl font-bold text-gray-400">
+                {heading.slice(0, 1).toUpperCase()}
               </div>
             )}
           </div>
         </div>
+      </div>
+
+      {/* Body */}
+      <div className="px-6 pb-6 pt-10">
+        <h1 className="text-2xl font-medium text-gray-900 md:text-3xl">{heading}</h1>
+        {ownerName && (
+          <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
+            {ownerImage && (
+              <span className="relative inline-block h-5 w-5 overflow-hidden rounded-full bg-gray-200">
+                <Image
+                  src={ownerImage}
+                  alt={ownerName}
+                  fill
+                  unoptimized
+                  sizes="20px"
+                  className="object-cover"
+                />
+              </span>
+            )}
+            <span>
+              by {ownerName}
+              {ownerTitle ? ` · ${ownerTitle}` : ""}
+            </span>
+          </div>
+        )}
+        {tagline && (
+          <p className="mt-3 line-clamp-3 text-sm text-gray-600 md:text-base">{tagline}</p>
+        )}
+        {ctaText && (
+          <a
+            href={ctaUrl || "#"}
+            className="mt-5 inline-block rounded-lg bg-purple-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-purple-700"
+          >
+            {ctaText}
+          </a>
+        )}
       </div>
     </section>
   );
@@ -70,28 +99,29 @@ export const HeroRender = (props: Record<string, any>) => {
 export const HeroSchema: SectionSchema = {
   type: "hero",
   label: "Hero",
-  description: "Eye-catching hero section with title, subtitle, image, and CTA",
+  description: "Cover image, community logo, owner, and CTA",
   icon: "🦸",
   defaultProps: {
-    title: "Welcome to Our Community",
-    subtitle: "Join thousands of members learning and growing together",
+    title: "",
+    subtitle: "",
     imageUrl: "",
     ctaLabel: "Join Now",
     ctaUrl: "#",
+    // alignment retained for backward-compat with existing landingLayout JSON;
+    // the refactored cover layout no longer branches on it.
     alignment: "left",
   },
   fields: [
-    { key: "title", label: "Title", kind: "text", placeholder: "Main headline" },
-    { key: "subtitle", label: "Subtitle", kind: "textarea", placeholder: "Supporting text" },
-    { key: "imageUrl", label: "Hero Image (URL)", kind: "image", placeholder: "https://..." },
+    { key: "title", label: "Title", kind: "text", placeholder: "Defaults to community name" },
+    {
+      key: "subtitle",
+      label: "Subtitle",
+      kind: "textarea",
+      placeholder: "Defaults to community description",
+    },
+    { key: "imageUrl", label: "Cover Image (URL)", kind: "image", placeholder: "https://..." },
     { key: "ctaLabel", label: "Button Text", kind: "text", placeholder: "Join Now" },
     { key: "ctaUrl", label: "Button URL", kind: "url", placeholder: "https://..." },
-    {
-      key: "alignment",
-      label: "Image Position",
-      kind: "select",
-      options: ["left", "right"],
-    },
   ],
   Render: HeroRender,
 };

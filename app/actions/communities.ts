@@ -1,9 +1,11 @@
 "use server";
 
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { getCurrentUserId } from "@/lib/auth-utils";
 import { getLimitsForPlan } from "@/lib/plans";
+import { buildDefaultLandingLayout } from "@/lib/community-landing-template";
 
 /**
  * Create a new community
@@ -73,6 +75,15 @@ export async function createCommunity(data: {
 
     // Use transaction to ensure both community and membership are created atomically
     const result = await prisma.$transaction(async (tx) => {
+      // Default Patreon-style landing layout (Sub-Phase D). Persist the bare
+      // sections array — the landingLayout column stores SectionInstance[].
+      const defaultLanding = buildDefaultLandingLayout({
+        name: data.name,
+        slug: data.slug,
+        description: data.description,
+        coverImageUrl: data.coverImageUrl,
+      });
+
       // Create community
       const community = await tx.community.create({
         data: {
@@ -93,6 +104,7 @@ export async function createCommunity(data: {
           fontFamily: data.fontFamily || "Inter",
           heroTitle: data.heroTitle,
           heroSubtitle: data.heroSubtitle,
+          landingLayout: defaultLanding.sections as unknown as Prisma.InputJsonValue,
         },
       });
 

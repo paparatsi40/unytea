@@ -47,6 +47,40 @@ function renderSection(section: SectionInstance, t: ReturnType<typeof useTransla
       return <OwnerBioRender {...section.props} />;
     case "gallery":
       return <GalleryRender {...section.props} />;
+    case "upcomingSessions": {
+      // UpcomingSessionsRender is an async Server Component that queries
+      // Prisma, so it cannot run inside this client builder. Show a static
+      // placeholder; live session data renders on the published page.
+      const title = section.props.title || "Upcoming sessions";
+      return (
+        <section className="rounded-2xl bg-white px-8 py-10 shadow-sm">
+          <h3 className="text-xl font-medium text-gray-900">{title}</h3>
+          <p className="mt-2 text-sm text-gray-500">
+            {t("community.landing.sectionBuilder.placeholder.upcomingSessions")}
+          </p>
+        </section>
+      );
+    }
+    case "postsFeed":
+      // PostsFeedRender is an async Server Component (queries Prisma), so it
+      // can't run in this client builder. Static placeholder; real feed
+      // renders on the published page.
+      return (
+        <div className="rounded-md border border-dashed px-4 py-6 text-center text-muted-foreground">
+          <p className="text-sm">{t("community.landing.sectionBuilder.placeholder.postsFeed")}</p>
+        </div>
+      );
+    case "membershipTiers":
+      // MembershipTiersRender is an async Server Component (queries Prisma),
+      // so it can't run in this client builder. Static placeholder; real
+      // tiers render on the published page.
+      return (
+        <div className="rounded-md border border-dashed px-4 py-6 text-center text-muted-foreground">
+          <p className="text-sm">
+            {t("community.landing.sectionBuilder.placeholder.membershipTiers")}
+          </p>
+        </div>
+      );
     case "pricing": {
       const title = section.props.title || "Choose the plan that fits you";
       const subtitle =

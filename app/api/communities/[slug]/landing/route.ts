@@ -29,6 +29,9 @@ const sectionTypeSchema = z.enum([
   "gallery",
   "pricing",
   "video",
+  "upcomingSessions", // NEW (Sub-Phase D)
+  "postsFeed", // NEW (Sub-Phase D)
+  "membershipTiers", // NEW (Sub-Phase D)
 ]);
 
 const propValueSchema: z.ZodType<unknown> = z.lazy(() =>

@@ -1,4 +1,71 @@
 {
+  "community": {
+    "landing": {
+      "upcomingSessions": {
+        "defaultTitle": "Sessions à venir",
+        "thisWeek": "{count} cette semaine",
+        "empty": "Aucune session prévue dans les 7 prochains jours. Revenez bientôt.",
+        "untitled": "Session sans titre",
+        "attending": "{count, plural, =1 {1 participant} other {# participants}}",
+        "duration": "{minutes} min",
+        "durationTBD": "À définir",
+        "rsvp": "Réserver"
+      },
+      "postsFeed": {
+        "defaultTitle": "Dernières publications de la communauté",
+        "empty": "Aucune publication pour l'instant. Revenez bientôt.",
+        "unknownAuthor": "Inconnu",
+        "untitled": "Sans titre",
+        "viewAll": "Voir tous les posts →"
+      },
+      "membershipTiers": {
+        "defaultTitle": "Devenir membre",
+        "subtitle": "Choisissez un tier pour soutenir cette communauté",
+        "joinTier": "Rejoindre {tierName}",
+        "perMonth": "/mois",
+        "perYear": "/an",
+        "oneTime": " paiement unique"
+      },
+      "stats": {
+        "defaultTitle": "Communauté",
+        "members": "{count, plural, =1 {1 membre} other {# membres}}",
+        "activityStatus": {
+          "very_active": "Très active",
+          "active": "Active",
+          "moderate": "Modérée",
+          "quiet": "Calme"
+        },
+        "joinCommunity": "Rejoindre la communauté"
+      },
+      "hero": {
+        "fallbackTitle": "Bienvenue dans notre communauté",
+        "fallbackCta": "Rejoindre la communauté"
+      },
+      "ownerBio": {
+        "defaultTitle": "À propos du host"
+      },
+      "cta": {
+        "fallbackTitle": "Prêt à rejoindre ?",
+        "fallbackSubtitle": "Faites partie d'une communauté qui se réunit en direct.",
+        "fallbackCtaLabel": "Rejoindre la communauté"
+      },
+      "settings": {
+        "useDefaultTemplate": "Utiliser le modèle par défaut",
+        "resetToDefault": "Réinitialiser au modèle par défaut",
+        "applying": "Application...",
+        "successToast": "Modèle par défaut appliqué",
+        "errorToast": "Échec de l'application du modèle",
+        "confirmReset": "Cela remplacera votre disposition actuelle de page communautaire par le modèle par défaut. Continuer ?"
+      },
+      "sectionBuilder": {
+        "placeholder": {
+          "upcomingSessions": "Les sessions en direct apparaîtront ici sur la page publiée.",
+          "postsFeed": "Les posts récents apparaîtront ici sur la page publiée.",
+          "membershipTiers": "Les tiers d'abonnement apparaîtront ici sur la page publiée."
+        }
+      }
+    }
+  },
   "common": {
     "search": "Rechercher",
     "continue": "Continuer",

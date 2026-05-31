@@ -1,6 +1,8 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/utils";
 import { getLimitsForPlan } from "@/lib/plans";
+import { buildDefaultLandingLayout } from "@/lib/community-landing-template";
 
 /**
  * Create a new community
@@ -23,6 +25,15 @@ export async function createCommunity(data: {
     counter++;
   }
 
+  // Default Patreon-style landing layout (Sub-Phase D). Persist the bare
+  // sections array — the landingLayout column stores SectionInstance[].
+  const defaultLanding = buildDefaultLandingLayout({
+    name: data.name,
+    slug,
+    description: data.description,
+    coverImageUrl: data.coverImageUrl,
+  });
+
   // Create community
   const community = await prisma.community.create({
     data: {
@@ -33,6 +44,7 @@ export async function createCommunity(data: {
       imageUrl: data.imageUrl,
       coverImageUrl: data.coverImageUrl,
       memberCount: 1, // Owner is first member
+      landingLayout: defaultLanding.sections as unknown as Prisma.InputJsonValue,
     },
   });
 

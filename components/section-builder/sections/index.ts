@@ -8,6 +8,9 @@ import { FAQSchema } from "./FAQ";
 import { StatsSchema } from "./Stats";
 import { OwnerBioSchema } from "./OwnerBio";
 import { GallerySchema } from "./Gallery";
+import { UpcomingSessionsSchema } from "./UpcomingSessions";
+import { PostsFeedSchema } from "./PostsFeed";
+import { MembershipTiersSchema } from "./MembershipTiers";
 
 /**
  * SECTIONS REGISTRY
@@ -22,6 +25,9 @@ export const SECTIONS: Record<SectionType, SectionSchema> = {
   stats: StatsSchema,
   ownerBio: OwnerBioSchema,
   gallery: GallerySchema,
+  upcomingSessions: UpcomingSessionsSchema,
+  postsFeed: PostsFeedSchema,
+  membershipTiers: MembershipTiersSchema,
 
   pricing: {
     type: "pricing",
@@ -94,6 +100,10 @@ export const SECTION_ORDER: SectionType[] = [
   "cta",
   "pricing",
   "video",
+  // NEW (Sub-Phase D)
+  "upcomingSessions",
+  "postsFeed",
+  "membershipTiers",
 ];
 
 /**
@@ -108,4 +118,10 @@ export {
   StatsSchema,
   OwnerBioSchema,
   GallerySchema,
+  UpcomingSessionsSchema,
+  PostsFeedSchema,
+  MembershipTiersSchema,
 };
+export { UpcomingSessionsRender } from "./UpcomingSessions";
+export { PostsFeedRender } from "./PostsFeed";
+export { MembershipTiersRender } from "./MembershipTiers";
