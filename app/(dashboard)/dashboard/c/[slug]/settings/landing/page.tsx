@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { SectionBuilder } from "@/components/section-builder/SectionBuilder";
 import { SectionInstance } from "@/components/section-builder/types";
+import { resetCommunityLandingToDefault } from "@/app/actions/community-landing";
 import { toast } from "sonner";
-import { Loader2, Eye, ArrowLeft } from "lucide-react";
+import { Loader2, Eye, ArrowLeft, Sparkles } from "lucide-react";
 
 export default function LandingPageSettings() {
   const params = useParams();
@@ -14,9 +15,11 @@ export default function LandingPageSettings() {
   const slug = (params?.slug as string) ?? "";
 
   const [loading, setLoading] = useState(true);
+  const [communityId, setCommunityId] = useState<string | null>(null);
   const [communityName, setCommunityName] = useState("");
   const [communityDescription, setCommunityDescription] = useState<string | null>(null);
   const [initialSections, setInitialSections] = useState<SectionInstance[]>([]);
+  const [isResetting, startReset] = useTransition();
 
   useEffect(() => {
     fetchCommunityData();
@@ -29,6 +32,7 @@ export default function LandingPageSettings() {
 
       const data = await response.json();
 
+      setCommunityId(data.id ?? null);
       setCommunityName(data.name || "");
       setCommunityDescription(data.description || null);
 
@@ -66,6 +70,28 @@ export default function LandingPageSettings() {
     }
   }
 
+  function handleResetToDefault() {
+    if (!communityId) return;
+    const hasLayout = initialSections.length > 0;
+    if (
+      hasLayout &&
+      !confirm(
+        "This will replace your current landing page layout with the default template. Continue?"
+      )
+    ) {
+      return;
+    }
+    startReset(async () => {
+      try {
+        await resetCommunityLandingToDefault(communityId);
+        toast.success("Default template applied");
+        await fetchCommunityData(); // reload so the builder shows the new layout
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "Failed to apply template");
+      }
+    });
+  }
+
   if (loading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
@@ -73,6 +99,8 @@ export default function LandingPageSettings() {
       </div>
     );
   }
+
+  const hasLayout = initialSections.length > 0;
 
   return (
     <div className="space-y-6">
@@ -96,6 +124,19 @@ export default function LandingPageSettings() {
           </div>
         </div>
         <div className="flex gap-3">
+          <Button
+            variant={hasLayout ? "outline" : "default"}
+            className="gap-2"
+            onClick={handleResetToDefault}
+            disabled={isResetting || !communityId}
+          >
+            <Sparkles className="h-4 w-4" />
+            {isResetting
+              ? "Applying..."
+              : hasLayout
+                ? "Reset to default template"
+                : "Use default template"}
+          </Button>
           <Button variant="outline" onClick={() => window.open(`/c/${slug}`, "_blank")}>
             <Eye className="mr-2 h-4 w-4" />
             Preview
