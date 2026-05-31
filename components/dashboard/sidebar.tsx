@@ -97,7 +97,7 @@ export function DashboardSidebar() {
           <p className="text-sm font-semibold text-foreground">{t("upgrade.title")}</p>
           <p className="mt-1 text-xs text-muted-foreground">{t("upgrade.subtitle")}</p>
           <Link
-            href="/dashboard/settings/billing"
+            href="/dashboard/upgrade"
             className="mt-3 block w-full rounded-md bg-primary px-3 py-2 text-center text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
           >
             {t("upgrade.cta")}

@@ -506,9 +506,9 @@
       "settings": "Configuración"
     },
     "upgrade": {
-      "title": "Subir a Premium",
-      "subtitle": "Desbloquea todas las funciones",
-      "cta": "Actualizar ahora"
+      "title": "Elige tu plan",
+      "subtitle": "Empieza tu prueba gratis de 14 días",
+      "cta": "Ver planes"
     }
   },
   "billing": {
