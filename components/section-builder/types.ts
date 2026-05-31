@@ -12,7 +12,10 @@ export type SectionType =
   | "ownerBio"
   | "gallery"
   | "pricing"
-  | "video";
+  | "video"
+  | "upcomingSessions" // NEW (Sub-Phase D)
+  | "postsFeed" // NEW (Sub-Phase D)
+  | "membershipTiers"; // NEW (Sub-Phase D)
 
 export type FieldKind = "text" | "textarea" | "image" | "url" | "number" | "color" | "select";
 

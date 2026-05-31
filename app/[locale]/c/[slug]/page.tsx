@@ -9,6 +9,9 @@ import { FAQRender } from "@/components/section-builder/sections/FAQ";
 import { StatsRender } from "@/components/section-builder/sections/Stats";
 import { OwnerBioRender } from "@/components/section-builder/sections/OwnerBio";
 import { GalleryRender } from "@/components/section-builder/sections/Gallery";
+import { UpcomingSessionsRender } from "@/components/section-builder/sections/UpcomingSessions";
+import { PostsFeedRender } from "@/components/section-builder/sections/PostsFeed";
+import { MembershipTiersRender } from "@/components/section-builder/sections/MembershipTiers";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
@@ -59,6 +62,12 @@ function renderSection(section: SectionInstance, index: number) {
       return <OwnerBioRender key={key} {...section.props} />;
     case "gallery":
       return <GalleryRender key={key} {...section.props} />;
+    case "upcomingSessions":
+      return <UpcomingSessionsRender key={key} {...section.props} />;
+    case "postsFeed":
+      return <PostsFeedRender key={key} {...section.props} />;
+    case "membershipTiers":
+      return <MembershipTiersRender key={key} {...section.props} />;
     case "pricing":
       return (
         <div key={key} className="p-8 text-center text-gray-500">

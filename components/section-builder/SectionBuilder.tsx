@@ -13,6 +13,9 @@ import { FAQRender } from "./sections/FAQ";
 import { StatsRender } from "./sections/Stats";
 import { OwnerBioRender } from "./sections/OwnerBio";
 import { GalleryRender } from "./sections/Gallery";
+import { UpcomingSessionsRender } from "./sections/UpcomingSessions";
+import { PostsFeedRender } from "./sections/PostsFeed";
+import { MembershipTiersRender } from "./sections/MembershipTiers";
 import { ImageUploader } from "@/components/ui/image-uploader";
 import { Button } from "@/components/ui/button";
 import { generateCommunityFAQs } from "@/app/actions/ai-content";
@@ -47,6 +50,12 @@ function renderSection(section: SectionInstance, t: ReturnType<typeof useTransla
       return <OwnerBioRender {...section.props} />;
     case "gallery":
       return <GalleryRender {...section.props} />;
+    case "upcomingSessions":
+      return <UpcomingSessionsRender {...section.props} />;
+    case "postsFeed":
+      return <PostsFeedRender {...section.props} />;
+    case "membershipTiers":
+      return <MembershipTiersRender {...section.props} />;
     case "pricing": {
       const title = section.props.title || "Choose the plan that fits you";
       const subtitle =
