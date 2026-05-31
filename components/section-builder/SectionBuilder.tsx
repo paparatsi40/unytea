@@ -13,7 +13,6 @@ import { FAQRender } from "./sections/FAQ";
 import { StatsRender } from "./sections/Stats";
 import { OwnerBioRender } from "./sections/OwnerBio";
 import { GalleryRender } from "./sections/Gallery";
-import { MembershipTiersRender } from "./sections/MembershipTiers";
 import { ImageUploader } from "@/components/ui/image-uploader";
 import { Button } from "@/components/ui/button";
 import { generateCommunityFAQs } from "@/app/actions/ai-content";
@@ -74,7 +73,16 @@ function renderSection(section: SectionInstance, t: ReturnType<typeof useTransla
         </div>
       );
     case "membershipTiers":
-      return <MembershipTiersRender {...section.props} />;
+      // MembershipTiersRender is an async Server Component (queries Prisma),
+      // so it can't run in this client builder. Static placeholder; real
+      // tiers render on the published page.
+      return (
+        <div className="rounded-md border border-dashed px-4 py-6 text-center text-muted-foreground">
+          <p className="text-sm">
+            Los tiers de membresía aparecerán aquí en la página publicada.
+          </p>
+        </div>
+      );
     case "pricing": {
       const title = section.props.title || "Choose the plan that fits you";
       const subtitle =
