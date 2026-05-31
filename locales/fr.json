@@ -505,9 +505,9 @@
       "settings": "Paramètres"
     },
     "upgrade": {
-      "title": "Passer à Premium",
-      "subtitle": "Débloquez toutes les fonctionnalités",
-      "cta": "Mettre à niveau"
+      "title": "Choisissez votre plan",
+      "subtitle": "Commencez votre essai gratuit de 14 jours",
+      "cta": "Voir les plans"
     }
   },
   "billing": {

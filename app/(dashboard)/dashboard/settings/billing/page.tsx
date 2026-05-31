@@ -89,6 +89,8 @@ type Subscription = {
 };
 
 export default function BillingPage() {
+  // "START" is the sentinel for the 'no active subscription' state.
+  // Display logic in CardTitle/CardDescription branches on this value.
   const [platformPlan, setPlatformPlan] = useState<string>("START");
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [isLoadingData, setIsLoadingData] = useState(true);
@@ -180,11 +182,14 @@ export default function BillingPage() {
             <div className="flex items-center gap-2">
               <Crown className="h-5 w-5 text-primary" />
               <CardTitle>
-                Plan actual:{" "}
                 {isLoadingData ? (
                   <span className="inline-block h-4 w-20 animate-pulse rounded bg-muted" />
+                ) : platformPlan === "START" ? (
+                  "Sin plan activo"
                 ) : (
-                  <span className="text-primary">{platformPlan}</span>
+                  <>
+                    Plan actual: <span className="text-primary">{platformPlan}</span>
+                  </>
                 )}
               </CardTitle>
             </div>
@@ -224,8 +229,10 @@ export default function BillingPage() {
                   <p className="text-red-600">Will cancel at period end</p>
                 )}
               </div>
+            ) : platformPlan === "START" ? (
+              "Selecciona un plan para empezar tu prueba gratuita de 14 días."
             ) : (
-              "Estás en el plan gratuito Start. Actualiza para desbloquear más funciones."
+              "Tu plan actual y suscripción de Unytea."
             )}
           </CardDescription>
         </CardHeader>
@@ -295,10 +302,6 @@ export default function BillingPage() {
                   <Button className="w-full" variant="ghost" disabled>
                     <Lock className="mr-2 h-4 w-4" />
                     Plan inferior
-                  </Button>
-                ) : plan.key === "START" ? (
-                  <Button className="w-full" variant="ghost" disabled>
-                    Gratis
                   </Button>
                 ) : (
                   <Button

@@ -421,9 +421,9 @@
       "settings": "Settings"
     },
     "upgrade": {
-      "title": "Upgrade to Premium",
-      "subtitle": "Unlock all features",
-      "cta": "Upgrade Now"
+      "title": "Choose your plan",
+      "subtitle": "Start your 14-day free trial",
+      "cta": "View plans"
     }
   },
   "explore": {
