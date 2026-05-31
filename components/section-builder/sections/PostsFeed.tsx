@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Heart, MessageCircle } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { getTranslations } from "next-intl/server";
 import type { JSX } from "react";
 import { SectionSchema } from "../types";
 
@@ -50,12 +51,16 @@ function extractExcerpt(content: string, max = 120): string {
 }
 
 export async function PostsFeedRender(props: PostsFeedRenderProps): Promise<JSX.Element> {
-  const { communityId, communitySlug, title = "Latest from the community", limit = 5 } = props;
+  const { communityId, communitySlug, title, limit = 5 } = props;
 
   if (!communityId) {
     // Defensive: section configured but no community context. Render nothing.
     return <></>;
   }
+
+  // String form resolves the request locale (this renders under app/[locale]).
+  const t = await getTranslations("community.landing.postsFeed");
+  const heading = title || t("defaultTitle");
 
   const posts = await prisma.post.findMany({
     where: {
@@ -80,8 +85,8 @@ export async function PostsFeedRender(props: PostsFeedRenderProps): Promise<JSX.
     return (
       <section className="px-4 py-8">
         <div className="mx-auto max-w-4xl">
-          <h2 className="mb-2 text-xl font-medium">{title}</h2>
-          <p className="text-sm text-muted-foreground">No posts yet. Check back soon.</p>
+          <h2 className="mb-2 text-xl font-medium">{heading}</h2>
+          <p className="text-sm text-muted-foreground">{t("empty")}</p>
         </div>
       </section>
     );
@@ -90,10 +95,15 @@ export async function PostsFeedRender(props: PostsFeedRenderProps): Promise<JSX.
   return (
     <section className="px-4 py-8">
       <div className="mx-auto max-w-4xl">
-        <h2 className="mb-4 text-xl font-medium">{title}</h2>
+        <h2 className="mb-4 text-xl font-medium">{heading}</h2>
         <div className="flex flex-col gap-4">
           {posts.map((post) => (
-            <PostRow key={post.id} post={post} />
+            <PostRow
+              key={post.id}
+              post={post}
+              unknownAuthorLabel={t("unknownAuthor")}
+              untitledLabel={t("untitled")}
+            />
           ))}
         </div>
         {communitySlug && (
@@ -102,7 +112,7 @@ export async function PostsFeedRender(props: PostsFeedRenderProps): Promise<JSX.
               href={`/dashboard/c/${communitySlug}/feed`}
               className="text-sm font-medium text-primary hover:underline"
             >
-              View all posts →
+              {t("viewAll")}
             </Link>
           </div>
         )}
@@ -112,9 +122,17 @@ export async function PostsFeedRender(props: PostsFeedRenderProps): Promise<JSX.
 }
 
 // Inline helper component
-function PostRow({ post }: { post: PostRowData }) {
+function PostRow({
+  post,
+  unknownAuthorLabel,
+  untitledLabel,
+}: {
+  post: PostRowData;
+  unknownAuthorLabel: string;
+  untitledLabel: string;
+}) {
   const imageUrl = firstImageUrl(post.attachments);
-  const heading = post.title || extractExcerpt(post.content, 80) || "Untitled";
+  const heading = post.title || extractExcerpt(post.content, 80) || untitledLabel;
 
   return (
     <div className="flex gap-3">
@@ -132,7 +150,7 @@ function PostRow({ post }: { post: PostRowData }) {
       {/* Content */}
       <div className="min-w-0 flex-1">
         <div className="mb-1 flex items-center gap-2 text-xs text-muted-foreground">
-          <span>{post.author?.name ?? "Unknown"}</span>
+          <span>{post.author?.name ?? unknownAuthorLabel}</span>
           <span>·</span>
           <time>{formatDistanceToNow(post.createdAt, { addSuffix: true })}</time>
         </div>

@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { getTranslations } from "next-intl/server";
 import type { SubscriptionPlan } from "@prisma/client";
 import type { JSX } from "react";
 import { SectionSchema } from "../types";
@@ -16,12 +17,15 @@ interface MembershipTiersRenderProps {
 export async function MembershipTiersRender(
   props: MembershipTiersRenderProps
 ): Promise<JSX.Element> {
-  const { communityId, communitySlug, title = "Become a member" } = props;
+  const { communityId, communitySlug, title } = props;
 
   if (!communityId) {
     // Defensive: section configured but no community context. Render nothing.
     return <></>;
   }
+
+  // String form resolves the request locale (this renders under app/[locale]).
+  const t = await getTranslations("community.landing.membershipTiers");
 
   const plans = await prisma.subscriptionPlan.findMany({
     where: { communityId, isActive: true },
@@ -34,13 +38,20 @@ export async function MembershipTiersRender(
     return <></>;
   }
 
+  const intervalLabel = (interval: SubscriptionPlan["interval"]): string =>
+    interval === "MONTHLY"
+      ? t("perMonth")
+      : interval === "YEARLY"
+        ? t("perYear")
+        : interval === "LIFETIME"
+          ? t("oneTime")
+          : "";
+
   return (
     <section className="px-4 py-8">
       <div className="mx-auto max-w-4xl">
-        <h2 className="mb-1 text-center text-xl font-medium">{title}</h2>
-        <p className="mb-6 text-center text-sm text-muted-foreground">
-          Choose a tier to support this community
-        </p>
+        <h2 className="mb-1 text-center text-xl font-medium">{title || t("defaultTitle")}</h2>
+        <p className="mb-6 text-center text-sm text-muted-foreground">{t("subtitle")}</p>
         <div
           className={cn(
             "grid gap-4",
@@ -50,7 +61,13 @@ export async function MembershipTiersRender(
           )}
         >
           {plans.map((plan) => (
-            <TierCard key={plan.id} plan={plan} communitySlug={communitySlug} />
+            <TierCard
+              key={plan.id}
+              plan={plan}
+              communitySlug={communitySlug}
+              intervalLabel={intervalLabel(plan.interval)}
+              ctaLabel={t("joinTier", { tierName: plan.name })}
+            />
           ))}
         </div>
       </div>
@@ -58,18 +75,20 @@ export async function MembershipTiersRender(
   );
 }
 
-// Inline helper component
-function TierCard({ plan, communitySlug }: { plan: SubscriptionPlan; communitySlug?: string }) {
+// Inline helper component — receives already-translated labels so it stays sync.
+function TierCard({
+  plan,
+  communitySlug,
+  intervalLabel,
+  ctaLabel,
+}: {
+  plan: SubscriptionPlan;
+  communitySlug?: string;
+  intervalLabel: string;
+  ctaLabel: string;
+}) {
   // price is stored as a Float in cents (per seed-subscription-plans.ts).
   const priceUSD = (plan.price / 100).toFixed(0);
-  const intervalLabel =
-    plan.interval === "MONTHLY"
-      ? "/mo"
-      : plan.interval === "YEARLY"
-        ? "/yr"
-        : plan.interval === "LIFETIME"
-          ? " one-time"
-          : "";
 
   // features is a Json column holding a string[] (per seed). Defensive parse.
   const features: string[] = Array.isArray(plan.features)
@@ -102,7 +121,7 @@ function TierCard({ plan, communitySlug }: { plan: SubscriptionPlan; communitySl
         </ul>
       )}
       <Button asChild className="w-full">
-        <Link href={ctaHref}>Join {plan.name}</Link>
+        <Link href={ctaHref}>{ctaLabel}</Link>
       </Button>
     </div>
   );

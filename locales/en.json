@@ -1,4 +1,64 @@
 {
+  "community": {
+    "landing": {
+      "upcomingSessions": {
+        "defaultTitle": "Upcoming sessions",
+        "thisWeek": "{count} this week",
+        "empty": "No upcoming sessions in the next 7 days. Check back soon.",
+        "untitled": "Untitled session",
+        "attending": "{count, plural, =1 {1 attending} other {# attending}}",
+        "duration": "{minutes} min",
+        "durationTBD": "TBD",
+        "rsvp": "RSVP"
+      },
+      "postsFeed": {
+        "defaultTitle": "Latest from the community",
+        "empty": "No posts yet. Check back soon.",
+        "unknownAuthor": "Unknown",
+        "untitled": "Untitled",
+        "viewAll": "View all posts →"
+      },
+      "membershipTiers": {
+        "defaultTitle": "Become a member",
+        "subtitle": "Choose a tier to support this community",
+        "joinTier": "Join {tierName}",
+        "perMonth": "/mo",
+        "perYear": "/yr",
+        "oneTime": " one-time"
+      },
+      "stats": {
+        "defaultTitle": "Community",
+        "members": "{count, plural, =1 {1 member} other {# members}}",
+        "activityStatus": {
+          "very_active": "Very active",
+          "active": "Active",
+          "moderate": "Moderate",
+          "quiet": "Quiet"
+        },
+        "joinCommunity": "Join community"
+      },
+      "hero": {
+        "fallbackTitle": "Welcome to our community",
+        "fallbackCta": "Join community"
+      },
+      "ownerBio": {
+        "defaultTitle": "About the host"
+      },
+      "cta": {
+        "fallbackTitle": "Ready to join?",
+        "fallbackSubtitle": "Be part of a community that meets live.",
+        "fallbackCtaLabel": "Join community"
+      },
+      "settings": {
+        "useDefaultTemplate": "Use default template",
+        "resetToDefault": "Reset to default template",
+        "applying": "Applying...",
+        "successToast": "Default template applied",
+        "errorToast": "Failed to apply template",
+        "confirmReset": "This will replace your current landing page layout with the default template. Continue?"
+      }
+    }
+  },
   "common": {
     "search": "Search",
     "continue": "Continue",

@@ -1,4 +1,64 @@
 {
+  "community": {
+    "landing": {
+      "upcomingSessions": {
+        "defaultTitle": "Próximas sesiones",
+        "thisWeek": "{count} esta semana",
+        "empty": "No hay sesiones próximas en los próximos 7 días. Vuelve pronto.",
+        "untitled": "Sesión sin título",
+        "attending": "{count, plural, =1 {1 asistiendo} other {# asistiendo}}",
+        "duration": "{minutes} min",
+        "durationTBD": "Por definir",
+        "rsvp": "Reservar"
+      },
+      "postsFeed": {
+        "defaultTitle": "Últimas publicaciones de la comunidad",
+        "empty": "Aún no hay publicaciones. Vuelve pronto.",
+        "unknownAuthor": "Desconocido",
+        "untitled": "Sin título",
+        "viewAll": "Ver todas las publicaciones →"
+      },
+      "membershipTiers": {
+        "defaultTitle": "Únete a la comunidad",
+        "subtitle": "Elige un tier para apoyar esta comunidad",
+        "joinTier": "Unirme a {tierName}",
+        "perMonth": "/mes",
+        "perYear": "/año",
+        "oneTime": " pago único"
+      },
+      "stats": {
+        "defaultTitle": "Comunidad",
+        "members": "{count, plural, =1 {1 miembro} other {# miembros}}",
+        "activityStatus": {
+          "very_active": "Muy activa",
+          "active": "Activa",
+          "moderate": "Moderada",
+          "quiet": "Tranquila"
+        },
+        "joinCommunity": "Unirme a la comunidad"
+      },
+      "hero": {
+        "fallbackTitle": "Bienvenido a nuestra comunidad",
+        "fallbackCta": "Unirme a la comunidad"
+      },
+      "ownerBio": {
+        "defaultTitle": "Sobre el host"
+      },
+      "cta": {
+        "fallbackTitle": "¿Listo para unirte?",
+        "fallbackSubtitle": "Sé parte de una comunidad que se reúne en vivo.",
+        "fallbackCtaLabel": "Unirme a la comunidad"
+      },
+      "settings": {
+        "useDefaultTemplate": "Usar plantilla predeterminada",
+        "resetToDefault": "Restablecer a plantilla predeterminada",
+        "applying": "Aplicando...",
+        "successToast": "Plantilla predeterminada aplicada",
+        "errorToast": "Error al aplicar la plantilla",
+        "confirmReset": "Esto reemplazará el layout actual de tu página de comunidad con la plantilla predeterminada. ¿Continuar?"
+      }
+    }
+  },
   "common": {
     "search": "Buscar",
     "continue": "Continuar",

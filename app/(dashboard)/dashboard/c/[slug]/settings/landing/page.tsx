@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { SectionBuilder } from "@/components/section-builder/SectionBuilder";
 import { SectionInstance } from "@/components/section-builder/types";
 import { resetCommunityLandingToDefault } from "@/app/actions/community-landing";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Loader2, Eye, ArrowLeft, Sparkles } from "lucide-react";
 
@@ -13,6 +14,7 @@ export default function LandingPageSettings() {
   const params = useParams();
   const router = useRouter();
   const slug = (params?.slug as string) ?? "";
+  const t = useTranslations("community.landing.settings");
 
   const [loading, setLoading] = useState(true);
   const [communityId, setCommunityId] = useState<string | null>(null);
@@ -73,21 +75,16 @@ export default function LandingPageSettings() {
   function handleResetToDefault() {
     if (!communityId) return;
     const hasLayout = initialSections.length > 0;
-    if (
-      hasLayout &&
-      !confirm(
-        "This will replace your current landing page layout with the default template. Continue?"
-      )
-    ) {
+    if (hasLayout && !confirm(t("confirmReset"))) {
       return;
     }
     startReset(async () => {
       try {
         await resetCommunityLandingToDefault(communityId);
-        toast.success("Default template applied");
+        toast.success(t("successToast"));
         await fetchCommunityData(); // reload so the builder shows the new layout
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : "Failed to apply template");
+        toast.error(err instanceof Error ? err.message : t("errorToast"));
       }
     });
   }
@@ -132,10 +129,10 @@ export default function LandingPageSettings() {
           >
             <Sparkles className="h-4 w-4" />
             {isResetting
-              ? "Applying..."
+              ? t("applying")
               : hasLayout
-                ? "Reset to default template"
-                : "Use default template"}
+                ? t("resetToDefault")
+                : t("useDefaultTemplate")}
           </Button>
           <Button variant="outline" onClick={() => window.open(`/c/${slug}`, "_blank")}>
             <Eye className="mr-2 h-4 w-4" />

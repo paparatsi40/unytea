@@ -2,22 +2,17 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { SectionSchema } from "../types";
 import type { LandingCommunity, LandingSampleMember, LandingActivityStatus } from "../types";
-
-const ACTIVITY_LABELS: Record<LandingActivityStatus, string> = {
-  very_active: "Very active",
-  active: "Active",
-  moderate: "Moderately active",
-  quiet: "Quiet",
-};
 
 export const StatsRender = (props: Record<string, any>) => {
   const { title } = props;
   const community = props.community as LandingCommunity | undefined;
   const sampleMembers = (props.sampleMembers as LandingSampleMember[] | undefined) ?? [];
   const activityStatus = props.activityStatus as LandingActivityStatus | undefined;
+  const t = useTranslations("community.landing.stats");
 
   // No community context (e.g. section-builder preview) — show a placeholder.
   if (!community) {
@@ -30,10 +25,11 @@ export const StatsRender = (props: Record<string, any>) => {
 
   const memberCount = community.memberCount ?? 0;
   const isActive = activityStatus === "very_active" || activityStatus === "active";
+  const displayTitle = title || t("defaultTitle");
 
   return (
     <section className="rounded-2xl border border-border bg-card px-6 py-6">
-      {title && <h2 className="mb-4 text-xl font-medium text-foreground">{title}</h2>}
+      {displayTitle && <h2 className="mb-4 text-xl font-medium text-foreground">{displayTitle}</h2>}
       <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
         <div className="flex items-center gap-4">
           {sampleMembers.length > 0 && (
@@ -61,7 +57,7 @@ export const StatsRender = (props: Record<string, any>) => {
           )}
           <div className="text-sm">
             <span className="font-medium text-foreground">
-              {memberCount.toLocaleString()} {memberCount === 1 ? "member" : "members"}
+              {t("members", { count: memberCount })}
             </span>
             {activityStatus && (
               <span className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -71,7 +67,7 @@ export const StatsRender = (props: Record<string, any>) => {
                     isActive ? "bg-green-500" : "bg-gray-400"
                   )}
                 />
-                {ACTIVITY_LABELS[activityStatus]}
+                {t(`activityStatus.${activityStatus}`)}
               </span>
             )}
           </div>
@@ -85,7 +81,7 @@ export const StatsRender = (props: Record<string, any>) => {
             href={`/c/${community.slug}/join`}
             className="inline-flex items-center rounded-lg bg-purple-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-purple-700"
           >
-            Join community
+            {t("joinCommunity")}
           </Link>
         )}
       </div>

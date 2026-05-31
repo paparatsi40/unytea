@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Clock, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { addDays, format } from "date-fns";
+import { getTranslations } from "next-intl/server";
 import type { JSX } from "react";
 import { SectionSchema } from "../types";
 
@@ -15,12 +16,16 @@ interface UpcomingSessionsRenderProps {
 export async function UpcomingSessionsRender(
   props: UpcomingSessionsRenderProps
 ): Promise<JSX.Element> {
-  const { communityId, title = "Upcoming sessions", limit = 5 } = props;
+  const { communityId, title, limit = 5 } = props;
 
   if (!communityId) {
     // Defensive: section configured but no community context. Render nothing.
     return <></>;
   }
+
+  // String form resolves the request locale (this renders under app/[locale]).
+  const t = await getTranslations("community.landing.upcomingSessions");
+  const heading = title || t("defaultTitle");
 
   const now = new Date();
   const sevenDaysFromNow = addDays(now, 7);
@@ -49,10 +54,8 @@ export async function UpcomingSessionsRender(
     return (
       <section className="px-4 py-8">
         <div className="mx-auto max-w-4xl">
-          <h2 className="mb-2 text-xl font-medium">{title}</h2>
-          <p className="text-sm text-muted-foreground">
-            No upcoming sessions in the next 7 days. Check back soon.
-          </p>
+          <h2 className="mb-2 text-xl font-medium">{heading}</h2>
+          <p className="text-sm text-muted-foreground">{t("empty")}</p>
         </div>
       </section>
     );
@@ -62,35 +65,53 @@ export async function UpcomingSessionsRender(
     <section className="px-4 py-8">
       <div className="mx-auto max-w-4xl">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-medium">{title}</h2>
-          <span className="text-sm text-muted-foreground">{sessions.length} this week</span>
+          <h2 className="text-xl font-medium">{heading}</h2>
+          <span className="text-sm text-muted-foreground">
+            {t("thisWeek", { count: sessions.length })}
+          </span>
         </div>
         <div className="flex flex-col gap-2">
-          {sessions.map((session) => (
-            <SessionRow key={session.id} session={session} />
-          ))}
+          {sessions.map((session) => {
+            const attendeeCount = session._count?.participations ?? 0;
+            return (
+              <SessionRow
+                key={session.id}
+                scheduledAt={session.scheduledAt}
+                title={session.title || t("untitled")}
+                durationLabel={
+                  session.duration ? t("duration", { minutes: session.duration }) : t("durationTBD")
+                }
+                attendingLabel={attendeeCount > 0 ? t("attending", { count: attendeeCount }) : null}
+                slug={session.slug}
+                rsvpLabel={t("rsvp")}
+              />
+            );
+          })}
         </div>
       </div>
     </section>
   );
 }
 
-type SessionRowData = {
-  id: string;
-  title: string | null;
+// Inline helper component — receives already-translated labels so it stays sync.
+function SessionRow({
+  scheduledAt,
+  title,
+  durationLabel,
+  attendingLabel,
+  slug,
+  rsvpLabel,
+}: {
   scheduledAt: Date;
-  duration: number | null;
+  title: string;
+  durationLabel: string;
+  attendingLabel: string | null;
   slug: string | null;
-  _count: { participations: number };
-};
-
-// Inline helper component
-function SessionRow({ session }: { session: SessionRowData }) {
-  const date = new Date(session.scheduledAt);
+  rsvpLabel: string;
+}) {
+  const date = new Date(scheduledAt);
   const dayLabel = format(date, "EEE").toUpperCase(); // "MON"
   const timeLabel = format(date, "h:mma").toLowerCase(); // "7pm"
-  const attendeeCount = session._count?.participations ?? 0;
-  const durationLabel = session.duration ? `${session.duration} min` : "TBD";
 
   return (
     <div className="flex items-center gap-3 rounded-md bg-muted/30 p-3">
@@ -102,16 +123,16 @@ function SessionRow({ session }: { session: SessionRowData }) {
 
       {/* Session info */}
       <div className="min-w-0 flex-1">
-        <div className="truncate text-sm font-medium">{session.title || "Untitled session"}</div>
+        <div className="truncate text-sm font-medium">{title}</div>
         <div className="mt-0.5 flex items-center gap-3 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1">
             <Clock className="h-3 w-3" />
             {durationLabel}
           </span>
-          {attendeeCount > 0 && (
+          {attendingLabel && (
             <span className="inline-flex items-center gap-1">
               <Users className="h-3 w-3" />
-              {attendeeCount} attending
+              {attendingLabel}
             </span>
           )}
         </div>
@@ -119,9 +140,9 @@ function SessionRow({ session }: { session: SessionRowData }) {
 
       {/* CTA — public session page is slug-based (/sessions/[slug]). Only link
           when the session has a public slug; otherwise omit (no broken RSVP). */}
-      {session.slug && (
+      {slug && (
         <Button asChild size="sm" variant="outline">
-          <Link href={`/sessions/${session.slug}`}>RSVP</Link>
+          <Link href={`/sessions/${slug}`}>{rsvpLabel}</Link>
         </Button>
       )}
     </div>

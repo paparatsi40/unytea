@@ -1,12 +1,14 @@
 "use client";
 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { SectionSchema } from "../types";
 import type { LandingCommunity } from "../types";
 
 export const OwnerBioRender = (props: Record<string, any>) => {
   const { title, name, role, bio, imageUrl, link1Label, link1Url, link2Label, link2Url } = props;
   const community = props.community as LandingCommunity | undefined;
+  const t = useTranslations("community.landing.ownerBio");
 
   // Host-configured props win; community owner data fills the gaps.
   const displayName = name || community?.owner?.name || "Your Name";
@@ -22,7 +24,7 @@ export const OwnerBioRender = (props: Record<string, any>) => {
     <section className="rounded-2xl border border-border bg-white p-8 md:p-12">
       <div className="mx-auto max-w-3xl">
         <h2 className="mb-8 text-center text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-          {title || "About the host"}
+          {title || t("defaultTitle")}
         </h2>
         <div className="flex flex-col items-center gap-5 sm:flex-row sm:items-start">
           <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-full bg-gray-100 shadow-md">

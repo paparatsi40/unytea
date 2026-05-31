@@ -1,18 +1,20 @@
 "use client";
 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { SectionSchema } from "../types";
 import type { LandingCommunity } from "../types";
 
 export const HeroRender = (props: Record<string, any>) => {
   const { title, subtitle, imageUrl, ctaLabel, ctaUrl } = props;
   const community = props.community as LandingCommunity | undefined;
+  const t = useTranslations("community.landing.hero");
 
   // Host-configured props take precedence; community data fills the gaps so
   // the same section works in the builder (no community) and on the live page.
   const coverUrl = imageUrl || community?.coverImageUrl || "";
   const logoUrl = community?.imageUrl || "";
-  const heading = title || community?.name || "Welcome to our Community";
+  const heading = title || community?.name || t("fallbackTitle");
   const tagline = subtitle || community?.description || "";
   const ownerName = community?.owner?.name;
   const ownerImage = community?.owner?.image;
