@@ -53,3 +53,34 @@ export interface LandingLayout {
     font?: string;
   };
 }
+
+/**
+ * Community context injected into section props by the public landing page
+ * (app/[locale]/c/[slug]/page.tsx). Sections that need live community data
+ * (Hero, OwnerBio, Stats) read these; presentational sections ignore them.
+ * Absent in the section-builder preview, so consumers must degrade gracefully.
+ */
+export type LandingActivityStatus = "very_active" | "active" | "moderate" | "quiet";
+
+export interface LandingSampleMember {
+  id: string;
+  name: string;
+  image: string | null;
+  initials: string;
+}
+
+export interface LandingCommunity {
+  id: string;
+  slug: string;
+  name: string;
+  description: string | null;
+  imageUrl: string | null; // community logo
+  coverImageUrl: string | null;
+  primaryColor: string | null;
+  secondaryColor: string | null;
+  isPaid: boolean;
+  memberCount: number;
+  ownerTitle: string | null;
+  ownerLinks: unknown; // Json column
+  owner: { id: string; name: string | null; image: string | null };
+}

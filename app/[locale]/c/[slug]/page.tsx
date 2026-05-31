@@ -1,6 +1,12 @@
 import { notFound } from "next/navigation";
+import { subDays } from "date-fns";
 import { prisma } from "@/lib/prisma";
 import { SectionInstance } from "@/components/section-builder/types";
+import type {
+  LandingActivityStatus,
+  LandingCommunity,
+  LandingSampleMember,
+} from "@/components/section-builder/types";
 import { HeroRender } from "@/components/section-builder/sections/Hero";
 import { FeaturesRender } from "@/components/section-builder/sections/Features";
 import { CTARender } from "@/components/section-builder/sections/CTA";
@@ -42,20 +48,48 @@ async function getCommunity(slug: string) {
   return community;
 }
 
-function renderSection(
-  section: SectionInstance,
-  index: number,
-  context: { communityId: string; communitySlug: string }
-) {
+// TODO(shared-helper): duplicated from lib/explore-query.ts (both private
+// there). Extract computeInitials + classifyActivity into a shared module
+// and import from both call sites.
+const ACTIVITY_WINDOW_DAYS = 30;
+
+function computeInitials(name: string | null | undefined): string {
+  const trimmed = (name ?? "").trim();
+  if (!trimmed) return "??";
+  const parts = trimmed.split(/\s+/);
+  if (parts.length === 1) return (parts[0].slice(0, 2) || parts[0]).toUpperCase();
+  return ((parts[0][0] ?? "") + (parts[parts.length - 1][0] ?? "")).toUpperCase();
+}
+
+function classifyActivity(totalActions: number): LandingActivityStatus {
+  const avgPerWeek = (totalActions / ACTIVITY_WINDOW_DAYS) * 7;
+  if (avgPerWeek >= 10) return "very_active";
+  if (avgPerWeek >= 5) return "active";
+  if (avgPerWeek >= 1) return "moderate";
+  return "quiet";
+}
+
+type LandingContext = {
+  communityId: string;
+  communitySlug: string;
+  community: LandingCommunity;
+  sampleMembers: LandingSampleMember[];
+  activityStatus: LandingActivityStatus | null;
+};
+
+function renderSection(section: SectionInstance, index: number, context: LandingContext) {
   const key = section.id || `section-${index}`;
   // Inject page-level community context into host-configured props. Sections
-  // that need it (UpcomingSessions, PostsFeed, and MembershipTiers in the
-  // next commit) read communityId/communitySlug; sections that don't simply
-  // ignore the extra props.
+  // that need it (UpcomingSessions/PostsFeed/MembershipTiers via id/slug;
+  // Hero/OwnerBio/Stats via community + sampleMembers/activityStatus) read
+  // these; presentational sections simply ignore the extra props.
   const propsWithContext = {
     ...section.props,
     communityId: context.communityId,
     communitySlug: context.communitySlug,
+    community: context.community,
+    sampleMembers: context.sampleMembers,
+    activityStatus: context.activityStatus,
   };
 
   switch (section.type) {
@@ -131,6 +165,62 @@ export default async function PublicCommunityPage(props: {
     ? (community.landingLayout as unknown as SectionInstance[])
     : [];
 
+  // Trimmed community object passed to data-aware sections (Hero/OwnerBio/Stats).
+  // Only the fields they need — avoids shipping landingLayout/heavy columns to
+  // the client when these sections render.
+  const landingCommunity: LandingCommunity = {
+    id: community.id,
+    slug: community.slug,
+    name: community.name,
+    description: community.description,
+    imageUrl: community.imageUrl,
+    coverImageUrl: community.coverImageUrl,
+    primaryColor: community.primaryColor,
+    secondaryColor: community.secondaryColor,
+    isPaid: community.isPaid,
+    memberCount: community.memberCount,
+    ownerTitle: community.ownerTitle,
+    ownerLinks: community.ownerLinks,
+    owner: {
+      id: community.owner.id,
+      name: community.owner.name,
+      image: community.owner.image,
+    },
+  };
+
+  // Stats needs sample-member avatars + an activity status. Only run these
+  // extra queries when a Stats section is actually present in the layout.
+  let sampleMembers: LandingSampleMember[] = [];
+  let activityStatus: LandingActivityStatus | null = null;
+  if (sections.some((s) => s.type === "stats")) {
+    const since = subDays(new Date(), ACTIVITY_WINDOW_DAYS);
+    const [memberRows, postCount, commentCount] = await Promise.all([
+      prisma.member.findMany({
+        where: {
+          communityId: community.id,
+          status: "ACTIVE",
+          userId: { not: community.owner.id },
+        },
+        orderBy: { joinedAt: "asc" },
+        take: 7,
+        select: { user: { select: { id: true, name: true, image: true } } },
+      }),
+      prisma.post.count({
+        where: { communityId: community.id, deletedAt: null, createdAt: { gte: since } },
+      }),
+      prisma.comment.count({
+        where: { post: { communityId: community.id }, createdAt: { gte: since } },
+      }),
+    ]);
+    sampleMembers = memberRows.map((m) => ({
+      id: m.user.id,
+      name: m.user.name ?? "Unknown",
+      image: m.user.image,
+      initials: computeInitials(m.user.name),
+    }));
+    activityStatus = classifyActivity(postCount + commentCount);
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Top Bar */}
@@ -197,6 +287,9 @@ export default async function PublicCommunityPage(props: {
               renderSection(section, index, {
                 communityId: community.id,
                 communitySlug: community.slug,
+                community: landingCommunity,
+                sampleMembers,
+                activityStatus,
               })
             )}
             {/* Footer CTA if owner */}
