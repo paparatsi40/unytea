@@ -21,6 +21,8 @@ export const HeroRender = (props: Record<string, any>) => {
   const ownerTitle = community?.ownerTitle;
   const primary = community?.primaryColor || "#8B5CF6";
   const secondary = community?.secondaryColor || "#EC4899";
+  // Empty ctaLabel (default-template) falls back to the localized CTA.
+  const ctaText = ctaLabel || t("fallbackCta");
 
   return (
     <section className="overflow-hidden rounded-2xl border border-border bg-white">
@@ -79,12 +81,12 @@ export const HeroRender = (props: Record<string, any>) => {
           </div>
         )}
         {tagline && <p className="mt-3 line-clamp-3 text-sm text-gray-600 md:text-base">{tagline}</p>}
-        {ctaLabel && (
+        {ctaText && (
           <a
             href={ctaUrl || "#"}
             className="mt-5 inline-block rounded-lg bg-purple-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-purple-700"
           >
-            {ctaLabel}
+            {ctaText}
           </a>
         )}
       </div>

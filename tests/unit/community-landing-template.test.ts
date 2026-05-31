@@ -60,10 +60,18 @@ describe("buildDefaultLandingLayout", () => {
   it("handles null/missing community fields gracefully", () => {
     const layout = buildDefaultLandingLayout({});
     expect(layout.sections).toHaveLength(7);
-    // Hero falls back to default
+    // FIX-I4: generic labels persist as empty strings; the section render-time
+    // t() fallback localizes them. Community-specific fields default to "" too
+    // when absent. ctaUrl stays a safe placeholder when there's no slug.
     const hero = layout.sections.find((s) => s.type === "hero");
-    expect(hero?.props.title).toBeTruthy(); // never empty string
+    expect(hero?.props.title).toBe("");
+    expect(hero?.props.ctaLabel).toBe("");
     expect(hero?.props.ctaUrl).toBe("#"); // no slug → safe placeholder
+
+    const cta = layout.sections.find((s) => s.type === "cta");
+    expect(cta?.props.title).toBe("");
+    expect(cta?.props.subtitle).toBe("");
+    expect(cta?.props.ctaLabel).toBe("");
   });
 
   it("uses /c/{slug}/join for both Hero CTA and final CTA section", () => {

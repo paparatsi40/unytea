@@ -56,6 +56,13 @@
         "successToast": "Default template applied",
         "errorToast": "Failed to apply template",
         "confirmReset": "This will replace your current landing page layout with the default template. Continue?"
+      },
+      "sectionBuilder": {
+        "placeholder": {
+          "upcomingSessions": "Upcoming live sessions will appear here on the published page.",
+          "postsFeed": "Recent posts will appear here on the published page.",
+          "membershipTiers": "Membership tiers will appear here on the published page."
+        }
       }
     }
   },

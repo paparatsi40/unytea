@@ -56,7 +56,7 @@ function renderSection(section: SectionInstance, t: ReturnType<typeof useTransla
         <section className="rounded-2xl bg-white px-8 py-10 shadow-sm">
           <h3 className="text-xl font-medium text-gray-900">{title}</h3>
           <p className="mt-2 text-sm text-gray-500">
-            Live sessions from this community will appear here on the published page.
+            {t("community.landing.sectionBuilder.placeholder.upcomingSessions")}
           </p>
         </section>
       );
@@ -67,9 +67,7 @@ function renderSection(section: SectionInstance, t: ReturnType<typeof useTransla
       // renders on the published page.
       return (
         <div className="rounded-md border border-dashed px-4 py-6 text-center text-muted-foreground">
-          <p className="text-sm">
-            Los posts más recientes aparecerán aquí en la página publicada.
-          </p>
+          <p className="text-sm">{t("community.landing.sectionBuilder.placeholder.postsFeed")}</p>
         </div>
       );
     case "membershipTiers":
@@ -79,7 +77,7 @@ function renderSection(section: SectionInstance, t: ReturnType<typeof useTransla
       return (
         <div className="rounded-md border border-dashed px-4 py-6 text-center text-muted-foreground">
           <p className="text-sm">
-            Los tiers de membresía aparecerán aquí en la página publicada.
+            {t("community.landing.sectionBuilder.placeholder.membershipTiers")}
           </p>
         </div>
       );

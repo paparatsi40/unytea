@@ -17,8 +17,10 @@ export async function resetCommunityLandingToDefault(communityId: string) {
     throw new Error("Unauthorized");
   }
 
-  const community = await prisma.community.findUnique({
-    where: { id: communityId },
+  // Atomic ownership check: the ownerId guard in the WHERE clause means a
+  // non-owner simply gets no row back (no separate ownerId comparison).
+  const community = await prisma.community.findFirst({
+    where: { id: communityId, ownerId: session.user.id },
     include: {
       owner: {
         select: { name: true, image: true },
@@ -27,11 +29,7 @@ export async function resetCommunityLandingToDefault(communityId: string) {
   });
 
   if (!community) {
-    throw new Error("Community not found");
-  }
-
-  if (community.ownerId !== session.user.id) {
-    throw new Error("Forbidden — only owner can reset template");
+    throw new Error("Community not found or not authorized");
   }
 
   const layout = buildDefaultLandingLayout({
@@ -44,11 +42,17 @@ export async function resetCommunityLandingToDefault(communityId: string) {
     owner: community.owner,
   });
 
-  await prisma.community.update({
-    where: { id: communityId },
-    // Persist the bare sections array — landingLayout stores SectionInstance[].
+  // Re-assert ownership in the update WHERE clause so a mid-call ownership
+  // change / deletion can't slip a write through. Persist the bare sections
+  // array — landingLayout stores SectionInstance[].
+  const result = await prisma.community.updateMany({
+    where: { id: communityId, ownerId: session.user.id },
     data: { landingLayout: layout.sections as unknown as Prisma.InputJsonValue },
   });
+
+  if (result.count === 0) {
+    throw new Error("Failed to update — community may have been modified");
+  }
 
   revalidatePath(`/dashboard/c/${community.slug}/settings/landing`);
   revalidatePath(`/c/${community.slug}`);

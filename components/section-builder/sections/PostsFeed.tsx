@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/lib/auth";
 import Link from "next/link";
 import Image from "next/image";
 import { Heart, MessageCircle } from "lucide-react";
@@ -92,6 +93,18 @@ export async function PostsFeedRender(props: PostsFeedRenderProps): Promise<JSX.
     );
   }
 
+  // The full feed (/dashboard/c/{slug}/feed) is member-gated, so only show
+  // 'View all' to members — avoids bouncing prospective members to sign-in.
+  const session = await auth();
+  let isMember = false;
+  if (session?.user?.id) {
+    const membership = await prisma.member.findFirst({
+      where: { userId: session.user.id, communityId },
+      select: { id: true },
+    });
+    isMember = !!membership;
+  }
+
   return (
     <section className="px-4 py-8">
       <div className="mx-auto max-w-4xl">
@@ -106,7 +119,7 @@ export async function PostsFeedRender(props: PostsFeedRenderProps): Promise<JSX.
             />
           ))}
         </div>
-        {communitySlug && (
+        {isMember && communitySlug && (
           <div className="mt-4 text-center">
             <Link
               href={`/dashboard/c/${communitySlug}/feed`}

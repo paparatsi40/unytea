@@ -56,6 +56,13 @@
         "successToast": "Plantilla predeterminada aplicada",
         "errorToast": "Error al aplicar la plantilla",
         "confirmReset": "Esto reemplazará el layout actual de tu página de comunidad con la plantilla predeterminada. ¿Continuar?"
+      },
+      "sectionBuilder": {
+        "placeholder": {
+          "upcomingSessions": "Las sesiones en vivo aparecerán aquí en la página publicada.",
+          "postsFeed": "Los posts más recientes aparecerán aquí en la página publicada.",
+          "membershipTiers": "Los tiers de membresía aparecerán aquí en la página publicada."
+        }
       }
     }
   },

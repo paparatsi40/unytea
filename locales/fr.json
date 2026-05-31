@@ -56,6 +56,13 @@
         "successToast": "Modèle par défaut appliqué",
         "errorToast": "Échec de l'application du modèle",
         "confirmReset": "Cela remplacera votre disposition actuelle de page communautaire par le modèle par défaut. Continuer ?"
+      },
+      "sectionBuilder": {
+        "placeholder": {
+          "upcomingSessions": "Les sessions en direct apparaîtront ici sur la page publiée.",
+          "postsFeed": "Les posts récents apparaîtront ici sur la page publiée.",
+          "membershipTiers": "Les tiers d'abonnement apparaîtront ici sur la page publiée."
+        }
       }
     }
   },

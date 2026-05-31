@@ -1,9 +1,16 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { SectionSchema } from "../types";
 
 export const CTARender = (props: Record<string, any>) => {
   const { title, subtitle, ctaLabel, ctaUrl, backgroundColor = "purple" } = props;
+  const t = useTranslations("community.landing.cta");
+
+  // Empty props (default-template) fall back to localized strings.
+  const heading = title || t("fallbackTitle");
+  const sub = subtitle || t("fallbackSubtitle");
+  const ctaText = ctaLabel || t("fallbackCtaLabel");
 
   const bgColors: Record<string, string> = {
     purple: "from-purple-600 to-fuchsia-500",
@@ -17,16 +24,14 @@ export const CTARender = (props: Record<string, any>) => {
       className={`rounded-2xl border border-border bg-gradient-to-br ${bgColors[backgroundColor] || bgColors.purple} p-8 text-white md:p-16`}
     >
       <div className="mx-auto max-w-3xl text-center">
-        <h3 className="text-3xl font-bold md:text-4xl lg:text-5xl">{title || "Ready to Join?"}</h3>
-        <p className="mt-4 text-lg text-white/90 md:text-xl">
-          {subtitle || "Take the next step today"}
-        </p>
-        {ctaLabel && (
+        <h3 className="text-3xl font-bold md:text-4xl lg:text-5xl">{heading}</h3>
+        <p className="mt-4 text-lg text-white/90 md:text-xl">{sub}</p>
+        {ctaText && (
           <a
             href={ctaUrl || "#"}
             className="mt-8 inline-block rounded-lg bg-white px-8 py-4 text-lg font-semibold text-purple-700 shadow-lg transition-all hover:scale-105 hover:shadow-xl"
           >
-            {ctaLabel}
+            {ctaText}
           </a>
         )}
       </div>

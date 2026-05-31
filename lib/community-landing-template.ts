@@ -43,10 +43,13 @@ export function buildDefaultLandingLayout(community: CommunityForTemplate): Land
       id: randomUUID(),
       type: "hero",
       props: {
-        title: community.name ?? "Welcome to our community",
+        // Community-specific fields are persisted; generic labels are left
+        // empty so each locale's render-time t() fallback localizes them
+        // (see FIX-I4: avoids baking English into ES/FR default landings).
+        title: community.name ?? "",
         subtitle: community.description ?? "",
         imageUrl: community.coverImageUrl ?? "",
-        ctaLabel: "Join community",
+        ctaLabel: "",
         ctaUrl: joinUrl,
         alignment: "left",
       },
@@ -100,9 +103,10 @@ export function buildDefaultLandingLayout(community: CommunityForTemplate): Land
       id: randomUUID(),
       type: "cta",
       props: {
-        title: "Ready to join?",
-        subtitle: "Be part of a community that meets live.",
-        ctaLabel: "Join community",
+        // Empty → CTA render falls back to localized community.landing.cta.*
+        title: "",
+        subtitle: "",
+        ctaLabel: "",
         ctaUrl: joinUrl,
       },
     },
