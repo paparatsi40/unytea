@@ -13,7 +13,6 @@ import { FAQRender } from "./sections/FAQ";
 import { StatsRender } from "./sections/Stats";
 import { OwnerBioRender } from "./sections/OwnerBio";
 import { GalleryRender } from "./sections/Gallery";
-import { PostsFeedRender } from "./sections/PostsFeed";
 import { MembershipTiersRender } from "./sections/MembershipTiers";
 import { ImageUploader } from "@/components/ui/image-uploader";
 import { Button } from "@/components/ui/button";
@@ -64,7 +63,16 @@ function renderSection(section: SectionInstance, t: ReturnType<typeof useTransla
       );
     }
     case "postsFeed":
-      return <PostsFeedRender {...section.props} />;
+      // PostsFeedRender is an async Server Component (queries Prisma), so it
+      // can't run in this client builder. Static placeholder; real feed
+      // renders on the published page.
+      return (
+        <div className="rounded-md border border-dashed px-4 py-6 text-center text-muted-foreground">
+          <p className="text-sm">
+            Los posts más recientes aparecerán aquí en la página publicada.
+          </p>
+        </div>
+      );
     case "membershipTiers":
       return <MembershipTiersRender {...section.props} />;
     case "pricing": {

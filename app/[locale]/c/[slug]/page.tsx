@@ -45,13 +45,18 @@ async function getCommunity(slug: string) {
 function renderSection(
   section: SectionInstance,
   index: number,
-  context: { communityId: string }
+  context: { communityId: string; communitySlug: string }
 ) {
   const key = section.id || `section-${index}`;
   // Inject page-level community context into host-configured props. Sections
-  // that need it (UpcomingSessions, and PostsFeed/MembershipTiers in later
-  // commits) read communityId; sections that don't simply ignore it.
-  const propsWithContext = { ...section.props, communityId: context.communityId };
+  // that need it (UpcomingSessions, PostsFeed, and MembershipTiers in the
+  // next commit) read communityId/communitySlug; sections that don't simply
+  // ignore the extra props.
+  const propsWithContext = {
+    ...section.props,
+    communityId: context.communityId,
+    communitySlug: context.communitySlug,
+  };
 
   switch (section.type) {
     case "hero":
@@ -189,7 +194,10 @@ export default async function PublicCommunityPage(props: {
           // Render Sections
           <div className="mx-auto max-w-6xl space-y-12">
             {sections.map((section, index) =>
-              renderSection(section, index, { communityId: community.id })
+              renderSection(section, index, {
+                communityId: community.id,
+                communitySlug: community.slug,
+              })
             )}
             {/* Footer CTA if owner */}
             {isOwner && (
