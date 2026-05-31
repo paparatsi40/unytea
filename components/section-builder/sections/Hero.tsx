@@ -80,7 +80,9 @@ export const HeroRender = (props: Record<string, any>) => {
             </span>
           </div>
         )}
-        {tagline && <p className="mt-3 line-clamp-3 text-sm text-gray-600 md:text-base">{tagline}</p>}
+        {tagline && (
+          <p className="mt-3 line-clamp-3 text-sm text-gray-600 md:text-base">{tagline}</p>
+        )}
         {ctaText && (
           <a
             href={ctaUrl || "#"}

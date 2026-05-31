@@ -45,7 +45,9 @@ export const OwnerBioRender = (props: Record<string, any>) => {
           </div>
           <div className="flex-1 text-center sm:text-left">
             <h3 className="text-xl font-medium text-gray-900">{displayName}</h3>
-            {displayRole && <p className="mt-0.5 text-sm font-medium text-purple-600">{displayRole}</p>}
+            {displayRole && (
+              <p className="mt-0.5 text-sm font-medium text-purple-600">{displayRole}</p>
+            )}
             <p className="mt-3 whitespace-pre-line text-sm text-gray-700 md:text-base">
               {bio || "Share your story, expertise, and why you created this community..."}
             </p>

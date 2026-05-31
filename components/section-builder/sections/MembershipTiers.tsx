@@ -103,9 +103,7 @@ function TierCard({
   return (
     <div className="flex flex-col rounded-lg border border-border bg-card p-6">
       <h3 className="mb-1 text-lg font-medium">{plan.name}</h3>
-      {plan.description && (
-        <p className="mb-4 text-sm text-muted-foreground">{plan.description}</p>
-      )}
+      {plan.description && <p className="mb-4 text-sm text-muted-foreground">{plan.description}</p>}
       <div className="mb-4">
         <span className="text-3xl font-bold">${priceUSD}</span>
         <span className="text-sm text-muted-foreground">{intervalLabel}</span>
