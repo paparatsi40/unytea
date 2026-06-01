@@ -343,6 +343,10 @@
     "continue": "Continue"
   },
   "dashboard": {
+    "calendar": {
+      "title": "Calendar",
+      "subtitle": "All your sessions across communities"
+    },
     "profile": {
       "loading": "Loading...",
       "userFallback": "User",

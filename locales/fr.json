@@ -342,6 +342,10 @@
     "continue": "Continuer"
   },
   "dashboard": {
+    "calendar": {
+      "title": "Calendrier",
+      "subtitle": "Toutes vos sessions dans vos communautés"
+    },
     "profile": {
       "loading": "Chargement...",
       "userFallback": "Utilisateur",
