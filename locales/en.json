@@ -856,6 +856,56 @@
           "body": "Unable to load sessions",
           "back": "Back to Communities"
         }
+      },
+      "settings": {
+        "layout": {
+          "header": "Community Settings",
+          "subtitle": "Manage your community preferences and configuration",
+          "nav": {
+            "general": { "name": "General", "description": "Basic community settings" },
+            "appearance": { "name": "Appearance", "description": "Customize layout and branding" },
+            "members": { "name": "Members", "description": "Manage roles and permissions" },
+            "payments": { "name": "Payments", "description": "Configure membership pricing" }
+          }
+        },
+        "general": {
+          "title": "General Settings",
+          "subtitle": "Update your community's basic information",
+          "nameLabel": "Community Name",
+          "namePlaceholder": "My Awesome Community",
+          "descriptionLabel": "Description",
+          "descriptionPlaceholder": "Tell people what your community is about...",
+          "descriptionHint": "Shown on the public Explore page and on your community card.",
+          "categoryLabel": "Category",
+          "categoryPlaceholder": "Select a category…",
+          "categoryHint": "Helps people find your community in Explore.",
+          "languageLabel": "Primary language",
+          "languagePlaceholder": "Select a language…",
+          "languageHint": "The language most conversations and sessions happen in.",
+          "privateTitle": "Private Community",
+          "privateHint": "Only approved members can see the community content",
+          "requireApprovalTitle": "Require Approval for New Members",
+          "requireApprovalHint": "You'll need to approve each member before they can join",
+          "cancel": "Cancel",
+          "saving": "Saving...",
+          "save": "Save Changes",
+          "danger": {
+            "title": "Danger Zone",
+            "description": "Once you delete a community, there is no going back. Please be certain.",
+            "deleting": "Deleting...",
+            "delete": "Delete Community",
+            "namePrompt": "Type the community name exactly to confirm deletion:\n\n{name}",
+            "nameRequired": "Community name is required for deletion confirmation",
+            "nameMismatch": "Confirmation text does not match community name"
+          },
+          "toasts": {
+            "loadFailed": "Failed to load community data",
+            "saved": "Settings saved successfully!",
+            "saveFailed": "Failed to save settings",
+            "deleted": "Community deleted successfully",
+            "deleteFailed": "Failed to delete community"
+          }
+        }
       }
     },
     "calendar": {

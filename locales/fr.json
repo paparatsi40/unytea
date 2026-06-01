@@ -855,6 +855,59 @@
           "body": "Impossible de charger les sessions",
           "back": "Retour aux communautés"
         }
+      },
+      "settings": {
+        "layout": {
+          "header": "Paramètres de la communauté",
+          "subtitle": "Gérez les préférences et la configuration de votre communauté",
+          "nav": {
+            "general": { "name": "Général", "description": "Paramètres de base de la communauté" },
+            "appearance": {
+              "name": "Apparence",
+              "description": "Personnalisez la mise en page et la marque"
+            },
+            "members": { "name": "Membres", "description": "Gérez les rôles et les permissions" },
+            "payments": { "name": "Paiements", "description": "Configurez les tarifs d'adhésion" }
+          }
+        },
+        "general": {
+          "title": "Paramètres généraux",
+          "subtitle": "Mettez à jour les informations de base de votre communauté",
+          "nameLabel": "Nom de la communauté",
+          "namePlaceholder": "Ma communauté géniale",
+          "descriptionLabel": "Description",
+          "descriptionPlaceholder": "Expliquez aux gens de quoi parle votre communauté...",
+          "descriptionHint": "Affiché sur la page publique Explorer et sur la carte de votre communauté.",
+          "categoryLabel": "Catégorie",
+          "categoryPlaceholder": "Sélectionnez une catégorie…",
+          "categoryHint": "Aide les gens à trouver votre communauté dans Explorer.",
+          "languageLabel": "Langue principale",
+          "languagePlaceholder": "Sélectionnez une langue…",
+          "languageHint": "La langue dans laquelle se déroulent la plupart des conversations et sessions.",
+          "privateTitle": "Communauté privée",
+          "privateHint": "Seuls les membres approuvés peuvent voir le contenu de la communauté",
+          "requireApprovalTitle": "Exiger l'approbation des nouveaux membres",
+          "requireApprovalHint": "Vous devrez approuver chaque membre avant qu'il puisse rejoindre",
+          "cancel": "Annuler",
+          "saving": "Enregistrement...",
+          "save": "Enregistrer les modifications",
+          "danger": {
+            "title": "Zone de danger",
+            "description": "Une fois une communauté supprimée, il n'y a pas de retour en arrière. Soyez certain.",
+            "deleting": "Suppression...",
+            "delete": "Supprimer la communauté",
+            "namePrompt": "Tapez le nom exact de la communauté pour confirmer la suppression :\n\n{name}",
+            "nameRequired": "Le nom de la communauté est requis pour confirmer la suppression",
+            "nameMismatch": "Le texte de confirmation ne correspond pas au nom de la communauté"
+          },
+          "toasts": {
+            "loadFailed": "Échec du chargement des données de la communauté",
+            "saved": "Paramètres enregistrés avec succès !",
+            "saveFailed": "Échec de l'enregistrement des paramètres",
+            "deleted": "Communauté supprimée avec succès",
+            "deleteFailed": "Échec de la suppression de la communauté"
+          }
+        }
       }
     },
     "calendar": {

@@ -856,6 +856,59 @@
           "body": "No se pudieron cargar las sesiones",
           "back": "Volver a comunidades"
         }
+      },
+      "settings": {
+        "layout": {
+          "header": "Configuración de la comunidad",
+          "subtitle": "Gestiona las preferencias y la configuración de tu comunidad",
+          "nav": {
+            "general": { "name": "General", "description": "Configuración básica de la comunidad" },
+            "appearance": {
+              "name": "Apariencia",
+              "description": "Personaliza el diseño y la marca"
+            },
+            "members": { "name": "Miembros", "description": "Gestiona roles y permisos" },
+            "payments": { "name": "Pagos", "description": "Configura los precios de membresía" }
+          }
+        },
+        "general": {
+          "title": "Configuración general",
+          "subtitle": "Actualiza la información básica de tu comunidad",
+          "nameLabel": "Nombre de la comunidad",
+          "namePlaceholder": "Mi comunidad increíble",
+          "descriptionLabel": "Descripción",
+          "descriptionPlaceholder": "Cuéntale a la gente de qué trata tu comunidad...",
+          "descriptionHint": "Se muestra en la página pública de Explorar y en la tarjeta de tu comunidad.",
+          "categoryLabel": "Categoría",
+          "categoryPlaceholder": "Selecciona una categoría…",
+          "categoryHint": "Ayuda a que la gente encuentre tu comunidad en Explorar.",
+          "languageLabel": "Idioma principal",
+          "languagePlaceholder": "Selecciona un idioma…",
+          "languageHint": "El idioma en el que ocurren la mayoría de las conversaciones y sesiones.",
+          "privateTitle": "Comunidad privada",
+          "privateHint": "Solo los miembros aprobados pueden ver el contenido de la comunidad",
+          "requireApprovalTitle": "Requerir aprobación para nuevos miembros",
+          "requireApprovalHint": "Tendrás que aprobar a cada miembro antes de que pueda unirse",
+          "cancel": "Cancelar",
+          "saving": "Guardando...",
+          "save": "Guardar cambios",
+          "danger": {
+            "title": "Zona de peligro",
+            "description": "Una vez que elimines una comunidad, no hay vuelta atrás. Asegúrate por completo.",
+            "deleting": "Eliminando...",
+            "delete": "Eliminar comunidad",
+            "namePrompt": "Escribe el nombre exacto de la comunidad para confirmar la eliminación:\n\n{name}",
+            "nameRequired": "El nombre de la comunidad es obligatorio para confirmar la eliminación",
+            "nameMismatch": "El texto de confirmación no coincide con el nombre de la comunidad"
+          },
+          "toasts": {
+            "loadFailed": "No se pudieron cargar los datos de la comunidad",
+            "saved": "¡Configuración guardada con éxito!",
+            "saveFailed": "No se pudo guardar la configuración",
+            "deleted": "Comunidad eliminada con éxito",
+            "deleteFailed": "No se pudo eliminar la comunidad"
+          }
+        }
       }
     },
     "calendar": {

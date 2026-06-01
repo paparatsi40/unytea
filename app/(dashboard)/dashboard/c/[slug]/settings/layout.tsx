@@ -2,48 +2,29 @@
 
 import Link from "next/link";
 import { usePathname, useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { Settings, Users, Eye, CreditCard } from "lucide-react";
 
 export default function CommunitySettingsLayout({ children }: { children: React.ReactNode }) {
+  const t = useTranslations("dashboard.communityAdmin.settings.layout");
   const pathname = usePathname();
   const params = useParams();
   const slug = (params?.slug as string) || "";
 
   const settingsNav = [
-    {
-      name: "General",
-      href: `/dashboard/c/${slug}/settings`,
-      icon: Settings,
-      description: "Basic community settings",
-    },
-    {
-      name: "Appearance",
-      href: `/dashboard/c/${slug}/settings/landing`,
-      icon: Eye,
-      description: "Customize layout and branding",
-    },
-
-    {
-      name: "Members",
-      href: `/dashboard/c/${slug}/settings/members`,
-      icon: Users,
-      description: "Manage roles and permissions",
-    },
-    {
-      name: "Payments",
-      href: `/dashboard/c/${slug}/settings/payments`,
-      icon: CreditCard,
-      description: "Configure membership pricing",
-    },
+    { key: "general", href: `/dashboard/c/${slug}/settings`, icon: Settings },
+    { key: "appearance", href: `/dashboard/c/${slug}/settings/landing`, icon: Eye },
+    { key: "members", href: `/dashboard/c/${slug}/settings/members`, icon: Users },
+    { key: "payments", href: `/dashboard/c/${slug}/settings/payments`, icon: CreditCard },
   ];
 
   return (
     <div className="container mx-auto max-w-7xl px-4 py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Community Settings</h1>
-        <p className="mt-2 text-gray-500">Manage your community preferences and configuration</p>
+        <h1 className="text-3xl font-bold text-gray-900">{t("header")}</h1>
+        <p className="mt-2 text-gray-500">{t("subtitle")}</p>
       </div>
 
       <div className="flex gap-8">
@@ -67,8 +48,8 @@ export default function CommunitySettingsLayout({ children }: { children: React.
                 >
                   <Icon className="mt-0.5 h-5 w-5 shrink-0" />
                   <div>
-                    <div className="font-medium">{item.name}</div>
-                    <div className="text-xs text-gray-500">{item.description}</div>
+                    <div className="font-medium">{t(`nav.${item.key}.name`)}</div>
+                    <div className="text-xs text-gray-500">{t(`nav.${item.key}.description`)}</div>
                   </div>
                 </Link>
               );
