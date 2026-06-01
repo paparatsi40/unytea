@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -80,6 +80,7 @@ export function ResourceCard({
   variant = "default",
 }: ResourceCardProps) {
   const t = useTranslations("library");
+  const locale = useLocale();
   const Icon = typeIcons[resource.type];
   const progress = resource.progress?.[0]?.progress ?? 0;
   const isCompleted = resource.progress?.[0]?.completed ?? false;
@@ -316,7 +317,7 @@ export function ResourceCard({
             <div className="flex items-center gap-3 text-muted-foreground">
               <span className="flex items-center gap-1 text-sm">
                 <Eye className="h-4 w-4" />
-                {resource.viewCount.toLocaleString()}
+                {resource.viewCount.toLocaleString(locale)}
               </span>
               <button
                 onClick={(e) => {
@@ -326,7 +327,7 @@ export function ResourceCard({
                 className="flex items-center gap-1 text-sm transition-colors hover:text-red-500"
               >
                 <Heart className="h-4 w-4" />
-                {resource._count.likes.toLocaleString()}
+                {resource._count.likes.toLocaleString(locale)}
               </button>
             </div>
           </div>
