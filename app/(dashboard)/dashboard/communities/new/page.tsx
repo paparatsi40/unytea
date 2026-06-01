@@ -25,32 +25,32 @@ import { useTranslations } from "next-intl";
 const getSteps = (t: ReturnType<typeof useTranslations>) => [
   {
     id: 1,
-    title: t("communities.stepBasicInfo"),
-    description: t("communities.stepBasicInfoDesc"),
+    title: t("steps.basicInfo.title"),
+    description: t("steps.basicInfo.description"),
     icon: Users,
   },
   {
     id: 2,
-    title: t("communities.stepAppearance"),
-    description: t("communities.stepAppearanceDesc"),
+    title: t("steps.appearance.title"),
+    description: t("steps.appearance.description"),
     icon: Palette,
   },
   {
     id: 3,
-    title: t("communities.stepLayout"),
-    description: t("communities.stepLayoutDesc"),
+    title: t("steps.layout.title"),
+    description: t("steps.layout.description"),
     icon: Sparkles,
   },
   {
     id: 4,
-    title: t("communities.stepSettings"),
-    description: t("communities.stepSettingsDesc"),
+    title: t("steps.settings.title"),
+    description: t("steps.settings.description"),
     icon: SettingsIcon,
   },
   {
     id: 5,
-    title: t("communities.stepPreview"),
-    description: t("communities.stepPreviewDesc"),
+    title: t("steps.preview.title"),
+    description: t("steps.preview.description"),
     icon: Sparkles,
   },
 ];
@@ -58,7 +58,7 @@ const getSteps = (t: ReturnType<typeof useTranslations>) => [
 export default function NewCommunityPage() {
   const router = useRouter();
   const { user } = useCurrentUser();
-  const t = useTranslations();
+  const t = useTranslations("dashboard.createCommunity");
   const steps = getSteps(t);
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -126,23 +126,16 @@ export default function NewCommunityPage() {
       }
 
       toast.success(
-        t("communities.uploadSuccess", {
-          type: type === "logo" ? t("communities.logo") : t("communities.cover"),
-        })
+        type === "logo" ? t("toasts.uploadSuccessLogo") : t("toasts.uploadSuccessCover")
       );
     } catch (error) {
       console.error("Upload error:", error);
-      toast.error(
-        t("communities.uploadFailed", {
-          type: type === "logo" ? t("communities.logo") : t("communities.cover"),
-        })
-      );
-    } finally {
-      if (type === "logo") {
-        setUploadingLogo(false);
-      } else {
-        setUploadingCover(false);
-      }
+      toast.error(type === "logo" ? t("toasts.uploadFailedLogo") : t("toasts.uploadFailedCover"));
+    }
+    if (type === "logo") {
+      setUploadingLogo(false);
+    } else {
+      setUploadingCover(false);
     }
   };
 
@@ -160,12 +153,12 @@ export default function NewCommunityPage() {
 
   const handleSubmit = async () => {
     if (!user) {
-      alert(t("auth.signInRequired"));
+      alert(t("validation.signInRequired"));
       return;
     }
 
     if (!formData.name) {
-      alert(t("communities.nameRequired"));
+      alert(t("validation.nameRequired"));
       return;
     }
 
@@ -223,22 +216,22 @@ export default function NewCommunityPage() {
       } else {
         console.error("❌ Failed to create community:", result.error);
         if ((result as any).code === "PLAN_LIMIT_COMMUNITIES") {
-          toast.error(result.error ?? t("communities.createFailed"), {
+          toast.error(result.error ?? t("toasts.createFailed"), {
             duration: 6000,
             action: {
-              label: "Upgrade",
+              label: t("toasts.upgradeAction"),
               onClick: () => router.push("/dashboard/settings/billing"),
             },
           });
           setPlanCheck((prev) => (prev ? { ...prev, canCreate: false } : prev));
         } else {
-          toast.error(result.error || t("communities.createFailed"));
+          toast.error(result.error || t("toasts.createFailed"));
         }
         setIsSubmitting(false);
       }
     } catch (error) {
       console.error("💥 Error creating community:", error);
-      alert(error instanceof Error ? error.message : t("communities.createFailed"));
+      alert(error instanceof Error ? error.message : t("toasts.createFailed"));
       setIsSubmitting(false);
     }
   };
@@ -247,12 +240,15 @@ export default function NewCommunityPage() {
 
   // ── PLAN GATE: upgrade wall shown before the wizard ──────────────────
   if (planCheck !== null && !planCheck.canCreate) {
-    const planLabels: Record<string, string> = {
-      START: "Start (Gratis)",
-      CREATOR: "Creator",
-      BUSINESS: "Business",
-      PRO: "Pro",
-    };
+    const knownPlans = ["START", "CREATOR", "BUSINESS", "PRO"];
+    const planLabel = knownPlans.includes(planCheck.plan)
+      ? t(`planGate.planNames.${planCheck.plan.toLowerCase()}`)
+      : planCheck.plan;
+    const planCards = [
+      { plan: "creator", amount: "49", count: 1, highlight: false },
+      { plan: "business", amount: "99", count: 1, highlight: false },
+      { plan: "pro", amount: "199", count: 3, highlight: true },
+    ];
     return (
       <div className="mx-auto max-w-2xl space-y-6">
         <Button
@@ -261,7 +257,7 @@ export default function NewCommunityPage() {
           className="flex items-center space-x-2"
         >
           <ArrowLeft className="h-4 w-4" />
-          <span>{t("communities.backToCommunities")}</span>
+          <span>{t("common.backToCommunities")}</span>
         </Button>
 
         <div className="space-y-6 rounded-2xl border border-border bg-card p-10 text-center shadow-lg">
@@ -270,23 +266,15 @@ export default function NewCommunityPage() {
           </div>
 
           <div className="space-y-2">
-            <h2 className="text-2xl font-bold text-foreground">Límite de comunidades alcanzado</h2>
+            <h2 className="text-2xl font-bold text-foreground">{t("planGate.title")}</h2>
             <p className="text-muted-foreground">
-              Tu plan{" "}
-              <span className="font-semibold text-foreground">
-                {planLabels[planCheck.plan] ?? planCheck.plan}
-              </span>{" "}
-              permite {planCheck.max === 1 ? "1 comunidad" : `${planCheck.max} comunidades`}. Ya
-              tienes {planCheck.current} activa{planCheck.current !== 1 ? "s" : ""}.
+              {t("planGate.allowance", { plan: planLabel, max: planCheck.max })}{" "}
+              {t("planGate.current", { count: planCheck.current })}
             </p>
           </div>
 
           <div className="grid grid-cols-1 gap-3 text-left sm:grid-cols-3">
-            {[
-              { plan: "CREATOR", price: "$49/mes", communities: "1 comunidad", highlight: false },
-              { plan: "BUSINESS", price: "$99/mes", communities: "1 comunidad", highlight: false },
-              { plan: "PRO", price: "$199/mes", communities: "3 comunidades", highlight: true },
-            ].map((p) => (
+            {planCards.map((p) => (
               <div
                 key={p.plan}
                 className={`space-y-1 rounded-xl border p-4 ${
@@ -297,12 +285,16 @@ export default function NewCommunityPage() {
               >
                 {p.highlight && (
                   <span className="text-xs font-semibold uppercase tracking-wide text-primary">
-                    Recomendado
+                    {t("planGate.recommendedBadge")}
                   </span>
                 )}
-                <p className="font-bold text-foreground">{p.plan}</p>
-                <p className="text-sm text-muted-foreground">{p.communities}</p>
-                <p className="text-lg font-semibold text-foreground">{p.price}</p>
+                <p className="font-bold text-foreground">{t(`planGate.planNames.${p.plan}`)}</p>
+                <p className="text-sm text-muted-foreground">
+                  {t("planGate.cardCommunityLimit", { count: p.count })}
+                </p>
+                <p className="text-lg font-semibold text-foreground">
+                  {t("planGate.pricePerMonth", { amount: p.amount })}
+                </p>
               </div>
             ))}
           </div>
@@ -313,10 +305,10 @@ export default function NewCommunityPage() {
               className="flex items-center gap-2"
             >
               <Zap className="h-4 w-4" />
-              Ver planes y actualizar
+              {t("planGate.viewPlansButton")}
             </Button>
             <Button variant="outline" onClick={() => router.back()}>
-              Volver
+              {t("planGate.backButton")}
             </Button>
           </div>
         </div>
@@ -338,7 +330,7 @@ export default function NewCommunityPage() {
       {/* Back Button */}
       <Button variant="ghost" onClick={() => router.back()} className="flex items-center space-x-2">
         <ArrowLeft className="h-4 w-4" />
-        <span>{t("communities.backToCommunities")}</span>
+        <span>{t("common.backToCommunities")}</span>
       </Button>
 
       {/* Progress */}
@@ -401,7 +393,7 @@ export default function NewCommunityPage() {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  placeholder={t("communities.namePlaceholder")}
+                  placeholder={t("steps.basicInfo.namePlaceholder")}
                   maxLength={50}
                 />
                 <p className="mt-1 text-xs text-muted-foreground">
@@ -418,7 +410,7 @@ export default function NewCommunityPage() {
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  placeholder={t("communities.descriptionPlaceholder")}
+                  placeholder={t("steps.basicInfo.descriptionPlaceholder")}
                   rows={4}
                   maxLength={500}
                 />
@@ -948,7 +940,7 @@ export default function NewCommunityPage() {
               disabled={isSubmitting}
             >
               <ArrowLeft className="h-4 w-4" />
-              <span>Previous</span>
+              <span>{t("common.previous")}</span>
             </Button>
           )}
 
@@ -958,7 +950,7 @@ export default function NewCommunityPage() {
               className="ml-auto flex items-center space-x-2"
               disabled={!isStepValid()}
             >
-              <span>Continue</span>
+              <span>{t("common.continue")}</span>
               <ArrowRight className="h-4 w-4" />
             </Button>
           ) : (
@@ -968,7 +960,7 @@ export default function NewCommunityPage() {
               disabled={!isStepValid() || isSubmitting}
             >
               <Sparkles className="h-4 w-4" />
-              <span>{isSubmitting ? "Creating..." : "Create Community"}</span>
+              <span>{isSubmitting ? t("common.creating") : t("common.createButton")}</span>
             </Button>
           )}
         </div>

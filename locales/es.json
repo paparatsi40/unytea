@@ -1105,6 +1105,67 @@
         }
       }
     },
+    "createCommunity": {
+      "common": {
+        "backToCommunities": "Volver a Comunidades",
+        "previous": "Anterior",
+        "continue": "Continuar",
+        "creating": "Creando...",
+        "createButton": "Crear Comunidad"
+      },
+      "steps": {
+        "basicInfo": {
+          "title": "Información Básica",
+          "description": "Comienza con lo esencial",
+          "namePlaceholder": "Ingresa el nombre de tu comunidad",
+          "descriptionPlaceholder": "Describe tu comunidad, qué aprenderán los miembros y por qué deberían unirse..."
+        },
+        "appearance": {
+          "title": "Apariencia",
+          "description": "Personaliza el look de tu comunidad"
+        },
+        "layout": {
+          "title": "Diseño",
+          "description": "Elige la estructura de tu comunidad"
+        },
+        "settings": {
+          "title": "Configuración",
+          "description": "Configura acceso y privacidad"
+        },
+        "preview": {
+          "title": "Vista Previa",
+          "description": "Revisa antes de publicar"
+        }
+      },
+      "validation": {
+        "nameRequired": "Por favor ingresa un nombre para la comunidad",
+        "signInRequired": "Inicia sesión para crear una comunidad"
+      },
+      "toasts": {
+        "uploadSuccessLogo": "Logo subido correctamente",
+        "uploadSuccessCover": "Portada subida correctamente",
+        "uploadFailedLogo": "No se pudo subir el logo",
+        "uploadFailedCover": "No se pudo subir la portada",
+        "createFailed": "No se pudo crear la comunidad. Inténtalo de nuevo.",
+        "upgradeAction": "Mejorar plan"
+      },
+      "planGate": {
+        "title": "Límite de comunidades alcanzado",
+        "allowance": "Tu plan {plan} permite {max, plural, =1 {1 comunidad} other {# comunidades}}.",
+        "current": "Ya tienes {count, plural, =1 {1 comunidad activa} other {# comunidades activas}}.",
+        "planNames": {
+          "start": "Start (Gratis)",
+          "creator": "Creator",
+          "business": "Business",
+          "pro": "Pro"
+        },
+        "recommendedBadge": "Recomendado",
+        "pricePerMonth": "${amount}/mes",
+        "cardCommunityLimit": "{count, plural, =1 {1 comunidad} other {# comunidades}}",
+        "viewPlansButton": "Ver planes y actualizar",
+        "backButton": "Volver"
+      }
+    },
     "calendar": {
       "metaTitle": "Calendario",
       "title": "Calendario",

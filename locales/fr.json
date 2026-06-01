@@ -1104,6 +1104,67 @@
         }
       }
     },
+    "createCommunity": {
+      "common": {
+        "backToCommunities": "Retour aux Communautés",
+        "previous": "Précédent",
+        "continue": "Continuer",
+        "creating": "Création...",
+        "createButton": "Créer la communauté"
+      },
+      "steps": {
+        "basicInfo": {
+          "title": "Informations de Base",
+          "description": "Commencez avec l'essentiel",
+          "namePlaceholder": "Saisissez le nom de votre communauté",
+          "descriptionPlaceholder": "Décrivez votre communauté, ce que les membres apprendront et pourquoi ils devraient la rejoindre..."
+        },
+        "appearance": {
+          "title": "Apparence",
+          "description": "Personnalisez l'apparence de votre communauté"
+        },
+        "layout": {
+          "title": "Mise en Page",
+          "description": "Choisissez la structure de votre communauté"
+        },
+        "settings": {
+          "title": "Paramètres",
+          "description": "Configurez l'accès et la confidentialité"
+        },
+        "preview": {
+          "title": "Aperçu",
+          "description": "Vérifiez avant de publier"
+        }
+      },
+      "validation": {
+        "nameRequired": "Veuillez saisir un nom de communauté",
+        "signInRequired": "Connectez-vous pour créer une communauté"
+      },
+      "toasts": {
+        "uploadSuccessLogo": "Logo importé avec succès",
+        "uploadSuccessCover": "Image de couverture importée avec succès",
+        "uploadFailedLogo": "Échec de l'import du logo",
+        "uploadFailedCover": "Échec de l'import de l'image de couverture",
+        "createFailed": "Échec de la création de la communauté. Veuillez réessayer.",
+        "upgradeAction": "Mettre à niveau"
+      },
+      "planGate": {
+        "title": "Limite de communautés atteinte",
+        "allowance": "Votre forfait {plan} autorise {max, plural, =1 {1 communauté} other {# communautés}}.",
+        "current": "Vous avez déjà {count, plural, =1 {1 communauté active} other {# communautés actives}}.",
+        "planNames": {
+          "start": "Start (Gratuit)",
+          "creator": "Creator",
+          "business": "Business",
+          "pro": "Pro"
+        },
+        "recommendedBadge": "Recommandé",
+        "pricePerMonth": "${amount}/mois",
+        "cardCommunityLimit": "{count, plural, =1 {1 communauté} other {# communautés}}",
+        "viewPlansButton": "Voir les forfaits et améliorer",
+        "backButton": "Retour"
+      }
+    },
     "calendar": {
       "metaTitle": "Calendrier",
       "title": "Calendrier",

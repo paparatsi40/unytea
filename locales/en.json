@@ -1102,6 +1102,67 @@
         }
       }
     },
+    "createCommunity": {
+      "common": {
+        "backToCommunities": "Back to Communities",
+        "previous": "Previous",
+        "continue": "Continue",
+        "creating": "Creating...",
+        "createButton": "Create Community"
+      },
+      "steps": {
+        "basicInfo": {
+          "title": "Basic Information",
+          "description": "Start with the essentials",
+          "namePlaceholder": "Enter your community name",
+          "descriptionPlaceholder": "Describe your community, what members will learn, and why they should join..."
+        },
+        "appearance": {
+          "title": "Appearance",
+          "description": "Customize your community look"
+        },
+        "layout": {
+          "title": "Layout",
+          "description": "Choose your community structure"
+        },
+        "settings": {
+          "title": "Settings",
+          "description": "Configure access and privacy"
+        },
+        "preview": {
+          "title": "Preview",
+          "description": "Review before publishing"
+        }
+      },
+      "validation": {
+        "nameRequired": "Please enter a community name",
+        "signInRequired": "Please sign in to create a community"
+      },
+      "toasts": {
+        "uploadSuccessLogo": "Logo uploaded successfully",
+        "uploadSuccessCover": "Cover image uploaded successfully",
+        "uploadFailedLogo": "Failed to upload logo",
+        "uploadFailedCover": "Failed to upload cover image",
+        "createFailed": "Failed to create community. Please try again.",
+        "upgradeAction": "Upgrade"
+      },
+      "planGate": {
+        "title": "Community limit reached",
+        "allowance": "Your {plan} plan allows {max, plural, =1 {1 community} other {# communities}}.",
+        "current": "You already have {count, plural, =1 {1 active community} other {# active communities}}.",
+        "planNames": {
+          "start": "Start (Free)",
+          "creator": "Creator",
+          "business": "Business",
+          "pro": "Pro"
+        },
+        "recommendedBadge": "Recommended",
+        "pricePerMonth": "${amount}/mo",
+        "cardCommunityLimit": "{count, plural, =1 {1 community} other {# communities}}",
+        "viewPlansButton": "View plans & upgrade",
+        "backButton": "Back"
+      }
+    },
     "calendar": {
       "metaTitle": "Calendar",
       "title": "Calendar",
