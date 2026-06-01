@@ -4,9 +4,11 @@ import { useState } from "react";
 import Image from "next/image";
 import { formatDistanceToNow } from "date-fns";
 import { MessageCircle, Heart, Trash2, Clock } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { CommentForm } from "./CommentForm";
 import { deleteComment } from "@/app/actions/comments";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { getDateFnsLocale } from "@/lib/i18n/date-fns-locale";
 import { toast } from "sonner";
 
 type Comment = {
@@ -39,12 +41,18 @@ export function CommentItem({
   onReplySuccess,
 }: CommentItemProps) {
   const { user } = useCurrentUser();
+  const t = useTranslations("dashboard.communityAdmin.comments.item");
+  const locale = useLocale();
+  const dfLocale = getDateFnsLocale(locale);
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
-  const authorName = comment.author.name || "Anonymous";
-  const timeAgo = formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true });
+  const authorName = comment.author.name || t("anonymous");
+  const timeAgo = formatDistanceToNow(new Date(comment.createdAt), {
+    addSuffix: true,
+    locale: dfLocale,
+  });
   const isAuthor = user?.id === comment.author.id;
 
   const handleDelete = async () => {
@@ -57,7 +65,7 @@ export function CommentItem({
       return;
     }
 
-    toast.error(result.error || "Failed to delete comment");
+    toast.error(result.error || t("deleteFailed"));
     setIsDeleting(false);
   };
 
@@ -126,27 +134,27 @@ export function CommentItem({
                 className="flex items-center space-x-1 rounded-lg px-2 py-1 text-xs text-gray-500 transition-colors hover:bg-gray-50 hover:text-purple-600"
               >
                 <MessageCircle className="h-3.5 w-3.5" />
-                <span>Reply</span>
+                <span>{t("reply")}</span>
               </button>
             )}
           </div>
 
           {confirmDelete && isAuthor && (
             <div className="mt-2 flex items-center justify-between gap-2 rounded-lg border border-red-200 bg-red-50 px-2.5 py-2">
-              <p className="text-[11px] font-medium text-red-700">Delete this comment?</p>
+              <p className="text-[11px] font-medium text-red-700">{t("deleteConfirm")}</p>
               <div className="flex items-center gap-1.5">
                 <button
                   onClick={() => setConfirmDelete(false)}
                   className="rounded-md px-2 py-1 text-[11px] font-medium text-gray-600 hover:bg-white"
                 >
-                  Cancel
+                  {t("cancel")}
                 </button>
                 <button
                   onClick={handleDelete}
                   disabled={isDeleting}
                   className="rounded-md bg-red-600 px-2.5 py-1 text-[11px] font-medium text-white hover:bg-red-700 disabled:opacity-60"
                 >
-                  {isDeleting ? "Deleting..." : "Delete"}
+                  {isDeleting ? t("deleting") : t("delete")}
                 </button>
               </div>
             </div>
@@ -159,7 +167,7 @@ export function CommentItem({
                 postId={postId}
                 parentId={comment.id}
                 onSuccess={handleReplySuccess}
-                placeholder={`Reply to ${authorName}...`}
+                placeholder={t("replyPlaceholder", { name: authorName })}
                 autoFocus
               />
             </div>

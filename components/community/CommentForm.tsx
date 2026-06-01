@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { createComment } from "@/app/actions/comments";
 import { Send, Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 type CommentFormProps = {
   postId: string;
@@ -16,9 +17,10 @@ export function CommentForm({
   postId,
   parentId,
   onSuccess,
-  placeholder = "Write a comment...",
+  placeholder,
   autoFocus = false,
 }: CommentFormProps) {
+  const t = useTranslations("dashboard.communityAdmin.comments.form");
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,7 +29,7 @@ export function CommentForm({
     e.preventDefault();
 
     if (!content.trim()) {
-      setError("Comment cannot be empty");
+      setError(t("empty"));
       return;
     }
 
@@ -40,7 +42,7 @@ export function CommentForm({
       setContent("");
       onSuccess?.();
     } else {
-      setError(result.error || "Failed to post comment");
+      setError(result.error || t("postFailed"));
     }
 
     setIsSubmitting(false);
@@ -52,7 +54,7 @@ export function CommentForm({
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          placeholder={placeholder}
+          placeholder={placeholder ?? t("placeholderComment")}
           autoFocus={autoFocus}
           disabled={isSubmitting}
           rows={3}
@@ -61,7 +63,7 @@ export function CommentForm({
 
         {/* Character count */}
         <div className="absolute bottom-2 left-2 text-xs text-gray-400">
-          {content.length} / 1000
+          {t("charCount", { count: content.length })}
         </div>
 
         {/* Submit button inside textarea */}

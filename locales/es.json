@@ -530,6 +530,30 @@
         },
         "durationMeta": "{minutes} min",
         "withMentor": "con {name}"
+      },
+      "comments": {
+        "section": {
+          "headerCount": "{count, plural, =0 {Sin comentarios} =1 {# comentario} other {# comentarios}}",
+          "loadError": "No se pudieron cargar los comentarios",
+          "emptyTitle": "Aún no hay comentarios",
+          "emptySubtitle": "¡Sé el primero en comentar!"
+        },
+        "item": {
+          "anonymous": "Anónimo",
+          "reply": "Responder",
+          "replyPlaceholder": "Responder a {name}...",
+          "deleteConfirm": "¿Eliminar este comentario?",
+          "cancel": "Cancelar",
+          "delete": "Eliminar",
+          "deleting": "Eliminando...",
+          "deleteFailed": "No se pudo eliminar el comentario"
+        },
+        "form": {
+          "placeholderComment": "Escribe un comentario...",
+          "charCount": "{count} / 1000",
+          "empty": "El comentario no puede estar vacío",
+          "postFailed": "No se pudo publicar el comentario"
+        }
       }
     },
     "calendar": {
@@ -1547,16 +1571,6 @@
       "noResultsEmpty": "Esta comunidad aún no tiene recursos. ¡Sé el primero en compartir algo!",
       "loading": "Cargando...",
       "loadMore": "Cargar más"
-    }
-  },
-  "comments": {
-    "commentsLabel": "comentarios",
-    "errors": {
-      "loadFailed": "No se pudieron cargar los comentarios"
-    },
-    "empty": {
-      "title": "Aún no hay comentarios",
-      "subtitle": "¡Sé el primero en comentar!"
     }
   }
 }
