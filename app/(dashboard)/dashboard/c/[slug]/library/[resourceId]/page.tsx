@@ -4,7 +4,10 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { format } from "date-fns";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
+import { getDateFnsLocale } from "@/lib/i18n/date-fns-locale";
 import { toast } from "sonner";
 import {
   ArrowLeft,
@@ -37,13 +40,6 @@ const resourceTypeIcons: Record<ResourceType, typeof FileText> = {
   LINK: LinkIcon,
 };
 
-const resourceTypeLabels: Record<ResourceType, string> = {
-  DOCUMENT: "Documento",
-  VIDEO: "Video",
-  AUDIO: "Audio",
-  LINK: "Enlace",
-};
-
 const resourceTypeColors: Record<ResourceType, string> = {
   DOCUMENT: "from-blue-500 to-blue-600",
   VIDEO: "from-red-500 to-red-600",
@@ -52,6 +48,9 @@ const resourceTypeColors: Record<ResourceType, string> = {
 };
 
 export default function ResourceDetailPage() {
+  const t = useTranslations("library");
+  const locale = useLocale();
+  const dfLocale = getDateFnsLocale(locale);
   const params = useParams();
   const communitySlug = params?.slug as string | undefined;
   const resourceId = params?.resourceId as string | undefined;
@@ -69,15 +68,14 @@ export default function ResourceDetailPage() {
       if (result.success) {
         setResource(result.data);
       } else {
-        toast.error(result.error || "Error al cargar el recurso");
+        toast.error(result.error || t("detail.loadError"));
       }
     } catch (error) {
       console.error("Error fetching resource:", error);
-      toast.error("Error al cargar el recurso");
-    } finally {
-      setIsLoading(false);
+      toast.error(t("detail.loadError"));
     }
-  }, [communitySlug, resourceId]);
+    setIsLoading(false);
+  }, [communitySlug, resourceId, t]);
 
   useEffect(() => {
     fetchResource();
@@ -97,22 +95,22 @@ export default function ResourceDetailPage() {
             }
           : null
       );
-      toast.success(result.data.liked ? "¡Te gusta este recurso!" : "Like removido");
+      toast.success(result.data.liked ? t("like.liked") : t("like.unliked"));
     }
   };
 
   const handleDelete = async () => {
-    if (!resourceId || !confirm("¿Estás seguro de que quieres eliminar este recurso?")) {
+    if (!resourceId || !confirm(t("delete.confirm"))) {
       return;
     }
 
     setIsDeleting(true);
     const result = await deleteResource(resourceId);
     if (result.success) {
-      toast.success("Recurso eliminado");
+      toast.success(t("delete.success"));
       window.location.href = `/dashboard/c/${communitySlug}/library`;
     } else {
-      toast.error(result.error || "Error al eliminar el recurso");
+      toast.error(result.error || t("detail.deleteError"));
       setIsDeleting(false);
     }
   };
@@ -126,13 +124,13 @@ export default function ResourceDetailPage() {
   const handleShare = () => {
     if (navigator.share) {
       navigator.share({
-        title: resource?.title || "Recurso",
+        title: resource?.title || t("detail.shareFallbackTitle"),
         text: resource?.description || "",
         url: window.location.href,
       });
     } else {
       navigator.clipboard.writeText(window.location.href);
-      toast.success("Enlace copiado al portapapeles");
+      toast.success(t("detail.linkCopied"));
     }
   };
 
@@ -141,7 +139,7 @@ export default function ResourceDetailPage() {
       <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-background to-muted/20">
         <div className="text-center">
           <div className="mx-auto mb-4 h-12 w-12 animate-pulse rounded-full bg-gradient-to-br from-purple-500 to-pink-500" />
-          <p className="text-muted-foreground">Cargando recurso...</p>
+          <p className="text-muted-foreground">{t("detail.loading")}</p>
         </div>
       </div>
     );
@@ -152,14 +150,12 @@ export default function ResourceDetailPage() {
       <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-background to-muted/20">
         <div className="text-center">
           <FileText className="mx-auto mb-4 h-16 w-16 text-gray-300" />
-          <h2 className="mb-2 text-xl font-semibold text-gray-900">Recurso no encontrado</h2>
-          <p className="mb-4 text-muted-foreground">
-            El recurso que buscas no existe o no tienes acceso a él.
-          </p>
+          <h2 className="mb-2 text-xl font-semibold text-gray-900">{t("detail.notFoundTitle")}</h2>
+          <p className="mb-4 text-muted-foreground">{t("detail.notFoundBody")}</p>
           <Link href={`/dashboard/c/${communitySlug}/library`}>
             <Button variant="outline">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Volver a la biblioteca
+              {t("detail.backToLibrary")}
             </Button>
           </Link>
         </div>
@@ -181,12 +177,12 @@ export default function ResourceDetailPage() {
               <Link href={`/dashboard/c/${communitySlug}/library`}>
                 <Button variant="ghost" size="sm" className="gap-2">
                   <ArrowLeft className="h-4 w-4" />
-                  Volver
+                  {t("detail.back")}
                 </Button>
               </Link>
               <div className="h-6 w-px bg-border" />
               <nav className="flex items-center gap-2 text-sm text-muted-foreground">
-                <span>Biblioteca</span>
+                <span>{t("detail.breadcrumb")}</span>
                 <span>/</span>
                 <span className="max-w-[200px] truncate font-medium text-foreground md:max-w-md">
                   {resource.title}
@@ -209,7 +205,7 @@ export default function ResourceDetailPage() {
 
               <Button variant="outline" size="sm" onClick={handleShare}>
                 <Share2 className="mr-2 h-4 w-4" />
-                Compartir
+                {t("detail.share")}
               </Button>
 
               {(resource.canEdit || resource.canDelete) && (
@@ -223,7 +219,7 @@ export default function ResourceDetailPage() {
                     {resource.canEdit && (
                       <DropdownMenuItem>
                         <Edit className="mr-2 h-4 w-4" />
-                        Editar
+                        {t("detail.edit")}
                       </DropdownMenuItem>
                     )}
                     {resource.canDelete && (
@@ -233,7 +229,7 @@ export default function ResourceDetailPage() {
                         className="text-red-600"
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
-                        {isDeleting ? "Eliminando..." : "Eliminar"}
+                        {isDeleting ? t("detail.deleting") : t("detail.delete")}
                       </DropdownMenuItem>
                     )}
                   </DropdownMenuContent>
@@ -264,7 +260,7 @@ export default function ResourceDetailPage() {
                 <div className="min-w-0 flex-1">
                   <div className="mb-1 flex items-center gap-2">
                     <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                      {resourceTypeLabels[resource.type as ResourceType]}
+                      {t(`resourceType.${resource.type as ResourceType}`)}
                     </span>
                     {resource.category && (
                       <>
@@ -287,22 +283,19 @@ export default function ResourceDetailPage() {
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <div className="flex items-center gap-2">
                       <Eye className="h-4 w-4" />
-                      <span>{resource.viewCount || 0} vistas</span>
+                      <span>{t("detail.views", { count: resource.viewCount || 0 })}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Clock className="h-4 w-4" />
                       <span>
-                        {new Date(resource.createdAt).toLocaleDateString("es-ES", {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        })}
+                        {format(new Date(resource.createdAt), "PPP", { locale: dfLocale })}
                       </span>
                     </div>
                     {resource.author && (
                       <div className="flex items-center gap-2">
-                        <span>por</span>
-                        <span className="font-medium text-foreground">{resource.author.name}</span>
+                        <span className="font-medium text-foreground">
+                          {t("detail.by", { name: resource.author.name })}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -318,7 +311,7 @@ export default function ResourceDetailPage() {
                   className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
                 >
                   <Download className="mr-2 h-4 w-4" />
-                  Descargar / Ver recurso
+                  {t("detail.download")}
                 </Button>
               )}
             </div>
@@ -332,7 +325,7 @@ export default function ResourceDetailPage() {
                   className="h-full w-full"
                   poster="/video-poster.png"
                 >
-                  Tu navegador no soporta el elemento video.
+                  {t("detail.videoUnsupported")}
                 </video>
               </div>
             )}
@@ -340,14 +333,14 @@ export default function ResourceDetailPage() {
             {resource.type === "AUDIO" && resource.fileUrl && (
               <div className="mb-6 w-full rounded-xl bg-gradient-to-br from-green-50 to-green-100 p-6">
                 <audio src={resource.fileUrl} controls className="w-full">
-                  Tu navegador no soporta el elemento audio.
+                  {t("detail.audioUnsupported")}
                 </audio>
               </div>
             )}
 
             {resource.type === "LINK" && resource.fileUrl && (
               <div className="mb-6 w-full rounded-xl bg-gradient-to-br from-orange-50 to-orange-100 p-6">
-                <p className="mb-2 text-sm text-muted-foreground">Enlace externo:</p>
+                <p className="mb-2 text-sm text-muted-foreground">{t("detail.externalLink")}</p>
                 <a
                   href={resource.fileUrl}
                   target="_blank"
@@ -361,7 +354,7 @@ export default function ResourceDetailPage() {
 
             {resource.type === "DOCUMENT" && resource.fileUrl && (
               <div className="mb-6 w-full rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 p-6">
-                <p className="mb-2 text-sm text-muted-foreground">Archivo de documento</p>
+                <p className="mb-2 text-sm text-muted-foreground">{t("detail.documentFile")}</p>
                 <a
                   href={resource.fileUrl}
                   target="_blank"
@@ -376,7 +369,9 @@ export default function ResourceDetailPage() {
             {/* Additional Info */}
             {resource.tags && resource.tags.length > 0 && (
               <div className="rounded-xl border bg-white p-4 shadow-sm">
-                <h3 className="mb-2 text-sm font-medium text-muted-foreground">Etiquetas</h3>
+                <h3 className="mb-2 text-sm font-medium text-muted-foreground">
+                  {t("detail.tags")}
+                </h3>
                 <div className="flex flex-wrap gap-2">
                   {resource.tags.map((tag: string) => (
                     <span

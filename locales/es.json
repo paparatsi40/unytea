@@ -1682,6 +1682,41 @@
       "noResultsEmpty": "Esta comunidad aún no tiene recursos. ¡Sé el primero en compartir algo!",
       "loading": "Cargando...",
       "loadMore": "Cargar más"
+    },
+    "communityNotFound": "Comunidad no encontrada",
+    "resourceType": {
+      "DOCUMENT": "Documento",
+      "VIDEO": "Video",
+      "AUDIO": "Audio",
+      "LINK": "Enlace"
+    },
+    "card": {
+      "edit": "Editar",
+      "delete": "Eliminar"
+    },
+    "detail": {
+      "loading": "Cargando recurso...",
+      "loadError": "Error al cargar el recurso",
+      "notFoundTitle": "Recurso no encontrado",
+      "notFoundBody": "El recurso que buscas no existe o no tienes acceso a él.",
+      "backToLibrary": "Volver a la biblioteca",
+      "back": "Volver",
+      "breadcrumb": "Biblioteca",
+      "share": "Compartir",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "deleting": "Eliminando...",
+      "deleteError": "Error al eliminar el recurso",
+      "linkCopied": "Enlace copiado al portapapeles",
+      "shareFallbackTitle": "Recurso",
+      "views": "{count, plural, =1 {# vista} other {# vistas}}",
+      "by": "por {name}",
+      "download": "Descargar / Ver recurso",
+      "videoUnsupported": "Tu navegador no soporta el elemento video.",
+      "audioUnsupported": "Tu navegador no soporta el elemento audio.",
+      "externalLink": "Enlace externo:",
+      "documentFile": "Archivo de documento",
+      "tags": "Etiquetas"
     }
   }
 }

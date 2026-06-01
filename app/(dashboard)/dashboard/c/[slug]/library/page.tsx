@@ -218,7 +218,7 @@ export default function LibraryPage() {
   if (!communitySlug) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <p>Community not found</p>
+        <p>{t("communityNotFound")}</p>
       </div>
     );
   }

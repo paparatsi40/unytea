@@ -1682,6 +1682,41 @@
       "noResultsEmpty": "This community has no resources yet. Be the first to share something!",
       "loading": "Loading...",
       "loadMore": "Load more"
+    },
+    "communityNotFound": "Community not found",
+    "resourceType": {
+      "DOCUMENT": "Document",
+      "VIDEO": "Video",
+      "AUDIO": "Audio",
+      "LINK": "Link"
+    },
+    "card": {
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "detail": {
+      "loading": "Loading resource...",
+      "loadError": "Error loading resource",
+      "notFoundTitle": "Resource not found",
+      "notFoundBody": "The resource you're looking for doesn't exist or you don't have access to it.",
+      "backToLibrary": "Back to library",
+      "back": "Back",
+      "breadcrumb": "Library",
+      "share": "Share",
+      "edit": "Edit",
+      "delete": "Delete",
+      "deleting": "Deleting...",
+      "deleteError": "Error deleting resource",
+      "linkCopied": "Link copied to clipboard",
+      "shareFallbackTitle": "Resource",
+      "views": "{count, plural, =1 {# view} other {# views}}",
+      "by": "by {name}",
+      "download": "Download / View resource",
+      "videoUnsupported": "Your browser does not support the video element.",
+      "audioUnsupported": "Your browser does not support the audio element.",
+      "externalLink": "External link:",
+      "documentFile": "Document file",
+      "tags": "Tags"
     }
   }
 }
