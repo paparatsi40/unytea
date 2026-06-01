@@ -362,6 +362,23 @@
       "securityDescription": "Manage password, authentication, and account safety options.",
       "openSecurity": "Open security options"
     },
+    "messages": {
+      "userFallback": "User",
+      "subtitleShared": "Shared communities: {count}",
+      "directConversation": "Direct conversation",
+      "contact": "Contact",
+      "viewProfile": "View profile",
+      "profileUnavailable": "Profile unavailable",
+      "context": "Context",
+      "startedFrom": "Started from community members.",
+      "communitiesInCommon": "Communities in common",
+      "moreCount": "+{count} more",
+      "noSharedCommunities": "No active shared communities found.",
+      "unread": "Unread",
+      "totalUnread": "total unread messages in your inbox",
+      "emptyTitle": "Your Messages",
+      "emptyBody": "Select a conversation from the left to view it. To start a new conversation, open a community member directory and use the Message button there."
+    },
     "library": {
       "title": "Library",
       "subtitle": "Your courses, recordings, and resources",

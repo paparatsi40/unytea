@@ -362,6 +362,23 @@
       "securityDescription": "Administra la contraseña, la autenticación y las opciones de seguridad de la cuenta.",
       "openSecurity": "Abrir opciones de seguridad"
     },
+    "messages": {
+      "userFallback": "Usuario",
+      "subtitleShared": "Comunidades en común: {count}",
+      "directConversation": "Conversación directa",
+      "contact": "Contacto",
+      "viewProfile": "Ver perfil",
+      "profileUnavailable": "Perfil no disponible",
+      "context": "Contexto",
+      "startedFrom": "Iniciada desde members de la comunidad.",
+      "communitiesInCommon": "Comunidades en común",
+      "moreCount": "+{count} más",
+      "noSharedCommunities": "No se encontraron comunidades compartidas activas.",
+      "unread": "Sin leer",
+      "totalUnread": "mensajes sin leer en total en tu bandeja",
+      "emptyTitle": "Tus mensajes",
+      "emptyBody": "Selecciona una conversación de la izquierda para verla. Para iniciar una nueva conversación, abre el directorio de members de una comunidad y usa el botón Mensaje."
+    },
     "library": {
       "title": "Biblioteca",
       "subtitle": "Tus cursos, grabaciones y recursos",

@@ -361,6 +361,23 @@
       "securityDescription": "Gérez le mot de passe, l'authentification et les options de sécurité du compte.",
       "openSecurity": "Ouvrir les options de sécurité"
     },
+    "messages": {
+      "userFallback": "Utilisateur",
+      "subtitleShared": "Communautés en commun : {count}",
+      "directConversation": "Conversation directe",
+      "contact": "Contact",
+      "viewProfile": "Voir le profil",
+      "profileUnavailable": "Profil indisponible",
+      "context": "Contexte",
+      "startedFrom": "Démarrée depuis les membres de la communauté.",
+      "communitiesInCommon": "Communautés en commun",
+      "moreCount": "+{count} de plus",
+      "noSharedCommunities": "Aucune communauté partagée active trouvée.",
+      "unread": "Non lus",
+      "totalUnread": "messages non lus au total dans votre boîte de réception",
+      "emptyTitle": "Vos messages",
+      "emptyBody": "Sélectionnez une conversation à gauche pour l'afficher. Pour démarrer une nouvelle conversation, ouvrez l'annuaire des membres d'une communauté et utilisez le bouton Message."
+    },
     "library": {
       "title": "Bibliothèque",
       "subtitle": "Vos cours, enregistrements et ressources",
