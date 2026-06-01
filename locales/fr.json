@@ -553,6 +553,308 @@
           "empty": "Le commentaire ne peut pas être vide",
           "postFailed": "Échec de la publication du commentaire"
         }
+      },
+      "courses": {
+        "title": "Cours",
+        "subtitle": "Créez et gérez les cours de votre communauté",
+        "createButton": "Créer un cours",
+        "card": {
+          "published": "Publié",
+          "draft": "Brouillon",
+          "free": "Gratuit",
+          "modulesCount": "{count, plural, =1 {# module} other {# modules}}",
+          "enrolledCount": "{count, plural, =1 {# inscrit} other {# inscrits}}",
+          "edit": "Modifier",
+          "publish": "Publier",
+          "unpublish": "Dépublier"
+        },
+        "createDialog": {
+          "title": "Créer un nouveau cours",
+          "titleLabel": "Titre du cours",
+          "titlePlaceholder": "Ex. Introduction au marketing",
+          "slugLabel": "Slug d'URL",
+          "slugPlaceholder": "introduction-au-marketing",
+          "descriptionLabel": "Description",
+          "descriptionPlaceholder": "Qu'apprendront les étudiants dans ce cours ?",
+          "paidCourse": "Cours payant",
+          "freeCourse": "Cours gratuit",
+          "paidHint": "Les étudiants devront payer pour accéder à ce cours",
+          "freeHint": "Tous les membres peuvent accéder gratuitement à ce cours",
+          "priceLabel": "Prix (USD)",
+          "pricePlaceholder": "29.99",
+          "cancel": "Annuler",
+          "submit": "Créer le cours"
+        },
+        "empty": {
+          "title": "Aucun cours pour le moment",
+          "description": "Créez votre premier cours pour commencer à enseigner à votre communauté",
+          "cta": "Créez votre premier cours"
+        },
+        "toasts": {
+          "communityNotFound": "Communauté introuvable",
+          "loadFailed": "Échec du chargement des cours",
+          "created": "Cours créé !",
+          "createFailed": "Échec de la création du cours",
+          "published": "Cours publié !",
+          "unpublished": "Cours dépublié",
+          "updateFailed": "Échec de la mise à jour du cours",
+          "deleted": "Cours supprimé",
+          "deleteFailed": "Échec de la suppression du cours",
+          "deleteConfirm": "Voulez-vous vraiment supprimer ce cours ? Cette action est irréversible."
+        },
+        "builder": {
+          "notFound": "Cours introuvable",
+          "goBack": "Retour",
+          "backToCourses": "Retour aux cours",
+          "header": {
+            "titleLabel": "Titre",
+            "descriptionLabel": "Description",
+            "paidCourse": "Cours payant",
+            "freeCourse": "Cours gratuit",
+            "save": "Enregistrer",
+            "cancel": "Annuler",
+            "published": "Publié",
+            "draft": "Brouillon",
+            "free": "Gratuit",
+            "editDetails": "Modifier les détails",
+            "publish": "Publier",
+            "unpublish": "Dépublier"
+          },
+          "modules": {
+            "header": "Modules ({count})",
+            "addButton": "Ajouter un module",
+            "titlePlaceholder": "Titre du module...",
+            "add": "Ajouter",
+            "empty": "Aucun module pour le moment. Ajoutez votre premier module pour commencer à construire le cours.",
+            "lessonCount": "{count, plural, =1 {# leçon} other {# leçons}}",
+            "deleteConfirm": "Supprimer ce module et toutes ses leçons ?"
+          },
+          "lessons": {
+            "titlePlaceholder": "Titre de la leçon...",
+            "type": {
+              "TEXT": "Texte",
+              "VIDEO": "Vidéo",
+              "AUDIO": "Audio"
+            },
+            "videoUrlPlaceholder": "URL de la vidéo (YouTube, Vimeo, etc.)",
+            "contentPlaceholder": "Contenu de la leçon...",
+            "freePreview": "Aperçu gratuit",
+            "paidOnly": "Payant uniquement",
+            "free": "Gratuit",
+            "save": "Enregistrer",
+            "cancel": "Annuler",
+            "addButton": "Ajouter une leçon",
+            "deleteConfirm": "Supprimer cette leçon ?"
+          },
+          "toasts": {
+            "loadFailed": "Échec du chargement du cours",
+            "updated": "Cours mis à jour !",
+            "updateFailed": "Échec de la mise à jour du cours",
+            "published": "Cours publié !",
+            "unpublished": "Cours dépublié",
+            "moduleAdded": "Module ajouté !",
+            "moduleAddFailed": "Échec de l'ajout du module",
+            "moduleDeleted": "Module supprimé",
+            "moduleDeleteFailed": "Échec de la suppression du module",
+            "lessonAdded": "Leçon ajoutée !",
+            "lessonAddFailed": "Échec de l'ajout de la leçon",
+            "lessonUpdated": "Leçon mise à jour !",
+            "lessonUpdateFailed": "Échec de la mise à jour de la leçon",
+            "lessonDeleted": "Leçon supprimée",
+            "lessonDeleteFailed": "Échec de la suppression de la leçon"
+          }
+        }
+      },
+      "sessions": {
+        "weekdays": {
+          "0": "dim",
+          "1": "lun",
+          "2": "mar",
+          "3": "mer",
+          "4": "jeu",
+          "5": "ven",
+          "6": "sam"
+        },
+        "createDialog": {
+          "triggerDefault": "Créer une session",
+          "title": "Créer une session en direct",
+          "subtitle": "Commencez maintenant ou planifiez pour plus tard",
+          "modeNow": "Commencer maintenant",
+          "modeScheduled": "Planifier",
+          "typeVideo": "Vidéo",
+          "typeAudio": "Audio uniquement",
+          "titleLabel": "Titre de la session",
+          "titlePlaceholder": "Ex. : Appel de coaching hebdomadaire",
+          "descriptionLabel": "Description",
+          "descriptionOptional": "(facultatif)",
+          "descriptionPlaceholder": "Que couvrira cette session ?",
+          "durationLabel": "Durée (minutes)",
+          "dateTimeLabel": "Date et heure",
+          "timezoneLabel": "Fuseau horaire",
+          "yourTime": "Votre heure : {tz}",
+          "weeklyTip": "⭐ Les sessions hebdomadaires triplent l'engagement",
+          "repeatLabel": "Répéter",
+          "repeatOnce": "Une fois",
+          "repeatWeekly": "Hebdomadaire",
+          "repeatMonthly": "Mensuel",
+          "every": "Tous les",
+          "intervalWeek": "{count, plural, =1 {semaine} other {semaines}}",
+          "intervalMonth": "{count, plural, =1 {mois} other {mois}}",
+          "on": "Le",
+          "totalSessions": "Sessions au total",
+          "upcomingSessions": "Prochaines sessions",
+          "moreCount": "+{count} de plus",
+          "autoPostTitle": "Publier automatiquement dans le fil de la communauté",
+          "autoPostHint": "Les membres seront notifiés de cette session",
+          "summaryWeekly": "{count} sessions toutes les {interval, plural, =1 {semaine} other {# semaines}} le {day}",
+          "summaryMonthly": "{count} sessions tous les {interval, plural, =1 {mois} other {# mois}}",
+          "willBeCreated": "{count} sessions seront créées",
+          "cancel": "Annuler",
+          "starting": "Démarrage...",
+          "creating": "Création...",
+          "submitStartNow": "Démarrer la session en direct",
+          "submitOnce": "Créer la session",
+          "submitRecurring": "Créer les sessions",
+          "toasts": {
+            "started": "Session en direct démarrée !",
+            "startFailed": "Échec du démarrage de la session",
+            "scheduledRecurring": "{count} sessions planifiées !",
+            "scheduledOnce": "Session planifiée avec succès !",
+            "createFailed": "Échec de la création de la session",
+            "unexpectedError": "Une erreur inattendue s'est produite"
+          }
+        },
+        "title": "Sessions en direct",
+        "today": "Aujourd'hui",
+        "tomorrow": "Demain",
+        "sessionsCount": "{count, plural, =1 {# session} other {# sessions}}",
+        "subtitle": "{community} • Animez du coaching, des cours et des ateliers en direct",
+        "liveNowCount": "{count, plural, =1 {# session en direct maintenant} other {# sessions en direct maintenant}}",
+        "thisWeekCount": "{count, plural, =1 {# session cette semaine} other {# sessions cette semaine}}",
+        "scheduleSession": "Planifier une session",
+        "ownerOnly": "(Réservé au propriétaire)",
+        "nextSession": {
+          "label": "Prochaine / Session en cours",
+          "liveBlurb": "Votre communauté est en direct maintenant. Gardez l'élan et augmentez le taux de participation.",
+          "metaScheduled": "{date} · {time} · {minutes} min · avec {host}",
+          "noneTitle": "Aucune session planifiée pour le moment",
+          "noneBody": "Planifiez votre prochain point en direct pour maintenir la cadence hebdomadaire de la communauté.",
+          "joinLive": "Rejoindre en direct",
+          "openSession": "Ouvrir la session",
+          "attending": "Je participe",
+          "rsvp": "RSVP",
+          "manage": "Gérer"
+        },
+        "hostFallback": "Animateur",
+        "performance": {
+          "title": "Performance des sessions",
+          "reminders": "Rappels",
+          "window": "Période :",
+          "windowDays": "{days}j",
+          "avgAttendance": "Présence moyenne",
+          "lastDays": "{days} derniers jours",
+          "vsPrev": "{value} vs période précédente",
+          "vsPrevPp": "{value}pp vs période précédente",
+          "rsvpToJoin": "RSVP → participation",
+          "target": "objectif : {value}%",
+          "onTarget": "Objectif atteint",
+          "ppToTarget": "{value}pp avant l'objectif",
+          "remindersSent": "Rappels envoyés",
+          "deliveryVolume": "volume d'envoi",
+          "completedSessions": "Sessions terminées",
+          "replayRate": "Taux de rediffusion : {value}%",
+          "replayVsPrev": "{value}pp de rediffusion vs période précédente"
+        },
+        "recommendation": {
+          "lowRsvp": {
+            "title": "Faible conversion RSVP → participation",
+            "description": "Astuce : Demandez aux membres de poser des questions dans le fil avant la session. Cela augmente généralement la participation d'environ 30%."
+          },
+          "lowAttendance": {
+            "title": "La participation reste faible",
+            "description": "Essayez un horaire hebdomadaire fixe et annoncez-le plus tôt dans le fil pour créer une habitude."
+          },
+          "lowReplay": {
+            "title": "Opportunité de capture de rediffusion",
+            "description": "Plus de sessions ont besoin d'une distribution de rediffusion. Envoyez des notifications d'enregistrement prêt et partagez des liens publics."
+          },
+          "momentum": {
+            "title": "L'élan s'améliore",
+            "description": "Gardez une cadence stable cette semaine et lancez une annonce de session en direct supplémentaire."
+          },
+          "createQuestionPost": "Créer une publication de questions"
+        },
+        "scheduleSurface": {
+          "title": "Vue du calendrier",
+          "subtitle": "Vues à venir, passées et calendrier"
+        },
+        "tabs": {
+          "upcoming": "À venir ({count})",
+          "past": "Passées ({count})",
+          "calendar": "Calendrier"
+        },
+        "filters": {
+          "liveNow": "{count} en direct maintenant",
+          "all": "Toutes ({count})",
+          "live": "En direct ({count})",
+          "today": "Aujourd'hui ({count})",
+          "week": "Cette semaine ({count})",
+          "clearFilter": "Effacer le filtre"
+        },
+        "pastFilters": {
+          "all": "Toutes ({count})",
+          "replay": "Avec rediffusion ({count})",
+          "public": "Rediffusions publiques ({count})"
+        },
+        "card": {
+          "live": "EN DIRECT",
+          "withHost": "avec {host}",
+          "minutes": "{minutes} min",
+          "attending": "{count} participants",
+          "joinLive": "Rejoindre en direct",
+          "join": "Rejoindre",
+          "publicPage": "Page publique",
+          "attendingBtn": "Je participe",
+          "rsvp": "RSVP",
+          "manage": "Gérer",
+          "attended": "{count} ont participé",
+          "watch": "Regarder",
+          "watchReplay": "Voir la rediffusion",
+          "publicLink": "Lien public",
+          "membersOnly": "Réservé aux membres",
+          "enterRoom": "Entrer dans la salle",
+          "recordingAvailable": "Enregistrement disponible"
+        },
+        "featuredReplays": {
+          "title": "Rediffusions à la une",
+          "replay": "Rediffusion",
+          "topAttended": "La plus suivie"
+        },
+        "empty": {
+          "upcomingLive": "Aucune session en direct pour le moment",
+          "upcomingToday": "Aucune session planifiée pour aujourd'hui",
+          "upcomingWeek": "Aucune session planifiée cette semaine",
+          "upcomingAll": "Aucune session à venir pour le moment",
+          "upcomingBodyAll": "Planifiez votre prochain point en direct pour maintenir la cadence hebdomadaire de la communauté.",
+          "upcomingBodyFiltered": "Essayez un autre filtre ou planifiez une session pour cette période.",
+          "pastTitle": "Aucune session passée pour le moment",
+          "pastBody": "Les sessions passées avec enregistrement apparaîtront ici",
+          "pastFilterTitle": "Aucune session ne correspond à ce filtre",
+          "pastFilterPublic": "Aucune rediffusion publique pour le moment. Marquez une rediffusion comme publique pour la distribuer.",
+          "pastFilterReplay": "Aucun enregistrement disponible dans cette plage.",
+          "pastFilterDefault": "Essayez un autre filtre ou organisez une nouvelle session en direct."
+        },
+        "calendar": {
+          "sessionsThisMonth": "{count, plural, =1 {# session} other {# sessions}} ce mois-ci",
+          "upcomingInMonth": "À venir ce mois-ci",
+          "noUpcomingInMonth": "Aucune session à venir ce mois-ci.",
+          "moreCount": "+{count} de plus"
+        },
+        "error": {
+          "title": "Une erreur est survenue",
+          "body": "Impossible de charger les sessions",
+          "back": "Retour aux communautés"
+        }
       }
     },
     "calendar": {
@@ -1570,6 +1872,41 @@
       "noResultsEmpty": "Cette communauté n'a pas encore de ressources. Soyez le premier à partager quelque chose !",
       "loading": "Chargement...",
       "loadMore": "Charger plus"
+    },
+    "communityNotFound": "Communauté introuvable",
+    "resourceType": {
+      "DOCUMENT": "Document",
+      "VIDEO": "Vidéo",
+      "AUDIO": "Audio",
+      "LINK": "Lien"
+    },
+    "card": {
+      "edit": "Modifier",
+      "delete": "Supprimer"
+    },
+    "detail": {
+      "loading": "Chargement de la ressource...",
+      "loadError": "Erreur lors du chargement de la ressource",
+      "notFoundTitle": "Ressource introuvable",
+      "notFoundBody": "La ressource que vous cherchez n'existe pas ou vous n'y avez pas accès.",
+      "backToLibrary": "Retour à la bibliothèque",
+      "back": "Retour",
+      "breadcrumb": "Bibliothèque",
+      "share": "Partager",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "deleting": "Suppression...",
+      "deleteError": "Erreur lors de la suppression de la ressource",
+      "linkCopied": "Lien copié dans le presse-papiers",
+      "shareFallbackTitle": "Ressource",
+      "views": "{count, plural, =1 {# vue} other {# vues}}",
+      "by": "par {name}",
+      "download": "Télécharger / Voir la ressource",
+      "videoUnsupported": "Votre navigateur ne prend pas en charge l'élément vidéo.",
+      "audioUnsupported": "Votre navigateur ne prend pas en charge l'élément audio.",
+      "externalLink": "Lien externe :",
+      "documentFile": "Fichier document",
+      "tags": "Étiquettes"
     }
   }
 }

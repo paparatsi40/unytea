@@ -26,6 +26,7 @@ import {
   Unlock,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import {
   getCourse,
   updateCourse,
@@ -75,6 +76,7 @@ interface CourseData {
 }
 
 export default function CourseBuilderPage() {
+  const t = useTranslations("dashboard.communityAdmin.courses.builder");
   const params = useParams();
   const router = useRouter();
   const slug = params?.slug as string;
@@ -140,14 +142,13 @@ export default function CourseBuilderPage() {
         const moduleIds = new Set(result.course.modules.map((m: { id: string }) => m.id));
         setExpandedModules(moduleIds);
       } else {
-        toast.error(result.error || "Failed to load course");
+        toast.error(result.error || t("toasts.loadFailed"));
       }
     } catch (error) {
       console.error("Error fetching course:", error);
-      toast.error("Failed to load course");
-    } finally {
-      setIsLoading(false);
+      toast.error(t("toasts.loadFailed"));
     }
+    setIsLoading(false);
   }, [courseId]);
 
   useEffect(() => {
@@ -179,17 +180,16 @@ export default function CourseBuilderPage() {
         price: courseForm.isPaid ? courseForm.price : 0,
       });
       if (result.success) {
-        toast.success("Course updated!");
+        toast.success(t("toasts.updated"));
         setEditingDetails(false);
         fetchCourse();
       } else {
-        toast.error(result.error || "Failed to update course");
+        toast.error(result.error || t("toasts.updateFailed"));
       }
     } catch (error) {
-      toast.error("Failed to update course");
-    } finally {
-      setIsSavingDetails(false);
+      toast.error(t("toasts.updateFailed"));
     }
+    setIsSavingDetails(false);
   };
 
   // Add module
@@ -203,29 +203,28 @@ export default function CourseBuilderPage() {
         position: course.modules.length,
       });
       if (result.success) {
-        toast.success("Module added!");
+        toast.success(t("toasts.moduleAdded"));
         setNewModuleTitle("");
         setAddingModule(false);
         fetchCourse();
       } else {
-        toast.error(result.error || "Failed to add module");
+        toast.error(result.error || t("toasts.moduleAddFailed"));
       }
     } catch (error) {
-      toast.error("Failed to add module");
-    } finally {
-      setIsAddingModule(false);
+      toast.error(t("toasts.moduleAddFailed"));
     }
+    setIsAddingModule(false);
   };
 
   // Delete module
   const handleDeleteModule = async (moduleId: string) => {
-    if (!confirm("Delete this module and all its lessons?")) return;
+    if (!confirm(t("modules.deleteConfirm"))) return;
     const result = await deleteModule(moduleId);
     if (result.success) {
-      toast.success("Module deleted");
+      toast.success(t("toasts.moduleDeleted"));
       fetchCourse();
     } else {
-      toast.error(result.error || "Failed to delete module");
+      toast.error(result.error || t("toasts.moduleDeleteFailed"));
     }
   };
 
@@ -246,18 +245,17 @@ export default function CourseBuilderPage() {
         isFree: lessonForm.isFree,
       });
       if (result.success) {
-        toast.success("Lesson added!");
+        toast.success(t("toasts.lessonAdded"));
         setLessonForm({ title: "", content: "", contentType: "TEXT", videoUrl: "", isFree: false });
         setAddingLessonToModule(null);
         fetchCourse();
       } else {
-        toast.error(result.error || "Failed to add lesson");
+        toast.error(result.error || t("toasts.lessonAddFailed"));
       }
     } catch (error) {
-      toast.error("Failed to add lesson");
-    } finally {
-      setIsAddingLesson(false);
+      toast.error(t("toasts.lessonAddFailed"));
     }
+    setIsAddingLesson(false);
   };
 
   // Start editing lesson
@@ -284,28 +282,27 @@ export default function CourseBuilderPage() {
         isFree: editLessonForm.isFree,
       });
       if (result.success) {
-        toast.success("Lesson updated!");
+        toast.success(t("toasts.lessonUpdated"));
         setEditingLesson(null);
         fetchCourse();
       } else {
-        toast.error(result.error || "Failed to update lesson");
+        toast.error(result.error || t("toasts.lessonUpdateFailed"));
       }
     } catch (error) {
-      toast.error("Failed to update lesson");
-    } finally {
-      setIsSavingLesson(false);
+      toast.error(t("toasts.lessonUpdateFailed"));
     }
+    setIsSavingLesson(false);
   };
 
   // Delete lesson
   const handleDeleteLesson = async (lessonId: string) => {
-    if (!confirm("Delete this lesson?")) return;
+    if (!confirm(t("lessons.deleteConfirm"))) return;
     const result = await deleteLesson(lessonId);
     if (result.success) {
-      toast.success("Lesson deleted");
+      toast.success(t("toasts.lessonDeleted"));
       fetchCourse();
     } else {
-      toast.error(result.error || "Failed to delete lesson");
+      toast.error(result.error || t("toasts.lessonDeleteFailed"));
     }
   };
 
@@ -316,10 +313,10 @@ export default function CourseBuilderPage() {
       isPublished: !course.isPublished,
     });
     if (result.success) {
-      toast.success(course.isPublished ? "Course unpublished" : "Course published!");
+      toast.success(course.isPublished ? t("toasts.unpublished") : t("toasts.published"));
       fetchCourse();
     } else {
-      toast.error(result.error || "Failed to update course");
+      toast.error(result.error || t("toasts.updateFailed"));
     }
   };
 
@@ -346,12 +343,12 @@ export default function CourseBuilderPage() {
     return (
       <div className="flex min-h-[400px] flex-col items-center justify-center gap-4">
         <BookOpen className="h-12 w-12 text-gray-300" />
-        <p className="text-gray-500">Course not found</p>
+        <p className="text-gray-500">{t("notFound")}</p>
         <button
           onClick={() => router.back()}
           className="text-sm text-purple-600 hover:text-purple-700"
         >
-          Go back
+          {t("goBack")}
         </button>
       </div>
     );
@@ -365,7 +362,7 @@ export default function CourseBuilderPage() {
         className="mb-6 flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700"
       >
         <ArrowLeft className="h-4 w-4" />
-        Back to Courses
+        {t("backToCourses")}
       </button>
 
       {/* Course Header */}
@@ -375,7 +372,9 @@ export default function CourseBuilderPage() {
             {editingDetails ? (
               <div className="space-y-4">
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">Title</label>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                    {t("header.titleLabel")}
+                  </label>
                   <input
                     type="text"
                     value={courseForm.title}
@@ -385,7 +384,7 @@ export default function CourseBuilderPage() {
                 </div>
                 <div>
                   <label className="mb-1 block text-sm font-medium text-gray-700">
-                    Description
+                    {t("header.descriptionLabel")}
                   </label>
                   <textarea
                     value={courseForm.description}
@@ -401,7 +400,7 @@ export default function CourseBuilderPage() {
                     <div className="flex items-center gap-2">
                       <DollarSign className="h-4 w-4 text-gray-400" />
                       <span className="text-sm font-medium text-gray-700">
-                        {courseForm.isPaid ? "Paid Course" : "Free Course"}
+                        {courseForm.isPaid ? t("header.paidCourse") : t("header.freeCourse")}
                       </span>
                     </div>
                     <button
@@ -447,13 +446,13 @@ export default function CourseBuilderPage() {
                     ) : (
                       <Save className="h-4 w-4" />
                     )}
-                    Save
+                    {t("header.save")}
                   </button>
                   <button
                     onClick={() => setEditingDetails(false)}
                     className="rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
                   >
-                    Cancel
+                    {t("header.cancel")}
                   </button>
                 </div>
               </div>
@@ -468,7 +467,7 @@ export default function CourseBuilderPage() {
                         : "bg-gray-100 text-gray-600"
                     }`}
                   >
-                    {course.isPublished ? "Published" : "Draft"}
+                    {course.isPublished ? t("header.published") : t("header.draft")}
                   </span>
                   {course.isPaid ? (
                     <span className="rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-700">
@@ -476,7 +475,7 @@ export default function CourseBuilderPage() {
                     </span>
                   ) : (
                     <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
-                      Free
+                      {t("header.free")}
                     </span>
                   )}
                 </div>
@@ -492,7 +491,7 @@ export default function CourseBuilderPage() {
               <button
                 onClick={() => setEditingDetails(true)}
                 className="rounded-lg border border-gray-200 p-2 text-gray-500 hover:bg-gray-50"
-                title="Edit details"
+                title={t("header.editDetails")}
               >
                 <Pencil className="h-4 w-4" />
               </button>
@@ -507,12 +506,12 @@ export default function CourseBuilderPage() {
                 {course.isPublished ? (
                   <>
                     <EyeOff className="h-4 w-4" />
-                    Unpublish
+                    {t("header.unpublish")}
                   </>
                 ) : (
                   <>
                     <Eye className="h-4 w-4" />
-                    Publish
+                    {t("header.publish")}
                   </>
                 )}
               </button>
@@ -524,13 +523,15 @@ export default function CourseBuilderPage() {
       {/* Modules List */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">Modules ({course.modules.length})</h2>
+          <h2 className="text-lg font-semibold text-gray-900">
+            {t("modules.header", { count: course.modules.length })}
+          </h2>
           <button
             onClick={() => setAddingModule(true)}
             className="flex items-center gap-1.5 rounded-lg bg-purple-50 px-3 py-2 text-sm font-medium text-purple-700 hover:bg-purple-100"
           >
             <Plus className="h-4 w-4" />
-            Add Module
+            {t("modules.addButton")}
           </button>
         </div>
 
@@ -542,7 +543,7 @@ export default function CourseBuilderPage() {
                 type="text"
                 value={newModuleTitle}
                 onChange={(e) => setNewModuleTitle(e.target.value)}
-                placeholder="Module title..."
+                placeholder={t("modules.titlePlaceholder")}
                 autoFocus
                 onKeyDown={(e) => e.key === "Enter" && handleAddModule()}
                 className="flex-1 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
@@ -557,7 +558,7 @@ export default function CourseBuilderPage() {
                 ) : (
                   <Plus className="h-4 w-4" />
                 )}
-                Add
+                {t("modules.add")}
               </button>
               <button
                 onClick={() => {
@@ -576,9 +577,7 @@ export default function CourseBuilderPage() {
         {course.modules.length === 0 && !addingModule ? (
           <div className="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
             <BookOpen className="mx-auto mb-3 h-10 w-10 text-gray-300" />
-            <p className="text-sm text-gray-500">
-              No modules yet. Add your first module to start building the course.
-            </p>
+            <p className="text-sm text-gray-500">{t("modules.empty")}</p>
           </div>
         ) : (
           course.modules.map((mod, modIndex) => (
@@ -603,7 +602,7 @@ export default function CourseBuilderPage() {
                 <div className="flex-1">
                   <h3 className="text-sm font-semibold text-gray-900">{mod.title}</h3>
                   <p className="text-xs text-gray-500">
-                    {mod.lessons.length} lesson{mod.lessons.length !== 1 ? "s" : ""}
+                    {t("modules.lessonCount", { count: mod.lessons.length })}
                   </p>
                 </div>
                 <button
@@ -634,7 +633,7 @@ export default function CourseBuilderPage() {
                                 setEditLessonForm({ ...editLessonForm, title: e.target.value })
                               }
                               className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm text-gray-900 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
-                              placeholder="Lesson title"
+                              placeholder={t("lessons.titlePlaceholder")}
                             />
                             {/* Content Type */}
                             <div className="flex gap-2">
@@ -652,7 +651,7 @@ export default function CourseBuilderPage() {
                                   }`}
                                 >
                                   {contentTypeIcon(type)}
-                                  {type}
+                                  {t(`lessons.type.${type}`)}
                                 </button>
                               ))}
                             </div>
@@ -663,7 +662,7 @@ export default function CourseBuilderPage() {
                                 onChange={(e) =>
                                   setEditLessonForm({ ...editLessonForm, videoUrl: e.target.value })
                                 }
-                                placeholder="Video URL (YouTube, Vimeo, etc.)"
+                                placeholder={t("lessons.videoUrlPlaceholder")}
                                 className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm text-gray-900 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
                               />
                             )}
@@ -673,7 +672,7 @@ export default function CourseBuilderPage() {
                                 setEditLessonForm({ ...editLessonForm, content: e.target.value })
                               }
                               rows={4}
-                              placeholder="Lesson content..."
+                              placeholder={t("lessons.contentPlaceholder")}
                               className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm text-gray-900 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
                             />
                             {/* Free toggle */}
@@ -698,7 +697,9 @@ export default function CourseBuilderPage() {
                                     editLessonForm.isFree ? "text-green-700" : "text-gray-500"
                                   }
                                 >
-                                  {editLessonForm.isFree ? "Free preview" : "Paid only"}
+                                  {editLessonForm.isFree
+                                    ? t("lessons.freePreview")
+                                    : t("lessons.paidOnly")}
                                 </span>
                               </button>
                             </div>
@@ -713,13 +714,13 @@ export default function CourseBuilderPage() {
                                 ) : (
                                   <Save className="h-4 w-4" />
                                 )}
-                                Save
+                                {t("lessons.save")}
                               </button>
                               <button
                                 onClick={() => setEditingLesson(null)}
                                 className="rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
                               >
-                                Cancel
+                                {t("lessons.cancel")}
                               </button>
                             </div>
                           </div>
@@ -733,7 +734,7 @@ export default function CourseBuilderPage() {
                           <span className="flex-1 text-sm text-gray-900">{lesson.title}</span>
                           {lesson.isFree && (
                             <span className="rounded bg-green-100 px-1.5 py-0.5 text-[10px] font-medium text-green-700">
-                              Free
+                              {t("lessons.free")}
                             </span>
                           )}
                           <div className="flex items-center gap-1">
@@ -763,7 +764,7 @@ export default function CourseBuilderPage() {
                           type="text"
                           value={lessonForm.title}
                           onChange={(e) => setLessonForm({ ...lessonForm, title: e.target.value })}
-                          placeholder="Lesson title..."
+                          placeholder={t("lessons.titlePlaceholder")}
                           autoFocus
                           className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
                         />
@@ -781,7 +782,7 @@ export default function CourseBuilderPage() {
                               }`}
                             >
                               {contentTypeIcon(type)}
-                              {type}
+                              {t(`lessons.type.${type}`)}
                             </button>
                           ))}
                         </div>
@@ -792,7 +793,7 @@ export default function CourseBuilderPage() {
                             onChange={(e) =>
                               setLessonForm({ ...lessonForm, videoUrl: e.target.value })
                             }
-                            placeholder="Video URL (YouTube, Vimeo, etc.)"
+                            placeholder={t("lessons.videoUrlPlaceholder")}
                             className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
                           />
                         )}
@@ -802,7 +803,7 @@ export default function CourseBuilderPage() {
                             setLessonForm({ ...lessonForm, content: e.target.value })
                           }
                           rows={3}
-                          placeholder="Lesson content..."
+                          placeholder={t("lessons.contentPlaceholder")}
                           className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
                         />
                         {/* Free toggle */}
@@ -822,7 +823,7 @@ export default function CourseBuilderPage() {
                             <span
                               className={lessonForm.isFree ? "text-green-700" : "text-gray-500"}
                             >
-                              {lessonForm.isFree ? "Free preview" : "Paid only"}
+                              {lessonForm.isFree ? t("lessons.freePreview") : t("lessons.paidOnly")}
                             </span>
                           </button>
                         </div>
@@ -837,7 +838,7 @@ export default function CourseBuilderPage() {
                             ) : (
                               <Plus className="h-4 w-4" />
                             )}
-                            Add Lesson
+                            {t("lessons.addButton")}
                           </button>
                           <button
                             onClick={() => {
@@ -852,7 +853,7 @@ export default function CourseBuilderPage() {
                             }}
                             className="rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
                           >
-                            Cancel
+                            {t("lessons.cancel")}
                           </button>
                         </div>
                       </div>
@@ -864,7 +865,7 @@ export default function CourseBuilderPage() {
                       className="flex w-full items-center gap-2 border-t border-gray-100 px-5 py-3 text-xs font-medium text-purple-600 hover:bg-purple-50"
                     >
                       <Plus className="h-3.5 w-3.5" />
-                      Add Lesson
+                      {t("lessons.addButton")}
                     </button>
                   )}
                 </div>

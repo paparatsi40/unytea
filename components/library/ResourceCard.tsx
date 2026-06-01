@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -78,6 +79,8 @@ export function ResourceCard({
   canEdit = false,
   variant = "default",
 }: ResourceCardProps) {
+  const t = useTranslations("library");
+  const locale = useLocale();
   const Icon = typeIcons[resource.type];
   const progress = resource.progress?.[0]?.progress ?? 0;
   const isCompleted = resource.progress?.[0]?.completed ?? false;
@@ -175,7 +178,7 @@ export function ResourceCard({
           <div className="absolute left-3 top-3">
             <Badge variant="secondary" className="bg-white/90 backdrop-blur-sm dark:bg-black/50">
               <Icon className="mr-1 h-3 w-3" />
-              {resource.type}
+              {t(`resourceType.${resource.type}`)}
             </Badge>
           </div>
 
@@ -261,7 +264,9 @@ export function ResourceCard({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={(e) => e.preventDefault()}>Editar</DropdownMenuItem>
+                  <DropdownMenuItem onClick={(e) => e.preventDefault()}>
+                    {t("card.edit")}
+                  </DropdownMenuItem>
                   <DropdownMenuItem
                     className="text-red-600"
                     onClick={(e) => {
@@ -269,7 +274,7 @@ export function ResourceCard({
                       onDelete?.();
                     }}
                   >
-                    Eliminar
+                    {t("card.delete")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -312,7 +317,7 @@ export function ResourceCard({
             <div className="flex items-center gap-3 text-muted-foreground">
               <span className="flex items-center gap-1 text-sm">
                 <Eye className="h-4 w-4" />
-                {resource.viewCount.toLocaleString()}
+                {resource.viewCount.toLocaleString(locale)}
               </span>
               <button
                 onClick={(e) => {
@@ -322,7 +327,7 @@ export function ResourceCard({
                 className="flex items-center gap-1 text-sm transition-colors hover:text-red-500"
               >
                 <Heart className="h-4 w-4" />
-                {resource._count.likes.toLocaleString()}
+                {resource._count.likes.toLocaleString(locale)}
               </button>
             </div>
           </div>
