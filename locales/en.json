@@ -415,6 +415,16 @@
         "openSettings": "Settings"
       }
     },
+    "notifications": {
+      "openNotifications": "Open notifications",
+      "title": "Notifications",
+      "markAllRead": "Mark all read",
+      "markAsRead": "Mark as read",
+      "delete": "Delete",
+      "viewAll": "View all notifications",
+      "empty": "No notifications yet",
+      "loading": "Loading notifications..."
+    },
     "title": "Dashboard",
     "welcome": "Welcome back",
     "stats": {

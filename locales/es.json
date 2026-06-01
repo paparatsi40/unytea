@@ -415,6 +415,16 @@
         "openSettings": "Configuración"
       }
     },
+    "notifications": {
+      "openNotifications": "Abrir notificaciones",
+      "title": "Notificaciones",
+      "markAllRead": "Marcar todas como leídas",
+      "markAsRead": "Marcar como leída",
+      "delete": "Eliminar",
+      "viewAll": "Ver todas las notificaciones",
+      "empty": "No hay notificaciones todavía",
+      "loading": "Cargando notificaciones..."
+    },
     "title": "Panel",
     "welcome": "Bienvenido de vuelta",
     "stats": {

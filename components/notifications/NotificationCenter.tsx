@@ -1,7 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { Bell, X, Check, MessageCircle, Users, Trophy, Heart, AlertCircle } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
+import { formatDistanceToNow } from "date-fns";
+import { enUS, es, fr } from "date-fns/locale";
 import {
   getUserNotifications,
   markNotificationAsRead,
@@ -9,6 +13,8 @@ import {
   deleteNotification,
 } from "@/app/actions/notifications";
 import { useCurrentUser } from "@/hooks/use-current-user";
+
+const DATE_FNS_LOCALES = { en: enUS, es, fr } as const;
 
 type NotificationType =
   | "MESSAGE"
@@ -30,6 +36,9 @@ interface Notification {
 }
 
 export function NotificationCenter() {
+  const t = useTranslations("dashboard.notifications");
+  const locale = useLocale();
+  const dfLocale = DATE_FNS_LOCALES[locale as keyof typeof DATE_FNS_LOCALES] ?? enUS;
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
@@ -99,26 +108,12 @@ export function NotificationCenter() {
     }
   };
 
-  const formatTimestamp = (date: Date) => {
-    const now = new Date();
-    const notificationDate = new Date(date);
-    const diff = now.getTime() - notificationDate.getTime();
-    const minutes = Math.floor(diff / 1000 / 60);
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
-
-    if (minutes < 1) return "just now";
-    if (minutes < 60) return `${minutes}m ago`;
-    if (hours < 24) return `${hours}h ago`;
-    return `${days}d ago`;
-  };
-
   return (
     <div className="relative">
       {/* Bell Icon Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        aria-label={isOpen ? "Close notifications" : "Open notifications"}
+        aria-label={t("openNotifications")}
         className="relative rounded-full p-2 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
       >
         <Bell className="h-6 w-6" />
@@ -139,13 +134,13 @@ export function NotificationCenter() {
           <div className="absolute right-0 top-12 z-50 w-96 max-w-[calc(100vw-2rem)] rounded-lg border border-gray-200 bg-white shadow-xl">
             {/* Header */}
             <div className="flex items-center justify-between border-b border-gray-200 p-4">
-              <h3 className="font-semibold text-gray-900">Notifications</h3>
+              <h3 className="font-semibold text-gray-900">{t("title")}</h3>
               {unreadCount > 0 && (
                 <button
                   onClick={handleMarkAllAsRead}
                   className="text-sm text-purple-600 hover:text-purple-700"
                 >
-                  Mark all read
+                  {t("markAllRead")}
                 </button>
               )}
             </div>
@@ -155,12 +150,12 @@ export function NotificationCenter() {
               {loading ? (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
                   <Bell className="h-12 w-12 text-gray-300" />
-                  <p className="mt-4 text-sm text-gray-500">Loading notifications...</p>
+                  <p className="mt-4 text-sm text-gray-500">{t("loading")}</p>
                 </div>
               ) : notifications.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
                   <Bell className="h-12 w-12 text-gray-300" />
-                  <p className="mt-4 text-sm text-gray-500">No notifications yet</p>
+                  <p className="mt-4 text-sm text-gray-500">{t("empty")}</p>
                 </div>
               ) : (
                 <div className="divide-y divide-gray-100">
@@ -180,7 +175,10 @@ export function NotificationCenter() {
                           <p className="text-sm font-medium text-gray-900">{notification.title}</p>
                           <p className="mt-1 text-sm text-gray-600">{notification.message}</p>
                           <p className="mt-1 text-xs text-gray-400">
-                            {formatTimestamp(notification.createdAt)}
+                            {formatDistanceToNow(new Date(notification.createdAt), {
+                              addSuffix: true,
+                              locale: dfLocale,
+                            })}
                           </p>
                         </div>
 
@@ -190,7 +188,7 @@ export function NotificationCenter() {
                             <button
                               onClick={() => handleMarkAsRead(notification.id)}
                               className="rounded p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-600"
-                              title="Mark as read"
+                              title={t("markAsRead")}
                             >
                               <Check className="h-4 w-4" />
                             </button>
@@ -198,7 +196,7 @@ export function NotificationCenter() {
                           <button
                             onClick={() => handleDelete(notification.id)}
                             className="rounded p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-600"
-                            title="Delete"
+                            title={t("delete")}
                           >
                             <X className="h-4 w-4" />
                           </button>
@@ -218,15 +216,13 @@ export function NotificationCenter() {
             {/* Footer */}
             {notifications.length > 0 && (
               <div className="border-t border-gray-200 p-2">
-                <button
-                  onClick={() => {
-                    // Navigate to all notifications page
-                    setIsOpen(false);
-                  }}
-                  className="w-full rounded p-2 text-center text-sm text-purple-600 hover:bg-purple-50"
+                <Link
+                  href="/dashboard/notifications"
+                  onClick={() => setIsOpen(false)}
+                  className="block w-full rounded p-2 text-center text-sm text-purple-600 hover:bg-purple-50"
                 >
-                  View all notifications
-                </button>
+                  {t("viewAll")}
+                </Link>
               </div>
             )}
           </div>

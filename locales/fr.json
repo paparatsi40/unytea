@@ -414,6 +414,16 @@
         "openSettings": "Paramètres"
       }
     },
+    "notifications": {
+      "openNotifications": "Ouvrir les notifications",
+      "title": "Notifications",
+      "markAllRead": "Tout marquer comme lu",
+      "markAsRead": "Marquer comme lu",
+      "delete": "Supprimer",
+      "viewAll": "Voir toutes les notifications",
+      "empty": "Aucune notification",
+      "loading": "Chargement des notifications..."
+    },
     "title": "Tableau de Bord",
     "welcome": "Bienvenue",
     "stats": {
