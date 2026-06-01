@@ -602,6 +602,68 @@
           "deleted": "Course deleted",
           "deleteFailed": "Failed to delete course",
           "deleteConfirm": "Are you sure you want to delete this course? This action cannot be undone."
+        },
+        "builder": {
+          "notFound": "Course not found",
+          "goBack": "Go back",
+          "backToCourses": "Back to Courses",
+          "header": {
+            "titleLabel": "Title",
+            "descriptionLabel": "Description",
+            "paidCourse": "Paid Course",
+            "freeCourse": "Free Course",
+            "save": "Save",
+            "cancel": "Cancel",
+            "published": "Published",
+            "draft": "Draft",
+            "free": "Free",
+            "editDetails": "Edit details",
+            "publish": "Publish",
+            "unpublish": "Unpublish"
+          },
+          "modules": {
+            "header": "Modules ({count})",
+            "addButton": "Add Module",
+            "titlePlaceholder": "Module title...",
+            "add": "Add",
+            "empty": "No modules yet. Add your first module to start building the course.",
+            "lessonCount": "{count, plural, =1 {# lesson} other {# lessons}}",
+            "deleteConfirm": "Delete this module and all its lessons?"
+          },
+          "lessons": {
+            "titlePlaceholder": "Lesson title...",
+            "type": {
+              "TEXT": "Text",
+              "VIDEO": "Video",
+              "AUDIO": "Audio"
+            },
+            "videoUrlPlaceholder": "Video URL (YouTube, Vimeo, etc.)",
+            "contentPlaceholder": "Lesson content...",
+            "freePreview": "Free preview",
+            "paidOnly": "Paid only",
+            "free": "Free",
+            "save": "Save",
+            "cancel": "Cancel",
+            "addButton": "Add Lesson",
+            "deleteConfirm": "Delete this lesson?"
+          },
+          "toasts": {
+            "loadFailed": "Failed to load course",
+            "updated": "Course updated!",
+            "updateFailed": "Failed to update course",
+            "published": "Course published!",
+            "unpublished": "Course unpublished",
+            "moduleAdded": "Module added!",
+            "moduleAddFailed": "Failed to add module",
+            "moduleDeleted": "Module deleted",
+            "moduleDeleteFailed": "Failed to delete module",
+            "lessonAdded": "Lesson added!",
+            "lessonAddFailed": "Failed to add lesson",
+            "lessonUpdated": "Lesson updated!",
+            "lessonUpdateFailed": "Failed to update lesson",
+            "lessonDeleted": "Lesson deleted",
+            "lessonDeleteFailed": "Failed to delete lesson"
+          }
         }
       }
     },

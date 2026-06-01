@@ -601,6 +601,68 @@
           "deleted": "Cours supprimé",
           "deleteFailed": "Échec de la suppression du cours",
           "deleteConfirm": "Voulez-vous vraiment supprimer ce cours ? Cette action est irréversible."
+        },
+        "builder": {
+          "notFound": "Cours introuvable",
+          "goBack": "Retour",
+          "backToCourses": "Retour aux cours",
+          "header": {
+            "titleLabel": "Titre",
+            "descriptionLabel": "Description",
+            "paidCourse": "Cours payant",
+            "freeCourse": "Cours gratuit",
+            "save": "Enregistrer",
+            "cancel": "Annuler",
+            "published": "Publié",
+            "draft": "Brouillon",
+            "free": "Gratuit",
+            "editDetails": "Modifier les détails",
+            "publish": "Publier",
+            "unpublish": "Dépublier"
+          },
+          "modules": {
+            "header": "Modules ({count})",
+            "addButton": "Ajouter un module",
+            "titlePlaceholder": "Titre du module...",
+            "add": "Ajouter",
+            "empty": "Aucun module pour le moment. Ajoutez votre premier module pour commencer à construire le cours.",
+            "lessonCount": "{count, plural, =1 {# leçon} other {# leçons}}",
+            "deleteConfirm": "Supprimer ce module et toutes ses leçons ?"
+          },
+          "lessons": {
+            "titlePlaceholder": "Titre de la leçon...",
+            "type": {
+              "TEXT": "Texte",
+              "VIDEO": "Vidéo",
+              "AUDIO": "Audio"
+            },
+            "videoUrlPlaceholder": "URL de la vidéo (YouTube, Vimeo, etc.)",
+            "contentPlaceholder": "Contenu de la leçon...",
+            "freePreview": "Aperçu gratuit",
+            "paidOnly": "Payant uniquement",
+            "free": "Gratuit",
+            "save": "Enregistrer",
+            "cancel": "Annuler",
+            "addButton": "Ajouter une leçon",
+            "deleteConfirm": "Supprimer cette leçon ?"
+          },
+          "toasts": {
+            "loadFailed": "Échec du chargement du cours",
+            "updated": "Cours mis à jour !",
+            "updateFailed": "Échec de la mise à jour du cours",
+            "published": "Cours publié !",
+            "unpublished": "Cours dépublié",
+            "moduleAdded": "Module ajouté !",
+            "moduleAddFailed": "Échec de l'ajout du module",
+            "moduleDeleted": "Module supprimé",
+            "moduleDeleteFailed": "Échec de la suppression du module",
+            "lessonAdded": "Leçon ajoutée !",
+            "lessonAddFailed": "Échec de l'ajout de la leçon",
+            "lessonUpdated": "Leçon mise à jour !",
+            "lessonUpdateFailed": "Échec de la mise à jour de la leçon",
+            "lessonDeleted": "Leçon supprimée",
+            "lessonDeleteFailed": "Échec de la suppression de la leçon"
+          }
         }
       }
     },

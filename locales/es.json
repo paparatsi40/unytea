@@ -602,6 +602,68 @@
           "deleted": "Curso eliminado",
           "deleteFailed": "No se pudo eliminar el curso",
           "deleteConfirm": "¿Seguro que quieres eliminar este curso? Esta acción no se puede deshacer."
+        },
+        "builder": {
+          "notFound": "Curso no encontrado",
+          "goBack": "Volver",
+          "backToCourses": "Volver a cursos",
+          "header": {
+            "titleLabel": "Título",
+            "descriptionLabel": "Descripción",
+            "paidCourse": "Curso de pago",
+            "freeCourse": "Curso gratuito",
+            "save": "Guardar",
+            "cancel": "Cancelar",
+            "published": "Publicado",
+            "draft": "Borrador",
+            "free": "Gratis",
+            "editDetails": "Editar detalles",
+            "publish": "Publicar",
+            "unpublish": "Despublicar"
+          },
+          "modules": {
+            "header": "Módulos ({count})",
+            "addButton": "Añadir módulo",
+            "titlePlaceholder": "Título del módulo...",
+            "add": "Añadir",
+            "empty": "Aún no hay módulos. Añade tu primer módulo para empezar a construir el curso.",
+            "lessonCount": "{count, plural, =1 {# lección} other {# lecciones}}",
+            "deleteConfirm": "¿Eliminar este módulo y todas sus lecciones?"
+          },
+          "lessons": {
+            "titlePlaceholder": "Título de la lección...",
+            "type": {
+              "TEXT": "Texto",
+              "VIDEO": "Video",
+              "AUDIO": "Audio"
+            },
+            "videoUrlPlaceholder": "URL del video (YouTube, Vimeo, etc.)",
+            "contentPlaceholder": "Contenido de la lección...",
+            "freePreview": "Vista previa gratis",
+            "paidOnly": "Solo de pago",
+            "free": "Gratis",
+            "save": "Guardar",
+            "cancel": "Cancelar",
+            "addButton": "Añadir lección",
+            "deleteConfirm": "¿Eliminar esta lección?"
+          },
+          "toasts": {
+            "loadFailed": "No se pudo cargar el curso",
+            "updated": "¡Curso actualizado!",
+            "updateFailed": "No se pudo actualizar el curso",
+            "published": "¡Curso publicado!",
+            "unpublished": "Curso despublicado",
+            "moduleAdded": "¡Módulo añadido!",
+            "moduleAddFailed": "No se pudo añadir el módulo",
+            "moduleDeleted": "Módulo eliminado",
+            "moduleDeleteFailed": "No se pudo eliminar el módulo",
+            "lessonAdded": "¡Lección añadida!",
+            "lessonAddFailed": "No se pudo añadir la lección",
+            "lessonUpdated": "¡Lección actualizada!",
+            "lessonUpdateFailed": "No se pudo actualizar la lección",
+            "lessonDeleted": "Lección eliminada",
+            "lessonDeleteFailed": "No se pudo eliminar la lección"
+          }
         }
       }
     },
