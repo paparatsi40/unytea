@@ -1020,6 +1020,90 @@
         }
       }
     },
+    "communityMember": {
+      "about": {
+        "notFound": "Communauté introuvable",
+        "title": "À propos de {name}",
+        "subtitle": "En savoir plus sur cette communauté",
+        "descriptionTitle": "Description",
+        "noDescription": "Aucune description disponible.",
+        "stats": {
+          "members": "Membres",
+          "posts": "Publications",
+          "courses": "Cours"
+        },
+        "detailsTitle": "Détails de la communauté",
+        "createdOn": "Créée le {date}",
+        "communityType": "Type : {value}",
+        "type": {
+          "public": "Publique",
+          "private": "Privée"
+        },
+        "slug": "Slug : {value}",
+        "ownerTitle": "Propriétaire de la communauté",
+        "owner": "Propriétaire",
+        "unknownOwner": "Inconnu",
+        "backButton": "Retour à la communauté"
+      },
+      "chat": {
+        "loading": "Chargement du chat...",
+        "noChannels": {
+          "title": "Aucun canal trouvé",
+          "hint": "Échec de la création des canaux par défaut"
+        },
+        "viewToggle": {
+          "chat": "Chat",
+          "auditorium": "Auditorium"
+        },
+        "defaultChannel": "Général"
+      },
+      "pusherChat": {
+        "connected": "Connecté",
+        "connecting": "Connexion...",
+        "messageCount": "{count, plural, =1 {# message} other {# messages}}",
+        "empty": {
+          "title": "Aucun message pour l'instant",
+          "hint": "Lancez la conversation !"
+        },
+        "relativeTime": {
+          "justNow": "à l'instant",
+          "minutesAgo": "il y a {count} min",
+          "hoursAgo": "il y a {count} h",
+          "daysAgo": "il y a {count} j"
+        },
+        "inputPlaceholder": "Saisissez un message...",
+        "inputHint": "Appuyez sur Entrée pour envoyer, Maj+Entrée pour un saut de ligne",
+        "anonymous": "Anonyme"
+      },
+      "memberCard": {
+        "imageAlt": "Membre",
+        "anonymous": "Anonyme",
+        "messageButton": "Message",
+        "callButton": "Appeler",
+        "viewProfileButton": "Voir le profil complet",
+        "viewProfileComingSoon": "La page de profil arrive bientôt"
+      },
+      "buddy": {
+        "notFound": "Communauté introuvable",
+        "comingSoonTitle": "Trouvez votre partenaire de responsabilité",
+        "comingSoonDescription": "Soyez mis en relation avec quelqu'un pour rester motivés et responsables mutuellement !",
+        "findBuddyButton": "Trouver mon partenaire",
+        "features": {
+          "setGoals": {
+            "title": "Définir des objectifs",
+            "description": "Travaillez vers des objectifs communs"
+          },
+          "checkIns": {
+            "title": "Points réguliers",
+            "description": "Mises à jour régulières des progrès"
+          },
+          "growTogether": {
+            "title": "Grandir ensemble",
+            "description": "Des résultats 10x meilleurs"
+          }
+        }
+      }
+    },
     "calendar": {
       "metaTitle": "Calendrier",
       "title": "Calendrier",

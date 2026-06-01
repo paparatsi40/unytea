@@ -6,6 +6,9 @@ import { Loader2, Users, Calendar, BookOpen, Shield, Globe } from "lucide-react"
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
+import { useTranslations, useLocale } from "next-intl";
+import { format } from "date-fns";
+import { getDateFnsLocale } from "@/lib/i18n/date-fns-locale";
 
 interface CommunityData {
   id: string;
@@ -28,9 +31,19 @@ interface CommunityData {
   };
 }
 
+// community.type isn't a real column (the API never returns it), so this
+// normalizes whatever may arrive and defaults to "public" — matching the
+// previous hardcoded "Public" fallback. Returns a key resolved in render.
+function getCommunityTypeKey(type?: string): "public" | "private" {
+  return type?.toLowerCase() === "private" ? "private" : "public";
+}
+
 export default function CommunityAboutPage() {
   const params = useParams();
   const slug = (params?.slug as string) || "";
+  const t = useTranslations("dashboard.communityMember.about");
+  const locale = useLocale();
+  const dfLocale = getDateFnsLocale(locale);
   const [community, setCommunity] = useState<CommunityData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -51,9 +64,8 @@ export default function CommunityAboutPage() {
       }
     } catch (error) {
       console.error("Error loading community:", error);
-    } finally {
-      setIsLoading(false);
     }
+    setIsLoading(false);
   };
 
   if (isLoading) {
@@ -67,23 +79,21 @@ export default function CommunityAboutPage() {
   if (!community) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <p className="text-gray-600">Community not found</p>
+        <p className="text-gray-600">{t("notFound")}</p>
       </div>
     );
   }
 
-  const createdDate = new Date(community.createdAt).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  const createdDate = format(new Date(community.createdAt), "PPP", { locale: dfLocale });
 
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="mb-2 text-3xl font-bold text-gray-900">About {community.name}</h1>
-        <p className="text-gray-600">Learn more about this community</p>
+        <h1 className="mb-2 text-3xl font-bold text-gray-900">
+          {t("title", { name: community.name })}
+        </h1>
+        <p className="text-gray-600">{t("subtitle")}</p>
       </div>
 
       {/* Cover Image */}
@@ -101,9 +111,9 @@ export default function CommunityAboutPage() {
 
       {/* Description */}
       <div className="mb-6 rounded-xl border border-gray-200 bg-white p-6">
-        <h2 className="mb-4 text-xl font-semibold text-gray-900">Description</h2>
+        <h2 className="mb-4 text-xl font-semibold text-gray-900">{t("descriptionTitle")}</h2>
         <p className="leading-relaxed text-gray-700">
-          {community.description || "No description available."}
+          {community.description || t("noDescription")}
         </p>
       </div>
 
@@ -115,7 +125,7 @@ export default function CommunityAboutPage() {
           </div>
           <div>
             <p className="text-2xl font-bold text-gray-900">{community._count?.members || 0}</p>
-            <p className="text-sm text-gray-600">Members</p>
+            <p className="text-sm text-gray-600">{t("stats.members")}</p>
           </div>
         </div>
 
@@ -125,7 +135,7 @@ export default function CommunityAboutPage() {
           </div>
           <div>
             <p className="text-2xl font-bold text-gray-900">{community._count?.posts || 0}</p>
-            <p className="text-sm text-gray-600">Posts</p>
+            <p className="text-sm text-gray-600">{t("stats.posts")}</p>
           </div>
         </div>
 
@@ -135,26 +145,28 @@ export default function CommunityAboutPage() {
           </div>
           <div>
             <p className="text-2xl font-bold text-gray-900">{community._count?.courses || 0}</p>
-            <p className="text-sm text-gray-600">Courses</p>
+            <p className="text-sm text-gray-600">{t("stats.courses")}</p>
           </div>
         </div>
       </div>
 
       {/* Details */}
       <div className="mb-6 rounded-xl border border-gray-200 bg-white p-6">
-        <h2 className="mb-4 text-xl font-semibold text-gray-900">Community Details</h2>
+        <h2 className="mb-4 text-xl font-semibold text-gray-900">{t("detailsTitle")}</h2>
         <div className="space-y-4">
           <div className="flex items-center gap-3">
             <Calendar className="h-5 w-5 text-gray-400" />
-            <span className="text-gray-600">Created on {createdDate}</span>
+            <span className="text-gray-600">{t("createdOn", { date: createdDate })}</span>
           </div>
           <div className="flex items-center gap-3">
             <Shield className="h-5 w-5 text-gray-400" />
-            <span className="text-gray-600">Type: {community.type || "Public"}</span>
+            <span className="text-gray-600">
+              {t("communityType", { value: t(`type.${getCommunityTypeKey(community.type)}`) })}
+            </span>
           </div>
           <div className="flex items-center gap-3">
             <Globe className="h-5 w-5 text-gray-400" />
-            <span className="text-gray-600">Slug: {community.slug}</span>
+            <span className="text-gray-600">{t("slug", { value: community.slug })}</span>
           </div>
         </div>
       </div>
@@ -162,12 +174,12 @@ export default function CommunityAboutPage() {
       {/* Owner */}
       {community.owner && (
         <div className="mb-6 rounded-xl border border-gray-200 bg-white p-6">
-          <h2 className="mb-4 text-xl font-semibold text-gray-900">Community Owner</h2>
+          <h2 className="mb-4 text-xl font-semibold text-gray-900">{t("ownerTitle")}</h2>
           <div className="flex items-center gap-4">
             {community.owner.image ? (
               <Image
                 src={community.owner.image}
-                alt={community.owner.name || "Owner"}
+                alt={community.owner.name || t("owner")}
                 width={64}
                 height={64}
                 className="h-16 w-16 rounded-full object-cover"
@@ -178,8 +190,10 @@ export default function CommunityAboutPage() {
               </div>
             )}
             <div>
-              <p className="font-semibold text-gray-900">{community.owner.name || "Unknown"}</p>
-              <p className="text-sm text-gray-600">Owner</p>
+              <p className="font-semibold text-gray-900">
+                {community.owner.name || t("unknownOwner")}
+              </p>
+              <p className="text-sm text-gray-600">{t("owner")}</p>
             </div>
           </div>
         </div>
@@ -188,7 +202,7 @@ export default function CommunityAboutPage() {
       {/* Back Button */}
       <div className="flex gap-4">
         <Link href={`/dashboard/c/${slug}/chat`}>
-          <Button variant="outline">Back to Community</Button>
+          <Button variant="outline">{t("backButton")}</Button>
         </Link>
       </div>
     </div>
