@@ -46,10 +46,9 @@ export default function LandingPageSettings() {
       }
     } catch (error) {
       console.error("Error:", error);
-      toast.error("Failed to load landing page settings");
-    } finally {
-      setLoading(false);
+      toast.error(t("loadFailedToast"));
     }
+    setLoading(false);
   }
 
   async function handleSave(sections: SectionInstance[]) {
@@ -64,10 +63,10 @@ export default function LandingPageSettings() {
 
       if (!response.ok) throw new Error("Failed to save");
 
-      toast.success("Landing page saved successfully!");
+      toast.success(t("saveSuccessToast"));
     } catch (error) {
       console.error("Error:", error);
-      toast.error("Failed to save landing page");
+      toast.error(t("saveFailedToast"));
       throw error; // Re-throw to let SectionBuilder handle it
     }
   }
@@ -113,10 +112,8 @@ export default function LandingPageSettings() {
               <ArrowLeft className="h-4 w-4" />
             </Button>
             <div>
-              <h1 className="text-3xl font-bold text-foreground">Landing Page Builder</h1>
-              <p className="mt-2 text-muted-foreground">
-                Build your landing page with pre-designed sections
-              </p>
+              <h1 className="text-3xl font-bold text-foreground">{t("builderTitle")}</h1>
+              <p className="mt-2 text-muted-foreground">{t("builderSubtitle")}</p>
             </div>
           </div>
         </div>
@@ -136,7 +133,7 @@ export default function LandingPageSettings() {
           </Button>
           <Button variant="outline" onClick={() => window.open(`/c/${slug}`, "_blank")}>
             <Eye className="mr-2 h-4 w-4" />
-            Preview
+            {t("preview")}
           </Button>
         </div>
       </div>
@@ -154,27 +151,16 @@ export default function LandingPageSettings() {
         <div className="flex gap-3">
           <div className="text-2xl">💡</div>
           <div>
-            <h3 className="text-sm font-semibold text-blue-900">How to use the Section Builder</h3>
+            <h3 className="text-sm font-semibold text-blue-900">{t("help.title")}</h3>
             <ul className="mt-2 space-y-1 text-xs text-blue-700">
+              <li>• {t.rich("help.addSections", { b: (chunks) => <strong>{chunks}</strong> })}</li>
+              <li>• {t.rich("help.reorder", { b: (chunks) => <strong>{chunks}</strong> })}</li>
+              <li>• {t.rich("help.editContent", { b: (chunks) => <strong>{chunks}</strong> })}</li>
               <li>
-                • <strong>Add sections</strong> from the left panel by clicking on them
+                • {t.rich("help.previewRealtime", { b: (chunks) => <strong>{chunks}</strong> })}
               </li>
-              <li>
-                • <strong>Reorder sections</strong> using the ↑/↓ buttons in the layers panel
-              </li>
-              <li>
-                • <strong>Edit content</strong> by selecting a section and using the properties
-                panel on the right
-              </li>
-              <li>
-                • <strong>Preview in real-time</strong> in the center panel
-              </li>
-              <li>
-                • <strong>Save your changes</strong> using the Save button
-              </li>
-              <li>
-                • <strong>All sections are responsive</strong> and work perfectly on mobile devices
-              </li>
+              <li>• {t.rich("help.saveChanges", { b: (chunks) => <strong>{chunks}</strong> })}</li>
+              <li>• {t.rich("help.responsive", { b: (chunks) => <strong>{chunks}</strong> })}</li>
             </ul>
           </div>
         </div>

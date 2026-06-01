@@ -55,7 +55,22 @@
         "applying": "Aplicando...",
         "successToast": "Plantilla predeterminada aplicada",
         "errorToast": "Error al aplicar la plantilla",
-        "confirmReset": "Esto reemplazará el layout actual de tu página de comunidad con la plantilla predeterminada. ¿Continuar?"
+        "confirmReset": "Esto reemplazará el layout actual de tu página de comunidad con la plantilla predeterminada. ¿Continuar?",
+        "loadFailedToast": "No se pudo cargar la configuración de la página de bienvenida",
+        "saveSuccessToast": "¡Página de bienvenida guardada correctamente!",
+        "saveFailedToast": "No se pudo guardar la página de bienvenida",
+        "builderTitle": "Constructor de página de bienvenida",
+        "builderSubtitle": "Crea tu página de bienvenida con secciones prediseñadas",
+        "preview": "Vista previa",
+        "help": {
+          "title": "Cómo usar el constructor de secciones",
+          "addSections": "<b>Añade secciones</b> desde el panel izquierdo haciendo clic en ellas",
+          "reorder": "<b>Reordena las secciones</b> con los botones ↑/↓ del panel de capas",
+          "editContent": "<b>Edita el contenido</b> seleccionando una sección y usando el panel de propiedades de la derecha",
+          "previewRealtime": "<b>Previsualiza en tiempo real</b> en el panel central",
+          "saveChanges": "<b>Guarda tus cambios</b> con el botón Guardar",
+          "responsive": "<b>Todas las secciones son adaptables</b> y funcionan perfectamente en dispositivos móviles"
+        }
       },
       "sectionBuilder": {
         "placeholder": {
@@ -855,6 +870,154 @@
           "title": "Algo salió mal",
           "body": "No se pudieron cargar las sesiones",
           "back": "Volver a comunidades"
+        }
+      },
+      "settings": {
+        "layout": {
+          "header": "Configuración de la comunidad",
+          "subtitle": "Gestiona las preferencias y la configuración de tu comunidad",
+          "nav": {
+            "general": { "name": "General", "description": "Configuración básica de la comunidad" },
+            "appearance": {
+              "name": "Apariencia",
+              "description": "Personaliza el diseño y la marca"
+            },
+            "members": { "name": "Miembros", "description": "Gestiona roles y permisos" },
+            "payments": { "name": "Pagos", "description": "Configura los precios de membresía" }
+          }
+        },
+        "general": {
+          "title": "Configuración general",
+          "subtitle": "Actualiza la información básica de tu comunidad",
+          "nameLabel": "Nombre de la comunidad",
+          "namePlaceholder": "Mi comunidad increíble",
+          "descriptionLabel": "Descripción",
+          "descriptionPlaceholder": "Cuéntale a la gente de qué trata tu comunidad...",
+          "descriptionHint": "Se muestra en la página pública de Explorar y en la tarjeta de tu comunidad.",
+          "categoryLabel": "Categoría",
+          "categoryPlaceholder": "Selecciona una categoría…",
+          "categoryHint": "Ayuda a que la gente encuentre tu comunidad en Explorar.",
+          "languageLabel": "Idioma principal",
+          "languagePlaceholder": "Selecciona un idioma…",
+          "languageHint": "El idioma en el que ocurren la mayoría de las conversaciones y sesiones.",
+          "privateTitle": "Comunidad privada",
+          "privateHint": "Solo los miembros aprobados pueden ver el contenido de la comunidad",
+          "requireApprovalTitle": "Requerir aprobación para nuevos miembros",
+          "requireApprovalHint": "Tendrás que aprobar a cada miembro antes de que pueda unirse",
+          "cancel": "Cancelar",
+          "saving": "Guardando...",
+          "save": "Guardar cambios",
+          "danger": {
+            "title": "Zona de peligro",
+            "description": "Una vez que elimines una comunidad, no hay vuelta atrás. Asegúrate por completo.",
+            "deleting": "Eliminando...",
+            "delete": "Eliminar comunidad",
+            "namePrompt": "Escribe el nombre exacto de la comunidad para confirmar la eliminación:\n\n{name}",
+            "nameRequired": "El nombre de la comunidad es obligatorio para confirmar la eliminación",
+            "nameMismatch": "El texto de confirmación no coincide con el nombre de la comunidad"
+          },
+          "toasts": {
+            "loadFailed": "No se pudieron cargar los datos de la comunidad",
+            "saved": "¡Configuración guardada con éxito!",
+            "saveFailed": "No se pudo guardar la configuración",
+            "deleted": "Comunidad eliminada con éxito",
+            "deleteFailed": "No se pudo eliminar la comunidad"
+          }
+        },
+        "payments": {
+          "title": "Pagos y monetización",
+          "subtitle": "Configura las membresías de pago y conecta tu cuenta de Stripe",
+          "connect": {
+            "cardTitle": "Stripe Connect",
+            "cardDescription": "Conecta tu cuenta de Stripe para recibir pagos de los miembros de la comunidad. Te quedas con el 95% de todos los ingresos, la comisión de la plataforma es del 5%.",
+            "notConnected": {
+              "alertTitle": "Cuenta de Stripe no conectada",
+              "alertBody": "Necesitas conectar una cuenta de Stripe antes de poder cobrar por membresías.",
+              "button": "Conectar con Stripe",
+              "connecting": "Conectando..."
+            },
+            "active": {
+              "alertTitle": "Cuenta de Stripe conectada y activa",
+              "accountId": "ID de cuenta: {id}",
+              "openDashboard": "Abrir el panel de Stripe"
+            },
+            "pending": {
+              "alertTitle": "Cuenta de Stripe pendiente de verificación",
+              "alertBody": "Por favor completa el proceso de verificación en Stripe.",
+              "completeButton": "Completar verificación",
+              "loading": "Cargando..."
+            }
+          },
+          "pricing": {
+            "title": "Precios de membresía",
+            "subtitle": "Establece los precios de membresía de tu comunidad. Las comunidades gratuitas permiten que cualquiera se una.",
+            "paidToggle": "Comunidad de pago",
+            "paidToggleHint": "Requiere pago para unirse a esta comunidad",
+            "monthlyLabel": "Precio mensual (USD)",
+            "yearlyLabel": "Precio anual (USD)",
+            "monthlyPlaceholder": "29",
+            "yearlyPlaceholder": "290",
+            "defaultTierLabel": "Nivel de pago predeterminado",
+            "tierAmountLabel": "Nivel {tier}",
+            "priceIdLabel": "Stripe Price ID ({tier})",
+            "priceIdPlaceholder": "price_...",
+            "priceIdPlaceholderOptional": "price_... (opcional)",
+            "revenuePreview": "Recibes: ${monthly}/mes · ${yearly}/año después de la comisión del {fee}% de la plataforma",
+            "save": "Guardar configuración",
+            "saving": "Guardando..."
+          },
+          "tier": {
+            "free": "Free",
+            "pro": "Pro",
+            "vip": "VIP"
+          },
+          "revenueSplit": {
+            "title": "Reparto de ingresos",
+            "youKeep": "Te quedas con",
+            "platformFee": "Comisión de la plataforma",
+            "footer": "Los pagos se procesan de forma segura a través de Stripe y se transfieren a tu cuenta automáticamente."
+          },
+          "toasts": {
+            "errorTitle": "Error",
+            "successTitle": "Éxito",
+            "saved": "Configuración de pagos guardada con éxito.",
+            "connectFailed": "No se pudo conectar con Stripe. Inténtalo de nuevo.",
+            "connectLinkFailed": "No se pudo crear el enlace de onboarding",
+            "saveFailed": "No se pudo guardar la configuración. Inténtalo de nuevo.",
+            "saveServerFailed": "No se pudo guardar la configuración de pagos"
+          }
+        },
+        "appearance": {
+          "title": "Apariencia",
+          "subtitle": "Personaliza el diseño y la imagen de marca de tu comunidad",
+          "cardTitle": "Personalizar apariencia",
+          "cardDescription": "Usa las herramientas de abajo para controlar cómo se ve tu comunidad ante visitantes y miembros.",
+          "landingBuilderButton": "Constructor de página de bienvenida",
+          "sectionPresetsButton": "Ajustes de secciones"
+        },
+        "members": {
+          "title": "Miembros",
+          "subtitle": "Gestiona roles, aprueba solicitudes y elimina miembros."
+        },
+        "memberDirectory": {
+          "notFound": "Comunidad no encontrada",
+          "title": "Miembros",
+          "subtitle": "{count, plural, =1 {Conecta con # persona increíble de esta comunidad} other {Conecta con # personas increíbles de esta comunidad}}",
+          "searchPlaceholder": "Buscar por nombre, habilidades o biografía...",
+          "sort": {
+            "recent": "Más recientes",
+            "name": "Nombre (A-Z)"
+          },
+          "filters": {
+            "all": "Todos",
+            "available": "Disponible",
+            "mentoring": "Mentoría"
+          },
+          "resultsCount": "{count, plural, =1 {# miembro} other {# miembros}}",
+          "empty": {
+            "title": "No se encontraron miembros",
+            "hint": "Prueba a ajustar tu búsqueda o filtros"
+          }
         }
       }
     },

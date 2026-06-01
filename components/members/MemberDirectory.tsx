@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Search, Users } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { MemberCard } from "./MemberCard";
 import { getCommunityMembers } from "@/app/actions/members";
 
@@ -10,6 +11,7 @@ type Props = {
 };
 
 export function MemberDirectory({ communityId }: Props) {
+  const t = useTranslations("dashboard.communityAdmin.settings.memberDirectory");
   const [members, setMembers] = useState<any[]>([]);
   const [filteredMembers, setFilteredMembers] = useState<any[]>([]);
   const [search, setSearch] = useState("");
@@ -59,10 +61,8 @@ export function MemberDirectory({ communityId }: Props) {
     <div className="mx-auto max-w-7xl px-8 py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Members</h1>
-        <p className="mt-2 text-gray-600">
-          Connect with {members.length} amazing people in this community
-        </p>
+        <h1 className="text-3xl font-bold text-gray-900">{t("title")}</h1>
+        <p className="mt-2 text-gray-600">{t("subtitle", { count: members.length })}</p>
       </div>
 
       {/* Search & Filters */}
@@ -74,7 +74,7 @@ export function MemberDirectory({ communityId }: Props) {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by name, skills, or bio..."
+            placeholder={t("searchPlaceholder")}
             className="w-full rounded-lg border border-gray-300 py-2.5 pl-10 pr-4 text-sm focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 md:py-3 md:pl-12 md:text-base"
           />
         </div>
@@ -88,8 +88,8 @@ export function MemberDirectory({ communityId }: Props) {
           onChange={(e) => setSortBy(e.target.value as any)}
           className="rounded-lg border border-gray-300 px-3 py-2 text-xs focus:border-purple-500 focus:outline-none md:text-sm"
         >
-          <option value="recent">Recently Joined</option>
-          <option value="name">Name (A-Z)</option>
+          <option value="recent">{t("sort.recent")}</option>
+          <option value="name">{t("sort.name")}</option>
         </select>
 
         {/* Status Filters */}
@@ -102,7 +102,7 @@ export function MemberDirectory({ communityId }: Props) {
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
           >
-            All
+            {t("filters.all")}
           </button>
           <button
             onClick={() => setStatusFilter("AVAILABLE")}
@@ -112,7 +112,7 @@ export function MemberDirectory({ communityId }: Props) {
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
           >
-            💚 Available
+            💚 {t("filters.available")}
           </button>
           <button
             onClick={() => setStatusFilter("MENTORING")}
@@ -122,14 +122,14 @@ export function MemberDirectory({ communityId }: Props) {
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
           >
-            💜 Mentoring
+            💜 {t("filters.mentoring")}
           </button>
         </div>
 
         {/* Results Count */}
         <div className="ml-auto flex items-center space-x-2 text-sm text-gray-600">
           <Users className="h-4 w-4" />
-          <span>{filteredMembers.length} members</span>
+          <span>{t("resultsCount", { count: filteredMembers.length })}</span>
         </div>
       </div>
 
@@ -154,8 +154,8 @@ export function MemberDirectory({ communityId }: Props) {
       ) : filteredMembers.length === 0 ? (
         <div className="flex h-64 flex-col items-center justify-center text-center">
           <Users className="h-12 w-12 text-gray-300 md:h-16 md:w-16" />
-          <p className="mt-4 text-base font-medium text-gray-600 md:text-lg">No members found</p>
-          <p className="text-sm text-gray-500">Try adjusting your search or filters</p>
+          <p className="mt-4 text-base font-medium text-gray-600 md:text-lg">{t("empty.title")}</p>
+          <p className="text-sm text-gray-500">{t("empty.hint")}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3">

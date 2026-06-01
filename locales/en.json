@@ -55,7 +55,22 @@
         "applying": "Applying...",
         "successToast": "Default template applied",
         "errorToast": "Failed to apply template",
-        "confirmReset": "This will replace your current landing page layout with the default template. Continue?"
+        "confirmReset": "This will replace your current landing page layout with the default template. Continue?",
+        "loadFailedToast": "Failed to load landing page settings",
+        "saveSuccessToast": "Landing page saved successfully!",
+        "saveFailedToast": "Failed to save landing page",
+        "builderTitle": "Landing Page Builder",
+        "builderSubtitle": "Build your landing page with pre-designed sections",
+        "preview": "Preview",
+        "help": {
+          "title": "How to use the Section Builder",
+          "addSections": "<b>Add sections</b> from the left panel by clicking on them",
+          "reorder": "<b>Reorder sections</b> using the ↑/↓ buttons in the layers panel",
+          "editContent": "<b>Edit content</b> by selecting a section and using the properties panel on the right",
+          "previewRealtime": "<b>Preview in real-time</b> in the center panel",
+          "saveChanges": "<b>Save your changes</b> using the Save button",
+          "responsive": "<b>All sections are responsive</b> and work perfectly on mobile devices"
+        }
       },
       "sectionBuilder": {
         "placeholder": {
@@ -855,6 +870,151 @@
           "title": "Something went wrong",
           "body": "Unable to load sessions",
           "back": "Back to Communities"
+        }
+      },
+      "settings": {
+        "layout": {
+          "header": "Community Settings",
+          "subtitle": "Manage your community preferences and configuration",
+          "nav": {
+            "general": { "name": "General", "description": "Basic community settings" },
+            "appearance": { "name": "Appearance", "description": "Customize layout and branding" },
+            "members": { "name": "Members", "description": "Manage roles and permissions" },
+            "payments": { "name": "Payments", "description": "Configure membership pricing" }
+          }
+        },
+        "general": {
+          "title": "General Settings",
+          "subtitle": "Update your community's basic information",
+          "nameLabel": "Community Name",
+          "namePlaceholder": "My Awesome Community",
+          "descriptionLabel": "Description",
+          "descriptionPlaceholder": "Tell people what your community is about...",
+          "descriptionHint": "Shown on the public Explore page and on your community card.",
+          "categoryLabel": "Category",
+          "categoryPlaceholder": "Select a category…",
+          "categoryHint": "Helps people find your community in Explore.",
+          "languageLabel": "Primary language",
+          "languagePlaceholder": "Select a language…",
+          "languageHint": "The language most conversations and sessions happen in.",
+          "privateTitle": "Private Community",
+          "privateHint": "Only approved members can see the community content",
+          "requireApprovalTitle": "Require Approval for New Members",
+          "requireApprovalHint": "You'll need to approve each member before they can join",
+          "cancel": "Cancel",
+          "saving": "Saving...",
+          "save": "Save Changes",
+          "danger": {
+            "title": "Danger Zone",
+            "description": "Once you delete a community, there is no going back. Please be certain.",
+            "deleting": "Deleting...",
+            "delete": "Delete Community",
+            "namePrompt": "Type the community name exactly to confirm deletion:\n\n{name}",
+            "nameRequired": "Community name is required for deletion confirmation",
+            "nameMismatch": "Confirmation text does not match community name"
+          },
+          "toasts": {
+            "loadFailed": "Failed to load community data",
+            "saved": "Settings saved successfully!",
+            "saveFailed": "Failed to save settings",
+            "deleted": "Community deleted successfully",
+            "deleteFailed": "Failed to delete community"
+          }
+        },
+        "payments": {
+          "title": "Payments & Monetization",
+          "subtitle": "Configure paid memberships and connect your Stripe account",
+          "connect": {
+            "cardTitle": "Stripe Connect",
+            "cardDescription": "Connect your Stripe account to receive payments from community members. You keep 95% of all revenue, platform fee is 5%.",
+            "notConnected": {
+              "alertTitle": "Stripe account not connected",
+              "alertBody": "You need to connect a Stripe account before you can charge for memberships.",
+              "button": "Connect with Stripe",
+              "connecting": "Connecting..."
+            },
+            "active": {
+              "alertTitle": "Stripe account connected and active",
+              "accountId": "Account ID: {id}",
+              "openDashboard": "Open Stripe Dashboard"
+            },
+            "pending": {
+              "alertTitle": "Stripe account pending verification",
+              "alertBody": "Please complete the verification process in Stripe.",
+              "completeButton": "Complete Verification",
+              "loading": "Loading..."
+            }
+          },
+          "pricing": {
+            "title": "Membership Pricing",
+            "subtitle": "Set your community membership prices. Free communities allow anyone to join.",
+            "paidToggle": "Paid Community",
+            "paidToggleHint": "Require payment to join this community",
+            "monthlyLabel": "Monthly Price (USD)",
+            "yearlyLabel": "Yearly Price (USD)",
+            "monthlyPlaceholder": "29",
+            "yearlyPlaceholder": "290",
+            "defaultTierLabel": "Default Paid Tier",
+            "tierAmountLabel": "{tier} tier",
+            "priceIdLabel": "Stripe Price ID ({tier})",
+            "priceIdPlaceholder": "price_...",
+            "priceIdPlaceholderOptional": "price_... (optional)",
+            "revenuePreview": "You receive: ${monthly}/mo · ${yearly}/yr after {fee}% platform fee",
+            "save": "Save Settings",
+            "saving": "Saving..."
+          },
+          "tier": {
+            "free": "Free",
+            "pro": "Pro",
+            "vip": "VIP"
+          },
+          "revenueSplit": {
+            "title": "Revenue Split",
+            "youKeep": "You keep",
+            "platformFee": "Platform fee",
+            "footer": "Payments are processed securely through Stripe and transferred to your account automatically."
+          },
+          "toasts": {
+            "errorTitle": "Error",
+            "successTitle": "Success",
+            "saved": "Payment settings saved successfully.",
+            "connectFailed": "Failed to connect with Stripe. Please try again.",
+            "connectLinkFailed": "Failed to create onboarding link",
+            "saveFailed": "Failed to save settings. Please try again.",
+            "saveServerFailed": "Failed to save payment settings"
+          }
+        },
+        "appearance": {
+          "title": "Appearance",
+          "subtitle": "Customize your community layout and branding experience",
+          "cardTitle": "Customize appearance",
+          "cardDescription": "Use the tools below to control how your community looks for visitors and members.",
+          "landingBuilderButton": "Landing page builder",
+          "sectionPresetsButton": "Section presets"
+        },
+        "members": {
+          "title": "Members",
+          "subtitle": "Manage roles, approve requests, and remove members."
+        },
+        "memberDirectory": {
+          "notFound": "Community not found",
+          "title": "Members",
+          "subtitle": "{count, plural, =1 {Connect with # amazing person in this community} other {Connect with # amazing people in this community}}",
+          "searchPlaceholder": "Search by name, skills, or bio...",
+          "sort": {
+            "recent": "Recently Joined",
+            "name": "Name (A-Z)"
+          },
+          "filters": {
+            "all": "All",
+            "available": "Available",
+            "mentoring": "Mentoring"
+          },
+          "resultsCount": "{count, plural, =1 {# member} other {# members}}",
+          "empty": {
+            "title": "No members found",
+            "hint": "Try adjusting your search or filters"
+          }
         }
       }
     },

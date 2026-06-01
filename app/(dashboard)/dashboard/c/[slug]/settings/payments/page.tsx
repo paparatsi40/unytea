@@ -8,8 +8,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslations } from "next-intl";
 
 export default function CommunityPaymentsPage() {
+  const t = useTranslations("dashboard.communityAdmin.settings.payments");
   const { toast } = useToast();
   const params = useParams<{ slug: string }>();
   const slug = params?.slug;
@@ -86,9 +88,8 @@ export default function CommunityPaymentsPage() {
         }
       } catch (_error) {
         console.error("Error loading payment data:", _error);
-      } finally {
-        setIsLoading(false);
       }
+      setIsLoading(false);
     }
 
     loadData();
@@ -107,18 +108,17 @@ export default function CommunityPaymentsPage() {
       } else {
         const errorData = await res.json();
         console.error("Stripe Connect error:", errorData);
-        throw new Error(errorData.details || errorData.error || "Failed to create onboarding link");
+        throw new Error(errorData.details || errorData.error || t("toasts.connectLinkFailed"));
       }
     } catch (error: any) {
       console.error("Connect error:", error);
       toast({
-        title: "Error",
-        description: error.message || "Failed to connect with Stripe. Please try again.",
+        title: t("toasts.errorTitle"),
+        description: error.message || t("toasts.connectFailed"),
         variant: "destructive",
       });
-    } finally {
-      setIsConnecting(false);
     }
+    setIsConnecting(false);
   };
 
   const handleSaveSettings = async () => {
@@ -137,7 +137,7 @@ export default function CommunityPaymentsPage() {
       const payload = await res.json();
 
       if (!res.ok) {
-        throw new Error(payload?.error || "Failed to save payment settings");
+        throw new Error(payload?.error || t("toasts.saveServerFailed"));
       }
 
       if (payload?.settings) {
@@ -169,18 +169,17 @@ export default function CommunityPaymentsPage() {
       }
 
       toast({
-        title: "Success",
-        description: "Payment settings saved successfully.",
+        title: t("toasts.successTitle"),
+        description: t("toasts.saved"),
       });
     } catch (_error: any) {
       toast({
-        title: "Error",
-        description: _error?.message || "Failed to save settings. Please try again.",
+        title: t("toasts.errorTitle"),
+        description: _error?.message || t("toasts.saveFailed"),
         variant: "destructive",
       });
-    } finally {
-      setIsSaving(false);
     }
+    setIsSaving(false);
   };
 
   if (isLoading) {
@@ -195,10 +194,8 @@ export default function CommunityPaymentsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Payments & Monetization</h2>
-        <p className="mt-1 text-gray-500">
-          Configure paid memberships and connect your Stripe account
-        </p>
+        <h2 className="text-2xl font-bold text-gray-900">{t("title")}</h2>
+        <p className="mt-1 text-gray-500">{t("subtitle")}</p>
       </div>
 
       {/* Stripe Connect Status */}
@@ -206,12 +203,9 @@ export default function CommunityPaymentsPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <CreditCard className="h-5 w-5" />
-            Stripe Connect
+            {t("connect.cardTitle")}
           </CardTitle>
-          <CardDescription>
-            Connect your Stripe account to receive payments from community members. You keep 95% of
-            all revenue, platform fee is 5%.
-          </CardDescription>
+          <CardDescription>{t("connect.cardDescription")}</CardDescription>
         </CardHeader>
         <CardContent>
           {!stripeStatus?.isConnected ? (
@@ -219,9 +213,11 @@ export default function CommunityPaymentsPage() {
               <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
                 <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
                 <div>
-                  <p className="text-sm font-medium text-amber-800">Stripe account not connected</p>
+                  <p className="text-sm font-medium text-amber-800">
+                    {t("connect.notConnected.alertTitle")}
+                  </p>
                   <p className="mt-1 text-sm text-amber-700">
-                    You need to connect a Stripe account before you can charge for memberships.
+                    {t("connect.notConnected.alertBody")}
                   </p>
                 </div>
               </div>
@@ -233,12 +229,12 @@ export default function CommunityPaymentsPage() {
                 {isConnecting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Connecting...
+                    {t("connect.notConnected.connecting")}
                   </>
                 ) : (
                   <>
                     <CreditCard className="mr-2 h-4 w-4" />
-                    Connect with Stripe
+                    {t("connect.notConnected.button")}
                   </>
                 )}
               </Button>
@@ -249,10 +245,10 @@ export default function CommunityPaymentsPage() {
                 <Check className="mt-0.5 h-5 w-5 shrink-0 text-green-600" />
                 <div>
                   <p className="text-sm font-medium text-green-800">
-                    Stripe account connected and active
+                    {t("connect.active.alertTitle")}
                   </p>
                   <p className="mt-1 text-sm text-green-700">
-                    Account ID: {stripeStatus.accountId}
+                    {t("connect.active.accountId", { id: stripeStatus.accountId ?? "" })}
                   </p>
                 </div>
               </div>
@@ -261,7 +257,7 @@ export default function CommunityPaymentsPage() {
                 onClick={() => window.open("https://dashboard.stripe.com", "_blank")}
               >
                 <ExternalLink className="mr-2 h-4 w-4" />
-                Open Stripe Dashboard
+                {t("connect.active.openDashboard")}
               </Button>
             </div>
           ) : (
@@ -270,23 +266,21 @@ export default function CommunityPaymentsPage() {
                 <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-blue-600" />
                 <div>
                   <p className="text-sm font-medium text-blue-800">
-                    Stripe account pending verification
+                    {t("connect.pending.alertTitle")}
                   </p>
-                  <p className="mt-1 text-sm text-blue-700">
-                    Please complete the verification process in Stripe.
-                  </p>
+                  <p className="mt-1 text-sm text-blue-700">{t("connect.pending.alertBody")}</p>
                 </div>
               </div>
               <Button onClick={handleConnectStripe} disabled={isConnecting}>
                 {isConnecting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Loading...
+                    {t("connect.pending.loading")}
                   </>
                 ) : (
                   <>
                     <ExternalLink className="mr-2 h-4 w-4" />
-                    Complete Verification
+                    {t("connect.pending.completeButton")}
                   </>
                 )}
               </Button>
@@ -298,19 +292,17 @@ export default function CommunityPaymentsPage() {
       {/* Membership Pricing */}
       <Card>
         <CardHeader>
-          <CardTitle>Membership Pricing</CardTitle>
-          <CardDescription>
-            Set your community membership prices. Free communities allow anyone to join.
-          </CardDescription>
+          <CardTitle>{t("pricing.title")}</CardTitle>
+          <CardDescription>{t("pricing.subtitle")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Paid Toggle */}
           <div className="flex items-center justify-between rounded-lg border p-4">
             <div>
               <Label htmlFor="isPaid" className="text-base font-medium">
-                Paid Community
+                {t("pricing.paidToggle")}
               </Label>
-              <p className="text-sm text-gray-500">Require payment to join this community</p>
+              <p className="text-sm text-gray-500">{t("pricing.paidToggleHint")}</p>
             </div>
             <input
               type="checkbox"
@@ -326,7 +318,7 @@ export default function CommunityPaymentsPage() {
             <div className="space-y-5">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="monthlyPrice">Monthly Price (USD)</Label>
+                  <Label htmlFor="monthlyPrice">{t("pricing.monthlyLabel")}</Label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
                       $
@@ -347,13 +339,13 @@ export default function CommunityPaymentsPage() {
                         }))
                       }
                       className="pl-7"
-                      placeholder="29"
+                      placeholder={t("pricing.monthlyPlaceholder")}
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="yearlyPrice">Yearly Price (USD)</Label>
+                  <Label htmlFor="yearlyPrice">{t("pricing.yearlyLabel")}</Label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
                       $
@@ -370,7 +362,7 @@ export default function CommunityPaymentsPage() {
                         }))
                       }
                       className="pl-7"
-                      placeholder="290"
+                      placeholder={t("pricing.yearlyPlaceholder")}
                     />
                   </div>
                 </div>
@@ -378,7 +370,7 @@ export default function CommunityPaymentsPage() {
 
               <div className="space-y-4 rounded-lg border p-4">
                 <div className="space-y-2">
-                  <Label htmlFor="defaultTier">Default Paid Tier</Label>
+                  <Label htmlFor="defaultTier">{t("pricing.defaultTierLabel")}</Label>
                   <select
                     id="defaultTier"
                     value={settings.defaultTier}
@@ -390,15 +382,17 @@ export default function CommunityPaymentsPage() {
                     }
                     className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
                   >
-                    <option value="free">Free</option>
-                    <option value="pro">Pro</option>
-                    <option value="vip">VIP</option>
+                    <option value="free">{t("tier.free")}</option>
+                    <option value="pro">{t("tier.pro")}</option>
+                    <option value="vip">{t("tier.vip")}</option>
                   </select>
                 </div>
 
                 <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
                   <div className="space-y-1">
-                    <Label htmlFor="tierFree">Free tier</Label>
+                    <Label htmlFor="tierFree">
+                      {t("pricing.tierAmountLabel", { tier: t("tier.free") })}
+                    </Label>
                     <Input
                       id="tierFree"
                       type="number"
@@ -413,7 +407,9 @@ export default function CommunityPaymentsPage() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label htmlFor="tierPro">Pro tier</Label>
+                    <Label htmlFor="tierPro">
+                      {t("pricing.tierAmountLabel", { tier: t("tier.pro") })}
+                    </Label>
                     <Input
                       id="tierPro"
                       type="number"
@@ -428,7 +424,9 @@ export default function CommunityPaymentsPage() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label htmlFor="tierVip">VIP tier</Label>
+                    <Label htmlFor="tierVip">
+                      {t("pricing.tierAmountLabel", { tier: t("tier.vip") })}
+                    </Label>
                     <Input
                       id="tierVip"
                       type="number"
@@ -446,7 +444,9 @@ export default function CommunityPaymentsPage() {
 
                 <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
                   <div className="space-y-1">
-                    <Label htmlFor="stripePriceFree">Stripe Price ID (Free)</Label>
+                    <Label htmlFor="stripePriceFree">
+                      {t("pricing.priceIdLabel", { tier: t("tier.free") })}
+                    </Label>
                     <Input
                       id="stripePriceFree"
                       value={settings.tierStripePriceIds.free}
@@ -456,11 +456,13 @@ export default function CommunityPaymentsPage() {
                           tierStripePriceIds: { ...prev.tierStripePriceIds, free: e.target.value },
                         }))
                       }
-                      placeholder="price_... (optional)"
+                      placeholder={t("pricing.priceIdPlaceholderOptional")}
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label htmlFor="stripePricePro">Stripe Price ID (Pro)</Label>
+                    <Label htmlFor="stripePricePro">
+                      {t("pricing.priceIdLabel", { tier: t("tier.pro") })}
+                    </Label>
                     <Input
                       id="stripePricePro"
                       value={settings.tierStripePriceIds.pro}
@@ -470,11 +472,13 @@ export default function CommunityPaymentsPage() {
                           tierStripePriceIds: { ...prev.tierStripePriceIds, pro: e.target.value },
                         }))
                       }
-                      placeholder="price_..."
+                      placeholder={t("pricing.priceIdPlaceholder")}
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label htmlFor="stripePriceVip">Stripe Price ID (VIP)</Label>
+                    <Label htmlFor="stripePriceVip">
+                      {t("pricing.priceIdLabel", { tier: t("tier.vip") })}
+                    </Label>
                     <Input
                       id="stripePriceVip"
                       value={settings.tierStripePriceIds.vip}
@@ -484,16 +488,18 @@ export default function CommunityPaymentsPage() {
                           tierStripePriceIds: { ...prev.tierStripePriceIds, vip: e.target.value },
                         }))
                       }
-                      placeholder="price_..."
+                      placeholder={t("pricing.priceIdPlaceholder")}
                     />
                   </div>
                 </div>
               </div>
 
               <p className="text-xs text-gray-500">
-                You receive: ${(parseFloat(settings.monthlyPrice || "0") * 0.95).toFixed(2)}/mo · $
-                {(parseFloat(settings.yearlyPrice || "0") * 0.95).toFixed(2)}/yr after 5% platform
-                fee
+                {t("pricing.revenuePreview", {
+                  monthly: (parseFloat(settings.monthlyPrice || "0") * 0.95).toFixed(2),
+                  yearly: (parseFloat(settings.yearlyPrice || "0") * 0.95).toFixed(2),
+                  fee: 5,
+                })}
               </p>
             </div>
           )}
@@ -503,10 +509,10 @@ export default function CommunityPaymentsPage() {
             {isSaving ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Saving...
+                {t("pricing.saving")}
               </>
             ) : (
-              "Save Settings"
+              t("pricing.save")
             )}
           </Button>
         </CardContent>
@@ -515,21 +521,18 @@ export default function CommunityPaymentsPage() {
       {/* Revenue Info */}
       <Card className="bg-gray-50">
         <CardContent className="p-6">
-          <h3 className="mb-2 font-semibold text-gray-900">Revenue Split</h3>
+          <h3 className="mb-2 font-semibold text-gray-900">{t("revenueSplit.title")}</h3>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <p className="text-2xl font-bold text-green-600">95%</p>
-              <p className="text-sm text-gray-600">You keep</p>
+              <p className="text-sm text-gray-600">{t("revenueSplit.youKeep")}</p>
             </div>
             <div>
               <p className="text-2xl font-bold text-sky-600">5%</p>
-              <p className="text-sm text-gray-600">Platform fee</p>
+              <p className="text-sm text-gray-600">{t("revenueSplit.platformFee")}</p>
             </div>
           </div>
-          <p className="mt-4 text-xs text-gray-500">
-            Payments are processed securely through Stripe and transferred to your account
-            automatically.
-          </p>
+          <p className="mt-4 text-xs text-gray-500">{t("revenueSplit.footer")}</p>
         </CardContent>
       </Card>
     </div>
