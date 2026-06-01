@@ -554,6 +554,55 @@
           "empty": "El comentario no puede estar vacío",
           "postFailed": "No se pudo publicar el comentario"
         }
+      },
+      "courses": {
+        "title": "Cursos",
+        "subtitle": "Crea y gestiona cursos para tu comunidad",
+        "createButton": "Crear curso",
+        "card": {
+          "published": "Publicado",
+          "draft": "Borrador",
+          "free": "Gratis",
+          "modulesCount": "{count, plural, =1 {# módulo} other {# módulos}}",
+          "enrolledCount": "{count, plural, =1 {# inscrito} other {# inscritos}}",
+          "edit": "Editar",
+          "publish": "Publicar",
+          "unpublish": "Despublicar"
+        },
+        "createDialog": {
+          "title": "Crear nuevo curso",
+          "titleLabel": "Título del curso",
+          "titlePlaceholder": "Ej. Introducción al marketing",
+          "slugLabel": "Slug de URL",
+          "slugPlaceholder": "introduccion-al-marketing",
+          "descriptionLabel": "Descripción",
+          "descriptionPlaceholder": "¿Qué aprenderán los estudiantes en este curso?",
+          "paidCourse": "Curso de pago",
+          "freeCourse": "Curso gratuito",
+          "paidHint": "Los estudiantes deberán pagar para acceder a este curso",
+          "freeHint": "Todos los miembros pueden acceder a este curso gratis",
+          "priceLabel": "Precio (USD)",
+          "pricePlaceholder": "29.99",
+          "cancel": "Cancelar",
+          "submit": "Crear curso"
+        },
+        "empty": {
+          "title": "Aún no hay cursos",
+          "description": "Crea tu primer curso para empezar a enseñar a tu comunidad",
+          "cta": "Crea tu primer curso"
+        },
+        "toasts": {
+          "communityNotFound": "Comunidad no encontrada",
+          "loadFailed": "No se pudieron cargar los cursos",
+          "created": "¡Curso creado!",
+          "createFailed": "No se pudo crear el curso",
+          "published": "¡Curso publicado!",
+          "unpublished": "Curso despublicado",
+          "updateFailed": "No se pudo actualizar el curso",
+          "deleted": "Curso eliminado",
+          "deleteFailed": "No se pudo eliminar el curso",
+          "deleteConfirm": "¿Seguro que quieres eliminar este curso? Esta acción no se puede deshacer."
+        }
       }
     },
     "calendar": {

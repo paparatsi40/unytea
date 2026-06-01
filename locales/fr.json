@@ -553,6 +553,55 @@
           "empty": "Le commentaire ne peut pas être vide",
           "postFailed": "Échec de la publication du commentaire"
         }
+      },
+      "courses": {
+        "title": "Cours",
+        "subtitle": "Créez et gérez les cours de votre communauté",
+        "createButton": "Créer un cours",
+        "card": {
+          "published": "Publié",
+          "draft": "Brouillon",
+          "free": "Gratuit",
+          "modulesCount": "{count, plural, =1 {# module} other {# modules}}",
+          "enrolledCount": "{count, plural, =1 {# inscrit} other {# inscrits}}",
+          "edit": "Modifier",
+          "publish": "Publier",
+          "unpublish": "Dépublier"
+        },
+        "createDialog": {
+          "title": "Créer un nouveau cours",
+          "titleLabel": "Titre du cours",
+          "titlePlaceholder": "Ex. Introduction au marketing",
+          "slugLabel": "Slug d'URL",
+          "slugPlaceholder": "introduction-au-marketing",
+          "descriptionLabel": "Description",
+          "descriptionPlaceholder": "Qu'apprendront les étudiants dans ce cours ?",
+          "paidCourse": "Cours payant",
+          "freeCourse": "Cours gratuit",
+          "paidHint": "Les étudiants devront payer pour accéder à ce cours",
+          "freeHint": "Tous les membres peuvent accéder gratuitement à ce cours",
+          "priceLabel": "Prix (USD)",
+          "pricePlaceholder": "29.99",
+          "cancel": "Annuler",
+          "submit": "Créer le cours"
+        },
+        "empty": {
+          "title": "Aucun cours pour le moment",
+          "description": "Créez votre premier cours pour commencer à enseigner à votre communauté",
+          "cta": "Créez votre premier cours"
+        },
+        "toasts": {
+          "communityNotFound": "Communauté introuvable",
+          "loadFailed": "Échec du chargement des cours",
+          "created": "Cours créé !",
+          "createFailed": "Échec de la création du cours",
+          "published": "Cours publié !",
+          "unpublished": "Cours dépublié",
+          "updateFailed": "Échec de la mise à jour du cours",
+          "deleted": "Cours supprimé",
+          "deleteFailed": "Échec de la suppression du cours",
+          "deleteConfirm": "Voulez-vous vraiment supprimer ce cours ? Cette action est irréversible."
+        }
       }
     },
     "calendar": {

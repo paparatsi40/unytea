@@ -19,6 +19,7 @@ import {
   ToggleRight,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import {
   createCourse,
   getCommunityCourses,
@@ -45,6 +46,7 @@ interface Course {
 }
 
 export default function CommunityCoursesPage() {
+  const t = useTranslations("dashboard.communityAdmin.courses");
   const params = useParams();
   const router = useRouter();
   const slug = params?.slug as string;
@@ -72,24 +74,23 @@ export default function CommunityCoursesPage() {
       // First get community ID from slug
       const res = await fetch(`/api/communities/${slug}`);
       if (!res.ok) {
-        toast.error("Community not found");
-        return;
-      }
-      const community = await res.json();
-      setCommunityId(community.id);
-
-      const result = await getCommunityCourses(community.id);
-      if (result.success && result.courses) {
-        setCourses(result.courses as unknown as Course[]);
+        toast.error(t("toasts.communityNotFound"));
       } else {
-        toast.error(result.error || "Failed to load courses");
+        const community = await res.json();
+        setCommunityId(community.id);
+
+        const result = await getCommunityCourses(community.id);
+        if (result.success && result.courses) {
+          setCourses(result.courses as unknown as Course[]);
+        } else {
+          toast.error(result.error || t("toasts.loadFailed"));
+        }
       }
     } catch (error) {
       console.error("Error fetching courses:", error);
-      toast.error("Failed to load courses");
-    } finally {
-      setIsLoading(false);
+      toast.error(t("toasts.loadFailed"));
     }
+    setIsLoading(false);
   }, [slug]);
 
   useEffect(() => {
@@ -126,20 +127,19 @@ export default function CommunityCoursesPage() {
       });
 
       if (result.success && result.course) {
-        toast.success("Course created!");
+        toast.success(t("toasts.created"));
         setShowCreateForm(false);
         setFormData({ title: "", slug: "", description: "", isPaid: false, price: 0 });
         // Navigate to the course builder
         router.push(`/dashboard/c/${slug}/courses/${result.course.id}`);
       } else {
-        toast.error(result.error || "Failed to create course");
+        toast.error(result.error || t("toasts.createFailed"));
       }
     } catch (error) {
       console.error("Error creating course:", error);
-      toast.error("Failed to create course");
-    } finally {
-      setIsSubmitting(false);
+      toast.error(t("toasts.createFailed"));
     }
+    setIsSubmitting(false);
   };
 
   const handleTogglePublish = async (course: Course) => {
@@ -147,23 +147,23 @@ export default function CommunityCoursesPage() {
       isPublished: !course.isPublished,
     });
     if (result.success) {
-      toast.success(course.isPublished ? "Course unpublished" : "Course published!");
+      toast.success(course.isPublished ? t("toasts.unpublished") : t("toasts.published"));
       fetchCourses();
     } else {
-      toast.error(result.error || "Failed to update course");
+      toast.error(result.error || t("toasts.updateFailed"));
     }
   };
 
   const handleDeleteCourse = async (courseId: string) => {
-    if (!confirm("Are you sure you want to delete this course? This action cannot be undone.")) {
+    if (!confirm(t("toasts.deleteConfirm"))) {
       return;
     }
     const result = await deleteCourse(courseId);
     if (result.success) {
-      toast.success("Course deleted");
+      toast.success(t("toasts.deleted"));
       fetchCourses();
     } else {
-      toast.error(result.error || "Failed to delete course");
+      toast.error(result.error || t("toasts.deleteFailed"));
     }
   };
 
@@ -184,8 +184,8 @@ export default function CommunityCoursesPage() {
             <GraduationCap className="h-6 w-6 text-purple-600" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Courses</h1>
-            <p className="text-sm text-gray-500">Create and manage courses for your community</p>
+            <h1 className="text-2xl font-bold text-gray-900">{t("title")}</h1>
+            <p className="text-sm text-gray-500">{t("subtitle")}</p>
           </div>
         </div>
 
@@ -194,7 +194,7 @@ export default function CommunityCoursesPage() {
           className="flex items-center gap-2 rounded-xl bg-purple-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-purple-700"
         >
           <Plus className="h-4 w-4" />
-          Create Course
+          {t("createButton")}
         </button>
       </div>
 
@@ -203,7 +203,7 @@ export default function CommunityCoursesPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-xl">
             <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
-              <h2 className="text-lg font-semibold text-gray-900">Create New Course</h2>
+              <h2 className="text-lg font-semibold text-gray-900">{t("createDialog.title")}</h2>
               <button
                 onClick={() => setShowCreateForm(false)}
                 className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
@@ -216,13 +216,13 @@ export default function CommunityCoursesPage() {
               {/* Title */}
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                  Course Title *
+                  {t("createDialog.titleLabel")} *
                 </label>
                 <input
                   type="text"
                   value={formData.title}
                   onChange={(e) => handleTitleChange(e.target.value)}
-                  placeholder="e.g. Introduction to Marketing"
+                  placeholder={t("createDialog.titlePlaceholder")}
                   required
                   className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
                 />
@@ -230,14 +230,16 @@ export default function CommunityCoursesPage() {
 
               {/* Slug */}
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-gray-700">URL Slug</label>
+                <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                  {t("createDialog.slugLabel")}
+                </label>
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-gray-400">/courses/</span>
                   <input
                     type="text"
                     value={formData.slug}
                     onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                    placeholder="introduction-to-marketing"
+                    placeholder={t("createDialog.slugPlaceholder")}
                     className="flex-1 rounded-lg border border-gray-200 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
                   />
                 </div>
@@ -246,12 +248,12 @@ export default function CommunityCoursesPage() {
               {/* Description */}
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                  Description
+                  {t("createDialog.descriptionLabel")}
                 </label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="What will students learn in this course?"
+                  placeholder={t("createDialog.descriptionPlaceholder")}
                   rows={3}
                   className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
                 />
@@ -264,12 +266,12 @@ export default function CommunityCoursesPage() {
                     <DollarSign className="h-5 w-5 text-gray-400" />
                     <div>
                       <p className="text-sm font-medium text-gray-900">
-                        {formData.isPaid ? "Paid Course" : "Free Course"}
+                        {formData.isPaid
+                          ? t("createDialog.paidCourse")
+                          : t("createDialog.freeCourse")}
                       </p>
                       <p className="text-xs text-gray-500">
-                        {formData.isPaid
-                          ? "Students will need to pay to access this course"
-                          : "All members can access this course for free"}
+                        {formData.isPaid ? t("createDialog.paidHint") : t("createDialog.freeHint")}
                       </p>
                     </div>
                   </div>
@@ -290,7 +292,7 @@ export default function CommunityCoursesPage() {
                 {formData.isPaid && (
                   <div className="mt-4 border-t border-gray-100 pt-4">
                     <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                      Price (USD) *
+                      {t("createDialog.priceLabel")} *
                     </label>
                     <div className="relative">
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">
@@ -307,7 +309,7 @@ export default function CommunityCoursesPage() {
                             price: parseFloat(e.target.value) || 0,
                           })
                         }
-                        placeholder="29.99"
+                        placeholder={t("createDialog.pricePlaceholder")}
                         className="w-full rounded-lg border border-gray-200 py-2.5 pl-8 pr-4 text-sm text-gray-900 placeholder-gray-400 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
                         required={formData.isPaid}
                       />
@@ -323,7 +325,7 @@ export default function CommunityCoursesPage() {
                   onClick={() => setShowCreateForm(false)}
                   className="rounded-lg border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
                 >
-                  Cancel
+                  {t("createDialog.cancel")}
                 </button>
                 <button
                   type="submit"
@@ -335,7 +337,7 @@ export default function CommunityCoursesPage() {
                   ) : (
                     <Plus className="h-4 w-4" />
                   )}
-                  Create Course
+                  {t("createDialog.submit")}
                 </button>
               </div>
             </form>
@@ -375,7 +377,7 @@ export default function CommunityCoursesPage() {
                     course.isPublished ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"
                   }`}
                 >
-                  {course.isPublished ? "Published" : "Draft"}
+                  {course.isPublished ? t("card.published") : t("card.draft")}
                 </span>
               </div>
 
@@ -387,7 +389,7 @@ export default function CommunityCoursesPage() {
               )}
               {!course.isPaid && (
                 <div className="absolute right-3 top-3 rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700">
-                  Free
+                  {t("card.free")}
                 </div>
               )}
 
@@ -404,11 +406,11 @@ export default function CommunityCoursesPage() {
                 <div className="mb-4 flex items-center gap-4 text-xs text-gray-500">
                   <div className="flex items-center gap-1">
                     <BookOpen className="h-3.5 w-3.5" />
-                    <span>{course._count.modules} modules</span>
+                    <span>{t("card.modulesCount", { count: course._count.modules })}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Users className="h-3.5 w-3.5" />
-                    <span>{course._count.enrollments} enrolled</span>
+                    <span>{t("card.enrolledCount", { count: course._count.enrollments })}</span>
                   </div>
                 </div>
 
@@ -419,12 +421,12 @@ export default function CommunityCoursesPage() {
                     className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-purple-50 px-3 py-2 text-xs font-medium text-purple-700 transition-colors hover:bg-purple-100"
                   >
                     <Pencil className="h-3.5 w-3.5" />
-                    Edit
+                    {t("card.edit")}
                   </button>
                   <button
                     onClick={() => handleTogglePublish(course)}
                     className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-50"
-                    title={course.isPublished ? "Unpublish" : "Publish"}
+                    title={course.isPublished ? t("card.unpublish") : t("card.publish")}
                   >
                     {course.isPublished ? (
                       <EyeOff className="h-3.5 w-3.5" />
@@ -447,16 +449,14 @@ export default function CommunityCoursesPage() {
         /* Empty State */
         <div className="rounded-xl border border-gray-200 bg-white p-12 text-center shadow-sm">
           <GraduationCap className="mx-auto mb-4 h-16 w-16 text-gray-300" />
-          <h3 className="mb-2 text-lg font-semibold text-gray-900">No courses yet</h3>
-          <p className="mb-6 text-sm text-gray-500">
-            Create your first course to start teaching your community
-          </p>
+          <h3 className="mb-2 text-lg font-semibold text-gray-900">{t("empty.title")}</h3>
+          <p className="mb-6 text-sm text-gray-500">{t("empty.description")}</p>
           <button
             onClick={() => setShowCreateForm(true)}
             className="inline-flex items-center gap-2 rounded-xl bg-purple-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-purple-700"
           >
             <Plus className="h-4 w-4" />
-            Create Your First Course
+            {t("empty.cta")}
           </button>
         </div>
       )}

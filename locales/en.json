@@ -554,6 +554,55 @@
           "empty": "Comment cannot be empty",
           "postFailed": "Failed to post comment"
         }
+      },
+      "courses": {
+        "title": "Courses",
+        "subtitle": "Create and manage courses for your community",
+        "createButton": "Create Course",
+        "card": {
+          "published": "Published",
+          "draft": "Draft",
+          "free": "Free",
+          "modulesCount": "{count, plural, =1 {# module} other {# modules}}",
+          "enrolledCount": "{count, plural, =1 {# enrolled} other {# enrolled}}",
+          "edit": "Edit",
+          "publish": "Publish",
+          "unpublish": "Unpublish"
+        },
+        "createDialog": {
+          "title": "Create New Course",
+          "titleLabel": "Course Title",
+          "titlePlaceholder": "e.g. Introduction to Marketing",
+          "slugLabel": "URL Slug",
+          "slugPlaceholder": "introduction-to-marketing",
+          "descriptionLabel": "Description",
+          "descriptionPlaceholder": "What will students learn in this course?",
+          "paidCourse": "Paid Course",
+          "freeCourse": "Free Course",
+          "paidHint": "Students will need to pay to access this course",
+          "freeHint": "All members can access this course for free",
+          "priceLabel": "Price (USD)",
+          "pricePlaceholder": "29.99",
+          "cancel": "Cancel",
+          "submit": "Create Course"
+        },
+        "empty": {
+          "title": "No courses yet",
+          "description": "Create your first course to start teaching your community",
+          "cta": "Create Your First Course"
+        },
+        "toasts": {
+          "communityNotFound": "Community not found",
+          "loadFailed": "Failed to load courses",
+          "created": "Course created!",
+          "createFailed": "Failed to create course",
+          "published": "Course published!",
+          "unpublished": "Course unpublished",
+          "updateFailed": "Failed to update course",
+          "deleted": "Course deleted",
+          "deleteFailed": "Failed to delete course",
+          "deleteConfirm": "Are you sure you want to delete this course? This action cannot be undone."
+        }
       }
     },
     "calendar": {
