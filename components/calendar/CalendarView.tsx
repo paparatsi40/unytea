@@ -14,6 +14,8 @@ import {
   addMonths,
   subMonths,
 } from "date-fns";
+import { enUS, es, fr } from "date-fns/locale";
+import { useLocale, useTranslations } from "next-intl";
 import {
   ChevronLeft,
   ChevronRight,
@@ -23,6 +25,8 @@ import {
   Download,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+const DATE_FNS_LOCALES = { en: enUS, es, fr } as const;
 
 export interface CalendarSession {
   id: string;
@@ -44,8 +48,19 @@ interface CalendarViewProps {
 }
 
 export function CalendarView({ sessions, onSessionClick }: CalendarViewProps) {
+  const t = useTranslations("dashboard.calendar");
+  const locale = useLocale();
+  const dfLocale = DATE_FNS_LOCALES[locale as keyof typeof DATE_FNS_LOCALES] ?? enUS;
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+
+  // Status label: special-cases live, falls back to the raw lowercased status
+  // when no translation key exists (forward-compatible with new statuses).
+  const getStatusLabel = (status: string) => {
+    if (status === "IN_PROGRESS") return t("live");
+    const key = `status.${status.toLowerCase()}`;
+    return t.has(key) ? t(key) : status.toLowerCase();
+  };
 
   // Build calendar grid
   const calendarDays = useMemo(() => {
@@ -95,7 +110,7 @@ export function CalendarView({ sessions, onSessionClick }: CalendarViewProps) {
       `DTSTART:${formatICSDate(start)}`,
       `DTEND:${formatICSDate(end)}`,
       `SUMMARY:${session.title}`,
-      `DESCRIPTION:${session.communityName ? `Community: ${session.communityName}` : "Unytea Session"}`,
+      `DESCRIPTION:${session.communityName ? `${t("ics.communityPrefix")}: ${session.communityName}` : t("ics.defaultDescription")}`,
       `URL:${window.location.origin}/dashboard/sessions/${session.id}`,
       "END:VEVENT",
       "END:VCALENDAR",
@@ -123,7 +138,7 @@ export function CalendarView({ sessions, onSessionClick }: CalendarViewProps) {
       action: "TEMPLATE",
       text: session.title,
       dates: `${fmt(start)}/${fmt(end)}`,
-      details: `Unytea Session${session.communityName ? ` - ${session.communityName}` : ""}`,
+      details: `${t("ics.defaultDescription")}${session.communityName ? ` - ${session.communityName}` : ""}`,
     });
     return `https://calendar.google.com/calendar/render?${params.toString()}`;
   };
@@ -134,7 +149,9 @@ export function CalendarView({ sessions, onSessionClick }: CalendarViewProps) {
       <div className="flex-1">
         {/* Month Navigation */}
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-white">{format(currentMonth, "MMMM yyyy")}</h2>
+          <h2 className="text-lg font-semibold text-white">
+            {format(currentMonth, "MMMM yyyy", { locale: dfLocale })}
+          </h2>
           <div className="flex items-center gap-1">
             <button
               onClick={() => {
@@ -143,16 +160,18 @@ export function CalendarView({ sessions, onSessionClick }: CalendarViewProps) {
               }}
               className="rounded-lg px-3 py-1.5 text-xs font-medium text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-white"
             >
-              Today
+              {t("nav.today")}
             </button>
             <button
               onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
+              aria-label={t("nav.previousMonth")}
               className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-white"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
             <button
               onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
+              aria-label={t("nav.nextMonth")}
               className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-white"
             >
               <ChevronRight className="h-4 w-4" />
@@ -160,11 +179,14 @@ export function CalendarView({ sessions, onSessionClick }: CalendarViewProps) {
           </div>
         </div>
 
-        {/* Day Headers */}
+        {/* Day Headers — localized short weekday names via date-fns (first calendar week) */}
         <div className="mb-2 grid grid-cols-7 gap-1">
-          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-            <div key={day} className="py-2 text-center text-xs font-medium text-zinc-500">
-              {day}
+          {calendarDays.slice(0, 7).map((day) => (
+            <div
+              key={format(day, "yyyy-MM-dd")}
+              className="py-2 text-center text-xs font-medium text-zinc-500"
+            >
+              {format(day, "EEE", { locale: dfLocale })}
             </div>
           ))}
         </div>
@@ -217,15 +239,15 @@ export function CalendarView({ sessions, onSessionClick }: CalendarViewProps) {
           <h3 className="mb-4 text-sm font-medium text-zinc-400">
             {selectedDate
               ? isToday(selectedDate)
-                ? "Today"
-                : format(selectedDate, "EEEE, MMMM d")
-              : "Select a date"}
+                ? t("nav.today")
+                : format(selectedDate, "EEEE, MMMM d", { locale: dfLocale })
+              : t("selectDate")}
           </h3>
 
           {selectedDateSessions.length === 0 ? (
             <div className="flex flex-col items-center py-8 text-center">
               <CalendarIcon className="mb-3 h-10 w-10 text-zinc-700" />
-              <p className="text-sm text-zinc-500">No sessions scheduled</p>
+              <p className="text-sm text-zinc-500">{t("noSessions")}</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -239,9 +261,11 @@ export function CalendarView({ sessions, onSessionClick }: CalendarViewProps) {
                   <div className="mb-2 flex items-center gap-2">
                     <Clock className="h-3.5 w-3.5 text-purple-400" />
                     <span className="text-xs font-medium text-purple-300">
-                      {format(new Date(session.scheduledAt), "h:mm a")}
+                      {format(new Date(session.scheduledAt), "h:mm a", { locale: dfLocale })}
                     </span>
-                    <span className="text-xs text-zinc-600">{session.duration}min</span>
+                    <span className="text-xs text-zinc-600">
+                      {t("durationMinutes", { minutes: session.duration })}
+                    </span>
                     <span
                       className={cn(
                         "ml-auto rounded-full px-2 py-0.5 text-xs font-medium",
@@ -252,7 +276,7 @@ export function CalendarView({ sessions, onSessionClick }: CalendarViewProps) {
                             : "bg-zinc-700 text-zinc-400"
                       )}
                     >
-                      {session.status === "IN_PROGRESS" ? "Live" : session.status.toLowerCase()}
+                      {getStatusLabel(session.status)}
                     </span>
                   </div>
 
@@ -267,7 +291,7 @@ export function CalendarView({ sessions, onSessionClick }: CalendarViewProps) {
                         {session.communityName}
                       </span>
                     )}
-                    {session.hostName && <span>by {session.hostName}</span>}
+                    {session.hostName && <span>{t("by", { name: session.hostName })}</span>}
                   </div>
 
                   {/* Export buttons (visible on hover) */}
@@ -279,7 +303,7 @@ export function CalendarView({ sessions, onSessionClick }: CalendarViewProps) {
                       onClick={(e) => e.stopPropagation()}
                       className="rounded-md bg-zinc-700/50 px-2 py-1 text-xs text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-white"
                     >
-                      Google Cal
+                      {t("exportGoogle")}
                     </a>
                     <button
                       onClick={(e) => {

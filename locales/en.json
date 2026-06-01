@@ -345,7 +345,27 @@
   "dashboard": {
     "calendar": {
       "title": "Calendar",
-      "subtitle": "All your sessions across communities"
+      "subtitle": "All your sessions across communities",
+      "nav": {
+        "today": "Today",
+        "previousMonth": "Previous month",
+        "nextMonth": "Next month"
+      },
+      "selectDate": "Select a date",
+      "noSessions": "No sessions scheduled",
+      "durationMinutes": "{minutes} min",
+      "live": "Live",
+      "status": {
+        "scheduled": "scheduled",
+        "completed": "completed",
+        "cancelled": "cancelled"
+      },
+      "by": "by {name}",
+      "exportGoogle": "Google Cal",
+      "ics": {
+        "communityPrefix": "Community",
+        "defaultDescription": "Unytea Session"
+      }
     },
     "profile": {
       "loading": "Loading...",

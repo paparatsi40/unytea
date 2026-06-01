@@ -344,7 +344,27 @@
   "dashboard": {
     "calendar": {
       "title": "Calendrier",
-      "subtitle": "Toutes vos sessions dans vos communautés"
+      "subtitle": "Toutes vos sessions dans vos communautés",
+      "nav": {
+        "today": "Aujourd'hui",
+        "previousMonth": "Mois précédent",
+        "nextMonth": "Mois suivant"
+      },
+      "selectDate": "Sélectionnez une date",
+      "noSessions": "Aucune session planifiée",
+      "durationMinutes": "{minutes} min",
+      "live": "En direct",
+      "status": {
+        "scheduled": "planifiée",
+        "completed": "terminée",
+        "cancelled": "annulée"
+      },
+      "by": "par {name}",
+      "exportGoogle": "Google Cal",
+      "ics": {
+        "communityPrefix": "Communauté",
+        "defaultDescription": "Session Unytea"
+      }
     },
     "profile": {
       "loading": "Chargement...",
