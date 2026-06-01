@@ -55,7 +55,22 @@
         "applying": "Applying...",
         "successToast": "Default template applied",
         "errorToast": "Failed to apply template",
-        "confirmReset": "This will replace your current landing page layout with the default template. Continue?"
+        "confirmReset": "This will replace your current landing page layout with the default template. Continue?",
+        "loadFailedToast": "Failed to load landing page settings",
+        "saveSuccessToast": "Landing page saved successfully!",
+        "saveFailedToast": "Failed to save landing page",
+        "builderTitle": "Landing Page Builder",
+        "builderSubtitle": "Build your landing page with pre-designed sections",
+        "preview": "Preview",
+        "help": {
+          "title": "How to use the Section Builder",
+          "addSections": "<b>Add sections</b> from the left panel by clicking on them",
+          "reorder": "<b>Reorder sections</b> using the ↑/↓ buttons in the layers panel",
+          "editContent": "<b>Edit content</b> by selecting a section and using the properties panel on the right",
+          "previewRealtime": "<b>Preview in real-time</b> in the center panel",
+          "saveChanges": "<b>Save your changes</b> using the Save button",
+          "responsive": "<b>All sections are responsive</b> and work perfectly on mobile devices"
+        }
       },
       "sectionBuilder": {
         "placeholder": {
@@ -967,6 +982,38 @@
             "connectLinkFailed": "Failed to create onboarding link",
             "saveFailed": "Failed to save settings. Please try again.",
             "saveServerFailed": "Failed to save payment settings"
+          }
+        },
+        "appearance": {
+          "title": "Appearance",
+          "subtitle": "Customize your community layout and branding experience",
+          "cardTitle": "Customize appearance",
+          "cardDescription": "Use the tools below to control how your community looks for visitors and members.",
+          "landingBuilderButton": "Landing page builder",
+          "sectionPresetsButton": "Section presets"
+        },
+        "members": {
+          "title": "Members",
+          "subtitle": "Manage roles, approve requests, and remove members."
+        },
+        "memberDirectory": {
+          "notFound": "Community not found",
+          "title": "Members",
+          "subtitle": "{count, plural, =1 {Connect with # amazing person in this community} other {Connect with # amazing people in this community}}",
+          "searchPlaceholder": "Search by name, skills, or bio...",
+          "sort": {
+            "recent": "Recently Joined",
+            "name": "Name (A-Z)"
+          },
+          "filters": {
+            "all": "All",
+            "available": "Available",
+            "mentoring": "Mentoring"
+          },
+          "resultsCount": "{count, plural, =1 {# member} other {# members}}",
+          "empty": {
+            "title": "No members found",
+            "hint": "Try adjusting your search or filters"
           }
         }
       }

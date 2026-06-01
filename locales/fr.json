@@ -55,7 +55,22 @@
         "applying": "Application...",
         "successToast": "Modèle par défaut appliqué",
         "errorToast": "Échec de l'application du modèle",
-        "confirmReset": "Cela remplacera votre disposition actuelle de page communautaire par le modèle par défaut. Continuer ?"
+        "confirmReset": "Cela remplacera votre disposition actuelle de page communautaire par le modèle par défaut. Continuer ?",
+        "loadFailedToast": "Échec du chargement des paramètres de la page d'accueil",
+        "saveSuccessToast": "Page d'accueil enregistrée avec succès !",
+        "saveFailedToast": "Échec de l'enregistrement de la page d'accueil",
+        "builderTitle": "Constructeur de page d'accueil",
+        "builderSubtitle": "Composez votre page d'accueil avec des sections prédéfinies",
+        "preview": "Aperçu",
+        "help": {
+          "title": "Comment utiliser le constructeur de sections",
+          "addSections": "<b>Ajoutez des sections</b> depuis le panneau de gauche en cliquant dessus",
+          "reorder": "<b>Réorganisez les sections</b> à l'aide des boutons ↑/↓ du panneau des calques",
+          "editContent": "<b>Modifiez le contenu</b> en sélectionnant une section et en utilisant le panneau des propriétés à droite",
+          "previewRealtime": "<b>Prévisualisez en temps réel</b> dans le panneau central",
+          "saveChanges": "<b>Enregistrez vos modifications</b> avec le bouton Enregistrer",
+          "responsive": "<b>Toutes les sections sont adaptatives</b> et fonctionnent parfaitement sur mobile"
+        }
       },
       "sectionBuilder": {
         "placeholder": {
@@ -969,6 +984,38 @@
             "connectLinkFailed": "Échec de la création du lien d'onboarding",
             "saveFailed": "Échec de l'enregistrement des paramètres. Veuillez réessayer.",
             "saveServerFailed": "Échec de l'enregistrement des paramètres de paiement"
+          }
+        },
+        "appearance": {
+          "title": "Apparence",
+          "subtitle": "Personnalisez la disposition et l'identité visuelle de votre communauté",
+          "cardTitle": "Personnaliser l'apparence",
+          "cardDescription": "Utilisez les outils ci-dessous pour contrôler l'apparence de votre communauté pour les visiteurs et les membres.",
+          "landingBuilderButton": "Constructeur de page d'accueil",
+          "sectionPresetsButton": "Préréglages de sections"
+        },
+        "members": {
+          "title": "Membres",
+          "subtitle": "Gérez les rôles, approuvez les demandes et retirez des membres."
+        },
+        "memberDirectory": {
+          "notFound": "Communauté introuvable",
+          "title": "Membres",
+          "subtitle": "{count, plural, =1 {Connectez-vous avec # personne formidable de cette communauté} other {Connectez-vous avec # personnes formidables de cette communauté}}",
+          "searchPlaceholder": "Rechercher par nom, compétences ou bio...",
+          "sort": {
+            "recent": "Plus récents",
+            "name": "Nom (A-Z)"
+          },
+          "filters": {
+            "all": "Tous",
+            "available": "Disponible",
+            "mentoring": "Mentorat"
+          },
+          "resultsCount": "{count, plural, =1 {# membre} other {# membres}}",
+          "empty": {
+            "title": "Aucun membre trouvé",
+            "hint": "Essayez d'ajuster votre recherche ou vos filtres"
           }
         }
       }

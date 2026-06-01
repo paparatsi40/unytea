@@ -4,10 +4,12 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { MemberDirectory } from "@/components/members/MemberDirectory";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export default function CommunityMembers() {
   const params = useParams();
   const slug = (params?.slug as string) || "";
+  const tDir = useTranslations("dashboard.communityAdmin.settings.memberDirectory");
   const [communityId, setCommunityId] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
 
@@ -25,9 +27,8 @@ export default function CommunityMembers() {
       }
     } catch (error) {
       console.error("Error loading community:", error);
-    } finally {
-      setIsLoading(false);
     }
+    setIsLoading(false);
   };
 
   if (isLoading) {
@@ -41,7 +42,7 @@ export default function CommunityMembers() {
   if (!communityId) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <p className="text-gray-600">Community not found</p>
+        <p className="text-gray-600">{tDir("notFound")}</p>
       </div>
     );
   }
