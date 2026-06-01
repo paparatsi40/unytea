@@ -343,6 +343,228 @@
     "continue": "Continuar"
   },
   "dashboard": {
+    "library": {
+      "title": "Biblioteca",
+      "subtitle": "Tus cursos, grabaciones y recursos",
+      "tabs": {
+        "courses": "Cursos",
+        "recordings": "Grabaciones",
+        "resources": "Recursos"
+      },
+      "courses": {
+        "failedToLoad": "Error al cargar los cursos",
+        "genericError": "Ocurrió un error",
+        "browse": "Explorar cursos",
+        "totalEnrolled": "Inscripciones totales",
+        "inProgress": "En progreso",
+        "completed": "Completados",
+        "continueLearning": "Continuar aprendiendo",
+        "notStarted": "Sin empezar",
+        "noCoursesTitle": "Aún no hay cursos",
+        "noCoursesBody": "Explora los cursos disponibles y empieza a aprender hoy"
+      },
+      "recordings": {
+        "newSession": "Nueva sesión",
+        "nextLiveSession": "Próxima sesión en vivo",
+        "viewSession": "Ver sesión",
+        "totalRecordings": "Grabaciones totales",
+        "totalContent": "Contenido total",
+        "totalParticipants": "Participantes totales",
+        "noRecordingsTitle": "Aún no hay grabaciones",
+        "noRecordingsBody": "Inicia una sesión en vivo y grábala para construir tu biblioteca",
+        "createFirstSession": "Crear primera sesión",
+        "recordingBadge": "Grabación",
+        "noDescription": "Sin descripción",
+        "participants": "{count, plural, =1 {1 participante} other {# participantes}}",
+        "watch": "Ver",
+        "addToCourse": "Agregar a curso",
+        "proTipTitle": "💡 Consejo",
+        "proTipBody": "Las grabaciones se guardan automáticamente después de cada sesión en vivo. Úsalas para:",
+        "proTip1": "Agregarlas a tus cursos como contenido premium",
+        "proTip2": "Compartirlas con members que se perdieron la sesión en vivo",
+        "proTip3": "Reutilizarlas como clips cortos para redes sociales"
+      },
+      "resources": {
+        "loading": "Cargando tu biblioteca de conocimiento...",
+        "buildCourse": "Crear un curso desde sesiones",
+        "coursePotential": "Potencial de curso",
+        "suggestionMeta": "{sessions} sesiones · {hours}h en total",
+        "potentialStudents": "Estudiantes potenciales",
+        "totalAttendees": "Asistentes totales",
+        "engagementScore": "Puntuación de engagement",
+        "scoreValue": "{value}/100",
+        "createCourse": "Crear curso",
+        "knowledgeImpact": "Tu impacto de conocimiento",
+        "sessionsRecorded": "Sesiones grabadas",
+        "coursesCreated": "Cursos creados",
+        "conversionRate": "{rate}% de conversión",
+        "studentsLearning": "Estudiantes aprendiendo",
+        "lessonsCreated": "Lecciones creadas",
+        "bestSessions": "Mejores sesiones",
+        "bestSessionMeta": "{community} · {count} asistentes",
+        "communityFallback": "Comunidad",
+        "open": "Abrir",
+        "keyTopics": "Temas clave",
+        "topicsEmpty": "Los temas aparecerán a medida que se acumulen las sesiones.",
+        "curatedRecordings": "Grabaciones destacadas",
+        "viewRecordings": "Ver grabaciones",
+        "curatedMeta": "{count} asistentes · {duration} min",
+        "watch": "Ver",
+        "sessionsReadyToConvert": "Sesiones listas para convertir",
+        "selectMultiple": "Seleccionar varias",
+        "convertibleMeta": "{community} · {duration} min · {count} asistentes",
+        "score": "Puntuación: {score}/100",
+        "view": "Ver",
+        "viewAllSessions": "Ver las {count} sesiones",
+        "emptyTitleConvertible": "Aún no hay grabaciones convertibles",
+        "emptyTitleNone": "Aún no hay sesiones para convertir",
+        "emptyBodyConvertible": "Ya tienes sesiones completadas. Abre Grabaciones para revisar el estado y convertir las que estén listas para cursos.",
+        "emptyBodyNone": "Las sesiones en vivo completadas con grabaciones aparecerán aquí, listas para convertirse en cursos.",
+        "openRecordings": "Abrir grabaciones",
+        "hostFirstSession": "Organiza tu primera sesión",
+        "toastLoadError": "Error al cargar los datos",
+        "toastCourseCreated": "¡Curso creado con éxito!"
+      }
+    },
+    "home": {
+      "welcomeBack": "Bienvenido, {name}",
+      "subtitle": "Esto es lo que está pasando en tus comunidades hoy.",
+      "createCommunity": "Crear comunidad",
+      "onboarding": {
+        "profile": {
+          "title": "Completa tu perfil",
+          "description": "Agrega tu bio, intereses y una foto"
+        },
+        "post": {
+          "title": "Crea tu primera publicación",
+          "description": "Preséntate ante la comunidad"
+        },
+        "session": {
+          "title": "Asiste a una sesión en vivo",
+          "description": "Únete a una sesión para aprender y conectar"
+        },
+        "lesson": {
+          "title": "Completa una lección",
+          "description": "Empieza a aprender de un curso"
+        },
+        "buddy": {
+          "title": "Encuentra un compañero de responsabilidad",
+          "description": "Emparéjate con alguien para crecer juntos"
+        }
+      },
+      "actionFirst": {
+        "noSessions": "No tienes sesiones esta semana. Programa la primera.",
+        "fewSessions": "{count} sesión esta semana. Mantén el ritmo.",
+        "manySessions": "{count} sesiones esta semana. Buen ritmo.",
+        "scheduleSession": "Programar sesión"
+      },
+      "analytics": {
+        "title": "Esta semana",
+        "viewFull": "Ver analytics completos",
+        "sessions": "Sesiones",
+        "newMembers": "Miembros nuevos",
+        "posts": "Publicaciones",
+        "vsLastWeek": "vs semana pasada"
+      },
+      "nextLiveSession": {
+        "title": "Próxima sesión en vivo",
+        "joinNow": "Unirse ahora",
+        "viewDetails": "Ver detalles",
+        "minutes": "{minutes} min"
+      },
+      "yourCommunities": {
+        "title": "Tus comunidades",
+        "viewAll": "Ver todas",
+        "memberCount": "{count, plural, =1 {1 miembro} other {# miembros}}",
+        "ownerBadge": "Dueño",
+        "memberBadge": "Miembro"
+      },
+      "recentActivity": {
+        "title": "Actividad reciente",
+        "noActivity": "No hay actividad reciente. Aparecerá aquí a medida que crezcan tus comunidades.",
+        "newMember": "{actor} se unió a {community}",
+        "newPost": "{actor} publicó en {community}"
+      },
+      "quickActions": {
+        "title": "Acciones rápidas",
+        "createSession": "Crear sesión",
+        "createPost": "Crear publicación",
+        "inviteMember": "Invitar miembro",
+        "viewAnalytics": "Ver analíticas",
+        "openSettings": "Configuración"
+      }
+    },
+    "notifications": {
+      "openNotifications": "Abrir notificaciones",
+      "title": "Notificaciones",
+      "markAllRead": "Marcar todas como leídas",
+      "markAsRead": "Marcar como leída",
+      "delete": "Eliminar",
+      "viewAll": "Ver todas las notificaciones",
+      "empty": "No hay notificaciones todavía",
+      "loading": "Cargando notificaciones..."
+    },
+    "billing": {
+      "title": "Facturación",
+      "subtitle": "Administra tu plan y suscripción de Unytea",
+      "noPlan": "Sin plan activo",
+      "currentPlan": "Plan actual: {plan}",
+      "manageSubscription": "Administrar suscripción",
+      "statusLabel": "Estado:",
+      "renews": "Se renueva: {date}",
+      "willCancel": "Se cancelará al final del período",
+      "selectPlanTrial": "Selecciona un plan para empezar tu prueba gratuita de 14 días.",
+      "currentPlanDescription": "Tu plan actual y suscripción de Unytea.",
+      "yourPlanBadge": "Tu plan",
+      "popularBadge": "Popular",
+      "currentPlanButton": "Plan actual",
+      "lowerPlan": "Plan inferior",
+      "upgradeTo": "Mejorar a {plan}",
+      "perMonth": "/mes",
+      "paymentMethods": "Métodos de pago",
+      "paymentMethodsDescription": "Administra tus métodos de pago e historial de facturación",
+      "paymentMethodsStripe": "Administra tus métodos de pago directamente en el portal de Stripe.",
+      "openBillingPortal": "Abrir portal de facturación",
+      "noPaymentMethods": "Sin métodos de pago",
+      "autoAddedOnUpgrade": "Se agrega automáticamente al hacer upgrade",
+      "portalError": "Error al abrir el portal de facturación",
+      "checkoutError": "Error al iniciar el checkout",
+      "plans": {
+        "CREATOR": {
+          "description": "Para creators emergentes lanzando su primera comunidad",
+          "features": [
+            "Comunidad ilimitada de members",
+            "Live sessions hasta 100 participantes concurrentes",
+            "Cursos pagados",
+            "Feed y biblioteca de comunidad",
+            "Analíticas básicas",
+            "8% de comisión sobre ingresos de members"
+          ]
+        },
+        "BUSINESS": {
+          "description": "Para hosts establecidos creciendo su comunidad",
+          "features": [
+            "Todo lo de Creator",
+            "Live sessions hasta 300 participantes concurrentes",
+            "Dominio personalizado",
+            "Analíticas avanzadas",
+            "Hasta 5 admins",
+            "5% de comisión sobre ingresos de members"
+          ]
+        },
+        "PRO": {
+          "description": "Para teams escalando múltiples comunidades",
+          "features": [
+            "Todo lo de Business",
+            "Live sessions hasta 1000 participantes concurrentes",
+            "Experiencia white-label",
+            "Acceso a API",
+            "Admins ilimitados",
+            "3% de comisión sobre ingresos de members"
+          ]
+        }
+      }
+    },
     "title": "Panel",
     "welcome": "Bienvenido de vuelta",
     "stats": {
@@ -563,13 +785,8 @@
       "dashboard": "Panel",
       "explore": "Explorar",
       "communities": "Comunidades",
+      "library": "Biblioteca",
       "messages": "Mensajes",
-      "sessions": "Sesiones",
-      "recordings": "Grabaciones",
-      "knowledgeLibrary": "Biblioteca de conocimiento",
-      "courses": "Cursos",
-      "analytics": "Analíticas",
-      "notifications": "Notificaciones",
       "settings": "Configuración"
     },
     "upgrade": {

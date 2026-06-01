@@ -342,6 +342,228 @@
     "continue": "Continuer"
   },
   "dashboard": {
+    "library": {
+      "title": "Bibliothèque",
+      "subtitle": "Vos cours, enregistrements et ressources",
+      "tabs": {
+        "courses": "Cours",
+        "recordings": "Enregistrements",
+        "resources": "Ressources"
+      },
+      "courses": {
+        "failedToLoad": "Échec du chargement des cours",
+        "genericError": "Une erreur s'est produite",
+        "browse": "Parcourir les cours",
+        "totalEnrolled": "Total inscrits",
+        "inProgress": "En cours",
+        "completed": "Terminés",
+        "continueLearning": "Continuer l'apprentissage",
+        "notStarted": "Non commencés",
+        "noCoursesTitle": "Aucun cours pour l'instant",
+        "noCoursesBody": "Parcourez les cours disponibles et commencez à apprendre dès aujourd'hui"
+      },
+      "recordings": {
+        "newSession": "Nouvelle session",
+        "nextLiveSession": "Prochaine session en direct",
+        "viewSession": "Voir la session",
+        "totalRecordings": "Total des enregistrements",
+        "totalContent": "Contenu total",
+        "totalParticipants": "Total des participants",
+        "noRecordingsTitle": "Aucun enregistrement pour l'instant",
+        "noRecordingsBody": "Démarrez une session en direct et enregistrez-la pour construire votre bibliothèque",
+        "createFirstSession": "Créer la première session",
+        "recordingBadge": "Enregistrement",
+        "noDescription": "Aucune description",
+        "participants": "{count, plural, =1 {1 participant} other {# participants}}",
+        "watch": "Regarder",
+        "addToCourse": "Ajouter au cours",
+        "proTipTitle": "💡 Astuce",
+        "proTipBody": "Les enregistrements sont sauvegardés automatiquement après chaque session en direct. Utilisez-les pour :",
+        "proTip1": "Les ajouter à vos cours comme contenu premium",
+        "proTip2": "Les partager avec les membres qui ont manqué la session en direct",
+        "proTip3": "Les réutiliser comme courts clips pour les réseaux sociaux"
+      },
+      "resources": {
+        "loading": "Chargement de votre bibliothèque de connaissances...",
+        "buildCourse": "Créer un cours à partir de sessions",
+        "coursePotential": "Potentiel de cours",
+        "suggestionMeta": "{sessions} sessions · {hours} h au total",
+        "potentialStudents": "Étudiants potentiels",
+        "totalAttendees": "Total des participants",
+        "engagementScore": "Score d'engagement",
+        "scoreValue": "{value}/100",
+        "createCourse": "Créer un cours",
+        "knowledgeImpact": "Votre impact de connaissance",
+        "sessionsRecorded": "Sessions enregistrées",
+        "coursesCreated": "Cours créés",
+        "conversionRate": "{rate}% de conversion",
+        "studentsLearning": "Étudiants en apprentissage",
+        "lessonsCreated": "Leçons créées",
+        "bestSessions": "Meilleures sessions",
+        "bestSessionMeta": "{community} · {count} participants",
+        "communityFallback": "Communauté",
+        "open": "Ouvrir",
+        "keyTopics": "Sujets clés",
+        "topicsEmpty": "Les sujets apparaîtront à mesure que les sessions s'accumulent.",
+        "curatedRecordings": "Enregistrements sélectionnés",
+        "viewRecordings": "Voir les enregistrements",
+        "curatedMeta": "{count} participants · {duration} min",
+        "watch": "Regarder",
+        "sessionsReadyToConvert": "Sessions prêtes à convertir",
+        "selectMultiple": "Sélectionner plusieurs",
+        "convertibleMeta": "{community} · {duration} min · {count} participants",
+        "score": "Score : {score}/100",
+        "view": "Voir",
+        "viewAllSessions": "Voir les {count} sessions",
+        "emptyTitleConvertible": "Aucun enregistrement convertible pour l'instant",
+        "emptyTitleNone": "Aucune session à convertir pour l'instant",
+        "emptyBodyConvertible": "Vous avez déjà des sessions terminées. Ouvrez Enregistrements pour vérifier le statut et convertir celles qui sont prêtes pour des cours.",
+        "emptyBodyNone": "Les sessions en direct terminées avec enregistrements apparaîtront ici, prêtes à être transformées en cours.",
+        "openRecordings": "Ouvrir les enregistrements",
+        "hostFirstSession": "Animez votre première session",
+        "toastLoadError": "Échec du chargement des données",
+        "toastCourseCreated": "Cours créé avec succès !"
+      }
+    },
+    "home": {
+      "welcomeBack": "Bon retour, {name}",
+      "subtitle": "Voici ce qui se passe dans vos communautés aujourd'hui.",
+      "createCommunity": "Créer une communauté",
+      "onboarding": {
+        "profile": {
+          "title": "Complétez votre profil",
+          "description": "Ajoutez votre bio, vos intérêts et une photo"
+        },
+        "post": {
+          "title": "Créez votre première publication",
+          "description": "Présentez-vous à la communauté"
+        },
+        "session": {
+          "title": "Assistez à une session en direct",
+          "description": "Rejoignez une session pour apprendre et échanger"
+        },
+        "lesson": {
+          "title": "Terminez une leçon",
+          "description": "Commencez à apprendre avec un cours"
+        },
+        "buddy": {
+          "title": "Trouvez un partenaire de responsabilité",
+          "description": "Faites-vous jumeler avec quelqu'un pour progresser ensemble"
+        }
+      },
+      "actionFirst": {
+        "noSessions": "Vous n'avez aucune session cette semaine. Planifiez la première.",
+        "fewSessions": "{count} session cette semaine. Gardez le rythme.",
+        "manySessions": "{count} sessions cette semaine. Excellent rythme.",
+        "scheduleSession": "Planifier une session"
+      },
+      "analytics": {
+        "title": "Cette semaine",
+        "viewFull": "Voir les analyses complètes",
+        "sessions": "Sessions",
+        "newMembers": "Nouveaux membres",
+        "posts": "Publications",
+        "vsLastWeek": "vs semaine dernière"
+      },
+      "nextLiveSession": {
+        "title": "Prochaine session en direct",
+        "joinNow": "Rejoindre maintenant",
+        "viewDetails": "Voir les détails",
+        "minutes": "{minutes} min"
+      },
+      "yourCommunities": {
+        "title": "Vos communautés",
+        "viewAll": "Voir tout",
+        "memberCount": "{count, plural, =1 {1 membre} other {# membres}}",
+        "ownerBadge": "Propriétaire",
+        "memberBadge": "Membre"
+      },
+      "recentActivity": {
+        "title": "Activité récente",
+        "noActivity": "Aucune activité récente. Tout apparaîtra ici à mesure que vos communautés grandissent.",
+        "newMember": "{actor} a rejoint {community}",
+        "newPost": "{actor} a publié dans {community}"
+      },
+      "quickActions": {
+        "title": "Actions rapides",
+        "createSession": "Créer une session",
+        "createPost": "Créer une publication",
+        "inviteMember": "Inviter un membre",
+        "viewAnalytics": "Voir les analytiques",
+        "openSettings": "Paramètres"
+      }
+    },
+    "notifications": {
+      "openNotifications": "Ouvrir les notifications",
+      "title": "Notifications",
+      "markAllRead": "Tout marquer comme lu",
+      "markAsRead": "Marquer comme lu",
+      "delete": "Supprimer",
+      "viewAll": "Voir toutes les notifications",
+      "empty": "Aucune notification",
+      "loading": "Chargement des notifications..."
+    },
+    "billing": {
+      "title": "Facturation",
+      "subtitle": "Gérez votre forfait et votre abonnement Unytea",
+      "noPlan": "Aucun forfait actif",
+      "currentPlan": "Forfait actuel : {plan}",
+      "manageSubscription": "Gérer l'abonnement",
+      "statusLabel": "Statut :",
+      "renews": "Renouvellement : {date}",
+      "willCancel": "Sera annulé à la fin de la période",
+      "selectPlanTrial": "Choisissez un forfait pour démarrer votre essai gratuit de 14 jours.",
+      "currentPlanDescription": "Votre forfait et abonnement Unytea actuels.",
+      "yourPlanBadge": "Votre forfait",
+      "popularBadge": "Populaire",
+      "currentPlanButton": "Forfait actuel",
+      "lowerPlan": "Forfait inférieur",
+      "upgradeTo": "Passer à {plan}",
+      "perMonth": "/mois",
+      "paymentMethods": "Moyens de paiement",
+      "paymentMethodsDescription": "Gérez vos moyens de paiement et votre historique de facturation",
+      "paymentMethodsStripe": "Gérez vos moyens de paiement directement dans le portail Stripe.",
+      "openBillingPortal": "Ouvrir le portail de facturation",
+      "noPaymentMethods": "Aucun moyen de paiement",
+      "autoAddedOnUpgrade": "Ajouté automatiquement lors de la mise à niveau",
+      "portalError": "Échec de l'ouverture du portail de facturation",
+      "checkoutError": "Échec du démarrage du paiement",
+      "plans": {
+        "CREATOR": {
+          "description": "Pour les créateurs émergents lançant leur première communauté",
+          "features": [
+            "Membres de communauté illimités",
+            "Sessions live jusqu'à 100 participants simultanés",
+            "Cours payants",
+            "Fil et bibliothèque de communauté",
+            "Analyses de base",
+            "8% de commission sur les revenus des membres"
+          ]
+        },
+        "BUSINESS": {
+          "description": "Pour les hôtes établis développant leur communauté",
+          "features": [
+            "Tout ce qui est dans Creator",
+            "Sessions live jusqu'à 300 participants simultanés",
+            "Domaine personnalisé",
+            "Analyses avancées",
+            "Jusqu'à 5 admins",
+            "5% de commission sur les revenus des membres"
+          ]
+        },
+        "PRO": {
+          "description": "Pour les équipes gérant plusieurs communautés",
+          "features": [
+            "Tout ce qui est dans Business",
+            "Sessions live jusqu'à 1000 participants simultanés",
+            "Expérience white-label",
+            "Accès API",
+            "Admins illimités",
+            "3% de commission sur les revenus des membres"
+          ]
+        }
+      }
+    },
     "title": "Tableau de Bord",
     "welcome": "Bienvenue",
     "stats": {
@@ -562,13 +784,8 @@
       "dashboard": "Tableau de Bord",
       "explore": "Explorer",
       "communities": "Communautés",
+      "library": "Bibliothèque",
       "messages": "Messages",
-      "sessions": "Sessions",
-      "recordings": "Enregistrements",
-      "knowledgeLibrary": "Bibliothèque de connaissances",
-      "courses": "Cours",
-      "analytics": "Analytiques",
-      "notifications": "Notifications",
       "settings": "Paramètres"
     },
     "upgrade": {

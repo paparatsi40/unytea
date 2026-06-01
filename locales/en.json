@@ -343,6 +343,228 @@
     "continue": "Continue"
   },
   "dashboard": {
+    "library": {
+      "title": "Library",
+      "subtitle": "Your courses, recordings, and resources",
+      "tabs": {
+        "courses": "Courses",
+        "recordings": "Recordings",
+        "resources": "Resources"
+      },
+      "courses": {
+        "failedToLoad": "Failed to load courses",
+        "genericError": "An error occurred",
+        "browse": "Browse Courses",
+        "totalEnrolled": "Total Enrolled",
+        "inProgress": "In Progress",
+        "completed": "Completed",
+        "continueLearning": "Continue Learning",
+        "notStarted": "Not Started",
+        "noCoursesTitle": "No courses yet",
+        "noCoursesBody": "Browse available courses and start learning today"
+      },
+      "recordings": {
+        "newSession": "New Session",
+        "nextLiveSession": "Next live session",
+        "viewSession": "View Session",
+        "totalRecordings": "Total recordings",
+        "totalContent": "Total content",
+        "totalParticipants": "Total participants",
+        "noRecordingsTitle": "No recordings yet",
+        "noRecordingsBody": "Start a live session and record it to build your library",
+        "createFirstSession": "Create First Session",
+        "recordingBadge": "Recording",
+        "noDescription": "No description",
+        "participants": "{count, plural, =1 {1 participant} other {# participants}}",
+        "watch": "Watch",
+        "addToCourse": "Add to Course",
+        "proTipTitle": "💡 Pro tip",
+        "proTipBody": "Recordings are automatically saved after each live session. Use them to:",
+        "proTip1": "Add to your courses as premium content",
+        "proTip2": "Share with members who missed the live session",
+        "proTip3": "Repurpose as short clips for social media"
+      },
+      "resources": {
+        "loading": "Loading your knowledge library...",
+        "buildCourse": "Build a Course from Sessions",
+        "coursePotential": "Course Potential",
+        "suggestionMeta": "{sessions} sessions · {hours}h total",
+        "potentialStudents": "Potential students",
+        "totalAttendees": "Total attendees",
+        "engagementScore": "Engagement score",
+        "scoreValue": "{value}/100",
+        "createCourse": "Create Course",
+        "knowledgeImpact": "Your Knowledge Impact",
+        "sessionsRecorded": "Sessions recorded",
+        "coursesCreated": "Courses created",
+        "conversionRate": "{rate}% conversion rate",
+        "studentsLearning": "Students learning",
+        "lessonsCreated": "Lessons created",
+        "bestSessions": "Best Sessions",
+        "bestSessionMeta": "{community} · {count} attendees",
+        "communityFallback": "Community",
+        "open": "Open",
+        "keyTopics": "Key Topics",
+        "topicsEmpty": "Topics will appear as sessions accumulate.",
+        "curatedRecordings": "Curated Recordings",
+        "viewRecordings": "View recordings",
+        "curatedMeta": "{count} attendees · {duration} min",
+        "watch": "Watch",
+        "sessionsReadyToConvert": "Sessions Ready to Convert",
+        "selectMultiple": "Select Multiple",
+        "convertibleMeta": "{community} · {duration} min · {count} attendees",
+        "score": "Score: {score}/100",
+        "view": "View",
+        "viewAllSessions": "View all {count} sessions",
+        "emptyTitleConvertible": "No convertible recordings yet",
+        "emptyTitleNone": "No sessions to convert yet",
+        "emptyBodyConvertible": "You already have completed sessions. Open Recordings to review status and convert those ready for courses.",
+        "emptyBodyNone": "Complete live sessions with recordings will appear here, ready to be turned into courses.",
+        "openRecordings": "Open Recordings",
+        "hostFirstSession": "Host Your First Session",
+        "toastLoadError": "Failed to load data",
+        "toastCourseCreated": "Course created successfully!"
+      }
+    },
+    "home": {
+      "welcomeBack": "Welcome back, {name}",
+      "subtitle": "Here's what's happening in your communities today.",
+      "createCommunity": "Create community",
+      "onboarding": {
+        "profile": {
+          "title": "Complete your profile",
+          "description": "Add your bio, interests, and a photo"
+        },
+        "post": {
+          "title": "Create your first post",
+          "description": "Introduce yourself to the community"
+        },
+        "session": {
+          "title": "Attend a live session",
+          "description": "Join a session to learn and connect"
+        },
+        "lesson": {
+          "title": "Complete a lesson",
+          "description": "Start learning from a course"
+        },
+        "buddy": {
+          "title": "Find an accountability buddy",
+          "description": "Get paired with someone to grow together"
+        }
+      },
+      "actionFirst": {
+        "noSessions": "You have no sessions this week. Schedule your first.",
+        "fewSessions": "{count} session this week. Keep the momentum.",
+        "manySessions": "{count} sessions this week. Great rhythm.",
+        "scheduleSession": "Schedule session"
+      },
+      "analytics": {
+        "title": "This week",
+        "viewFull": "View full analytics",
+        "sessions": "Sessions",
+        "newMembers": "New members",
+        "posts": "Posts",
+        "vsLastWeek": "vs last week"
+      },
+      "nextLiveSession": {
+        "title": "Next live session",
+        "joinNow": "Join now",
+        "viewDetails": "View details",
+        "minutes": "{minutes} min"
+      },
+      "yourCommunities": {
+        "title": "Your communities",
+        "viewAll": "View all",
+        "memberCount": "{count, plural, =1 {1 member} other {# members}}",
+        "ownerBadge": "Owner",
+        "memberBadge": "Member"
+      },
+      "recentActivity": {
+        "title": "Recent activity",
+        "noActivity": "No recent activity. Things will show up here as your communities grow.",
+        "newMember": "{actor} joined {community}",
+        "newPost": "{actor} posted in {community}"
+      },
+      "quickActions": {
+        "title": "Quick actions",
+        "createSession": "Create session",
+        "createPost": "Create post",
+        "inviteMember": "Invite member",
+        "viewAnalytics": "View analytics",
+        "openSettings": "Settings"
+      }
+    },
+    "notifications": {
+      "openNotifications": "Open notifications",
+      "title": "Notifications",
+      "markAllRead": "Mark all read",
+      "markAsRead": "Mark as read",
+      "delete": "Delete",
+      "viewAll": "View all notifications",
+      "empty": "No notifications yet",
+      "loading": "Loading notifications..."
+    },
+    "billing": {
+      "title": "Billing",
+      "subtitle": "Manage your Unytea plan and subscription",
+      "noPlan": "No active plan",
+      "currentPlan": "Current plan: {plan}",
+      "manageSubscription": "Manage subscription",
+      "statusLabel": "Status:",
+      "renews": "Renews: {date}",
+      "willCancel": "Will cancel at period end",
+      "selectPlanTrial": "Select a plan to start your 14-day free trial.",
+      "currentPlanDescription": "Your current Unytea plan and subscription.",
+      "yourPlanBadge": "Your plan",
+      "popularBadge": "Popular",
+      "currentPlanButton": "Current plan",
+      "lowerPlan": "Lower plan",
+      "upgradeTo": "Upgrade to {plan}",
+      "perMonth": "/month",
+      "paymentMethods": "Payment methods",
+      "paymentMethodsDescription": "Manage your payment methods and billing history",
+      "paymentMethodsStripe": "Manage your payment methods directly in the Stripe portal.",
+      "openBillingPortal": "Open billing portal",
+      "noPaymentMethods": "No payment methods",
+      "autoAddedOnUpgrade": "Added automatically when you upgrade",
+      "portalError": "Failed to open billing portal",
+      "checkoutError": "Failed to start checkout",
+      "plans": {
+        "CREATOR": {
+          "description": "For emerging creators launching their first community",
+          "features": [
+            "Unlimited community members",
+            "Live sessions up to 100 concurrent participants",
+            "Paid courses",
+            "Community feed + library",
+            "Basic analytics",
+            "8% commission on member revenue"
+          ]
+        },
+        "BUSINESS": {
+          "description": "For established hosts growing their community",
+          "features": [
+            "Everything in Creator",
+            "Live sessions up to 300 concurrent participants",
+            "Custom domain",
+            "Advanced analytics",
+            "Up to 5 admins",
+            "5% commission on member revenue"
+          ]
+        },
+        "PRO": {
+          "description": "For teams scaling multiple communities",
+          "features": [
+            "Everything in Business",
+            "Live sessions up to 1000 concurrent participants",
+            "White-label experience",
+            "API access",
+            "Unlimited admins",
+            "3% commission on member revenue"
+          ]
+        }
+      }
+    },
     "title": "Dashboard",
     "welcome": "Welcome back",
     "stats": {
@@ -478,13 +700,8 @@
       "dashboard": "Dashboard",
       "explore": "Explore",
       "communities": "Communities",
+      "library": "Library",
       "messages": "Messages",
-      "sessions": "Sessions",
-      "recordings": "Recordings",
-      "knowledgeLibrary": "Knowledge Library",
-      "courses": "Courses",
-      "analytics": "Analytics",
-      "notifications": "Notifications",
       "settings": "Settings"
     },
     "upgrade": {

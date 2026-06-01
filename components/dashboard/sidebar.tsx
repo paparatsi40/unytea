@@ -5,17 +5,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
-import {
-  Home,
-  Compass,
-  Users,
-  MessageSquare,
-  BookOpen,
-  Settings,
-  TrendingUp,
-  Bell,
-  Library,
-} from "lucide-react";
+import { Home, Compass, Users, BookOpen, MessageSquare, Settings } from "lucide-react";
 
 type NavItem = {
   key: string;
@@ -27,6 +17,10 @@ type NavItem = {
   localePrefix?: boolean;
 };
 
+// Sub-Phase E: simplified IA, 10 → 6 items (approved by Carlos 2026-05-31).
+// Recordings / Knowledge Library / Courses consolidate under /dashboard/library
+// (Commit 2); Analytics moves to a Home widget; Notifications moves to the top-bar
+// bell. Those routes stay reachable by direct URL until later commits redirect them.
 const navigation: NavItem[] = [
   { key: "dashboard", href: "/dashboard", icon: Home },
   // Explore exits the dashboard to the marketing /explore surface (pattern
@@ -36,12 +30,8 @@ const navigation: NavItem[] = [
   // at render time (the dashboard route group has no locale segment).
   { key: "explore", href: "/explore", icon: Compass, localePrefix: true },
   { key: "communities", href: "/dashboard/communities", icon: Users },
+  { key: "library", href: "/dashboard/library", icon: BookOpen },
   { key: "messages", href: "/dashboard/messages", icon: MessageSquare },
-  { key: "recordings", href: "/dashboard/recordings", icon: Library },
-  { key: "knowledgeLibrary", href: "/dashboard/knowledge-library", icon: BookOpen },
-  { key: "courses", href: "/dashboard/courses", icon: BookOpen },
-  { key: "analytics", href: "/dashboard/analytics", icon: TrendingUp },
-  { key: "notifications", href: "/dashboard/notifications", icon: Bell },
   { key: "settings", href: "/dashboard/settings", icon: Settings },
 ];
 
