@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
 import { LibraryTabs, type LibraryTab } from "@/components/dashboard/LibraryTabs";
 import { CoursesTab } from "@/components/dashboard/library/CoursesTab";
 import { RecordingsTab } from "@/components/dashboard/library/RecordingsTab";
@@ -15,6 +17,11 @@ type Props = {
 };
 
 export default async function LibraryPage(props: Props) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    redirect("/auth/signin?callbackUrl=/dashboard/library");
+  }
+
   const { tab } = await props.searchParams;
 
   // Default to 'courses' for missing/invalid tab params.

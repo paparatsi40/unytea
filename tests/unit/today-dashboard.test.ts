@@ -198,6 +198,6 @@ describe("getTodayDashboard", () => {
     );
 
     const result = await getTodayDashboard();
-    expect(result?.recentActivity.length).toBeLessThanOrEqual(10);
+    expect(result?.recentActivity).toHaveLength(10);
   });
 });

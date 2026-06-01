@@ -14,6 +14,7 @@ import {
   TrendingUp,
   Plus,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -66,6 +67,7 @@ interface ConvertibleSession {
 // header is dropped (the Library page provides it). Stays a client component —
 // it owns data-loading state, a creation dialog, and client-side auth gating.
 export function ResourcesTab() {
+  const t = useTranslations("dashboard.library.resources");
   const router = useRouter();
   const { user, isLoading: isAuthLoading } = useCurrentUser();
   const [stats, setStats] = useState<KnowledgeStats | null>(null);
@@ -107,7 +109,7 @@ export function ResourcesTab() {
       }
     } catch (error) {
       console.error("Error loading knowledge library:", error);
-      toast.error("Failed to load data");
+      toast.error(t("toastLoadError"));
     } finally {
       setLoading(false);
     }
@@ -118,7 +120,7 @@ export function ResourcesTab() {
       <div className="flex min-h-[400px] items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
-          <p className="text-muted-foreground">Loading your knowledge library...</p>
+          <p className="text-muted-foreground">{t("loading")}</p>
         </div>
       </div>
     );
@@ -176,7 +178,7 @@ export function ResourcesTab() {
           disabled={!hasConvertibleSessions}
         >
           <Sparkles className="h-4 w-4" />
-          Build a Course from Sessions
+          {t("buildCourse")}
         </Button>
       </div>
 
@@ -185,7 +187,7 @@ export function ResourcesTab() {
         <section className="mb-8">
           <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-foreground">
             <Sparkles className="h-5 w-5 text-amber-500" />
-            Course Potential
+            {t("coursePotential")}
           </h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {suggestions.map((suggestion, index) => (
@@ -201,8 +203,10 @@ export function ResourcesTab() {
                         {suggestion.title}
                       </h3>
                       <p className="mt-1 text-sm text-muted-foreground">
-                        {suggestion.sessionCount} sessions •{" "}
-                        {Math.round(suggestion.totalDuration / 60)}h total
+                        {t("suggestionMeta", {
+                          sessions: suggestion.sessionCount,
+                          hours: Math.round(suggestion.totalDuration / 60),
+                        })}
                       </p>
                     </div>
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-500/10 text-purple-500">
@@ -212,21 +216,21 @@ export function ResourcesTab() {
 
                   <div className="mt-4 space-y-3">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Potential students</span>
+                      <span className="text-muted-foreground">{t("potentialStudents")}</span>
                       <span className="font-medium text-foreground">
                         {suggestion.potentialStudents}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Total attendees</span>
+                      <span className="text-muted-foreground">{t("totalAttendees")}</span>
                       <span className="font-medium text-foreground">
                         {suggestion.totalAttendees}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Engagement score</span>
+                      <span className="text-muted-foreground">{t("engagementScore")}</span>
                       <span className="font-medium text-green-400">
-                        {suggestion.avgEngagement}/100
+                        {t("scoreValue", { value: suggestion.avgEngagement })}
                       </span>
                     </div>
                   </div>
@@ -235,7 +239,7 @@ export function ResourcesTab() {
                     variant="ghost"
                     className="mt-4 w-full text-purple-400 hover:bg-purple-500/10 hover:text-purple-300"
                   >
-                    Create Course
+                    {t("createCourse")}
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </CardContent>
@@ -248,7 +252,7 @@ export function ResourcesTab() {
       {/* KNOWLEDGE IMPACT STATS */}
       {stats && (
         <section className="mb-8">
-          <h2 className="mb-4 text-lg font-semibold text-foreground">Your Knowledge Impact</h2>
+          <h2 className="mb-4 text-lg font-semibold text-foreground">{t("knowledgeImpact")}</h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card className="border-border bg-card">
               <CardContent className="p-5">
@@ -258,7 +262,7 @@ export function ResourcesTab() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-foreground">{stats.completedSessions}</p>
-                    <p className="text-sm text-muted-foreground">Sessions recorded</p>
+                    <p className="text-sm text-muted-foreground">{t("sessionsRecorded")}</p>
                   </div>
                 </div>
               </CardContent>
@@ -274,14 +278,14 @@ export function ResourcesTab() {
                     <p className="text-2xl font-bold text-foreground">
                       {stats.coursesFromSessions}
                     </p>
-                    <p className="text-sm text-muted-foreground">Courses created</p>
+                    <p className="text-sm text-muted-foreground">{t("coursesCreated")}</p>
                   </div>
                 </div>
                 {stats?.totalCourses > 0 && (
                   <div className="mt-3">
                     <Progress value={stats?.conversionRate} className="h-1.5 bg-muted" />
                     <p className="mt-1 text-xs text-muted-foreground">
-                      {stats?.conversionRate}% conversion rate
+                      {t("conversionRate", { rate: stats?.conversionRate })}
                     </p>
                   </div>
                 )}
@@ -296,7 +300,7 @@ export function ResourcesTab() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-foreground">{stats.totalEnrollments}</p>
-                    <p className="text-sm text-muted-foreground">Students learning</p>
+                    <p className="text-sm text-muted-foreground">{t("studentsLearning")}</p>
                   </div>
                 </div>
               </CardContent>
@@ -310,7 +314,7 @@ export function ResourcesTab() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-foreground">{stats.totalLessons}</p>
-                    <p className="text-sm text-muted-foreground">Lessons created</p>
+                    <p className="text-sm text-muted-foreground">{t("lessonsCreated")}</p>
                   </div>
                 </div>
               </CardContent>
@@ -324,7 +328,7 @@ export function ResourcesTab() {
         <section className="mb-8 grid gap-4 md:grid-cols-3">
           <Card className="border-border bg-card md:col-span-2">
             <CardContent className="p-5">
-              <h2 className="mb-3 text-lg font-semibold text-foreground">Best Sessions</h2>
+              <h2 className="mb-3 text-lg font-semibold text-foreground">{t("bestSessions")}</h2>
               <div className="space-y-3">
                 {bestSessions.map((session) => (
                   <div
@@ -334,13 +338,15 @@ export function ResourcesTab() {
                     <div>
                       <p className="font-medium text-foreground">{session.title}</p>
                       <p className="text-xs text-muted-foreground">
-                        {session.community?.name || "Community"} • {session._count.participations}{" "}
-                        attendees
+                        {t("bestSessionMeta", {
+                          community: session.community?.name || t("communityFallback"),
+                          count: session._count.participations,
+                        })}
                       </p>
                     </div>
                     <Link href={`/dashboard/sessions/${session.id}`}>
                       <Button variant="ghost" size="sm" className="text-purple-400">
-                        Open
+                        {t("open")}
                       </Button>
                     </Link>
                   </div>
@@ -351,7 +357,7 @@ export function ResourcesTab() {
 
           <Card className="border-border bg-card">
             <CardContent className="p-5">
-              <h2 className="mb-3 text-lg font-semibold text-foreground">Key Topics</h2>
+              <h2 className="mb-3 text-lg font-semibold text-foreground">{t("keyTopics")}</h2>
               <div className="flex flex-wrap gap-2">
                 {keyTopics.length > 0 ? (
                   keyTopics.map(([topic, count]) => (
@@ -360,9 +366,7 @@ export function ResourcesTab() {
                     </Badge>
                   ))
                 ) : (
-                  <p className="text-sm text-muted-foreground">
-                    Topics will appear as sessions accumulate.
-                  </p>
+                  <p className="text-sm text-muted-foreground">{t("topicsEmpty")}</p>
                 )}
               </div>
             </CardContent>
@@ -373,10 +377,10 @@ export function ResourcesTab() {
       {hasConvertibleSessions && (
         <section className="mb-8">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-foreground">Curated Recordings</h2>
+            <h2 className="text-lg font-semibold text-foreground">{t("curatedRecordings")}</h2>
             <Link href="/dashboard/library?tab=recordings">
               <Button variant="outline" size="sm" className="border-border text-foreground">
-                View recordings
+                {t("viewRecordings")}
               </Button>
             </Link>
           </div>
@@ -388,12 +392,15 @@ export function ResourcesTab() {
                   <div>
                     <p className="font-medium text-foreground">{session.title}</p>
                     <p className="text-xs text-muted-foreground">
-                      {session._count.participations} attendees • {session.duration} min
+                      {t("curatedMeta", {
+                        count: session._count.participations,
+                        duration: session.duration,
+                      })}
                     </p>
                   </div>
                   <Link href={`/dashboard/sessions/${session.id}`}>
                     <Button variant="ghost" size="sm" className="text-purple-400">
-                      Watch
+                      {t("watch")}
                     </Button>
                   </Link>
                 </CardContent>
@@ -407,7 +414,7 @@ export function ResourcesTab() {
       {hasConvertibleSessions && (
         <section>
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-foreground">Sessions Ready to Convert</h2>
+            <h2 className="text-lg font-semibold text-foreground">{t("sessionsReadyToConvert")}</h2>
             <Button
               variant="outline"
               size="sm"
@@ -415,7 +422,7 @@ export function ResourcesTab() {
               onClick={() => setShowCreateDialog(true)}
             >
               <Plus className="mr-1 h-4 w-4" />
-              Select Multiple
+              {t("selectMultiple")}
             </Button>
           </div>
 
@@ -438,15 +445,18 @@ export function ResourcesTab() {
                       <div>
                         <h3 className="font-medium text-foreground">{session.title}</h3>
                         <p className="text-sm text-muted-foreground">
-                          {session.community?.name} • {session.duration} min •{" "}
-                          {session._count.participations} attendees
+                          {t("convertibleMeta", {
+                            community: session.community?.name ?? t("communityFallback"),
+                            duration: session.duration,
+                            count: session._count.participations,
+                          })}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="text-right">
                         <p className="text-sm font-medium text-foreground">
-                          Score: {session.engagementScore}/100
+                          {t("score", { score: session.engagementScore })}
                         </p>
                         <p className="text-xs text-muted-foreground">
                           {new Date(session.scheduledAt).toLocaleDateString()}
@@ -454,7 +464,7 @@ export function ResourcesTab() {
                       </div>
                       <Link href={`/dashboard/sessions/${session.id}`}>
                         <Button variant="ghost" size="sm" className="text-purple-400">
-                          View
+                          {t("view")}
                           <ArrowRight className="ml-1 h-4 w-4" />
                         </Button>
                       </Link>
@@ -472,7 +482,7 @@ export function ResourcesTab() {
                 className="border-border text-muted-foreground"
                 onClick={() => setShowCreateDialog(true)}
               >
-                View all {sessions.length} sessions
+                {t("viewAllSessions", { count: sessions.length })}
               </Button>
             </div>
           )}
@@ -489,12 +499,10 @@ export function ResourcesTab() {
               </div>
             </div>
             <h3 className="mb-2 text-lg font-semibold text-foreground">
-              {hasRecordedSessions ? "No convertible recordings yet" : "No sessions to convert yet"}
+              {hasRecordedSessions ? t("emptyTitleConvertible") : t("emptyTitleNone")}
             </h3>
             <p className="mx-auto mb-6 max-w-md text-muted-foreground">
-              {hasRecordedSessions
-                ? "You already have completed sessions. Open Recordings to review status and convert those ready for courses."
-                : "Complete live sessions with recordings will appear here, ready to be turned into courses."}
+              {hasRecordedSessions ? t("emptyBodyConvertible") : t("emptyBodyNone")}
             </p>
             <Link
               href={
@@ -503,7 +511,7 @@ export function ResourcesTab() {
             >
               <Button className="bg-purple-600 text-white hover:bg-purple-700">
                 <Plus className="mr-2 h-4 w-4" />
-                {hasRecordedSessions ? "Open Recordings" : "Host Your First Session"}
+                {hasRecordedSessions ? t("openRecordings") : t("hostFirstSession")}
               </Button>
             </Link>
           </CardContent>
@@ -518,7 +526,7 @@ export function ResourcesTab() {
         suggestions={suggestions}
         onSuccess={() => {
           loadData();
-          toast.success("Course created successfully!");
+          toast.success(t("toastCourseCreated"));
         }}
       />
     </div>

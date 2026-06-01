@@ -45,15 +45,18 @@ export function NotificationCenter() {
   const { user: _user } = useCurrentUser();
   void _user; // User object available if needed for future features
 
-  // Load notifications with polling
+  // Initial load on mount (badge count is visible without opening).
   useEffect(() => {
     loadNotifications();
-
-    // Poll every 30 seconds for new notifications
-    const interval = setInterval(loadNotifications, 30000);
-
-    return () => clearInterval(interval);
   }, []);
+
+  // Poll every 30s only while the dropdown is open — avoids a background
+  // request every 30s for the whole session when nobody is looking.
+  useEffect(() => {
+    if (!isOpen) return;
+    const interval = setInterval(loadNotifications, 30000);
+    return () => clearInterval(interval);
+  }, [isOpen]);
 
   const loadNotifications = async () => {
     setLoading(true);
