@@ -1082,6 +1082,26 @@
         "callButton": "Appeler",
         "viewProfileButton": "Voir le profil complet",
         "viewProfileComingSoon": "La page de profil arrive bientôt"
+      },
+      "buddy": {
+        "notFound": "Communauté introuvable",
+        "comingSoonTitle": "Trouvez votre partenaire de responsabilité",
+        "comingSoonDescription": "Soyez mis en relation avec quelqu'un pour rester motivés et responsables mutuellement !",
+        "findBuddyButton": "Trouver mon partenaire",
+        "features": {
+          "setGoals": {
+            "title": "Définir des objectifs",
+            "description": "Travaillez vers des objectifs communs"
+          },
+          "checkIns": {
+            "title": "Points réguliers",
+            "description": "Mises à jour régulières des progrès"
+          },
+          "growTogether": {
+            "title": "Grandir ensemble",
+            "description": "Des résultats 10x meilleurs"
+          }
+        }
       }
     },
     "calendar": {

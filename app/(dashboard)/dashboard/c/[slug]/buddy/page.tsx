@@ -3,10 +3,12 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { Users, Target, Heart, Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export default function BuddyPage() {
   const params = useParams();
   const slug = (params?.slug as string) || "";
+  const t = useTranslations("dashboard.communityMember.buddy");
   const [communityId, setCommunityId] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const hasBuddy = false;
@@ -24,9 +26,8 @@ export default function BuddyPage() {
       }
     } catch (error) {
       console.error("Error loading community:", error);
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   if (loading) {
@@ -40,7 +41,7 @@ export default function BuddyPage() {
   if (!communityId) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <p className="text-gray-600">Community not found</p>
+        <p className="text-gray-600">{t("notFound")}</p>
       </div>
     );
   }
@@ -54,10 +55,10 @@ export default function BuddyPage() {
               <Users className="h-7 w-7 text-purple-600 md:h-8 md:w-8" />
             </div>
             <h2 className="mt-3 text-xl font-bold text-gray-900 md:mt-4 md:text-2xl">
-              Find Your Accountability Partner
+              {t("comingSoonTitle")}
             </h2>
             <p className="mt-2 px-4 text-sm text-gray-600 md:text-base">
-              Get matched with someone to keep each other motivated and accountable!
+              {t("comingSoonDescription")}
             </p>
 
             <button
@@ -65,62 +66,45 @@ export default function BuddyPage() {
               className="mt-4 inline-flex items-center space-x-2 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg transition-all hover:from-purple-700 hover:to-pink-700 md:mt-6 md:px-6 md:py-3 md:text-base"
             >
               <Users className="h-4 w-4 md:h-5 md:w-5" />
-              <span>Find My Buddy</span>
+              <span>{t("findBuddyButton")}</span>
             </button>
           </div>
 
           <div className="mt-8 grid grid-cols-3 gap-4 md:mt-12 md:gap-6">
             <div className="text-center">
               <Target className="mx-auto h-6 w-6 text-purple-600 md:h-8 md:w-8" />
-              <h3 className="mt-2 text-sm font-semibold text-gray-900 md:text-base">Set Goals</h3>
+              <h3 className="mt-2 text-sm font-semibold text-gray-900 md:text-base">
+                {t("features.setGoals.title")}
+              </h3>
               <p className="mt-1 hidden text-xs text-gray-600 sm:block md:text-sm">
-                Work towards shared objectives
+                {t("features.setGoals.description")}
               </p>
             </div>
             <div className="text-center">
               <Heart className="mx-auto h-6 w-6 text-purple-600 md:h-8 md:w-8" />
-              <h3 className="mt-2 text-sm font-semibold text-gray-900 md:text-base">Check-Ins</h3>
+              <h3 className="mt-2 text-sm font-semibold text-gray-900 md:text-base">
+                {t("features.checkIns.title")}
+              </h3>
               <p className="mt-1 hidden text-xs text-gray-600 sm:block md:text-sm">
-                Regular progress updates
+                {t("features.checkIns.description")}
               </p>
             </div>
             <div className="text-center">
               <Users className="mx-auto h-6 w-6 text-purple-600 md:h-8 md:w-8" />
               <h3 className="mt-2 text-sm font-semibold text-gray-900 md:text-base">
-                Grow Together
+                {t("features.growTogether.title")}
               </h3>
               <p className="mt-1 hidden text-xs text-gray-600 sm:block md:text-sm">
-                10x better results
+                {t("features.growTogether.description")}
               </p>
             </div>
-          </div>
-
-          <div className="mt-8 rounded-xl border border-purple-200 bg-purple-50 p-4 md:mt-12 md:p-6">
-            <h3 className="text-sm font-bold text-purple-900 md:text-base">
-              ✅ Buddy System MVP Completado
-            </h3>
-            <p className="mt-2 text-xs text-purple-700 md:text-sm">
-              El sistema está funcional. Funcionalidad completa:
-            </p>
-            <ul className="mt-3 space-y-1 text-xs text-purple-700 md:text-sm">
-              <li>✅ Auto-matching algorithm</li>
-              <li>✅ Shared goals creation</li>
-              <li>✅ Daily check-ins with mood tracker</li>
-              <li>✅ Progress tracking</li>
-              <li>✅ Beautiful dashboard</li>
-            </ul>
-            <p className="mt-4 text-xs text-purple-600">
-              Para testing completo con database, necesitarás conectar las server actions.
-            </p>
           </div>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <p>Dashboard con buddy</p>
-    </div>
-  );
+  // Reachable only once the buddy feature ships (hasBuddy is currently a
+  // hardcoded false). The matched-buddy dashboard will render here.
+  return null;
 }

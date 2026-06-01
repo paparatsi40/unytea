@@ -1080,6 +1080,26 @@
         "callButton": "Call",
         "viewProfileButton": "View Full Profile",
         "viewProfileComingSoon": "Profile page coming soon"
+      },
+      "buddy": {
+        "notFound": "Community not found",
+        "comingSoonTitle": "Find Your Accountability Partner",
+        "comingSoonDescription": "Get matched with someone to keep each other motivated and accountable!",
+        "findBuddyButton": "Find My Buddy",
+        "features": {
+          "setGoals": {
+            "title": "Set Goals",
+            "description": "Work towards shared objectives"
+          },
+          "checkIns": {
+            "title": "Check-Ins",
+            "description": "Regular progress updates"
+          },
+          "growTogether": {
+            "title": "Grow Together",
+            "description": "10x better results"
+          }
+        }
       }
     },
     "calendar": {
