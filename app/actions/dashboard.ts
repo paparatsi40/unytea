@@ -1508,65 +1508,14 @@ export async function getCommunityOSSnapshot() {
   }
 }
 
-export async function getDashboardSnapshot() {
-  try {
-    const [
-      metricsRes,
-      nextSessionRes,
-      upcomingRes,
-      activityRes,
-      membersRes,
-      performanceRes,
-      hostAnalyticsRes,
-      nextActionRes,
-      hostAlertsRes,
-      communityOSRes,
-      aiPlaybookRes,
-      autopilotRes,
-      identityRes,
-      activationRes,
-    ] = await Promise.all([
-      getDashboardMetrics(),
-      getNextLiveSession(),
-      getUpcomingSessions(5),
-      getCommunityActivity(6),
-      getRecentMembers(4),
-      getPerformanceSnapshot(),
-      getHostAnalyticsV1(),
-      getNextRecommendedAction(),
-      getHostAlerts(),
-      getCommunityOSSnapshot(),
-      getAIPlaybookRecommendations(),
-      getAutopilotDashboardSnapshot(),
-      getUserIdentitySnapshot(8),
-      getActivationEngineSnapshot(),
-    ]);
-
-    return {
-      success: true,
-      payload: {
-        metricsRes,
-        nextSessionRes,
-        upcomingRes,
-        activityRes,
-        membersRes,
-        performanceRes,
-        hostAnalyticsRes,
-        nextActionRes,
-        hostAlertsRes,
-        communityOSRes,
-        aiPlaybookRes,
-        autopilotRes,
-        identityRes,
-        activationRes,
-      },
-    };
-  } catch (error) {
-    console.error("Error getting dashboard snapshot:", error);
-    return { success: false, error: "Failed to load dashboard snapshot" };
-  }
-}
-
+// NOTE (Sub-Phase E Commit 9): getDashboardSnapshot was removed — the Commit 4
+// home rewrite replaced it with getTodayDashboard, leaving it with 0 consumers.
+// The 12 fan-out functions it orchestrated (getDashboardMetrics,
+// getActivationEngineSnapshot, getCommunityOSSnapshot, getAIPlaybookRecommendations,
+// getAutopilotDashboardSnapshot, etc.) are intentionally KEPT: they have no
+// current consumers but are the telemetry an Advanced dashboard route would
+// reuse, and getUserIdentitySnapshot/getNextLiveSession are still used elsewhere.
+// Tracked for a deliberate dead-code pass if the Advanced route is dropped.
 export async function getAutopilotDashboardSnapshot() {
   try {
     const userId = await getCurrentUserId();
