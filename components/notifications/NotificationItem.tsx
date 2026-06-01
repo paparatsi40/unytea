@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
+import { enUS, es, fr } from "date-fns/locale";
+import { useLocale, useTranslations } from "next-intl";
 import {
   MessageSquare,
   Heart,
@@ -51,7 +53,12 @@ const NOTIFICATION_ICONS: Record<string, React.ReactNode> = {
   SYSTEM: <Info className="h-5 w-5 text-gray-500" />,
 };
 
+const DATE_FNS_LOCALES = { en: enUS, es, fr } as const;
+
 export function NotificationItem({ notification, onUpdate }: NotificationItemProps) {
+  const t = useTranslations("dashboard.notifications");
+  const locale = useLocale();
+  const dfLocale = DATE_FNS_LOCALES[locale as keyof typeof DATE_FNS_LOCALES] ?? enUS;
   const [isLoading, setIsLoading] = useState(false);
 
   const handleMarkAsRead = async (e: React.MouseEvent) => {
@@ -61,10 +68,10 @@ export function NotificationItem({ notification, onUpdate }: NotificationItemPro
     const result = await markNotificationAsRead(notification.id);
 
     if (result.success) {
-      toast.success("Marked as read");
+      toast.success(t("markedAsReadToast"));
       onUpdate?.();
     } else {
-      toast.error(result.error || "Failed to mark as read");
+      toast.error(result.error || t("markAsReadError"));
     }
     setIsLoading(false);
   };
@@ -76,10 +83,10 @@ export function NotificationItem({ notification, onUpdate }: NotificationItemPro
     const result = await deleteNotification(notification.id);
 
     if (result.success) {
-      toast.success("Notification deleted");
+      toast.success(t("deletedToast"));
       onUpdate?.();
     } else {
-      toast.error(result.error || "Failed to delete");
+      toast.error(result.error || t("deleteError"));
     }
     setIsLoading(false);
   };
@@ -111,7 +118,7 @@ export function NotificationItem({ notification, onUpdate }: NotificationItemPro
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/5">
             <Image
               src={notification.sender.image}
-              alt={notification.sender.name || "Notification sender"}
+              alt={notification.sender.name || t("senderAlt")}
               width={32}
               height={32}
               className="h-8 w-8 rounded-full"
@@ -131,6 +138,7 @@ export function NotificationItem({ notification, onUpdate }: NotificationItemPro
           <span className="text-xs text-muted-foreground">
             {formatDistanceToNow(new Date(notification.createdAt), {
               addSuffix: true,
+              locale: dfLocale,
             })}
           </span>
         </div>
@@ -144,7 +152,7 @@ export function NotificationItem({ notification, onUpdate }: NotificationItemPro
             onClick={handleMarkAsRead}
             disabled={isLoading}
             className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-50"
-            title="Mark as read"
+            title={t("markAsRead")}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -162,7 +170,7 @@ export function NotificationItem({ notification, onUpdate }: NotificationItemPro
           onClick={handleDelete}
           disabled={isLoading}
           className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-red-500/10 hover:text-red-500 disabled:opacity-50"
-          title="Delete"
+          title={t("delete")}
         >
           <X className="h-4 w-4" />
         </button>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { NotificationItem } from "./NotificationItem";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Bell } from "lucide-react";
@@ -27,6 +28,8 @@ interface NotificationListProps {
 }
 
 export function NotificationList({ notifications }: NotificationListProps) {
+  const t = useTranslations("dashboard.notifications");
+  const locale = useLocale();
   const [filter, setFilter] = useState<"all" | "unread">("all");
 
   const filteredNotifications = notifications.filter((notif) =>
@@ -36,7 +39,7 @@ export function NotificationList({ notifications }: NotificationListProps) {
   // Group notifications by date
   const groupedNotifications = filteredNotifications.reduce(
     (acc, notif) => {
-      const date = new Date(notif.createdAt).toLocaleDateString("en-US", {
+      const date = new Date(notif.createdAt).toLocaleDateString(locale, {
         weekday: "long",
         year: "numeric",
         month: "long",
@@ -55,9 +58,9 @@ export function NotificationList({ notifications }: NotificationListProps) {
   return (
     <Tabs value={filter} onValueChange={(v) => setFilter(v as "all" | "unread")}>
       <TabsList className="grid w-full max-w-md grid-cols-2">
-        <TabsTrigger value="all">All ({notifications.length})</TabsTrigger>
+        <TabsTrigger value="all">{t("filterAll", { count: notifications.length })}</TabsTrigger>
         <TabsTrigger value="unread">
-          Unread ({notifications.filter((n) => !n.isRead).length})
+          {t("filterUnread", { count: notifications.filter((n) => !n.isRead).length })}
         </TabsTrigger>
       </TabsList>
 
@@ -65,11 +68,11 @@ export function NotificationList({ notifications }: NotificationListProps) {
         {filteredNotifications.length === 0 ? (
           <div className="flex min-h-[400px] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-muted/20 p-12">
             <Bell className="mb-4 h-16 w-16 text-muted-foreground/40" />
-            <h3 className="mb-2 text-lg font-semibold text-foreground">No notifications</h3>
+            <h3 className="mb-2 text-lg font-semibold text-foreground">
+              {t("noNotificationsTitle")}
+            </h3>
             <p className="text-center text-sm text-muted-foreground">
-              {filter === "unread"
-                ? "You're all caught up! No unread notifications."
-                : "You don't have any notifications yet."}
+              {filter === "unread" ? t("emptyUnreadBody") : t("emptyAllBody")}
             </p>
           </div>
         ) : (

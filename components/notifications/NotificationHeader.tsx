@@ -6,6 +6,7 @@ import {
   deleteAllReadNotifications,
 } from "@/app/actions/notifications";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 interface NotificationHeaderProps {
@@ -13,6 +14,7 @@ interface NotificationHeaderProps {
 }
 
 export function NotificationHeader({ unreadCount }: NotificationHeaderProps) {
+  const t = useTranslations("dashboard.notifications");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleMarkAllAsRead = async () => {
@@ -20,10 +22,10 @@ export function NotificationHeader({ unreadCount }: NotificationHeaderProps) {
     const result = await markAllNotificationsAsRead();
 
     if (result.success) {
-      toast.success("All notifications marked as read");
+      toast.success(t("markAllReadSuccess"));
       window.location.reload();
     } else {
-      toast.error(result.error || "Failed to mark all as read");
+      toast.error(result.error || t("markAllReadError"));
     }
     setIsLoading(false);
   };
@@ -33,10 +35,10 @@ export function NotificationHeader({ unreadCount }: NotificationHeaderProps) {
     const result = await deleteAllReadNotifications();
 
     if (result.success) {
-      toast.success("All read notifications deleted");
+      toast.success(t("clearReadSuccess"));
       window.location.reload();
     } else {
-      toast.error(result.error || "Failed to delete notifications");
+      toast.error(result.error || t("clearReadError"));
     }
     setIsLoading(false);
   };
@@ -48,9 +50,9 @@ export function NotificationHeader({ unreadCount }: NotificationHeaderProps) {
           <Bell className="h-6 w-6 text-red-500" />
         </div>
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Notifications</h1>
+          <h1 className="text-3xl font-bold text-foreground">{t("title")}</h1>
           <p className="text-sm text-muted-foreground">
-            {unreadCount > 0 ? `${unreadCount} unread` : "All caught up!"}
+            {unreadCount > 0 ? t("unreadCount", { count: unreadCount }) : t("allCaughtUp")}
           </p>
         </div>
       </div>
@@ -63,7 +65,7 @@ export function NotificationHeader({ unreadCount }: NotificationHeaderProps) {
             className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
           >
             <CheckCheck className="h-4 w-4" />
-            Mark all as read
+            {t("markAllRead")}
           </button>
         )}
         <button
@@ -72,7 +74,7 @@ export function NotificationHeader({ unreadCount }: NotificationHeaderProps) {
           className="flex items-center gap-2 rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50"
         >
           <Trash2 className="h-4 w-4" />
-          Clear read
+          {t("clearRead")}
         </button>
       </div>
     </div>

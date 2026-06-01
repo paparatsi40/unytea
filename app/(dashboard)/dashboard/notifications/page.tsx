@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { getUserNotifications } from "@/app/actions/notifications";
 import { NotificationList } from "@/components/notifications/NotificationList";
 import { NotificationHeader } from "@/components/notifications/NotificationHeader";
-import { Bell } from "lucide-react";
+import { NotificationsLoadError } from "@/components/notifications/NotificationsLoadError";
 
 export const metadata = {
   title: "Notifications | Unytea",
@@ -19,17 +19,7 @@ export default async function NotificationsPage() {
   const result = await getUserNotifications(100);
 
   if (!result.success) {
-    return (
-      <div className="flex min-h-[600px] items-center justify-center">
-        <div className="text-center">
-          <Bell className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
-          <h2 className="mb-2 text-xl font-semibold text-foreground">
-            Failed to load notifications
-          </h2>
-          <p className="text-muted-foreground">{result.error || "An error occurred"}</p>
-        </div>
-      </div>
-    );
+    return <NotificationsLoadError error={result.error} />;
   }
 
   const { notifications, unreadCount } = result;

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { ConversationList } from "@/components/messages/ConversationList";
 import { MessageThread } from "@/components/messages/MessageThread";
@@ -17,6 +18,7 @@ interface OtherUser {
 }
 
 export default function MessagesPage() {
+  const t = useTranslations("dashboard.messages");
   const router = useRouter();
   const searchParams = useSearchParams();
   const [activeConversationId, setActiveConversationId] = useState<string>();
@@ -115,8 +117,8 @@ export default function MessagesPage() {
                   otherUser={activeOtherUser}
                   subtitle={
                     sharedCommunities.length > 0
-                      ? `Shared communities: ${sharedCommunities.length}`
-                      : "Direct conversation"
+                      ? t("subtitleShared", { count: sharedCommunities.length })
+                      : t("directConversation")
                   }
                   onBack={handleMobileBack}
                   showBackButton
@@ -128,14 +130,14 @@ export default function MessagesPage() {
 
           <aside className="hidden w-[300px] shrink-0 border-l border-gray-200 bg-white p-4 xl:flex xl:flex-col xl:gap-4">
             <div>
-              <p className="text-xs uppercase tracking-wide text-gray-500">Contact</p>
+              <p className="text-xs uppercase tracking-wide text-gray-500">{t("contact")}</p>
 
               <div className="mt-2.5 flex items-center gap-3">
                 <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-purple-500 to-pink-500 font-semibold text-white">
                   {activeOtherUser.image ? (
                     <img
                       src={activeOtherUser.image}
-                      alt={activeOtherUser.name || "User"}
+                      alt={activeOtherUser.name || t("userFallback")}
                       className="h-full w-full object-cover"
                     />
                   ) : (
@@ -147,7 +149,7 @@ export default function MessagesPage() {
 
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-gray-900">
-                    {activeOtherUser.firstName || activeOtherUser.name || "User"}
+                    {activeOtherUser.firstName || activeOtherUser.name || t("userFallback")}
                   </p>
                   {activeOtherUser.username && (
                     <p className="truncate text-xs text-gray-500">@{activeOtherUser.username}</p>
@@ -167,20 +169,20 @@ export default function MessagesPage() {
                     : "pointer-events-none border-gray-200 text-gray-400"
                 }`}
                 aria-disabled={!activeOtherUser.username}
-                title={activeOtherUser.username ? "View profile" : "Profile unavailable"}
+                title={activeOtherUser.username ? t("viewProfile") : t("profileUnavailable")}
               >
-                View profile
+                {t("viewProfile")}
               </Link>
             </div>
 
             <div className="rounded-xl border border-gray-200 bg-gray-50 p-3.5">
-              <p className="text-xs uppercase tracking-wide text-gray-500">Context</p>
-              <p className="mt-2 text-sm font-medium text-gray-900">Direct conversation</p>
-              <p className="mt-1 text-xs text-gray-500">Started from community members.</p>
+              <p className="text-xs uppercase tracking-wide text-gray-500">{t("context")}</p>
+              <p className="mt-2 text-sm font-medium text-gray-900">{t("directConversation")}</p>
+              <p className="mt-1 text-xs text-gray-500">{t("startedFrom")}</p>
 
               <div className="mt-3 rounded-lg border border-gray-200 bg-white p-2.5">
                 <p className="text-[11px] uppercase tracking-wide text-gray-500">
-                  Communities in common
+                  {t("communitiesInCommon")}
                 </p>
 
                 {sharedCommunities.length > 0 ? (
@@ -196,20 +198,20 @@ export default function MessagesPage() {
 
                     {sharedCommunities.length > 3 ? (
                       <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[11px] text-gray-600">
-                        +{sharedCommunities.length - 3} more
+                        {t("moreCount", { count: sharedCommunities.length - 3 })}
                       </span>
                     ) : null}
                   </div>
                 ) : (
-                  <p className="mt-2 text-xs text-gray-500">No active shared communities found.</p>
+                  <p className="mt-2 text-xs text-gray-500">{t("noSharedCommunities")}</p>
                 )}
               </div>
             </div>
 
             <div className="rounded-xl border border-purple-200 bg-purple-50 p-3.5">
-              <p className="text-xs uppercase tracking-wide text-purple-700">Unread</p>
+              <p className="text-xs uppercase tracking-wide text-purple-700">{t("unread")}</p>
               <p className="mt-2 text-2xl font-bold text-purple-900">{unreadTotal}</p>
-              <p className="text-xs text-purple-700/80">total unread messages in your inbox</p>
+              <p className="text-xs text-purple-700/80">{t("totalUnread")}</p>
             </div>
           </aside>
         </>
@@ -220,10 +222,9 @@ export default function MessagesPage() {
               <span className="text-4xl">💬</span>
             </div>
 
-            <h2 className="text-2xl font-bold tracking-tight text-gray-900">Your Messages</h2>
+            <h2 className="text-2xl font-bold tracking-tight text-gray-900">{t("emptyTitle")}</h2>
             <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-gray-600">
-              Select a conversation from the left to view it. To start a new conversation, open a
-              community member directory and use the Message button there.
+              {t("emptyBody")}
             </p>
           </div>
         </div>
