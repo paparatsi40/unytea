@@ -723,6 +723,137 @@
             "createFailed": "Échec de la création de la session",
             "unexpectedError": "Une erreur inattendue s'est produite"
           }
+        },
+        "title": "Sessions en direct",
+        "today": "Aujourd'hui",
+        "tomorrow": "Demain",
+        "sessionsCount": "{count, plural, =1 {# session} other {# sessions}}",
+        "subtitle": "{community} • Animez du coaching, des cours et des ateliers en direct",
+        "liveNowCount": "{count, plural, =1 {# session en direct maintenant} other {# sessions en direct maintenant}}",
+        "thisWeekCount": "{count, plural, =1 {# session cette semaine} other {# sessions cette semaine}}",
+        "scheduleSession": "Planifier une session",
+        "ownerOnly": "(Réservé au propriétaire)",
+        "nextSession": {
+          "label": "Prochaine / Session en cours",
+          "liveBlurb": "Votre communauté est en direct maintenant. Gardez l'élan et augmentez le taux de participation.",
+          "metaScheduled": "{date} · {time} · {minutes} min · avec {host}",
+          "noneTitle": "Aucune session planifiée pour le moment",
+          "noneBody": "Planifiez votre prochain point en direct pour maintenir la cadence hebdomadaire de la communauté.",
+          "joinLive": "Rejoindre en direct",
+          "openSession": "Ouvrir la session",
+          "attending": "Je participe",
+          "rsvp": "RSVP",
+          "manage": "Gérer"
+        },
+        "hostFallback": "Animateur",
+        "performance": {
+          "title": "Performance des sessions",
+          "reminders": "Rappels",
+          "window": "Période :",
+          "windowDays": "{days}j",
+          "avgAttendance": "Présence moyenne",
+          "lastDays": "{days} derniers jours",
+          "vsPrev": "{value} vs période précédente",
+          "vsPrevPp": "{value}pp vs période précédente",
+          "rsvpToJoin": "RSVP → participation",
+          "target": "objectif : {value}%",
+          "onTarget": "Objectif atteint",
+          "ppToTarget": "{value}pp avant l'objectif",
+          "remindersSent": "Rappels envoyés",
+          "deliveryVolume": "volume d'envoi",
+          "completedSessions": "Sessions terminées",
+          "replayRate": "Taux de rediffusion : {value}%",
+          "replayVsPrev": "{value}pp de rediffusion vs période précédente"
+        },
+        "recommendation": {
+          "lowRsvp": {
+            "title": "Faible conversion RSVP → participation",
+            "description": "Astuce : Demandez aux membres de poser des questions dans le fil avant la session. Cela augmente généralement la participation d'environ 30%."
+          },
+          "lowAttendance": {
+            "title": "La participation reste faible",
+            "description": "Essayez un horaire hebdomadaire fixe et annoncez-le plus tôt dans le fil pour créer une habitude."
+          },
+          "lowReplay": {
+            "title": "Opportunité de capture de rediffusion",
+            "description": "Plus de sessions ont besoin d'une distribution de rediffusion. Envoyez des notifications d'enregistrement prêt et partagez des liens publics."
+          },
+          "momentum": {
+            "title": "L'élan s'améliore",
+            "description": "Gardez une cadence stable cette semaine et lancez une annonce de session en direct supplémentaire."
+          },
+          "createQuestionPost": "Créer une publication de questions"
+        },
+        "scheduleSurface": {
+          "title": "Vue du calendrier",
+          "subtitle": "Vues à venir, passées et calendrier"
+        },
+        "tabs": {
+          "upcoming": "À venir ({count})",
+          "past": "Passées ({count})",
+          "calendar": "Calendrier"
+        },
+        "filters": {
+          "liveNow": "{count} en direct maintenant",
+          "all": "Toutes ({count})",
+          "live": "En direct ({count})",
+          "today": "Aujourd'hui ({count})",
+          "week": "Cette semaine ({count})",
+          "clearFilter": "Effacer le filtre"
+        },
+        "pastFilters": {
+          "all": "Toutes ({count})",
+          "replay": "Avec rediffusion ({count})",
+          "public": "Rediffusions publiques ({count})"
+        },
+        "card": {
+          "live": "EN DIRECT",
+          "withHost": "avec {host}",
+          "minutes": "{minutes} min",
+          "attending": "{count} participants",
+          "joinLive": "Rejoindre en direct",
+          "join": "Rejoindre",
+          "publicPage": "Page publique",
+          "attendingBtn": "Je participe",
+          "rsvp": "RSVP",
+          "manage": "Gérer",
+          "attended": "{count} ont participé",
+          "watch": "Regarder",
+          "watchReplay": "Voir la rediffusion",
+          "publicLink": "Lien public",
+          "membersOnly": "Réservé aux membres",
+          "enterRoom": "Entrer dans la salle",
+          "recordingAvailable": "Enregistrement disponible"
+        },
+        "featuredReplays": {
+          "title": "Rediffusions à la une",
+          "replay": "Rediffusion",
+          "topAttended": "La plus suivie"
+        },
+        "empty": {
+          "upcomingLive": "Aucune session en direct pour le moment",
+          "upcomingToday": "Aucune session planifiée pour aujourd'hui",
+          "upcomingWeek": "Aucune session planifiée cette semaine",
+          "upcomingAll": "Aucune session à venir pour le moment",
+          "upcomingBodyAll": "Planifiez votre prochain point en direct pour maintenir la cadence hebdomadaire de la communauté.",
+          "upcomingBodyFiltered": "Essayez un autre filtre ou planifiez une session pour cette période.",
+          "pastTitle": "Aucune session passée pour le moment",
+          "pastBody": "Les sessions passées avec enregistrement apparaîtront ici",
+          "pastFilterTitle": "Aucune session ne correspond à ce filtre",
+          "pastFilterPublic": "Aucune rediffusion publique pour le moment. Marquez une rediffusion comme publique pour la distribuer.",
+          "pastFilterReplay": "Aucun enregistrement disponible dans cette plage.",
+          "pastFilterDefault": "Essayez un autre filtre ou organisez une nouvelle session en direct."
+        },
+        "calendar": {
+          "sessionsThisMonth": "{count, plural, =1 {# session} other {# sessions}} ce mois-ci",
+          "upcomingInMonth": "À venir ce mois-ci",
+          "noUpcomingInMonth": "Aucune session à venir ce mois-ci.",
+          "moreCount": "+{count} de plus"
+        },
+        "error": {
+          "title": "Une erreur est survenue",
+          "body": "Impossible de charger les sessions",
+          "back": "Retour aux communautés"
         }
       }
     },

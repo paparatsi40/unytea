@@ -724,6 +724,137 @@
             "createFailed": "Failed to create session",
             "unexpectedError": "An unexpected error occurred"
           }
+        },
+        "title": "Live Sessions",
+        "today": "Today",
+        "tomorrow": "Tomorrow",
+        "sessionsCount": "{count, plural, =1 {# session} other {# sessions}}",
+        "subtitle": "{community} • Run live coaching, classes, and workshops",
+        "liveNowCount": "{count, plural, =1 {# session is live now} other {# sessions are live now}}",
+        "thisWeekCount": "{count, plural, =1 {# session this week} other {# sessions this week}}",
+        "scheduleSession": "Schedule Session",
+        "ownerOnly": "(Owner only feature)",
+        "nextSession": {
+          "label": "Next / Current session",
+          "liveBlurb": "Your community is live now. Keep momentum and drive join rate.",
+          "metaScheduled": "{date} · {time} · {minutes} min · with {host}",
+          "noneTitle": "No session scheduled yet",
+          "noneBody": "Schedule your next live touchpoint to keep weekly community cadence.",
+          "joinLive": "Join live",
+          "openSession": "Open session",
+          "attending": "Attending",
+          "rsvp": "RSVP",
+          "manage": "Manage"
+        },
+        "hostFallback": "Host",
+        "performance": {
+          "title": "Session performance",
+          "reminders": "Reminders",
+          "window": "Window:",
+          "windowDays": "{days}d",
+          "avgAttendance": "Avg attendance",
+          "lastDays": "last {days} days",
+          "vsPrev": "{value} vs prev period",
+          "vsPrevPp": "{value}pp vs prev period",
+          "rsvpToJoin": "RSVP → join",
+          "target": "target: {value}%",
+          "onTarget": "On target",
+          "ppToTarget": "{value}pp to target",
+          "remindersSent": "Reminders sent",
+          "deliveryVolume": "delivery volume",
+          "completedSessions": "Completed sessions",
+          "replayRate": "Replay rate: {value}%",
+          "replayVsPrev": "{value}pp replay vs prev period"
+        },
+        "recommendation": {
+          "lowRsvp": {
+            "title": "Low RSVP → Join conversion",
+            "description": "Tip: Ask members to drop questions in the feed before the session. This typically increases attendance by ~30%."
+          },
+          "lowAttendance": {
+            "title": "Attendance is still low",
+            "description": "Try a fixed weekly time and announce it earlier in feed to build a habit loop."
+          },
+          "lowReplay": {
+            "title": "Replay capture opportunity",
+            "description": "More sessions need replay distribution. Push recording-ready notifications and share public links."
+          },
+          "momentum": {
+            "title": "Momentum is improving",
+            "description": "Keep cadence stable this week and push one extra live session announcement."
+          },
+          "createQuestionPost": "Create question post"
+        },
+        "scheduleSurface": {
+          "title": "Schedule surface",
+          "subtitle": "Upcoming, past, and calendar views"
+        },
+        "tabs": {
+          "upcoming": "Upcoming ({count})",
+          "past": "Past ({count})",
+          "calendar": "Calendar"
+        },
+        "filters": {
+          "liveNow": "{count} live now",
+          "all": "All ({count})",
+          "live": "Live ({count})",
+          "today": "Today ({count})",
+          "week": "This week ({count})",
+          "clearFilter": "Clear filter"
+        },
+        "pastFilters": {
+          "all": "All ({count})",
+          "replay": "With Replay ({count})",
+          "public": "Public Replays ({count})"
+        },
+        "card": {
+          "live": "LIVE",
+          "withHost": "with {host}",
+          "minutes": "{minutes} min",
+          "attending": "{count} attending",
+          "joinLive": "Join Live",
+          "join": "Join",
+          "publicPage": "Public Page",
+          "attendingBtn": "Attending",
+          "rsvp": "RSVP",
+          "manage": "Manage",
+          "attended": "{count} attended",
+          "watch": "Watch",
+          "watchReplay": "Watch Replay",
+          "publicLink": "Public Link",
+          "membersOnly": "Members-only",
+          "enterRoom": "Enter Room",
+          "recordingAvailable": "Recording available"
+        },
+        "featuredReplays": {
+          "title": "Featured Replays",
+          "replay": "Replay",
+          "topAttended": "Top attended"
+        },
+        "empty": {
+          "upcomingLive": "No sessions live right now",
+          "upcomingToday": "No sessions scheduled for today",
+          "upcomingWeek": "No sessions scheduled this week",
+          "upcomingAll": "No upcoming sessions yet",
+          "upcomingBodyAll": "Schedule your next live touchpoint to keep weekly community cadence.",
+          "upcomingBodyFiltered": "Try another filter or schedule a session for this window.",
+          "pastTitle": "No past sessions yet",
+          "pastBody": "Past sessions with recordings will appear here",
+          "pastFilterTitle": "No sessions match this filter",
+          "pastFilterPublic": "No public replays yet. Mark a replay as public to distribute it.",
+          "pastFilterReplay": "No recordings available yet in this range.",
+          "pastFilterDefault": "Try another filter or host a new live session."
+        },
+        "calendar": {
+          "sessionsThisMonth": "{count, plural, =1 {# session} other {# sessions}} this month",
+          "upcomingInMonth": "Upcoming in this month",
+          "noUpcomingInMonth": "No upcoming sessions this month.",
+          "moreCount": "+{count} more"
+        },
+        "error": {
+          "title": "Something went wrong",
+          "body": "Unable to load sessions",
+          "back": "Back to Communities"
         }
       }
     },
