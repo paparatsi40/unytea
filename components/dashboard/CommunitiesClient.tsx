@@ -44,6 +44,13 @@ type CommunityPriorityReason =
   | "build_habit"
   | "healthy";
 
+// Internal error codes (not user-facing) so the render can map to localized
+// messages without string-matching on English copy.
+const ERROR_CODES = {
+  FETCH_FAILED: "FETCH_FAILED",
+  LOAD_FAILED: "LOAD_FAILED",
+} as const;
+
 // Localized "{weekday} · {time}" — day/time formatted with the active locale.
 function formatSessionDayTime(dateString: string, locale: string) {
   const date = new Date(dateString);
@@ -315,13 +322,13 @@ export function CommunitiesClient() {
       try {
         const response = await fetch("/api/communities");
         if (!response.ok) {
-          throw new Error("Failed to fetch communities");
+          throw new Error(ERROR_CODES.FETCH_FAILED);
         }
 
         const data = await response.json();
         setCommunities(data?.myCommunities || []);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "load");
+        setError(err instanceof Error ? err.message : ERROR_CODES.LOAD_FAILED);
       } finally {
         setLoading(false);
       }
@@ -415,7 +422,7 @@ export function CommunitiesClient() {
         <div className="text-center">
           <h2 className="text-2xl font-bold text-foreground">{t("errorTitle")}</h2>
           <p className="mt-2 text-muted-foreground">
-            {error === "Failed to fetch communities" ? t("fetchError") : t("loadError")}
+            {error === ERROR_CODES.FETCH_FAILED ? t("fetchError") : t("loadError")}
           </p>
           <Button onClick={() => window.location.reload()} className="mt-4">
             {t("retry")}
