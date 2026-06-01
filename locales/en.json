@@ -343,6 +343,31 @@
     "continue": "Continue"
   },
   "dashboard": {
+    "communityAdmin": {
+      "gate": {
+        "backToCommunities": "Back to Communities",
+        "members": "{count, plural, =1 {# member} other {# members}}",
+        "posts": "{count, plural, =1 {# post} other {# posts}}",
+        "joinCta": "Join community • Attend live sessions",
+        "pendingTitle": "Membership Pending",
+        "pendingBody": "Your request to join {name} is pending approval. You'll be notified when the community owner reviews your request.",
+        "deniedTitle": "Access Denied",
+        "deniedBody": "Your access to {name} has been restricted. Please contact the community owner for more information."
+      },
+      "feed": {
+        "label": "Community feed",
+        "subtitle": "Live activity from real posts and member discussions.",
+        "liveNow": "Live now",
+        "upcoming": "Upcoming",
+        "attending": "{count, plural, =1 {# attending} other {# attending}}",
+        "joinNow": "Join now",
+        "openRoom": "Open room",
+        "openSessions": "Open sessions",
+        "viewAll": "View all",
+        "noUpcomingTitle": "No upcoming live sessions",
+        "noUpcomingBody": "When a new session is scheduled, it will appear here."
+      }
+    },
     "calendar": {
       "metaTitle": "Calendar",
       "title": "Calendar",

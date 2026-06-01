@@ -342,6 +342,31 @@
     "continue": "Continuer"
   },
   "dashboard": {
+    "communityAdmin": {
+      "gate": {
+        "backToCommunities": "Retour aux communautés",
+        "members": "{count, plural, =1 {# membre} other {# membres}}",
+        "posts": "{count, plural, =1 {# publication} other {# publications}}",
+        "joinCta": "Rejoindre la communauté • Participez aux sessions en direct",
+        "pendingTitle": "Adhésion en attente",
+        "pendingBody": "Votre demande pour rejoindre {name} est en attente d'approbation. Vous serez notifié lorsque le propriétaire de la communauté examinera votre demande.",
+        "deniedTitle": "Accès refusé",
+        "deniedBody": "Votre accès à {name} a été restreint. Contactez le propriétaire de la communauté pour plus d'informations."
+      },
+      "feed": {
+        "label": "Fil de la communauté",
+        "subtitle": "Activité en direct des publications réelles et des discussions entre membres.",
+        "liveNow": "En direct",
+        "upcoming": "À venir",
+        "attending": "{count, plural, =1 {# participant} other {# participants}}",
+        "joinNow": "Rejoindre",
+        "openRoom": "Ouvrir la salle",
+        "openSessions": "Ouvrir les sessions",
+        "viewAll": "Voir tout",
+        "noUpcomingTitle": "Aucune session en direct à venir",
+        "noUpcomingBody": "Lorsqu'une nouvelle session est planifiée, elle apparaîtra ici."
+      }
+    },
     "calendar": {
       "metaTitle": "Calendrier",
       "title": "Calendrier",
