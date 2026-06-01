@@ -1,7 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Calendar } from "lucide-react";
+import { usePageTitle } from "@/lib/hooks/usePageTitle";
 import { CalendarView, type CalendarSession } from "@/components/calendar/CalendarView";
 
 interface CalendarPageClientProps {
@@ -9,6 +11,8 @@ interface CalendarPageClientProps {
 }
 
 export function CalendarPageClient({ sessions }: CalendarPageClientProps) {
+  const t = useTranslations("dashboard.calendar");
+  usePageTitle("metaTitle", "dashboard.calendar");
   const router = useRouter();
 
   const handleSessionClick = (session: CalendarSession) => {
@@ -27,8 +31,8 @@ export function CalendarPageClient({ sessions }: CalendarPageClientProps) {
           <Calendar className="h-5 w-5 text-purple-400" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-white">Calendar</h1>
-          <p className="text-sm text-zinc-400">All your sessions across communities</p>
+          <h1 className="text-2xl font-bold text-white">{t("title")}</h1>
+          <p className="text-sm text-zinc-400">{t("subtitle")}</p>
         </div>
       </div>
 

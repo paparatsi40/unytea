@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Bell, X, Check, MessageCircle, Users, Trophy, Heart, AlertCircle } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { formatDistanceToNow } from "date-fns";
-import { enUS, es, fr } from "date-fns/locale";
+import { getDateFnsLocale } from "@/lib/i18n/date-fns-locale";
 import {
   getUserNotifications,
   markNotificationAsRead,
@@ -13,8 +13,6 @@ import {
   deleteNotification,
 } from "@/app/actions/notifications";
 import { useCurrentUser } from "@/hooks/use-current-user";
-
-const DATE_FNS_LOCALES = { en: enUS, es, fr } as const;
 
 type NotificationType =
   | "MESSAGE"
@@ -38,7 +36,7 @@ interface Notification {
 export function NotificationCenter() {
   const t = useTranslations("dashboard.notifications");
   const locale = useLocale();
-  const dfLocale = DATE_FNS_LOCALES[locale as keyof typeof DATE_FNS_LOCALES] ?? enUS;
+  const dfLocale = getDateFnsLocale(locale);
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);

@@ -3,12 +3,10 @@
 import { Video, Play, Plus, Library, Clock, Users, Calendar } from "lucide-react";
 import { RecordingDistributionActions } from "@/components/sessions/RecordingDistributionActions";
 import { formatDistanceToNow } from "date-fns";
-import { enUS, es, fr } from "date-fns/locale";
+import { getDateFnsLocale } from "@/lib/i18n/date-fns-locale";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import type { RecordingRow, NextLiveSession } from "./RecordingsTab";
-
-const DATE_FNS_LOCALES = { en: enUS, es, fr } as const;
 
 export function RecordingsTabView({
   recordings,
@@ -19,7 +17,7 @@ export function RecordingsTabView({
 }) {
   const t = useTranslations("dashboard.library.recordings");
   const locale = useLocale();
-  const dfLocale = DATE_FNS_LOCALES[locale as keyof typeof DATE_FNS_LOCALES] ?? enUS;
+  const dfLocale = getDateFnsLocale(locale);
 
   return (
     <div className="space-y-8">

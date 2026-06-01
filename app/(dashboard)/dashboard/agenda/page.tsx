@@ -1,18 +1,7 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { Video, Calendar, Clock, ArrowRight, Sparkles, Users } from "lucide-react";
-import { format, isToday, isTomorrow, formatDistanceToNow } from "date-fns";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
-import Image from "next/image";
-
-function formatSessionDate(date: Date): string {
-  if (isToday(date)) return "Today";
-  if (isTomorrow(date)) return "Tomorrow";
-  return format(date, "EEEE, MMM d");
-}
+import { AgendaPageClient, type AgendaSession } from "./AgendaPageClient";
 
 export const metadata = {
   title: "Agenda | Unytea",
@@ -37,21 +26,10 @@ export default async function AgendaPage() {
       title: true,
       scheduledAt: true,
       duration: true,
-      status: true,
       recordingUrl: true,
-      communityId: true,
-      mentor: {
-        select: {
-          id: true,
-          name: true,
-          image: true,
-        },
-      },
       community: {
         select: {
-          id: true,
           name: true,
-          slug: true,
           imageUrl: true,
         },
       },
@@ -61,155 +39,21 @@ export default async function AgendaPage() {
     },
   });
 
+  // Serialize to plain props so the client view can localize dates/strings
+  // (the dashboard route group has no [locale] segment for server getTranslations).
+  const mapped: AgendaSession[] = allSessions.map((s) => ({
+    id: s.id,
+    title: s.title,
+    scheduledAt: s.scheduledAt.toISOString(),
+    duration: s.duration,
+    recordingUrl: s.recordingUrl,
+    communityName: s.community?.name ?? null,
+    communityImageUrl: s.community?.imageUrl ?? null,
+  }));
+
   const now = new Date();
-  const upcoming = allSessions.filter((s) => new Date(s.scheduledAt) > now);
-  const past = allSessions.filter((s) => new Date(s.scheduledAt) <= now);
+  const upcoming = mapped.filter((s) => new Date(s.scheduledAt) > now);
+  const past = mapped.filter((s) => new Date(s.scheduledAt) <= now);
 
-  // Group upcoming by date
-  const groupedByDate = upcoming.reduce(
-    (acc, session) => {
-      const date = formatSessionDate(new Date(session.scheduledAt));
-      if (!acc[date]) acc[date] = [];
-      acc[date].push(session);
-      return acc;
-    },
-    {} as Record<string, typeof upcoming>
-  );
-
-  return (
-    <div className="space-y-8 p-8">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-white">Your Agenda</h1>
-        <p className="mt-1 text-sm text-zinc-400">All your upcoming sessions across communities</p>
-        {upcoming.length > 0 && (
-          <p className="mt-2 text-sm font-medium text-purple-400">
-            <Sparkles className="mr-1 inline h-4 w-4" />
-            {upcoming.length} upcoming session{upcoming.length !== 1 ? "s" : ""} this week
-          </p>
-        )}
-      </div>
-
-      {/* UPCOMING SESSIONS GROUPED BY DATE */}
-      {upcoming.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-zinc-700 bg-zinc-900 p-8 text-center">
-          <Video className="mx-auto mb-4 h-12 w-12 text-zinc-500" />
-          <h2 className="mb-2 text-xl font-semibold text-white">No upcoming sessions</h2>
-          <p className="text-zinc-400">
-            You don&apos;t have any scheduled sessions. Join a community to find live events.
-          </p>
-          <Link href="/dashboard/communities">
-            <Button className="mt-4 rounded-full bg-purple-600 hover:bg-purple-700">
-              Explore Communities
-            </Button>
-          </Link>
-        </div>
-      ) : (
-        <div className="space-y-6">
-          {Object.entries(groupedByDate).map(([date, sessions]) => (
-            <div key={date} className="space-y-3">
-              <h2 className="flex items-center gap-2 text-sm font-medium text-zinc-400">
-                <Calendar className="h-4 w-4" />
-                {date}
-              </h2>
-
-              <div className="space-y-3">
-                {sessions.map((s) => (
-                  <div
-                    key={s.id}
-                    className="flex items-center gap-4 rounded-xl border border-zinc-800 bg-zinc-950 p-4 transition-all hover:border-zinc-700"
-                  >
-                    {/* Community Avatar */}
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-zinc-900">
-                      {s.community?.imageUrl ? (
-                        <Image
-                          src={s.community.imageUrl}
-                          alt={s.community.name}
-                          width={48}
-                          height={48}
-                          className="h-full w-full rounded-lg object-cover"
-                        />
-                      ) : (
-                        <Users className="h-6 w-6 text-zinc-500" />
-                      )}
-                    </div>
-
-                    {/* Session Info */}
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <h3 className="truncate font-semibold text-white">{s.title}</h3>
-                        {isToday(new Date(s.scheduledAt)) && (
-                          <Badge className="bg-purple-600 text-xs text-white">Today</Badge>
-                        )}
-                      </div>
-                      <p className="text-sm text-zinc-400">
-                        {s.community?.name} • {format(new Date(s.scheduledAt), "h:mm a")}
-                      </p>
-                    </div>
-
-                    {/* Duration */}
-                    <div className="hidden items-center gap-1 text-xs text-zinc-500 sm:flex">
-                      <Clock className="h-3 w-3" />
-                      {s.duration} min
-                    </div>
-
-                    {/* Actions */}
-                    <Link href={`/dashboard/sessions/${s.id}/room`}>
-                      <Button size="sm" className="rounded-full bg-purple-600 hover:bg-purple-700">
-                        Join
-                        <ArrowRight className="ml-1 h-3 w-3" />
-                      </Button>
-                    </Link>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* PAST SESSIONS SUMMARY */}
-      {past.length > 0 && (
-        <div className="border-t border-zinc-800 pt-4">
-          <h2 className="mb-3 text-sm font-medium text-zinc-400">
-            Recent Past Sessions ({past.length})
-          </h2>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {past.slice(0, 4).map((s) => (
-              <div
-                key={s.id}
-                className="flex items-center gap-3 rounded-lg border border-zinc-800 bg-zinc-950/50 p-3"
-              >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-zinc-900">
-                  <Users className="h-5 w-5 text-zinc-500" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-white">{s.title}</p>
-                  <p className="text-xs text-zinc-500">
-                    {s.community?.name} •{" "}
-                    {formatDistanceToNow(new Date(s.scheduledAt), { addSuffix: true })}
-                  </p>
-                </div>
-                {s.recordingUrl && (
-                  <Badge className="border-0 bg-green-500/10 text-xs text-green-400">
-                    Recording
-                  </Badge>
-                )}
-              </div>
-            ))}
-          </div>
-          {past.length > 4 && (
-            <div className="mt-4 text-center">
-              <Link href="/dashboard/sessions">
-                <Button variant="ghost" className="text-zinc-400 hover:text-white">
-                  View all {past.length} sessions
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
+  return <AgendaPageClient upcoming={upcoming} past={past} />;
 }

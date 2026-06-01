@@ -21,7 +21,7 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { OnboardingChecklist } from "@/components/onboarding/OnboardingChecklist";
 import { formatDistanceToNow, format } from "date-fns";
-import { enUS, es, fr } from "date-fns/locale";
+import { getDateFnsLocale } from "@/lib/i18n/date-fns-locale";
 import type { OnboardingProgress } from "@/app/actions/onboarding";
 import type { TodayDashboardData } from "@/app/actions/today-dashboard";
 
@@ -30,12 +30,10 @@ interface Props {
   onboardingProgress: OnboardingProgress | null;
 }
 
-const DATE_FNS_LOCALES = { en: enUS, es, fr } as const;
-
 export function DashboardHomeView({ data, onboardingProgress }: Props) {
   const t = useTranslations("dashboard.home");
   const locale = useLocale();
-  const dfLocale = DATE_FNS_LOCALES[locale as keyof typeof DATE_FNS_LOCALES] ?? enUS;
+  const dfLocale = getDateFnsLocale(locale);
 
   const s = data.weeklyStats.sessionsThisWeek;
   const heroText =

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
-import { enUS, es, fr } from "date-fns/locale";
+import { getDateFnsLocale } from "@/lib/i18n/date-fns-locale";
 import { useLocale, useTranslations } from "next-intl";
 import {
   MessageSquare,
@@ -53,12 +53,10 @@ const NOTIFICATION_ICONS: Record<string, React.ReactNode> = {
   SYSTEM: <Info className="h-5 w-5 text-gray-500" />,
 };
 
-const DATE_FNS_LOCALES = { en: enUS, es, fr } as const;
-
 export function NotificationItem({ notification, onUpdate }: NotificationItemProps) {
   const t = useTranslations("dashboard.notifications");
   const locale = useLocale();
-  const dfLocale = DATE_FNS_LOCALES[locale as keyof typeof DATE_FNS_LOCALES] ?? enUS;
+  const dfLocale = getDateFnsLocale(locale);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleMarkAsRead = async (e: React.MouseEvent) => {

@@ -342,6 +342,247 @@
     "continue": "Continuer"
   },
   "dashboard": {
+    "calendar": {
+      "metaTitle": "Calendrier",
+      "title": "Calendrier",
+      "subtitle": "Toutes vos sessions dans vos communautés",
+      "nav": {
+        "today": "Aujourd'hui",
+        "previousMonth": "Mois précédent",
+        "nextMonth": "Mois suivant"
+      },
+      "selectDate": "Sélectionnez une date",
+      "noSessions": "Aucune session planifiée",
+      "durationMinutes": "{minutes} min",
+      "live": "En direct",
+      "status": {
+        "scheduled": "planifiée",
+        "completed": "terminée",
+        "cancelled": "annulée"
+      },
+      "by": "par {name}",
+      "exportGoogle": "Google Cal",
+      "ics": {
+        "communityPrefix": "Communauté",
+        "defaultDescription": "Session Unytea"
+      }
+    },
+    "agenda": {
+      "metaTitle": "Agenda",
+      "title": "Votre agenda",
+      "subtitle": "Toutes vos prochaines sessions dans vos communautés",
+      "upcomingThisWeek": "{count, plural, =1 {# session à venir cette semaine} other {# sessions à venir cette semaine}}",
+      "today": "Aujourd'hui",
+      "tomorrow": "Demain",
+      "durationMinutes": "{minutes} min",
+      "join": "Rejoindre",
+      "empty": {
+        "title": "Aucune session à venir",
+        "description": "Vous n'avez aucune session planifiée. Rejoignez une communauté pour trouver des événements en direct.",
+        "cta": "Explorer les communautés"
+      },
+      "past": {
+        "title": "Sessions passées récentes ({count})",
+        "recording": "Enregistrement",
+        "viewAll": "{count, plural, =1 {Voir # session} other {Voir les # sessions}}"
+      }
+    },
+    "sessions": {
+      "metaTitle": "Sessions",
+      "title": "Sessions en direct",
+      "subtitle": "Animez du coaching, des cours et des ateliers en direct",
+      "scheduleSession": "Planifier une session",
+      "sessionsThisWeek": "{count, plural, =1 {# session cette semaine} other {# sessions cette semaine}}",
+      "loadFailedTitle": "Échec du chargement des sessions",
+      "genericError": "Une erreur s'est produite",
+      "today": "Aujourd'hui",
+      "tomorrow": "Demain",
+      "durationMinutes": "{minutes} min",
+      "withHost": "avec {name}",
+      "joinNextSession": "Rejoindre la session",
+      "startingSoon": {
+        "badge": "COMMENCE BIENTÔT",
+        "startsIn": "Commence dans {minutes} min · {time}"
+      },
+      "liveNow": {
+        "badge": "EN DIRECT",
+        "startedAgo": "Commencé il y a {distance}",
+        "participants": "{count, plural, =1 {# participant} other {# participants}}"
+      },
+      "upcoming": {
+        "title": "Sessions à venir",
+        "edit": "Modifier",
+        "attending": "{count} inscrits"
+      },
+      "empty": {
+        "title": "Animez votre première session en direct",
+        "description": "Animez des appels de coaching, des ateliers ou des sessions de questions-réponses. Engagez votre communauté en temps réel.",
+        "takesMinutes": "Prend 2 minutes",
+        "growFaster": "Les communautés avec des sessions hebdomadaires grandissent 3 fois plus vite",
+        "classroomAlt": "Salle de classe conventionnelle avec des étudiants",
+        "yogaAlt": "Instructeur de yoga ou de pilates avec des étudiants en pratique"
+      },
+      "past": {
+        "title": "Sessions passées",
+        "recordingAvailable": "Enregistrement disponible",
+        "enterRoom": "Entrer dans la salle",
+        "watch": "Regarder",
+        "viewAll": "{count, plural, =1 {Voir # session passée} other {Voir les # sessions passées}}"
+      }
+    },
+    "analytics": {
+      "metaTitle": "Analytique",
+      "title": "Analytique",
+      "subtitle": "Informations et métriques de vos communautés",
+      "loadFailedTitle": "Échec du chargement de l'analytique",
+      "genericError": "Une erreur s'est produite",
+      "selector": {
+        "all": "Toutes les communautés",
+        "select": "Sélectionner une communauté"
+      },
+      "overview": {
+        "totalMembers": "Membres au total",
+        "totalPosts": "Publications au total",
+        "totalComments": "Commentaires au total",
+        "totalMessages": "Messages au total",
+        "thisMonth": "+{count} ce mois-ci"
+      },
+      "growth": {
+        "title": "Aperçu de la croissance",
+        "subtitle": "Tendances de croissance des membres et du contenu",
+        "memberTitle": "Croissance des membres",
+        "contentTitle": "Croissance du contenu",
+        "totalMembers": "Membres au total",
+        "totalPosts": "Publications au total",
+        "newThisMonth": "Nouveaux ce mois-ci"
+      },
+      "communities": {
+        "title": "Vos communautés",
+        "youOwn": "{count, plural, =1 {Vous possédez # communauté} other {Vous possédez # communautés}}",
+        "emptyText": "Créez votre première communauté pour voir des analyses détaillées",
+        "createCta": "Créer une communauté"
+      },
+      "northStar": {
+        "title": "Cadre de décision North Star",
+        "subtitle": "Diagnostiquez ce qu'il faut améliorer ensuite à partir des participants actifs hebdomadaires et des leviers clés.",
+        "waa": "Participants actifs hebdomadaires",
+        "avgLiveAttendance": "Présence moyenne en direct",
+        "returningAttendees": "Participants récurrents",
+        "feedParticipation": "Participation au fil",
+        "contentReuse": "Réutilisation du contenu",
+        "diagnosisLabel": "Diagnostic :",
+        "error": "Impossible de charger les diagnostics North Star pour le moment.",
+        "diagnosis": {
+          "noCommunities": "Aucune communauté pour le moment",
+          "healthy": "Croissance saine sur tous les leviers clés",
+          "bottleneck": "Principal point de blocage : {signals}"
+        },
+        "weakSignals": {
+          "weeklyActiveAttendeesLow": "les participants actifs hebdomadaires sont faibles",
+          "avgLiveAttendanceLow": "la présence moyenne en direct est faible",
+          "returningAttendeesWeak": "les participants récurrents sont faibles",
+          "feedParticipationLow": "la participation au fil est faible",
+          "contentReuseLow": "la réutilisation des sessions en contenu est faible"
+        },
+        "actions": {
+          "createCommunity": {
+            "title": "Créez votre première communauté",
+            "why": "Vous avez besoin d'une communauté active pour commencer à générer des participants actifs hebdomadaires.",
+            "cta": "Créer une communauté"
+          },
+          "improveAttendance": {
+            "title": "Améliorez la présence cette semaine",
+            "why": "Une faible présence s'améliore généralement avec des rappels plus précoces et une promesse de session plus claire.",
+            "cta": "Optimiser la prochaine session"
+          },
+          "preSessionDiscussion": {
+            "title": "Lancez une discussion avant la session",
+            "why": "Les communautés avec une discussion avant le direct convertissent mieux en présence.",
+            "cta": "Publier un sujet de discussion"
+          },
+          "publishRecaps": {
+            "title": "Publiez des récapitulatifs et des enregistrements",
+            "why": "Le contenu réutilisé augmente la rétention et les opportunités de monétisation.",
+            "cta": "Publier dans la bibliothèque"
+          },
+          "scaleFormat": {
+            "title": "Développez votre meilleur format",
+            "why": "Vos leviers clés sont sains ; le prochain gain vient de plus de sessions hebdomadaires et de distribution.",
+            "cta": "Planifier la prochaine session"
+          }
+        }
+      },
+      "health": {
+        "title": "Santé de la communauté en direct",
+        "subtitle": "Métriques de santé clés pour les communautés basées sur les sessions",
+        "returningAttendees": "Participants récurrents",
+        "returningDetail": "{returning} sur {unique} participants ont rejoint plus d'une session.",
+        "feedParticipation": "Taux de participation au fil (30 j)",
+        "feedDetail": "{active} membres actifs ont publié ou commenté sur {total} membres actifs.",
+        "error": "Impossible de charger les métriques de santé en direct pour le moment.",
+        "benchmark": {
+          "needsWork": "À améliorer",
+          "acceptable": "Acceptable",
+          "strong": "Solide",
+          "exceptional": "Exceptionnel",
+          "silent": "Silencieux",
+          "normal": "Normal",
+          "alive": "Actif",
+          "veryStrong": "Très solide"
+        }
+      },
+      "retention": {
+        "title": "Cohortes de rétention",
+        "subtitle": "Cohortes hebdomadaires par date d'inscription et % actif les semaines suivantes",
+        "trendLabel": "Tendance S1→S3 :",
+        "allCommunities": "Toutes les communautés",
+        "cohortWeek": "Cohorte (semaine)",
+        "size": "Taille",
+        "empty": "Pas encore assez de données de cohorte."
+      },
+      "proTipLabel": "💡 Astuce :",
+      "proTip": "Utilisez le sélecteur de communauté en haut à droite (\"Toutes les communautés\") pour voir des analyses détaillées par communauté, y compris les informations sur les membres, les métriques d'engagement et les performances du contenu.",
+      "charts": {
+        "tabs": {
+          "sessions": "Sessions",
+          "courses": "Cours",
+          "revenue": "Revenus"
+        },
+        "sessions": {
+          "total": "Sessions au total",
+          "avgAttendance": "Présence moyenne",
+          "avgRating": "Note moyenne",
+          "notAvailable": "N/D",
+          "reviews": "{count, plural, =1 {# avis} other {# avis}}",
+          "status": "Statut",
+          "statusSub": "{scheduled} planifiées · {live} en direct",
+          "chartTitle": "Sessions et présence (30 derniers jours)",
+          "empty": "Pas encore de données de session"
+        },
+        "courses": {
+          "total": "Cours au total",
+          "enrollments": "Inscriptions",
+          "completionRate": "Taux d'achèvement",
+          "completedSub": "{count} terminées",
+          "certificates": "Certificats",
+          "chartTitle": "Nouvelles inscriptions (30 derniers jours)",
+          "performance": "Performance des cours",
+          "enrolled": "{count} inscrits",
+          "completionModules": "{completion}% d'achèvement · {modules, plural, =1 {# module} other {# modules}}",
+          "empty": "Pas encore de données de cours"
+        },
+        "revenue": {
+          "total": "Revenus totaux",
+          "course": "Revenus des cours",
+          "membership": "Revenus des abonnements",
+          "paidMembers": "{count, plural, =1 {# membre payant} other {# membres payants}}",
+          "byCourse": "Revenus par cours",
+          "priceEnrollments": "{price} × {count, plural, =1 {# inscription} other {# inscriptions}}",
+          "emptyHint": "Commencez à monétiser en fixant des prix sur vos cours et communautés",
+          "empty": "Pas encore de données de revenus"
+        }
+      }
+    },
     "profile": {
       "loading": "Chargement...",
       "userFallback": "Utilisateur",
