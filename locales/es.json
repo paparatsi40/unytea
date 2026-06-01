@@ -382,10 +382,15 @@
         "noSessions": "No tienes sesiones esta semana. Programa la primera.",
         "fewSessions": "{count} sesión esta semana. Mantén el ritmo.",
         "manySessions": "{count} sesiones esta semana. Buen ritmo.",
-        "scheduleSession": "Programar sesión",
-        "statSessions": "Sesiones esta semana",
-        "statMembers": "Nuevos miembros",
-        "statPosts": "Publicaciones esta semana"
+        "scheduleSession": "Programar sesión"
+      },
+      "analytics": {
+        "title": "Esta semana",
+        "viewFull": "Ver analytics completos",
+        "sessions": "Sesiones",
+        "newMembers": "Miembros nuevos",
+        "posts": "Publicaciones",
+        "vsLastWeek": "vs semana pasada"
       },
       "nextLiveSession": {
         "title": "Próxima sesión en vivo",
@@ -648,7 +653,6 @@
       "library": "Biblioteca",
       "messages": "Mensajes",
       "sessions": "Sesiones",
-      "analytics": "Analíticas",
       "notifications": "Notificaciones",
       "settings": "Configuración"
     },

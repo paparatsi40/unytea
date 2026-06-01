@@ -37,6 +37,10 @@ export interface TodayDashboardData {
     sessionsThisWeek: number;
     newMembersThisWeek: number;
     postsThisWeek: number;
+    // Week-over-week deltas (this week minus the prior 7-day window).
+    sessionsDelta: number;
+    newMembersDelta: number;
+    postsDelta: number;
   };
   recentActivity: TodayActivity[];
 }
@@ -55,6 +59,7 @@ export async function getTodayDashboard(): Promise<TodayDashboardData | null> {
   const userId = session.user.id;
   const now = new Date();
   const weekAgo = subDays(now, 7);
+  const twoWeeksAgo = subDays(now, 14);
   const sevenDaysFromNow = addDays(now, 7);
 
   const [
@@ -67,6 +72,9 @@ export async function getTodayDashboard(): Promise<TodayDashboardData | null> {
     postsThisWeek,
     recentMembers,
     recentPosts,
+    sessionsLastWeek,
+    newMembersLastWeek,
+    postsLastWeek,
   ] = await Promise.all([
     prisma.user.findUnique({
       where: { id: userId },
@@ -142,6 +150,23 @@ export async function getTodayDashboard(): Promise<TodayDashboardData | null> {
       orderBy: { createdAt: "desc" },
       take: 5,
     }),
+
+    // Prior 7-day window (7-14 days ago) for week-over-week deltas.
+    prisma.mentorSession.count({
+      where: { community: { ownerId: userId }, scheduledAt: { gte: twoWeeksAgo, lt: weekAgo } },
+    }),
+
+    prisma.member.count({
+      where: { community: { ownerId: userId }, joinedAt: { gte: twoWeeksAgo, lt: weekAgo } },
+    }),
+
+    prisma.post.count({
+      where: {
+        community: { ownerId: userId },
+        createdAt: { gte: twoWeeksAgo, lt: weekAgo },
+        deletedAt: null,
+      },
+    }),
   ]);
 
   // Owned communities first, then memberships not already owned, capped at 6.
@@ -186,7 +211,14 @@ export async function getTodayDashboard(): Promise<TodayDashboardData | null> {
           }
         : null,
     communities,
-    weeklyStats: { sessionsThisWeek, newMembersThisWeek, postsThisWeek },
+    weeklyStats: {
+      sessionsThisWeek,
+      newMembersThisWeek,
+      postsThisWeek,
+      sessionsDelta: sessionsThisWeek - sessionsLastWeek,
+      newMembersDelta: newMembersThisWeek - newMembersLastWeek,
+      postsDelta: postsThisWeek - postsLastWeek,
+    },
     recentActivity,
   };
 }

@@ -382,10 +382,15 @@
         "noSessions": "You have no sessions this week. Schedule your first.",
         "fewSessions": "{count} session this week. Keep the momentum.",
         "manySessions": "{count} sessions this week. Great rhythm.",
-        "scheduleSession": "Schedule session",
-        "statSessions": "Sessions this week",
-        "statMembers": "New members",
-        "statPosts": "Posts this week"
+        "scheduleSession": "Schedule session"
+      },
+      "analytics": {
+        "title": "This week",
+        "viewFull": "View full analytics",
+        "sessions": "Sessions",
+        "newMembers": "New members",
+        "posts": "Posts",
+        "vsLastWeek": "vs last week"
       },
       "nextLiveSession": {
         "title": "Next live session",
@@ -563,7 +568,6 @@
       "library": "Library",
       "messages": "Messages",
       "sessions": "Sessions",
-      "analytics": "Analytics",
       "notifications": "Notifications",
       "settings": "Settings"
     },

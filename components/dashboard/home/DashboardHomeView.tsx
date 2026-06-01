@@ -3,9 +3,22 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
-import { Calendar, Users, MessageSquare, Plus, BarChart3, Settings, Video } from "lucide-react";
+import {
+  Calendar,
+  Users,
+  MessageSquare,
+  Plus,
+  BarChart3,
+  Settings,
+  Video,
+  TrendingUp,
+  TrendingDown,
+  Minus,
+  ArrowRight,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import { OnboardingChecklist } from "@/components/onboarding/OnboardingChecklist";
 import { formatDistanceToNow, format } from "date-fns";
 import { enUS, es, fr } from "date-fns/locale";
@@ -78,7 +91,7 @@ export function DashboardHomeView({ data, onboardingProgress }: Props) {
       {/* Onboarding (new users only) */}
       {onboardingItems.length > 0 && <OnboardingChecklist items={onboardingItems} />}
 
-      {/* Action-first hero */}
+      {/* Action-first hero — purely "what to do next", no stats. */}
       <Card className="p-5">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <p className="max-w-2xl text-lg font-medium text-foreground">{heroText}</p>
@@ -89,12 +102,40 @@ export function DashboardHomeView({ data, onboardingProgress }: Props) {
             </Link>
           </Button>
         </div>
-        <div className="mt-4 grid gap-3 sm:grid-cols-3">
-          <Stat value={data.weeklyStats.sessionsThisWeek} label={t("actionFirst.statSessions")} />
-          <Stat value={data.weeklyStats.newMembersThisWeek} label={t("actionFirst.statMembers")} />
-          <Stat value={data.weeklyStats.postsThisWeek} label={t("actionFirst.statPosts")} />
-        </div>
       </Card>
+
+      {/* Analytics summary — "how am I doing" (week-over-week). */}
+      <div className="rounded-lg border border-border bg-card p-5">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-base font-medium">{t("analytics.title")}</h2>
+          <Link
+            href="/dashboard/analytics"
+            className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+          >
+            {t("analytics.viewFull")} <ArrowRight className="h-3 w-3" />
+          </Link>
+        </div>
+        <div className="grid grid-cols-3 gap-4">
+          <MetricCell
+            label={t("analytics.sessions")}
+            value={data.weeklyStats.sessionsThisWeek}
+            delta={data.weeklyStats.sessionsDelta}
+            vsLabel={t("analytics.vsLastWeek")}
+          />
+          <MetricCell
+            label={t("analytics.newMembers")}
+            value={data.weeklyStats.newMembersThisWeek}
+            delta={data.weeklyStats.newMembersDelta}
+            vsLabel={t("analytics.vsLastWeek")}
+          />
+          <MetricCell
+            label={t("analytics.posts")}
+            value={data.weeklyStats.postsThisWeek}
+            delta={data.weeklyStats.postsDelta}
+            vsLabel={t("analytics.vsLastWeek")}
+          />
+        </div>
+      </div>
 
       {/* Next live session */}
       {data.nextLiveSession && (
@@ -249,11 +290,35 @@ export function DashboardHomeView({ data, onboardingProgress }: Props) {
   );
 }
 
-function Stat({ value, label }: { value: number; label: string }) {
+function MetricCell({
+  label,
+  value,
+  delta,
+  vsLabel,
+}: {
+  label: string;
+  value: number;
+  delta: number;
+  vsLabel: string;
+}) {
+  const trend = delta > 0 ? "up" : delta < 0 ? "down" : "flat";
+  const TrendIcon = trend === "up" ? TrendingUp : trend === "down" ? TrendingDown : Minus;
+  const trendColor =
+    trend === "up" ? "text-green-600" : trend === "down" ? "text-red-600" : "text-muted-foreground";
+  const sign = delta > 0 ? "+" : "";
+
   return (
-    <div className="rounded-lg bg-muted/50 p-3">
-      <p className="text-2xl font-bold text-foreground">{value}</p>
-      <p className="text-xs text-muted-foreground">{label}</p>
+    <div>
+      <div className="mb-1 text-xs text-muted-foreground">{label}</div>
+      <div className="mb-0.5 text-2xl font-semibold">{value}</div>
+      <div className={cn("inline-flex items-center gap-0.5 text-xs", trendColor)}>
+        <TrendIcon className="h-3 w-3" />
+        <span>
+          {sign}
+          {delta}
+        </span>
+        <span className="ml-1 text-muted-foreground">{vsLabel}</span>
+      </div>
     </div>
   );
 }
