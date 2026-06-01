@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { usePusher } from "@/hooks/use-pusher";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { useTranslations } from "next-intl";
 
 interface Message {
   id: string;
@@ -23,6 +24,7 @@ interface PusherChatProps {
 }
 
 export function PusherChat({ channelId, channelName }: PusherChatProps) {
+  const t = useTranslations("dashboard.communityMember.pusherChat");
   const { user } = useCurrentUser();
   const { sendMessage, onMessage, isConnected } = usePusher(channelId, user?.id || "");
 
@@ -56,15 +58,14 @@ export function PusherChat({ channelId, channelName }: PusherChatProps) {
 
     setIsSending(true);
     try {
-      await sendMessage(newMessage.trim(), user.name || "Anonymous");
+      await sendMessage(newMessage.trim(), user.name || t("anonymous"));
       setNewMessage("");
       inputRef.current?.focus();
     } catch (error) {
       console.error("Failed to send message:", error);
-    } finally {
-      setIsSending(false);
     }
-  }, [newMessage, user, sendMessage]);
+    setIsSending(false);
+  }, [newMessage, user, sendMessage, t]);
 
   // Handle Enter key
   const handleKeyDown = useCallback(
@@ -113,18 +114,18 @@ export function PusherChat({ channelId, channelName }: PusherChatProps) {
               {isConnected ? (
                 <span className="flex items-center gap-1 text-green-500">
                   <Wifi className="h-3 w-3" />
-                  Connected
+                  {t("connected")}
                 </span>
               ) : (
                 <span className="flex items-center gap-1 text-yellow-500">
                   <WifiOff className="h-3 w-3" />
-                  Connecting...
+                  {t("connecting")}
                 </span>
               )}
             </p>
           </div>
         </div>
-        <Badge variant="secondary">{messages.length} messages</Badge>
+        <Badge variant="secondary">{t("messageCount", { count: messages.length })}</Badge>
       </div>
 
       {/* Messages */}
@@ -133,8 +134,8 @@ export function PusherChat({ channelId, channelName }: PusherChatProps) {
           {groupedMessages.length === 0 ? (
             <div className="flex h-40 flex-col items-center justify-center text-muted-foreground">
               <Users className="mb-2 h-8 w-8 opacity-50" />
-              <p>No messages yet</p>
-              <p className="text-sm">Start the conversation!</p>
+              <p>{t("empty.title")}</p>
+              <p className="text-sm">{t("empty.hint")}</p>
             </div>
           ) : (
             groupedMessages.map((group) => {
@@ -182,10 +183,16 @@ export function PusherChat({ channelId, channelName }: PusherChatProps) {
                           (now.getTime() - date.getTime()) / (1000 * 60)
                         );
 
-                        if (diffInMinutes < 1) return "just now";
-                        if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
-                        if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
-                        return `${Math.floor(diffInMinutes / 1440)}d ago`;
+                        if (diffInMinutes < 1) return t("relativeTime.justNow");
+                        if (diffInMinutes < 60)
+                          return t("relativeTime.minutesAgo", { count: diffInMinutes });
+                        if (diffInMinutes < 1440)
+                          return t("relativeTime.hoursAgo", {
+                            count: Math.floor(diffInMinutes / 60),
+                          });
+                        return t("relativeTime.daysAgo", {
+                          count: Math.floor(diffInMinutes / 1440),
+                        });
                       })()}
                     </span>
                   </div>
@@ -201,7 +208,7 @@ export function PusherChat({ channelId, channelName }: PusherChatProps) {
         <div className="flex gap-2">
           <Input
             ref={inputRef}
-            placeholder="Type a message..."
+            placeholder={t("inputPlaceholder")}
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -220,9 +227,7 @@ export function PusherChat({ channelId, channelName }: PusherChatProps) {
             )}
           </Button>
         </div>
-        <p className="mt-2 text-xs text-muted-foreground">
-          Press Enter to send, Shift+Enter for new line
-        </p>
+        <p className="mt-2 text-xs text-muted-foreground">{t("inputHint")}</p>
       </div>
     </div>
   );

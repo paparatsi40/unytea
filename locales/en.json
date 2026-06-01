@@ -1042,6 +1042,44 @@
         "owner": "Owner",
         "unknownOwner": "Unknown",
         "backButton": "Back to Community"
+      },
+      "chat": {
+        "loading": "Loading chat...",
+        "noChannels": {
+          "title": "No channels found",
+          "hint": "Failed to create default channels"
+        },
+        "viewToggle": {
+          "chat": "Chat",
+          "auditorium": "Auditorium"
+        },
+        "defaultChannel": "General"
+      },
+      "pusherChat": {
+        "connected": "Connected",
+        "connecting": "Connecting...",
+        "messageCount": "{count, plural, =1 {# message} other {# messages}}",
+        "empty": {
+          "title": "No messages yet",
+          "hint": "Start the conversation!"
+        },
+        "relativeTime": {
+          "justNow": "just now",
+          "minutesAgo": "{count}m ago",
+          "hoursAgo": "{count}h ago",
+          "daysAgo": "{count}d ago"
+        },
+        "inputPlaceholder": "Type a message...",
+        "inputHint": "Press Enter to send, Shift+Enter for new line",
+        "anonymous": "Anonymous"
+      },
+      "memberCard": {
+        "imageAlt": "Member",
+        "anonymous": "Anonymous",
+        "messageButton": "Message",
+        "callButton": "Call",
+        "viewProfileButton": "View Full Profile",
+        "viewProfileComingSoon": "Profile page coming soon"
       }
     },
     "calendar": {

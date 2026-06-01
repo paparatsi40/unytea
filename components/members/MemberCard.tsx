@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { MessageCircle, Video, MapPin, Sparkles } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 type Member = {
   id: string;
@@ -20,6 +21,7 @@ type Member = {
 };
 
 export function MemberCard({ member }: { member: Member }) {
+  const t = useTranslations("dashboard.communityMember.memberCard");
   const [imageError, setImageError] = useState(false);
 
   return (
@@ -35,7 +37,7 @@ export function MemberCard({ member }: { member: Member }) {
             {member.user.image && !imageError ? (
               <img
                 src={member.user.image}
-                alt={member.user.name || "Member"}
+                alt={member.user.name || t("imageAlt")}
                 className="h-full w-full object-cover"
                 onError={() => setImageError(true)}
               />
@@ -49,7 +51,9 @@ export function MemberCard({ member }: { member: Member }) {
 
         {/* Name & Tagline */}
         <div className="mb-3">
-          <h3 className="text-lg font-semibold text-gray-900">{member.user.name || "Anonymous"}</h3>
+          <h3 className="text-lg font-semibold text-gray-900">
+            {member.user.name || t("anonymous")}
+          </h3>
           {member.user.tagline && <p className="text-sm text-gray-600">{member.user.tagline}</p>}
         </div>
 
@@ -92,14 +96,14 @@ export function MemberCard({ member }: { member: Member }) {
             className="flex flex-1 items-center justify-center space-x-1 rounded-lg bg-purple-50 px-3 py-2 text-sm font-medium text-purple-600 transition-colors hover:bg-purple-100"
           >
             <MessageCircle className="h-4 w-4" />
-            <span>Message</span>
+            <span>{t("messageButton")}</span>
           </Link>
           <button
             disabled
             className="flex flex-1 cursor-not-allowed items-center justify-center space-x-1 rounded-lg bg-gray-50 px-3 py-2 text-sm font-medium text-gray-400 opacity-50 transition-colors"
           >
             <Video className="h-4 w-4" />
-            <span>Call</span>
+            <span>{t("callButton")}</span>
           </button>
         </div>
 
@@ -111,11 +115,11 @@ export function MemberCard({ member }: { member: Member }) {
           disabled
           type="button"
           className="mt-3 flex cursor-not-allowed items-center justify-center space-x-1 text-xs font-medium text-purple-600 opacity-50"
-          aria-label="Profile page coming soon"
-          title="Profile page coming in Sprint 4"
+          aria-label={t("viewProfileComingSoon")}
+          title={t("viewProfileComingSoon")}
         >
           <Sparkles className="h-3 w-3" />
-          <span>View Full Profile</span>
+          <span>{t("viewProfileButton")}</span>
         </button>
       </div>
     </div>

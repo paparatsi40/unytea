@@ -1044,6 +1044,44 @@
         "owner": "Propriétaire",
         "unknownOwner": "Inconnu",
         "backButton": "Retour à la communauté"
+      },
+      "chat": {
+        "loading": "Chargement du chat...",
+        "noChannels": {
+          "title": "Aucun canal trouvé",
+          "hint": "Échec de la création des canaux par défaut"
+        },
+        "viewToggle": {
+          "chat": "Chat",
+          "auditorium": "Auditorium"
+        },
+        "defaultChannel": "Général"
+      },
+      "pusherChat": {
+        "connected": "Connecté",
+        "connecting": "Connexion...",
+        "messageCount": "{count, plural, =1 {# message} other {# messages}}",
+        "empty": {
+          "title": "Aucun message pour l'instant",
+          "hint": "Lancez la conversation !"
+        },
+        "relativeTime": {
+          "justNow": "à l'instant",
+          "minutesAgo": "il y a {count} min",
+          "hoursAgo": "il y a {count} h",
+          "daysAgo": "il y a {count} j"
+        },
+        "inputPlaceholder": "Saisissez un message...",
+        "inputHint": "Appuyez sur Entrée pour envoyer, Maj+Entrée pour un saut de ligne",
+        "anonymous": "Anonyme"
+      },
+      "memberCard": {
+        "imageAlt": "Membre",
+        "anonymous": "Anonyme",
+        "messageButton": "Message",
+        "callButton": "Appeler",
+        "viewProfileButton": "Voir le profil complet",
+        "viewProfileComingSoon": "La page de profil arrive bientôt"
       }
     },
     "calendar": {

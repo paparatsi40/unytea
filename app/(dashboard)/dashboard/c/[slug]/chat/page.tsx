@@ -6,6 +6,7 @@ import { PusherChat } from "@/components/chat/PusherChat";
 import { AuditoriumSpace } from "@/components/auditorium/AuditoriumSpace";
 import { getOrCreateDefaultChannels, updateChannelPresence } from "@/app/actions/channels";
 import { Loader2, LayoutList, Users } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 type Channel = {
   id: string;
@@ -18,6 +19,7 @@ type Channel = {
 export default function CommunityChat() {
   const params = useParams();
   const slug = (params?.slug as string) || "";
+  const t = useTranslations("dashboard.communityMember.chat");
 
   const [channels, setChannels] = useState<Channel[]>([]);
   const [activeChannelId, setActiveChannelId] = useState<string>("");
@@ -85,7 +87,7 @@ export default function CommunityChat() {
       <div className="flex h-screen items-center justify-center">
         <div className="text-center">
           <Loader2 className="mx-auto h-8 w-8 animate-spin text-purple-600" />
-          <p className="mt-2 text-sm text-gray-500">Loading chat...</p>
+          <p className="mt-2 text-sm text-gray-500">{t("loading")}</p>
         </div>
       </div>
     );
@@ -95,8 +97,8 @@ export default function CommunityChat() {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="text-center">
-          <p className="text-lg font-medium text-gray-900">No channels found</p>
-          <p className="text-sm text-gray-500">Failed to create default channels</p>
+          <p className="text-lg font-medium text-gray-900">{t("noChannels.title")}</p>
+          <p className="text-sm text-gray-500">{t("noChannels.hint")}</p>
         </div>
       </div>
     );
@@ -104,7 +106,7 @@ export default function CommunityChat() {
 
   // Get active channel name
   const activeChannel = channels.find((c) => c.id === activeChannelId);
-  const currentChannelName = activeChannel?.name || activeChannelName || "General";
+  const currentChannelName = activeChannel?.name || activeChannelName || t("defaultChannel");
 
   return (
     <div className="relative h-full">
@@ -117,7 +119,7 @@ export default function CommunityChat() {
           }`}
         >
           <LayoutList className="h-4 w-4" />
-          <span>Chat</span>
+          <span>{t("viewToggle.chat")}</span>
         </button>
         <button
           onClick={() => setViewMode("auditorium")}
@@ -128,7 +130,7 @@ export default function CommunityChat() {
           }`}
         >
           <Users className="h-4 w-4" />
-          <span>Auditorium</span>
+          <span>{t("viewToggle.auditorium")}</span>
         </button>
       </div>
 
