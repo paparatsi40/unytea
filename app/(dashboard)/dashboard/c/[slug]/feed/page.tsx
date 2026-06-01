@@ -1,12 +1,8 @@
 import { notFound, redirect } from "next/navigation";
-import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/auth-utils";
 import { PremiumPostFeed } from "@/components/community/PremiumPostFeed";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Calendar, Play, Users } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
+import { CommunityFeedSidebar } from "./CommunityFeedSidebar";
 
 export default async function CommunityFeedPage({ params }: { params: Promise<{ slug: string }> }) {
   const userId = await getCurrentUserId();
@@ -123,6 +119,18 @@ export default async function CommunityFeedPage({ params }: { params: Promise<{ 
       }
     : null;
 
+  // Serialized shape for the client sidebar (localizes its own strings/dates).
+  const sidebarSession = mappedUpcomingSession
+    ? {
+        id: mappedUpcomingSession.id,
+        title: mappedUpcomingSession.title,
+        scheduledAt: mappedUpcomingSession.scheduledAt.toISOString(),
+        attendeeCount: mappedUpcomingSession.attendeeCount,
+        roomId: mappedUpcomingSession.roomId,
+        status: mappedUpcomingSession.status,
+      }
+    : null;
+
   const mappedHotTopics = hotTopics
     .filter((post) => post._count.comments > 0)
     .map((post) => ({
@@ -148,81 +156,7 @@ export default async function CommunityFeedPage({ params }: { params: Promise<{ 
           />
         </div>
 
-        <aside className="space-y-4 lg:col-span-4">
-          <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-            <p className="text-xs font-semibold uppercase tracking-wide text-purple-600">
-              Community feed
-            </p>
-            <h1 className="mt-1 text-lg font-semibold text-gray-900">{community.name}</h1>
-            <p className="mt-1 text-sm text-gray-600">
-              Live activity from real posts and member discussions.
-            </p>
-          </div>
-
-          {mappedUpcomingSession ? (
-            <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-              <div className="bg-gradient-to-r from-zinc-900 to-zinc-800 p-4 text-white">
-                <Badge className="mb-3 border-none bg-red-500/20 text-red-300">
-                  <span className="mr-1.5 h-1.5 w-1.5 animate-pulse rounded-full bg-red-400" />
-                  {upcomingSession?.status === "IN_PROGRESS" ? "Live now" : "Upcoming"}
-                </Badge>
-                <h3 className="text-lg font-semibold">{mappedUpcomingSession.title}</h3>
-                <div className="mt-2 space-y-1 text-sm text-zinc-300">
-                  <p className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    {formatDistanceToNow(new Date(mappedUpcomingSession.scheduledAt), {
-                      addSuffix: true,
-                    })}
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <Users className="h-4 w-4" />
-                    {mappedUpcomingSession.attendeeCount} attending
-                  </p>
-                </div>
-                <div className="mt-4 flex gap-2">
-                  {mappedUpcomingSession.roomId ? (
-                    <Link
-                      href={`/dashboard/sessions/${mappedUpcomingSession.id}/room`}
-                      className="flex-1"
-                    >
-                      <Button className="w-full bg-purple-600 hover:bg-purple-700">
-                        <Play className="mr-2 h-4 w-4" />
-                        {mappedUpcomingSession.status === "IN_PROGRESS" ? "Join now" : "Open room"}
-                      </Button>
-                    </Link>
-                  ) : (
-                    <Link href="/dashboard/sessions" className="flex-1">
-                      <Button className="w-full bg-purple-600 hover:bg-purple-700">
-                        <Calendar className="mr-2 h-4 w-4" />
-                        Open sessions
-                      </Button>
-                    </Link>
-                  )}
-                  <Link href="/dashboard/sessions" className="flex-1">
-                    <Button
-                      variant="outline"
-                      className="w-full border-zinc-700 bg-zinc-800/50 text-zinc-200 hover:bg-zinc-800"
-                    >
-                      View all
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-              <p className="text-sm font-medium text-gray-900">No upcoming live sessions</p>
-              <p className="mt-1 text-sm text-gray-600">
-                When a new session is scheduled, it will appear here.
-              </p>
-              <Link href="/dashboard/sessions" className="mt-3 inline-block">
-                <Button size="sm" variant="outline">
-                  Open sessions
-                </Button>
-              </Link>
-            </div>
-          )}
-        </aside>
+        <CommunityFeedSidebar communityName={community.name} upcomingSession={sidebarSession} />
       </div>
     </div>
   );

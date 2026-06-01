@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { format, isToday, isTomorrow } from "date-fns";
 import { Radio, Video } from "lucide-react";
 import { getSessionFeedState } from "@/app/actions/community-feed";
+import { getDateFnsLocale } from "@/lib/i18n/date-fns-locale";
 
 type SessionAnnouncementAttachment = {
   sessionId?: string;
@@ -41,6 +43,9 @@ interface SessionAnnouncementCardProps {
 }
 
 export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) {
+  const t = useTranslations("dashboard.communityAdmin.sessionAnnouncement");
+  const locale = useLocale();
+  const dfLocale = getDateFnsLocale(locale);
   const sessionData = Array.isArray(post.attachments) ? null : post.attachments;
 
   // IMPORTANT: All hooks must be called BEFORE any early return (Rules of Hooks).
@@ -78,12 +83,12 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
   const scheduledAt = sessionData.scheduledAt ? new Date(sessionData.scheduledAt) : null;
 
   const formatDate = (date: Date) => {
-    if (isToday(date)) return "Today";
-    if (isTomorrow(date)) return "Tomorrow";
-    return format(date, "EEE, MMM d");
+    if (isToday(date)) return t("today");
+    if (isTomorrow(date)) return t("tomorrow");
+    return format(date, "EEE, MMM d", { locale: dfLocale });
   };
 
-  const formatTime = (date: Date) => format(date, "h:mm a");
+  const formatTime = (date: Date) => format(date, "h:mm a", { locale: dfLocale });
 
   const isUpcoming = scheduledAt ? scheduledAt > new Date() : false;
   const effectiveStatus = sessionState?.status || (isUpcoming ? "SCHEDULED" : "COMPLETED");
@@ -97,32 +102,32 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
       : `/dashboard/sessions/${sessionData.sessionId}/room?src=feed_session_card`;
 
   const ctaLabel = isLive
-    ? "Join live"
+    ? t("cta.joinLive")
     : hasRecording
-      ? "Watch recording"
+      ? t("cta.watchRecording")
       : isUpcoming
-        ? "Join session"
-        : "View session";
+        ? t("cta.joinSession")
+        : t("cta.viewSession");
 
   const sharedByLabel = post.author.name
-    ? `${post.author.name} shared a session`
-    : "Shared session";
+    ? t("sharedBy", { name: post.author.name })
+    : t("sharedByFallback");
 
   const contextLine = hasRecording
-    ? "Session recap and follow-up questions from the recording."
+    ? t("context.recording")
     : isLive
-      ? "Live now — join the conversation and bring your questions."
-      : "Quick preview of the upcoming session for the community.";
+      ? t("context.live")
+      : t("context.upcoming");
 
   const metaParts: string[] = [];
   if (scheduledAt) {
     metaParts.push(`${formatDate(scheduledAt)} · ${formatTime(scheduledAt)}`);
   }
   if (sessionData.duration) {
-    metaParts.push(`${sessionData.duration} min`);
+    metaParts.push(t("durationMeta", { minutes: sessionData.duration }));
   }
   if (sessionData.mentorName) {
-    metaParts.push(`with ${sessionData.mentorName}`);
+    metaParts.push(t("withMentor", { name: sessionData.mentorName }));
   }
 
   return (
@@ -135,7 +140,7 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
       </div>
 
       <h3 className="text-sm font-semibold text-gray-900">
-        {sessionData.sessionTitle || post.title || "Live session"}
+        {sessionData.sessionTitle || post.title || t("titleFallback")}
       </h3>
 
       {contextLine ? (

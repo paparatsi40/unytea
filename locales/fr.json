@@ -342,6 +342,219 @@
     "continue": "Continuer"
   },
   "dashboard": {
+    "communityAdmin": {
+      "gate": {
+        "backToCommunities": "Retour aux communautés",
+        "members": "{count, plural, =1 {# membre} other {# membres}}",
+        "posts": "{count, plural, =1 {# publication} other {# publications}}",
+        "joinCta": "Rejoindre la communauté • Participez aux sessions en direct",
+        "pendingTitle": "Adhésion en attente",
+        "pendingBody": "Votre demande pour rejoindre {name} est en attente d'approbation. Vous serez notifié lorsque le propriétaire de la communauté examinera votre demande.",
+        "deniedTitle": "Accès refusé",
+        "deniedBody": "Votre accès à {name} a été restreint. Contactez le propriétaire de la communauté pour plus d'informations."
+      },
+      "feed": {
+        "label": "Fil de la communauté",
+        "subtitle": "Activité en direct des publications réelles et des discussions entre membres.",
+        "liveNow": "En direct",
+        "upcoming": "À venir",
+        "attending": "{count, plural, =1 {# participant} other {# participants}}",
+        "joinNow": "Rejoindre",
+        "openRoom": "Ouvrir la salle",
+        "openSessions": "Ouvrir les sessions",
+        "viewAll": "Voir tout",
+        "noUpcomingTitle": "Aucune session en direct à venir",
+        "noUpcomingBody": "Lorsqu'une nouvelle session est planifiée, elle apparaîtra ici.",
+        "successToast": "Publication créée avec succès !",
+        "failedCreate": "Échec de la création de la publication",
+        "failedUpload": "Échec du téléversement de la pièce jointe",
+        "attachmentFallback": "A partagé une pièce jointe",
+        "youFallback": "Vous",
+        "timeUntilSoon": "Bientôt",
+        "preSession": {
+          "liveIn": "EN DIRECT DANS {time}",
+          "meta": "Animée par {host} • {minutes} min • {attending}",
+          "hostFallback": "l'animateur",
+          "prompt": "💬 Posez vos questions à l'animateur 👇",
+          "promptHint": "Les meilleures questions pourront être mises en avant pendant la session en direct !",
+          "askQuestion": "Poser une question"
+        },
+        "hotTopics": {
+          "title": "🔥 Discussions populaires",
+          "comments": "{count, plural, =1 {# commentaire} other {# commentaires}}"
+        },
+        "composer": {
+          "modePost": "Publier",
+          "modeQuestion": "Poser une question",
+          "modeWin": "Partager une victoire",
+          "modeResource": "Partager une ressource",
+          "modeDiscussion": "Discussion",
+          "subtitleDefault": "Partagez avec la communauté",
+          "subtitleQuestion": "Demandez à la communauté",
+          "subtitleWin": "Célébrez votre réussite",
+          "subtitleResource": "Partagez quelque chose d'utile",
+          "subtitleDiscussion": "Lancez une conversation",
+          "titlePlaceholderDefault": "Ajoutez un titre (facultatif)",
+          "titlePlaceholderQuestion": "Quelle est votre question ?",
+          "titlePlaceholderWin": "Qu'avez-vous accompli ?",
+          "titlePlaceholderResource": "Que partagez-vous ?",
+          "titlePlaceholderDiscussion": "De quoi voulez-vous discuter ?",
+          "contentPlaceholderDefault": "Partagez vos pensées, idées ou questions avec la communauté... ✨",
+          "contentPlaceholderQuestion": "Que voulez-vous demander à la communauté ? Soyez précis pour obtenir de meilleures réponses...",
+          "contentPlaceholderWin": "Partagez une victoire ou un succès récent ! Qu'avez-vous accompli ? Comment avez-vous fait ?",
+          "contentPlaceholderResource": "Partagez une ressource, un outil ou un article utile que la communauté adorerait...",
+          "contentPlaceholderDiscussion": "Lancez une discussion. Qu'avez-vous en tête ? Que voulez-vous explorer avec la communauté ?",
+          "characters": "{count, plural, =1 {# caractère} other {# caractères}}",
+          "addAttachment": "Ajouter une pièce jointe",
+          "addEmoji": "Ajouter un emoji",
+          "mention": "Mentionner quelqu'un",
+          "cancel": "Annuler",
+          "publishing": "Publication...",
+          "submitDefault": "Publier",
+          "submitQuestion": "Demander",
+          "submitWin": "Partager",
+          "submitResource": "Partager",
+          "submitDiscussion": "Discuter"
+        },
+        "filters": {
+          "all": "Tout",
+          "updates": "Mises à jour",
+          "questions": "Questions",
+          "resources": "Ressources",
+          "discussion": "Discussion"
+        },
+        "emptyState": {
+          "titleNoPosts": "Aucune publication pour le moment",
+          "titleNoFilter": "Aucune publication pour ce filtre",
+          "bodyNoPosts": "Soyez le premier à partager vos idées et à lancer une conversation avec la communauté.",
+          "bodyNoFilter": "Essayez un autre filtre pour voir une activité différente de la communauté.",
+          "askQuestion": "Poser une question",
+          "shareWin": "Partager une victoire",
+          "shareResource": "Partager une ressource",
+          "startDiscussion": "Lancer une discussion"
+        }
+      },
+      "header": {
+        "owner": "Propriétaire",
+        "private": "Privée",
+        "pendingBadge": "En attente d'approbation",
+        "membersLabel": "membres",
+        "postsLabel": "publications",
+        "nav": {
+          "feed": "Fil",
+          "sessions": "Sessions",
+          "chat": "Chat",
+          "library": "Bibliothèque",
+          "courses": "Cours",
+          "buddy": "Buddy",
+          "members": "Membres",
+          "about": "À propos"
+        }
+      },
+      "actions": {
+        "pendingApproval": "En attente d'approbation",
+        "leave": "Quitter",
+        "settings": "Paramètres",
+        "joinCommunity": "Rejoindre la communauté",
+        "signInToJoin": "Vous devez être connecté pour rejoindre",
+        "joinedSuccess": "Inscription réussie !",
+        "joinFailed": "Échec de l'adhésion à la communauté",
+        "signInRequired": "Vous devez être connecté",
+        "leaveConfirm": "Êtes-vous sûr de vouloir quitter cette communauté ? Vous devrez demander à rejoindre à nouveau.",
+        "leftSuccess": "Vous avez quitté la communauté",
+        "leaveFailed": "Échec du départ de la communauté"
+      },
+      "postCard": {
+        "pinned": "Épinglé",
+        "anonymous": "Anonyme",
+        "updating": "Mise à jour...",
+        "pinPost": "Épingler la publication",
+        "unpinPost": "Désépingler",
+        "editPost": "Modifier la publication",
+        "deletePost": "Supprimer la publication",
+        "titlePlaceholder": "Titre (facultatif)",
+        "cancel": "Annuler",
+        "save": "Enregistrer",
+        "saving": "Enregistrement...",
+        "attachment": "Pièce jointe",
+        "reactionsCount": "{count, plural, =1 {# réaction} other {# réactions}}",
+        "commentsCount": "{count, plural, =1 {# commentaire} other {# commentaires}}",
+        "comments": "Commentaires",
+        "copying": "Copie...",
+        "copied": "Copié",
+        "copyLink": "Copier le lien",
+        "confirmDelete": "Supprimer définitivement cette publication ?",
+        "delete": "Supprimer",
+        "deleting": "Suppression de la publication...",
+        "toasts": {
+          "deleteFailed": "Échec de la suppression de la publication",
+          "contentEmpty": "Le contenu ne peut pas être vide",
+          "updated": "Publication mise à jour",
+          "updateFailed": "Échec de la mise à jour de la publication",
+          "linkCopied": "Lien copié",
+          "linkCopiedDesc": "Le lien de la publication est prêt à être partagé.",
+          "copyFailed": "Impossible de copier le lien",
+          "copyFailedDesc": "Veuillez copier l'URL depuis votre navigateur.",
+          "pinFailed": "Échec de la mise à jour de l'épinglage",
+          "pinnedToast": "Publication épinglée",
+          "unpinnedToast": "Publication désépinglée"
+        }
+      },
+      "reactions": {
+        "love": "J'adore",
+        "like": "J'aime",
+        "celebrate": "Bravo",
+        "fire": "Feu",
+        "idea": "Idée",
+        "clap": "Applaudir",
+        "react": "Réagir",
+        "andMore": "et {count} de plus"
+      },
+      "sessionAnnouncement": {
+        "today": "Aujourd'hui",
+        "tomorrow": "Demain",
+        "titleFallback": "Session en direct",
+        "sharedBy": "{name} a partagé une session",
+        "sharedByFallback": "Session partagée",
+        "cta": {
+          "joinLive": "Rejoindre en direct",
+          "watchRecording": "Voir l'enregistrement",
+          "joinSession": "Rejoindre la session",
+          "viewSession": "Voir la session"
+        },
+        "context": {
+          "recording": "Récapitulatif de la session et questions de suivi de l'enregistrement.",
+          "live": "En direct maintenant — rejoignez la conversation et apportez vos questions.",
+          "upcoming": "Aperçu rapide de la prochaine session pour la communauté."
+        },
+        "durationMeta": "{minutes} min",
+        "withMentor": "avec {name}"
+      },
+      "comments": {
+        "section": {
+          "headerCount": "{count, plural, =0 {Aucun commentaire} =1 {# commentaire} other {# commentaires}}",
+          "loadError": "Échec du chargement des commentaires",
+          "emptyTitle": "Aucun commentaire pour le moment",
+          "emptySubtitle": "Soyez le premier à commenter !"
+        },
+        "item": {
+          "anonymous": "Anonyme",
+          "reply": "Répondre",
+          "replyPlaceholder": "Répondre à {name}...",
+          "deleteConfirm": "Supprimer ce commentaire ?",
+          "cancel": "Annuler",
+          "delete": "Supprimer",
+          "deleting": "Suppression...",
+          "deleteFailed": "Échec de la suppression du commentaire"
+        },
+        "form": {
+          "placeholderComment": "Écrivez un commentaire...",
+          "charCount": "{count} / 1000",
+          "empty": "Le commentaire ne peut pas être vide",
+          "postFailed": "Échec de la publication du commentaire"
+        }
+      }
+    },
     "calendar": {
       "metaTitle": "Calendrier",
       "title": "Calendrier",
@@ -1357,16 +1570,6 @@
       "noResultsEmpty": "Cette communauté n'a pas encore de ressources. Soyez le premier à partager quelque chose !",
       "loading": "Chargement...",
       "loadMore": "Charger plus"
-    }
-  },
-  "comments": {
-    "commentsLabel": "commentaires",
-    "errors": {
-      "loadFailed": "Échec du chargement des commentaires"
-    },
-    "empty": {
-      "title": "Aucun commentaire pour le moment",
-      "subtitle": "Soyez le premier à commenter !"
     }
   }
 }

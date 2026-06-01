@@ -28,6 +28,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { useUploadThing } from "@/lib/uploadthing";
 
 type PostAttachment = {
@@ -94,6 +95,9 @@ export function PremiumPostFeed({
   canModeratePosts?: boolean;
 }) {
   const { user } = useCurrentUser();
+  const t = useTranslations("dashboard.communityAdmin.feed");
+  // Composer-mode keys are suffixed with the capitalized mode (Default/Question/...).
+  const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
   const [posts, setPosts] = useState<Post[]>(initialPosts);
   const [content, setContent] = useState("");
   const [title, setTitle] = useState("");
@@ -154,7 +158,7 @@ export function PremiumPostFeed({
       const result = await createPost(formData);
 
       if (!result.success) {
-        toast.error(result.error || "Failed to create post");
+        toast.error(result.error || t("failedCreate"));
         setIsSubmitting(false);
         return;
       }
@@ -181,7 +185,7 @@ export function PremiumPostFeed({
           title: postFromAction.title ?? (title.trim() || null),
           content:
             postFromAction.content ??
-            (content.trim() || (attachments.length > 0 ? "Shared an attachment" : "")),
+            (content.trim() || (attachments.length > 0 ? t("attachmentFallback") : "")),
           contentType: postFromAction.contentType ?? contentType,
           attachments:
             (postFromAction.attachments as PostAttachment[] | null | undefined) ?? attachments,
@@ -189,7 +193,7 @@ export function PremiumPostFeed({
           createdAt: postFromAction.createdAt ? new Date(postFromAction.createdAt) : new Date(),
           author: {
             id: user.id,
-            name: user.name || "You",
+            name: user.name || t("youFallback"),
             image: user.image || null,
           },
           _count: {
@@ -202,7 +206,7 @@ export function PremiumPostFeed({
       }
     } catch (error) {
       console.error("❌ Error creating post:", error);
-      toast.error("Failed to create post");
+      toast.error(t("failedCreate"));
     } finally {
       setIsSubmitting(false);
     }
@@ -247,7 +251,7 @@ export function PremiumPostFeed({
         setAttachments((prev) => [...prev, ...uploadedAttachments]);
       }
     } catch (error) {
-      const errorMessage = (error as Error)?.message || "Failed to upload attachment";
+      const errorMessage = (error as Error)?.message || t("failedUpload");
       toast.error(errorMessage);
     } finally {
       setIsUploadingAttachment(false);
@@ -255,20 +259,7 @@ export function PremiumPostFeed({
     }
   };
 
-  const getPlaceholder = () => {
-    switch (composerMode) {
-      case "question":
-        return "What do you want to ask the community? Be specific to get better answers...";
-      case "win":
-        return "Share a recent win or success! What did you accomplish? How did you do it?";
-      case "resource":
-        return "Share a helpful resource, tool, or article that the community would love...";
-      case "discussion":
-        return "Start a discussion. What's on your mind? What do you want to explore with the community?";
-      default:
-        return "Share your thoughts, ideas, or questions with the community... ✨";
-    }
-  };
+  const getPlaceholder = () => t(`composer.contentPlaceholder${cap(composerMode)}`);
 
   const userFullName = user ? user.name || "" : "";
 
@@ -298,7 +289,7 @@ export function PremiumPostFeed({
 
     if (diffDays > 0) return `${diffDays}d ${diffHours % 24}h`;
     if (diffHours > 0) return `${diffHours}h`;
-    return "Soon";
+    return t("timeUntilSoon");
   };
 
   return (
@@ -308,7 +299,7 @@ export function PremiumPostFeed({
         <div className="fixed right-6 top-6 z-50 animate-slide-in-from-top">
           <div className="flex items-center space-x-3 rounded-xl border border-green-200 bg-white px-5 py-3 shadow-lg">
             <CheckCircle2 className="h-5 w-5 text-green-500" />
-            <p className="font-medium text-gray-900">Post published successfully!</p>
+            <p className="font-medium text-gray-900">{t("successToast")}</p>
           </div>
         </div>
       )}
@@ -323,23 +314,24 @@ export function PremiumPostFeed({
             <div className="flex-1">
               <div className="mb-1 flex items-center gap-2">
                 <Badge className="border-amber-200 bg-amber-100 text-amber-700">
-                  LIVE IN {getTimeUntil(upcomingSession.scheduledAt).toUpperCase()}
+                  {t("preSession.liveIn", {
+                    time: getTimeUntil(upcomingSession.scheduledAt).toUpperCase(),
+                  })}
                 </Badge>
               </div>
               <h3 className="text-lg font-semibold text-gray-900">{upcomingSession.title}</h3>
               <p className="mt-1 text-sm text-gray-600">
-                Hosted by {upcomingSession.mentorName || "the host"} • {upcomingSession.duration}{" "}
-                min • {upcomingSession.attendeeCount} attending
+                {t("preSession.meta", {
+                  host: upcomingSession.mentorName || t("preSession.hostFallback"),
+                  minutes: upcomingSession.duration,
+                  attending: t("attending", { count: upcomingSession.attendeeCount }),
+                })}
               </p>
 
               {/* Pre-session discussion prompt */}
               <div className="mt-4 rounded-lg border border-amber-200/50 bg-white/60 p-4">
-                <p className="mb-2 text-sm font-medium text-gray-800">
-                  💬 Drop your questions for the host 👇
-                </p>
-                <p className="text-xs text-gray-500">
-                  The best questions may be featured during the live session!
-                </p>
+                <p className="mb-2 text-sm font-medium text-gray-800">{t("preSession.prompt")}</p>
+                <p className="text-xs text-gray-500">{t("preSession.promptHint")}</p>
               </div>
 
               <div className="mt-3 flex items-center gap-3">
@@ -347,14 +339,14 @@ export function PremiumPostFeed({
                   <Link href={`/dashboard/sessions/${upcomingSession.id}/room`}>
                     <Button size="sm" className="bg-amber-600 text-white hover:bg-amber-700">
                       <Play className="mr-1.5 h-4 w-4" />
-                      {upcomingSession.status === "IN_PROGRESS" ? "Join now" : "Open room"}
+                      {upcomingSession.status === "IN_PROGRESS" ? t("joinNow") : t("openRoom")}
                     </Button>
                   </Link>
                 ) : (
                   <Link href="/dashboard/sessions">
                     <Button size="sm" className="bg-amber-600 text-white hover:bg-amber-700">
                       <Clock className="mr-1.5 h-4 w-4" />
-                      Open sessions
+                      {t("openSessions")}
                     </Button>
                   </Link>
                 )}
@@ -368,7 +360,7 @@ export function PremiumPostFeed({
                   className="border-amber-300 hover:bg-amber-100"
                 >
                   <HelpCircle className="mr-1.5 h-4 w-4" />
-                  Ask a Question
+                  {t("preSession.askQuestion")}
                 </Button>
               </div>
             </div>
@@ -381,7 +373,7 @@ export function PremiumPostFeed({
         <div className="mb-6 rounded-xl border border-purple-100 bg-white p-4 shadow-sm">
           <div className="mb-3 flex items-center gap-2">
             <Flame className="h-5 w-5 text-orange-500" />
-            <h3 className="font-semibold text-gray-900">🔥 Hot Discussions</h3>
+            <h3 className="font-semibold text-gray-900">{t("hotTopics.title")}</h3>
           </div>
           <div className="space-y-2">
             {hotTopics.slice(0, 3).map((topic) => (
@@ -397,7 +389,7 @@ export function PremiumPostFeed({
                   </span>
                 </div>
                 <Badge variant="secondary" className="text-xs">
-                  {topic.commentCount} comments
+                  {t("hotTopics.comments", { count: topic.commentCount })}
                 </Badge>
               </Link>
             ))}
@@ -421,7 +413,7 @@ export function PremiumPostFeed({
             }`}
           >
             <Sparkles className="h-4 w-4" />
-            Post
+            {t("composer.modePost")}
           </button>
           <button
             type="button"
@@ -433,7 +425,7 @@ export function PremiumPostFeed({
             }`}
           >
             <HelpCircle className="h-4 w-4" />
-            Ask Question
+            {t("composer.modeQuestion")}
           </button>
           <button
             type="button"
@@ -445,7 +437,7 @@ export function PremiumPostFeed({
             }`}
           >
             <Trophy className="h-4 w-4" />
-            Share Win
+            {t("composer.modeWin")}
           </button>
           <button
             type="button"
@@ -457,7 +449,7 @@ export function PremiumPostFeed({
             }`}
           >
             <BookOpen className="h-4 w-4" />
-            Share Resource
+            {t("composer.modeResource")}
           </button>
           <button
             type="button"
@@ -469,7 +461,7 @@ export function PremiumPostFeed({
             }`}
           >
             <MessagesSquare className="h-4 w-4" />
-            Discussion
+            {t("composer.modeDiscussion")}
           </button>
         </div>
 
@@ -493,13 +485,7 @@ export function PremiumPostFeed({
             </div>
             <div>
               <p className="text-sm font-semibold text-gray-900">{userFullName}</p>
-              <p className="text-xs text-gray-500">
-                {composerMode === "question" && "Ask the community"}
-                {composerMode === "win" && "Celebrate your success"}
-                {composerMode === "resource" && "Share something helpful"}
-                {composerMode === "discussion" && "Start a conversation"}
-                {composerMode === "default" && "Share with the community"}
-              </p>
+              <p className="text-xs text-gray-500">{t(`composer.subtitle${cap(composerMode)}`)}</p>
             </div>
           </div>
 
@@ -510,17 +496,7 @@ export function PremiumPostFeed({
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder={
-                  composerMode === "question"
-                    ? "What's your question?"
-                    : composerMode === "win"
-                      ? "What did you achieve?"
-                      : composerMode === "resource"
-                        ? "What are you sharing?"
-                        : composerMode === "discussion"
-                          ? "What do you want to discuss?"
-                          : "Add a title (optional)"
-                }
+                placeholder={t(`composer.titlePlaceholder${cap(composerMode)}`)}
                 className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm font-medium text-gray-900 placeholder-gray-400 transition-colors focus:border-purple-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-100"
               />
             </div>
@@ -560,7 +536,7 @@ export function PremiumPostFeed({
             {/* Character Count */}
             {focused && (
               <div className="absolute bottom-3 right-3 text-sm text-gray-400">
-                {content.length} characters
+                {t("composer.characters", { count: content.length })}
               </div>
             )}
           </div>
@@ -572,7 +548,7 @@ export function PremiumPostFeed({
                 type="button"
                 onClick={handleAttachmentClick}
                 className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-50 hover:text-gray-600"
-                title="Add attachment"
+                title={t("composer.addAttachment")}
                 disabled={isUploadingAttachment}
               >
                 {isUploadingAttachment ? (
@@ -594,14 +570,14 @@ export function PremiumPostFeed({
               <button
                 type="button"
                 className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-50 hover:text-gray-600"
-                title="Add emoji"
+                title={t("composer.addEmoji")}
               >
                 <Smile className="h-4 w-4" />
               </button>
               <button
                 type="button"
                 className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-50 hover:text-gray-600"
-                title="Mention someone"
+                title={t("composer.mention")}
               >
                 <AtSign className="h-4 w-4" />
               </button>
@@ -618,7 +594,7 @@ export function PremiumPostFeed({
                 }}
                 className="px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
               >
-                Cancel
+                {t("composer.cancel")}
               </button>
               <button
                 type="submit"
@@ -632,22 +608,12 @@ export function PremiumPostFeed({
                 {isSubmitting ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Publishing...</span>
+                    <span>{t("composer.publishing")}</span>
                   </>
                 ) : (
                   <>
                     <Send className="h-4 w-4" />
-                    <span>
-                      {composerMode === "question"
-                        ? "Ask"
-                        : composerMode === "win"
-                          ? "Share Win"
-                          : composerMode === "resource"
-                            ? "Share"
-                            : composerMode === "discussion"
-                              ? "Discuss"
-                              : "Post"}
-                    </span>
+                    <span>{t(`composer.submit${cap(composerMode)}`)}</span>
                   </>
                 )}
               </button>
@@ -666,7 +632,7 @@ export function PremiumPostFeed({
               : "bg-gray-100 text-gray-600 hover:bg-gray-200"
           }`}
         >
-          All
+          {t("filters.all")}
         </button>
         <button
           type="button"
@@ -677,7 +643,7 @@ export function PremiumPostFeed({
               : "bg-blue-50 text-blue-700 hover:bg-blue-100"
           }`}
         >
-          <Clock className="h-3.5 w-3.5" /> Updates
+          <Clock className="h-3.5 w-3.5" /> {t("filters.updates")}
         </button>
         <button
           type="button"
@@ -688,7 +654,7 @@ export function PremiumPostFeed({
               : "bg-purple-50 text-purple-700 hover:bg-purple-100"
           }`}
         >
-          Questions
+          {t("filters.questions")}
         </button>
         <button
           type="button"
@@ -699,7 +665,7 @@ export function PremiumPostFeed({
               : "bg-green-50 text-green-700 hover:bg-green-100"
           }`}
         >
-          Resources
+          {t("filters.resources")}
         </button>
         <button
           type="button"
@@ -710,7 +676,7 @@ export function PremiumPostFeed({
               : "bg-amber-50 text-amber-700 hover:bg-amber-100"
           }`}
         >
-          Discussion
+          {t("filters.discussion")}
         </button>
       </div>
 
@@ -733,12 +699,10 @@ export function PremiumPostFeed({
           </div>
 
           <h3 className="mb-2 text-xl font-semibold text-gray-900">
-            {posts.length === 0 ? "No posts yet" : "No posts for this filter"}
+            {posts.length === 0 ? t("emptyState.titleNoPosts") : t("emptyState.titleNoFilter")}
           </h3>
           <p className="mx-auto mb-6 max-w-sm text-sm text-gray-600">
-            {posts.length === 0
-              ? "Be the first to share your thoughts and start a conversation with the community."
-              : "Try another filter to see different community activity."}
+            {posts.length === 0 ? t("emptyState.bodyNoPosts") : t("emptyState.bodyNoFilter")}
           </p>
 
           {/* Feature Highlights */}
@@ -748,28 +712,30 @@ export function PremiumPostFeed({
               className="rounded-lg bg-blue-50 p-3 text-left transition-colors hover:bg-blue-100"
             >
               <div className="mb-1 text-xl">❓</div>
-              <p className="text-xs font-medium text-blue-700">Ask a Question</p>
+              <p className="text-xs font-medium text-blue-700">{t("emptyState.askQuestion")}</p>
             </button>
             <button
               onClick={() => setComposerMode("win")}
               className="rounded-lg bg-amber-50 p-3 text-left transition-colors hover:bg-amber-100"
             >
               <div className="mb-1 text-xl">🏆</div>
-              <p className="text-xs font-medium text-amber-700">Share a Win</p>
+              <p className="text-xs font-medium text-amber-700">{t("emptyState.shareWin")}</p>
             </button>
             <button
               onClick={() => setComposerMode("resource")}
               className="rounded-lg bg-green-50 p-3 text-left transition-colors hover:bg-green-100"
             >
               <div className="mb-1 text-xl">📚</div>
-              <p className="text-xs font-medium text-green-700">Share Resource</p>
+              <p className="text-xs font-medium text-green-700">{t("emptyState.shareResource")}</p>
             </button>
             <button
               onClick={() => setComposerMode("discussion")}
               className="rounded-lg bg-purple-50 p-3 text-left transition-colors hover:bg-purple-100"
             >
               <div className="mb-1 text-xl">💬</div>
-              <p className="text-xs font-medium text-purple-700">Start Discussion</p>
+              <p className="text-xs font-medium text-purple-700">
+                {t("emptyState.startDiscussion")}
+              </p>
             </button>
           </div>
         </div>

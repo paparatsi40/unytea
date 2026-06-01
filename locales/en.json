@@ -343,6 +343,219 @@
     "continue": "Continue"
   },
   "dashboard": {
+    "communityAdmin": {
+      "gate": {
+        "backToCommunities": "Back to Communities",
+        "members": "{count, plural, =1 {# member} other {# members}}",
+        "posts": "{count, plural, =1 {# post} other {# posts}}",
+        "joinCta": "Join community • Attend live sessions",
+        "pendingTitle": "Membership Pending",
+        "pendingBody": "Your request to join {name} is pending approval. You'll be notified when the community owner reviews your request.",
+        "deniedTitle": "Access Denied",
+        "deniedBody": "Your access to {name} has been restricted. Please contact the community owner for more information."
+      },
+      "feed": {
+        "label": "Community feed",
+        "subtitle": "Live activity from real posts and member discussions.",
+        "liveNow": "Live now",
+        "upcoming": "Upcoming",
+        "attending": "{count, plural, =1 {# attending} other {# attending}}",
+        "joinNow": "Join now",
+        "openRoom": "Open room",
+        "openSessions": "Open sessions",
+        "viewAll": "View all",
+        "noUpcomingTitle": "No upcoming live sessions",
+        "noUpcomingBody": "When a new session is scheduled, it will appear here.",
+        "successToast": "Post published successfully!",
+        "failedCreate": "Failed to create post",
+        "failedUpload": "Failed to upload attachment",
+        "attachmentFallback": "Shared an attachment",
+        "youFallback": "You",
+        "timeUntilSoon": "Soon",
+        "preSession": {
+          "liveIn": "LIVE IN {time}",
+          "meta": "Hosted by {host} • {minutes} min • {attending}",
+          "hostFallback": "the host",
+          "prompt": "💬 Drop your questions for the host 👇",
+          "promptHint": "The best questions may be featured during the live session!",
+          "askQuestion": "Ask a Question"
+        },
+        "hotTopics": {
+          "title": "🔥 Hot Discussions",
+          "comments": "{count, plural, =1 {# comment} other {# comments}}"
+        },
+        "composer": {
+          "modePost": "Post",
+          "modeQuestion": "Ask Question",
+          "modeWin": "Share Win",
+          "modeResource": "Share Resource",
+          "modeDiscussion": "Discussion",
+          "subtitleDefault": "Share with the community",
+          "subtitleQuestion": "Ask the community",
+          "subtitleWin": "Celebrate your success",
+          "subtitleResource": "Share something helpful",
+          "subtitleDiscussion": "Start a conversation",
+          "titlePlaceholderDefault": "Add a title (optional)",
+          "titlePlaceholderQuestion": "What's your question?",
+          "titlePlaceholderWin": "What did you achieve?",
+          "titlePlaceholderResource": "What are you sharing?",
+          "titlePlaceholderDiscussion": "What do you want to discuss?",
+          "contentPlaceholderDefault": "Share your thoughts, ideas, or questions with the community... ✨",
+          "contentPlaceholderQuestion": "What do you want to ask the community? Be specific to get better answers...",
+          "contentPlaceholderWin": "Share a recent win or success! What did you accomplish? How did you do it?",
+          "contentPlaceholderResource": "Share a helpful resource, tool, or article that the community would love...",
+          "contentPlaceholderDiscussion": "Start a discussion. What's on your mind? What do you want to explore with the community?",
+          "characters": "{count, plural, =1 {# character} other {# characters}}",
+          "addAttachment": "Add attachment",
+          "addEmoji": "Add emoji",
+          "mention": "Mention someone",
+          "cancel": "Cancel",
+          "publishing": "Publishing...",
+          "submitDefault": "Post",
+          "submitQuestion": "Ask",
+          "submitWin": "Share Win",
+          "submitResource": "Share",
+          "submitDiscussion": "Discuss"
+        },
+        "filters": {
+          "all": "All",
+          "updates": "Updates",
+          "questions": "Questions",
+          "resources": "Resources",
+          "discussion": "Discussion"
+        },
+        "emptyState": {
+          "titleNoPosts": "No posts yet",
+          "titleNoFilter": "No posts for this filter",
+          "bodyNoPosts": "Be the first to share your thoughts and start a conversation with the community.",
+          "bodyNoFilter": "Try another filter to see different community activity.",
+          "askQuestion": "Ask a Question",
+          "shareWin": "Share a Win",
+          "shareResource": "Share Resource",
+          "startDiscussion": "Start Discussion"
+        }
+      },
+      "header": {
+        "owner": "Owner",
+        "private": "Private",
+        "pendingBadge": "Pending Approval",
+        "membersLabel": "members",
+        "postsLabel": "posts",
+        "nav": {
+          "feed": "Feed",
+          "sessions": "Sessions",
+          "chat": "Chat",
+          "library": "Library",
+          "courses": "Courses",
+          "buddy": "Buddy",
+          "members": "Members",
+          "about": "About"
+        }
+      },
+      "actions": {
+        "pendingApproval": "Pending approval",
+        "leave": "Leave",
+        "settings": "Settings",
+        "joinCommunity": "Join Community",
+        "signInToJoin": "You must be signed in to join",
+        "joinedSuccess": "Successfully joined!",
+        "joinFailed": "Failed to join community",
+        "signInRequired": "You must be signed in",
+        "leaveConfirm": "Are you sure you want to leave this community? You'll need to request to join again.",
+        "leftSuccess": "Successfully left community",
+        "leaveFailed": "Failed to leave community"
+      },
+      "postCard": {
+        "pinned": "Pinned",
+        "anonymous": "Anonymous",
+        "updating": "Updating...",
+        "pinPost": "Pin post",
+        "unpinPost": "Unpin post",
+        "editPost": "Edit post",
+        "deletePost": "Delete post",
+        "titlePlaceholder": "Title (optional)",
+        "cancel": "Cancel",
+        "save": "Save",
+        "saving": "Saving...",
+        "attachment": "Attachment",
+        "reactionsCount": "{count, plural, =1 {# reaction} other {# reactions}}",
+        "commentsCount": "{count, plural, =1 {# comment} other {# comments}}",
+        "comments": "Comments",
+        "copying": "Copying...",
+        "copied": "Copied",
+        "copyLink": "Copy link",
+        "confirmDelete": "Delete this post permanently?",
+        "delete": "Delete",
+        "deleting": "Deleting post...",
+        "toasts": {
+          "deleteFailed": "Failed to delete post",
+          "contentEmpty": "Content cannot be empty",
+          "updated": "Post updated",
+          "updateFailed": "Failed to update post",
+          "linkCopied": "Link copied",
+          "linkCopiedDesc": "Post link is ready to share.",
+          "copyFailed": "Couldn't copy link",
+          "copyFailedDesc": "Please copy URL from your browser.",
+          "pinFailed": "Failed to update pin state",
+          "pinnedToast": "Post pinned",
+          "unpinnedToast": "Post unpinned"
+        }
+      },
+      "reactions": {
+        "love": "Love",
+        "like": "Like",
+        "celebrate": "Celebrate",
+        "fire": "Fire",
+        "idea": "Idea",
+        "clap": "Clap",
+        "react": "React",
+        "andMore": "and {count} more"
+      },
+      "sessionAnnouncement": {
+        "today": "Today",
+        "tomorrow": "Tomorrow",
+        "titleFallback": "Live session",
+        "sharedBy": "{name} shared a session",
+        "sharedByFallback": "Shared session",
+        "cta": {
+          "joinLive": "Join live",
+          "watchRecording": "Watch recording",
+          "joinSession": "Join session",
+          "viewSession": "View session"
+        },
+        "context": {
+          "recording": "Session recap and follow-up questions from the recording.",
+          "live": "Live now — join the conversation and bring your questions.",
+          "upcoming": "Quick preview of the upcoming session for the community."
+        },
+        "durationMeta": "{minutes} min",
+        "withMentor": "with {name}"
+      },
+      "comments": {
+        "section": {
+          "headerCount": "{count, plural, =0 {No comments} =1 {# comment} other {# comments}}",
+          "loadError": "Failed to load comments",
+          "emptyTitle": "No comments yet",
+          "emptySubtitle": "Be the first to comment!"
+        },
+        "item": {
+          "anonymous": "Anonymous",
+          "reply": "Reply",
+          "replyPlaceholder": "Reply to {name}...",
+          "deleteConfirm": "Delete this comment?",
+          "cancel": "Cancel",
+          "delete": "Delete",
+          "deleting": "Deleting...",
+          "deleteFailed": "Failed to delete comment"
+        },
+        "form": {
+          "placeholderComment": "Write a comment...",
+          "charCount": "{count} / 1000",
+          "empty": "Comment cannot be empty",
+          "postFailed": "Failed to post comment"
+        }
+      }
+    },
     "calendar": {
       "metaTitle": "Calendar",
       "title": "Calendar",
@@ -1358,16 +1571,6 @@
       "noResultsEmpty": "This community has no resources yet. Be the first to share something!",
       "loading": "Loading...",
       "loadMore": "Load more"
-    }
-  },
-  "comments": {
-    "commentsLabel": "Comments",
-    "errors": {
-      "loadFailed": "Failed to load comments"
-    },
-    "empty": {
-      "title": "No comments yet",
-      "subtitle": "Be the first to comment!"
     }
   }
 }

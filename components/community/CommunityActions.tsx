@@ -27,12 +27,12 @@ export function CommunityActions({
 }: CommunityActionsProps) {
   const router = useRouter();
   const { user } = useCurrentUser();
-  const t = useTranslations();
+  const t = useTranslations("dashboard.communityAdmin.actions");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleJoin = async () => {
     if (!user?.id) {
-      toast.error("You must be signed in to join");
+      toast.error(t("signInToJoin"));
       return;
     }
 
@@ -42,12 +42,12 @@ export function CommunityActions({
       const result = await joinCommunity(communityId);
 
       if (result.success) {
-        toast.success("Successfully joined!");
+        toast.success(t("joinedSuccess"));
         router.refresh();
       }
     } catch (error) {
       console.error("Error joining community:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to join community");
+      toast.error(error instanceof Error ? error.message : t("joinFailed"));
     } finally {
       setIsLoading(false);
     }
@@ -55,13 +55,11 @@ export function CommunityActions({
 
   const handleLeave = async () => {
     if (!user?.id) {
-      toast.error("You must be signed in");
+      toast.error(t("signInRequired"));
       return;
     }
 
-    const confirmed = confirm(
-      "Are you sure you want to leave this community? You'll need to request to join again."
-    );
+    const confirmed = confirm(t("leaveConfirm"));
 
     if (!confirmed) return;
 
@@ -71,12 +69,12 @@ export function CommunityActions({
       const result = await leaveCommunity(communityId);
 
       if (result.success) {
-        toast.success("Successfully left community");
+        toast.success(t("leftSuccess"));
         router.push("/dashboard/communities");
       }
     } catch (error) {
       console.error("Error leaving community:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to leave community");
+      toast.error(error instanceof Error ? error.message : t("leaveFailed"));
     } finally {
       setIsLoading(false);
     }
@@ -87,7 +85,7 @@ export function CommunityActions({
       {isPending ? (
         <Button disabled variant="outline" className="flex items-center space-x-2">
           <Loader2 className="h-4 w-4 animate-spin" />
-          <span>{t("communities.pendingApproval")}</span>
+          <span>{t("pendingApproval")}</span>
         </Button>
       ) : isMember ? (
         <>
@@ -103,14 +101,14 @@ export function CommunityActions({
               ) : (
                 <UserMinus className="h-4 w-4" />
               )}
-              <span>Leave</span>
+              <span>{t("leave")}</span>
             </Button>
           )}
           {isOwner && (
             <Link href={`/dashboard/c/${communitySlug}/settings/sections`}>
               <Button variant="outline" className="flex items-center space-x-2">
                 <Settings className="h-4 w-4" />
-                <span>Settings</span>
+                <span>{t("settings")}</span>
               </Button>
             </Link>
           )}
@@ -126,7 +124,7 @@ export function CommunityActions({
           ) : (
             <UserPlus className="h-4 w-4" />
           )}
-          <span>Join Community</span>
+          <span>{t("joinCommunity")}</span>
         </Button>
       )}
     </div>

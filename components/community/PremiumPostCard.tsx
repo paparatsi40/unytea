@@ -20,6 +20,8 @@ import {
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
+import { useLocale, useTranslations } from "next-intl";
+import { getDateFnsLocale } from "@/lib/i18n/date-fns-locale";
 
 type PostAttachment = {
   url: string;
@@ -65,6 +67,9 @@ export function PremiumPostCard({
   canModeratePost?: boolean;
 }) {
   const { user } = useCurrentUser();
+  const t = useTranslations("dashboard.communityAdmin.postCard");
+  const locale = useLocale();
+  const dfLocale = getDateFnsLocale(locale);
 
   // IMPORTANT: All hooks must be called BEFORE any early return (Rules of Hooks).
   const [showMenu, setShowMenu] = useState(false);
@@ -87,8 +92,11 @@ export function PremiumPostCard({
     return <SessionAnnouncementCard post={post} />;
   }
 
-  const authorName = post.author.name || "Anonymous";
-  const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
+  const authorName = post.author.name || t("anonymous");
+  const timeAgo = formatDistanceToNow(new Date(post.createdAt), {
+    addSuffix: true,
+    locale: dfLocale,
+  });
   const isAuthor = user?.id === post.author.id;
 
   const handleDelete = async () => {
@@ -100,13 +108,13 @@ export function PremiumPostCard({
       return;
     }
 
-    toast.error(result.error || "Failed to delete post");
+    toast.error(result.error || t("toasts.deleteFailed"));
     setIsDeleting(false);
   };
 
   const handleSave = async () => {
     if (!editContent.trim()) {
-      toast.error("Content cannot be empty");
+      toast.error(t("toasts.contentEmpty"));
       return;
     }
 
@@ -121,11 +129,11 @@ export function PremiumPostCard({
       setIsEditing(false);
       setShowMenu(false);
       setConfirmDelete(false);
-      toast.success("Post updated");
+      toast.success(t("toasts.updated"));
       return;
     }
 
-    toast.error(result.error || "Failed to update post");
+    toast.error(result.error || t("toasts.updateFailed"));
     setIsSaving(false);
   };
 
@@ -146,9 +154,9 @@ export function PremiumPostCard({
       await navigator.clipboard.writeText(postUrl);
       setIsLinkCopied(true);
       setTimeout(() => setIsLinkCopied(false), 1800);
-      toast.success("Link copied", { description: "Post link is ready to share." });
+      toast.success(t("toasts.linkCopied"), { description: t("toasts.linkCopiedDesc") });
     } catch {
-      toast.error("Couldn't copy link", { description: "Please copy URL from your browser." });
+      toast.error(t("toasts.copyFailed"), { description: t("toasts.copyFailedDesc") });
     } finally {
       setIsSharing(false);
     }
@@ -161,21 +169,21 @@ export function PremiumPostCard({
     const result = await togglePostPin(post.id);
 
     if (!result.success) {
-      toast.error(result.error || "Failed to update pin state");
+      toast.error(result.error || t("toasts.pinFailed"));
       setIsPinToggling(false);
       return;
     }
 
     setIsPinned(Boolean(result.isPinned));
     setShowMenu(false);
-    toast.success(result.isPinned ? "Post pinned" : "Post unpinned");
+    toast.success(result.isPinned ? t("toasts.pinnedToast") : t("toasts.unpinnedToast"));
     setIsPinToggling(false);
   };
 
   if (isDeleting) {
     return (
       <article className="rounded-xl border border-gray-100 bg-gray-50 p-6 opacity-50">
-        <p className="text-center text-sm text-gray-500">Deleting post...</p>
+        <p className="text-center text-sm text-gray-500">{t("deleting")}</p>
       </article>
     );
   }
@@ -185,7 +193,7 @@ export function PremiumPostCard({
       {isPinned && (
         <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-purple-50 px-2.5 py-1 text-[11px] font-semibold text-purple-700">
           <Pin className="h-3.5 w-3.5" />
-          Pinned
+          {t("pinned")}
         </div>
       )}
 
@@ -242,7 +250,7 @@ export function PremiumPostCard({
                     >
                       <Pin className="h-4 w-4" />
                       <span>
-                        {isPinToggling ? "Updating..." : isPinned ? "Unpin post" : "Pin post"}
+                        {isPinToggling ? t("updating") : isPinned ? t("unpinPost") : t("pinPost")}
                       </span>
                     </button>
                   )}
@@ -256,7 +264,7 @@ export function PremiumPostCard({
                         className="flex w-full items-center space-x-2 px-4 py-2.5 text-left text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
                       >
                         <Edit2 className="h-4 w-4" />
-                        <span>Edit post</span>
+                        <span>{t("editPost")}</span>
                       </button>
                       <button
                         onClick={() => {
@@ -266,7 +274,7 @@ export function PremiumPostCard({
                         className="flex w-full items-center space-x-2 px-4 py-2.5 text-left text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
                       >
                         <Trash2 className="h-4 w-4" />
-                        <span>Delete post</span>
+                        <span>{t("deletePost")}</span>
                       </button>
                     </>
                   )}
@@ -285,7 +293,7 @@ export function PremiumPostCard({
             type="text"
             value={editTitle}
             onChange={(e) => setEditTitle(e.target.value)}
-            placeholder="Title (optional)"
+            placeholder={t("titlePlaceholder")}
             className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm font-semibold text-gray-900 placeholder-gray-400 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
           />
 
@@ -305,7 +313,7 @@ export function PremiumPostCard({
               className="flex items-center space-x-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 disabled:opacity-50"
             >
               <X className="h-4 w-4" />
-              <span>Cancel</span>
+              <span>{t("cancel")}</span>
             </button>
             <button
               onClick={handleSave}
@@ -313,7 +321,7 @@ export function PremiumPostCard({
               className="flex items-center space-x-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 px-3 py-1.5 text-sm font-medium text-white transition-all hover:from-purple-700 hover:to-pink-700 disabled:opacity-50"
             >
               <Check className="h-4 w-4" />
-              <span>{isSaving ? "Saving..." : "Save"}</span>
+              <span>{isSaving ? t("saving") : t("save")}</span>
             </button>
           </div>
         </div>
@@ -345,7 +353,7 @@ export function PremiumPostCard({
                       <div className="relative h-36 w-full">
                         <Image
                           src={attachment?.url}
-                          alt={attachment?.name || "Attachment"}
+                          alt={attachment?.name || t("attachment")}
                           fill
                           sizes="(min-width: 640px) 50vw, 100vw"
                           className="object-cover"
@@ -353,7 +361,7 @@ export function PremiumPostCard({
                       </div>
                     ) : (
                       <div className="flex items-center gap-2 px-3 py-3 text-sm text-gray-700">
-                        <span className="truncate">{attachment?.name || "Attachment"}</span>
+                        <span className="truncate">{attachment?.name || t("attachment")}</span>
                       </div>
                     )}
                   </a>
@@ -370,13 +378,13 @@ export function PremiumPostCard({
           {post._count.reactions > 0 && (
             <div className="flex items-center space-x-1.5 text-xs text-gray-500">
               <div className="h-4 w-4" />
-              <span>{post._count.reactions} reactions</span>
+              <span>{t("reactionsCount", { count: post._count.reactions })}</span>
             </div>
           )}
           {commentCount > 0 && (
             <div className="flex items-center space-x-1.5 text-xs text-gray-500">
               <MessageCircle className="h-4 w-4" />
-              <span>{commentCount} comments</span>
+              <span>{t("commentsCount", { count: commentCount })}</span>
             </div>
           )}
         </div>
@@ -400,7 +408,7 @@ export function PremiumPostCard({
             }`}
           >
             <MessageCircle className="h-4 w-4" />
-            <span>Comments</span>
+            <span>{t("comments")}</span>
             <span
               className={`rounded-full px-1.5 py-0.5 text-[10px] leading-none ${
                 showComments ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-600"
@@ -421,26 +429,26 @@ export function PremiumPostCard({
             }`}
           >
             <Link2 className="h-4 w-4" />
-            <span>{isSharing ? "Copying..." : isLinkCopied ? "Copied" : "Copy link"}</span>
+            <span>{isSharing ? t("copying") : isLinkCopied ? t("copied") : t("copyLink")}</span>
           </button>
         </div>
       )}
 
       {confirmDelete && !isEditing && (
         <div className="mt-4 flex items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2">
-          <p className="text-xs font-medium text-red-700">Delete this post permanently?</p>
+          <p className="text-xs font-medium text-red-700">{t("confirmDelete")}</p>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setConfirmDelete(false)}
               className="rounded-md px-2 py-1 text-xs font-medium text-gray-600 hover:bg-white"
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               onClick={handleDelete}
               className="rounded-md bg-red-600 px-2.5 py-1 text-xs font-medium text-white hover:bg-red-700"
             >
-              Delete
+              {t("delete")}
             </button>
           </div>
         </div>
