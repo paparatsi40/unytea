@@ -351,6 +351,69 @@
         "resources": "Ressources"
       }
     },
+    "home": {
+      "welcomeBack": "Bon retour, {name}",
+      "subtitle": "Voici ce qui se passe dans vos communautés aujourd'hui.",
+      "createCommunity": "Créer une communauté",
+      "onboarding": {
+        "profile": {
+          "title": "Complétez votre profil",
+          "description": "Ajoutez votre bio, vos intérêts et une photo"
+        },
+        "post": {
+          "title": "Créez votre première publication",
+          "description": "Présentez-vous à la communauté"
+        },
+        "session": {
+          "title": "Assistez à une session en direct",
+          "description": "Rejoignez une session pour apprendre et échanger"
+        },
+        "lesson": {
+          "title": "Terminez une leçon",
+          "description": "Commencez à apprendre avec un cours"
+        },
+        "buddy": {
+          "title": "Trouvez un partenaire de responsabilité",
+          "description": "Faites-vous jumeler avec quelqu'un pour progresser ensemble"
+        }
+      },
+      "actionFirst": {
+        "noSessions": "Vous n'avez aucune session cette semaine. Planifiez la première.",
+        "fewSessions": "{count} session cette semaine. Gardez le rythme.",
+        "manySessions": "{count} sessions cette semaine. Excellent rythme.",
+        "scheduleSession": "Planifier une session",
+        "statSessions": "Sessions cette semaine",
+        "statMembers": "Nouveaux membres",
+        "statPosts": "Publications cette semaine"
+      },
+      "nextLiveSession": {
+        "title": "Prochaine session en direct",
+        "joinNow": "Rejoindre maintenant",
+        "viewDetails": "Voir les détails",
+        "minutes": "{minutes} min"
+      },
+      "yourCommunities": {
+        "title": "Vos communautés",
+        "viewAll": "Voir tout",
+        "memberCount": "{count, plural, =1 {1 membre} other {# membres}}",
+        "ownerBadge": "Propriétaire",
+        "memberBadge": "Membre"
+      },
+      "recentActivity": {
+        "title": "Activité récente",
+        "noActivity": "Aucune activité récente. Tout apparaîtra ici à mesure que vos communautés grandissent.",
+        "newMember": "{actor} a rejoint {community}",
+        "newPost": "{actor} a publié dans {community}"
+      },
+      "quickActions": {
+        "title": "Actions rapides",
+        "createSession": "Créer une session",
+        "createPost": "Créer une publication",
+        "inviteMember": "Inviter un membre",
+        "viewAnalytics": "Voir les analytiques",
+        "openSettings": "Paramètres"
+      }
+    },
     "title": "Tableau de Bord",
     "welcome": "Bienvenue",
     "stats": {

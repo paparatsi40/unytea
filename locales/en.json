@@ -352,6 +352,69 @@
         "resources": "Resources"
       }
     },
+    "home": {
+      "welcomeBack": "Welcome back, {name}",
+      "subtitle": "Here's what's happening in your communities today.",
+      "createCommunity": "Create community",
+      "onboarding": {
+        "profile": {
+          "title": "Complete your profile",
+          "description": "Add your bio, interests, and a photo"
+        },
+        "post": {
+          "title": "Create your first post",
+          "description": "Introduce yourself to the community"
+        },
+        "session": {
+          "title": "Attend a live session",
+          "description": "Join a session to learn and connect"
+        },
+        "lesson": {
+          "title": "Complete a lesson",
+          "description": "Start learning from a course"
+        },
+        "buddy": {
+          "title": "Find an accountability buddy",
+          "description": "Get paired with someone to grow together"
+        }
+      },
+      "actionFirst": {
+        "noSessions": "You have no sessions this week. Schedule your first.",
+        "fewSessions": "{count} session this week. Keep the momentum.",
+        "manySessions": "{count} sessions this week. Great rhythm.",
+        "scheduleSession": "Schedule session",
+        "statSessions": "Sessions this week",
+        "statMembers": "New members",
+        "statPosts": "Posts this week"
+      },
+      "nextLiveSession": {
+        "title": "Next live session",
+        "joinNow": "Join now",
+        "viewDetails": "View details",
+        "minutes": "{minutes} min"
+      },
+      "yourCommunities": {
+        "title": "Your communities",
+        "viewAll": "View all",
+        "memberCount": "{count, plural, =1 {1 member} other {# members}}",
+        "ownerBadge": "Owner",
+        "memberBadge": "Member"
+      },
+      "recentActivity": {
+        "title": "Recent activity",
+        "noActivity": "No recent activity. Things will show up here as your communities grow.",
+        "newMember": "{actor} joined {community}",
+        "newPost": "{actor} posted in {community}"
+      },
+      "quickActions": {
+        "title": "Quick actions",
+        "createSession": "Create session",
+        "createPost": "Create post",
+        "inviteMember": "Invite member",
+        "viewAnalytics": "View analytics",
+        "openSettings": "Settings"
+      }
+    },
     "title": "Dashboard",
     "welcome": "Welcome back",
     "stats": {

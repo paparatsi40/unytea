@@ -352,6 +352,69 @@
         "resources": "Recursos"
       }
     },
+    "home": {
+      "welcomeBack": "Bienvenido, {name}",
+      "subtitle": "Esto es lo que está pasando en tus comunidades hoy.",
+      "createCommunity": "Crear comunidad",
+      "onboarding": {
+        "profile": {
+          "title": "Completa tu perfil",
+          "description": "Agrega tu bio, intereses y una foto"
+        },
+        "post": {
+          "title": "Crea tu primera publicación",
+          "description": "Preséntate ante la comunidad"
+        },
+        "session": {
+          "title": "Asiste a una sesión en vivo",
+          "description": "Únete a una sesión para aprender y conectar"
+        },
+        "lesson": {
+          "title": "Completa una lección",
+          "description": "Empieza a aprender de un curso"
+        },
+        "buddy": {
+          "title": "Encuentra un compañero de responsabilidad",
+          "description": "Emparéjate con alguien para crecer juntos"
+        }
+      },
+      "actionFirst": {
+        "noSessions": "No tienes sesiones esta semana. Programa la primera.",
+        "fewSessions": "{count} sesión esta semana. Mantén el ritmo.",
+        "manySessions": "{count} sesiones esta semana. Buen ritmo.",
+        "scheduleSession": "Programar sesión",
+        "statSessions": "Sesiones esta semana",
+        "statMembers": "Nuevos miembros",
+        "statPosts": "Publicaciones esta semana"
+      },
+      "nextLiveSession": {
+        "title": "Próxima sesión en vivo",
+        "joinNow": "Unirse ahora",
+        "viewDetails": "Ver detalles",
+        "minutes": "{minutes} min"
+      },
+      "yourCommunities": {
+        "title": "Tus comunidades",
+        "viewAll": "Ver todas",
+        "memberCount": "{count, plural, =1 {1 miembro} other {# miembros}}",
+        "ownerBadge": "Dueño",
+        "memberBadge": "Miembro"
+      },
+      "recentActivity": {
+        "title": "Actividad reciente",
+        "noActivity": "No hay actividad reciente. Aparecerá aquí a medida que crezcan tus comunidades.",
+        "newMember": "{actor} se unió a {community}",
+        "newPost": "{actor} publicó en {community}"
+      },
+      "quickActions": {
+        "title": "Acciones rápidas",
+        "createSession": "Crear sesión",
+        "createPost": "Crear publicación",
+        "inviteMember": "Invitar miembro",
+        "viewAnalytics": "Ver analíticas",
+        "openSettings": "Configuración"
+      }
+    },
     "title": "Panel",
     "welcome": "Bienvenido de vuelta",
     "stats": {
