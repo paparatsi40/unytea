@@ -47,9 +47,14 @@ export function LanguageSelector() {
       const newPathname = pathname.replace(/^\/(en|es|fr)/, `/${newLocale}`);
       router.push(newPathname);
       router.refresh();
+    } else {
+      // Dashboard / auth route groups have no [locale] segment.
+      // NextIntlClientProvider in the layout reads the locale from
+      // localStorage at mount and doesn't observe later changes, so a soft
+      // re-render leaves every other mounted component with stale strings.
+      // Force a full reload to re-mount the provider with the new locale.
+      window.location.reload();
     }
-    // If on dashboard/auth (no i18n), stay on current page
-    // The locale preference is saved and will apply to public pages
   };
 
   const currentLocaleData = locales.find((l) => l.code === currentLocale);
