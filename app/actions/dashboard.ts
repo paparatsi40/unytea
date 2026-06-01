@@ -1024,7 +1024,7 @@ export async function getAIPlaybookRecommendations() {
         problem: "Your recap content is under-leveraged.",
         action: "Share recap highlights to turn each session into reusable growth content.",
         cta: "Promote recordings",
-        href: "/dashboard/recordings",
+        href: "/dashboard/library?tab=recordings",
         explainability: `Recording views (14d): ${signals.recordingViews}`,
       });
     }
@@ -1108,7 +1108,7 @@ export async function getNextRecommendedAction() {
         recommendation: {
           title: "Boost replay distribution",
           description: "Your recordings are ready—share recap posts to increase replay views.",
-          href: "/dashboard/recordings",
+          href: "/dashboard/library?tab=recordings",
           cta: "Promote recordings",
           priority: "medium",
         },
@@ -1426,7 +1426,7 @@ export async function getCommunityOSSnapshot() {
         action: "Share recap and key takeaways",
         description: "Publish recap so members who missed live can still benefit.",
         cta: "Share recap",
-        href: "/dashboard/recordings",
+        href: "/dashboard/library?tab=recordings",
         completed: recapPosts > 0,
       },
       {

@@ -562,7 +562,7 @@ export default function DashboardPage() {
                 id: "lesson",
                 title: "Complete a lesson",
                 description: "Start learning from a course",
-                href: "/dashboard/courses",
+                href: "/dashboard/library?tab=courses",
                 completed: onboardingProgress.hasCompletedLesson,
               },
               {
@@ -705,7 +705,7 @@ export default function DashboardPage() {
                   Host your session <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
-              <Link href="/dashboard/recordings">
+              <Link href="/dashboard/library?tab=recordings">
                 <Button variant="outline" className="justify-between">
                   Share recap <ArrowRight className="h-4 w-4" />
                 </Button>

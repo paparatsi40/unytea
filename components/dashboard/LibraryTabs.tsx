@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -13,11 +14,20 @@ export type LibraryTab = "courses" | "recordings" | "resources";
  * segment, so server-side getTranslations would not see the user's locale).
  *
  * The active tab is driven by the ?tab= query param, computed server-side in
- * page.tsx and passed in as a prop. Each trigger is a <Link> that swaps the
- * query param — the URL stays bookmarkable and the Radix Tabs `value` follows
- * the prop on re-render.
+ * page.tsx, which also renders ONLY the active tab's content and passes it as
+ * `children`. This lets server components (CoursesTab/RecordingsTab) and a
+ * client component (ResourcesTab) live in the same tab set without breaking
+ * the server/client boundary, and avoids fetching inactive tabs. Each trigger
+ * is a <Link> that swaps the query param — the URL stays bookmarkable and the
+ * Radix Tabs `value` follows the activeTab prop on navigation.
  */
-export function LibraryTabs({ activeTab }: { activeTab: LibraryTab }) {
+export function LibraryTabs({
+  activeTab,
+  children,
+}: {
+  activeTab: LibraryTab;
+  children: ReactNode;
+}) {
   const t = useTranslations("dashboard.library");
 
   return (
@@ -49,47 +59,9 @@ export function LibraryTabs({ activeTab }: { activeTab: LibraryTab }) {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="courses">
-          <MigratingPlaceholder legacyHref="/dashboard/courses" legacyLabel="/dashboard/courses" />
-        </TabsContent>
-        <TabsContent value="recordings">
-          <MigratingPlaceholder
-            legacyHref="/dashboard/recordings"
-            legacyLabel="/dashboard/recordings"
-          />
-        </TabsContent>
-        <TabsContent value="resources">
-          <MigratingPlaceholder
-            legacyHref="/dashboard/knowledge-library"
-            legacyLabel="/dashboard/knowledge-library"
-          />
-        </TabsContent>
+        {/* Only the active tab's content is rendered (server-side in page.tsx). */}
+        <TabsContent value={activeTab}>{children}</TabsContent>
       </Tabs>
-    </div>
-  );
-}
-
-// Temporary placeholder — Commit 3 replaces these with migrated content.
-// Kept in English on purpose: it's transient scaffolding, not shipped copy.
-function MigratingPlaceholder({
-  legacyHref,
-  legacyLabel,
-}: {
-  legacyHref: string;
-  legacyLabel: string;
-}) {
-  return (
-    <div className="rounded-lg border border-dashed border-border p-12 text-center">
-      <h2 className="mb-2 text-lg font-medium">Content migrating</h2>
-      <p className="text-sm text-muted-foreground">
-        Tab structure ready. Content migration lands in the next commit.
-        <br />
-        Still accessible at{" "}
-        <Link href={legacyHref} className="underline">
-          {legacyLabel}
-        </Link>
-        .
-      </p>
     </div>
   );
 }

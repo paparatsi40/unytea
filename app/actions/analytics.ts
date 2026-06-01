@@ -697,7 +697,7 @@ export async function getNorthStarDecisionSnapshot(communityId?: string) {
       actions.push({
         title: "Publish recaps and recordings",
         why: "Reused content increases retention and monetization opportunities.",
-        href: "/dashboard/knowledge-library",
+        href: "/dashboard/library?tab=resources",
         cta: "Publish to library",
       });
     }

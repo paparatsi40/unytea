@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { LibraryTabs, type LibraryTab } from "@/components/dashboard/LibraryTabs";
+import { CoursesTab } from "@/components/dashboard/library/CoursesTab";
+import { RecordingsTab } from "@/components/dashboard/library/RecordingsTab";
+import { ResourcesTab } from "@/components/dashboard/library/ResourcesTab";
 
 export const metadata: Metadata = {
   title: "Library — Unytea",
@@ -19,5 +22,17 @@ export default async function LibraryPage(props: Props) {
     ? (tab as LibraryTab)
     : "courses";
 
-  return <LibraryTabs activeTab={activeTab} />;
+  // Render only the active tab's content (server-side) and hand it to the
+  // client tabs wrapper as children — avoids fetching inactive tabs and keeps
+  // server/client components mixed cleanly across tabs.
+  const content =
+    activeTab === "courses" ? (
+      <CoursesTab />
+    ) : activeTab === "recordings" ? (
+      <RecordingsTab />
+    ) : (
+      <ResourcesTab />
+    );
+
+  return <LibraryTabs activeTab={activeTab}>{content}</LibraryTabs>;
 }

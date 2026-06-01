@@ -137,7 +137,10 @@ export default function CourseDetailPage() {
         <div className="text-center">
           <BookOpen className="mx-auto mb-4 h-12 w-12 text-gray-400" />
           <h2 className="text-xl font-semibold">Course not found</h2>
-          <Link href="/dashboard/courses" className="mt-4 text-blue-600 hover:underline">
+          <Link
+            href="/dashboard/library?tab=courses"
+            className="mt-4 text-blue-600 hover:underline"
+          >
             Back to courses
           </Link>
         </div>
@@ -155,7 +158,7 @@ export default function CourseDetailPage() {
     <div className="space-y-6 p-8">
       {/* Back Link */}
       <Link
-        href="/dashboard/courses"
+        href="/dashboard/library?tab=courses"
         className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900"
       >
         <ArrowLeft className="h-4 w-4" />
