@@ -428,6 +428,119 @@
         "viewAll": "{count, plural, =1 {Ver # sesión pasada} other {Ver las # sesiones pasadas}}"
       }
     },
+    "analytics": {
+      "title": "Analíticas",
+      "subtitle": "Información y métricas de tus comunidades",
+      "loadFailedTitle": "Error al cargar las analíticas",
+      "genericError": "Ocurrió un error",
+      "selector": {
+        "all": "Todas las comunidades",
+        "select": "Seleccionar comunidad"
+      },
+      "overview": {
+        "totalMembers": "Miembros totales",
+        "totalPosts": "Publicaciones totales",
+        "totalComments": "Comentarios totales",
+        "totalMessages": "Mensajes totales",
+        "thisMonth": "+{count} este mes"
+      },
+      "growth": {
+        "title": "Resumen de crecimiento",
+        "subtitle": "Tendencias de crecimiento de miembros y contenido",
+        "memberTitle": "Crecimiento de miembros",
+        "contentTitle": "Crecimiento de contenido",
+        "totalMembers": "Miembros totales",
+        "totalPosts": "Publicaciones totales",
+        "newThisMonth": "Nuevos este mes"
+      },
+      "communities": {
+        "title": "Tus comunidades",
+        "youOwn": "{count, plural, =1 {Tienes # comunidad} other {Tienes # comunidades}}",
+        "emptyText": "Crea tu primera comunidad para ver analíticas detalladas",
+        "createCta": "Crear comunidad"
+      },
+      "northStar": {
+        "title": "Marco de decisión North Star",
+        "subtitle": "Diagnostica qué mejorar a continuación a partir de los asistentes activos semanales y los impulsores clave.",
+        "waa": "Asistentes activos semanales",
+        "avgLiveAttendance": "Asistencia media en vivo",
+        "returningAttendees": "Asistentes recurrentes",
+        "feedParticipation": "Participación en el feed",
+        "contentReuse": "Reutilización de contenido",
+        "diagnosisLabel": "Diagnóstico:",
+        "error": "No se pudieron cargar los diagnósticos de North Star ahora mismo."
+      },
+      "health": {
+        "title": "Salud de la comunidad en vivo",
+        "subtitle": "Métricas de salud clave para comunidades basadas en sesiones",
+        "returningAttendees": "Asistentes recurrentes",
+        "returningDetail": "{returning} de {unique} asistentes se unieron a más de una sesión.",
+        "feedParticipation": "Tasa de participación en el feed (30 d)",
+        "feedDetail": "{active} miembros activos publicaron o comentaron de {total} miembros activos.",
+        "error": "No se pudieron cargar las métricas de salud en vivo ahora mismo.",
+        "benchmark": {
+          "needsWork": "Necesita trabajo",
+          "acceptable": "Aceptable",
+          "strong": "Fuerte",
+          "exceptional": "Excepcional",
+          "silent": "Silencioso",
+          "normal": "Normal",
+          "alive": "Activo",
+          "veryStrong": "Muy fuerte"
+        }
+      },
+      "retention": {
+        "title": "Cohortes de retención",
+        "subtitle": "Cohortes semanales por fecha de ingreso y % activo en las semanas siguientes",
+        "trendLabel": "Tendencia S1→S3:",
+        "allCommunities": "Todas las comunidades",
+        "cohortWeek": "Cohorte (semana)",
+        "size": "Tamaño",
+        "empty": "Aún no hay suficientes datos de cohortes."
+      },
+      "proTipLabel": "💡 Consejo:",
+      "proTip": "Usa el selector de comunidad en la esquina superior derecha (\"Todas las comunidades\") para ver analíticas detalladas por comunidad, incluyendo información de miembros, métricas de participación y rendimiento del contenido.",
+      "charts": {
+        "tabs": {
+          "sessions": "Sesiones",
+          "courses": "Cursos",
+          "revenue": "Ingresos"
+        },
+        "sessions": {
+          "total": "Sesiones totales",
+          "avgAttendance": "Asistencia media",
+          "avgRating": "Valoración media",
+          "notAvailable": "N/D",
+          "reviews": "{count, plural, =1 {# reseña} other {# reseñas}}",
+          "status": "Estado",
+          "statusSub": "{scheduled} programadas · {live} en vivo",
+          "chartTitle": "Sesiones y asistencia (últimos 30 días)",
+          "empty": "Aún no hay datos de sesiones"
+        },
+        "courses": {
+          "total": "Cursos totales",
+          "enrollments": "Inscripciones",
+          "completionRate": "Tasa de finalización",
+          "completedSub": "{count} completadas",
+          "certificates": "Certificados",
+          "chartTitle": "Nuevas inscripciones (últimos 30 días)",
+          "performance": "Rendimiento de cursos",
+          "enrolled": "{count} inscritos",
+          "completionModules": "{completion}% de finalización · {modules, plural, =1 {# módulo} other {# módulos}}",
+          "empty": "Aún no hay datos de cursos"
+        },
+        "revenue": {
+          "total": "Ingresos totales",
+          "course": "Ingresos por cursos",
+          "membership": "Ingresos por membresías",
+          "paidMembers": "{count, plural, =1 {# miembro de pago} other {# miembros de pago}}",
+          "byCourse": "Ingresos por curso",
+          "priceEnrollments": "{price} × {count, plural, =1 {# inscripción} other {# inscripciones}}",
+          "emptyHint": "Empieza a monetizar estableciendo precios en tus cursos y comunidades",
+          "empty": "Aún no hay datos de ingresos"
+        }
+      }
+    },
     "profile": {
       "loading": "Cargando...",
       "userFallback": "Usuario",

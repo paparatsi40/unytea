@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import {
   BarChart3,
   BookOpen,
@@ -30,7 +31,7 @@ interface CourseBreakdown {
   avgProgress: number;
 }
 
-interface SessionData {
+export interface SessionData {
   total: number;
   completed: number;
   scheduled: number;
@@ -41,7 +42,7 @@ interface SessionData {
   dailyChart: DailyChartPoint[];
 }
 
-interface CourseData {
+export interface CourseData {
   totalCourses: number;
   totalEnrollments: number;
   completedEnrollments: number;
@@ -52,7 +53,7 @@ interface CourseData {
   enrollmentChart: DailyChartPoint[];
 }
 
-interface RevenueData {
+export interface RevenueData {
   totalRevenue: number;
   courseRevenue: number;
   membershipRevenue: number;
@@ -148,12 +149,14 @@ function StatBox({
 
 // ── Main Component ───────────────────────────────────────────────────
 export function AnalyticsCharts({ sessions, courses, revenue }: AnalyticsChartsProps) {
+  const t = useTranslations("dashboard.analytics.charts");
+  const locale = useLocale();
   const [tab, setTab] = useState<TabId>("sessions");
 
   const tabs: { id: TabId; label: string; icon: React.ElementType }[] = [
-    { id: "sessions", label: "Sessions", icon: PlayCircle },
-    { id: "courses", label: "Courses", icon: BookOpen },
-    { id: "revenue", label: "Revenue", icon: DollarSign },
+    { id: "sessions", label: t("tabs.sessions"), icon: PlayCircle },
+    { id: "courses", label: t("tabs.courses"), icon: BookOpen },
+    { id: "revenue", label: t("tabs.revenue"), icon: DollarSign },
   ];
 
   return (
@@ -188,28 +191,33 @@ export function AnalyticsCharts({ sessions, courses, revenue }: AnalyticsChartsP
                 <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
                   <StatBox
                     icon={PlayCircle}
-                    label="Total Sessions"
+                    label={t("sessions.total")}
                     value={sessions.total}
                     color="text-blue-500"
                   />
                   <StatBox
                     icon={Users}
-                    label="Avg Attendance"
+                    label={t("sessions.avgAttendance")}
                     value={sessions.avgAttendance}
                     color="text-emerald-500"
                   />
                   <StatBox
                     icon={Star}
-                    label="Avg Rating"
-                    value={sessions.avgRating ? `${sessions.avgRating}/5` : "N/A"}
-                    sub={`${sessions.totalFeedback} reviews`}
+                    label={t("sessions.avgRating")}
+                    value={
+                      sessions.avgRating ? `${sessions.avgRating}/5` : t("sessions.notAvailable")
+                    }
+                    sub={t("sessions.reviews", { count: sessions.totalFeedback })}
                     color="text-amber-500"
                   />
                   <StatBox
                     icon={BarChart3}
-                    label="Status"
+                    label={t("sessions.status")}
                     value={sessions.completed}
-                    sub={`${sessions.scheduled} scheduled · ${sessions.live} live`}
+                    sub={t("sessions.statusSub", {
+                      scheduled: sessions.scheduled,
+                      live: sessions.live,
+                    })}
                     color="text-purple-500"
                   />
                 </div>
@@ -217,7 +225,7 @@ export function AnalyticsCharts({ sessions, courses, revenue }: AnalyticsChartsP
                 {/* Sessions chart */}
                 <div>
                   <h4 className="mb-3 text-sm font-medium text-gray-500">
-                    Sessions & Attendance (Last 30 days)
+                    {t("sessions.chartTitle")}
                   </h4>
                   <div className="rounded-xl border border-gray-100 bg-gray-50 p-4">
                     <MiniBarChart
@@ -234,7 +242,7 @@ export function AnalyticsCharts({ sessions, courses, revenue }: AnalyticsChartsP
                 </div>
               </div>
             ) : (
-              <EmptyState text="No session data yet" />
+              <EmptyState text={t("sessions.empty")} />
             )}
           </>
         )}
@@ -247,26 +255,26 @@ export function AnalyticsCharts({ sessions, courses, revenue }: AnalyticsChartsP
                 <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
                   <StatBox
                     icon={BookOpen}
-                    label="Total Courses"
+                    label={t("courses.total")}
                     value={courses.totalCourses}
                     color="text-blue-500"
                   />
                   <StatBox
                     icon={Users}
-                    label="Enrollments"
+                    label={t("courses.enrollments")}
                     value={courses.totalEnrollments}
                     color="text-emerald-500"
                   />
                   <StatBox
                     icon={TrendingUp}
-                    label="Completion Rate"
+                    label={t("courses.completionRate")}
                     value={`${courses.completionRate}%`}
-                    sub={`${courses.completedEnrollments} completed`}
+                    sub={t("courses.completedSub", { count: courses.completedEnrollments })}
                     color="text-purple-500"
                   />
                   <StatBox
                     icon={Award}
-                    label="Certificates"
+                    label={t("courses.certificates")}
                     value={courses.certificateCount}
                     color="text-amber-500"
                   />
@@ -275,7 +283,7 @@ export function AnalyticsCharts({ sessions, courses, revenue }: AnalyticsChartsP
                 {/* Enrollments chart */}
                 <div>
                   <h4 className="mb-3 text-sm font-medium text-gray-500">
-                    New Enrollments (Last 30 days)
+                    {t("courses.chartTitle")}
                   </h4>
                   <div className="rounded-xl border border-gray-100 bg-gray-50 p-4">
                     <MiniBarChart
@@ -296,7 +304,9 @@ export function AnalyticsCharts({ sessions, courses, revenue }: AnalyticsChartsP
                 {/* Course breakdown table */}
                 {courses.courseBreakdown.length > 0 && (
                   <div>
-                    <h4 className="mb-3 text-sm font-medium text-gray-500">Course Performance</h4>
+                    <h4 className="mb-3 text-sm font-medium text-gray-500">
+                      {t("courses.performance")}
+                    </h4>
                     <div className="space-y-2">
                       {courses.courseBreakdown.map((c) => (
                         <div
@@ -305,7 +315,9 @@ export function AnalyticsCharts({ sessions, courses, revenue }: AnalyticsChartsP
                         >
                           <div className="mb-2 flex items-center justify-between">
                             <span className="text-sm font-medium text-gray-900">{c.title}</span>
-                            <span className="text-xs text-gray-500">{c.enrollments} enrolled</span>
+                            <span className="text-xs text-gray-500">
+                              {t("courses.enrolled", { count: c.enrollments })}
+                            </span>
                           </div>
                           <div className="flex items-center gap-3">
                             <div className="flex-1">
@@ -316,7 +328,10 @@ export function AnalyticsCharts({ sessions, courses, revenue }: AnalyticsChartsP
                             </span>
                           </div>
                           <p className="mt-1 text-[10px] text-gray-400">
-                            {c.completionRate}% completion · {c.modules} modules
+                            {t("courses.completionModules", {
+                              completion: c.completionRate,
+                              modules: c.modules,
+                            })}
                           </p>
                         </div>
                       ))}
@@ -325,7 +340,7 @@ export function AnalyticsCharts({ sessions, courses, revenue }: AnalyticsChartsP
                 )}
               </div>
             ) : (
-              <EmptyState text="No course data yet" />
+              <EmptyState text={t("courses.empty")} />
             )}
           </>
         )}
@@ -338,21 +353,21 @@ export function AnalyticsCharts({ sessions, courses, revenue }: AnalyticsChartsP
                 <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
                   <StatBox
                     icon={DollarSign}
-                    label="Total Revenue"
-                    value={`$${revenue.totalRevenue.toLocaleString()}`}
+                    label={t("revenue.total")}
+                    value={`$${revenue.totalRevenue.toLocaleString(locale)}`}
                     color="text-emerald-500"
                   />
                   <StatBox
                     icon={BookOpen}
-                    label="Course Revenue"
-                    value={`$${revenue.courseRevenue.toLocaleString()}`}
+                    label={t("revenue.course")}
+                    value={`$${revenue.courseRevenue.toLocaleString(locale)}`}
                     color="text-blue-500"
                   />
                   <StatBox
                     icon={Users}
-                    label="Membership Revenue"
-                    value={`$${revenue.membershipRevenue.toLocaleString()}`}
-                    sub={`${revenue.paidMembers} paid members`}
+                    label={t("revenue.membership")}
+                    value={`$${revenue.membershipRevenue.toLocaleString(locale)}`}
+                    sub={t("revenue.paidMembers", { count: revenue.paidMembers })}
                     color="text-purple-500"
                   />
                 </div>
@@ -360,7 +375,9 @@ export function AnalyticsCharts({ sessions, courses, revenue }: AnalyticsChartsP
                 {/* Course revenue breakdown */}
                 {revenue.courseBreakdown.length > 0 && (
                   <div>
-                    <h4 className="mb-3 text-sm font-medium text-gray-500">Revenue by Course</h4>
+                    <h4 className="mb-3 text-sm font-medium text-gray-500">
+                      {t("revenue.byCourse")}
+                    </h4>
                     <div className="space-y-2">
                       {revenue.courseBreakdown.map((c, i) => (
                         <div
@@ -370,11 +387,14 @@ export function AnalyticsCharts({ sessions, courses, revenue }: AnalyticsChartsP
                           <div>
                             <p className="text-sm font-medium text-gray-900">{c.title}</p>
                             <p className="text-xs text-gray-500">
-                              ${c.price} × {c.enrollments} enrollments
+                              {t("revenue.priceEnrollments", {
+                                price: `$${c.price}`,
+                                count: c.enrollments,
+                              })}
                             </p>
                           </div>
                           <span className="text-sm font-bold text-emerald-600">
-                            ${c.revenue.toLocaleString()}
+                            ${c.revenue.toLocaleString(locale)}
                           </span>
                         </div>
                       ))}
@@ -385,14 +405,12 @@ export function AnalyticsCharts({ sessions, courses, revenue }: AnalyticsChartsP
                 {revenue.totalRevenue === 0 && (
                   <div className="rounded-xl border border-gray-100 bg-gray-50 p-6 text-center">
                     <DollarSign className="mx-auto mb-2 h-8 w-8 text-gray-300" />
-                    <p className="text-sm text-gray-500">
-                      Start monetizing by setting prices on your courses and communities
-                    </p>
+                    <p className="text-sm text-gray-500">{t("revenue.emptyHint")}</p>
                   </div>
                 )}
               </div>
             ) : (
-              <EmptyState text="No revenue data yet" />
+              <EmptyState text={t("revenue.empty")} />
             )}
           </>
         )}

@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { ChevronDown } from "lucide-react";
 
 export function CommunitySelector() {
+  const t = useTranslations("dashboard.analytics");
   const [communities, setCommunities] = useState<any[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -40,8 +42,8 @@ export function CommunitySelector() {
       >
         <span>
           {selected
-            ? communities.find((c) => c.id === selected)?.name || "Select Community"
-            : "All Communities"}
+            ? communities.find((c) => c.id === selected)?.name || t("selector.select")
+            : t("selector.all")}
         </span>
         <ChevronDown className="h-4 w-4" />
       </button>
@@ -57,7 +59,7 @@ export function CommunitySelector() {
               }}
               className="w-full rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-muted"
             >
-              All Communities
+              {t("selector.all")}
             </button>
             {communities.map((community) => (
               <button

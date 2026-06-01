@@ -427,6 +427,119 @@
         "viewAll": "{count, plural, =1 {Voir # session passée} other {Voir les # sessions passées}}"
       }
     },
+    "analytics": {
+      "title": "Analytique",
+      "subtitle": "Informations et métriques de vos communautés",
+      "loadFailedTitle": "Échec du chargement de l'analytique",
+      "genericError": "Une erreur s'est produite",
+      "selector": {
+        "all": "Toutes les communautés",
+        "select": "Sélectionner une communauté"
+      },
+      "overview": {
+        "totalMembers": "Membres au total",
+        "totalPosts": "Publications au total",
+        "totalComments": "Commentaires au total",
+        "totalMessages": "Messages au total",
+        "thisMonth": "+{count} ce mois-ci"
+      },
+      "growth": {
+        "title": "Aperçu de la croissance",
+        "subtitle": "Tendances de croissance des membres et du contenu",
+        "memberTitle": "Croissance des membres",
+        "contentTitle": "Croissance du contenu",
+        "totalMembers": "Membres au total",
+        "totalPosts": "Publications au total",
+        "newThisMonth": "Nouveaux ce mois-ci"
+      },
+      "communities": {
+        "title": "Vos communautés",
+        "youOwn": "{count, plural, =1 {Vous possédez # communauté} other {Vous possédez # communautés}}",
+        "emptyText": "Créez votre première communauté pour voir des analyses détaillées",
+        "createCta": "Créer une communauté"
+      },
+      "northStar": {
+        "title": "Cadre de décision North Star",
+        "subtitle": "Diagnostiquez ce qu'il faut améliorer ensuite à partir des participants actifs hebdomadaires et des leviers clés.",
+        "waa": "Participants actifs hebdomadaires",
+        "avgLiveAttendance": "Présence moyenne en direct",
+        "returningAttendees": "Participants récurrents",
+        "feedParticipation": "Participation au fil",
+        "contentReuse": "Réutilisation du contenu",
+        "diagnosisLabel": "Diagnostic :",
+        "error": "Impossible de charger les diagnostics North Star pour le moment."
+      },
+      "health": {
+        "title": "Santé de la communauté en direct",
+        "subtitle": "Métriques de santé clés pour les communautés basées sur les sessions",
+        "returningAttendees": "Participants récurrents",
+        "returningDetail": "{returning} sur {unique} participants ont rejoint plus d'une session.",
+        "feedParticipation": "Taux de participation au fil (30 j)",
+        "feedDetail": "{active} membres actifs ont publié ou commenté sur {total} membres actifs.",
+        "error": "Impossible de charger les métriques de santé en direct pour le moment.",
+        "benchmark": {
+          "needsWork": "À améliorer",
+          "acceptable": "Acceptable",
+          "strong": "Solide",
+          "exceptional": "Exceptionnel",
+          "silent": "Silencieux",
+          "normal": "Normal",
+          "alive": "Actif",
+          "veryStrong": "Très solide"
+        }
+      },
+      "retention": {
+        "title": "Cohortes de rétention",
+        "subtitle": "Cohortes hebdomadaires par date d'inscription et % actif les semaines suivantes",
+        "trendLabel": "Tendance S1→S3 :",
+        "allCommunities": "Toutes les communautés",
+        "cohortWeek": "Cohorte (semaine)",
+        "size": "Taille",
+        "empty": "Pas encore assez de données de cohorte."
+      },
+      "proTipLabel": "💡 Astuce :",
+      "proTip": "Utilisez le sélecteur de communauté en haut à droite (\"Toutes les communautés\") pour voir des analyses détaillées par communauté, y compris les informations sur les membres, les métriques d'engagement et les performances du contenu.",
+      "charts": {
+        "tabs": {
+          "sessions": "Sessions",
+          "courses": "Cours",
+          "revenue": "Revenus"
+        },
+        "sessions": {
+          "total": "Sessions au total",
+          "avgAttendance": "Présence moyenne",
+          "avgRating": "Note moyenne",
+          "notAvailable": "N/D",
+          "reviews": "{count, plural, =1 {# avis} other {# avis}}",
+          "status": "Statut",
+          "statusSub": "{scheduled} planifiées · {live} en direct",
+          "chartTitle": "Sessions et présence (30 derniers jours)",
+          "empty": "Pas encore de données de session"
+        },
+        "courses": {
+          "total": "Cours au total",
+          "enrollments": "Inscriptions",
+          "completionRate": "Taux d'achèvement",
+          "completedSub": "{count} terminées",
+          "certificates": "Certificats",
+          "chartTitle": "Nouvelles inscriptions (30 derniers jours)",
+          "performance": "Performance des cours",
+          "enrolled": "{count} inscrits",
+          "completionModules": "{completion}% d'achèvement · {modules, plural, =1 {# module} other {# modules}}",
+          "empty": "Pas encore de données de cours"
+        },
+        "revenue": {
+          "total": "Revenus totaux",
+          "course": "Revenus des cours",
+          "membership": "Revenus des abonnements",
+          "paidMembers": "{count, plural, =1 {# membre payant} other {# membres payants}}",
+          "byCourse": "Revenus par cours",
+          "priceEnrollments": "{price} × {count, plural, =1 {# inscription} other {# inscriptions}}",
+          "emptyHint": "Commencez à monétiser en fixant des prix sur vos cours et communautés",
+          "empty": "Pas encore de données de revenus"
+        }
+      }
+    },
     "profile": {
       "loading": "Chargement...",
       "userFallback": "Utilisateur",

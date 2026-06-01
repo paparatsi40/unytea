@@ -428,6 +428,119 @@
         "viewAll": "{count, plural, =1 {View all # past session} other {View all # past sessions}}"
       }
     },
+    "analytics": {
+      "title": "Analytics",
+      "subtitle": "Insights and metrics for your communities",
+      "loadFailedTitle": "Failed to load analytics",
+      "genericError": "An error occurred",
+      "selector": {
+        "all": "All Communities",
+        "select": "Select Community"
+      },
+      "overview": {
+        "totalMembers": "Total Members",
+        "totalPosts": "Total Posts",
+        "totalComments": "Total Comments",
+        "totalMessages": "Total Messages",
+        "thisMonth": "+{count} this month"
+      },
+      "growth": {
+        "title": "Growth Overview",
+        "subtitle": "Member and content growth trends",
+        "memberTitle": "Member Growth",
+        "contentTitle": "Content Growth",
+        "totalMembers": "Total Members",
+        "totalPosts": "Total Posts",
+        "newThisMonth": "New This Month"
+      },
+      "communities": {
+        "title": "Your Communities",
+        "youOwn": "{count, plural, =1 {You own # community} other {You own # communities}}",
+        "emptyText": "Create your first community to see detailed analytics",
+        "createCta": "Create Community"
+      },
+      "northStar": {
+        "title": "North Star Decision Framework",
+        "subtitle": "Diagnose what to improve next from weekly active attendees and core drivers.",
+        "waa": "Weekly Active Attendees",
+        "avgLiveAttendance": "Avg Live Attendance",
+        "returningAttendees": "Returning Attendees",
+        "feedParticipation": "Feed Participation",
+        "contentReuse": "Content Reuse",
+        "diagnosisLabel": "Diagnosis:",
+        "error": "Could not load north star diagnostics right now."
+      },
+      "health": {
+        "title": "Live Community Health",
+        "subtitle": "Core health metrics for session-driven communities",
+        "returningAttendees": "Returning attendees",
+        "returningDetail": "{returning} of {unique} attendees joined more than one session.",
+        "feedParticipation": "Feed participation rate (30d)",
+        "feedDetail": "{active} active members posted/commented from {total} active members.",
+        "error": "Could not load live health metrics right now.",
+        "benchmark": {
+          "needsWork": "Needs work",
+          "acceptable": "Acceptable",
+          "strong": "Strong",
+          "exceptional": "Exceptional",
+          "silent": "Silent",
+          "normal": "Normal",
+          "alive": "Alive",
+          "veryStrong": "Very strong"
+        }
+      },
+      "retention": {
+        "title": "Retention Cohorts",
+        "subtitle": "Weekly cohorts by join date and % active in following weeks",
+        "trendLabel": "W1→W3 trend:",
+        "allCommunities": "All communities",
+        "cohortWeek": "Cohort (week)",
+        "size": "Size",
+        "empty": "Not enough cohort data yet."
+      },
+      "proTipLabel": "💡 Pro Tip:",
+      "proTip": "Use the community selector in the top-right corner (\"All Communities\") to view detailed analytics per community, including member insights, engagement metrics, and content performance.",
+      "charts": {
+        "tabs": {
+          "sessions": "Sessions",
+          "courses": "Courses",
+          "revenue": "Revenue"
+        },
+        "sessions": {
+          "total": "Total Sessions",
+          "avgAttendance": "Avg Attendance",
+          "avgRating": "Avg Rating",
+          "notAvailable": "N/A",
+          "reviews": "{count, plural, =1 {# review} other {# reviews}}",
+          "status": "Status",
+          "statusSub": "{scheduled} scheduled · {live} live",
+          "chartTitle": "Sessions & Attendance (Last 30 days)",
+          "empty": "No session data yet"
+        },
+        "courses": {
+          "total": "Total Courses",
+          "enrollments": "Enrollments",
+          "completionRate": "Completion Rate",
+          "completedSub": "{count} completed",
+          "certificates": "Certificates",
+          "chartTitle": "New Enrollments (Last 30 days)",
+          "performance": "Course Performance",
+          "enrolled": "{count} enrolled",
+          "completionModules": "{completion}% completion · {modules, plural, =1 {# module} other {# modules}}",
+          "empty": "No course data yet"
+        },
+        "revenue": {
+          "total": "Total Revenue",
+          "course": "Course Revenue",
+          "membership": "Membership Revenue",
+          "paidMembers": "{count, plural, =1 {# paid member} other {# paid members}}",
+          "byCourse": "Revenue by Course",
+          "priceEnrollments": "{price} × {count, plural, =1 {# enrollment} other {# enrollments}}",
+          "emptyHint": "Start monetizing by setting prices on your courses and communities",
+          "empty": "No revenue data yet"
+        }
+      }
+    },
     "profile": {
       "loading": "Loading...",
       "userFallback": "User",
