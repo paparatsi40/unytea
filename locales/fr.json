@@ -463,6 +463,72 @@
         "leaveConfirm": "Êtes-vous sûr de vouloir quitter cette communauté ? Vous devrez demander à rejoindre à nouveau.",
         "leftSuccess": "Vous avez quitté la communauté",
         "leaveFailed": "Échec du départ de la communauté"
+      },
+      "postCard": {
+        "pinned": "Épinglé",
+        "anonymous": "Anonyme",
+        "updating": "Mise à jour...",
+        "pinPost": "Épingler la publication",
+        "unpinPost": "Désépingler",
+        "editPost": "Modifier la publication",
+        "deletePost": "Supprimer la publication",
+        "titlePlaceholder": "Titre (facultatif)",
+        "cancel": "Annuler",
+        "save": "Enregistrer",
+        "saving": "Enregistrement...",
+        "attachment": "Pièce jointe",
+        "reactionsCount": "{count, plural, =1 {# réaction} other {# réactions}}",
+        "commentsCount": "{count, plural, =1 {# commentaire} other {# commentaires}}",
+        "comments": "Commentaires",
+        "copying": "Copie...",
+        "copied": "Copié",
+        "copyLink": "Copier le lien",
+        "confirmDelete": "Supprimer définitivement cette publication ?",
+        "delete": "Supprimer",
+        "deleting": "Suppression de la publication...",
+        "toasts": {
+          "deleteFailed": "Échec de la suppression de la publication",
+          "contentEmpty": "Le contenu ne peut pas être vide",
+          "updated": "Publication mise à jour",
+          "updateFailed": "Échec de la mise à jour de la publication",
+          "linkCopied": "Lien copié",
+          "linkCopiedDesc": "Le lien de la publication est prêt à être partagé.",
+          "copyFailed": "Impossible de copier le lien",
+          "copyFailedDesc": "Veuillez copier l'URL depuis votre navigateur.",
+          "pinFailed": "Échec de la mise à jour de l'épinglage",
+          "pinnedToast": "Publication épinglée",
+          "unpinnedToast": "Publication désépinglée"
+        }
+      },
+      "reactions": {
+        "love": "J'adore",
+        "like": "J'aime",
+        "celebrate": "Bravo",
+        "fire": "Feu",
+        "idea": "Idée",
+        "clap": "Applaudir",
+        "react": "Réagir",
+        "andMore": "et {count} de plus"
+      },
+      "sessionAnnouncement": {
+        "today": "Aujourd'hui",
+        "tomorrow": "Demain",
+        "titleFallback": "Session en direct",
+        "sharedBy": "{name} a partagé une session",
+        "sharedByFallback": "Session partagée",
+        "cta": {
+          "joinLive": "Rejoindre en direct",
+          "watchRecording": "Voir l'enregistrement",
+          "joinSession": "Rejoindre la session",
+          "viewSession": "Voir la session"
+        },
+        "context": {
+          "recording": "Récapitulatif de la session et questions de suivi de l'enregistrement.",
+          "live": "En direct maintenant — rejoignez la conversation et apportez vos questions.",
+          "upcoming": "Aperçu rapide de la prochaine session pour la communauté."
+        },
+        "durationMeta": "{minutes} min",
+        "withMentor": "avec {name}"
       }
     },
     "calendar": {

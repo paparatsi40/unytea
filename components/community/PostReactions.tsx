@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { toggleReaction, getPostReactions, type ReactionType } from "@/app/actions/reactions";
 import { Heart, ThumbsUp, PartyPopper, Flame, Lightbulb, Hand } from "lucide-react";
@@ -17,7 +18,7 @@ const REACTIONS = [
     type: "LOVE" as ReactionType,
     emoji: "❤️",
     icon: Heart,
-    label: "Love",
+    labelKey: "love",
     color: "text-red-500",
     bgColor: "bg-red-500/10",
     hoverColor: "hover:bg-red-500/20",
@@ -26,7 +27,7 @@ const REACTIONS = [
     type: "LIKE" as ReactionType,
     emoji: "👍",
     icon: ThumbsUp,
-    label: "Like",
+    labelKey: "like",
     color: "text-blue-500",
     bgColor: "bg-blue-500/10",
     hoverColor: "hover:bg-blue-500/20",
@@ -35,7 +36,7 @@ const REACTIONS = [
     type: "CELEBRATE" as ReactionType,
     emoji: "🎉",
     icon: PartyPopper,
-    label: "Celebrate",
+    labelKey: "celebrate",
     color: "text-purple-500",
     bgColor: "bg-purple-500/10",
     hoverColor: "hover:bg-purple-500/20",
@@ -44,7 +45,7 @@ const REACTIONS = [
     type: "FIRE" as ReactionType,
     emoji: "🔥",
     icon: Flame,
-    label: "Fire",
+    labelKey: "fire",
     color: "text-orange-500",
     bgColor: "bg-orange-500/10",
     hoverColor: "hover:bg-orange-500/20",
@@ -53,7 +54,7 @@ const REACTIONS = [
     type: "IDEA" as ReactionType,
     emoji: "💡",
     icon: Lightbulb,
-    label: "Idea",
+    labelKey: "idea",
     color: "text-yellow-500",
     bgColor: "bg-yellow-500/10",
     hoverColor: "hover:bg-yellow-500/20",
@@ -62,7 +63,7 @@ const REACTIONS = [
     type: "CLAP" as ReactionType,
     emoji: "👏",
     icon: Hand,
-    label: "Clap",
+    labelKey: "clap",
     color: "text-green-500",
     bgColor: "bg-green-500/10",
     hoverColor: "hover:bg-green-500/20",
@@ -71,6 +72,7 @@ const REACTIONS = [
 
 export function PostReactions({ postId }: { postId: string }) {
   const { user } = useCurrentUser();
+  const t = useTranslations("dashboard.communityAdmin.reactions");
   const [reactions, setReactions] = useState<Record<string, ReactionData>>({});
   const [totalCount, setTotalCount] = useState(0);
   const [showPicker, setShowPicker] = useState(false);
@@ -180,7 +182,7 @@ export function PostReactions({ postId }: { postId: string }) {
                       <div className="flex items-center space-x-2">
                         <span>{reaction.emoji}</span>
                         <span>
-                          {data.count} {reaction.label}
+                          {data.count} {t(reaction.labelKey)}
                         </span>
                       </div>
                       {data.users.length > 0 && (
@@ -189,7 +191,8 @@ export function PostReactions({ postId }: { postId: string }) {
                             .slice(0, 3)
                             .map((u) => u.name)
                             .join(", ")}
-                          {data.users.length > 3 && ` and ${data.users.length - 3} more`}
+                          {data.users.length > 3 &&
+                            ` ${t("andMore", { count: data.users.length - 3 })}`}
                         </div>
                       )}
                     </div>
@@ -213,7 +216,7 @@ export function PostReactions({ postId }: { postId: string }) {
             )}
           >
             <span className="text-base transition-transform group-hover:scale-110">😊</span>
-            {totalCount === 0 && <span className="font-semibold">React</span>}
+            {totalCount === 0 && <span className="font-semibold">{t("react")}</span>}
           </button>
 
           {/* Reaction Picker */}
@@ -237,7 +240,7 @@ export function PostReactions({ postId }: { postId: string }) {
                       {/* Mini tooltip */}
                       <div className="pointer-events-none absolute bottom-full left-1/2 mb-1 -translate-x-1/2 opacity-0 transition-opacity group-hover/emoji:opacity-100">
                         <div className="whitespace-nowrap rounded-lg bg-popover px-2 py-1 text-xs font-medium text-popover-foreground shadow-lg">
-                          {reaction.label}
+                          {t(reaction.labelKey)}
                         </div>
                       </div>
                     </button>

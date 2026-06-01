@@ -464,6 +464,72 @@
         "leaveConfirm": "Are you sure you want to leave this community? You'll need to request to join again.",
         "leftSuccess": "Successfully left community",
         "leaveFailed": "Failed to leave community"
+      },
+      "postCard": {
+        "pinned": "Pinned",
+        "anonymous": "Anonymous",
+        "updating": "Updating...",
+        "pinPost": "Pin post",
+        "unpinPost": "Unpin post",
+        "editPost": "Edit post",
+        "deletePost": "Delete post",
+        "titlePlaceholder": "Title (optional)",
+        "cancel": "Cancel",
+        "save": "Save",
+        "saving": "Saving...",
+        "attachment": "Attachment",
+        "reactionsCount": "{count, plural, =1 {# reaction} other {# reactions}}",
+        "commentsCount": "{count, plural, =1 {# comment} other {# comments}}",
+        "comments": "Comments",
+        "copying": "Copying...",
+        "copied": "Copied",
+        "copyLink": "Copy link",
+        "confirmDelete": "Delete this post permanently?",
+        "delete": "Delete",
+        "deleting": "Deleting post...",
+        "toasts": {
+          "deleteFailed": "Failed to delete post",
+          "contentEmpty": "Content cannot be empty",
+          "updated": "Post updated",
+          "updateFailed": "Failed to update post",
+          "linkCopied": "Link copied",
+          "linkCopiedDesc": "Post link is ready to share.",
+          "copyFailed": "Couldn't copy link",
+          "copyFailedDesc": "Please copy URL from your browser.",
+          "pinFailed": "Failed to update pin state",
+          "pinnedToast": "Post pinned",
+          "unpinnedToast": "Post unpinned"
+        }
+      },
+      "reactions": {
+        "love": "Love",
+        "like": "Like",
+        "celebrate": "Celebrate",
+        "fire": "Fire",
+        "idea": "Idea",
+        "clap": "Clap",
+        "react": "React",
+        "andMore": "and {count} more"
+      },
+      "sessionAnnouncement": {
+        "today": "Today",
+        "tomorrow": "Tomorrow",
+        "titleFallback": "Live session",
+        "sharedBy": "{name} shared a session",
+        "sharedByFallback": "Shared session",
+        "cta": {
+          "joinLive": "Join live",
+          "watchRecording": "Watch recording",
+          "joinSession": "Join session",
+          "viewSession": "View session"
+        },
+        "context": {
+          "recording": "Session recap and follow-up questions from the recording.",
+          "live": "Live now — join the conversation and bring your questions.",
+          "upcoming": "Quick preview of the upcoming session for the community."
+        },
+        "durationMeta": "{minutes} min",
+        "withMentor": "with {name}"
       }
     },
     "calendar": {

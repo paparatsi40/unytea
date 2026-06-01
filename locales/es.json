@@ -464,6 +464,72 @@
         "leaveConfirm": "¿Seguro que quieres salir de esta comunidad? Tendrás que solicitar unirte de nuevo.",
         "leftSuccess": "Saliste de la comunidad",
         "leaveFailed": "No se pudo salir de la comunidad"
+      },
+      "postCard": {
+        "pinned": "Fijado",
+        "anonymous": "Anónimo",
+        "updating": "Actualizando...",
+        "pinPost": "Fijar publicación",
+        "unpinPost": "Dejar de fijar",
+        "editPost": "Editar publicación",
+        "deletePost": "Eliminar publicación",
+        "titlePlaceholder": "Título (opcional)",
+        "cancel": "Cancelar",
+        "save": "Guardar",
+        "saving": "Guardando...",
+        "attachment": "Adjunto",
+        "reactionsCount": "{count, plural, =1 {# reacción} other {# reacciones}}",
+        "commentsCount": "{count, plural, =1 {# comentario} other {# comentarios}}",
+        "comments": "Comentarios",
+        "copying": "Copiando...",
+        "copied": "Copiado",
+        "copyLink": "Copiar enlace",
+        "confirmDelete": "¿Eliminar esta publicación permanentemente?",
+        "delete": "Eliminar",
+        "deleting": "Eliminando publicación...",
+        "toasts": {
+          "deleteFailed": "No se pudo eliminar la publicación",
+          "contentEmpty": "El contenido no puede estar vacío",
+          "updated": "Publicación actualizada",
+          "updateFailed": "No se pudo actualizar la publicación",
+          "linkCopied": "Enlace copiado",
+          "linkCopiedDesc": "El enlace de la publicación está listo para compartir.",
+          "copyFailed": "No se pudo copiar el enlace",
+          "copyFailedDesc": "Copia la URL desde tu navegador.",
+          "pinFailed": "No se pudo actualizar el estado de fijado",
+          "pinnedToast": "Publicación fijada",
+          "unpinnedToast": "Publicación dejada de fijar"
+        }
+      },
+      "reactions": {
+        "love": "Me encanta",
+        "like": "Me gusta",
+        "celebrate": "Celebrar",
+        "fire": "Fuego",
+        "idea": "Idea",
+        "clap": "Aplauso",
+        "react": "Reaccionar",
+        "andMore": "y {count} más"
+      },
+      "sessionAnnouncement": {
+        "today": "Hoy",
+        "tomorrow": "Mañana",
+        "titleFallback": "Sesión en vivo",
+        "sharedBy": "{name} compartió una sesión",
+        "sharedByFallback": "Sesión compartida",
+        "cta": {
+          "joinLive": "Unirse en vivo",
+          "watchRecording": "Ver grabación",
+          "joinSession": "Unirse a la sesión",
+          "viewSession": "Ver sesión"
+        },
+        "context": {
+          "recording": "Resumen de la sesión y preguntas de seguimiento de la grabación.",
+          "live": "En vivo ahora — únete a la conversación y trae tus preguntas.",
+          "upcoming": "Vista previa rápida de la próxima sesión para la comunidad."
+        },
+        "durationMeta": "{minutes} min",
+        "withMentor": "con {name}"
       }
     },
     "calendar": {
