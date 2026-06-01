@@ -366,6 +366,36 @@
         "viewAll": "Ver todas",
         "noUpcomingTitle": "No hay sesiones en vivo próximas",
         "noUpcomingBody": "Cuando se programe una nueva sesión, aparecerá aquí."
+      },
+      "header": {
+        "owner": "Propietario",
+        "private": "Privada",
+        "pendingBadge": "Aprobación pendiente",
+        "membersLabel": "miembros",
+        "postsLabel": "publicaciones",
+        "nav": {
+          "feed": "Feed",
+          "sessions": "Sesiones",
+          "chat": "Chat",
+          "library": "Biblioteca",
+          "courses": "Cursos",
+          "buddy": "Buddy",
+          "members": "Miembros",
+          "about": "Acerca de"
+        }
+      },
+      "actions": {
+        "pendingApproval": "Aprobación pendiente",
+        "leave": "Salir",
+        "settings": "Configuración",
+        "joinCommunity": "Unirse a la comunidad",
+        "signInToJoin": "Debes iniciar sesión para unirte",
+        "joinedSuccess": "¡Te uniste con éxito!",
+        "joinFailed": "No se pudo unir a la comunidad",
+        "signInRequired": "Debes iniciar sesión",
+        "leaveConfirm": "¿Seguro que quieres salir de esta comunidad? Tendrás que solicitar unirte de nuevo.",
+        "leftSuccess": "Saliste de la comunidad",
+        "leaveFailed": "No se pudo salir de la comunidad"
       }
     },
     "calendar": {

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { CommunityActions } from "@/components/community/CommunityActions";
 import {
   MessageCircle,
@@ -42,6 +43,7 @@ export function PremiumCommunityHeader({
   isPending: boolean;
 }) {
   const pathname = usePathname();
+  const t = useTranslations("dashboard.communityAdmin.header");
 
   return (
     <div className="border-b border-gray-100 bg-white">
@@ -88,17 +90,17 @@ export function PremiumCommunityHeader({
                 {isOwner && (
                   <span className="inline-flex items-center space-x-1 rounded-lg bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700 md:px-2.5 md:py-1">
                     <Crown className="h-2.5 w-2.5 md:h-3 md:w-3" />
-                    <span className="hidden md:inline">Owner</span>
+                    <span className="hidden md:inline">{t("owner")}</span>
                   </span>
                 )}
                 {community.isPrivate && (
                   <span className="rounded-lg bg-purple-50 px-2 py-0.5 text-xs font-semibold text-purple-700 md:px-2.5 md:py-1">
-                    Private
+                    {t("private")}
                   </span>
                 )}
                 {isPending && (
                   <span className="rounded-lg bg-orange-50 px-2 py-0.5 text-xs font-semibold text-orange-700 md:px-2.5 md:py-1">
-                    Pending Approval
+                    {t("pendingBadge")}
                   </span>
                 )}
               </div>
@@ -115,14 +117,14 @@ export function PremiumCommunityHeader({
                   <span className="font-semibold text-gray-900">
                     {community._count?.members || 0}
                   </span>
-                  <span className="hidden text-gray-500 sm:inline">members</span>
+                  <span className="hidden text-gray-500 sm:inline">{t("membersLabel")}</span>
                 </div>
                 <div className="flex items-center space-x-1.5 text-xs md:space-x-2 md:text-sm">
                   <TrendingUp className="h-3 w-3 text-gray-400 md:h-4 md:w-4" />
                   <span className="font-semibold text-gray-900">
                     {community._count?.posts || 0}
                   </span>
-                  <span className="hidden text-gray-500 sm:inline">posts</span>
+                  <span className="hidden text-gray-500 sm:inline">{t("postsLabel")}</span>
                 </div>
               </div>
             </div>
@@ -152,7 +154,7 @@ export function PremiumCommunityHeader({
             }`}
           >
             <Flame className="h-3.5 w-3.5 md:h-4 md:w-4" />
-            <span>Feed</span>
+            <span>{t("nav.feed")}</span>
           </Link>
           <Link
             href={`/dashboard/c/${community.slug}/sessions`}
@@ -163,7 +165,7 @@ export function PremiumCommunityHeader({
             }`}
           >
             <Video className="h-3.5 w-3.5 md:h-4 md:w-4" />
-            <span>Sessions</span>
+            <span>{t("nav.sessions")}</span>
           </Link>
           <Link
             href={`/dashboard/c/${community.slug}/chat`}
@@ -174,7 +176,7 @@ export function PremiumCommunityHeader({
             }`}
           >
             <MessageCircle className="h-3.5 w-3.5 md:h-4 md:w-4" />
-            <span>Chat</span>
+            <span>{t("nav.chat")}</span>
           </Link>
           <Link
             href={`/dashboard/c/${community.slug}/library`}
@@ -185,7 +187,7 @@ export function PremiumCommunityHeader({
             }`}
           >
             <BookOpen className="h-3.5 w-3.5 md:h-4 md:w-4" />
-            <span>Library</span>
+            <span>{t("nav.library")}</span>
           </Link>
           <Link
             href={`/dashboard/c/${community.slug}/courses`}
@@ -196,7 +198,7 @@ export function PremiumCommunityHeader({
             }`}
           >
             <GraduationCap className="h-3.5 w-3.5 md:h-4 md:w-4" />
-            <span>Courses</span>
+            <span>{t("nav.courses")}</span>
           </Link>
           <Link
             href={`/dashboard/c/${community.slug}/buddy`}
@@ -207,7 +209,7 @@ export function PremiumCommunityHeader({
             }`}
           >
             <Heart className="h-3.5 w-3.5 md:h-4 md:w-4" />
-            <span>Buddy</span>
+            <span>{t("nav.buddy")}</span>
           </Link>
           <Link
             href={`/dashboard/c/${community.slug}/members`}
@@ -218,7 +220,7 @@ export function PremiumCommunityHeader({
             }`}
           >
             <Users className="h-3.5 w-3.5 md:h-4 md:w-4" />
-            <span>Members</span>
+            <span>{t("nav.members")}</span>
           </Link>
           <Link
             href={`/dashboard/c/${community.slug}/about`}
@@ -229,7 +231,7 @@ export function PremiumCommunityHeader({
             }`}
           >
             <TrendingUp className="h-3.5 w-3.5 md:h-4 md:w-4" />
-            <span>About</span>
+            <span>{t("nav.about")}</span>
           </Link>
         </div>
       </div>

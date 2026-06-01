@@ -366,6 +366,36 @@
         "viewAll": "View all",
         "noUpcomingTitle": "No upcoming live sessions",
         "noUpcomingBody": "When a new session is scheduled, it will appear here."
+      },
+      "header": {
+        "owner": "Owner",
+        "private": "Private",
+        "pendingBadge": "Pending Approval",
+        "membersLabel": "members",
+        "postsLabel": "posts",
+        "nav": {
+          "feed": "Feed",
+          "sessions": "Sessions",
+          "chat": "Chat",
+          "library": "Library",
+          "courses": "Courses",
+          "buddy": "Buddy",
+          "members": "Members",
+          "about": "About"
+        }
+      },
+      "actions": {
+        "pendingApproval": "Pending approval",
+        "leave": "Leave",
+        "settings": "Settings",
+        "joinCommunity": "Join Community",
+        "signInToJoin": "You must be signed in to join",
+        "joinedSuccess": "Successfully joined!",
+        "joinFailed": "Failed to join community",
+        "signInRequired": "You must be signed in",
+        "leaveConfirm": "Are you sure you want to leave this community? You'll need to request to join again.",
+        "leftSuccess": "Successfully left community",
+        "leaveFailed": "Failed to leave community"
       }
     },
     "calendar": {
