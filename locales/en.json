@@ -1018,6 +1018,32 @@
         }
       }
     },
+    "communityMember": {
+      "about": {
+        "notFound": "Community not found",
+        "title": "About {name}",
+        "subtitle": "Learn more about this community",
+        "descriptionTitle": "Description",
+        "noDescription": "No description available.",
+        "stats": {
+          "members": "Members",
+          "posts": "Posts",
+          "courses": "Courses"
+        },
+        "detailsTitle": "Community Details",
+        "createdOn": "Created on {date}",
+        "communityType": "Type: {value}",
+        "type": {
+          "public": "Public",
+          "private": "Private"
+        },
+        "slug": "Slug: {value}",
+        "ownerTitle": "Community Owner",
+        "owner": "Owner",
+        "unknownOwner": "Unknown",
+        "backButton": "Back to Community"
+      }
+    },
     "calendar": {
       "metaTitle": "Calendar",
       "title": "Calendar",

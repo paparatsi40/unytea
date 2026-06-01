@@ -1021,6 +1021,32 @@
         }
       }
     },
+    "communityMember": {
+      "about": {
+        "notFound": "Comunidad no encontrada",
+        "title": "Acerca de {name}",
+        "subtitle": "Conoce más sobre esta comunidad",
+        "descriptionTitle": "Descripción",
+        "noDescription": "No hay descripción disponible.",
+        "stats": {
+          "members": "Miembros",
+          "posts": "Publicaciones",
+          "courses": "Cursos"
+        },
+        "detailsTitle": "Detalles de la comunidad",
+        "createdOn": "Creada el {date}",
+        "communityType": "Tipo: {value}",
+        "type": {
+          "public": "Pública",
+          "private": "Privada"
+        },
+        "slug": "Slug: {value}",
+        "ownerTitle": "Propietario de la comunidad",
+        "owner": "Propietario",
+        "unknownOwner": "Desconocido",
+        "backButton": "Volver a la comunidad"
+      }
+    },
     "calendar": {
       "metaTitle": "Calendario",
       "title": "Calendario",
