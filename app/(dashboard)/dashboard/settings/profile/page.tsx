@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import Image from "next/image";
 import { User as UserIcon, Shield } from "lucide-react";
@@ -40,6 +41,7 @@ interface UserIdentitySnapshot {
 }
 
 export default function ProfilePage() {
+  const t = useTranslations("dashboard.profile");
   const { user } = useCurrentUser();
   const [identity, setIdentity] = useState<UserIdentitySnapshot | null>(null);
 
@@ -59,7 +61,7 @@ export default function ProfilePage() {
     return (
       <div className="space-y-6">
         <div className="rounded-xl border border-border bg-card p-8 text-center">
-          <p className="text-muted-foreground">Loading...</p>
+          <p className="text-muted-foreground">{t("loading")}</p>
         </div>
       </div>
     );
@@ -72,7 +74,7 @@ export default function ProfilePage() {
           {user.image ? (
             <Image
               src={user.image}
-              alt={user.name || "User"}
+              alt={user.name || t("userFallback")}
               width={96}
               height={96}
               className="h-24 w-24 rounded-full border-4 border-border object-cover"
@@ -84,7 +86,7 @@ export default function ProfilePage() {
           )}
           <div>
             <h2 className="text-2xl font-bold text-foreground">
-              {identity?.user.name || user.name || "User"}
+              {identity?.user.name || user.name || t("userFallback")}
             </h2>
             <p className="text-muted-foreground">
               {identity?.user.username ? `@${identity.user.username}` : user.email}
@@ -100,25 +102,31 @@ export default function ProfilePage() {
         {identity && (
           <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div className="rounded-lg border border-border bg-background p-4">
-              <p className="text-sm font-medium text-muted-foreground">Communities</p>
+              <p className="text-sm font-medium text-muted-foreground">{t("stats.communities")}</p>
               <p className="mt-1 text-2xl font-bold text-foreground">
                 {identity.stats.communitiesJoined}
               </p>
             </div>
             <div className="rounded-lg border border-border bg-background p-4">
-              <p className="text-sm font-medium text-muted-foreground">Sessions attended</p>
+              <p className="text-sm font-medium text-muted-foreground">
+                {t("stats.sessionsAttended")}
+              </p>
               <p className="mt-1 text-2xl font-bold text-foreground">
                 {identity.stats.sessionsAttended}
               </p>
             </div>
             <div className="rounded-lg border border-border bg-background p-4">
-              <p className="text-sm font-medium text-muted-foreground">Sessions hosted</p>
+              <p className="text-sm font-medium text-muted-foreground">
+                {t("stats.sessionsHosted")}
+              </p>
               <p className="mt-1 text-2xl font-bold text-foreground">
                 {identity.stats.sessionsHosted}
               </p>
             </div>
             <div className="rounded-lg border border-border bg-background p-4">
-              <p className="text-sm font-medium text-muted-foreground">Contributions</p>
+              <p className="text-sm font-medium text-muted-foreground">
+                {t("stats.contributions")}
+              </p>
               <p className="mt-1 text-2xl font-bold text-foreground">
                 {identity.stats.contributions}
               </p>
@@ -128,7 +136,7 @@ export default function ProfilePage() {
 
         {identity && identity.user.interests.length > 0 && (
           <div className="mb-6">
-            <p className="mb-2 text-sm font-medium text-muted-foreground">Interests</p>
+            <p className="mb-2 text-sm font-medium text-muted-foreground">{t("interests")}</p>
             <div className="flex flex-wrap gap-2">
               {identity.user.interests.slice(0, 8).map((interest) => (
                 <Badge key={interest} variant="outline">
@@ -142,10 +150,10 @@ export default function ProfilePage() {
         {identity && identity.communities.length > 0 && (
           <div className="mb-6">
             <div className="mb-2 flex items-center justify-between">
-              <p className="text-sm font-medium text-muted-foreground">Your communities</p>
+              <p className="text-sm font-medium text-muted-foreground">{t("yourCommunities")}</p>
               <Link href="/dashboard/communities">
                 <Button variant="ghost" size="sm">
-                  Open communities
+                  {t("openCommunities")}
                 </Button>
               </Link>
             </div>
@@ -158,8 +166,8 @@ export default function ProfilePage() {
                 >
                   <p className="font-medium text-foreground">{membership.community.name}</p>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    {membership.community.membersCount} members · {membership.role} ·{" "}
-                    {membership.community.isPaid ? "Paid" : "Free"}
+                    {t("members", { count: membership.community.membersCount })} · {membership.role}{" "}
+                    · {membership.community.isPaid ? t("paid") : t("free")}
                   </p>
                 </Link>
               ))}
@@ -170,14 +178,12 @@ export default function ProfilePage() {
         <div className="rounded-lg border border-border bg-background p-4">
           <div className="mb-2 flex items-center gap-2">
             <Shield className="h-4 w-4 text-muted-foreground" />
-            <p className="text-sm font-medium text-foreground">Security</p>
+            <p className="text-sm font-medium text-foreground">{t("security")}</p>
           </div>
-          <p className="mb-3 text-sm text-muted-foreground">
-            Manage password, authentication, and account safety options.
-          </p>
+          <p className="mb-3 text-sm text-muted-foreground">{t("securityDescription")}</p>
           <Link href="/dashboard/settings/account">
             <Button size="sm" variant="outline">
-              Open security options
+              {t("openSecurity")}
             </Button>
           </Link>
         </div>

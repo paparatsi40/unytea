@@ -343,6 +343,25 @@
     "continue": "Continue"
   },
   "dashboard": {
+    "profile": {
+      "loading": "Loading...",
+      "userFallback": "User",
+      "stats": {
+        "communities": "Communities",
+        "sessionsAttended": "Sessions attended",
+        "sessionsHosted": "Sessions hosted",
+        "contributions": "Contributions"
+      },
+      "interests": "Interests",
+      "yourCommunities": "Your communities",
+      "openCommunities": "Open communities",
+      "members": "{count, plural, =1 {1 member} other {# members}}",
+      "paid": "Paid",
+      "free": "Free",
+      "security": "Security",
+      "securityDescription": "Manage password, authentication, and account safety options.",
+      "openSecurity": "Open security options"
+    },
     "library": {
       "title": "Library",
       "subtitle": "Your courses, recordings, and resources",
