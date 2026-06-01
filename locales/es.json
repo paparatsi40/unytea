@@ -386,6 +386,48 @@
         "viewAll": "{count, plural, =1 {Ver # sesión} other {Ver las # sesiones}}"
       }
     },
+    "sessions": {
+      "title": "Sesiones en vivo",
+      "subtitle": "Imparte coaching, clases y talleres en vivo",
+      "scheduleSession": "Programar sesión",
+      "sessionsThisWeek": "{count, plural, =1 {# sesión esta semana} other {# sesiones esta semana}}",
+      "loadFailedTitle": "Error al cargar las sesiones",
+      "genericError": "Ocurrió un error",
+      "today": "Hoy",
+      "tomorrow": "Mañana",
+      "durationMinutes": "{minutes} min",
+      "withHost": "con {name}",
+      "joinNextSession": "Unirse a la sesión",
+      "startingSoon": {
+        "badge": "EMPIEZA PRONTO",
+        "startsIn": "Empieza en {minutes} min · {time}"
+      },
+      "liveNow": {
+        "badge": "EN VIVO",
+        "startedAgo": "Empezó hace {distance}",
+        "participants": "{count, plural, =1 {# participante} other {# participantes}}"
+      },
+      "upcoming": {
+        "title": "Próximas sesiones",
+        "edit": "Editar",
+        "attending": "{count} asistentes"
+      },
+      "empty": {
+        "title": "Organiza tu primera sesión en vivo",
+        "description": "Imparte sesiones de coaching, talleres o preguntas y respuestas. Conecta con tu comunidad en tiempo real.",
+        "takesMinutes": "Toma 2 minutos",
+        "growFaster": "Las comunidades con sesiones semanales crecen 3 veces más rápido",
+        "classroomAlt": "Aula convencional con estudiantes",
+        "yogaAlt": "Instructor de yoga o pilates con estudiantes practicando"
+      },
+      "past": {
+        "title": "Sesiones pasadas",
+        "recordingAvailable": "Grabación disponible",
+        "enterRoom": "Entrar a la sala",
+        "watch": "Ver",
+        "viewAll": "{count, plural, =1 {Ver # sesión pasada} other {Ver las # sesiones pasadas}}"
+      }
+    },
     "profile": {
       "loading": "Cargando...",
       "userFallback": "Usuario",

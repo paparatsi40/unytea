@@ -386,6 +386,48 @@
         "viewAll": "{count, plural, =1 {View all # session} other {View all # sessions}}"
       }
     },
+    "sessions": {
+      "title": "Live Sessions",
+      "subtitle": "Run live coaching, classes, and workshops",
+      "scheduleSession": "Schedule Session",
+      "sessionsThisWeek": "{count, plural, =1 {# session this week} other {# sessions this week}}",
+      "loadFailedTitle": "Failed to load sessions",
+      "genericError": "An error occurred",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "durationMinutes": "{minutes} min",
+      "withHost": "with {name}",
+      "joinNextSession": "Join Next Session",
+      "startingSoon": {
+        "badge": "STARTING SOON",
+        "startsIn": "Starts in {minutes} min · {time}"
+      },
+      "liveNow": {
+        "badge": "LIVE NOW",
+        "startedAgo": "Started {distance} ago",
+        "participants": "{count, plural, =1 {# participant} other {# participants}}"
+      },
+      "upcoming": {
+        "title": "Upcoming Sessions",
+        "edit": "Edit",
+        "attending": "{count} attending"
+      },
+      "empty": {
+        "title": "Host your first live session",
+        "description": "Run coaching calls, workshops, or Q&A sessions. Engage your community in real-time.",
+        "takesMinutes": "Takes 2 minutes",
+        "growFaster": "Communities with weekly sessions grow 3x faster",
+        "classroomAlt": "Conventional classroom with students",
+        "yogaAlt": "Yoga or pilates instructor with students practicing"
+      },
+      "past": {
+        "title": "Past Sessions",
+        "recordingAvailable": "Recording available",
+        "enterRoom": "Enter Room",
+        "watch": "Watch",
+        "viewAll": "{count, plural, =1 {View all # past session} other {View all # past sessions}}"
+      }
+    },
     "profile": {
       "loading": "Loading...",
       "userFallback": "User",

@@ -385,6 +385,48 @@
         "viewAll": "{count, plural, =1 {Voir # session} other {Voir les # sessions}}"
       }
     },
+    "sessions": {
+      "title": "Sessions en direct",
+      "subtitle": "Animez du coaching, des cours et des ateliers en direct",
+      "scheduleSession": "Planifier une session",
+      "sessionsThisWeek": "{count, plural, =1 {# session cette semaine} other {# sessions cette semaine}}",
+      "loadFailedTitle": "Échec du chargement des sessions",
+      "genericError": "Une erreur s'est produite",
+      "today": "Aujourd'hui",
+      "tomorrow": "Demain",
+      "durationMinutes": "{minutes} min",
+      "withHost": "avec {name}",
+      "joinNextSession": "Rejoindre la session",
+      "startingSoon": {
+        "badge": "COMMENCE BIENTÔT",
+        "startsIn": "Commence dans {minutes} min · {time}"
+      },
+      "liveNow": {
+        "badge": "EN DIRECT",
+        "startedAgo": "Commencé il y a {distance}",
+        "participants": "{count, plural, =1 {# participant} other {# participants}}"
+      },
+      "upcoming": {
+        "title": "Sessions à venir",
+        "edit": "Modifier",
+        "attending": "{count} inscrits"
+      },
+      "empty": {
+        "title": "Animez votre première session en direct",
+        "description": "Animez des appels de coaching, des ateliers ou des sessions de questions-réponses. Engagez votre communauté en temps réel.",
+        "takesMinutes": "Prend 2 minutes",
+        "growFaster": "Les communautés avec des sessions hebdomadaires grandissent 3 fois plus vite",
+        "classroomAlt": "Salle de classe conventionnelle avec des étudiants",
+        "yogaAlt": "Instructeur de yoga ou de pilates avec des étudiants en pratique"
+      },
+      "past": {
+        "title": "Sessions passées",
+        "recordingAvailable": "Enregistrement disponible",
+        "enterRoom": "Entrer dans la salle",
+        "watch": "Regarder",
+        "viewAll": "{count, plural, =1 {Voir # session passée} other {Voir les # sessions passées}}"
+      }
+    },
     "profile": {
       "loading": "Chargement...",
       "userFallback": "Utilisateur",
