@@ -367,6 +367,25 @@
         "defaultDescription": "Sesión de Unytea"
       }
     },
+    "agenda": {
+      "title": "Tu agenda",
+      "subtitle": "Todas tus próximas sesiones en tus comunidades",
+      "upcomingThisWeek": "{count, plural, =1 {# sesión próxima esta semana} other {# sesiones próximas esta semana}}",
+      "today": "Hoy",
+      "tomorrow": "Mañana",
+      "durationMinutes": "{minutes} min",
+      "join": "Unirse",
+      "empty": {
+        "title": "No hay sesiones próximas",
+        "description": "No tienes sesiones programadas. Únete a una comunidad para encontrar eventos en vivo.",
+        "cta": "Explorar comunidades"
+      },
+      "past": {
+        "title": "Sesiones pasadas recientes ({count})",
+        "recording": "Grabación",
+        "viewAll": "{count, plural, =1 {Ver # sesión} other {Ver las # sesiones}}"
+      }
+    },
     "profile": {
       "loading": "Cargando...",
       "userFallback": "Usuario",

@@ -367,6 +367,25 @@
         "defaultDescription": "Unytea Session"
       }
     },
+    "agenda": {
+      "title": "Your Agenda",
+      "subtitle": "All your upcoming sessions across communities",
+      "upcomingThisWeek": "{count, plural, =1 {# upcoming session this week} other {# upcoming sessions this week}}",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "durationMinutes": "{minutes} min",
+      "join": "Join",
+      "empty": {
+        "title": "No upcoming sessions",
+        "description": "You don't have any scheduled sessions. Join a community to find live events.",
+        "cta": "Explore Communities"
+      },
+      "past": {
+        "title": "Recent Past Sessions ({count})",
+        "recording": "Recording",
+        "viewAll": "{count, plural, =1 {View all # session} other {View all # sessions}}"
+      }
+    },
     "profile": {
       "loading": "Loading...",
       "userFallback": "User",
