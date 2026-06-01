@@ -905,6 +905,69 @@
             "deleted": "Community deleted successfully",
             "deleteFailed": "Failed to delete community"
           }
+        },
+        "payments": {
+          "title": "Payments & Monetization",
+          "subtitle": "Configure paid memberships and connect your Stripe account",
+          "connect": {
+            "cardTitle": "Stripe Connect",
+            "cardDescription": "Connect your Stripe account to receive payments from community members. You keep 95% of all revenue, platform fee is 5%.",
+            "notConnected": {
+              "alertTitle": "Stripe account not connected",
+              "alertBody": "You need to connect a Stripe account before you can charge for memberships.",
+              "button": "Connect with Stripe",
+              "connecting": "Connecting..."
+            },
+            "active": {
+              "alertTitle": "Stripe account connected and active",
+              "accountId": "Account ID: {id}",
+              "openDashboard": "Open Stripe Dashboard"
+            },
+            "pending": {
+              "alertTitle": "Stripe account pending verification",
+              "alertBody": "Please complete the verification process in Stripe.",
+              "completeButton": "Complete Verification",
+              "loading": "Loading..."
+            }
+          },
+          "pricing": {
+            "title": "Membership Pricing",
+            "subtitle": "Set your community membership prices. Free communities allow anyone to join.",
+            "paidToggle": "Paid Community",
+            "paidToggleHint": "Require payment to join this community",
+            "monthlyLabel": "Monthly Price (USD)",
+            "yearlyLabel": "Yearly Price (USD)",
+            "monthlyPlaceholder": "29",
+            "yearlyPlaceholder": "290",
+            "defaultTierLabel": "Default Paid Tier",
+            "tierAmountLabel": "{tier} tier",
+            "priceIdLabel": "Stripe Price ID ({tier})",
+            "priceIdPlaceholder": "price_...",
+            "priceIdPlaceholderOptional": "price_... (optional)",
+            "revenuePreview": "You receive: ${monthly}/mo · ${yearly}/yr after {fee}% platform fee",
+            "save": "Save Settings",
+            "saving": "Saving..."
+          },
+          "tier": {
+            "free": "Free",
+            "pro": "Pro",
+            "vip": "VIP"
+          },
+          "revenueSplit": {
+            "title": "Revenue Split",
+            "youKeep": "You keep",
+            "platformFee": "Platform fee",
+            "footer": "Payments are processed securely through Stripe and transferred to your account automatically."
+          },
+          "toasts": {
+            "errorTitle": "Error",
+            "successTitle": "Success",
+            "saved": "Payment settings saved successfully.",
+            "connectFailed": "Failed to connect with Stripe. Please try again.",
+            "connectLinkFailed": "Failed to create onboarding link",
+            "saveFailed": "Failed to save settings. Please try again.",
+            "saveServerFailed": "Failed to save payment settings"
+          }
         }
       }
     },

@@ -908,6 +908,69 @@
             "deleted": "Comunidad eliminada con éxito",
             "deleteFailed": "No se pudo eliminar la comunidad"
           }
+        },
+        "payments": {
+          "title": "Pagos y monetización",
+          "subtitle": "Configura las membresías de pago y conecta tu cuenta de Stripe",
+          "connect": {
+            "cardTitle": "Stripe Connect",
+            "cardDescription": "Conecta tu cuenta de Stripe para recibir pagos de los miembros de la comunidad. Te quedas con el 95% de todos los ingresos, la comisión de la plataforma es del 5%.",
+            "notConnected": {
+              "alertTitle": "Cuenta de Stripe no conectada",
+              "alertBody": "Necesitas conectar una cuenta de Stripe antes de poder cobrar por membresías.",
+              "button": "Conectar con Stripe",
+              "connecting": "Conectando..."
+            },
+            "active": {
+              "alertTitle": "Cuenta de Stripe conectada y activa",
+              "accountId": "ID de cuenta: {id}",
+              "openDashboard": "Abrir el panel de Stripe"
+            },
+            "pending": {
+              "alertTitle": "Cuenta de Stripe pendiente de verificación",
+              "alertBody": "Por favor completa el proceso de verificación en Stripe.",
+              "completeButton": "Completar verificación",
+              "loading": "Cargando..."
+            }
+          },
+          "pricing": {
+            "title": "Precios de membresía",
+            "subtitle": "Establece los precios de membresía de tu comunidad. Las comunidades gratuitas permiten que cualquiera se una.",
+            "paidToggle": "Comunidad de pago",
+            "paidToggleHint": "Requiere pago para unirse a esta comunidad",
+            "monthlyLabel": "Precio mensual (USD)",
+            "yearlyLabel": "Precio anual (USD)",
+            "monthlyPlaceholder": "29",
+            "yearlyPlaceholder": "290",
+            "defaultTierLabel": "Nivel de pago predeterminado",
+            "tierAmountLabel": "Nivel {tier}",
+            "priceIdLabel": "Stripe Price ID ({tier})",
+            "priceIdPlaceholder": "price_...",
+            "priceIdPlaceholderOptional": "price_... (opcional)",
+            "revenuePreview": "Recibes: ${monthly}/mes · ${yearly}/año después de la comisión del {fee}% de la plataforma",
+            "save": "Guardar configuración",
+            "saving": "Guardando..."
+          },
+          "tier": {
+            "free": "Free",
+            "pro": "Pro",
+            "vip": "VIP"
+          },
+          "revenueSplit": {
+            "title": "Reparto de ingresos",
+            "youKeep": "Te quedas con",
+            "platformFee": "Comisión de la plataforma",
+            "footer": "Los pagos se procesan de forma segura a través de Stripe y se transfieren a tu cuenta automáticamente."
+          },
+          "toasts": {
+            "errorTitle": "Error",
+            "successTitle": "Éxito",
+            "saved": "Configuración de pagos guardada con éxito.",
+            "connectFailed": "No se pudo conectar con Stripe. Inténtalo de nuevo.",
+            "connectLinkFailed": "No se pudo crear el enlace de onboarding",
+            "saveFailed": "No se pudo guardar la configuración. Inténtalo de nuevo.",
+            "saveServerFailed": "No se pudo guardar la configuración de pagos"
+          }
         }
       }
     },
