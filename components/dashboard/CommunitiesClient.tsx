@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Plus, Users, Loader2 } from "lucide-react";
@@ -43,10 +44,11 @@ type CommunityPriorityReason =
   | "build_habit"
   | "healthy";
 
-function formatSessionDayTime(dateString: string) {
+// Localized "{weekday} · {time}" — day/time formatted with the active locale.
+function formatSessionDayTime(dateString: string, locale: string) {
   const date = new Date(dateString);
-  const day = date.toLocaleDateString("en-US", { weekday: "long" });
-  const time = date.toLocaleTimeString("en-US", {
+  const day = date.toLocaleDateString(locale, { weekday: "long" });
+  const time = date.toLocaleTimeString(locale, {
     hour: "numeric",
     minute: "2-digit",
   });
@@ -122,28 +124,34 @@ function getCommunityPriority(community: Community): {
   return { score, reason };
 }
 
-function getCommunityState(community: Community): {
+type CommunityStateView = {
   state: CommunityCardState;
-  eyebrow: string;
-  detail: string;
-  primaryLabel: string;
+  eyebrowKey: string;
+  detailKey: string;
+  detailValues?: Record<string, string | number>;
+  primaryLabelKey: string;
   primaryHref: string;
   tone: string;
-} {
+};
+
+// Returns i18n keys + interpolation values (not pre-built strings) so the
+// component can localize via t() — these helpers run outside hook context.
+function getCommunityState(community: Community, locale: string): CommunityStateView {
   const weeklySessions = community.weeklySessions || 0;
   const nextSession = community.nextSession;
 
   if (!nextSession) {
     return {
       state: "empty",
-      eyebrow: "Needs attention",
-      detail: "No upcoming session",
-      primaryLabel: "Schedule",
+      eyebrowKey: "state.needsAttention",
+      detailKey: "state.noUpcomingSession",
+      primaryLabelKey: "state.schedule",
       primaryHref: "/dashboard/sessions",
       tone: "text-amber-700",
     };
   }
 
+  const dayTime = formatSessionDayTime(nextSession.scheduledAt, locale);
   const sessionDate = new Date(nextSession.scheduledAt);
   const today = new Date();
   const isToday = sessionDate.toDateString() === today.toDateString();
@@ -151,9 +159,10 @@ function getCommunityState(community: Community): {
   if (isToday || nextSession.status === "IN_PROGRESS") {
     return {
       state: "today",
-      eyebrow: "Happening now",
-      detail: `${formatSessionDayTime(nextSession.scheduledAt)} · ${nextSession.attendeeCount || 0} attending`,
-      primaryLabel: nextSession.status === "IN_PROGRESS" ? "Start" : "View",
+      eyebrowKey: "state.happeningNow",
+      detailKey: "state.detailToday",
+      detailValues: { dayTime, count: nextSession.attendeeCount || 0 },
+      primaryLabelKey: nextSession.status === "IN_PROGRESS" ? "state.start" : "state.view",
       primaryHref:
         nextSession.status === "IN_PROGRESS"
           ? `/dashboard/sessions/${nextSession.id}/room`
@@ -165,9 +174,10 @@ function getCommunityState(community: Community): {
   if ((nextSession.attendeeCount || 0) === 0) {
     return {
       state: "upcoming",
-      eyebrow: "Needs attention",
-      detail: `Next session · ${formatSessionDayTime(nextSession.scheduledAt)} · 0 attending`,
-      primaryLabel: "View",
+      eyebrowKey: "state.needsAttention",
+      detailKey: "state.detailUpcomingZero",
+      detailValues: { dayTime },
+      primaryLabelKey: "state.view",
       primaryHref: `/dashboard/sessions/${nextSession.id}`,
       tone: "text-amber-700",
     };
@@ -176,9 +186,10 @@ function getCommunityState(community: Community): {
   if (weeklySessions >= 2) {
     return {
       state: "healthy",
-      eyebrow: "Healthy",
-      detail: `${weeklySessions} sessions · ${community.avgAttendanceThisWeek || 0} avg attendees`,
-      primaryLabel: "View sessions",
+      eyebrowKey: "state.healthy",
+      detailKey: "state.detailHealthy",
+      detailValues: { sessions: weeklySessions, avg: community.avgAttendanceThisWeek || 0 },
+      primaryLabelKey: "state.viewSessions",
       primaryHref: "/dashboard/sessions",
       tone: "text-emerald-700",
     };
@@ -186,33 +197,48 @@ function getCommunityState(community: Community): {
 
   return {
     state: "upcoming",
-    eyebrow: "Growing",
-    detail: `Next session · ${formatSessionDayTime(nextSession.scheduledAt)} · ${nextSession.attendeeCount || 0} attending`,
-    primaryLabel: "View",
+    eyebrowKey: "state.growing",
+    detailKey: "state.detailUpcoming",
+    detailValues: { dayTime, count: nextSession.attendeeCount || 0 },
+    primaryLabelKey: "state.view",
     primaryHref: `/dashboard/sessions/${nextSession.id}`,
     tone: "text-sky-700",
   };
 }
 
-function getHeroContent(community: Community) {
+type HeroView = {
+  titleKey: string;
+  titleValues?: Record<string, string | number>;
+  subtitleKey: string;
+  subtitleValues?: Record<string, string | number>;
+  primaryLabelKey: string;
+  primaryHref: string;
+};
+
+function getHeroContent(community: Community, locale: string): HeroView {
   const nextSession = community.nextSession;
   const hasRunASession = Boolean(community.lastSessionAt) || (community.weeklySessions || 0) > 0;
   const priority = getCommunityPriority(community);
 
   if (priority.reason === "in_progress" && nextSession) {
     return {
-      title: "🔥 Session in progress",
-      subtitle: `${nextSession.title} · ${nextSession.attendeeCount || 0} attending`,
-      primaryLabel: "Start session",
+      titleKey: "hero.inProgressTitle",
+      subtitleKey: "hero.inProgressSubtitle",
+      subtitleValues: { title: nextSession.title, count: nextSession.attendeeCount || 0 },
+      primaryLabelKey: "hero.startSession",
       primaryHref: `/dashboard/sessions/${nextSession.id}/room`,
     };
   }
 
   if (priority.reason === "today" && nextSession) {
     return {
-      title: "🔥 Next session today",
-      subtitle: `${formatSessionDayTime(nextSession.scheduledAt)} · ${nextSession.attendeeCount || 0} attending`,
-      primaryLabel: "View session",
+      titleKey: "hero.todayTitle",
+      subtitleKey: "hero.todaySubtitle",
+      subtitleValues: {
+        dayTime: formatSessionDayTime(nextSession.scheduledAt, locale),
+        count: nextSession.attendeeCount || 0,
+      },
+      primaryLabelKey: "hero.viewSession",
       primaryHref: `/dashboard/sessions/${nextSession.id}`,
     };
   }
@@ -220,59 +246,56 @@ function getHeroContent(community: Community) {
   if (priority.reason === "no_upcoming") {
     if (!hasRunASession) {
       return {
-        title: "⚡ Start your first session",
-        subtitle: "Communities with weekly sessions grow 3x faster",
-        primaryLabel: "Schedule first session",
+        titleKey: "hero.firstSessionTitle",
+        subtitleKey: "hero.firstSessionSubtitle",
+        primaryLabelKey: "hero.scheduleFirstSession",
         primaryHref: "/dashboard/sessions",
       };
     }
 
     return {
-      title: "⚡ Schedule your next session",
-      subtitle: "Communities grow faster with a consistent weekly rhythm",
-      primaryLabel: "Schedule next session",
+      titleKey: "hero.scheduleNextTitle",
+      subtitleKey: "hero.scheduleNextSubtitle",
+      primaryLabelKey: "hero.scheduleNextSession",
       primaryHref: "/dashboard/sessions",
     };
   }
 
   if (priority.reason === "low_attendance" && nextSession) {
     return {
-      title: "⚡ Boost your next session",
-      subtitle: `Low attendance so far · ${formatSessionDayTime(nextSession.scheduledAt)}`,
-      primaryLabel: "View session",
+      titleKey: "hero.boostTitle",
+      subtitleKey: "hero.boostSubtitle",
+      subtitleValues: { dayTime: formatSessionDayTime(nextSession.scheduledAt, locale) },
+      primaryLabelKey: "hero.viewSession",
       primaryHref: `/dashboard/sessions/${nextSession.id}`,
     };
   }
 
   if (nextSession) {
-    const d = daysUntil(nextSession.scheduledAt);
-
-    if (d === 1) {
-      return {
-        title: "🔥 Next session in 1 day",
-        subtitle: `${formatSessionDayTime(nextSession.scheduledAt)} · ${nextSession.attendeeCount || 0} attending`,
-        primaryLabel: "View session",
-        primaryHref: `/dashboard/sessions/${nextSession.id}`,
-      };
-    }
-
     return {
-      title: `🔥 Next session in ${d} days`,
-      subtitle: `${formatSessionDayTime(nextSession.scheduledAt)} · ${nextSession.attendeeCount || 0} attending`,
-      primaryLabel: "View session",
+      titleKey: "hero.inDaysTitle",
+      titleValues: { days: daysUntil(nextSession.scheduledAt) },
+      subtitleKey: "hero.upcomingSubtitle",
+      subtitleValues: {
+        dayTime: formatSessionDayTime(nextSession.scheduledAt, locale),
+        count: nextSession.attendeeCount || 0,
+      },
+      primaryLabelKey: "hero.viewSession",
       primaryHref: `/dashboard/sessions/${nextSession.id}`,
     };
   }
 
   return {
-    title: "⚡ Schedule your next session",
-    subtitle: "Communities grow faster with a consistent weekly rhythm",
-    primaryLabel: "Schedule next session",
+    titleKey: "hero.scheduleNextTitle",
+    subtitleKey: "hero.scheduleNextSubtitle",
+    primaryLabelKey: "hero.scheduleNextSession",
     primaryHref: "/dashboard/sessions",
   };
 }
 
 export function CommunitiesClient() {
+  const t = useTranslations("dashboard.communities");
+  const locale = useLocale();
   const { user, isLoading } = useCurrentUser();
   const router = useRouter();
 
@@ -298,7 +321,7 @@ export function CommunitiesClient() {
         const data = await response.json();
         setCommunities(data?.myCommunities || []);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load communities");
+        setError(err instanceof Error ? err.message : "load");
       } finally {
         setLoading(false);
       }
@@ -321,7 +344,7 @@ export function CommunitiesClient() {
   }, [communities]);
 
   const primaryCommunity = sortedCommunities[0] || null;
-  const hero = primaryCommunity ? getHeroContent(primaryCommunity) : null;
+  const hero = primaryCommunity ? getHeroContent(primaryCommunity, locale) : null;
 
   const momentum = useMemo(() => {
     const sessions = communities.reduce((sum, c) => sum + (c.weeklySessions || 0), 0);
@@ -334,67 +357,45 @@ export function CommunitiesClient() {
 
   const milestones = useMemo(
     () => [
-      { label: "Community created", done: communities.length > 0 },
+      { key: "milestones.communityCreated", done: communities.length > 0 },
       {
-        label: "First session",
+        key: "milestones.firstSession",
         done: communities.some((c) => (c.weeklySessions || 0) > 0 || Boolean(c.lastSessionAt)),
       },
-      { label: "10 attendees", done: momentum.attendees >= 10 },
+      { key: "milestones.tenAttendees", done: momentum.attendees >= 10 },
       {
-        label: "Weekly habit",
+        key: "milestones.weeklyHabit",
         done: communities.some((c) => (c.weeklySessions || 0) >= 2),
       },
     ],
     [communities, momentum.attendees]
   );
 
-  const thisWeekSummary = useMemo(() => {
+  const summary = useMemo(() => {
     if (!primaryCommunity) {
-      return {
-        title: "No communities yet",
-        hint: "Create your first community to get started",
-      };
+      return { titleKey: "summary.noCommunitiesTitle", hintKey: "summary.noCommunitiesHint" };
     }
 
-    const priority = getCommunityPriority(primaryCommunity);
+    const reason = getCommunityPriority(primaryCommunity).reason;
 
-    if (priority.reason === "no_upcoming") {
-      return {
-        title: "No upcoming session",
-        hint: "Keep momentum going with your next session",
-      };
+    if (reason === "no_upcoming") {
+      return { titleKey: "summary.noUpcomingTitle", hintKey: "summary.noUpcomingHint" };
     }
-
-    if (priority.reason === "in_progress" || priority.reason === "today") {
-      return {
-        title: "Session happening today",
-        hint: "Keep momentum high and drive attendance",
-      };
+    if (reason === "in_progress" || reason === "today") {
+      return { titleKey: "summary.todayTitle", hintKey: "summary.todayHint" };
     }
-
-    if (priority.reason === "low_attendance") {
-      return {
-        title: "Attendance needs a push",
-        hint: "Ask a question before your next session",
-      };
+    if (reason === "low_attendance") {
+      return { titleKey: "summary.lowAttendanceTitle", hintKey: "summary.lowAttendanceHint" };
     }
-
-    if (priority.reason === "build_habit") {
-      return {
-        title: "Build your weekly rhythm",
-        hint: "Consistency helps communities grow faster",
-      };
+    if (reason === "build_habit") {
+      return { titleKey: "summary.buildHabitTitle", hintKey: "summary.buildHabitHint" };
     }
-
-    return {
-      title: "Good momentum",
-      hint: "Keep your weekly rhythm going",
-    };
+    return { titleKey: "summary.goodMomentumTitle", hintKey: "summary.goodMomentumHint" };
   }, [primaryCommunity]);
 
   const quickActions = [
-    { label: "Invite members", href: "/dashboard/communities" },
-    { label: "Create post", href: "/dashboard/communities" },
+    { labelKey: "inviteMembers", href: "/dashboard/communities" },
+    { labelKey: "createPost", href: "/dashboard/communities" },
   ];
 
   if (isLoading || loading) {
@@ -402,7 +403,7 @@ export function CommunitiesClient() {
       <div className="flex min-h-[400px] items-center justify-center">
         <div className="text-center">
           <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />
-          <p className="mt-4 text-sm text-muted-foreground">Loading communities...</p>
+          <p className="mt-4 text-sm text-muted-foreground">{t("loading")}</p>
         </div>
       </div>
     );
@@ -412,10 +413,12 @@ export function CommunitiesClient() {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-foreground">Error loading communities</h2>
-          <p className="mt-2 text-muted-foreground">{error}</p>
+          <h2 className="text-2xl font-bold text-foreground">{t("errorTitle")}</h2>
+          <p className="mt-2 text-muted-foreground">
+            {error === "Failed to fetch communities" ? t("fetchError") : t("loadError")}
+          </p>
           <Button onClick={() => window.location.reload()} className="mt-4">
-            Retry
+            {t("retry")}
           </Button>
         </div>
       </div>
@@ -428,15 +431,15 @@ export function CommunitiesClient() {
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">
           <Users className="h-6 w-6 text-primary" />
         </div>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">No communities yet</h2>
+        <h2 className="mt-4 text-xl font-semibold text-foreground">{t("noCommunitiesTitle")}</h2>
         <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-          Create your first community to start your community engine.
+          {t("emptyEngine")}
         </p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
           <Link href="/dashboard/communities/new">
             <Button>
               <Plus className="mr-2 h-4 w-4" />
-              Create community
+              {t("createCommunity")}
             </Button>
           </Link>
         </div>
@@ -456,29 +459,36 @@ export function CommunitiesClient() {
                     {primaryCommunity.name}
                   </h1>
                   <span className="rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
-                    In focus
+                    {t("inFocus")}
                   </span>
                 </div>
 
                 <p className="text-sm text-muted-foreground">
-                  {primaryCommunity._count.members} members · {primaryCommunity._count.posts} posts
+                  {t("stats", {
+                    members: primaryCommunity._count.members,
+                    posts: primaryCommunity._count.posts,
+                  })}
                 </p>
               </div>
 
               <div className="space-y-2">
                 <p className="text-2xl font-semibold tracking-tight text-foreground">
-                  {hero.title}
+                  {t(hero.titleKey, hero.titleValues)}
                 </p>
-                <p className="max-w-2xl text-sm leading-6 text-muted-foreground">{hero.subtitle}</p>
+                <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
+                  {t(hero.subtitleKey, hero.subtitleValues)}
+                </p>
               </div>
 
               <div className="flex flex-wrap gap-3">
                 <Link href={hero.primaryHref}>
-                  <Button className="h-11 px-5 text-sm font-medium">{hero.primaryLabel}</Button>
+                  <Button className="h-11 px-5 text-sm font-medium">
+                    {t(hero.primaryLabelKey)}
+                  </Button>
                 </Link>
                 <Link href={`/dashboard/c/${primaryCommunity.slug}`}>
                   <Button variant="outline" className="h-11 px-5 text-sm font-medium">
-                    Enter community
+                    {t("enterCommunity")}
                   </Button>
                 </Link>
               </div>
@@ -490,13 +500,13 @@ export function CommunitiesClient() {
       <div className="grid gap-4 lg:grid-cols-[1.35fr_0.65fr]">
         <section className="rounded-3xl border border-border/70 bg-card p-6 shadow-sm">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-            Your progress
+            {t("yourProgress")}
           </p>
 
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
             {milestones.map((item) => (
               <div
-                key={item.label}
+                key={item.key}
                 className="flex items-center gap-3 rounded-2xl border border-border/60 bg-background/60 px-4 py-3"
               >
                 <div
@@ -511,7 +521,7 @@ export function CommunitiesClient() {
                     item.done ? "font-medium text-foreground" : "text-muted-foreground"
                   }`}
                 >
-                  {item.label}
+                  {t(item.key)}
                 </span>
               </div>
             ))}
@@ -520,28 +530,30 @@ export function CommunitiesClient() {
 
         <section className="rounded-3xl border border-border/70 bg-card p-6 shadow-sm">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-            This week
+            {t("thisWeek")}
           </p>
 
           <div className="mt-5 space-y-4">
             <div className="space-y-1.5">
               <p className="text-lg font-semibold tracking-tight text-foreground">
-                {thisWeekSummary.title}
+                {t(summary.titleKey)}
               </p>
-              <p className="text-sm leading-6 text-muted-foreground">{thisWeekSummary.hint}</p>
+              <p className="text-sm leading-6 text-muted-foreground">{t(summary.hintKey)}</p>
             </div>
 
             <div className="space-y-2 rounded-2xl border border-border/60 bg-background/60 p-4 text-sm">
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Sessions</span>
-                <span className="font-medium text-foreground">{momentum.sessions} scheduled</span>
+                <span className="text-muted-foreground">{t("momentum.sessions")}</span>
+                <span className="font-medium text-foreground">
+                  {t("momentum.sessionsScheduled", { count: momentum.sessions })}
+                </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Members</span>
+                <span className="text-muted-foreground">{t("momentum.members")}</span>
                 <span className="font-medium text-foreground">{momentum.members}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Posts</span>
+                <span className="text-muted-foreground">{t("momentum.posts")}</span>
                 <span className="font-medium text-foreground">{momentum.posts}</span>
               </div>
             </div>
@@ -551,15 +563,15 @@ export function CommunitiesClient() {
 
       <section className="space-y-3">
         <div className="flex items-center justify-between">
-          <p className="text-sm font-semibold text-foreground">Your communities</p>
+          <p className="text-sm font-semibold text-foreground">{t("yourCommunities")}</p>
           {sortedCommunities.length > 1 && (
-            <p className="text-xs text-muted-foreground">Ordered by priority</p>
+            <p className="text-xs text-muted-foreground">{t("orderedByPriority")}</p>
           )}
         </div>
 
         <div className="space-y-3">
           {sortedCommunities.map((community) => {
-            const state = getCommunityState(community);
+            const state = getCommunityState(community, locale);
 
             return (
               <div
@@ -575,26 +587,31 @@ export function CommunitiesClient() {
                     </div>
 
                     <p className="mt-1 text-sm text-muted-foreground">
-                      {community._count.members} members · {community._count.posts} posts
+                      {t("stats", {
+                        members: community._count.members,
+                        posts: community._count.posts,
+                      })}
                     </p>
 
                     <div className="mt-2.5 flex flex-wrap items-center gap-2 text-sm">
-                      <span className={`font-medium ${state.tone}`}>{state.eyebrow}</span>
+                      <span className={`font-medium ${state.tone}`}>{t(state.eyebrowKey)}</span>
                       <span className="text-muted-foreground">·</span>
-                      <span className="text-foreground">{state.detail}</span>
+                      <span className="text-foreground">
+                        {t(state.detailKey, state.detailValues)}
+                      </span>
                     </div>
                   </div>
 
                   <div className="flex shrink-0 gap-2">
                     <Link href={state.primaryHref}>
                       <Button size="sm" variant="outline" className="h-9 px-4">
-                        {state.primaryLabel}
+                        {t(state.primaryLabelKey)}
                       </Button>
                     </Link>
 
                     <Link href={`/dashboard/c/${community.slug}`}>
                       <Button size="sm" variant="outline" className="h-9 px-4">
-                        Enter
+                        {t("enter")}
                       </Button>
                     </Link>
                   </div>
@@ -607,14 +624,14 @@ export function CommunitiesClient() {
 
       <section className="rounded-3xl border border-border/70 bg-card px-5 py-4 shadow-sm">
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-          Quick actions
+          {t("quickActions")}
         </p>
 
         <div className="mt-4 flex flex-wrap gap-3">
           {quickActions.map((action) => (
-            <Link key={action.label} href={action.href}>
+            <Link key={action.labelKey} href={action.href}>
               <Button variant="outline" className="h-10 px-4">
-                {action.label}
+                {t(action.labelKey)}
               </Button>
             </Link>
           ))}
