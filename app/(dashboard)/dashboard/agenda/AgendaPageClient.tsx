@@ -2,15 +2,14 @@
 
 import { useMemo } from "react";
 import { format, isToday, isTomorrow, formatDistanceToNow } from "date-fns";
-import { enUS, es, fr } from "date-fns/locale";
+import { getDateFnsLocale } from "@/lib/i18n/date-fns-locale";
+import { usePageTitle } from "@/lib/hooks/usePageTitle";
 import { useLocale, useTranslations } from "next-intl";
 import { Video, Calendar, Clock, ArrowRight, Sparkles, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import Image from "next/image";
-
-const DATE_FNS_LOCALES = { en: enUS, es, fr } as const;
 
 export interface AgendaSession {
   id: string;
@@ -29,8 +28,9 @@ interface AgendaPageClientProps {
 
 export function AgendaPageClient({ upcoming, past }: AgendaPageClientProps) {
   const t = useTranslations("dashboard.agenda");
+  usePageTitle("metaTitle", "dashboard.agenda");
   const locale = useLocale();
-  const dfLocale = DATE_FNS_LOCALES[locale as keyof typeof DATE_FNS_LOCALES] ?? enUS;
+  const dfLocale = getDateFnsLocale(locale);
 
   // Localized date-group label (Today / Tomorrow / weekday + date).
   const groupLabel = (date: Date) => {

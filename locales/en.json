@@ -344,6 +344,7 @@
   },
   "dashboard": {
     "calendar": {
+      "metaTitle": "Calendar",
       "title": "Calendar",
       "subtitle": "All your sessions across communities",
       "nav": {
@@ -368,6 +369,7 @@
       }
     },
     "agenda": {
+      "metaTitle": "Agenda",
       "title": "Your Agenda",
       "subtitle": "All your upcoming sessions across communities",
       "upcomingThisWeek": "{count, plural, =1 {# upcoming session this week} other {# upcoming sessions this week}}",
@@ -387,6 +389,7 @@
       }
     },
     "sessions": {
+      "metaTitle": "Sessions",
       "title": "Live Sessions",
       "subtitle": "Run live coaching, classes, and workshops",
       "scheduleSession": "Schedule Session",
@@ -429,6 +432,7 @@
       }
     },
     "analytics": {
+      "metaTitle": "Analytics",
       "title": "Analytics",
       "subtitle": "Insights and metrics for your communities",
       "loadFailedTitle": "Failed to load analytics",
@@ -468,7 +472,46 @@
         "feedParticipation": "Feed Participation",
         "contentReuse": "Content Reuse",
         "diagnosisLabel": "Diagnosis:",
-        "error": "Could not load north star diagnostics right now."
+        "error": "Could not load north star diagnostics right now.",
+        "diagnosis": {
+          "noCommunities": "No communities yet",
+          "healthy": "Healthy growth momentum across all core drivers",
+          "bottleneck": "Main bottleneck: {signals}"
+        },
+        "weakSignals": {
+          "weeklyActiveAttendeesLow": "weekly active attendees are low",
+          "avgLiveAttendanceLow": "average live attendance is low",
+          "returningAttendeesWeak": "returning attendees are weak",
+          "feedParticipationLow": "feed participation is low",
+          "contentReuseLow": "session-to-content reuse is low"
+        },
+        "actions": {
+          "createCommunity": {
+            "title": "Create your first community",
+            "why": "You need one active community to start generating weekly active attendees.",
+            "cta": "Create community"
+          },
+          "improveAttendance": {
+            "title": "Improve attendance this week",
+            "why": "Low attendance usually improves with earlier reminders and clearer session promise.",
+            "cta": "Optimize next session"
+          },
+          "preSessionDiscussion": {
+            "title": "Trigger pre-session discussion",
+            "why": "Communities with pre-live discussion convert better to attendance.",
+            "cta": "Post discussion prompt"
+          },
+          "publishRecaps": {
+            "title": "Publish recaps and recordings",
+            "why": "Reused content increases retention and monetization opportunities.",
+            "cta": "Publish to library"
+          },
+          "scaleFormat": {
+            "title": "Scale your best format",
+            "why": "Your key drivers are healthy; next gain comes from more weekly sessions and distribution.",
+            "cta": "Schedule next session"
+          }
+        }
       },
       "health": {
         "title": "Live Community Health",

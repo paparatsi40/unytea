@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { BarChart3, TrendingUp } from "lucide-react";
+import { usePageTitle } from "@/lib/hooks/usePageTitle";
 import { StatsCard } from "@/components/analytics/StatsCard";
 import { CommunitySelector } from "@/components/analytics/CommunitySelector";
 import {
@@ -39,10 +40,15 @@ interface NorthStarData {
 }
 
 interface NorthAction {
-  title: string;
-  why: string;
+  titleKey: string;
+  whyKey: string;
+  ctaKey: string;
   href: string;
-  cta: string;
+}
+
+interface NorthStarDiagnosis {
+  key: string;
+  signalKeys?: string[];
 }
 
 interface Cohort {
@@ -63,7 +69,7 @@ interface AnalyticsPageClientProps {
   data: OverviewData | null;
   health: HealthMetrics | null;
   northStar: NorthStarData | null;
-  northDiagnosis: string | null;
+  northDiagnosis: NorthStarDiagnosis | null;
   northActions: NorthAction[];
   cohorts: Cohort[];
   retentionCommunities: RetentionCommunity[];
@@ -91,6 +97,7 @@ export function AnalyticsPageClient({
   error,
 }: AnalyticsPageClientProps) {
   const t = useTranslations("dashboard.analytics");
+  usePageTitle("metaTitle", "dashboard.analytics");
 
   if (error !== null || !data) {
     return (
@@ -120,6 +127,18 @@ export function AnalyticsPageClient({
 
   const returningBenchmark = getReturningBenchmark(health?.returningAttendeesRate || 0);
   const feedBenchmark = getFeedBenchmark(health?.feedParticipationRate || 0);
+
+  // North Star diagnosis text: server returns a key (+ weak-signal keys for the
+  // bottleneck case); resolve the localized signal list and interpolate here.
+  const diagnosisText = northDiagnosis
+    ? northDiagnosis.signalKeys && northDiagnosis.signalKeys.length > 0
+      ? t(`northStar.diagnosis.${northDiagnosis.key}`, {
+          signals: northDiagnosis.signalKeys
+            .map((k) => t(`northStar.weakSignals.${k}`))
+            .join(" + "),
+        })
+      : t(`northStar.diagnosis.${northDiagnosis.key}`)
+    : null;
 
   return (
     <div className="space-y-8 p-8">
@@ -293,20 +312,26 @@ export function AnalyticsPageClient({
             </div>
 
             <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
-              <strong>{t("northStar.diagnosisLabel")}</strong> {northDiagnosis}
+              <strong>{t("northStar.diagnosisLabel")}</strong> {diagnosisText}
             </div>
 
             {northActions.length > 0 && (
               <div className="mt-4 grid gap-3 md:grid-cols-3">
                 {northActions.map((action) => (
                   <a
-                    key={action.title}
+                    key={action.titleKey}
                     href={action.href}
                     className="rounded-lg border border-border/40 bg-background p-4 hover:border-primary/40"
                   >
-                    <p className="font-semibold text-foreground">{action.title}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">{action.why}</p>
-                    <p className="mt-3 text-xs font-semibold text-primary">{action.cta} →</p>
+                    <p className="font-semibold text-foreground">
+                      {t(`northStar.actions.${action.titleKey}`)}
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {t(`northStar.actions.${action.whyKey}`)}
+                    </p>
+                    <p className="mt-3 text-xs font-semibold text-primary">
+                      {t(`northStar.actions.${action.ctaKey}`)} →
+                    </p>
                   </a>
                 ))}
               </div>

@@ -13,15 +13,14 @@ import {
   BellRing,
 } from "lucide-react";
 import { format, isToday, isTomorrow, formatDistanceToNow } from "date-fns";
-import { enUS, es, fr } from "date-fns/locale";
+import { getDateFnsLocale } from "@/lib/i18n/date-fns-locale";
+import { usePageTitle } from "@/lib/hooks/usePageTitle";
 import { useLocale, useTranslations } from "next-intl";
 import { CreateSessionDialog } from "@/components/sessions/CreateSessionDialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import Image from "next/image";
-
-const DATE_FNS_LOCALES = { en: enUS, es, fr } as const;
 
 export interface SessionItem {
   id: string;
@@ -53,8 +52,9 @@ export function SessionsPageClient({
   error,
 }: SessionsPageClientProps) {
   const t = useTranslations("dashboard.sessions");
+  usePageTitle("metaTitle", "dashboard.sessions");
   const locale = useLocale();
-  const dfLocale = DATE_FNS_LOCALES[locale as keyof typeof DATE_FNS_LOCALES] ?? enUS;
+  const dfLocale = getDateFnsLocale(locale);
 
   if (error !== null) {
     return (

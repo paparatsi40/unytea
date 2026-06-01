@@ -13,6 +13,10 @@ import {
   Star,
 } from "lucide-react";
 
+// Locale-aware currency formatting (symbol + grouping position vary by locale).
+const formatCurrency = (value: number, locale: string, currency = "USD") =>
+  new Intl.NumberFormat(locale, { style: "currency", currency }).format(value);
+
 // ── Types ────────────────────────────────────────────────────────────
 interface DailyChartPoint {
   date: string;
@@ -76,11 +80,13 @@ function MiniBarChart({
   dataKey,
   color,
   height = 120,
+  locale,
 }: {
   data: DailyChartPoint[];
   dataKey: "sessions" | "attendees" | "enrollments";
   color: string;
   height?: number;
+  locale: string;
 }) {
   const values = data.map((d) => (d[dataKey] as number) || 0);
   const max = Math.max(...values, 1);
@@ -91,7 +97,11 @@ function MiniBarChart({
         const val = (d[dataKey] as number) || 0;
         const h = (val / max) * 100;
         return (
-          <div key={d.date} className="group relative min-w-0 flex-1" title={`${d.label}: ${val}`}>
+          <div
+            key={d.date}
+            className="group relative min-w-0 flex-1"
+            title={`${d.label}: ${val.toLocaleString(locale)}`}
+          >
             <div
               className={`w-full rounded-t-sm ${color} transition-all hover:opacity-80`}
               style={{ height: `${Math.max(h, 2)}%` }}
@@ -233,6 +243,7 @@ export function AnalyticsCharts({ sessions, courses, revenue }: AnalyticsChartsP
                       dataKey="attendees"
                       color="bg-purple-400"
                       height={140}
+                      locale={locale}
                     />
                     <div className="mt-2 flex justify-between text-[10px] text-gray-400">
                       <span>{sessions.dailyChart[0]?.label}</span>
@@ -291,6 +302,7 @@ export function AnalyticsCharts({ sessions, courses, revenue }: AnalyticsChartsP
                       dataKey="enrollments"
                       color="bg-emerald-400"
                       height={120}
+                      locale={locale}
                     />
                     <div className="mt-2 flex justify-between text-[10px] text-gray-400">
                       <span>{courses.enrollmentChart[0]?.label}</span>
@@ -354,19 +366,19 @@ export function AnalyticsCharts({ sessions, courses, revenue }: AnalyticsChartsP
                   <StatBox
                     icon={DollarSign}
                     label={t("revenue.total")}
-                    value={`$${revenue.totalRevenue.toLocaleString(locale)}`}
+                    value={formatCurrency(revenue.totalRevenue, locale)}
                     color="text-emerald-500"
                   />
                   <StatBox
                     icon={BookOpen}
                     label={t("revenue.course")}
-                    value={`$${revenue.courseRevenue.toLocaleString(locale)}`}
+                    value={formatCurrency(revenue.courseRevenue, locale)}
                     color="text-blue-500"
                   />
                   <StatBox
                     icon={Users}
                     label={t("revenue.membership")}
-                    value={`$${revenue.membershipRevenue.toLocaleString(locale)}`}
+                    value={formatCurrency(revenue.membershipRevenue, locale)}
                     sub={t("revenue.paidMembers", { count: revenue.paidMembers })}
                     color="text-purple-500"
                   />
@@ -388,13 +400,13 @@ export function AnalyticsCharts({ sessions, courses, revenue }: AnalyticsChartsP
                             <p className="text-sm font-medium text-gray-900">{c.title}</p>
                             <p className="text-xs text-gray-500">
                               {t("revenue.priceEnrollments", {
-                                price: `$${c.price}`,
+                                price: formatCurrency(c.price, locale),
                                 count: c.enrollments,
                               })}
                             </p>
                           </div>
                           <span className="text-sm font-bold text-emerald-600">
-                            ${c.revenue.toLocaleString(locale)}
+                            {formatCurrency(c.revenue, locale)}
                           </span>
                         </div>
                       ))}

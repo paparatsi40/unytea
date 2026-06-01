@@ -14,7 +14,7 @@ import {
   addMonths,
   subMonths,
 } from "date-fns";
-import { enUS, es, fr } from "date-fns/locale";
+import { getDateFnsLocale } from "@/lib/i18n/date-fns-locale";
 import { useLocale, useTranslations } from "next-intl";
 import {
   ChevronLeft,
@@ -25,8 +25,6 @@ import {
   Download,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const DATE_FNS_LOCALES = { en: enUS, es, fr } as const;
 
 export interface CalendarSession {
   id: string;
@@ -50,7 +48,7 @@ interface CalendarViewProps {
 export function CalendarView({ sessions, onSessionClick }: CalendarViewProps) {
   const t = useTranslations("dashboard.calendar");
   const locale = useLocale();
-  const dfLocale = DATE_FNS_LOCALES[locale as keyof typeof DATE_FNS_LOCALES] ?? enUS;
+  const dfLocale = getDateFnsLocale(locale);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
 

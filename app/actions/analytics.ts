@@ -546,13 +546,13 @@ export async function getNorthStarDecisionSnapshot(communityId?: string) {
           feedParticipationRate: 0,
           contentReuseRate: 0,
         },
-        diagnosis: "No communities yet",
+        diagnosis: { key: "noCommunities" as const },
         actions: [
           {
-            title: "Create your first community",
-            why: "You need one active community to start generating weekly active attendees.",
+            titleKey: "createCommunity.title",
+            whyKey: "createCommunity.why",
+            ctaKey: "createCommunity.cta",
             href: "/dashboard/communities/new",
-            cta: "Create community",
           },
         ],
       };
@@ -668,48 +668,38 @@ export async function getNorthStarDecisionSnapshot(communityId?: string) {
       ? Math.round((recordingBackedSessions / completedSessions7d.length) * 100)
       : 0;
 
-    const weakSignals: string[] = [];
-    if (waa < 20) weakSignals.push("weekly active attendees are low");
-    if (avgLiveAttendance < 12) weakSignals.push("average live attendance is low");
-    if (returningAttendeesRate < 35) weakSignals.push("returning attendees are weak");
-    if (feedParticipationRate < 10) weakSignals.push("feed participation is low");
-    if (contentReuseRate < 50) weakSignals.push("session-to-content reuse is low");
+    // Weak-signal and action TEXT is localized in the client (the dashboard
+    // route group has no [locale] segment for server getTranslations). The
+    // server returns translation KEYS only — see dashboard.analytics.northStar
+    // in the locale files. Matches the dashboard.communities helper-returns-key
+    // precedent.
+    const weakSignalKeys: string[] = [];
+    if (waa < 20) weakSignalKeys.push("weeklyActiveAttendeesLow");
+    if (avgLiveAttendance < 12) weakSignalKeys.push("avgLiveAttendanceLow");
+    if (returningAttendeesRate < 35) weakSignalKeys.push("returningAttendeesWeak");
+    if (feedParticipationRate < 10) weakSignalKeys.push("feedParticipationLow");
+    if (contentReuseRate < 50) weakSignalKeys.push("contentReuseLow");
 
-    const actions = [] as Array<{ title: string; why: string; href: string; cta: string }>;
+    const actions = [] as Array<{
+      titleKey: string;
+      whyKey: string;
+      ctaKey: string;
+      href: string;
+    }>;
 
-    if (avgLiveAttendance < 12) {
+    const pushAction = (key: string, href: string) =>
       actions.push({
-        title: "Improve attendance this week",
-        why: "Low attendance usually improves with earlier reminders and clearer session promise.",
-        href: "/dashboard/sessions",
-        cta: "Optimize next session",
+        titleKey: `${key}.title`,
+        whyKey: `${key}.why`,
+        ctaKey: `${key}.cta`,
+        href,
       });
-    }
-    if (feedParticipationRate < 10) {
-      actions.push({
-        title: "Trigger pre-session discussion",
-        why: "Communities with pre-live discussion convert better to attendance.",
-        href: "/dashboard/communities",
-        cta: "Post discussion prompt",
-      });
-    }
-    if (contentReuseRate < 50) {
-      actions.push({
-        title: "Publish recaps and recordings",
-        why: "Reused content increases retention and monetization opportunities.",
-        href: "/dashboard/library?tab=resources",
-        cta: "Publish to library",
-      });
-    }
 
-    if (actions.length === 0) {
-      actions.push({
-        title: "Scale your best format",
-        why: "Your key drivers are healthy; next gain comes from more weekly sessions and distribution.",
-        href: "/dashboard/sessions",
-        cta: "Schedule next session",
-      });
-    }
+    if (avgLiveAttendance < 12) pushAction("improveAttendance", "/dashboard/sessions");
+    if (feedParticipationRate < 10) pushAction("preSessionDiscussion", "/dashboard/communities");
+    if (contentReuseRate < 50) pushAction("publishRecaps", "/dashboard/library?tab=resources");
+
+    if (actions.length === 0) pushAction("scaleFormat", "/dashboard/sessions");
 
     return {
       success: true,
@@ -722,9 +712,9 @@ export async function getNorthStarDecisionSnapshot(communityId?: string) {
         feedParticipationRate,
         contentReuseRate,
       },
-      diagnosis: weakSignals.length
-        ? `Main bottleneck: ${weakSignals.slice(0, 2).join(" + ")}`
-        : "Healthy growth momentum across all core drivers",
+      diagnosis: weakSignalKeys.length
+        ? { key: "bottleneck" as const, signalKeys: weakSignalKeys.slice(0, 2) }
+        : { key: "healthy" as const },
       actions: actions.slice(0, 3),
     };
   } catch (error) {

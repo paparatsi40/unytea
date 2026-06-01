@@ -344,6 +344,7 @@
   },
   "dashboard": {
     "calendar": {
+      "metaTitle": "Calendario",
       "title": "Calendario",
       "subtitle": "Todas tus sesiones en tus comunidades",
       "nav": {
@@ -368,6 +369,7 @@
       }
     },
     "agenda": {
+      "metaTitle": "Agenda",
       "title": "Tu agenda",
       "subtitle": "Todas tus próximas sesiones en tus comunidades",
       "upcomingThisWeek": "{count, plural, =1 {# sesión próxima esta semana} other {# sesiones próximas esta semana}}",
@@ -387,6 +389,7 @@
       }
     },
     "sessions": {
+      "metaTitle": "Sesiones",
       "title": "Sesiones en vivo",
       "subtitle": "Imparte coaching, clases y talleres en vivo",
       "scheduleSession": "Programar sesión",
@@ -429,6 +432,7 @@
       }
     },
     "analytics": {
+      "metaTitle": "Analíticas",
       "title": "Analíticas",
       "subtitle": "Información y métricas de tus comunidades",
       "loadFailedTitle": "Error al cargar las analíticas",
@@ -468,7 +472,46 @@
         "feedParticipation": "Participación en el feed",
         "contentReuse": "Reutilización de contenido",
         "diagnosisLabel": "Diagnóstico:",
-        "error": "No se pudieron cargar los diagnósticos de North Star ahora mismo."
+        "error": "No se pudieron cargar los diagnósticos de North Star ahora mismo.",
+        "diagnosis": {
+          "noCommunities": "Aún no hay comunidades",
+          "healthy": "Crecimiento saludable en todos los impulsores clave",
+          "bottleneck": "Principal cuello de botella: {signals}"
+        },
+        "weakSignals": {
+          "weeklyActiveAttendeesLow": "los asistentes activos semanales son bajos",
+          "avgLiveAttendanceLow": "la asistencia media en vivo es baja",
+          "returningAttendeesWeak": "los asistentes recurrentes son débiles",
+          "feedParticipationLow": "la participación en el feed es baja",
+          "contentReuseLow": "la reutilización de sesión a contenido es baja"
+        },
+        "actions": {
+          "createCommunity": {
+            "title": "Crea tu primera comunidad",
+            "why": "Necesitas una comunidad activa para empezar a generar asistentes activos semanales.",
+            "cta": "Crear comunidad"
+          },
+          "improveAttendance": {
+            "title": "Mejora la asistencia esta semana",
+            "why": "La baja asistencia suele mejorar con recordatorios anticipados y una propuesta de sesión más clara.",
+            "cta": "Optimizar la próxima sesión"
+          },
+          "preSessionDiscussion": {
+            "title": "Inicia una conversación previa a la sesión",
+            "why": "Las comunidades con conversación previa al directo convierten mejor en asistencia.",
+            "cta": "Publicar tema de conversación"
+          },
+          "publishRecaps": {
+            "title": "Publica resúmenes y grabaciones",
+            "why": "El contenido reutilizado aumenta la retención y las oportunidades de monetización.",
+            "cta": "Publicar en la biblioteca"
+          },
+          "scaleFormat": {
+            "title": "Escala tu mejor formato",
+            "why": "Tus impulsores clave están saludables; la próxima mejora viene de más sesiones semanales y distribución.",
+            "cta": "Programar la próxima sesión"
+          }
+        }
       },
       "health": {
         "title": "Salud de la comunidad en vivo",

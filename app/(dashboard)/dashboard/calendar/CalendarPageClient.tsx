@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Calendar } from "lucide-react";
+import { usePageTitle } from "@/lib/hooks/usePageTitle";
 import { CalendarView, type CalendarSession } from "@/components/calendar/CalendarView";
 
 interface CalendarPageClientProps {
@@ -11,6 +12,7 @@ interface CalendarPageClientProps {
 
 export function CalendarPageClient({ sessions }: CalendarPageClientProps) {
   const t = useTranslations("dashboard.calendar");
+  usePageTitle("metaTitle", "dashboard.calendar");
   const router = useRouter();
 
   const handleSessionClick = (session: CalendarSession) => {

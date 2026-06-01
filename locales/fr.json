@@ -343,6 +343,7 @@
   },
   "dashboard": {
     "calendar": {
+      "metaTitle": "Calendrier",
       "title": "Calendrier",
       "subtitle": "Toutes vos sessions dans vos communautés",
       "nav": {
@@ -367,6 +368,7 @@
       }
     },
     "agenda": {
+      "metaTitle": "Agenda",
       "title": "Votre agenda",
       "subtitle": "Toutes vos prochaines sessions dans vos communautés",
       "upcomingThisWeek": "{count, plural, =1 {# session à venir cette semaine} other {# sessions à venir cette semaine}}",
@@ -386,6 +388,7 @@
       }
     },
     "sessions": {
+      "metaTitle": "Sessions",
       "title": "Sessions en direct",
       "subtitle": "Animez du coaching, des cours et des ateliers en direct",
       "scheduleSession": "Planifier une session",
@@ -428,6 +431,7 @@
       }
     },
     "analytics": {
+      "metaTitle": "Analytique",
       "title": "Analytique",
       "subtitle": "Informations et métriques de vos communautés",
       "loadFailedTitle": "Échec du chargement de l'analytique",
@@ -467,7 +471,46 @@
         "feedParticipation": "Participation au fil",
         "contentReuse": "Réutilisation du contenu",
         "diagnosisLabel": "Diagnostic :",
-        "error": "Impossible de charger les diagnostics North Star pour le moment."
+        "error": "Impossible de charger les diagnostics North Star pour le moment.",
+        "diagnosis": {
+          "noCommunities": "Aucune communauté pour le moment",
+          "healthy": "Croissance saine sur tous les leviers clés",
+          "bottleneck": "Principal point de blocage : {signals}"
+        },
+        "weakSignals": {
+          "weeklyActiveAttendeesLow": "les participants actifs hebdomadaires sont faibles",
+          "avgLiveAttendanceLow": "la présence moyenne en direct est faible",
+          "returningAttendeesWeak": "les participants récurrents sont faibles",
+          "feedParticipationLow": "la participation au fil est faible",
+          "contentReuseLow": "la réutilisation des sessions en contenu est faible"
+        },
+        "actions": {
+          "createCommunity": {
+            "title": "Créez votre première communauté",
+            "why": "Vous avez besoin d'une communauté active pour commencer à générer des participants actifs hebdomadaires.",
+            "cta": "Créer une communauté"
+          },
+          "improveAttendance": {
+            "title": "Améliorez la présence cette semaine",
+            "why": "Une faible présence s'améliore généralement avec des rappels plus précoces et une promesse de session plus claire.",
+            "cta": "Optimiser la prochaine session"
+          },
+          "preSessionDiscussion": {
+            "title": "Lancez une discussion avant la session",
+            "why": "Les communautés avec une discussion avant le direct convertissent mieux en présence.",
+            "cta": "Publier un sujet de discussion"
+          },
+          "publishRecaps": {
+            "title": "Publiez des récapitulatifs et des enregistrements",
+            "why": "Le contenu réutilisé augmente la rétention et les opportunités de monétisation.",
+            "cta": "Publier dans la bibliothèque"
+          },
+          "scaleFormat": {
+            "title": "Développez votre meilleur format",
+            "why": "Vos leviers clés sont sains ; le prochain gain vient de plus de sessions hebdomadaires et de distribution.",
+            "cta": "Planifier la prochaine session"
+          }
+        }
       },
       "health": {
         "title": "Santé de la communauté en direct",
