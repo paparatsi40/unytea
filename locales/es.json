@@ -430,6 +430,67 @@
       "empty": "No hay notificaciones todavía",
       "loading": "Cargando notificaciones..."
     },
+    "billing": {
+      "title": "Facturación",
+      "subtitle": "Administra tu plan y suscripción de Unytea",
+      "noPlan": "Sin plan activo",
+      "currentPlan": "Plan actual: {plan}",
+      "manageSubscription": "Administrar suscripción",
+      "statusLabel": "Estado:",
+      "renews": "Se renueva: {date}",
+      "willCancel": "Se cancelará al final del período",
+      "selectPlanTrial": "Selecciona un plan para empezar tu prueba gratuita de 14 días.",
+      "currentPlanDescription": "Tu plan actual y suscripción de Unytea.",
+      "yourPlanBadge": "Tu plan",
+      "popularBadge": "Popular",
+      "currentPlanButton": "Plan actual",
+      "lowerPlan": "Plan inferior",
+      "upgradeTo": "Mejorar a {plan}",
+      "perMonth": "/mes",
+      "paymentMethods": "Métodos de pago",
+      "paymentMethodsDescription": "Administra tus métodos de pago e historial de facturación",
+      "paymentMethodsStripe": "Administra tus métodos de pago directamente en el portal de Stripe.",
+      "openBillingPortal": "Abrir portal de facturación",
+      "noPaymentMethods": "Sin métodos de pago",
+      "autoAddedOnUpgrade": "Se agrega automáticamente al hacer upgrade",
+      "portalError": "Error al abrir el portal de facturación",
+      "checkoutError": "Error al iniciar el checkout",
+      "plans": {
+        "CREATOR": {
+          "description": "Para creators emergentes lanzando su primera comunidad",
+          "features": [
+            "Comunidad ilimitada de members",
+            "Live sessions hasta 100 participantes concurrentes",
+            "Cursos pagados",
+            "Feed y biblioteca de comunidad",
+            "Analíticas básicas",
+            "8% de comisión sobre ingresos de members"
+          ]
+        },
+        "BUSINESS": {
+          "description": "Para hosts establecidos creciendo su comunidad",
+          "features": [
+            "Todo lo de Creator",
+            "Live sessions hasta 300 participantes concurrentes",
+            "Dominio personalizado",
+            "Analíticas avanzadas",
+            "Hasta 5 admins",
+            "5% de comisión sobre ingresos de members"
+          ]
+        },
+        "PRO": {
+          "description": "Para teams escalando múltiples comunidades",
+          "features": [
+            "Todo lo de Business",
+            "Live sessions hasta 1000 participantes concurrentes",
+            "Experiencia white-label",
+            "Acceso a API",
+            "Admins ilimitados",
+            "3% de comisión sobre ingresos de members"
+          ]
+        }
+      }
+    },
     "title": "Panel",
     "welcome": "Bienvenido de vuelta",
     "stats": {
@@ -652,7 +713,6 @@
       "communities": "Comunidades",
       "library": "Biblioteca",
       "messages": "Mensajes",
-      "sessions": "Sesiones",
       "notifications": "Notificaciones",
       "settings": "Configuración"
     },

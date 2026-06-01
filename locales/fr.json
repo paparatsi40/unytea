@@ -429,6 +429,67 @@
       "empty": "Aucune notification",
       "loading": "Chargement des notifications..."
     },
+    "billing": {
+      "title": "Facturation",
+      "subtitle": "Gérez votre forfait et votre abonnement Unytea",
+      "noPlan": "Aucun forfait actif",
+      "currentPlan": "Forfait actuel : {plan}",
+      "manageSubscription": "Gérer l'abonnement",
+      "statusLabel": "Statut :",
+      "renews": "Renouvellement : {date}",
+      "willCancel": "Sera annulé à la fin de la période",
+      "selectPlanTrial": "Choisissez un forfait pour démarrer votre essai gratuit de 14 jours.",
+      "currentPlanDescription": "Votre forfait et abonnement Unytea actuels.",
+      "yourPlanBadge": "Votre forfait",
+      "popularBadge": "Populaire",
+      "currentPlanButton": "Forfait actuel",
+      "lowerPlan": "Forfait inférieur",
+      "upgradeTo": "Passer à {plan}",
+      "perMonth": "/mois",
+      "paymentMethods": "Moyens de paiement",
+      "paymentMethodsDescription": "Gérez vos moyens de paiement et votre historique de facturation",
+      "paymentMethodsStripe": "Gérez vos moyens de paiement directement dans le portail Stripe.",
+      "openBillingPortal": "Ouvrir le portail de facturation",
+      "noPaymentMethods": "Aucun moyen de paiement",
+      "autoAddedOnUpgrade": "Ajouté automatiquement lors de la mise à niveau",
+      "portalError": "Échec de l'ouverture du portail de facturation",
+      "checkoutError": "Échec du démarrage du paiement",
+      "plans": {
+        "CREATOR": {
+          "description": "Pour les créateurs émergents lançant leur première communauté",
+          "features": [
+            "Membres de communauté illimités",
+            "Sessions live jusqu'à 100 participants simultanés",
+            "Cours payants",
+            "Fil et bibliothèque de communauté",
+            "Analyses de base",
+            "8% de commission sur les revenus des membres"
+          ]
+        },
+        "BUSINESS": {
+          "description": "Pour les hôtes établis développant leur communauté",
+          "features": [
+            "Tout ce qui est dans Creator",
+            "Sessions live jusqu'à 300 participants simultanés",
+            "Domaine personnalisé",
+            "Analyses avancées",
+            "Jusqu'à 5 admins",
+            "5% de commission sur les revenus des membres"
+          ]
+        },
+        "PRO": {
+          "description": "Pour les équipes gérant plusieurs communautés",
+          "features": [
+            "Tout ce qui est dans Business",
+            "Sessions live jusqu'à 1000 participants simultanés",
+            "Expérience white-label",
+            "Accès API",
+            "Admins illimités",
+            "3% de commission sur les revenus des membres"
+          ]
+        }
+      }
+    },
     "title": "Tableau de Bord",
     "welcome": "Bienvenue",
     "stats": {
@@ -651,7 +712,6 @@
       "communities": "Communautés",
       "library": "Bibliothèque",
       "messages": "Messages",
-      "sessions": "Sessions",
       "notifications": "Notifications",
       "settings": "Paramètres"
     },

@@ -430,6 +430,67 @@
       "empty": "No notifications yet",
       "loading": "Loading notifications..."
     },
+    "billing": {
+      "title": "Billing",
+      "subtitle": "Manage your Unytea plan and subscription",
+      "noPlan": "No active plan",
+      "currentPlan": "Current plan: {plan}",
+      "manageSubscription": "Manage subscription",
+      "statusLabel": "Status:",
+      "renews": "Renews: {date}",
+      "willCancel": "Will cancel at period end",
+      "selectPlanTrial": "Select a plan to start your 14-day free trial.",
+      "currentPlanDescription": "Your current Unytea plan and subscription.",
+      "yourPlanBadge": "Your plan",
+      "popularBadge": "Popular",
+      "currentPlanButton": "Current plan",
+      "lowerPlan": "Lower plan",
+      "upgradeTo": "Upgrade to {plan}",
+      "perMonth": "/month",
+      "paymentMethods": "Payment methods",
+      "paymentMethodsDescription": "Manage your payment methods and billing history",
+      "paymentMethodsStripe": "Manage your payment methods directly in the Stripe portal.",
+      "openBillingPortal": "Open billing portal",
+      "noPaymentMethods": "No payment methods",
+      "autoAddedOnUpgrade": "Added automatically when you upgrade",
+      "portalError": "Failed to open billing portal",
+      "checkoutError": "Failed to start checkout",
+      "plans": {
+        "CREATOR": {
+          "description": "For emerging creators launching their first community",
+          "features": [
+            "Unlimited community members",
+            "Live sessions up to 100 concurrent participants",
+            "Paid courses",
+            "Community feed + library",
+            "Basic analytics",
+            "8% commission on member revenue"
+          ]
+        },
+        "BUSINESS": {
+          "description": "For established hosts growing their community",
+          "features": [
+            "Everything in Creator",
+            "Live sessions up to 300 concurrent participants",
+            "Custom domain",
+            "Advanced analytics",
+            "Up to 5 admins",
+            "5% commission on member revenue"
+          ]
+        },
+        "PRO": {
+          "description": "For teams scaling multiple communities",
+          "features": [
+            "Everything in Business",
+            "Live sessions up to 1000 concurrent participants",
+            "White-label experience",
+            "API access",
+            "Unlimited admins",
+            "3% commission on member revenue"
+          ]
+        }
+      }
+    },
     "title": "Dashboard",
     "welcome": "Welcome back",
     "stats": {
@@ -567,7 +628,6 @@
       "communities": "Communities",
       "library": "Library",
       "messages": "Messages",
-      "sessions": "Sessions",
       "notifications": "Notifications",
       "settings": "Settings"
     },
