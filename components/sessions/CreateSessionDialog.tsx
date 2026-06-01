@@ -5,6 +5,9 @@ import { Plus, Radio, Calendar, Clock, Video, Mic, Check } from "lucide-react";
 import { createSessionOrSeries } from "@/app/actions/sessions";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { format } from "date-fns";
+import { useLocale, useTranslations } from "next-intl";
+import { getDateFnsLocale } from "@/lib/i18n/date-fns-locale";
 
 type RecurrenceType = "once" | "weekly" | "monthly";
 type SessionMode = "now" | "scheduled";
@@ -20,15 +23,8 @@ interface CreateSessionDialogProps {
   onSuccess?: () => void;
 }
 
-const WEEKDAYS = [
-  { value: 0, label: "Sun" },
-  { value: 1, label: "Mon" },
-  { value: 2, label: "Tue" },
-  { value: 3, label: "Wed" },
-  { value: 4, label: "Thu" },
-  { value: 5, label: "Fri" },
-  { value: 6, label: "Sat" },
-];
+// Weekday values 0-6 (Sun-Sat); labels resolved via i18n (sessions.weekdays.*).
+const WEEKDAYS = [0, 1, 2, 3, 4, 5, 6];
 
 // Common timezones with friendly names
 const TIMEZONES = [
@@ -53,7 +49,7 @@ const TIMEZONES = [
 const DURATION_PRESETS = [30, 45, 60, 90, 120];
 
 export function CreateSessionDialog({
-  triggerText = "Create Session",
+  triggerText,
   className,
   communityId,
   defaultDuration = 60,
@@ -61,6 +57,9 @@ export function CreateSessionDialog({
   presetDescription,
   onSuccess,
 }: CreateSessionDialogProps) {
+  const t = useTranslations("dashboard.communityAdmin.sessions");
+  const locale = useLocale();
+  const dfLocale = getDateFnsLocale(locale);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -116,25 +115,13 @@ export function CreateSessionDialog({
     return dates;
   }, [scheduledAt, recurrence, interval, generateCount, mode]);
 
-  // Format date for display
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-    });
-  };
+  // Format date for display (locale-aware)
+  const formatDate = (date: Date) => format(date, "MMM d", { locale: dfLocale });
 
-  // Format date with day name
+  // Format date with day name (locale-aware)
   const formatDateFull = (dateStr: string) => {
     if (!dateStr) return "";
-    const date = new Date(dateStr);
-    return date.toLocaleDateString("en-US", {
-      weekday: "short",
-      month: "short",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    });
+    return format(new Date(dateStr), "EEE, MMM d, h:mm a", { locale: dfLocale });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -158,7 +145,7 @@ export function CreateSessionDialog({
 
         if (result.success) {
           const successResult = result as { success: true; session?: { id: string } };
-          toast.success("Live session started!");
+          toast.success(t("createDialog.toasts.started"));
           setIsOpen(false);
           resetForm();
           onSuccess?.();
@@ -170,7 +157,7 @@ export function CreateSessionDialog({
           }
         } else {
           const errorResult = result as { success: false; error?: string };
-          toast.error(errorResult.error || "Failed to start session");
+          toast.error(errorResult.error || t("createDialog.toasts.startFailed"));
         }
       } else {
         // Schedule session
@@ -199,8 +186,10 @@ export function CreateSessionDialog({
           const successResult = result as { success: true; type?: string; generatedCount?: number };
           toast.success(
             successResult.type === "recurring"
-              ? `${successResult.generatedCount} sessions scheduled!`
-              : "Session scheduled successfully!"
+              ? t("createDialog.toasts.scheduledRecurring", {
+                  count: successResult.generatedCount ?? 0,
+                })
+              : t("createDialog.toasts.scheduledOnce")
           );
           setIsOpen(false);
           resetForm();
@@ -208,12 +197,12 @@ export function CreateSessionDialog({
           router.refresh();
         } else {
           const errorResult = result as { success: false; error?: string };
-          toast.error(errorResult.error || "Failed to create session");
+          toast.error(errorResult.error || t("createDialog.toasts.createFailed"));
         }
       }
     } catch (error) {
       console.error("Error creating session:", error);
-      toast.error("An unexpected error occurred");
+      toast.error(t("createDialog.toasts.unexpectedError"));
     }
 
     setIsLoading(false);
@@ -245,7 +234,7 @@ export function CreateSessionDialog({
     <div>
       <label className="mb-1.5 block text-sm font-medium text-foreground/80">
         <Clock className="mr-1 inline h-4 w-4" />
-        Duration (minutes)
+        {t("createDialog.durationLabel")}
       </label>
       <div className="flex gap-2">
         <input
@@ -279,10 +268,13 @@ export function CreateSessionDialog({
   const getRecurrenceSummary = () => {
     if (recurrence === "once") return "";
     if (recurrence === "weekly") {
-      const dayName = WEEKDAYS.find((d) => d.value === dayOfWeek)?.label;
-      return `${generateCount} sessions every ${interval === 1 ? "week" : `${interval} weeks`} on ${dayName}s`;
+      return t("createDialog.summaryWeekly", {
+        count: generateCount,
+        interval,
+        day: t(`weekdays.${dayOfWeek}`),
+      });
     }
-    return `${generateCount} sessions every ${interval === 1 ? "month" : `${interval} months`}`;
+    return t("createDialog.summaryMonthly", { count: generateCount, interval });
   };
 
   return (
@@ -300,7 +292,7 @@ export function CreateSessionDialog({
         }
       >
         {!className?.includes("Schedule your first") && <Plus className="h-4 w-4" />}
-        {triggerText}
+        {triggerText ?? t("createDialog.triggerDefault")}
       </button>
 
       {isOpen && (
@@ -314,8 +306,8 @@ export function CreateSessionDialog({
           >
             {/* Header */}
             <div className="mb-6">
-              <h2 className="text-xl font-bold text-foreground">Create Live Session</h2>
-              <p className="text-sm text-muted-foreground">Start now or schedule for later</p>
+              <h2 className="text-xl font-bold text-foreground">{t("createDialog.title")}</h2>
+              <p className="text-sm text-muted-foreground">{t("createDialog.subtitle")}</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
@@ -331,7 +323,7 @@ export function CreateSessionDialog({
                   }`}
                 >
                   <Radio className="h-4 w-4" />
-                  Start now
+                  {t("createDialog.modeNow")}
                 </button>
                 <button
                   type="button"
@@ -343,7 +335,7 @@ export function CreateSessionDialog({
                   }`}
                 >
                   <Calendar className="h-4 w-4" />
-                  Schedule
+                  {t("createDialog.modeScheduled")}
                 </button>
               </div>
 
@@ -359,7 +351,7 @@ export function CreateSessionDialog({
                   }`}
                 >
                   <Video className="h-4 w-4" />
-                  Video
+                  {t("createDialog.typeVideo")}
                 </button>
                 <button
                   type="button"
@@ -371,14 +363,14 @@ export function CreateSessionDialog({
                   }`}
                 >
                   <Mic className="h-4 w-4" />
-                  Audio only
+                  {t("createDialog.typeAudio")}
                 </button>
               </div>
 
               {/* Title */}
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-foreground/80">
-                  Session Title
+                  {t("createDialog.titleLabel")}
                 </label>
                 <input
                   type="text"
@@ -386,21 +378,22 @@ export function CreateSessionDialog({
                   onChange={(e) => setTitle(e.target.value)}
                   required
                   className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:border-purple-500 focus:outline-none"
-                  placeholder="e.g., Weekly Coaching Call"
+                  placeholder={t("createDialog.titlePlaceholder")}
                 />
               </div>
 
               {/* Description */}
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-foreground/80">
-                  Description <span className="text-zinc-500">(optional)</span>
+                  {t("createDialog.descriptionLabel")}{" "}
+                  <span className="text-zinc-500">{t("createDialog.descriptionOptional")}</span>
                 </label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={2}
                   className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:border-purple-500 focus:outline-none"
-                  placeholder="What will this session cover?"
+                  placeholder={t("createDialog.descriptionPlaceholder")}
                 />
               </div>
 
@@ -413,7 +406,7 @@ export function CreateSessionDialog({
                   <div>
                     <label className="mb-1.5 block text-sm font-medium text-foreground/80">
                       <Calendar className="mr-1 inline h-4 w-4" />
-                      Date & Time
+                      {t("createDialog.dateTimeLabel")}
                     </label>
                     <input
                       type="datetime-local"
@@ -430,7 +423,7 @@ export function CreateSessionDialog({
                   {/* Timezone - Friendly names */}
                   <div>
                     <label className="mb-1.5 block text-sm font-medium text-foreground/80">
-                      Timezone
+                      {t("createDialog.timezoneLabel")}
                     </label>
                     <select
                       value={timezone}
@@ -444,35 +437,35 @@ export function CreateSessionDialog({
                       ))}
                     </select>
                     {scheduledAt && (
-                      <p className="mt-1 text-xs text-zinc-500">Your time: {timezoneLabel}</p>
+                      <p className="mt-1 text-xs text-zinc-500">
+                        {t("createDialog.yourTime", { tz: timezoneLabel })}
+                      </p>
                     )}
                   </div>
 
                   {/* Growth tip for weekly - shorter text */}
                   <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-3 py-2">
-                    <p className="text-xs text-amber-300">⭐ Weekly sessions boost engagement 3x</p>
+                    <p className="text-xs text-amber-300">{t("createDialog.weeklyTip")}</p>
                   </div>
 
                   {/* Repeat */}
                   <div>
-                    <label className="mb-2 block text-sm font-medium text-zinc-300">Repeat</label>
+                    <label className="mb-2 block text-sm font-medium text-zinc-300">
+                      {t("createDialog.repeatLabel")}
+                    </label>
                     <div className="flex gap-2">
-                      {[
-                        { id: "once", label: "Once" },
-                        { id: "weekly", label: "Weekly" },
-                        { id: "monthly", label: "Monthly" },
-                      ].map((option) => (
+                      {(["once", "weekly", "monthly"] as const).map((id) => (
                         <button
-                          key={option.id}
+                          key={id}
                           type="button"
-                          onClick={() => setRecurrence(option.id as RecurrenceType)}
+                          onClick={() => setRecurrence(id)}
                           className={`flex-1 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all ${
-                            recurrence === option.id
+                            recurrence === id
                               ? "border-purple-500 bg-purple-500/20 text-purple-400"
                               : "border-border bg-background text-muted-foreground hover:border-border/80 hover:text-foreground"
                           }`}
                         >
-                          {option.label}
+                          {t(`createDialog.repeat${id.charAt(0).toUpperCase()}${id.slice(1)}`)}
                         </button>
                       ))}
                     </div>
@@ -483,7 +476,9 @@ export function CreateSessionDialog({
                     <div className="space-y-4 rounded-xl border border-border bg-muted/40 p-4">
                       {/* Interval */}
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">Every</span>
+                        <span className="text-sm text-muted-foreground">
+                          {t("createDialog.every")}
+                        </span>
                         <div className="flex items-center gap-2">
                           <select
                             value={interval}
@@ -498,12 +493,8 @@ export function CreateSessionDialog({
                           </select>
                           <span className="text-sm text-muted-foreground">
                             {recurrence === "weekly"
-                              ? interval === 1
-                                ? "week"
-                                : "weeks"
-                              : interval === 1
-                                ? "month"
-                                : "months"}
+                              ? t("createDialog.intervalWeek", { count: interval })
+                              : t("createDialog.intervalMonth", { count: interval })}
                           </span>
                         </div>
                       </div>
@@ -511,20 +502,22 @@ export function CreateSessionDialog({
                       {/* Day of Week (for weekly) */}
                       {recurrence === "weekly" && (
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-muted-foreground">On</span>
+                          <span className="text-sm text-muted-foreground">
+                            {t("createDialog.on")}
+                          </span>
                           <div className="flex gap-1">
-                            {WEEKDAYS.map((day) => (
+                            {WEEKDAYS.map((value) => (
                               <button
-                                key={day.value}
+                                key={value}
                                 type="button"
-                                onClick={() => setDayOfWeek(day.value)}
+                                onClick={() => setDayOfWeek(value)}
                                 className={`h-8 w-8 rounded-lg text-xs font-medium transition-colors ${
-                                  dayOfWeek === day.value
+                                  dayOfWeek === value
                                     ? "bg-purple-600 text-white"
                                     : "bg-muted text-muted-foreground hover:bg-accent"
                                 }`}
                               >
-                                {day.label}
+                                {t(`weekdays.${value}`)}
                               </button>
                             ))}
                           </div>
@@ -533,7 +526,9 @@ export function CreateSessionDialog({
 
                       {/* Generate Count */}
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">Total sessions</span>
+                        <span className="text-sm text-muted-foreground">
+                          {t("createDialog.totalSessions")}
+                        </span>
                         <div className="flex items-center gap-2">
                           <button
                             type="button"
@@ -561,7 +556,7 @@ export function CreateSessionDialog({
                   {previewDates.length > 0 && (
                     <div className="rounded-xl border border-border bg-muted/40 p-4">
                       <p className="mb-2 text-xs font-medium uppercase text-zinc-500">
-                        Upcoming sessions
+                        {t("createDialog.upcomingSessions")}
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {previewDates.map((date, i) => (
@@ -574,7 +569,7 @@ export function CreateSessionDialog({
                         ))}
                         {generateCount > 6 && (
                           <span className="rounded-lg bg-muted px-2 py-1 text-xs text-muted-foreground">
-                            +{generateCount - 6} more
+                            {t("createDialog.moreCount", { count: generateCount - 6 })}
                           </span>
                         )}
                       </div>
@@ -597,10 +592,10 @@ export function CreateSessionDialog({
                   />
                   <div>
                     <p className="text-sm font-medium text-foreground">
-                      Auto-post in community feed
+                      {t("createDialog.autoPostTitle")}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      Members will be notified about this session
+                      {t("createDialog.autoPostHint")}
                     </p>
                   </div>
                 </label>
@@ -621,7 +616,7 @@ export function CreateSessionDialog({
                   disabled={isLoading}
                   className="flex-1 rounded-xl border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-accent"
                 >
-                  Cancel
+                  {t("createDialog.cancel")}
                 </button>
                 <button
                   type="submit"
@@ -634,20 +629,20 @@ export function CreateSessionDialog({
                 >
                   {isLoading
                     ? mode === "now"
-                      ? "Starting..."
-                      : "Creating..."
+                      ? t("createDialog.starting")
+                      : t("createDialog.creating")
                     : mode === "now"
-                      ? "Start Live Session"
+                      ? t("createDialog.submitStartNow")
                       : recurrence === "once"
-                        ? "Create Session"
-                        : "Create Sessions"}
+                        ? t("createDialog.submitOnce")
+                        : t("createDialog.submitRecurring")}
                 </button>
               </div>
 
               {/* Subtle count text */}
               {mode === "scheduled" && recurrence !== "once" && (
                 <p className="text-center text-xs text-muted-foreground">
-                  {generateCount} sessions will be created
+                  {t("createDialog.willBeCreated", { count: generateCount })}
                 </p>
               )}
             </form>

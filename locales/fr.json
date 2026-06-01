@@ -664,6 +664,66 @@
             "lessonDeleteFailed": "Échec de la suppression de la leçon"
           }
         }
+      },
+      "sessions": {
+        "weekdays": {
+          "0": "dim",
+          "1": "lun",
+          "2": "mar",
+          "3": "mer",
+          "4": "jeu",
+          "5": "ven",
+          "6": "sam"
+        },
+        "createDialog": {
+          "triggerDefault": "Créer une session",
+          "title": "Créer une session en direct",
+          "subtitle": "Commencez maintenant ou planifiez pour plus tard",
+          "modeNow": "Commencer maintenant",
+          "modeScheduled": "Planifier",
+          "typeVideo": "Vidéo",
+          "typeAudio": "Audio uniquement",
+          "titleLabel": "Titre de la session",
+          "titlePlaceholder": "Ex. : Appel de coaching hebdomadaire",
+          "descriptionLabel": "Description",
+          "descriptionOptional": "(facultatif)",
+          "descriptionPlaceholder": "Que couvrira cette session ?",
+          "durationLabel": "Durée (minutes)",
+          "dateTimeLabel": "Date et heure",
+          "timezoneLabel": "Fuseau horaire",
+          "yourTime": "Votre heure : {tz}",
+          "weeklyTip": "⭐ Les sessions hebdomadaires triplent l'engagement",
+          "repeatLabel": "Répéter",
+          "repeatOnce": "Une fois",
+          "repeatWeekly": "Hebdomadaire",
+          "repeatMonthly": "Mensuel",
+          "every": "Tous les",
+          "intervalWeek": "{count, plural, =1 {semaine} other {semaines}}",
+          "intervalMonth": "{count, plural, =1 {mois} other {mois}}",
+          "on": "Le",
+          "totalSessions": "Sessions au total",
+          "upcomingSessions": "Prochaines sessions",
+          "moreCount": "+{count} de plus",
+          "autoPostTitle": "Publier automatiquement dans le fil de la communauté",
+          "autoPostHint": "Les membres seront notifiés de cette session",
+          "summaryWeekly": "{count} sessions toutes les {interval, plural, =1 {semaine} other {# semaines}} le {day}",
+          "summaryMonthly": "{count} sessions tous les {interval, plural, =1 {mois} other {# mois}}",
+          "willBeCreated": "{count} sessions seront créées",
+          "cancel": "Annuler",
+          "starting": "Démarrage...",
+          "creating": "Création...",
+          "submitStartNow": "Démarrer la session en direct",
+          "submitOnce": "Créer la session",
+          "submitRecurring": "Créer les sessions",
+          "toasts": {
+            "started": "Session en direct démarrée !",
+            "startFailed": "Échec du démarrage de la session",
+            "scheduledRecurring": "{count} sessions planifiées !",
+            "scheduledOnce": "Session planifiée avec succès !",
+            "createFailed": "Échec de la création de la session",
+            "unexpectedError": "Une erreur inattendue s'est produite"
+          }
+        }
       }
     },
     "calendar": {

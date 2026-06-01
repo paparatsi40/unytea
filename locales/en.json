@@ -665,6 +665,66 @@
             "lessonDeleteFailed": "Failed to delete lesson"
           }
         }
+      },
+      "sessions": {
+        "weekdays": {
+          "0": "Sun",
+          "1": "Mon",
+          "2": "Tue",
+          "3": "Wed",
+          "4": "Thu",
+          "5": "Fri",
+          "6": "Sat"
+        },
+        "createDialog": {
+          "triggerDefault": "Create Session",
+          "title": "Create Live Session",
+          "subtitle": "Start now or schedule for later",
+          "modeNow": "Start now",
+          "modeScheduled": "Schedule",
+          "typeVideo": "Video",
+          "typeAudio": "Audio only",
+          "titleLabel": "Session Title",
+          "titlePlaceholder": "e.g., Weekly Coaching Call",
+          "descriptionLabel": "Description",
+          "descriptionOptional": "(optional)",
+          "descriptionPlaceholder": "What will this session cover?",
+          "durationLabel": "Duration (minutes)",
+          "dateTimeLabel": "Date & Time",
+          "timezoneLabel": "Timezone",
+          "yourTime": "Your time: {tz}",
+          "weeklyTip": "⭐ Weekly sessions boost engagement 3x",
+          "repeatLabel": "Repeat",
+          "repeatOnce": "Once",
+          "repeatWeekly": "Weekly",
+          "repeatMonthly": "Monthly",
+          "every": "Every",
+          "intervalWeek": "{count, plural, =1 {week} other {weeks}}",
+          "intervalMonth": "{count, plural, =1 {month} other {months}}",
+          "on": "On",
+          "totalSessions": "Total sessions",
+          "upcomingSessions": "Upcoming sessions",
+          "moreCount": "+{count} more",
+          "autoPostTitle": "Auto-post in community feed",
+          "autoPostHint": "Members will be notified about this session",
+          "summaryWeekly": "{count} sessions every {interval, plural, =1 {week} other {# weeks}} on {day}",
+          "summaryMonthly": "{count} sessions every {interval, plural, =1 {month} other {# months}}",
+          "willBeCreated": "{count} sessions will be created",
+          "cancel": "Cancel",
+          "starting": "Starting...",
+          "creating": "Creating...",
+          "submitStartNow": "Start Live Session",
+          "submitOnce": "Create Session",
+          "submitRecurring": "Create Sessions",
+          "toasts": {
+            "started": "Live session started!",
+            "startFailed": "Failed to start session",
+            "scheduledRecurring": "{count} sessions scheduled!",
+            "scheduledOnce": "Session scheduled successfully!",
+            "createFailed": "Failed to create session",
+            "unexpectedError": "An unexpected error occurred"
+          }
+        }
       }
     },
     "calendar": {

@@ -665,6 +665,66 @@
             "lessonDeleteFailed": "No se pudo eliminar la lección"
           }
         }
+      },
+      "sessions": {
+        "weekdays": {
+          "0": "dom",
+          "1": "lun",
+          "2": "mar",
+          "3": "mié",
+          "4": "jue",
+          "5": "vie",
+          "6": "sáb"
+        },
+        "createDialog": {
+          "triggerDefault": "Crear sesión",
+          "title": "Crear sesión en vivo",
+          "subtitle": "Empieza ahora o programa para más tarde",
+          "modeNow": "Empezar ahora",
+          "modeScheduled": "Programar",
+          "typeVideo": "Video",
+          "typeAudio": "Solo audio",
+          "titleLabel": "Título de la sesión",
+          "titlePlaceholder": "Ej.: Llamada de coaching semanal",
+          "descriptionLabel": "Descripción",
+          "descriptionOptional": "(opcional)",
+          "descriptionPlaceholder": "¿Qué cubrirá esta sesión?",
+          "durationLabel": "Duración (minutos)",
+          "dateTimeLabel": "Fecha y hora",
+          "timezoneLabel": "Zona horaria",
+          "yourTime": "Tu hora: {tz}",
+          "weeklyTip": "⭐ Las sesiones semanales triplican la participación",
+          "repeatLabel": "Repetir",
+          "repeatOnce": "Una vez",
+          "repeatWeekly": "Semanal",
+          "repeatMonthly": "Mensual",
+          "every": "Cada",
+          "intervalWeek": "{count, plural, =1 {semana} other {semanas}}",
+          "intervalMonth": "{count, plural, =1 {mes} other {meses}}",
+          "on": "El",
+          "totalSessions": "Sesiones totales",
+          "upcomingSessions": "Próximas sesiones",
+          "moreCount": "+{count} más",
+          "autoPostTitle": "Publicar automáticamente en el feed de la comunidad",
+          "autoPostHint": "Se notificará a los miembros sobre esta sesión",
+          "summaryWeekly": "{count} sesiones cada {interval, plural, =1 {semana} other {# semanas}} el {day}",
+          "summaryMonthly": "{count} sesiones cada {interval, plural, =1 {mes} other {# meses}}",
+          "willBeCreated": "Se crearán {count} sesiones",
+          "cancel": "Cancelar",
+          "starting": "Empezando...",
+          "creating": "Creando...",
+          "submitStartNow": "Iniciar sesión en vivo",
+          "submitOnce": "Crear sesión",
+          "submitRecurring": "Crear sesiones",
+          "toasts": {
+            "started": "¡Sesión en vivo iniciada!",
+            "startFailed": "No se pudo iniciar la sesión",
+            "scheduledRecurring": "¡{count} sesiones programadas!",
+            "scheduledOnce": "¡Sesión programada con éxito!",
+            "createFailed": "No se pudo crear la sesión",
+            "unexpectedError": "Ocurrió un error inesperado"
+          }
+        }
       }
     },
     "calendar": {
