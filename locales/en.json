@@ -343,6 +343,15 @@
     "continue": "Continue"
   },
   "dashboard": {
+    "library": {
+      "title": "Library",
+      "subtitle": "Your courses, recordings, and resources",
+      "tabs": {
+        "courses": "Courses",
+        "recordings": "Recordings",
+        "resources": "Resources"
+      }
+    },
     "title": "Dashboard",
     "welcome": "Welcome back",
     "stats": {

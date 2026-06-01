@@ -342,6 +342,15 @@
     "continue": "Continuer"
   },
   "dashboard": {
+    "library": {
+      "title": "Bibliothèque",
+      "subtitle": "Vos cours, enregistrements et ressources",
+      "tabs": {
+        "courses": "Cours",
+        "recordings": "Enregistrements",
+        "resources": "Ressources"
+      }
+    },
     "title": "Tableau de Bord",
     "welcome": "Bienvenue",
     "stats": {

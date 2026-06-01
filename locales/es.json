@@ -343,6 +343,15 @@
     "continue": "Continuar"
   },
   "dashboard": {
+    "library": {
+      "title": "Biblioteca",
+      "subtitle": "Tus cursos, grabaciones y recursos",
+      "tabs": {
+        "courses": "Cursos",
+        "recordings": "Grabaciones",
+        "resources": "Recursos"
+      }
+    },
     "title": "Panel",
     "welcome": "Bienvenido de vuelta",
     "stats": {
