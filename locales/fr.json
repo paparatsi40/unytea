@@ -341,6 +341,151 @@
     }
   },
   "dashboard": {
+    "accountSettings": {
+      "shell": {
+        "header": "Paramètres",
+        "subtitle": "Gérez votre compte et vos préférences"
+      },
+      "nav": {
+        "profile": { "name": "Profil", "description": "Gérez vos informations personnelles" },
+        "notifications": {
+          "name": "Notifications",
+          "description": "Configurez les préférences de notification"
+        },
+        "billing": { "name": "Facturation", "description": "Gérez l'abonnement et les paiements" },
+        "appearance": { "name": "Apparence", "description": "Personnalisez votre expérience" },
+        "integrations": { "name": "Intégrations", "description": "Connectez des services tiers" }
+      },
+      "account": {
+        "title": "Paramètres du compte",
+        "timezoneLabel": "Fuseau horaire",
+        "timezoneHint": "Utilisé pour afficher les dates et planifier les sessions",
+        "saveButton": "Enregistrer les paramètres",
+        "savingButton": "Enregistrement...",
+        "toasts": {
+          "saved": "Paramètres du compte enregistrés !",
+          "saveFailed": "Échec de l'enregistrement"
+        },
+        "security": {
+          "title": "Sécurité et accès",
+          "passwordTitle": "Mot de passe et connexion",
+          "passwordDescription": "Gérez la façon dont vous vous connectez et récupérez l'accès à votre compte.",
+          "changePasswordButton": "Changer le mot de passe",
+          "changePasswordPlaceholderToast": "Le flux de réinitialisation du mot de passe sera bientôt disponible.",
+          "sessionTitle": "Session",
+          "sessionDescription": "Déconnectez-vous de cet appareil immédiatement.",
+          "logoutButton": "Se déconnecter maintenant"
+        },
+        "danger": {
+          "title": "Zone de danger",
+          "deleteTitle": "Supprimer le compte",
+          "deleteDescription": "Supprimez définitivement votre compte et toutes vos données. Cette action est irréversible.",
+          "deleteButton": "Supprimer le compte",
+          "confirmPrompt": "Êtes-vous absolument sûr ? Cette action est irréversible !",
+          "deleteDisabledToast": "La suppression de compte est temporairement désactivée"
+        }
+      },
+      "appearance": {
+        "themeTitle": "Thème",
+        "themeSubtitle": "Choisissez l'apparence d'Unytea pour vous",
+        "themes": {
+          "light": { "label": "Clair", "description": "Thème clair" },
+          "dark": { "label": "Sombre", "description": "Thème sombre" },
+          "system": { "label": "Système", "description": "Suivre le système" }
+        },
+        "saveButton": "Enregistrer le thème",
+        "savingButton": "Enregistrement...",
+        "toasts": {
+          "saved": "Apparence enregistrée !",
+          "saveFailed": "Échec de l'enregistrement"
+        },
+        "communityTitle": "Apparence de la communauté",
+        "communitySubtitle": "Personnalisez la page d'accueil, les sections et la structure visuelle de chaque communauté.",
+        "noCommunities": "Vous n'avez pas encore de communautés. Créez-en une pour personnaliser son apparence.",
+        "communityLabel": "Communauté",
+        "landingCard": {
+          "title": "Constructeur de page d'accueil",
+          "description": "Modifiez le hero, les sections et la structure de la page"
+        },
+        "sectionsCard": {
+          "title": "Préréglages de sections",
+          "description": "Réorganisez, affichez/masquez et configurez les sections"
+        }
+      },
+      "privacy": {
+        "title": "Paramètres de confidentialité",
+        "profileVisibilityLabel": "Visibilité du profil",
+        "visibility": {
+          "public": "Public - Tout le monde peut voir",
+          "members": "Membres uniquement - Membres de la communauté",
+          "private": "Privé - Vous uniquement"
+        },
+        "allowMessagesLabel": "Qui peut vous envoyer des messages",
+        "messages": {
+          "everyone": "Tout le monde",
+          "members": "Les membres de mes communautés",
+          "none": "Personne"
+        },
+        "showEmail": {
+          "label": "Afficher l'e-mail",
+          "description": "Rendez votre e-mail visible sur votre profil"
+        },
+        "showActivity": {
+          "label": "Afficher l'activité",
+          "description": "Affichez votre activité récente"
+        },
+        "saveButton": "Enregistrer les paramètres de confidentialité",
+        "savingButton": "Enregistrement...",
+        "toasts": {
+          "saved": "Paramètres de confidentialité enregistrés !",
+          "saveFailed": "Échec de l'enregistrement"
+        }
+      },
+      "notifications": {
+        "title": "Préférences de notification",
+        "email": {
+          "label": "Notifications par e-mail",
+          "description": "Recevez des notifications par e-mail"
+        },
+        "comments": {
+          "label": "Commentaires",
+          "description": "Quand quelqu'un commente votre publication"
+        },
+        "mentions": { "label": "Mentions", "description": "Quand quelqu'un vous mentionne" },
+        "reactions": {
+          "label": "Réactions",
+          "description": "Quand quelqu'un réagit à votre contenu"
+        },
+        "buddyRequests": {
+          "label": "Demandes de partenaire",
+          "description": "Quand quelqu'un veut être votre partenaire"
+        },
+        "saveButton": "Enregistrer les préférences",
+        "savingButton": "Enregistrement...",
+        "toasts": {
+          "saved": "Préférences enregistrées !",
+          "saveFailed": "Échec de l'enregistrement"
+        }
+      },
+      "integrations": {
+        "title": "Intégrations",
+        "subtitle": "Connectez des services tiers pour enrichir votre communauté",
+        "comingSoon": "Bientôt disponible",
+        "configure": "Configurer",
+        "items": {
+          "stripe": { "description": "Acceptez les paiements pour les cours et les abonnements" },
+          "zoom": { "description": "Organisez des sessions vidéo avec l'intégration Zoom" },
+          "googleCalendar": { "description": "Synchronisez vos sessions avec Google Calendar" },
+          "zapier": { "description": "Connectez Unytea à plus de 5 000 applications" },
+          "slack": { "description": "Recevez les notifications de la communauté dans Slack" },
+          "discord": { "description": "Reliez votre communauté à Discord" }
+        },
+        "request": {
+          "title": "Demander une intégration",
+          "body": "Besoin d'une intégration spécifique ? Écrivez-nous à <email>support@unytea.com</email> et nous envisagerons de l'ajouter."
+        }
+      }
+    },
     "communityAdmin": {
       "gate": {
         "backToCommunities": "Retour aux communautés",

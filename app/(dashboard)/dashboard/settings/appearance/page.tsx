@@ -5,6 +5,15 @@ import Link from "next/link";
 import { Check, Sun, Moon, Monitor, Eye, LayoutTemplate, Sliders } from "lucide-react";
 import { updateAccountSettings } from "@/app/actions/settings";
 import { toast } from "react-hot-toast";
+import { useTranslations } from "next-intl";
+
+// Theme enum values double as i18n keys; labels/descriptions resolved via
+// t(`themes.${key}.{label,description}`) in render (helper-returns-key).
+const THEME_OPTIONS = [
+  { key: "light", Icon: Sun },
+  { key: "dark", Icon: Moon },
+  { key: "system", Icon: Monitor },
+] as const;
 
 type Community = {
   id: string;
@@ -14,6 +23,7 @@ type Community = {
 };
 
 export default function AppearancePage() {
+  const t = useTranslations("dashboard.accountSettings.appearance");
   const [loading, setLoading] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark" | "system">("system");
   const [communities, setCommunities] = useState<Community[]>([]);
@@ -62,9 +72,9 @@ export default function AppearancePage() {
     const result = await updateAccountSettings({ theme });
 
     if (result.success) {
-      toast.success("Appearance saved!");
+      toast.success(t("toasts.saved"));
     } else {
-      toast.error(result.error || "Failed to save");
+      toast.error(result.error || t("toasts.saveFailed"));
     }
     setLoading(false);
   };
@@ -72,48 +82,25 @@ export default function AppearancePage() {
   return (
     <div className="space-y-6">
       <div className="rounded-xl border border-border bg-card p-6">
-        <h2 className="mb-4 text-xl font-bold text-foreground">Theme</h2>
-        <p className="mb-6 text-sm text-muted-foreground">Choose how Unytea looks to you</p>
+        <h2 className="mb-4 text-xl font-bold text-foreground">{t("themeTitle")}</h2>
+        <p className="mb-6 text-sm text-muted-foreground">{t("themeSubtitle")}</p>
 
         <div className="grid gap-4 md:grid-cols-3">
-          <button
-            onClick={() => setTheme("light")}
-            className={`rounded-xl border-2 p-6 transition-all ${
-              theme === "light"
-                ? "border-primary bg-primary/5"
-                : "border-border hover:border-border/60"
-            }`}
-          >
-            <Sun className="mx-auto mb-3 h-8 w-8" />
-            <p className="font-semibold text-foreground">Light</p>
-            <p className="mt-1 text-sm text-muted-foreground">Light theme</p>
-          </button>
-
-          <button
-            onClick={() => setTheme("dark")}
-            className={`rounded-xl border-2 p-6 transition-all ${
-              theme === "dark"
-                ? "border-primary bg-primary/5"
-                : "border-border hover:border-border/60"
-            }`}
-          >
-            <Moon className="mx-auto mb-3 h-8 w-8" />
-            <p className="font-semibold text-foreground">Dark</p>
-            <p className="mt-1 text-sm text-muted-foreground">Dark theme</p>
-          </button>
-
-          <button
-            onClick={() => setTheme("system")}
-            className={`rounded-xl border-2 p-6 transition-all ${
-              theme === "system"
-                ? "border-primary bg-primary/5"
-                : "border-border hover:border-border/60"
-            }`}
-          >
-            <Monitor className="mx-auto mb-3 h-8 w-8" />
-            <p className="font-semibold text-foreground">System</p>
-            <p className="mt-1 text-sm text-muted-foreground">Match system</p>
-          </button>
+          {THEME_OPTIONS.map(({ key, Icon }) => (
+            <button
+              key={key}
+              onClick={() => setTheme(key)}
+              className={`rounded-xl border-2 p-6 transition-all ${
+                theme === key
+                  ? "border-primary bg-primary/5"
+                  : "border-border hover:border-border/60"
+              }`}
+            >
+              <Icon className="mx-auto mb-3 h-8 w-8" />
+              <p className="font-semibold text-foreground">{t(`themes.${key}.label`)}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{t(`themes.${key}.description`)}</p>
+            </button>
+          ))}
         </div>
 
         <div className="mt-6">
@@ -123,7 +110,7 @@ export default function AppearancePage() {
             className="flex items-center gap-2 rounded-lg bg-primary px-6 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
           >
             <Check className="h-4 w-4" />
-            {loading ? "Saving..." : "Save Theme"}
+            {loading ? t("savingButton") : t("saveButton")}
           </button>
         </div>
       </div>
@@ -131,20 +118,18 @@ export default function AppearancePage() {
       <div className="rounded-xl border border-border bg-card p-6">
         <div className="mb-4 flex items-center gap-2">
           <Eye className="h-5 w-5 text-muted-foreground" />
-          <h2 className="text-xl font-bold text-foreground">Community Appearance</h2>
+          <h2 className="text-xl font-bold text-foreground">{t("communityTitle")}</h2>
         </div>
-        <p className="mb-4 text-sm text-muted-foreground">
-          Customize landing, sections, and visual structure for each community.
-        </p>
+        <p className="mb-4 text-sm text-muted-foreground">{t("communitySubtitle")}</p>
 
         {communities.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            You don’t have communities yet. Create one to customize its appearance.
-          </p>
+          <p className="text-sm text-muted-foreground">{t("noCommunities")}</p>
         ) : (
           <div className="space-y-4">
             <div>
-              <label className="mb-2 block text-sm font-medium text-foreground">Community</label>
+              <label className="mb-2 block text-sm font-medium text-foreground">
+                {t("communityLabel")}
+              </label>
               <select
                 value={selectedSlug}
                 onChange={(e) => setSelectedSlug(e.target.value)}
@@ -162,24 +147,20 @@ export default function AppearancePage() {
               <Link href={`/dashboard/c/${selectedSlug}/settings/landing`}>
                 <button className="w-full rounded-lg border border-border px-4 py-3 text-left hover:bg-muted">
                   <div className="mb-1 flex items-center justify-between">
-                    <span className="font-medium text-foreground">Landing Page Builder</span>
+                    <span className="font-medium text-foreground">{t("landingCard.title")}</span>
                     <LayoutTemplate className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    Edit hero, sections, and page structure
-                  </p>
+                  <p className="text-xs text-muted-foreground">{t("landingCard.description")}</p>
                 </button>
               </Link>
 
               <Link href={`/dashboard/c/${selectedSlug}/settings/sections`}>
                 <button className="w-full rounded-lg border border-border px-4 py-3 text-left hover:bg-muted">
                   <div className="mb-1 flex items-center justify-between">
-                    <span className="font-medium text-foreground">Section Presets</span>
+                    <span className="font-medium text-foreground">{t("sectionsCard.title")}</span>
                     <Sliders className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    Reorder, show/hide, and configure sections
-                  </p>
+                  <p className="text-xs text-muted-foreground">{t("sectionsCard.description")}</p>
                 </button>
               </Link>
             </div>

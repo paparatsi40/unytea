@@ -342,6 +342,142 @@
     }
   },
   "dashboard": {
+    "accountSettings": {
+      "shell": {
+        "header": "Settings",
+        "subtitle": "Manage your account and preferences"
+      },
+      "nav": {
+        "profile": { "name": "Profile", "description": "Manage your personal information" },
+        "notifications": {
+          "name": "Notifications",
+          "description": "Configure notification preferences"
+        },
+        "billing": { "name": "Billing", "description": "Manage subscription and payments" },
+        "appearance": { "name": "Appearance", "description": "Customize your experience" },
+        "integrations": { "name": "Integrations", "description": "Connect third-party services" }
+      },
+      "account": {
+        "title": "Account Settings",
+        "timezoneLabel": "Timezone",
+        "timezoneHint": "Used for displaying dates and scheduling sessions",
+        "saveButton": "Save Settings",
+        "savingButton": "Saving...",
+        "toasts": {
+          "saved": "Account settings saved!",
+          "saveFailed": "Failed to save"
+        },
+        "security": {
+          "title": "Security & Access",
+          "passwordTitle": "Password & Sign-in",
+          "passwordDescription": "Manage how you sign in and recover your account access.",
+          "changePasswordButton": "Change password",
+          "changePasswordPlaceholderToast": "Password reset flow will be enabled next.",
+          "sessionTitle": "Session",
+          "sessionDescription": "Sign out from this device immediately.",
+          "logoutButton": "Log out now"
+        },
+        "danger": {
+          "title": "Danger Zone",
+          "deleteTitle": "Delete Account",
+          "deleteDescription": "Permanently delete your account and all of your data. This action cannot be undone.",
+          "deleteButton": "Delete Account",
+          "confirmPrompt": "Are you absolutely sure? This cannot be undone!",
+          "deleteDisabledToast": "Account deletion temporarily disabled"
+        }
+      },
+      "appearance": {
+        "themeTitle": "Theme",
+        "themeSubtitle": "Choose how Unytea looks to you",
+        "themes": {
+          "light": { "label": "Light", "description": "Light theme" },
+          "dark": { "label": "Dark", "description": "Dark theme" },
+          "system": { "label": "System", "description": "Match system" }
+        },
+        "saveButton": "Save Theme",
+        "savingButton": "Saving...",
+        "toasts": {
+          "saved": "Appearance saved!",
+          "saveFailed": "Failed to save"
+        },
+        "communityTitle": "Community Appearance",
+        "communitySubtitle": "Customize landing, sections, and visual structure for each community.",
+        "noCommunities": "You don’t have communities yet. Create one to customize its appearance.",
+        "communityLabel": "Community",
+        "landingCard": {
+          "title": "Landing Page Builder",
+          "description": "Edit hero, sections, and page structure"
+        },
+        "sectionsCard": {
+          "title": "Section Presets",
+          "description": "Reorder, show/hide, and configure sections"
+        }
+      },
+      "privacy": {
+        "title": "Privacy Settings",
+        "profileVisibilityLabel": "Profile Visibility",
+        "visibility": {
+          "public": "Public - Everyone can see",
+          "members": "Members Only - Community members",
+          "private": "Private - Only you"
+        },
+        "allowMessagesLabel": "Who can send you messages",
+        "messages": {
+          "everyone": "Everyone",
+          "members": "Members of my communities",
+          "none": "No one"
+        },
+        "showEmail": {
+          "label": "Show Email",
+          "description": "Make your email visible on your profile"
+        },
+        "showActivity": {
+          "label": "Show Activity",
+          "description": "Display your recent activity"
+        },
+        "saveButton": "Save Privacy Settings",
+        "savingButton": "Saving...",
+        "toasts": {
+          "saved": "Privacy settings saved!",
+          "saveFailed": "Failed to save"
+        }
+      },
+      "notifications": {
+        "title": "Notification Preferences",
+        "email": {
+          "label": "Email Notifications",
+          "description": "Receive notifications via email"
+        },
+        "comments": { "label": "Comments", "description": "When someone comments on your post" },
+        "mentions": { "label": "Mentions", "description": "When someone mentions you" },
+        "reactions": { "label": "Reactions", "description": "When someone reacts to your content" },
+        "buddyRequests": {
+          "label": "Buddy Requests",
+          "description": "When someone wants to be your buddy"
+        },
+        "saveButton": "Save Preferences",
+        "savingButton": "Saving...",
+        "toasts": { "saved": "Preferences saved!", "saveFailed": "Failed to save" }
+      },
+      "integrations": {
+        "title": "Integrations",
+        "subtitle": "Connect third-party services to enhance your community",
+        "comingSoon": "Coming Soon",
+        "configure": "Configure",
+        "items": {
+          "stripe": { "description": "Accept payments for courses and memberships" },
+          "zoom": { "description": "Host video sessions with Zoom integration" },
+          "googleCalendar": { "description": "Sync your sessions with Google Calendar" },
+          "zapier": { "description": "Connect Unytea with 5,000+ apps" },
+          "slack": { "description": "Get community notifications in Slack" },
+          "discord": { "description": "Bridge your community with Discord" }
+        },
+        "request": {
+          "title": "Request an Integration",
+          "body": "Need a specific integration? Let us know at <email>support@unytea.com</email> and we’ll consider adding it."
+        }
+      }
+    },
     "communityAdmin": {
       "gate": {
         "backToCommunities": "Back to Communities",
