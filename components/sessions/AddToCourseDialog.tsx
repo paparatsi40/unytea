@@ -22,6 +22,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BookOpen, Plus, Loader2, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import {
   addSessionToCourse,
   getAvailableCourses,
@@ -53,6 +54,7 @@ export function AddToCourseDialog({
   onOpenChange,
   onSuccess,
 }: AddToCourseDialogProps) {
+  const t = useTranslations("liveSession.addToCourse");
   const [activeTab, setActiveTab] = useState("existing");
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(false);
@@ -83,10 +85,10 @@ export function AddToCourseDialog({
       if (result.success) {
         setCourses(result.courses || []);
       } else {
-        toast.error("Failed to load courses");
+        toast.error(t("toasts.loadFailed"));
       }
     } catch (error) {
-      toast.error("Error loading courses");
+      toast.error(t("toasts.loadError"));
     } finally {
       setFetchingCourses(false);
     }
@@ -96,7 +98,7 @@ export function AddToCourseDialog({
 
   async function handleAddToExistingCourse() {
     if (!selectedCourseId) {
-      toast.error("Please select a course");
+      toast.error(t("validation.selectCourse"));
       return;
     }
 
@@ -110,14 +112,14 @@ export function AddToCourseDialog({
       });
 
       if (result.success) {
-        toast.success(result.message || "Session added to course!");
+        toast.success(result.message || t("toasts.added"));
         onOpenChange(false);
         onSuccess?.();
       } else {
-        toast.error(result.error || "Failed to add session");
+        toast.error(result.error || t("toasts.addFailed"));
       }
     } catch (error) {
-      toast.error("Error adding session to course");
+      toast.error(t("toasts.addError"));
     } finally {
       setLoading(false);
     }
@@ -125,7 +127,7 @@ export function AddToCourseDialog({
 
   async function handleCreateNewCourse() {
     if (!newCourseTitle.trim()) {
-      toast.error("Please enter a course title");
+      toast.error(t("validation.enterTitle"));
       return;
     }
 
@@ -139,14 +141,14 @@ export function AddToCourseDialog({
       });
 
       if (result.success) {
-        toast.success(result.message || "Course created successfully!");
+        toast.success(result.message || t("toasts.created"));
         onOpenChange(false);
         onSuccess?.();
       } else {
-        toast.error(result.error || "Failed to create course");
+        toast.error(result.error || t("toasts.createFailed"));
       }
     } catch (error) {
-      toast.error("Error creating course");
+      toast.error(t("toasts.createError"));
     } finally {
       setLoading(false);
     }
@@ -158,11 +160,9 @@ export function AddToCourseDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <BookOpen className="h-5 w-5 text-purple-500" />
-            Add Session to Course
+            {t("title")}
           </DialogTitle>
-          <DialogDescription className="text-zinc-400">
-            Convert this live session into permanent course content
-          </DialogDescription>
+          <DialogDescription className="text-zinc-400">{t("subtitle")}</DialogDescription>
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -171,13 +171,13 @@ export function AddToCourseDialog({
               value="existing"
               className="data-[state=active]:bg-zinc-700 data-[state=active]:text-white"
             >
-              Existing Course
+              {t("tabExisting")}
             </TabsTrigger>
             <TabsTrigger
               value="new"
               className="data-[state=active]:bg-zinc-700 data-[state=active]:text-white"
             >
-              Create New
+              {t("tabNew")}
             </TabsTrigger>
           </TabsList>
 
@@ -189,19 +189,19 @@ export function AddToCourseDialog({
               </div>
             ) : courses.length === 0 ? (
               <div className="py-6 text-center">
-                <p className="text-zinc-400">No courses found in this community.</p>
+                <p className="text-zinc-400">{t("existing.noCourses")}</p>
                 <Button
                   variant="link"
                   className="text-purple-400"
                   onClick={() => setActiveTab("new")}
                 >
-                  Create a new course instead
+                  {t("existing.createNewInstead")}
                 </Button>
               </div>
             ) : (
               <>
                 <div className="space-y-2">
-                  <Label className="text-zinc-300">Select Course</Label>
+                  <Label className="text-zinc-300">{t("existing.courseLabel")}</Label>
                   <Select
                     value={selectedCourseId}
                     onValueChange={(value) => {
@@ -210,7 +210,7 @@ export function AddToCourseDialog({
                     }}
                   >
                     <SelectTrigger className="border-zinc-700 bg-zinc-800 text-white">
-                      <SelectValue placeholder="Choose a course..." />
+                      <SelectValue placeholder={t("existing.coursePlaceholder")} />
                     </SelectTrigger>
                     <SelectContent className="border-zinc-700 bg-zinc-800">
                       {courses.map((course) => (
@@ -222,7 +222,7 @@ export function AddToCourseDialog({
                           <div className="flex items-center gap-2">
                             <span>{course.title}</span>
                             <span className="text-xs text-zinc-500">
-                              ({course._count.enrollments} enrolled)
+                              ({t("existing.enrolled", { count: course._count.enrollments })})
                             </span>
                           </div>
                         </SelectItem>
@@ -233,12 +233,10 @@ export function AddToCourseDialog({
 
                 {selectedCourse && selectedCourse.modules.length > 0 && (
                   <div className="space-y-2">
-                    <Label className="text-zinc-300">
-                      Module (optional - auto-creates &quot;Live Sessions&quot; if empty)
-                    </Label>
+                    <Label className="text-zinc-300">{t("existing.moduleLabel")}</Label>
                     <Select value={selectedModuleId} onValueChange={setSelectedModuleId}>
                       <SelectTrigger className="border-zinc-700 bg-zinc-800 text-white">
-                        <SelectValue placeholder="Select module or leave empty..." />
+                        <SelectValue placeholder={t("existing.modulePlaceholder")} />
                       </SelectTrigger>
                       <SelectContent className="border-zinc-700 bg-zinc-800">
                         {selectedCourse.modules.map((module) => (
@@ -256,11 +254,11 @@ export function AddToCourseDialog({
                 )}
 
                 <div className="space-y-2">
-                  <Label className="text-zinc-300">Lesson Title</Label>
+                  <Label className="text-zinc-300">{t("existing.lessonTitleLabel")}</Label>
                   <Input
                     value={lessonTitle}
                     onChange={(e) => setLessonTitle(e.target.value)}
-                    placeholder="Enter lesson title"
+                    placeholder={t("existing.lessonTitlePlaceholder")}
                     className="border-zinc-700 bg-zinc-800 text-white"
                   />
                 </div>
@@ -274,7 +272,7 @@ export function AddToCourseDialog({
                     className="rounded border-zinc-600 bg-zinc-700 text-purple-500"
                   />
                   <Label htmlFor="isFree" className="text-sm text-zinc-300">
-                    Make this lesson free (preview)
+                    {t("existing.makeFree")}
                   </Label>
                 </div>
 
@@ -286,12 +284,12 @@ export function AddToCourseDialog({
                   {loading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Adding...
+                      {t("existing.adding")}
                     </>
                   ) : (
                     <>
                       <CheckCircle className="mr-2 h-4 w-4" />
-                      Add to Course
+                      {t("existing.submit")}
                     </>
                   )}
                 </Button>
@@ -302,27 +300,27 @@ export function AddToCourseDialog({
           {/* NEW COURSE TAB */}
           <TabsContent value="new" className="mt-4 space-y-4">
             <div className="space-y-2">
-              <Label className="text-zinc-300">Course Title</Label>
+              <Label className="text-zinc-300">{t("new.courseTitleLabel")}</Label>
               <Input
                 value={newCourseTitle}
                 onChange={(e) => setNewCourseTitle(e.target.value)}
-                placeholder="Enter course title"
+                placeholder={t("new.courseTitlePlaceholder")}
                 className="border-zinc-700 bg-zinc-800 text-white"
               />
             </div>
 
             <div className="space-y-2">
-              <Label className="text-zinc-300">Description</Label>
+              <Label className="text-zinc-300">{t("new.descriptionLabel")}</Label>
               <Input
                 value={newCourseDescription}
                 onChange={(e) => setNewCourseDescription(e.target.value)}
-                placeholder="Brief description of the course"
+                placeholder={t("new.descriptionPlaceholder")}
                 className="border-zinc-700 bg-zinc-800 text-white"
               />
             </div>
 
             <div className="space-y-3">
-              <Label className="text-zinc-300">Pricing</Label>
+              <Label className="text-zinc-300">{t("new.pricingLabel")}</Label>
               <RadioGroup
                 value={newCourseIsPaid ? "paid" : "free"}
                 onValueChange={(value) => setNewCourseIsPaid(value === "paid")}
@@ -335,7 +333,7 @@ export function AddToCourseDialog({
                     className="border-zinc-600 text-purple-500"
                   />
                   <Label htmlFor="free" className="cursor-pointer text-zinc-300">
-                    Free
+                    {t("new.free")}
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -345,7 +343,7 @@ export function AddToCourseDialog({
                     className="border-zinc-600 text-purple-500"
                   />
                   <Label htmlFor="paid" className="cursor-pointer text-zinc-300">
-                    Paid
+                    {t("new.paid")}
                   </Label>
                 </div>
               </RadioGroup>
@@ -353,7 +351,7 @@ export function AddToCourseDialog({
 
             {newCourseIsPaid && (
               <div className="space-y-2">
-                <Label className="text-zinc-300">Price (USD)</Label>
+                <Label className="text-zinc-300">{t("new.priceLabel")}</Label>
                 <Input
                   type="number"
                   value={newCoursePrice}
@@ -372,12 +370,12 @@ export function AddToCourseDialog({
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Creating...
+                  {t("new.creating")}
                 </>
               ) : (
                 <>
                   <Plus className="mr-2 h-4 w-4" />
-                  Create Course from Session
+                  {t("new.submit")}
                 </>
               )}
             </Button>

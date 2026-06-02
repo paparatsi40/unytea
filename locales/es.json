@@ -2639,6 +2639,134 @@
       "legendOnline": "En línea",
       "legendTyping": "Escribiendo",
       "legendYou": "Tú"
+    },
+    "whiteboard": {
+      "loading": "Cargando pizarra...",
+      "exportPng": "Exportar PNG",
+      "exportPngTooltip": "Exportar como PNG",
+      "clear": "Borrar",
+      "clearTooltip": "Borrar lienzo",
+      "closeTooltip": "Cerrar pizarra",
+      "sessionLabel": "Sesión {id}"
+    },
+    "recordingDistribution": {
+      "copyLink": "Copiar enlace",
+      "download": "Descargar",
+      "linkCopied": "Enlace copiado",
+      "copyFailed": "No se pudo copiar el enlace",
+      "noLink": "Aún no hay un enlace para compartir disponible",
+      "shareText": "Mira esta sesión: {title}",
+      "socialText": "Mira esta sesión en Unytea: {title}"
+    },
+    "postSessionFlow": {
+      "header": {
+        "completed": "¡Sesión finalizada!",
+        "membersAttended": "{count, plural, =1 {1 miembro asistió} other {# miembros asistieron}}"
+      },
+      "recording": {
+        "readyTitle": "Grabación lista",
+        "readyDesc": "La grabación de tu sesión está lista para ver y compartir",
+        "processingTitle": "La grabación se está procesando...",
+        "processingDesc": "Estará lista en unos minutos",
+        "defaultTitle": "Estado de la grabación",
+        "defaultDesc": "Procesando la grabación de tu sesión",
+        "watch": "Ver"
+      },
+      "nextSteps": {
+        "title": "Convierte esta sesión en contenido",
+        "notesTitle": "Escribir notas",
+        "notesDesc": "Captura puntos clave, ideas y recursos",
+        "notesAdded": "Notas añadidas",
+        "shareTitle": "Compartir resumen",
+        "shareDesc": "Publica el resumen de la sesión en el feed de la comunidad",
+        "shareDone": "Ya compartido",
+        "courseTitle": "Añadir a curso",
+        "courseDesc": "Añade esta grabación a un módulo de curso",
+        "clipsTitle": "Crear clips",
+        "clipsDesc": "Genera clips cortos para redes sociales",
+        "libraryTitle": "Publicar en la biblioteca",
+        "libraryDesc": "Convierte este resumen en un recurso reutilizable de la biblioteca"
+      },
+      "stats": {
+        "title": "Rendimiento de la sesión",
+        "attendees": "Asistentes",
+        "minutes": "Minutos",
+        "messages": "Mensajes",
+        "completion": "Finalización"
+      },
+      "actions": {
+        "backToSessions": "Volver a sesiones",
+        "reEnterRoom": "Volver a entrar a la sala"
+      }
+    },
+    "notesEditor": {
+      "loading": "Cargando notas...",
+      "saved": "Guardado {relativeTime}",
+      "saving": "Guardando...",
+      "add": "Añadir",
+      "tabs": {
+        "insights": "Ideas ({count})",
+        "resources": "Recursos ({count})"
+      },
+      "notesHint": "Captura puntos clave, decisiones y tareas",
+      "notesPlaceholder": "Notas de la sesión\n\nPuntos clave:\n• \n\nTareas:\n• \n\nPreguntas de seguimiento:\n• ",
+      "insightsHint": "Ideas y aprendizajes clave de esta sesión",
+      "insightPlaceholder": "Añade una idea clave...",
+      "insightsEmpty": "Aún no hay ideas. Añade aprendizajes clave de esta sesión.",
+      "resourcesHint": "Enlaces, herramientas y recursos compartidos durante la sesión",
+      "resourcePlaceholder": "https://ejemplo.com o nombre del recurso",
+      "resourcesEmpty": "Aún no hay recursos. Añade enlaces y herramientas compartidos.",
+      "toasts": {
+        "loadFailed": "No se pudieron cargar las notas de la sesión",
+        "saved": "Notas guardadas",
+        "saveFailed": "No se pudieron guardar las notas"
+      }
+    },
+    "addToCourse": {
+      "title": "Añadir sesión a un curso",
+      "subtitle": "Convierte esta sesión en vivo en contenido permanente del curso",
+      "tabExisting": "Curso existente",
+      "tabNew": "Crear nuevo",
+      "existing": {
+        "noCourses": "No se encontraron cursos en esta comunidad.",
+        "createNewInstead": "Crear un nuevo curso en su lugar",
+        "courseLabel": "Seleccionar curso",
+        "coursePlaceholder": "Elige un curso...",
+        "enrolled": "{count, plural, =1 {1 inscrito} other {# inscritos}}",
+        "moduleLabel": "Módulo (opcional: se crea \"Live Sessions\" automáticamente si se deja vacío)",
+        "modulePlaceholder": "Selecciona un módulo o déjalo vacío...",
+        "lessonTitleLabel": "Título de la lección",
+        "lessonTitlePlaceholder": "Introduce el título de la lección",
+        "makeFree": "Hacer esta lección gratuita (vista previa)",
+        "adding": "Añadiendo...",
+        "submit": "Añadir al curso"
+      },
+      "new": {
+        "courseTitleLabel": "Título del curso",
+        "courseTitlePlaceholder": "Introduce el título del curso",
+        "descriptionLabel": "Descripción",
+        "descriptionPlaceholder": "Breve descripción del curso",
+        "pricingLabel": "Precios",
+        "free": "Gratis",
+        "paid": "De pago",
+        "priceLabel": "Precio (USD)",
+        "creating": "Creando...",
+        "submit": "Crear curso desde la sesión"
+      },
+      "validation": {
+        "selectCourse": "Por favor, selecciona un curso",
+        "enterTitle": "Por favor, introduce un título de curso"
+      },
+      "toasts": {
+        "loadFailed": "No se pudieron cargar los cursos",
+        "loadError": "Error al cargar los cursos",
+        "added": "¡Sesión añadida al curso!",
+        "addFailed": "No se pudo añadir la sesión",
+        "addError": "Error al añadir la sesión al curso",
+        "created": "¡Curso creado correctamente!",
+        "createFailed": "No se pudo crear el curso",
+        "createError": "Error al crear el curso"
+      }
     }
   }
 }

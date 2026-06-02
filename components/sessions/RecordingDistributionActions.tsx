@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { Copy, Download, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 interface RecordingDistributionActionsProps {
   recordingUrl: string | null;
@@ -16,25 +17,27 @@ export function RecordingDistributionActions({
   publicUrl,
   title,
 }: RecordingDistributionActionsProps) {
+  const t = useTranslations("liveSession.recordingDistribution");
+  const tNav = useTranslations("liveSession.publicPage.nav");
   const shareUrl = useMemo(() => publicUrl || recordingUrl || "", [publicUrl, recordingUrl]);
 
   const handleCopy = async () => {
     if (!shareUrl) {
-      toast.error("No shareable link available yet");
+      toast.error(t("noLink"));
       return;
     }
 
     try {
       await navigator.clipboard.writeText(shareUrl);
-      toast.success("Link copied");
+      toast.success(t("linkCopied"));
     } catch {
-      toast.error("Failed to copy link");
+      toast.error(t("copyFailed"));
     }
   };
 
   const handleShare = async () => {
     if (!shareUrl) {
-      toast.error("No shareable link available yet");
+      toast.error(t("noLink"));
       return;
     }
 
@@ -42,7 +45,7 @@ export function RecordingDistributionActions({
       try {
         await navigator.share({
           title,
-          text: `Watch this session: ${title}`,
+          text: t("shareText", { title }),
           url: shareUrl,
         });
         return;
@@ -52,7 +55,7 @@ export function RecordingDistributionActions({
     }
 
     const twitter = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-      `Watch this session on Unytea: ${title}`
+      t("socialText", { title })
     )}&url=${encodeURIComponent(shareUrl)}`;
     window.open(twitter, "_blank", "noopener,noreferrer");
   };
@@ -66,7 +69,7 @@ export function RecordingDistributionActions({
         onClick={handleCopy}
       >
         <Copy className="h-4 w-4" />
-        Copy link
+        {t("copyLink")}
       </Button>
 
       <a
@@ -75,7 +78,7 @@ export function RecordingDistributionActions({
         className="inline-flex items-center justify-center gap-2 rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-800"
       >
         <Download className="h-4 w-4" />
-        Download
+        {t("download")}
       </a>
 
       <Button
@@ -85,7 +88,7 @@ export function RecordingDistributionActions({
         onClick={handleShare}
       >
         <Share2 className="h-4 w-4" />
-        Share
+        {tNav("share")}
       </Button>
     </div>
   );
