@@ -1118,11 +1118,35 @@
           "title": "Información Básica",
           "description": "Comienza con lo esencial",
           "namePlaceholder": "Ingresa el nombre de tu comunidad",
-          "descriptionPlaceholder": "Describe tu comunidad, qué aprenderán los miembros y por qué deberían unirse..."
+          "descriptionPlaceholder": "Describe tu comunidad, qué aprenderán los miembros y por qué deberían unirse...",
+          "nameLabel": "Nombre de la Comunidad",
+          "charCount": "{count}/{max} caracteres",
+          "descriptionLabel": "Descripción",
+          "categoryLabel": "Categoría",
+          "categoryPlaceholder": "Selecciona una categoría",
+          "categories": {
+            "education": "Educación y Aprendizaje",
+            "business": "Negocios y Emprendimiento",
+            "tech": "Tecnología y Programación",
+            "health": "Salud y Fitness",
+            "creative": "Creatividad y Arte",
+            "lifestyle": "Estilo de Vida y Personal",
+            "other": "Otro"
+          }
         },
         "appearance": {
           "title": "Apariencia",
-          "description": "Personaliza el look de tu comunidad"
+          "description": "Personaliza el look de tu comunidad",
+          "logoLabel": "Logo de la Comunidad",
+          "coverLabel": "Imagen de Portada",
+          "uploadToggle": "Subir",
+          "urlToggle": "URL",
+          "urlPlaceholder": "https://example.com/image.png",
+          "uploading": "Subiendo...",
+          "logoRecommendation": "Se recomienda imagen cuadrada (p. ej., 512x512)",
+          "coverRecommendation": "Se recomienda imagen ancha (p. ej., 1920x400)",
+          "previewLabel": "Vista previa",
+          "namePreviewFallback": "Nombre de la Comunidad"
         },
         "layout": {
           "title": "Diseño",

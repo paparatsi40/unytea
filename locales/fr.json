@@ -1117,11 +1117,35 @@
           "title": "Informations de Base",
           "description": "Commencez avec l'essentiel",
           "namePlaceholder": "Saisissez le nom de votre communauté",
-          "descriptionPlaceholder": "Décrivez votre communauté, ce que les membres apprendront et pourquoi ils devraient la rejoindre..."
+          "descriptionPlaceholder": "Décrivez votre communauté, ce que les membres apprendront et pourquoi ils devraient la rejoindre...",
+          "nameLabel": "Nom de la Communauté",
+          "charCount": "{count}/{max} caractères",
+          "descriptionLabel": "Description",
+          "categoryLabel": "Catégorie",
+          "categoryPlaceholder": "Sélectionnez une catégorie",
+          "categories": {
+            "education": "Éducation et Apprentissage",
+            "business": "Affaires et Entrepreneuriat",
+            "tech": "Technologie et Programmation",
+            "health": "Santé et Bien-être",
+            "creative": "Création et Arts",
+            "lifestyle": "Style de Vie et Personnel",
+            "other": "Autre"
+          }
         },
         "appearance": {
           "title": "Apparence",
-          "description": "Personnalisez l'apparence de votre communauté"
+          "description": "Personnalisez l'apparence de votre communauté",
+          "logoLabel": "Logo de la Communauté",
+          "coverLabel": "Image de Couverture",
+          "uploadToggle": "Importer",
+          "urlToggle": "URL",
+          "urlPlaceholder": "https://example.com/image.png",
+          "uploading": "Importation...",
+          "logoRecommendation": "Image carrée recommandée (p. ex. 512x512)",
+          "coverRecommendation": "Image large recommandée (p. ex. 1920x400)",
+          "previewLabel": "Aperçu",
+          "namePreviewFallback": "Nom de la Communauté"
         },
         "layout": {
           "title": "Mise en Page",

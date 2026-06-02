@@ -1115,11 +1115,35 @@
           "title": "Basic Information",
           "description": "Start with the essentials",
           "namePlaceholder": "Enter your community name",
-          "descriptionPlaceholder": "Describe your community, what members will learn, and why they should join..."
+          "descriptionPlaceholder": "Describe your community, what members will learn, and why they should join...",
+          "nameLabel": "Community Name",
+          "charCount": "{count}/{max} characters",
+          "descriptionLabel": "Description",
+          "categoryLabel": "Category",
+          "categoryPlaceholder": "Select a category",
+          "categories": {
+            "education": "Education & Learning",
+            "business": "Business & Entrepreneurship",
+            "tech": "Technology & Programming",
+            "health": "Health & Fitness",
+            "creative": "Creative & Arts",
+            "lifestyle": "Lifestyle & Personal",
+            "other": "Other"
+          }
         },
         "appearance": {
           "title": "Appearance",
-          "description": "Customize your community look"
+          "description": "Customize your community look",
+          "logoLabel": "Community Logo",
+          "coverLabel": "Cover Image",
+          "uploadToggle": "Upload",
+          "urlToggle": "URL",
+          "urlPlaceholder": "https://example.com/image.png",
+          "uploading": "Uploading...",
+          "logoRecommendation": "Square image recommended (e.g., 512x512)",
+          "coverRecommendation": "Wide image recommended (e.g., 1920x400)",
+          "previewLabel": "Preview",
+          "namePreviewFallback": "Community Name"
         },
         "layout": {
           "title": "Layout",

@@ -22,6 +22,19 @@ import { toast } from "sonner";
 import { BookOpen } from "lucide-react";
 import { useTranslations } from "next-intl";
 
+// Wizard-local category taxonomy. Intentionally diverges from
+// explore.categories (the stored values differ) — labels resolved via
+// t(`steps.basicInfo.categories.${key}`) in render (helper-returns-key).
+const CATEGORY_KEYS = [
+  "education",
+  "business",
+  "tech",
+  "health",
+  "creative",
+  "lifestyle",
+  "other",
+] as const;
+
 const getSteps = (t: ReturnType<typeof useTranslations>) => [
   {
     id: 1,
@@ -386,7 +399,7 @@ export default function NewCommunityPage() {
               {/* Community Name */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-foreground">
-                  Community Name <span className="text-red-500">*</span>
+                  {t("steps.basicInfo.nameLabel")} <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -397,14 +410,14 @@ export default function NewCommunityPage() {
                   maxLength={50}
                 />
                 <p className="mt-1 text-xs text-muted-foreground">
-                  {formData.name.length}/50 characters
+                  {t("steps.basicInfo.charCount", { count: formData.name.length, max: 50 })}
                 </p>
               </div>
 
               {/* Description */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-foreground">
-                  Description
+                  {t("steps.basicInfo.descriptionLabel")}
                 </label>
                 <textarea
                   value={formData.description}
@@ -415,26 +428,26 @@ export default function NewCommunityPage() {
                   maxLength={500}
                 />
                 <p className="mt-1 text-xs text-muted-foreground">
-                  {formData.description.length}/500 characters
+                  {t("steps.basicInfo.charCount", { count: formData.description.length, max: 500 })}
                 </p>
               </div>
 
               {/* Category */}
               <div>
-                <label className="mb-2 block text-sm font-medium text-foreground">Category</label>
+                <label className="mb-2 block text-sm font-medium text-foreground">
+                  {t("steps.basicInfo.categoryLabel")}
+                </label>
                 <select
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                   className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                 >
-                  <option value="">Select a category</option>
-                  <option value="education">Education & Learning</option>
-                  <option value="business">Business & Entrepreneurship</option>
-                  <option value="tech">Technology & Programming</option>
-                  <option value="health">Health & Fitness</option>
-                  <option value="creative">Creative & Arts</option>
-                  <option value="lifestyle">Lifestyle & Personal</option>
-                  <option value="other">Other</option>
+                  <option value="">{t("steps.basicInfo.categoryPlaceholder")}</option>
+                  {CATEGORY_KEYS.map((key) => (
+                    <option key={key} value={key}>
+                      {t(`steps.basicInfo.categories.${key}`)}
+                    </option>
+                  ))}
                 </select>
               </div>
             </>
@@ -445,7 +458,7 @@ export default function NewCommunityPage() {
               {/* Logo/Icon URL */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-foreground">
-                  Community Logo
+                  {t("steps.appearance.logoLabel")}
                 </label>
                 <div className="flex items-center space-x-2">
                   <Button
@@ -453,14 +466,14 @@ export default function NewCommunityPage() {
                     variant={logoInputType === "upload" ? "default" : "outline"}
                     className="flex-1"
                   >
-                    Upload
+                    {t("steps.appearance.uploadToggle")}
                   </Button>
                   <Button
                     onClick={() => setLogoInputType("url")}
                     variant={logoInputType === "url" ? "default" : "outline"}
                     className="flex-1"
                   >
-                    URL
+                    {t("steps.appearance.urlToggle")}
                   </Button>
                 </div>
                 {logoInputType === "upload" ? (
@@ -479,21 +492,23 @@ export default function NewCommunityPage() {
                     value={formData.imageUrl}
                     onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
                     className="mt-2 w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    placeholder="https://example.com/logo.png"
+                    placeholder={t("steps.appearance.urlPlaceholder")}
                   />
                 )}
                 {uploadingLogo && (
-                  <p className="mt-1 text-xs text-muted-foreground">Uploading...</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {t("steps.appearance.uploading")}
+                  </p>
                 )}
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Square image recommended (e.g., 512x512)
+                  {t("steps.appearance.logoRecommendation")}
                 </p>
               </div>
 
               {/* Cover Image URL */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-foreground">
-                  Cover Image
+                  {t("steps.appearance.coverLabel")}
                 </label>
                 <div className="flex items-center space-x-2">
                   <Button
@@ -501,14 +516,14 @@ export default function NewCommunityPage() {
                     variant={coverInputType === "upload" ? "default" : "outline"}
                     className="flex-1"
                   >
-                    Upload
+                    {t("steps.appearance.uploadToggle")}
                   </Button>
                   <Button
                     onClick={() => setCoverInputType("url")}
                     variant={coverInputType === "url" ? "default" : "outline"}
                     className="flex-1"
                   >
-                    URL
+                    {t("steps.appearance.urlToggle")}
                   </Button>
                 </div>
                 {coverInputType === "upload" ? (
@@ -527,21 +542,25 @@ export default function NewCommunityPage() {
                     value={formData.coverImageUrl}
                     onChange={(e) => setFormData({ ...formData, coverImageUrl: e.target.value })}
                     className="mt-2 w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    placeholder="https://example.com/cover.png"
+                    placeholder={t("steps.appearance.urlPlaceholder")}
                   />
                 )}
                 {uploadingCover && (
-                  <p className="mt-1 text-xs text-muted-foreground">Uploading...</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {t("steps.appearance.uploading")}
+                  </p>
                 )}
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Wide image recommended (e.g., 1920x400)
+                  {t("steps.appearance.coverRecommendation")}
                 </p>
               </div>
 
               {/* Preview */}
               {(formData.imageUrl || formData.coverImageUrl) && (
                 <div className="rounded-lg border border-border bg-card p-4">
-                  <p className="mb-3 text-sm font-medium text-foreground">Preview</p>
+                  <p className="mb-3 text-sm font-medium text-foreground">
+                    {t("steps.appearance.previewLabel")}
+                  </p>
                   <div className="overflow-hidden rounded-lg">
                     <div className="relative h-32 bg-gradient-to-br from-primary/20 to-purple-500/20">
                       {formData.coverImageUrl && (
@@ -570,7 +589,9 @@ export default function NewCommunityPage() {
                       )}
                     </div>
                     <div className="bg-card p-6 pt-10">
-                      <p className="font-semibold">{formData.name || "Community Name"}</p>
+                      <p className="font-semibold">
+                        {formData.name || t("steps.appearance.namePreviewFallback")}
+                      </p>
                     </div>
                   </div>
                 </div>
