@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { LiveKitRoom, RoomAudioRenderer, useLocalParticipant } from "@livekit/components-react";
+import { LiveKitRoom, RoomAudioRenderer } from "@livekit/components-react";
 import "@livekit/components-styles";
 import { useTranslations } from "next-intl";
 import { Loader2, AlertCircle } from "lucide-react";
@@ -22,10 +22,8 @@ interface VideoRoomProps {
 
 /**
  * AudioUnlocker - Resumes suspended AudioContexts on the first user interaction.
- * Also monitors and logs mic/audio track state for debugging.
  */
 function AudioUnlocker() {
-  const { localParticipant } = useLocalParticipant();
   const hasUnlocked = useRef(false);
 
   useEffect(() => {
@@ -40,7 +38,6 @@ function AudioUnlocker() {
           const ctx = new AudioCtx();
           if (ctx.state === "suspended") {
             await ctx.resume();
-            console.log("[LiveKit] AudioContext resumed via user gesture");
           }
         }
       } catch (e) {
@@ -56,37 +53,6 @@ function AudioUnlocker() {
       events.forEach((evt) => document.removeEventListener(evt, resumeAudio));
     };
   }, []);
-
-  // Log mic/track state after connection for debugging
-  useEffect(() => {
-    if (!localParticipant) return;
-
-    const timer = setTimeout(() => {
-      const audioTracks = localParticipant.audioTrackPublications;
-      const videoTracks = localParticipant.videoTrackPublications;
-
-      console.log("[LiveKit] === Track State Debug ===");
-      console.log("[LiveKit] Participant identity:", localParticipant.identity);
-      console.log("[LiveKit] Permissions:", JSON.stringify(localParticipant.permissions));
-      console.log("[LiveKit] Audio tracks:", audioTracks.size);
-      audioTracks.forEach((pub, sid) => {
-        console.log(
-          `[LiveKit]   Audio track ${sid}: subscribed=${pub.isSubscribed}, muted=${pub.isMuted}, enabled=${pub.isEnabled}, source=${pub.source}`
-        );
-      });
-      console.log("[LiveKit] Video tracks:", videoTracks.size);
-      videoTracks.forEach((pub, sid) => {
-        console.log(
-          `[LiveKit]   Video track ${sid}: subscribed=${pub.isSubscribed}, muted=${pub.isMuted}, enabled=${pub.isEnabled}, source=${pub.source}`
-        );
-      });
-      console.log("[LiveKit] Mic enabled:", localParticipant.isMicrophoneEnabled);
-      console.log("[LiveKit] Camera enabled:", localParticipant.isCameraEnabled);
-      console.log("[LiveKit] === End Debug ===");
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, [localParticipant]);
 
   return null;
 }
@@ -173,17 +139,7 @@ export function VideoRoom({
         connect={true}
         video={sessionMode === "video"}
         audio={true}
-        onConnected={() => {
-          console.log(
-            "[LiveKit] Connected to room. Mode:",
-            sessionMode,
-            "| video:",
-            sessionMode === "video",
-            "| audio: true"
-          );
-        }}
-        onDisconnected={(reason) => {
-          console.log("[LiveKit] Disconnected from room", reason);
+        onDisconnected={() => {
           onLeave?.();
         }}
         onError={(err) => {
