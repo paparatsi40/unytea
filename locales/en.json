@@ -385,6 +385,62 @@
           "confirmPrompt": "Are you absolutely sure? This cannot be undone!",
           "deleteDisabledToast": "Account deletion temporarily disabled"
         }
+      },
+      "appearance": {
+        "themeTitle": "Theme",
+        "themeSubtitle": "Choose how Unytea looks to you",
+        "themes": {
+          "light": { "label": "Light", "description": "Light theme" },
+          "dark": { "label": "Dark", "description": "Dark theme" },
+          "system": { "label": "System", "description": "Match system" }
+        },
+        "saveButton": "Save Theme",
+        "savingButton": "Saving...",
+        "toasts": {
+          "saved": "Appearance saved!",
+          "saveFailed": "Failed to save"
+        },
+        "communityTitle": "Community Appearance",
+        "communitySubtitle": "Customize landing, sections, and visual structure for each community.",
+        "noCommunities": "You don’t have communities yet. Create one to customize its appearance.",
+        "communityLabel": "Community",
+        "landingCard": {
+          "title": "Landing Page Builder",
+          "description": "Edit hero, sections, and page structure"
+        },
+        "sectionsCard": {
+          "title": "Section Presets",
+          "description": "Reorder, show/hide, and configure sections"
+        }
+      },
+      "privacy": {
+        "title": "Privacy Settings",
+        "profileVisibilityLabel": "Profile Visibility",
+        "visibility": {
+          "public": "Public - Everyone can see",
+          "members": "Members Only - Community members",
+          "private": "Private - Only you"
+        },
+        "allowMessagesLabel": "Who can send you messages",
+        "messages": {
+          "everyone": "Everyone",
+          "members": "Members of my communities",
+          "none": "No one"
+        },
+        "showEmail": {
+          "label": "Show Email",
+          "description": "Make your email visible on your profile"
+        },
+        "showActivity": {
+          "label": "Show Activity",
+          "description": "Display your recent activity"
+        },
+        "saveButton": "Save Privacy Settings",
+        "savingButton": "Saving...",
+        "toasts": {
+          "saved": "Privacy settings saved!",
+          "saveFailed": "Failed to save"
+        }
       }
     },
     "communityAdmin": {

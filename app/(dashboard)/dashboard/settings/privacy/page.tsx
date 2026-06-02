@@ -4,8 +4,15 @@ import { useState } from "react";
 import { Check } from "lucide-react";
 import { updatePrivacySettings } from "@/app/actions/settings";
 import { toast } from "react-hot-toast";
+import { useTranslations } from "next-intl";
+
+// Enum values double as i18n keys; option labels resolved via
+// t(`visibility.${key}`) / t(`messages.${key}`) in render.
+const VISIBILITY_KEYS = ["public", "members", "private"] as const;
+const MESSAGE_KEYS = ["everyone", "members", "none"] as const;
 
 export default function PrivacyPage() {
+  const t = useTranslations("dashboard.accountSettings.privacy");
   const [loading, setLoading] = useState(false);
   const [settings, setSettings] = useState({
     profileVisibility: "public" as "public" | "members" | "private",
@@ -20,9 +27,9 @@ export default function PrivacyPage() {
     const result = await updatePrivacySettings(settings);
 
     if (result.success) {
-      toast.success("Privacy settings saved!");
+      toast.success(t("toasts.saved"));
     } else {
-      toast.error(result.error || "Failed to save");
+      toast.error(result.error || t("toasts.saveFailed"));
     }
     setLoading(false);
   };
@@ -30,12 +37,14 @@ export default function PrivacyPage() {
   return (
     <div className="space-y-6">
       <div className="rounded-xl border border-border bg-card p-6">
-        <h2 className="mb-4 text-xl font-bold text-foreground">Privacy Settings</h2>
+        <h2 className="mb-4 text-xl font-bold text-foreground">{t("title")}</h2>
 
         <div className="space-y-6">
           {/* Profile Visibility */}
           <div>
-            <label className="mb-2 block font-medium text-foreground">Profile Visibility</label>
+            <label className="mb-2 block font-medium text-foreground">
+              {t("profileVisibilityLabel")}
+            </label>
             <select
               value={settings.profileVisibility}
               onChange={(e) =>
@@ -46,16 +55,18 @@ export default function PrivacyPage() {
               }
               className="w-full rounded-lg border border-border bg-background px-4 py-2"
             >
-              <option value="public">Public - Everyone can see</option>
-              <option value="members">Members Only - Community members</option>
-              <option value="private">Private - Only you</option>
+              {VISIBILITY_KEYS.map((key) => (
+                <option key={key} value={key}>
+                  {t(`visibility.${key}`)}
+                </option>
+              ))}
             </select>
           </div>
 
           {/* Who can message you */}
           <div>
             <label className="mb-2 block font-medium text-foreground">
-              Who can send you messages
+              {t("allowMessagesLabel")}
             </label>
             <select
               value={settings.allowMessages}
@@ -67,9 +78,11 @@ export default function PrivacyPage() {
               }
               className="w-full rounded-lg border border-border bg-background px-4 py-2"
             >
-              <option value="everyone">Everyone</option>
-              <option value="members">Members of my communities</option>
-              <option value="none">No one</option>
+              {MESSAGE_KEYS.map((key) => (
+                <option key={key} value={key}>
+                  {t(`messages.${key}`)}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -77,10 +90,8 @@ export default function PrivacyPage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between rounded-lg border border-border p-4">
               <div>
-                <p className="font-medium text-foreground">Show Email</p>
-                <p className="text-sm text-muted-foreground">
-                  Make your email visible on your profile
-                </p>
+                <p className="font-medium text-foreground">{t("showEmail.label")}</p>
+                <p className="text-sm text-muted-foreground">{t("showEmail.description")}</p>
               </div>
               <label className="relative inline-flex cursor-pointer items-center">
                 <input
@@ -95,8 +106,8 @@ export default function PrivacyPage() {
 
             <div className="flex items-center justify-between rounded-lg border border-border p-4">
               <div>
-                <p className="font-medium text-foreground">Show Activity</p>
-                <p className="text-sm text-muted-foreground">Display your recent activity</p>
+                <p className="font-medium text-foreground">{t("showActivity.label")}</p>
+                <p className="text-sm text-muted-foreground">{t("showActivity.description")}</p>
               </div>
               <label className="relative inline-flex cursor-pointer items-center">
                 <input
@@ -119,7 +130,7 @@ export default function PrivacyPage() {
             className="flex items-center gap-2 rounded-lg bg-primary px-6 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
           >
             <Check className="h-4 w-4" />
-            {loading ? "Saving..." : "Save Privacy Settings"}
+            {loading ? t("savingButton") : t("saveButton")}
           </button>
         </div>
       </div>

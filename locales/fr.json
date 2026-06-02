@@ -384,6 +384,62 @@
           "confirmPrompt": "Êtes-vous absolument sûr ? Cette action est irréversible !",
           "deleteDisabledToast": "La suppression de compte est temporairement désactivée"
         }
+      },
+      "appearance": {
+        "themeTitle": "Thème",
+        "themeSubtitle": "Choisissez l'apparence d'Unytea pour vous",
+        "themes": {
+          "light": { "label": "Clair", "description": "Thème clair" },
+          "dark": { "label": "Sombre", "description": "Thème sombre" },
+          "system": { "label": "Système", "description": "Suivre le système" }
+        },
+        "saveButton": "Enregistrer le thème",
+        "savingButton": "Enregistrement...",
+        "toasts": {
+          "saved": "Apparence enregistrée !",
+          "saveFailed": "Échec de l'enregistrement"
+        },
+        "communityTitle": "Apparence de la communauté",
+        "communitySubtitle": "Personnalisez la page d'accueil, les sections et la structure visuelle de chaque communauté.",
+        "noCommunities": "Vous n'avez pas encore de communautés. Créez-en une pour personnaliser son apparence.",
+        "communityLabel": "Communauté",
+        "landingCard": {
+          "title": "Constructeur de page d'accueil",
+          "description": "Modifiez le hero, les sections et la structure de la page"
+        },
+        "sectionsCard": {
+          "title": "Préréglages de sections",
+          "description": "Réorganisez, affichez/masquez et configurez les sections"
+        }
+      },
+      "privacy": {
+        "title": "Paramètres de confidentialité",
+        "profileVisibilityLabel": "Visibilité du profil",
+        "visibility": {
+          "public": "Public - Tout le monde peut voir",
+          "members": "Membres uniquement - Membres de la communauté",
+          "private": "Privé - Vous uniquement"
+        },
+        "allowMessagesLabel": "Qui peut vous envoyer des messages",
+        "messages": {
+          "everyone": "Tout le monde",
+          "members": "Les membres de mes communautés",
+          "none": "Personne"
+        },
+        "showEmail": {
+          "label": "Afficher l'e-mail",
+          "description": "Rendez votre e-mail visible sur votre profil"
+        },
+        "showActivity": {
+          "label": "Afficher l'activité",
+          "description": "Affichez votre activité récente"
+        },
+        "saveButton": "Enregistrer les paramètres de confidentialité",
+        "savingButton": "Enregistrement...",
+        "toasts": {
+          "saved": "Paramètres de confidentialité enregistrés !",
+          "saveFailed": "Échec de l'enregistrement"
+        }
       }
     },
     "communityAdmin": {
