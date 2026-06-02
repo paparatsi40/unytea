@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { generateSessionRecap } from "./session-jobs";
 
@@ -11,7 +12,7 @@ export type AutopilotJobType =
   | "auto_distribute"
   | "auto_queue_next";
 
-interface AutopilotJobPayload {
+export interface AutopilotJobPayload {
   autopilot: {
     kind: "job" | "run" | "metric";
     sessionId: string;
@@ -21,14 +22,15 @@ interface AutopilotJobPayload {
     status?: "queued" | "running" | "done" | "failed";
     jobType?: AutopilotJobType;
     runAt?: string;
+    finishedAt?: string;
     retries?: number;
     error?: string;
     detail?: Record<string, unknown>;
   };
 }
 
-function toPayload(payload: AutopilotJobPayload): any {
-  return payload as any;
+function toPayload(payload: AutopilotJobPayload): Prisma.InputJsonValue {
+  return payload as unknown as Prisma.InputJsonValue;
 }
 
 function createRunId(sessionId: string) {
@@ -176,7 +178,10 @@ export async function runAutopilotDueJobs(limit: number = 30) {
   });
 
   const due = events
-    .map((e) => ({ event: e, payload: (e.payload as any)?.autopilot as any }))
+    .map((e) => ({
+      event: e,
+      payload: (e.payload as { autopilot?: AutopilotJobPayload["autopilot"] } | null)?.autopilot,
+    }))
     .filter((x) => x.payload?.status === "queued")
     .filter((x) => x.payload?.runAt && new Date(x.payload.runAt).getTime() <= now.getTime())
     .slice(0, limit);
@@ -189,7 +194,9 @@ export async function runAutopilotDueJobs(limit: number = 30) {
   };
 
   for (const item of due) {
-    const payload = item.payload;
+    // `due` was filtered on `x.payload?.status === "queued"`, so payload is
+    // guaranteed defined here (TS can't narrow through the filter predicate).
+    const payload = item.payload!;
     try {
       await prisma.sessionEvent.update({
         where: { id: item.event.id },
@@ -430,7 +437,7 @@ export async function getAutopilotOverview(limit: number = 20) {
 
   const jobs = events
     .map((e) => {
-      const ap = (e.payload as any)?.autopilot;
+      const ap = (e.payload as { autopilot?: AutopilotJobPayload["autopilot"] } | null)?.autopilot;
       if (!ap) return null;
       return {
         id: e.id,

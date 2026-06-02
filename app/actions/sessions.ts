@@ -464,7 +464,7 @@ export async function getCommunityAttendanceMetrics(communityId: string, days: n
 
       const sessionIdSet = new Set(sessions.map((s) => s.id));
       const remindersSent = reminderNotifications.filter((n) => {
-        const payload = n.data as any;
+        const payload = n.data as { sessionId?: string } | null;
         return payload?.sessionId && sessionIdSet.has(payload.sessionId);
       }).length;
 
