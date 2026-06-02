@@ -1104,6 +1104,144 @@
         }
       }
     },
+    "createCommunity": {
+      "common": {
+        "backToCommunities": "Retour aux Communautés",
+        "previous": "Précédent",
+        "continue": "Continuer",
+        "creating": "Création...",
+        "createButton": "Créer la communauté"
+      },
+      "steps": {
+        "basicInfo": {
+          "title": "Informations de Base",
+          "description": "Commencez avec l'essentiel",
+          "namePlaceholder": "Saisissez le nom de votre communauté",
+          "descriptionPlaceholder": "Décrivez votre communauté, ce que les membres apprendront et pourquoi ils devraient la rejoindre...",
+          "nameLabel": "Nom de la Communauté",
+          "charCount": "{count}/{max} caractères",
+          "descriptionLabel": "Description",
+          "categoryLabel": "Catégorie",
+          "categoryPlaceholder": "Sélectionnez une catégorie",
+          "categories": {
+            "education": "Éducation et Apprentissage",
+            "business": "Affaires et Entrepreneuriat",
+            "tech": "Technologie et Programmation",
+            "health": "Santé et Bien-être",
+            "creative": "Création et Arts",
+            "lifestyle": "Style de Vie et Personnel",
+            "other": "Autre"
+          }
+        },
+        "appearance": {
+          "title": "Apparence",
+          "description": "Personnalisez l'apparence de votre communauté",
+          "logoLabel": "Logo de la Communauté",
+          "coverLabel": "Image de Couverture",
+          "uploadToggle": "Importer",
+          "urlToggle": "URL",
+          "urlPlaceholder": "https://example.com/image.png",
+          "uploading": "Importation...",
+          "logoRecommendation": "Image carrée recommandée (p. ex. 512x512)",
+          "coverRecommendation": "Image large recommandée (p. ex. 1920x400)",
+          "previewLabel": "Aperçu",
+          "namePreviewFallback": "Nom de la Communauté"
+        },
+        "layout": {
+          "title": "Mise en Page",
+          "description": "Choisissez la structure de votre communauté",
+          "layoutTypeLabel": "Type de Mise en Page",
+          "layouts": {
+            "MODERN_GRID": "Grille Moderne - Style Pinterest, axé sur le visuel",
+            "CLASSIC_FORUM": "Forum Classique - Disposition de discussion traditionnelle",
+            "ACADEMY": "Académie - Éducatif axé sur les cours",
+            "DASHBOARD": "Tableau de bord - Analyses et données visibles",
+            "MINIMALIST": "Minimaliste - Épuré, style Notion"
+          },
+          "changeLaterHint": "Vous pourrez modifier cela plus tard dans Paramètres → Apparence",
+          "primaryColorLabel": "Couleur Primaire",
+          "secondaryColorLabel": "Couleur Secondaire",
+          "accentColorLabel": "Couleur d'Accent",
+          "fontFamilyLabel": "Police",
+          "fonts": {
+            "inter": "Inter - Moderne et épurée",
+            "montserrat": "Montserrat - Audacieuse et conviviale",
+            "openSans": "Open Sans - Professionnelle et lisible"
+          },
+          "heroTitleLabel": "Titre Principal (Optionnel)",
+          "heroTitlePlaceholder": "Bienvenue dans notre communauté",
+          "heroSubtitleLabel": "Sous-titre Principal (Optionnel)",
+          "heroSubtitlePlaceholder": "Ceci est une communauté pour..."
+        },
+        "settings": {
+          "title": "Paramètres",
+          "description": "Configurez l'accès et la confidentialité",
+          "privateLabel": "Communauté Privée",
+          "privateDescription": "Seuls les membres approuvés peuvent voir le contenu de la communauté",
+          "requireApprovalLabel": "Exiger l'approbation des nouveaux membres",
+          "requireApprovalDescription": "Vous devrez approuver chaque membre avant qu'il puisse rejoindre",
+          "customDomain": {
+            "label": "Domaine Personnalisé",
+            "description": "Disponible avec le forfait Professional et supérieurs"
+          }
+        },
+        "preview": {
+          "title": "Aperçu",
+          "description": "Vérifiez avant de publier",
+          "livePreviewHeader": "Aperçu en Direct - Voici à quoi ressemblera votre communauté",
+          "nameFallback": "Nom de Votre Communauté",
+          "descriptionFallback": "La description de votre communauté apparaîtra ici",
+          "joinButton": "Rejoindre la Communauté",
+          "stats": {
+            "members": "Membres",
+            "courses": "Cours",
+            "posts": "Publications"
+          },
+          "whatYouGetTitle": "Ce Que Vous Obtiendrez",
+          "whatYouGetSubtitle": "Aperçu des avantages pour les membres",
+          "features": {
+            "courses": { "title": "Cours", "description": "Accédez à du contenu premium" },
+            "community": { "title": "Communauté", "description": "Connectez-vous avec vos pairs" },
+            "events": { "title": "Événements en Direct", "description": "Sessions hebdomadaires" }
+          },
+          "selectedLayoutLabel": "Mise en Page Sélectionnée",
+          "colorThemeLabel": "Thème de Couleur",
+          "swatch": {
+            "primary": "Primaire",
+            "secondary": "Secondaire",
+            "accent": "Accent"
+          }
+        }
+      },
+      "validation": {
+        "nameRequired": "Veuillez saisir un nom de communauté",
+        "signInRequired": "Connectez-vous pour créer une communauté"
+      },
+      "toasts": {
+        "uploadSuccessLogo": "Logo importé avec succès",
+        "uploadSuccessCover": "Image de couverture importée avec succès",
+        "uploadFailedLogo": "Échec de l'import du logo",
+        "uploadFailedCover": "Échec de l'import de l'image de couverture",
+        "createFailed": "Échec de la création de la communauté. Veuillez réessayer.",
+        "upgradeAction": "Mettre à niveau"
+      },
+      "planGate": {
+        "title": "Limite de communautés atteinte",
+        "allowance": "Votre forfait {plan} autorise {max, plural, =1 {1 communauté} other {# communautés}}.",
+        "current": "Vous avez déjà {count, plural, =1 {1 communauté active} other {# communautés actives}}.",
+        "planNames": {
+          "start": "Start (Gratuit)",
+          "creator": "Creator",
+          "business": "Business",
+          "pro": "Pro"
+        },
+        "recommendedBadge": "Recommandé",
+        "pricePerMonth": "${amount}/mois",
+        "cardCommunityLimit": "{count, plural, =1 {1 communauté} other {# communautés}}",
+        "viewPlansButton": "Voir les forfaits et améliorer",
+        "backButton": "Retour"
+      }
+    },
     "calendar": {
       "metaTitle": "Calendrier",
       "title": "Calendrier",

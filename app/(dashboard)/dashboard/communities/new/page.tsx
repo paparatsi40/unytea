@@ -22,35 +22,60 @@ import { toast } from "sonner";
 import { BookOpen } from "lucide-react";
 import { useTranslations } from "next-intl";
 
+// Wizard-local category taxonomy. Intentionally diverges from
+// explore.categories (the stored values differ) — labels resolved via
+// t(`steps.basicInfo.categories.${key}`) in render (helper-returns-key).
+const CATEGORY_KEYS = [
+  "education",
+  "business",
+  "tech",
+  "health",
+  "creative",
+  "lifestyle",
+  "other",
+] as const;
+
+// Layout enum values double as i18n keys (no spaces) — labels resolved via
+// t(`steps.layout.layouts.${key}`). Wizard-local taxonomy.
+const LAYOUT_KEYS = ["MODERN_GRID", "CLASSIC_FORUM", "ACADEMY", "DASHBOARD", "MINIMALIST"] as const;
+
+// Font family: stored value (a real font name, possibly spaced) paired with
+// its i18n key, since "Open Sans" isn't a valid key segment on its own.
+const FONT_OPTIONS = [
+  { value: "Inter", key: "inter" },
+  { value: "Montserrat", key: "montserrat" },
+  { value: "Open Sans", key: "openSans" },
+] as const;
+
 const getSteps = (t: ReturnType<typeof useTranslations>) => [
   {
     id: 1,
-    title: t("communities.stepBasicInfo"),
-    description: t("communities.stepBasicInfoDesc"),
+    title: t("steps.basicInfo.title"),
+    description: t("steps.basicInfo.description"),
     icon: Users,
   },
   {
     id: 2,
-    title: t("communities.stepAppearance"),
-    description: t("communities.stepAppearanceDesc"),
+    title: t("steps.appearance.title"),
+    description: t("steps.appearance.description"),
     icon: Palette,
   },
   {
     id: 3,
-    title: t("communities.stepLayout"),
-    description: t("communities.stepLayoutDesc"),
+    title: t("steps.layout.title"),
+    description: t("steps.layout.description"),
     icon: Sparkles,
   },
   {
     id: 4,
-    title: t("communities.stepSettings"),
-    description: t("communities.stepSettingsDesc"),
+    title: t("steps.settings.title"),
+    description: t("steps.settings.description"),
     icon: SettingsIcon,
   },
   {
     id: 5,
-    title: t("communities.stepPreview"),
-    description: t("communities.stepPreviewDesc"),
+    title: t("steps.preview.title"),
+    description: t("steps.preview.description"),
     icon: Sparkles,
   },
 ];
@@ -58,7 +83,7 @@ const getSteps = (t: ReturnType<typeof useTranslations>) => [
 export default function NewCommunityPage() {
   const router = useRouter();
   const { user } = useCurrentUser();
-  const t = useTranslations();
+  const t = useTranslations("dashboard.createCommunity");
   const steps = getSteps(t);
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -126,23 +151,16 @@ export default function NewCommunityPage() {
       }
 
       toast.success(
-        t("communities.uploadSuccess", {
-          type: type === "logo" ? t("communities.logo") : t("communities.cover"),
-        })
+        type === "logo" ? t("toasts.uploadSuccessLogo") : t("toasts.uploadSuccessCover")
       );
     } catch (error) {
       console.error("Upload error:", error);
-      toast.error(
-        t("communities.uploadFailed", {
-          type: type === "logo" ? t("communities.logo") : t("communities.cover"),
-        })
-      );
-    } finally {
-      if (type === "logo") {
-        setUploadingLogo(false);
-      } else {
-        setUploadingCover(false);
-      }
+      toast.error(type === "logo" ? t("toasts.uploadFailedLogo") : t("toasts.uploadFailedCover"));
+    }
+    if (type === "logo") {
+      setUploadingLogo(false);
+    } else {
+      setUploadingCover(false);
     }
   };
 
@@ -160,12 +178,12 @@ export default function NewCommunityPage() {
 
   const handleSubmit = async () => {
     if (!user) {
-      alert(t("auth.signInRequired"));
+      alert(t("validation.signInRequired"));
       return;
     }
 
     if (!formData.name) {
-      alert(t("communities.nameRequired"));
+      alert(t("validation.nameRequired"));
       return;
     }
 
@@ -223,22 +241,22 @@ export default function NewCommunityPage() {
       } else {
         console.error("❌ Failed to create community:", result.error);
         if ((result as any).code === "PLAN_LIMIT_COMMUNITIES") {
-          toast.error(result.error ?? t("communities.createFailed"), {
+          toast.error(result.error ?? t("toasts.createFailed"), {
             duration: 6000,
             action: {
-              label: "Upgrade",
+              label: t("toasts.upgradeAction"),
               onClick: () => router.push("/dashboard/settings/billing"),
             },
           });
           setPlanCheck((prev) => (prev ? { ...prev, canCreate: false } : prev));
         } else {
-          toast.error(result.error || t("communities.createFailed"));
+          toast.error(result.error || t("toasts.createFailed"));
         }
         setIsSubmitting(false);
       }
     } catch (error) {
       console.error("💥 Error creating community:", error);
-      alert(error instanceof Error ? error.message : t("communities.createFailed"));
+      alert(error instanceof Error ? error.message : t("toasts.createFailed"));
       setIsSubmitting(false);
     }
   };
@@ -247,12 +265,15 @@ export default function NewCommunityPage() {
 
   // ── PLAN GATE: upgrade wall shown before the wizard ──────────────────
   if (planCheck !== null && !planCheck.canCreate) {
-    const planLabels: Record<string, string> = {
-      START: "Start (Gratis)",
-      CREATOR: "Creator",
-      BUSINESS: "Business",
-      PRO: "Pro",
-    };
+    const knownPlans = ["START", "CREATOR", "BUSINESS", "PRO"];
+    const planLabel = knownPlans.includes(planCheck.plan)
+      ? t(`planGate.planNames.${planCheck.plan.toLowerCase()}`)
+      : planCheck.plan;
+    const planCards = [
+      { plan: "creator", amount: "49", count: 1, highlight: false },
+      { plan: "business", amount: "99", count: 1, highlight: false },
+      { plan: "pro", amount: "199", count: 3, highlight: true },
+    ];
     return (
       <div className="mx-auto max-w-2xl space-y-6">
         <Button
@@ -261,7 +282,7 @@ export default function NewCommunityPage() {
           className="flex items-center space-x-2"
         >
           <ArrowLeft className="h-4 w-4" />
-          <span>{t("communities.backToCommunities")}</span>
+          <span>{t("common.backToCommunities")}</span>
         </Button>
 
         <div className="space-y-6 rounded-2xl border border-border bg-card p-10 text-center shadow-lg">
@@ -270,23 +291,15 @@ export default function NewCommunityPage() {
           </div>
 
           <div className="space-y-2">
-            <h2 className="text-2xl font-bold text-foreground">Límite de comunidades alcanzado</h2>
+            <h2 className="text-2xl font-bold text-foreground">{t("planGate.title")}</h2>
             <p className="text-muted-foreground">
-              Tu plan{" "}
-              <span className="font-semibold text-foreground">
-                {planLabels[planCheck.plan] ?? planCheck.plan}
-              </span>{" "}
-              permite {planCheck.max === 1 ? "1 comunidad" : `${planCheck.max} comunidades`}. Ya
-              tienes {planCheck.current} activa{planCheck.current !== 1 ? "s" : ""}.
+              {t("planGate.allowance", { plan: planLabel, max: planCheck.max })}{" "}
+              {t("planGate.current", { count: planCheck.current })}
             </p>
           </div>
 
           <div className="grid grid-cols-1 gap-3 text-left sm:grid-cols-3">
-            {[
-              { plan: "CREATOR", price: "$49/mes", communities: "1 comunidad", highlight: false },
-              { plan: "BUSINESS", price: "$99/mes", communities: "1 comunidad", highlight: false },
-              { plan: "PRO", price: "$199/mes", communities: "3 comunidades", highlight: true },
-            ].map((p) => (
+            {planCards.map((p) => (
               <div
                 key={p.plan}
                 className={`space-y-1 rounded-xl border p-4 ${
@@ -297,12 +310,16 @@ export default function NewCommunityPage() {
               >
                 {p.highlight && (
                   <span className="text-xs font-semibold uppercase tracking-wide text-primary">
-                    Recomendado
+                    {t("planGate.recommendedBadge")}
                   </span>
                 )}
-                <p className="font-bold text-foreground">{p.plan}</p>
-                <p className="text-sm text-muted-foreground">{p.communities}</p>
-                <p className="text-lg font-semibold text-foreground">{p.price}</p>
+                <p className="font-bold text-foreground">{t(`planGate.planNames.${p.plan}`)}</p>
+                <p className="text-sm text-muted-foreground">
+                  {t("planGate.cardCommunityLimit", { count: p.count })}
+                </p>
+                <p className="text-lg font-semibold text-foreground">
+                  {t("planGate.pricePerMonth", { amount: p.amount })}
+                </p>
               </div>
             ))}
           </div>
@@ -313,10 +330,10 @@ export default function NewCommunityPage() {
               className="flex items-center gap-2"
             >
               <Zap className="h-4 w-4" />
-              Ver planes y actualizar
+              {t("planGate.viewPlansButton")}
             </Button>
             <Button variant="outline" onClick={() => router.back()}>
-              Volver
+              {t("planGate.backButton")}
             </Button>
           </div>
         </div>
@@ -338,7 +355,7 @@ export default function NewCommunityPage() {
       {/* Back Button */}
       <Button variant="ghost" onClick={() => router.back()} className="flex items-center space-x-2">
         <ArrowLeft className="h-4 w-4" />
-        <span>{t("communities.backToCommunities")}</span>
+        <span>{t("common.backToCommunities")}</span>
       </Button>
 
       {/* Progress */}
@@ -394,55 +411,55 @@ export default function NewCommunityPage() {
               {/* Community Name */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-foreground">
-                  Community Name <span className="text-red-500">*</span>
+                  {t("steps.basicInfo.nameLabel")} <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  placeholder={t("communities.namePlaceholder")}
+                  placeholder={t("steps.basicInfo.namePlaceholder")}
                   maxLength={50}
                 />
                 <p className="mt-1 text-xs text-muted-foreground">
-                  {formData.name.length}/50 characters
+                  {t("steps.basicInfo.charCount", { count: formData.name.length, max: 50 })}
                 </p>
               </div>
 
               {/* Description */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-foreground">
-                  Description
+                  {t("steps.basicInfo.descriptionLabel")}
                 </label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  placeholder={t("communities.descriptionPlaceholder")}
+                  placeholder={t("steps.basicInfo.descriptionPlaceholder")}
                   rows={4}
                   maxLength={500}
                 />
                 <p className="mt-1 text-xs text-muted-foreground">
-                  {formData.description.length}/500 characters
+                  {t("steps.basicInfo.charCount", { count: formData.description.length, max: 500 })}
                 </p>
               </div>
 
               {/* Category */}
               <div>
-                <label className="mb-2 block text-sm font-medium text-foreground">Category</label>
+                <label className="mb-2 block text-sm font-medium text-foreground">
+                  {t("steps.basicInfo.categoryLabel")}
+                </label>
                 <select
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                   className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                 >
-                  <option value="">Select a category</option>
-                  <option value="education">Education & Learning</option>
-                  <option value="business">Business & Entrepreneurship</option>
-                  <option value="tech">Technology & Programming</option>
-                  <option value="health">Health & Fitness</option>
-                  <option value="creative">Creative & Arts</option>
-                  <option value="lifestyle">Lifestyle & Personal</option>
-                  <option value="other">Other</option>
+                  <option value="">{t("steps.basicInfo.categoryPlaceholder")}</option>
+                  {CATEGORY_KEYS.map((key) => (
+                    <option key={key} value={key}>
+                      {t(`steps.basicInfo.categories.${key}`)}
+                    </option>
+                  ))}
                 </select>
               </div>
             </>
@@ -453,7 +470,7 @@ export default function NewCommunityPage() {
               {/* Logo/Icon URL */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-foreground">
-                  Community Logo
+                  {t("steps.appearance.logoLabel")}
                 </label>
                 <div className="flex items-center space-x-2">
                   <Button
@@ -461,14 +478,14 @@ export default function NewCommunityPage() {
                     variant={logoInputType === "upload" ? "default" : "outline"}
                     className="flex-1"
                   >
-                    Upload
+                    {t("steps.appearance.uploadToggle")}
                   </Button>
                   <Button
                     onClick={() => setLogoInputType("url")}
                     variant={logoInputType === "url" ? "default" : "outline"}
                     className="flex-1"
                   >
-                    URL
+                    {t("steps.appearance.urlToggle")}
                   </Button>
                 </div>
                 {logoInputType === "upload" ? (
@@ -487,21 +504,23 @@ export default function NewCommunityPage() {
                     value={formData.imageUrl}
                     onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
                     className="mt-2 w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    placeholder="https://example.com/logo.png"
+                    placeholder={t("steps.appearance.urlPlaceholder")}
                   />
                 )}
                 {uploadingLogo && (
-                  <p className="mt-1 text-xs text-muted-foreground">Uploading...</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {t("steps.appearance.uploading")}
+                  </p>
                 )}
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Square image recommended (e.g., 512x512)
+                  {t("steps.appearance.logoRecommendation")}
                 </p>
               </div>
 
               {/* Cover Image URL */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-foreground">
-                  Cover Image
+                  {t("steps.appearance.coverLabel")}
                 </label>
                 <div className="flex items-center space-x-2">
                   <Button
@@ -509,14 +528,14 @@ export default function NewCommunityPage() {
                     variant={coverInputType === "upload" ? "default" : "outline"}
                     className="flex-1"
                   >
-                    Upload
+                    {t("steps.appearance.uploadToggle")}
                   </Button>
                   <Button
                     onClick={() => setCoverInputType("url")}
                     variant={coverInputType === "url" ? "default" : "outline"}
                     className="flex-1"
                   >
-                    URL
+                    {t("steps.appearance.urlToggle")}
                   </Button>
                 </div>
                 {coverInputType === "upload" ? (
@@ -535,21 +554,25 @@ export default function NewCommunityPage() {
                     value={formData.coverImageUrl}
                     onChange={(e) => setFormData({ ...formData, coverImageUrl: e.target.value })}
                     className="mt-2 w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    placeholder="https://example.com/cover.png"
+                    placeholder={t("steps.appearance.urlPlaceholder")}
                   />
                 )}
                 {uploadingCover && (
-                  <p className="mt-1 text-xs text-muted-foreground">Uploading...</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {t("steps.appearance.uploading")}
+                  </p>
                 )}
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Wide image recommended (e.g., 1920x400)
+                  {t("steps.appearance.coverRecommendation")}
                 </p>
               </div>
 
               {/* Preview */}
               {(formData.imageUrl || formData.coverImageUrl) && (
                 <div className="rounded-lg border border-border bg-card p-4">
-                  <p className="mb-3 text-sm font-medium text-foreground">Preview</p>
+                  <p className="mb-3 text-sm font-medium text-foreground">
+                    {t("steps.appearance.previewLabel")}
+                  </p>
                   <div className="overflow-hidden rounded-lg">
                     <div className="relative h-32 bg-gradient-to-br from-primary/20 to-purple-500/20">
                       {formData.coverImageUrl && (
@@ -578,7 +601,9 @@ export default function NewCommunityPage() {
                       )}
                     </div>
                     <div className="bg-card p-6 pt-10">
-                      <p className="font-semibold">{formData.name || "Community Name"}</p>
+                      <p className="font-semibold">
+                        {formData.name || t("steps.appearance.namePreviewFallback")}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -591,7 +616,7 @@ export default function NewCommunityPage() {
               {/* Layout & Theme */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-foreground">
-                  Layout Type
+                  {t("steps.layout.layoutTypeLabel")}
                 </label>
                 <select
                   value={formData.layoutType}
@@ -608,16 +633,14 @@ export default function NewCommunityPage() {
                   }
                   className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                 >
-                  <option value="MODERN_GRID">Modern Grid - Pinterest style, visual-first</option>
-                  <option value="CLASSIC_FORUM">
-                    Classic Forum - Traditional discussion layout
-                  </option>
-                  <option value="ACADEMY">Academy - Course-focused educational</option>
-                  <option value="DASHBOARD">Dashboard - Analytics and data-visible</option>
-                  <option value="MINIMALIST">Minimalist - Clean, Notion-like</option>
+                  {LAYOUT_KEYS.map((key) => (
+                    <option key={key} value={key}>
+                      {t(`steps.layout.layouts.${key}`)}
+                    </option>
+                  ))}
                 </select>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  You can change this later in Settings → Appearance
+                  {t("steps.layout.changeLaterHint")}
                 </p>
               </div>
 
@@ -625,7 +648,7 @@ export default function NewCommunityPage() {
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <label className="mb-2 block text-sm font-medium text-foreground">
-                    Primary Color
+                    {t("steps.layout.primaryColorLabel")}
                   </label>
                   <input
                     type="color"
@@ -637,7 +660,7 @@ export default function NewCommunityPage() {
 
                 <div>
                   <label className="mb-2 block text-sm font-medium text-foreground">
-                    Secondary Color
+                    {t("steps.layout.secondaryColorLabel")}
                   </label>
                   <input
                     type="color"
@@ -649,7 +672,7 @@ export default function NewCommunityPage() {
 
                 <div>
                   <label className="mb-2 block text-sm font-medium text-foreground">
-                    Accent Color
+                    {t("steps.layout.accentColorLabel")}
                   </label>
                   <input
                     type="color"
@@ -663,43 +686,45 @@ export default function NewCommunityPage() {
               {/* Font Family */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-foreground">
-                  Font Family
+                  {t("steps.layout.fontFamilyLabel")}
                 </label>
                 <select
                   value={formData.fontFamily}
                   onChange={(e) => setFormData({ ...formData, fontFamily: e.target.value })}
                   className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                 >
-                  <option value="Inter">Inter - Modern and clean</option>
-                  <option value="Montserrat">Montserrat - Bold and friendly</option>
-                  <option value="Open Sans">Open Sans - Professional and readable</option>
+                  {FONT_OPTIONS.map((font) => (
+                    <option key={font.key} value={font.value}>
+                      {t(`steps.layout.fonts.${font.key}`)}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               {/* Hero Section */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-foreground">
-                  Hero Title (Optional)
+                  {t("steps.layout.heroTitleLabel")}
                 </label>
                 <input
                   type="text"
                   value={formData.heroTitle}
                   onChange={(e) => setFormData({ ...formData, heroTitle: e.target.value })}
                   className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  placeholder="Welcome to our community"
+                  placeholder={t("steps.layout.heroTitlePlaceholder")}
                 />
               </div>
 
               <div>
                 <label className="mb-2 block text-sm font-medium text-foreground">
-                  Hero Subtitle (Optional)
+                  {t("steps.layout.heroSubtitleLabel")}
                 </label>
                 <textarea
                   value={formData.heroSubtitle}
                   onChange={(e) => setFormData({ ...formData, heroSubtitle: e.target.value })}
                   className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                   rows={3}
-                  placeholder="This is a community for..."
+                  placeholder={t("steps.layout.heroSubtitlePlaceholder")}
                 />
               </div>
             </>
@@ -722,10 +747,10 @@ export default function NewCommunityPage() {
                       htmlFor="isPrivate"
                       className="block text-sm font-medium text-foreground"
                     >
-                      Private Community
+                      {t("steps.settings.privateLabel")}
                     </label>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      Only approved members can see the community content
+                      {t("steps.settings.privateDescription")}
                     </p>
                   </div>
                 </div>
@@ -748,10 +773,10 @@ export default function NewCommunityPage() {
                       htmlFor="requireApproval"
                       className="block text-sm font-medium text-foreground"
                     >
-                      Require Approval for New Members
+                      {t("steps.settings.requireApprovalLabel")}
                     </label>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      You'll need to approve each member before they can join
+                      {t("steps.settings.requireApprovalDescription")}
                     </p>
                   </div>
                 </div>
@@ -762,9 +787,11 @@ export default function NewCommunityPage() {
                 <div className="flex items-start space-x-3">
                   <Sparkles className="h-5 w-5 text-primary" />
                   <div>
-                    <p className="text-sm font-medium text-foreground">Custom Domain</p>
+                    <p className="text-sm font-medium text-foreground">
+                      {t("steps.settings.customDomain.label")}
+                    </p>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      Available on Professional plan and above
+                      {t("steps.settings.customDomain.description")}
                     </p>
                   </div>
                 </div>
@@ -778,7 +805,7 @@ export default function NewCommunityPage() {
                 <div className="rounded-lg border-2 border-primary bg-primary/5 p-4">
                   <p className="flex items-center gap-2 text-sm font-semibold text-primary">
                     <Sparkles className="h-4 w-4" />
-                    Live Preview - This is how your community will look
+                    {t("steps.preview.livePreviewHeader")}
                   </p>
                 </div>
 
@@ -822,13 +849,13 @@ export default function NewCommunityPage() {
                         className="mb-2 text-3xl font-bold"
                         style={{ color: formData.primaryColor }}
                       >
-                        {formData.heroTitle || formData.name || "Your Community Name"}
+                        {formData.heroTitle || formData.name || t("steps.preview.nameFallback")}
                       </h1>
 
                       <p className="mx-auto max-w-2xl text-gray-600">
                         {formData.heroSubtitle ||
                           formData.description ||
-                          "Your community description will appear here"}
+                          t("steps.preview.descriptionFallback")}
                       </p>
 
                       <button
@@ -836,22 +863,28 @@ export default function NewCommunityPage() {
                         className="mt-6 rounded-full px-8 py-3 font-semibold text-white shadow-lg"
                         style={{ backgroundColor: formData.primaryColor }}
                       >
-                        Join Community
+                        {t("steps.preview.joinButton")}
                       </button>
 
                       {/* Mini Stats */}
                       <div className="mt-8 flex justify-center gap-8">
                         <div className="text-center">
                           <div className="text-2xl font-bold text-gray-900">1+</div>
-                          <div className="text-sm text-gray-500">Members</div>
+                          <div className="text-sm text-gray-500">
+                            {t("steps.preview.stats.members")}
+                          </div>
                         </div>
                         <div className="text-center">
                           <div className="text-2xl font-bold text-gray-900">0</div>
-                          <div className="text-sm text-gray-500">Courses</div>
+                          <div className="text-sm text-gray-500">
+                            {t("steps.preview.stats.courses")}
+                          </div>
                         </div>
                         <div className="text-center">
                           <div className="text-2xl font-bold text-gray-900">0</div>
-                          <div className="text-sm text-gray-500">Posts</div>
+                          <div className="text-sm text-gray-500">
+                            {t("steps.preview.stats.posts")}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -861,9 +894,9 @@ export default function NewCommunityPage() {
                   <div className="bg-gray-50 p-8">
                     <div className="mb-6 text-center">
                       <h2 className="mb-2 text-2xl font-bold text-gray-900">
-                        What You'll Get Inside
+                        {t("steps.preview.whatYouGetTitle")}
                       </h2>
-                      <p className="text-gray-600">Preview of member benefits</p>
+                      <p className="text-gray-600">{t("steps.preview.whatYouGetSubtitle")}</p>
                     </div>
 
                     <div className="grid grid-cols-3 gap-4">
@@ -874,8 +907,12 @@ export default function NewCommunityPage() {
                         >
                           <BookOpen className="h-5 w-5" style={{ color: formData.primaryColor }} />
                         </div>
-                        <div className="text-sm font-semibold text-gray-900">Courses</div>
-                        <div className="text-xs text-gray-500">Access premium content</div>
+                        <div className="text-sm font-semibold text-gray-900">
+                          {t("steps.preview.features.courses.title")}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {t("steps.preview.features.courses.description")}
+                        </div>
                       </div>
 
                       <div className="rounded-xl bg-white p-4 text-center shadow-sm">
@@ -885,8 +922,12 @@ export default function NewCommunityPage() {
                         >
                           <Users className="h-5 w-5" style={{ color: formData.secondaryColor }} />
                         </div>
-                        <div className="text-sm font-semibold text-gray-900">Community</div>
-                        <div className="text-xs text-gray-500">Connect with peers</div>
+                        <div className="text-sm font-semibold text-gray-900">
+                          {t("steps.preview.features.community.title")}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {t("steps.preview.features.community.description")}
+                        </div>
                       </div>
 
                       <div className="rounded-xl bg-white p-4 text-center shadow-sm">
@@ -896,8 +937,12 @@ export default function NewCommunityPage() {
                         >
                           <Sparkles className="h-5 w-5" style={{ color: formData.accentColor }} />
                         </div>
-                        <div className="text-sm font-semibold text-gray-900">Live Events</div>
-                        <div className="text-xs text-gray-500">Weekly sessions</div>
+                        <div className="text-sm font-semibold text-gray-900">
+                          {t("steps.preview.features.events.title")}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {t("steps.preview.features.events.description")}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -906,29 +951,33 @@ export default function NewCommunityPage() {
                 {/* Layout & Theme Info */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="rounded-lg border border-gray-200 bg-white p-4">
-                    <div className="mb-2 text-sm font-medium text-gray-700">Selected Layout</div>
+                    <div className="mb-2 text-sm font-medium text-gray-700">
+                      {t("steps.preview.selectedLayoutLabel")}
+                    </div>
                     <div className="text-lg font-bold" style={{ color: formData.primaryColor }}>
                       {formData.layoutType.replace(/_/g, " ")}
                     </div>
                   </div>
 
                   <div className="rounded-lg border border-gray-200 bg-white p-4">
-                    <div className="mb-2 text-sm font-medium text-gray-700">Color Theme</div>
+                    <div className="mb-2 text-sm font-medium text-gray-700">
+                      {t("steps.preview.colorThemeLabel")}
+                    </div>
                     <div className="flex gap-2">
                       <div
                         className="h-8 w-8 rounded-lg shadow-sm ring-2 ring-gray-200"
                         style={{ backgroundColor: formData.primaryColor }}
-                        title="Primary"
+                        title={t("steps.preview.swatch.primary")}
                       />
                       <div
                         className="h-8 w-8 rounded-lg shadow-sm ring-2 ring-gray-200"
                         style={{ backgroundColor: formData.secondaryColor }}
-                        title="Secondary"
+                        title={t("steps.preview.swatch.secondary")}
                       />
                       <div
                         className="h-8 w-8 rounded-lg shadow-sm ring-2 ring-gray-200"
                         style={{ backgroundColor: formData.accentColor }}
-                        title="Accent"
+                        title={t("steps.preview.swatch.accent")}
                       />
                     </div>
                   </div>
@@ -948,7 +997,7 @@ export default function NewCommunityPage() {
               disabled={isSubmitting}
             >
               <ArrowLeft className="h-4 w-4" />
-              <span>Previous</span>
+              <span>{t("common.previous")}</span>
             </Button>
           )}
 
@@ -958,7 +1007,7 @@ export default function NewCommunityPage() {
               className="ml-auto flex items-center space-x-2"
               disabled={!isStepValid()}
             >
-              <span>Continue</span>
+              <span>{t("common.continue")}</span>
               <ArrowRight className="h-4 w-4" />
             </Button>
           ) : (
@@ -968,7 +1017,7 @@ export default function NewCommunityPage() {
               disabled={!isStepValid() || isSubmitting}
             >
               <Sparkles className="h-4 w-4" />
-              <span>{isSubmitting ? "Creating..." : "Create Community"}</span>
+              <span>{isSubmitting ? t("common.creating") : t("common.createButton")}</span>
             </Button>
           )}
         </div>
