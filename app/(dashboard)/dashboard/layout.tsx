@@ -46,23 +46,6 @@ const fallbackMessages: Messages = {
     signup: "Sign Up",
     back: "Back",
   },
-  communities: {
-    stepBasicInfo: "Basic Information",
-    stepBasicInfoDesc: "Start with the essentials",
-    stepAppearance: "Appearance",
-    stepAppearanceDesc: "Customize your community look",
-    stepLayout: "Layout",
-    stepLayoutDesc: "Choose your community structure",
-    stepSettings: "Settings",
-    stepSettingsDesc: "Configure access and privacy",
-    stepPreview: "Preview",
-    stepPreviewDesc: "Review before publishing",
-    descriptionPlaceholder:
-      "Describe your community, what members will learn, and why they should join...",
-    backToCommunities: "Back to Communities",
-    communityName: "Community Name",
-    continue: "Continue",
-  },
 };
 
 async function loadMessages(locale: string): Promise<Messages> {
