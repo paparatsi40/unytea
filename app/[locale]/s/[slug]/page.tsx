@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import {
   getPublicSessionBySlug,
   getRelatedSessions,
@@ -15,12 +16,16 @@ interface Props {
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const params = await props.params;
+  const t = await getTranslations({
+    locale: params.locale,
+    namespace: "liveSession.publicPage.metadata",
+  });
   const session = await getPublicSessionBySlug(params.slug);
 
   if (!session) {
     return {
-      title: "Session Not Found | Unytea",
-      description: "This session could not be found.",
+      title: t("notFoundTitle"),
+      description: t("notFoundDescription"),
     };
   }
 
@@ -29,13 +34,13 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   const isPast = session.status === "COMPLETED";
 
   let title = session.title;
-  if (isLive) title = `🔴 LIVE: ${session.title}`;
-  else if (isUpcoming) title = `📅 Upcoming: ${session.title}`;
-  else if (isPast) title = `🎥 Replay: ${session.title}`;
+  if (isLive) title = `🔴 ${t("titleLive", { title: session.title })}`;
+  else if (isUpcoming) title = `📅 ${t("titleUpcoming", { title: session.title })}`;
+  else if (isPast) title = `🎥 ${t("titleReplay", { title: session.title })}`;
 
   const description =
     session.description?.slice(0, 160) ||
-    `Join ${session.mentor.name || "our expert"} for an interactive session on Unytea.`;
+    t("descriptionFallback", { name: session.mentor.name || t("defaultExpert") });
 
   const imageUrl =
     session.community?.imageUrl || session.mentor.image || "https://www.unytea.com/og-image.png";

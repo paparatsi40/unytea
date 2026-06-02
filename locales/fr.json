@@ -2422,5 +2422,106 @@
       "documentFile": "Fichier document",
       "tags": "Étiquettes"
     }
+  },
+  "liveSession": {
+    "publicPage": {
+      "nav": {
+        "back": "Retour à Unytea",
+        "share": "Partager"
+      },
+      "share": {
+        "shareText": "Regardez « {title} » par {host} sur Unytea",
+        "socialText": "Rejoignez cette session en direct : {title}"
+      },
+      "header": {
+        "badgeRecordingAvailable": "Enregistrement disponible",
+        "badgeMembersOnly": "Enregistrement réservé aux membres",
+        "duration": "{minutes} min",
+        "attended": "{count, plural, =1 {1 participant} other {# participants}}"
+      },
+      "player": {
+        "clickToPlay": "Cliquez pour lire l'enregistrement"
+      },
+      "replayGate": {
+        "title": "Rediffusion réservée aux membres",
+        "body": "Cet enregistrement est disponible pour les membres de la communauté. Rejoignez-la pour voir la rediffusion complète et assister à la prochaine session en direct."
+      },
+      "tabs": {
+        "about": "À propos",
+        "notes": "Notes",
+        "community": "Communauté"
+      },
+      "host": {
+        "hostedBy": "Animé par {name}",
+        "roleAt": "Animateur de sessions en direct chez {community}"
+      },
+      "summary": {
+        "title": "Résumé par IA",
+        "keyTakeaways": "Points clés",
+        "chapters": "Chapitres",
+        "keyQuotes": "Citations marquantes"
+      },
+      "notes": {
+        "sessionNotes": "Notes de la session",
+        "membersOnlyTitle": "Informations réservées aux membres",
+        "membersOnlyBody": "Rejoignez la communauté pour débloquer le résumé par IA, les points clés, les chapitres et les notes complètes de la session.",
+        "unlockCta": "Rejoindre pour débloquer les informations",
+        "tabMembersOnly": "Les notes sont disponibles uniquement pour les membres de la communauté.",
+        "tabEmpty": "Aucune note disponible pour cette session."
+      },
+      "communityTab": {
+        "members": "{count, plural, =1 {1 membre} other {# membres}}"
+      },
+      "related": {
+        "title": "Sessions associées",
+        "noPublicPage": "Aucune page publique pour cette session"
+      },
+      "crossCommunity": {
+        "title": "Autres communautés organisant des sessions cette semaine",
+        "subtitle": "Découvrez des communautés actives et rejoignez leurs prochaines sessions en direct.",
+        "members": "{count, plural, =1 {1 membre} other {# membres}}",
+        "attending": "{count} participants"
+      },
+      "sidebar": {
+        "intro": "Rejoignez cette communauté pour accéder aux sessions en direct, aux enregistrements et échanger avec des personnes partageant vos centres d'intérêt.",
+        "nextLive": "Prochaine session en direct",
+        "rsvpCounts": "{attending} participants · {interested} intéressés",
+        "attendingBtn": "Je participe",
+        "interestedBtn": "Intéressé",
+        "updating": "Mise à jour...",
+        "addGoogle": "Ajouter à Google Calendar",
+        "addApple": "Ajouter à Apple Calendar",
+        "viewRoom": "Voir la salle de la session",
+        "joinToRsvp": "Rejoignez la communauté pour confirmer votre présence et participer en direct.",
+        "askTitle": "Posez une question pour la prochaine session",
+        "askPlaceholder": "Déposez votre question pour l'animateur...",
+        "submitting": "Envoi...",
+        "submitQuestion": "Envoyer la question",
+        "goToCommunity": "Aller à la communauté",
+        "joinCommunity": "Rejoindre la communauté",
+        "explore": "Explorer les communautés",
+        "freeToJoin": "Gratuit pour rejoindre. Aucune carte bancaire requise."
+      },
+      "toasts": {
+        "rsvpRemoved": "Confirmation supprimée.",
+        "rsvpAttending": "Vous participez à la prochaine session en direct.",
+        "rsvpInterested": "Marqué comme intéressé.",
+        "rsvpFailed": "Impossible de mettre à jour la confirmation.",
+        "questionSubmitted": "Question envoyée pour la prochaine session en direct.",
+        "questionFailed": "Impossible d'envoyer votre question."
+      },
+      "calendar": {
+        "defaultDescription": "Rejoignez cette session en direct sur Unytea."
+      },
+      "metadata": {
+        "notFoundTitle": "Session introuvable | Unytea",
+        "notFoundDescription": "Cette session est introuvable.",
+        "titleLive": "EN DIRECT : {title}",
+        "titleUpcoming": "À venir : {title}",
+        "titleReplay": "Rediffusion : {title}",
+        "descriptionFallback": "Rejoignez {name} pour une session interactive sur Unytea.",
+        "defaultExpert": "notre expert"
+      }
+    }
   }
 }

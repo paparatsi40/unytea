@@ -11,6 +11,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { format } from "date-fns";
+import { useTranslations } from "next-intl";
+import { getDateFnsLocale } from "@/lib/i18n/date-fns-locale";
 
 interface PublicSessionPageProps {
   locale?: string;
@@ -99,6 +101,8 @@ export function PublicSessionPage({
   nextSession,
   relatedCommunities,
 }: PublicSessionPageProps) {
+  const t = useTranslations("liveSession.publicPage");
+  const dfLocale = getDateFnsLocale(locale);
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPlaying, setIsPlaying] = useState(false);
@@ -114,7 +118,9 @@ export function PublicSessionPage({
   >([]);
   const [rsvpMessage, setRsvpMessage] = useState<string | null>(null);
 
-  const formattedDate = format(new Date(session.scheduledAt), "MMMM d, yyyy");
+  const formattedDate = format(new Date(session.scheduledAt), "MMMM d, yyyy", {
+    locale: dfLocale,
+  });
   const canViewPremiumContent = session.canWatchRecording || session.isMember;
   const ref = searchParams?.get("ref") || null;
   const src = searchParams?.get("src") || null;
@@ -129,9 +135,9 @@ export function PublicSessionPage({
   if (src) roomParams.set("parent_src", src);
   const nextSessionRoomHref = `/dashboard/sessions/${nextSession?.id}/room?${roomParams.toString()}`;
   const formattedDuration = session.recording?.durationSeconds
-    ? `${Math.round(session.recording.durationSeconds / 60)} min`
+    ? t("header.duration", { minutes: Math.round(session.recording.durationSeconds / 60) })
     : session.duration
-      ? `${session.duration} min`
+      ? t("header.duration", { minutes: session.duration })
       : null;
 
   const buildGoogleCalendarUrl = (item: {
@@ -147,7 +153,7 @@ export function PublicSessionPage({
     const params = new URLSearchParams({
       action: "TEMPLATE",
       text: item.title,
-      details: item.description || "Join this live session on Unytea.",
+      details: item.description || t("calendar.defaultDescription"),
       dates: `${formatCalDate(start)}/${formatCalDate(end)}`,
     });
 
@@ -175,7 +181,7 @@ export function PublicSessionPage({
       `DTSTART:${formatCalDate(start)}`,
       `DTEND:${formatCalDate(end)}`,
       `SUMMARY:${(item.title || "Unytea Session").replace(/,/g, "\\,")}`,
-      `DESCRIPTION:${(item.description || "Join this live session on Unytea.").replace(/\n/g, " ").replace(/,/g, "\\,")}`,
+      `DESCRIPTION:${(item.description || t("calendar.defaultDescription")).replace(/\n/g, " ").replace(/,/g, "\\,")}`,
       "END:VEVENT",
       "END:VCALENDAR",
     ].join("\r\n");
@@ -198,7 +204,7 @@ export function PublicSessionPage({
     if (navigator.share) {
       await navigator.share({
         title: session.title,
-        text: `Watch "${session.title}" by ${session.host.name} on Unytea`,
+        text: t("share.shareText", { title: session.title, host: session.host.name ?? "" }),
         url: shareUrl.toString(),
       });
     } else {
@@ -209,7 +215,7 @@ export function PublicSessionPage({
   const shareToNetwork = (network: "twitter" | "linkedin" | "whatsapp") => {
     const shareUrl = new URL(window.location.href);
     shareUrl.searchParams.set("src", "public_share_network");
-    const text = encodeURIComponent(`Join this live session: ${session.title}`);
+    const text = encodeURIComponent(t("share.socialText", { title: session.title }));
     const url = encodeURIComponent(shareUrl.toString());
 
     const target =
@@ -253,14 +259,14 @@ export function PublicSessionPage({
       setNextInterestedCount(result.interestedCount || 0);
       setNextAttendingPreview(result.attendingPreview || []);
       if (!result.status) {
-        setRsvpMessage("RSVP removed.");
+        setRsvpMessage(t("toasts.rsvpRemoved"));
       } else if (result.status === "attending") {
-        setRsvpMessage("You're attending the next live session.");
+        setRsvpMessage(t("toasts.rsvpAttending"));
       } else {
-        setRsvpMessage("Marked as interested.");
+        setRsvpMessage(t("toasts.rsvpInterested"));
       }
     } else {
-      setRsvpMessage(result.error || "Could not update RSVP.");
+      setRsvpMessage(result.error || t("toasts.rsvpFailed"));
     }
 
     setIsRSVPLoading(false);
@@ -280,9 +286,9 @@ export function PublicSessionPage({
 
     if (result.success) {
       setQuestion("");
-      setQuestionMessage("Question submitted for the next live session.");
+      setQuestionMessage(t("toasts.questionSubmitted"));
     } else {
-      setQuestionMessage(result.error || "Could not submit your question.");
+      setQuestionMessage(result.error || t("toasts.questionFailed"));
     }
 
     setIsSubmittingQuestion(false);
@@ -301,7 +307,7 @@ export function PublicSessionPage({
               className="text-zinc-400 hover:text-white"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Unytea
+              {t("nav.back")}
             </Button>
             <div className="flex items-center gap-2">
               <Button
@@ -311,7 +317,7 @@ export function PublicSessionPage({
                 className="text-zinc-400 hover:text-white"
               >
                 <Share2 className="mr-2 h-4 w-4" />
-                Share
+                {t("nav.share")}
               </Button>
               <Button
                 variant="ghost"
@@ -348,7 +354,9 @@ export function PublicSessionPage({
           <Badge
             className={`mb-3 border ${session.canWatchRecording ? "border-emerald-500/30 bg-emerald-500/20 text-emerald-400" : "border-amber-500/30 bg-amber-500/20 text-amber-400"}`}
           >
-            {session.canWatchRecording ? "Recording Available" : "Members-only recording"}
+            {session.canWatchRecording
+              ? t("header.badgeRecordingAvailable")
+              : t("header.badgeMembersOnly")}
           </Badge>
           <h1 className="mb-4 text-3xl font-bold text-white sm:text-4xl">{session.title}</h1>
           <p className="mb-4 max-w-3xl text-lg text-zinc-400">{session.description}</p>
@@ -365,7 +373,7 @@ export function PublicSessionPage({
             )}
             <div className="flex items-center gap-2">
               <Users className="h-4 w-4" />
-              {session.attendeeCount} attended
+              {t("header.attended", { count: session.attendeeCount })}
             </div>
           </div>
         </div>
@@ -384,7 +392,7 @@ export function PublicSessionPage({
                   <div className="flex h-20 w-20 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400">
                     <Play className="h-10 w-10 fill-current" />
                   </div>
-                  <span className="text-zinc-400">Click to play recording</span>
+                  <span className="text-zinc-400">{t("player.clickToPlay")}</span>
                 </div>
               </div>
             )}
@@ -393,11 +401,8 @@ export function PublicSessionPage({
 
         {session.recording && !session.recording.url && (
           <div className="mb-8 rounded-xl border border-amber-500/30 bg-amber-500/10 p-6">
-            <h3 className="text-lg font-semibold text-white">Members-only replay</h3>
-            <p className="mt-2 text-sm text-zinc-300">
-              This recording is available to community members. Join to watch the full replay and
-              attend the next live session.
-            </p>
+            <h3 className="text-lg font-semibold text-white">{t("replayGate.title")}</h3>
+            <p className="mt-2 text-sm text-zinc-300">{t("replayGate.body")}</p>
           </div>
         )}
 
@@ -406,11 +411,11 @@ export function PublicSessionPage({
           <div className="lg:col-span-2">
             <Tabs defaultValue="about" className="w-full">
               <TabsList className="mb-6 bg-zinc-900">
-                <TabsTrigger value="about">About</TabsTrigger>
+                <TabsTrigger value="about">{t("tabs.about")}</TabsTrigger>
                 <TabsTrigger value="notes" disabled={!session.notes || !canViewPremiumContent}>
-                  Notes {session.notes && canViewPremiumContent && "✓"}
+                  {t("tabs.notes")} {session.notes && canViewPremiumContent && "✓"}
                 </TabsTrigger>
-                <TabsTrigger value="community">Community</TabsTrigger>
+                <TabsTrigger value="community">{t("tabs.community")}</TabsTrigger>
               </TabsList>
 
               <TabsContent value="about" className="space-y-6">
@@ -425,9 +430,11 @@ export function PublicSessionPage({
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
-                        <h3 className="font-semibold text-white">Hosted by {session.host.name}</h3>
+                        <h3 className="font-semibold text-white">
+                          {t("host.hostedBy", { name: session.host.name ?? "" })}
+                        </h3>
                         <p className="text-sm text-zinc-500">
-                          Live session host at {session.community.name}
+                          {t("host.roleAt", { community: session.community.name })}
                         </p>
                       </div>
                     </div>
@@ -437,13 +444,13 @@ export function PublicSessionPage({
                 {session.notes?.summary && canViewPremiumContent && (
                   <Card className="border-zinc-800 bg-zinc-900/50">
                     <CardContent className="p-6">
-                      <h3 className="mb-2 font-semibold text-white">AI Summary</h3>
+                      <h3 className="mb-2 font-semibold text-white">{t("summary.title")}</h3>
                       <p className="text-zinc-300">{session.notes.summary}</p>
 
                       {session.notes.keyInsights.length > 0 && (
                         <div className="mt-4">
                           <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">
-                            Key takeaways
+                            {t("summary.keyTakeaways")}
                           </p>
                           <ul className="list-disc space-y-1 pl-5 text-sm text-zinc-300">
                             {session.notes.keyInsights.slice(0, 5).map((item, idx) => (
@@ -456,7 +463,7 @@ export function PublicSessionPage({
                       {session.notes.chapters.length > 0 && (
                         <div className="mt-5">
                           <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">
-                            Chapters
+                            {t("summary.chapters")}
                           </p>
                           <div className="space-y-2">
                             {session.notes.chapters.slice(0, 6).map((chapter, idx) => (
@@ -477,7 +484,7 @@ export function PublicSessionPage({
                       {session.notes.quotes.length > 0 && (
                         <div className="mt-5">
                           <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">
-                            Key quotes
+                            {t("summary.keyQuotes")}
                           </p>
                           <div className="space-y-3">
                             {session.notes.quotes.slice(0, 3).map((quote, idx) => (
@@ -502,7 +509,7 @@ export function PublicSessionPage({
                 {session.notes?.content && canViewPremiumContent && (
                   <Card className="border-zinc-800 bg-zinc-900/50">
                     <CardContent className="p-6">
-                      <h3 className="mb-4 font-semibold text-white">Session Notes</h3>
+                      <h3 className="mb-4 font-semibold text-white">{t("notes.sessionNotes")}</h3>
                       <div className="prose prose-invert max-w-none text-zinc-300">
                         {session.notes.content}
                       </div>
@@ -513,16 +520,15 @@ export function PublicSessionPage({
                 {session.notes && !canViewPremiumContent && (
                   <Card className="border-amber-500/30 bg-amber-500/10">
                     <CardContent className="p-6">
-                      <h3 className="mb-2 font-semibold text-white">Members-only insights</h3>
-                      <p className="text-sm text-zinc-300">
-                        Join the community to unlock AI summary, key takeaways, chapters, and full
-                        session notes.
-                      </p>
+                      <h3 className="mb-2 font-semibold text-white">
+                        {t("notes.membersOnlyTitle")}
+                      </h3>
+                      <p className="text-sm text-zinc-300">{t("notes.membersOnlyBody")}</p>
                       <Button
                         className="mt-4 bg-emerald-500 text-white hover:bg-emerald-600"
                         onClick={() => router.push(joinCommunityHref)}
                       >
-                        Join to unlock insights
+                        {t("notes.unlockCta")}
                       </Button>
                     </CardContent>
                   </Card>
@@ -541,13 +547,11 @@ export function PublicSessionPage({
                 ) : session.notes && !canViewPremiumContent ? (
                   <Card className="border-amber-500/30 bg-amber-500/10">
                     <CardContent className="p-6">
-                      <p className="text-sm text-zinc-300">
-                        Notes are available for community members only.
-                      </p>
+                      <p className="text-sm text-zinc-300">{t("notes.tabMembersOnly")}</p>
                     </CardContent>
                   </Card>
                 ) : (
-                  <p className="text-zinc-500">No notes available for this session.</p>
+                  <p className="text-zinc-500">{t("notes.tabEmpty")}</p>
                 )}
               </TabsContent>
 
@@ -566,7 +570,7 @@ export function PublicSessionPage({
                           {session.community.name}
                         </h3>
                         <p className="mb-2 text-sm text-zinc-500">
-                          {session.community.memberCount} members
+                          {t("communityTab.members", { count: session.community.memberCount })}
                         </p>
                         <p className="text-zinc-400">{session.community.description}</p>
                       </div>
@@ -579,7 +583,7 @@ export function PublicSessionPage({
             {/* Related Sessions */}
             {relatedSessions && relatedSessions.length > 0 && (
               <div className="mt-8">
-                <h3 className="mb-4 text-xl font-semibold text-white">Related sessions</h3>
+                <h3 className="mb-4 text-xl font-semibold text-white">{t("related.title")}</h3>
                 <div className="grid gap-4 sm:grid-cols-2">
                   {relatedSessions.map((related) => {
                     const hasPublicPage = Boolean(related.slug);
@@ -612,7 +616,7 @@ export function PublicSessionPage({
                           </div>
                           {!hasPublicPage && (
                             <p className="mt-2 text-xs text-zinc-500">
-                              No public page for this session
+                              {t("related.noPublicPage")}
                             </p>
                           )}
                         </CardContent>
@@ -627,11 +631,9 @@ export function PublicSessionPage({
             {relatedCommunities && relatedCommunities.length > 0 && (
               <div className="mt-8">
                 <h3 className="mb-2 text-xl font-semibold text-white">
-                  Other communities hosting this week
+                  {t("crossCommunity.title")}
                 </h3>
-                <p className="mb-4 text-sm text-zinc-400">
-                  Discover active communities and join their next live sessions.
-                </p>
+                <p className="mb-4 text-sm text-zinc-400">{t("crossCommunity.subtitle")}</p>
                 <div className="grid gap-4 sm:grid-cols-2">
                   {relatedCommunities.map((community) => (
                     <Card
@@ -650,15 +652,19 @@ export function PublicSessionPage({
                           <div className="min-w-0 flex-1">
                             <p className="truncate font-medium text-white">{community.name}</p>
                             <p className="mt-1 text-xs text-zinc-400">
-                              {community.memberCount} members
+                              {t("crossCommunity.members", { count: community.memberCount })}
                             </p>
                             {community.nextSession && (
                               <p className="mt-2 text-xs text-emerald-400">
                                 {format(
                                   new Date(community.nextSession.scheduledAt),
-                                  "EEE, MMM d · h:mm a"
+                                  "EEE, MMM d · h:mm a",
+                                  { locale: dfLocale }
                                 )}{" "}
-                                · {community.nextSession.attendingCount} attending
+                                ·{" "}
+                                {t("crossCommunity.attending", {
+                                  count: community.nextSession.attendingCount,
+                                })}
                               </p>
                             )}
                           </div>
@@ -684,26 +690,30 @@ export function PublicSessionPage({
                   </Avatar>
                   <div>
                     <h3 className="font-semibold text-white">{session.community.name}</h3>
-                    <p className="text-sm text-zinc-500">{session.community.memberCount} members</p>
+                    <p className="text-sm text-zinc-500">
+                      {t("communityTab.members", { count: session.community.memberCount })}
+                    </p>
                   </div>
                 </div>
 
-                <p className="mb-6 text-sm text-zinc-400">
-                  Join this community to access live sessions, recordings, and connect with
-                  like-minded people.
-                </p>
+                <p className="mb-6 text-sm text-zinc-400">{t("sidebar.intro")}</p>
 
                 {nextSession && (
                   <div className="mb-4 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3">
                     <p className="text-xs font-semibold uppercase tracking-wide text-emerald-400">
-                      Next live session
+                      {t("sidebar.nextLive")}
                     </p>
                     <p className="mt-1 text-sm font-semibold text-white">{nextSession.title}</p>
                     <p className="mt-1 text-xs text-zinc-300">
-                      {format(new Date(nextSession.scheduledAt), "MMM d, yyyy 'at' h:mm a")}
+                      {format(new Date(nextSession.scheduledAt), "MMM d, yyyy 'at' h:mm a", {
+                        locale: dfLocale,
+                      })}
                     </p>
                     <p className="mt-1 text-xs text-zinc-300">
-                      {nextAttendingCount ?? 0} attending · {nextInterestedCount ?? 0} interested
+                      {t("sidebar.rsvpCounts", {
+                        attending: nextAttendingCount ?? 0,
+                        interested: nextInterestedCount ?? 0,
+                      })}
                     </p>
                     {nextAttendingPreview.length > 0 && (
                       <div className="mt-2 flex -space-x-2">
@@ -725,7 +735,7 @@ export function PublicSessionPage({
                           variant={nextRsvpStatus === "attending" ? "secondary" : "default"}
                           className={`mt-3 w-full ${nextRsvpStatus === "attending" ? "bg-zinc-800 text-zinc-200 hover:bg-zinc-700" : "bg-emerald-500 text-white hover:bg-emerald-600"}`}
                         >
-                          {isRSVPLoading ? "Updating..." : "Attending"}
+                          {isRSVPLoading ? t("sidebar.updating") : t("sidebar.attendingBtn")}
                         </Button>
                         <Button
                           onClick={() => handleSetNextSessionRSVP("interested")}
@@ -733,7 +743,7 @@ export function PublicSessionPage({
                           variant={nextRsvpStatus === "interested" ? "secondary" : "outline"}
                           className={`mt-2 w-full ${nextRsvpStatus === "interested" ? "bg-zinc-800 text-zinc-200 hover:bg-zinc-700" : "border-zinc-700 text-zinc-200 hover:bg-zinc-800"}`}
                         >
-                          {isRSVPLoading ? "Updating..." : "Interested"}
+                          {isRSVPLoading ? t("sidebar.updating") : t("sidebar.interestedBtn")}
                         </Button>
                         <Button
                           asChild
@@ -750,7 +760,7 @@ export function PublicSessionPage({
                             target="_blank"
                             rel="noreferrer"
                           >
-                            Add to Google Calendar
+                            {t("sidebar.addGoogle")}
                           </a>
                         </Button>
                         <Button
@@ -766,7 +776,7 @@ export function PublicSessionPage({
                           variant="outline"
                           className="mt-2 w-full border-zinc-700 text-zinc-200 hover:bg-zinc-800"
                         >
-                          Add to Apple Calendar
+                          {t("sidebar.addApple")}
                         </Button>
                         {rsvpMessage && <p className="mt-2 text-xs text-zinc-300">{rsvpMessage}</p>}
                         <Button
@@ -774,13 +784,11 @@ export function PublicSessionPage({
                           variant="outline"
                           className="mt-2 w-full border-zinc-700 text-zinc-200 hover:bg-zinc-800"
                         >
-                          View session room
+                          {t("sidebar.viewRoom")}
                         </Button>
                       </>
                     ) : (
-                      <p className="mt-2 text-xs text-zinc-300">
-                        Join community to RSVP and participate live.
-                      </p>
+                      <p className="mt-2 text-xs text-zinc-300">{t("sidebar.joinToRsvp")}</p>
                     )}
                   </div>
                 )}
@@ -788,12 +796,12 @@ export function PublicSessionPage({
                 {nextSession && session.isMember && (
                   <div className="mb-4 space-y-2">
                     <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
-                      Ask a question for next session
+                      {t("sidebar.askTitle")}
                     </p>
                     <textarea
                       value={question}
                       onChange={(e) => setQuestion(e.target.value)}
-                      placeholder="Drop your question for the host..."
+                      placeholder={t("sidebar.askPlaceholder")}
                       className="min-h-[84px] w-full rounded-md border border-zinc-700 bg-zinc-900 p-2 text-sm text-white placeholder:text-zinc-500 focus:border-emerald-500 focus:outline-none"
                     />
                     <Button
@@ -801,7 +809,7 @@ export function PublicSessionPage({
                       onClick={handleAskQuestion}
                       className="w-full bg-zinc-800 text-zinc-200 hover:bg-zinc-700"
                     >
-                      {isSubmittingQuestion ? "Submitting..." : "Submit Question"}
+                      {isSubmittingQuestion ? t("sidebar.submitting") : t("sidebar.submitQuestion")}
                     </Button>
                     {questionMessage && <p className="text-xs text-zinc-400">{questionMessage}</p>}
                   </div>
@@ -811,7 +819,7 @@ export function PublicSessionPage({
                   className="mb-3 w-full bg-emerald-500 text-white hover:bg-emerald-600"
                   onClick={() => router.push(joinCommunityHref)}
                 >
-                  {session.isMember ? "Go to Community" : "Join Community"}
+                  {session.isMember ? t("sidebar.goToCommunity") : t("sidebar.joinCommunity")}
                 </Button>
 
                 <Button
@@ -819,12 +827,12 @@ export function PublicSessionPage({
                   className="w-full border-zinc-700 text-zinc-300 hover:bg-zinc-800"
                   onClick={() => router.push(`/${locale}/`)}
                 >
-                  Explore Communities
+                  {t("sidebar.explore")}
                 </Button>
 
                 {!session.isMember && (
                   <p className="mt-4 text-center text-xs text-zinc-500">
-                    Free to join. No credit card required.
+                    {t("sidebar.freeToJoin")}
                   </p>
                 )}
               </CardContent>

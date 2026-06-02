@@ -2411,5 +2411,106 @@
       "documentFile": "Document file",
       "tags": "Tags"
     }
+  },
+  "liveSession": {
+    "publicPage": {
+      "nav": {
+        "back": "Back to Unytea",
+        "share": "Share"
+      },
+      "share": {
+        "shareText": "Watch \"{title}\" by {host} on Unytea",
+        "socialText": "Join this live session: {title}"
+      },
+      "header": {
+        "badgeRecordingAvailable": "Recording Available",
+        "badgeMembersOnly": "Members-only recording",
+        "duration": "{minutes} min",
+        "attended": "{count, plural, =1 {1 attended} other {# attended}}"
+      },
+      "player": {
+        "clickToPlay": "Click to play recording"
+      },
+      "replayGate": {
+        "title": "Members-only replay",
+        "body": "This recording is available to community members. Join to watch the full replay and attend the next live session."
+      },
+      "tabs": {
+        "about": "About",
+        "notes": "Notes",
+        "community": "Community"
+      },
+      "host": {
+        "hostedBy": "Hosted by {name}",
+        "roleAt": "Live session host at {community}"
+      },
+      "summary": {
+        "title": "AI Summary",
+        "keyTakeaways": "Key takeaways",
+        "chapters": "Chapters",
+        "keyQuotes": "Key quotes"
+      },
+      "notes": {
+        "sessionNotes": "Session Notes",
+        "membersOnlyTitle": "Members-only insights",
+        "membersOnlyBody": "Join the community to unlock AI summary, key takeaways, chapters, and full session notes.",
+        "unlockCta": "Join to unlock insights",
+        "tabMembersOnly": "Notes are available for community members only.",
+        "tabEmpty": "No notes available for this session."
+      },
+      "communityTab": {
+        "members": "{count, plural, =1 {1 member} other {# members}}"
+      },
+      "related": {
+        "title": "Related sessions",
+        "noPublicPage": "No public page for this session"
+      },
+      "crossCommunity": {
+        "title": "Other communities hosting this week",
+        "subtitle": "Discover active communities and join their next live sessions.",
+        "members": "{count, plural, =1 {1 member} other {# members}}",
+        "attending": "{count} attending"
+      },
+      "sidebar": {
+        "intro": "Join this community to access live sessions, recordings, and connect with like-minded people.",
+        "nextLive": "Next live session",
+        "rsvpCounts": "{attending} attending · {interested} interested",
+        "attendingBtn": "Attending",
+        "interestedBtn": "Interested",
+        "updating": "Updating...",
+        "addGoogle": "Add to Google Calendar",
+        "addApple": "Add to Apple Calendar",
+        "viewRoom": "View session room",
+        "joinToRsvp": "Join community to RSVP and participate live.",
+        "askTitle": "Ask a question for next session",
+        "askPlaceholder": "Drop your question for the host...",
+        "submitting": "Submitting...",
+        "submitQuestion": "Submit Question",
+        "goToCommunity": "Go to Community",
+        "joinCommunity": "Join Community",
+        "explore": "Explore Communities",
+        "freeToJoin": "Free to join. No credit card required."
+      },
+      "toasts": {
+        "rsvpRemoved": "RSVP removed.",
+        "rsvpAttending": "You're attending the next live session.",
+        "rsvpInterested": "Marked as interested.",
+        "rsvpFailed": "Could not update RSVP.",
+        "questionSubmitted": "Question submitted for the next live session.",
+        "questionFailed": "Could not submit your question."
+      },
+      "calendar": {
+        "defaultDescription": "Join this live session on Unytea."
+      },
+      "metadata": {
+        "notFoundTitle": "Session Not Found | Unytea",
+        "notFoundDescription": "This session could not be found.",
+        "titleLive": "LIVE: {title}",
+        "titleUpcoming": "Upcoming: {title}",
+        "titleReplay": "Replay: {title}",
+        "descriptionFallback": "Join {name} for an interactive session on Unytea.",
+        "defaultExpert": "our expert"
+      }
+    }
   }
 }

@@ -2420,5 +2420,106 @@
       "documentFile": "Archivo de documento",
       "tags": "Etiquetas"
     }
+  },
+  "liveSession": {
+    "publicPage": {
+      "nav": {
+        "back": "Volver a Unytea",
+        "share": "Compartir"
+      },
+      "share": {
+        "shareText": "Mira \"{title}\" de {host} en Unytea",
+        "socialText": "Únete a esta sesión en vivo: {title}"
+      },
+      "header": {
+        "badgeRecordingAvailable": "Grabación disponible",
+        "badgeMembersOnly": "Grabación solo para miembros",
+        "duration": "{minutes} min",
+        "attended": "{count, plural, =1 {1 asistente} other {# asistentes}}"
+      },
+      "player": {
+        "clickToPlay": "Haz clic para reproducir la grabación"
+      },
+      "replayGate": {
+        "title": "Repetición solo para miembros",
+        "body": "Esta grabación está disponible para los miembros de la comunidad. Únete para ver la repetición completa y asistir a la próxima sesión en vivo."
+      },
+      "tabs": {
+        "about": "Acerca de",
+        "notes": "Notas",
+        "community": "Comunidad"
+      },
+      "host": {
+        "hostedBy": "Presentado por {name}",
+        "roleAt": "Anfitrión de sesiones en vivo en {community}"
+      },
+      "summary": {
+        "title": "Resumen con IA",
+        "keyTakeaways": "Puntos clave",
+        "chapters": "Capítulos",
+        "keyQuotes": "Citas destacadas"
+      },
+      "notes": {
+        "sessionNotes": "Notas de la sesión",
+        "membersOnlyTitle": "Información solo para miembros",
+        "membersOnlyBody": "Únete a la comunidad para desbloquear el resumen con IA, los puntos clave, los capítulos y las notas completas de la sesión.",
+        "unlockCta": "Únete para desbloquear la información",
+        "tabMembersOnly": "Las notas están disponibles solo para miembros de la comunidad.",
+        "tabEmpty": "No hay notas disponibles para esta sesión."
+      },
+      "communityTab": {
+        "members": "{count, plural, =1 {1 miembro} other {# miembros}}"
+      },
+      "related": {
+        "title": "Sesiones relacionadas",
+        "noPublicPage": "No hay página pública para esta sesión"
+      },
+      "crossCommunity": {
+        "title": "Otras comunidades con sesiones esta semana",
+        "subtitle": "Descubre comunidades activas y únete a sus próximas sesiones en vivo.",
+        "members": "{count, plural, =1 {1 miembro} other {# miembros}}",
+        "attending": "{count} asistentes"
+      },
+      "sidebar": {
+        "intro": "Únete a esta comunidad para acceder a sesiones en vivo, grabaciones y conectar con personas afines.",
+        "nextLive": "Próxima sesión en vivo",
+        "rsvpCounts": "{attending} asistentes · {interested} interesados",
+        "attendingBtn": "Asistiré",
+        "interestedBtn": "Me interesa",
+        "updating": "Actualizando...",
+        "addGoogle": "Añadir a Google Calendar",
+        "addApple": "Añadir a Apple Calendar",
+        "viewRoom": "Ver sala de la sesión",
+        "joinToRsvp": "Únete a la comunidad para confirmar asistencia y participar en vivo.",
+        "askTitle": "Haz una pregunta para la próxima sesión",
+        "askPlaceholder": "Escribe tu pregunta para el anfitrión...",
+        "submitting": "Enviando...",
+        "submitQuestion": "Enviar pregunta",
+        "goToCommunity": "Ir a la comunidad",
+        "joinCommunity": "Unirse a la comunidad",
+        "explore": "Explorar comunidades",
+        "freeToJoin": "Gratis para unirte. No se requiere tarjeta de crédito."
+      },
+      "toasts": {
+        "rsvpRemoved": "Confirmación eliminada.",
+        "rsvpAttending": "Asistirás a la próxima sesión en vivo.",
+        "rsvpInterested": "Marcado como interesado.",
+        "rsvpFailed": "No se pudo actualizar la confirmación.",
+        "questionSubmitted": "Pregunta enviada para la próxima sesión en vivo.",
+        "questionFailed": "No se pudo enviar tu pregunta."
+      },
+      "calendar": {
+        "defaultDescription": "Únete a esta sesión en vivo en Unytea."
+      },
+      "metadata": {
+        "notFoundTitle": "Sesión no encontrada | Unytea",
+        "notFoundDescription": "No se pudo encontrar esta sesión.",
+        "titleLive": "EN VIVO: {title}",
+        "titleUpcoming": "Próximamente: {title}",
+        "titleReplay": "Repetición: {title}",
+        "descriptionFallback": "Únete a {name} para una sesión interactiva en Unytea.",
+        "defaultExpert": "nuestro experto"
+      }
+    }
   }
 }
