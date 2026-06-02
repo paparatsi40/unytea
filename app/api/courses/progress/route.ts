@@ -76,7 +76,7 @@ export async function GET() {
     });
 
     return NextResponse.json({ courses });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error fetching course progress:", error);
     return NextResponse.json({ error: "Failed to fetch course progress" }, { status: 500 });
   }

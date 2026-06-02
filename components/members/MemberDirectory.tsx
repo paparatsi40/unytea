@@ -85,7 +85,7 @@ export function MemberDirectory({ communityId }: Props) {
         {/* Sort By */}
         <select
           value={sortBy}
-          onChange={(e) => setSortBy(e.target.value as any)}
+          onChange={(e) => setSortBy(e.target.value as "recent" | "name")}
           className="rounded-lg border border-gray-300 px-3 py-2 text-xs focus:border-purple-500 focus:outline-none md:text-sm"
         >
           <option value="recent">{t("sort.recent")}</option>

@@ -50,7 +50,7 @@ export default function PrivacyPage() {
               onChange={(e) =>
                 setSettings({
                   ...settings,
-                  profileVisibility: e.target.value as any,
+                  profileVisibility: e.target.value as "public" | "members" | "private",
                 })
               }
               className="w-full rounded-lg border border-border bg-background px-4 py-2"
@@ -73,7 +73,7 @@ export default function PrivacyPage() {
               onChange={(e) =>
                 setSettings({
                   ...settings,
-                  allowMessages: e.target.value as any,
+                  allowMessages: e.target.value as "everyone" | "members" | "none",
                 })
               }
               className="w-full rounded-lg border border-border bg-background px-4 py-2"

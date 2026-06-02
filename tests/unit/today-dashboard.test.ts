@@ -20,6 +20,16 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { getTodayDashboard } from "@/app/actions/today-dashboard";
 
+// The mocks below intentionally provide minimal/partial shapes. We assert them
+// through the real resolved return type of each method (via `unknown`) so the
+// casts document intent and stay free of `any`.
+type UserResult = Awaited<ReturnType<typeof prisma.user.findUnique>>;
+type CommunityResult = Awaited<ReturnType<typeof prisma.community.findMany>>;
+type MemberResult = Awaited<ReturnType<typeof prisma.member.findMany>>;
+type SessionResult = Awaited<ReturnType<typeof prisma.mentorSession.findFirst>>;
+type PostResult = Awaited<ReturnType<typeof prisma.post.findMany>>;
+type AuthResult = Awaited<ReturnType<typeof auth>>;
+
 const mockUser = { name: "Test User" };
 const mockCommunity = {
   id: "comm-1",
@@ -39,20 +49,20 @@ const mockSession = {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  vi.mocked(auth).mockResolvedValue({ user: { id: "user-1" } } as any);
-  vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser as any);
-  vi.mocked(prisma.community.findMany).mockResolvedValue([] as any);
-  vi.mocked(prisma.member.findMany).mockResolvedValue([] as any);
-  vi.mocked(prisma.member.count).mockResolvedValue(0 as any);
-  vi.mocked(prisma.mentorSession.findFirst).mockResolvedValue(null as any);
-  vi.mocked(prisma.mentorSession.count).mockResolvedValue(0 as any);
-  vi.mocked(prisma.post.findMany).mockResolvedValue([] as any);
-  vi.mocked(prisma.post.count).mockResolvedValue(0 as any);
+  vi.mocked(auth).mockResolvedValue({ user: { id: "user-1" } } as unknown as AuthResult);
+  vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser as unknown as UserResult);
+  vi.mocked(prisma.community.findMany).mockResolvedValue([]);
+  vi.mocked(prisma.member.findMany).mockResolvedValue([]);
+  vi.mocked(prisma.member.count).mockResolvedValue(0);
+  vi.mocked(prisma.mentorSession.findFirst).mockResolvedValue(null);
+  vi.mocked(prisma.mentorSession.count).mockResolvedValue(0);
+  vi.mocked(prisma.post.findMany).mockResolvedValue([]);
+  vi.mocked(prisma.post.count).mockResolvedValue(0);
 });
 
 describe("getTodayDashboard", () => {
   it("returns null when no authenticated session", async () => {
-    vi.mocked(auth).mockResolvedValue(null as any);
+    vi.mocked(auth).mockResolvedValue(null as unknown as AuthResult);
     const result = await getTodayDashboard();
     expect(result).toBeNull();
   });
@@ -76,11 +86,13 @@ describe("getTodayDashboard", () => {
   });
 
   it("deduplicates communities: owned community NOT also in memberCommunities result", async () => {
-    vi.mocked(prisma.community.findMany).mockResolvedValue([mockCommunity] as any);
+    vi.mocked(prisma.community.findMany).mockResolvedValue([
+      mockCommunity,
+    ] as unknown as CommunityResult);
     vi.mocked(prisma.member.findMany).mockResolvedValue([
       // Same community appears in member list (user is owner AND member).
       { community: mockCommunity, joinedAt: new Date() },
-    ] as any);
+    ] as unknown as MemberResult);
 
     const result = await getTodayDashboard();
     expect(result?.communities).toHaveLength(1);
@@ -101,8 +113,8 @@ describe("getTodayDashboard", () => {
       joinedAt: new Date(),
     }));
 
-    vi.mocked(prisma.community.findMany).mockResolvedValue(owned as any);
-    vi.mocked(prisma.member.findMany).mockResolvedValue(memberOf as any);
+    vi.mocked(prisma.community.findMany).mockResolvedValue(owned as unknown as CommunityResult);
+    vi.mocked(prisma.member.findMany).mockResolvedValue(memberOf as unknown as MemberResult);
 
     const result = await getTodayDashboard();
     expect(result?.communities).toHaveLength(6);
@@ -114,7 +126,9 @@ describe("getTodayDashboard", () => {
   });
 
   it("returns next live session when within 7-day window", async () => {
-    vi.mocked(prisma.mentorSession.findFirst).mockResolvedValue(mockSession as any);
+    vi.mocked(prisma.mentorSession.findFirst).mockResolvedValue(
+      mockSession as unknown as SessionResult
+    );
 
     const result = await getTodayDashboard();
     expect(result?.nextLiveSession).toMatchObject({
@@ -130,16 +144,16 @@ describe("getTodayDashboard", () => {
   it("computes deltas correctly (week-over-week)", async () => {
     // mentorSession.count is invoked this-week first, then last-week.
     vi.mocked(prisma.mentorSession.count)
-      .mockResolvedValueOnce(5 as any) // sessionsThisWeek
-      .mockResolvedValueOnce(3 as any); // sessionsLastWeek
+      .mockResolvedValueOnce(5) // sessionsThisWeek
+      .mockResolvedValueOnce(3); // sessionsLastWeek
 
     vi.mocked(prisma.member.count)
-      .mockResolvedValueOnce(10 as any) // newMembersThisWeek
-      .mockResolvedValueOnce(15 as any); // newMembersLastWeek (decline)
+      .mockResolvedValueOnce(10) // newMembersThisWeek
+      .mockResolvedValueOnce(15); // newMembersLastWeek (decline)
 
     vi.mocked(prisma.post.count)
-      .mockResolvedValueOnce(20 as any) // postsThisWeek
-      .mockResolvedValueOnce(20 as any); // postsLastWeek (no change)
+      .mockResolvedValueOnce(20) // postsThisWeek
+      .mockResolvedValueOnce(20); // postsLastWeek (no change)
 
     const result = await getTodayDashboard();
     expect(result?.weeklyStats).toMatchObject({
@@ -159,15 +173,15 @@ describe("getTodayDashboard", () => {
 
     // First member.findMany call = top communities; second = recent members.
     vi.mocked(prisma.member.findMany)
-      .mockResolvedValueOnce([] as any)
+      .mockResolvedValueOnce([])
       .mockResolvedValueOnce([
         { user: { name: "Alice" }, joinedAt: older, community: { slug: "c1", name: "C1" } },
         { user: { name: "Charlie" }, joinedAt: newer, community: { slug: "c1", name: "C1" } },
-      ] as any);
+      ] as unknown as MemberResult);
 
     vi.mocked(prisma.post.findMany).mockResolvedValue([
       { author: { name: "Bob" }, createdAt: middle, community: { slug: "c1", name: "C1" } },
-    ] as any);
+    ] as unknown as PostResult);
 
     const result = await getTodayDashboard();
     expect(result?.recentActivity).toHaveLength(3);
@@ -186,15 +200,15 @@ describe("getTodayDashboard", () => {
     }));
 
     vi.mocked(prisma.member.findMany)
-      .mockResolvedValueOnce([] as any) // first call (communities)
-      .mockResolvedValueOnce(members as any); // second call (recent activity)
+      .mockResolvedValueOnce([]) // first call (communities)
+      .mockResolvedValueOnce(members as unknown as MemberResult); // second call (recent activity)
 
     vi.mocked(prisma.post.findMany).mockResolvedValue(
       Array.from({ length: 8 }, (_, i) => ({
         author: { name: `Author${i}` },
         createdAt: new Date(`2026-05-${(20 - i).toString().padStart(2, "0")}`),
         community: { slug: "c1", name: "C1" },
-      })) as any
+      })) as unknown as PostResult
     );
 
     const result = await getTodayDashboard();

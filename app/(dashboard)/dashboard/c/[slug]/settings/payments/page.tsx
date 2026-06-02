@@ -110,11 +110,11 @@ export default function CommunityPaymentsPage() {
         console.error("Stripe Connect error:", errorData);
         throw new Error(errorData.details || errorData.error || t("toasts.connectLinkFailed"));
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Connect error:", error);
       toast({
         title: t("toasts.errorTitle"),
-        description: error.message || t("toasts.connectFailed"),
+        description: error instanceof Error ? error.message : t("toasts.connectFailed"),
         variant: "destructive",
       });
     }
@@ -172,10 +172,10 @@ export default function CommunityPaymentsPage() {
         title: t("toasts.successTitle"),
         description: t("toasts.saved"),
       });
-    } catch (_error: any) {
+    } catch (error) {
       toast({
         title: t("toasts.errorTitle"),
-        description: _error?.message || t("toasts.saveFailed"),
+        description: error instanceof Error ? error.message : t("toasts.saveFailed"),
         variant: "destructive",
       });
     }

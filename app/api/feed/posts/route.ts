@@ -112,7 +112,7 @@ export async function GET() {
     });
 
     return NextResponse.json({ posts: formattedPosts });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error fetching feed posts:", error);
     return NextResponse.json({ error: "Failed to fetch posts" }, { status: 500 });
   }

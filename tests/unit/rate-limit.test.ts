@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
+import type { NextRequest } from "next/server";
 import { rateLimit, getIP, getIdentifier } from "@/lib/rate-limit";
 
 describe("Rate Limiter", () => {
@@ -44,28 +45,30 @@ describe("Rate Limiter", () => {
   });
   describe("getIP", () => {
     it("should extract IP from x-forwarded-for", () => {
-      const req = { headers: new Headers({ "x-forwarded-for": "192.168.1.1, 10.0.0.1" }) } as any;
+      const req = {
+        headers: new Headers({ "x-forwarded-for": "192.168.1.1, 10.0.0.1" }),
+      } as unknown as NextRequest;
       expect(getIP(req)).toBe("192.168.1.1");
     });
     it("should fallback to x-real-ip when x-forwarded-for absent", () => {
-      const req = { headers: new Headers({ "x-real-ip": "127.0.0.1" }) } as any;
+      const req = { headers: new Headers({ "x-real-ip": "127.0.0.1" }) } as unknown as NextRequest;
       expect(getIP(req)).toBe("127.0.0.1");
     });
     it("should return unknown when no headers", () => {
-      const req = { headers: new Headers({}) } as any;
+      const req = { headers: new Headers({}) } as unknown as NextRequest;
       expect(getIP(req)).toBe("unknown");
     });
   });
   describe("getIdentifier", () => {
     it("should use userId when provided", () => {
-      const req = { headers: new Headers({}), ip: "127.0.0.1" } as any;
+      const req = { headers: new Headers({}), ip: "127.0.0.1" } as unknown as NextRequest;
       expect(getIdentifier(req, "user-123")).toBe("user:user-123");
     });
     it("should use IP + UA for anonymous", () => {
       const req = {
         headers: new Headers({ "x-forwarded-for": "10.0.0.1", "user-agent": "Test/1.0" }),
         ip: undefined,
-      } as any;
+      } as unknown as NextRequest;
       expect(getIdentifier(req)).toBe("10.0.0.1:Test/1.0");
     });
   });

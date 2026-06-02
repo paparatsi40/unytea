@@ -50,7 +50,7 @@ export async function GET(_req: Request, props: { params: Promise<{ courseId: st
     }
 
     return NextResponse.json(course);
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error fetching course:", error);
     return NextResponse.json({ error: "Failed to fetch course" }, { status: 500 });
   }
