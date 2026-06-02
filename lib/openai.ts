@@ -97,9 +97,10 @@ export async function generateChatCompletion(options: ChatCompletionOptions): Pr
     });
 
     return response.choices[0]?.message?.content || "I couldn't generate a response.";
-  } catch (error: any) {
-    console.error("OpenAI API error:", error.message || error);
-    throw new Error(`Failed to generate AI response: ${error.message}`);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error("OpenAI API error:", message);
+    throw new Error(`Failed to generate AI response: ${message}`);
   }
 }
 

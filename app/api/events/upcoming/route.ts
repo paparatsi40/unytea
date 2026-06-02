@@ -88,7 +88,7 @@ export async function GET() {
     });
 
     return NextResponse.json({ events });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error fetching upcoming events:", error);
     return NextResponse.json({ error: "Failed to fetch events" }, { status: 500 });
   }

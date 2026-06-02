@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
@@ -103,9 +104,10 @@ export async function POST(request: Request) {
 
     try {
       event = stripe.webhooks.constructEvent(payload, signature, webhookSecret);
-    } catch (err: any) {
-      console.error(`Webhook signature verification failed:`, err.message);
-      return NextResponse.json({ error: `Webhook Error: ${err.message}` }, { status: 400 });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      console.error(`Webhook signature verification failed:`, message);
+      return NextResponse.json({ error: `Webhook Error: ${message}` }, { status: 400 });
     }
 
     // FIX-B5: idempotency check BEFORE the handler runs (read-only).
@@ -444,8 +446,8 @@ export async function POST(request: Request) {
       await prisma.processedStripeEvent.create({
         data: { id: event.id, type: event.type },
       });
-    } catch (err: any) {
-      if (err?.code === "P2002") {
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
         console.log(`[stripe-webhook] race-condition duplicate ${event.id}`);
       } else {
         console.error("[stripe-webhook] failed to record event id:", err);

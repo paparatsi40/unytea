@@ -112,10 +112,11 @@ export default function CourseDetailPage() {
         const errorData = await res.json();
         throw new Error(errorData.error || "Failed to create checkout");
       }
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Error",
-        description: error.message || "Failed to start purchase. Please try again.",
+        description:
+          error instanceof Error ? error.message : "Failed to start purchase. Please try again.",
         variant: "destructive",
       });
     } finally {

@@ -72,7 +72,7 @@ export async function GET(_req: Request, props: { params: Promise<{ courseId: st
       price: course.price,
       isCommunityMember: !!membership,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error checking course purchase status:", error);
     return NextResponse.json({ error: "Failed to check purchase status" }, { status: 500 });
   }
