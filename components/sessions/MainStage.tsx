@@ -8,6 +8,7 @@ import {
   useTracks,
 } from "@livekit/components-react";
 import { Track, LocalTrack } from "livekit-client";
+import { useTranslations } from "next-intl";
 import { Monitor, Video, Pencil, Headphones } from "lucide-react";
 import { SessionMode } from "./ModeSwitcher";
 import { SessionWhiteboard } from "./SessionWhiteboard";
@@ -49,9 +50,11 @@ function EmptyStage({
 function AudioStage({
   isMicrophoneEnabled,
   participantName,
+  statusLabel,
 }: {
   isMicrophoneEnabled: boolean;
   participantName: string;
+  statusLabel: string;
 }) {
   return (
     <div className="flex h-full min-h-[420px] items-center justify-center">
@@ -77,9 +80,7 @@ function AudioStage({
 
         <div>
           <p className="text-xl font-semibold text-white">{participantName}</p>
-          <p className="mt-2 text-sm text-zinc-400">
-            {isMicrophoneEnabled ? "Speaking..." : "Microphone is muted"}
-          </p>
+          <p className="mt-2 text-sm text-zinc-400">{statusLabel}</p>
         </div>
 
         {/* Audio indicator bars */}
@@ -109,12 +110,14 @@ export function MainStage({
   sessionId,
   className,
 }: MainStageProps) {
+  const t = useTranslations("liveSession.mainStage");
   const isAudioOnly = sessionMode === "audio";
   const { localParticipant } = useLocalParticipant();
 
   // Access track states from localParticipant
   const isCameraEnabled = localParticipant.isCameraEnabled;
   const isMicrophoneEnabled = localParticipant.isMicrophoneEnabled;
+  const audioStatusLabel = isMicrophoneEnabled ? t("speaking") : t("micMuted");
   const cameraTrack = localParticipant.getTrackPublication(Track.Source.Camera)?.track as
     | LocalTrack
     | undefined;
@@ -153,6 +156,7 @@ export function MainStage({
       <AudioStage
         isMicrophoneEnabled={isMicrophoneEnabled}
         participantName={localParticipant.identity}
+        statusLabel={audioStatusLabel}
       />
     );
   }
@@ -171,8 +175,8 @@ export function MainStage({
           ) : (
             <EmptyStage
               icon={Pencil}
-              title="Whiteboard unavailable"
-              description="This session does not have a whiteboard linked yet."
+              title={t("whiteboardUnavailableTitle")}
+              description={t("whiteboardUnavailableDesc")}
             />
           )
         ) : mode === "screen" ? (
@@ -185,13 +189,10 @@ export function MainStage({
             <AudioStage
               isMicrophoneEnabled={isMicrophoneEnabled}
               participantName={localParticipant.identity}
+              statusLabel={audioStatusLabel}
             />
           ) : (
-            <EmptyStage
-              icon={Monitor}
-              title="No screen is being shared"
-              description="Share your screen to present slides, demos, or walkthroughs."
-            />
+            <EmptyStage icon={Monitor} title={t("noScreenTitle")} description={t("noScreenDesc")} />
           )
         ) : isCameraEnabled && cameraTrack ? (
           <LocalVideo
@@ -206,12 +207,8 @@ export function MainStage({
         ) : (
           <EmptyStage
             icon={Video}
-            title="No camera video available"
-            description={
-              isCameraEnabled
-                ? "Waiting for video track…"
-                : "Turn on your camera or wait for another participant's camera."
-            }
+            title={t("noCameraTitle")}
+            description={isCameraEnabled ? t("noCameraWaiting") : t("noCameraDesc")}
           />
         )}
       </div>

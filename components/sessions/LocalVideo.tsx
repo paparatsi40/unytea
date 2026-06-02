@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { LocalTrack } from "livekit-client";
+import { useTranslations } from "next-intl";
 
 interface LocalVideoProps {
   className?: string;
@@ -10,6 +11,7 @@ interface LocalVideoProps {
 }
 
 export function LocalVideo({ className, cameraTrack, isCameraEnabled }: LocalVideoProps) {
+  const t = useTranslations("liveSession.localVideo");
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -48,8 +50,8 @@ export function LocalVideo({ className, cameraTrack, isCameraEnabled }: LocalVid
             />
           </svg>
           <div className="text-center">
-            <p className="text-lg font-medium text-zinc-300">Camera is off</p>
-            <p className="mt-1 text-sm text-zinc-500">Turn on your camera to start the session</p>
+            <p className="text-lg font-medium text-zinc-300">{t("cameraOff")}</p>
+            <p className="mt-1 text-sm text-zinc-500">{t("turnOnCamera")}</p>
           </div>
         </div>
       </div>

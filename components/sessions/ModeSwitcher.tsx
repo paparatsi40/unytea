@@ -1,6 +1,7 @@
 "use client";
 
 import { Video, Monitor, Pencil } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 export type SessionMode = "video" | "screen" | "whiteboard";
@@ -13,14 +14,14 @@ interface ModeSwitcherProps {
 }
 
 const MODES = [
-  { id: "video" as SessionMode, label: "Video", icon: Video },
-  { id: "screen" as SessionMode, label: "Screen", icon: Monitor },
-  { id: "whiteboard" as SessionMode, label: "Whiteboard", icon: Pencil },
+  { id: "video" as SessionMode, icon: Video },
+  { id: "screen" as SessionMode, icon: Monitor },
+  { id: "whiteboard" as SessionMode, icon: Pencil },
 ];
 
 const AUDIO_MODES = [
-  { id: "screen" as SessionMode, label: "Screen", icon: Monitor },
-  { id: "whiteboard" as SessionMode, label: "Whiteboard", icon: Pencil },
+  { id: "screen" as SessionMode, icon: Monitor },
+  { id: "whiteboard" as SessionMode, icon: Pencil },
 ];
 
 export function ModeSwitcher({
@@ -29,6 +30,7 @@ export function ModeSwitcher({
   hasWhiteboard = false,
   sessionMode = "video",
 }: ModeSwitcherProps) {
+  const t = useTranslations("liveSession.modeSwitcher");
   const isAudioOnly = sessionMode === "audio";
   const availableModes = isAudioOnly
     ? AUDIO_MODES.filter((mode) => {
@@ -62,7 +64,7 @@ export function ModeSwitcher({
             )}
           >
             <Icon className="h-4 w-4" />
-            <span>{mode.label}</span>
+            <span>{t(mode.id)}</span>
           </button>
         );
       })}

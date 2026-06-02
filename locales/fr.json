@@ -2590,6 +2590,38 @@
         "minutesAgo": "il y a {count} min",
         "hoursAgo": "il y a {count} h"
       }
+    },
+    "videoRoom": {
+      "tokenError": "Échec de l'obtention du jeton",
+      "unknownError": "Erreur inconnue",
+      "missingConfig": "Configuration LiveKit manquante"
+    },
+    "mainStage": {
+      "speaking": "En train de parler...",
+      "micMuted": "Le micro est coupé",
+      "whiteboardUnavailableTitle": "Tableau blanc indisponible",
+      "whiteboardUnavailableDesc": "Cette session n'a pas encore de tableau blanc associé.",
+      "noScreenTitle": "Aucun écran n'est partagé",
+      "noScreenDesc": "Partagez votre écran pour présenter des diapositives, des démos ou des tutoriels.",
+      "noCameraTitle": "Aucune vidéo de caméra disponible",
+      "noCameraWaiting": "En attente de la piste vidéo…",
+      "noCameraDesc": "Activez votre caméra ou attendez la caméra d'un autre participant."
+    },
+    "localVideo": {
+      "cameraOff": "La caméra est éteinte",
+      "turnOnCamera": "Activez votre caméra pour démarrer la session"
+    },
+    "modeSwitcher": {
+      "video": "Vidéo",
+      "screen": "Écran",
+      "whiteboard": "Tableau blanc"
+    },
+    "reactionsBar": {
+      "thumbsup": "Pouce levé",
+      "heart": "Cœur",
+      "fire": "Feu",
+      "party": "Fête",
+      "clap": "Applaudissement"
     }
   }
 }

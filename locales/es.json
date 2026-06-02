@@ -2588,6 +2588,38 @@
         "minutesAgo": "hace {count} min",
         "hoursAgo": "hace {count} h"
       }
+    },
+    "videoRoom": {
+      "tokenError": "No se pudo obtener el token",
+      "unknownError": "Error desconocido",
+      "missingConfig": "Falta la configuración de LiveKit"
+    },
+    "mainStage": {
+      "speaking": "Hablando...",
+      "micMuted": "El micrófono está silenciado",
+      "whiteboardUnavailableTitle": "Pizarra no disponible",
+      "whiteboardUnavailableDesc": "Esta sesión aún no tiene una pizarra vinculada.",
+      "noScreenTitle": "No se está compartiendo ninguna pantalla",
+      "noScreenDesc": "Comparte tu pantalla para presentar diapositivas, demos o tutoriales.",
+      "noCameraTitle": "No hay vídeo de cámara disponible",
+      "noCameraWaiting": "Esperando la pista de vídeo…",
+      "noCameraDesc": "Enciende tu cámara o espera la cámara de otro participante."
+    },
+    "localVideo": {
+      "cameraOff": "La cámara está apagada",
+      "turnOnCamera": "Enciende tu cámara para comenzar la sesión"
+    },
+    "modeSwitcher": {
+      "video": "Vídeo",
+      "screen": "Pantalla",
+      "whiteboard": "Pizarra"
+    },
+    "reactionsBar": {
+      "thumbsup": "Me gusta",
+      "heart": "Corazón",
+      "fire": "Fuego",
+      "party": "Fiesta",
+      "clap": "Aplauso"
     }
   }
 }

@@ -2579,6 +2579,38 @@
         "minutesAgo": "{count}m ago",
         "hoursAgo": "{count}h ago"
       }
+    },
+    "videoRoom": {
+      "tokenError": "Failed to get token",
+      "unknownError": "Unknown error",
+      "missingConfig": "Missing LiveKit config"
+    },
+    "mainStage": {
+      "speaking": "Speaking...",
+      "micMuted": "Microphone is muted",
+      "whiteboardUnavailableTitle": "Whiteboard unavailable",
+      "whiteboardUnavailableDesc": "This session does not have a whiteboard linked yet.",
+      "noScreenTitle": "No screen is being shared",
+      "noScreenDesc": "Share your screen to present slides, demos, or walkthroughs.",
+      "noCameraTitle": "No camera video available",
+      "noCameraWaiting": "Waiting for video track…",
+      "noCameraDesc": "Turn on your camera or wait for another participant's camera."
+    },
+    "localVideo": {
+      "cameraOff": "Camera is off",
+      "turnOnCamera": "Turn on your camera to start the session"
+    },
+    "modeSwitcher": {
+      "video": "Video",
+      "screen": "Screen",
+      "whiteboard": "Whiteboard"
+    },
+    "reactionsBar": {
+      "thumbsup": "Thumbs up",
+      "heart": "Heart",
+      "fire": "Fire",
+      "party": "Party",
+      "clap": "Clap"
     }
   }
 }
