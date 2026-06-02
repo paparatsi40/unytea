@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Trash2, AlertTriangle } from "lucide-react";
 import { deleteCommunity } from "@/app/actions/communities";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslations } from "next-intl";
 
 interface Community {
   id: string;
@@ -18,6 +19,8 @@ interface Community {
 }
 
 export default function ManageCommunitiesPage() {
+  const t = useTranslations("dashboard.communities");
+  const tCommon = useTranslations("common");
   const router = useRouter();
   const { toast } = useToast();
   const [communities, setCommunities] = useState<Community[]>([]);
@@ -43,11 +46,7 @@ export default function ManageCommunitiesPage() {
   }
 
   async function handleDelete(communityId: string, communityName: string) {
-    if (
-      !confirm(
-        `⚠️ Are you sure you want to delete "${communityName}"?\n\nThis will permanently delete:\n- All posts and comments\n- All members\n- All channels and messages\n- All courses and lessons\n- Everything related to this community\n\nThis action CANNOT be undone!`
-      )
-    ) {
+    if (!confirm(t("manage.deleteConfirm", { name: communityName }))) {
       return;
     }
 
@@ -58,23 +57,23 @@ export default function ManageCommunitiesPage() {
 
       if (result.success) {
         toast({
-          title: "Community Deleted",
-          description: result.message || "Community deleted successfully",
+          title: t("manage.toasts.deletedTitle"),
+          description: result.message || t("manage.toasts.deleted"),
         });
 
         // Remove from list
         setCommunities(communities.filter((c) => c.id !== communityId));
       } else {
         toast({
-          title: "Error",
-          description: result.error || "Failed to delete community",
+          title: t("manage.toasts.errorTitle"),
+          description: result.error || t("manage.toasts.deleteFailed"),
           variant: "destructive",
         });
       }
     } catch {
       toast({
-        title: "Error",
-        description: "An unexpected error occurred",
+        title: t("manage.toasts.errorTitle"),
+        description: t("manage.toasts.unexpectedError"),
         variant: "destructive",
       });
     } finally {
@@ -87,7 +86,7 @@ export default function ManageCommunitiesPage() {
       <div className="container mx-auto max-w-6xl p-8">
         <div className="text-center">
           <div className="mx-auto h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600"></div>
-          <p className="mt-4 text-gray-600">Loading communities...</p>
+          <p className="mt-4 text-gray-600">{t("loading")}</p>
         </div>
       </div>
     );
@@ -96,18 +95,16 @@ export default function ManageCommunitiesPage() {
   return (
     <div className="container mx-auto max-w-6xl p-8">
       <div className="mb-8">
-        <h1 className="mb-2 text-3xl font-bold text-gray-900">Manage Communities</h1>
-        <p className="text-gray-600">
-          Manage and delete your communities. Be careful - deletions are permanent!
-        </p>
+        <h1 className="mb-2 text-3xl font-bold text-gray-900">{t("manage.title")}</h1>
+        <p className="text-gray-600">{t("manage.subtitle")}</p>
       </div>
 
       {communities.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
-            <p className="text-gray-600">You don't own any communities yet.</p>
+            <p className="text-gray-600">{t("manage.emptyState.description")}</p>
             <Button onClick={() => router.push("/dashboard/communities/new")} className="mt-4">
-              Create Your First Community
+              {t("manage.emptyState.createButton")}
             </Button>
           </CardContent>
         </Card>
@@ -120,11 +117,11 @@ export default function ManageCommunitiesPage() {
                   <div>
                     <CardTitle className="text-xl">{community.name}</CardTitle>
                     <CardDescription className="mt-1">
-                      {community.description || "No description"}
+                      {community.description || t("manage.card.noDescription")}
                     </CardDescription>
                     <div className="mt-2 flex items-center gap-4 text-sm text-gray-500">
-                      <span>{community.memberCount} members</span>
-                      <span>{community.postCount} posts</span>
+                      <span>{t("manage.card.members", { count: community.memberCount })}</span>
+                      <span>{t("manage.card.posts", { count: community.postCount })}</span>
                       <span className="rounded bg-gray-100 px-2 py-1 font-mono text-xs">
                         /{community.slug}
                       </span>
@@ -136,7 +133,7 @@ export default function ManageCommunitiesPage() {
                       size="sm"
                       onClick={() => router.push(`/dashboard/c/${community.slug}`)}
                     >
-                      View
+                      {t("manage.card.viewButton")}
                     </Button>
                     <Button
                       variant="destructive"
@@ -147,12 +144,12 @@ export default function ManageCommunitiesPage() {
                       {deleting === community.id ? (
                         <>
                           <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-white"></div>
-                          Deleting...
+                          {t("manage.card.deletingButton")}
                         </>
                       ) : (
                         <>
                           <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
+                          {tCommon("delete")}
                         </>
                       )}
                     </Button>
@@ -169,10 +166,9 @@ export default function ManageCommunitiesPage() {
           <div className="flex items-start gap-3">
             <AlertTriangle className="mt-0.5 h-5 w-5 text-yellow-600" />
             <div>
-              <CardTitle className="text-yellow-900">Warning</CardTitle>
+              <CardTitle className="text-yellow-900">{t("manage.warning.title")}</CardTitle>
               <CardDescription className="mt-2 text-yellow-700">
-                Deleting a community is permanent and cannot be undone. All data including posts,
-                members, messages, and courses will be permanently deleted.
+                {t("manage.warning.description")}
               </CardDescription>
             </div>
           </div>

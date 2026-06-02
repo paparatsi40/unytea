@@ -1726,6 +1726,33 @@
         "buildHabitHint": "La régularité aide les communautés à grandir plus vite",
         "goodMomentumTitle": "Bon élan",
         "goodMomentumHint": "Maintenez votre rythme hebdomadaire"
+      },
+      "manage": {
+        "title": "Gérer les communautés",
+        "subtitle": "Gérez et supprimez vos communautés. Attention : les suppressions sont permanentes.",
+        "emptyState": {
+          "description": "Vous ne possédez encore aucune communauté.",
+          "createButton": "Créez votre première communauté"
+        },
+        "warning": {
+          "title": "Avertissement",
+          "description": "La suppression d'une communauté est permanente et irréversible. Toutes les données, y compris les publications, les membres, les messages et les cours, seront définitivement supprimées."
+        },
+        "card": {
+          "noDescription": "Aucune description",
+          "members": "{count, plural, =1 {1 membre} other {# membres}}",
+          "posts": "{count, plural, =1 {1 publication} other {# publications}}",
+          "viewButton": "Voir",
+          "deletingButton": "Suppression..."
+        },
+        "deleteConfirm": "⚠️ Voulez-vous vraiment supprimer « {name} » ?\n\nCela supprimera définitivement :\n- Toutes les publications et tous les commentaires\n- Tous les membres\n- Tous les canaux et messages\n- Tous les cours et leçons\n- Tout ce qui concerne cette communauté\n\nCette action est IRRÉVERSIBLE !",
+        "toasts": {
+          "deletedTitle": "Communauté supprimée",
+          "deleted": "Communauté supprimée avec succès",
+          "errorTitle": "Erreur",
+          "deleteFailed": "Échec de la suppression de la communauté",
+          "unexpectedError": "Une erreur inattendue s'est produite"
+        }
       }
     },
     "library": {
