@@ -14,6 +14,7 @@
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import {
   resourceCategorySchema,
   createResourceSchema,
@@ -547,7 +548,7 @@ export async function getResources(
       return { success: false, error: "Sin acceso a la comunidad", code: "FORBIDDEN" };
     }
 
-    const where: any = {
+    const where: Prisma.ResourceWhereInput = {
       communityId: access.community.id,
     };
 

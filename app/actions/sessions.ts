@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getCurrentUserId } from "@/lib/auth-utils";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { nanoid } from "nanoid";
 import { startSessionAutopilot } from "./autopilot";
 
@@ -451,7 +452,7 @@ export async function getCommunityAttendanceMetrics(communityId: string, days: n
         ? totalAttendance / completedSessions.length
         : 0;
 
-      const notificationWhere: any = {
+      const notificationWhere: Prisma.NotificationWhereInput = {
         type: "SESSION_REMINDER",
         createdAt: end ? { gte: start, lt: end } : { gte: start },
       };
