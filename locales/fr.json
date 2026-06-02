@@ -341,6 +341,51 @@
     }
   },
   "dashboard": {
+    "accountSettings": {
+      "shell": {
+        "header": "Paramètres",
+        "subtitle": "Gérez votre compte et vos préférences"
+      },
+      "nav": {
+        "profile": { "name": "Profil", "description": "Gérez vos informations personnelles" },
+        "notifications": {
+          "name": "Notifications",
+          "description": "Configurez les préférences de notification"
+        },
+        "billing": { "name": "Facturation", "description": "Gérez l'abonnement et les paiements" },
+        "appearance": { "name": "Apparence", "description": "Personnalisez votre expérience" },
+        "integrations": { "name": "Intégrations", "description": "Connectez des services tiers" }
+      },
+      "account": {
+        "title": "Paramètres du compte",
+        "timezoneLabel": "Fuseau horaire",
+        "timezoneHint": "Utilisé pour afficher les dates et planifier les sessions",
+        "saveButton": "Enregistrer les paramètres",
+        "savingButton": "Enregistrement...",
+        "toasts": {
+          "saved": "Paramètres du compte enregistrés !",
+          "saveFailed": "Échec de l'enregistrement"
+        },
+        "security": {
+          "title": "Sécurité et accès",
+          "passwordTitle": "Mot de passe et connexion",
+          "passwordDescription": "Gérez la façon dont vous vous connectez et récupérez l'accès à votre compte.",
+          "changePasswordButton": "Changer le mot de passe",
+          "changePasswordPlaceholderToast": "Le flux de réinitialisation du mot de passe sera bientôt disponible.",
+          "sessionTitle": "Session",
+          "sessionDescription": "Déconnectez-vous de cet appareil immédiatement.",
+          "logoutButton": "Se déconnecter maintenant"
+        },
+        "danger": {
+          "title": "Zone de danger",
+          "deleteTitle": "Supprimer le compte",
+          "deleteDescription": "Supprimez définitivement votre compte et toutes vos données. Cette action est irréversible.",
+          "deleteButton": "Supprimer le compte",
+          "confirmPrompt": "Êtes-vous absolument sûr ? Cette action est irréversible !",
+          "deleteDisabledToast": "La suppression de compte est temporairement désactivée"
+        }
+      }
+    },
     "communityAdmin": {
       "gate": {
         "backToCommunities": "Retour aux communautés",

@@ -342,6 +342,51 @@
     }
   },
   "dashboard": {
+    "accountSettings": {
+      "shell": {
+        "header": "Configuración",
+        "subtitle": "Gestiona tu cuenta y preferencias"
+      },
+      "nav": {
+        "profile": { "name": "Perfil", "description": "Gestiona tu información personal" },
+        "notifications": {
+          "name": "Notificaciones",
+          "description": "Configura las preferencias de notificación"
+        },
+        "billing": { "name": "Facturación", "description": "Gestiona la suscripción y los pagos" },
+        "appearance": { "name": "Apariencia", "description": "Personaliza tu experiencia" },
+        "integrations": { "name": "Integraciones", "description": "Conecta servicios de terceros" }
+      },
+      "account": {
+        "title": "Configuración de la cuenta",
+        "timezoneLabel": "Zona horaria",
+        "timezoneHint": "Se usa para mostrar fechas y programar sesiones",
+        "saveButton": "Guardar configuración",
+        "savingButton": "Guardando...",
+        "toasts": {
+          "saved": "¡Configuración de la cuenta guardada!",
+          "saveFailed": "No se pudo guardar"
+        },
+        "security": {
+          "title": "Seguridad y acceso",
+          "passwordTitle": "Contraseña e inicio de sesión",
+          "passwordDescription": "Gestiona cómo inicias sesión y recuperas el acceso a tu cuenta.",
+          "changePasswordButton": "Cambiar contraseña",
+          "changePasswordPlaceholderToast": "El flujo de cambio de contraseña estará disponible próximamente.",
+          "sessionTitle": "Sesión",
+          "sessionDescription": "Cierra sesión en este dispositivo de inmediato.",
+          "logoutButton": "Cerrar sesión ahora"
+        },
+        "danger": {
+          "title": "Zona de peligro",
+          "deleteTitle": "Eliminar cuenta",
+          "deleteDescription": "Elimina permanentemente tu cuenta y todos tus datos. Esta acción no se puede deshacer.",
+          "deleteButton": "Eliminar cuenta",
+          "confirmPrompt": "¿Estás absolutamente seguro? ¡Esto no se puede deshacer!",
+          "deleteDisabledToast": "La eliminación de cuenta está deshabilitada temporalmente"
+        }
+      }
+    },
     "communityAdmin": {
       "gate": {
         "backToCommunities": "Volver a comunidades",

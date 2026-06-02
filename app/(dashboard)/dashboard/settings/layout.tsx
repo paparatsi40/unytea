@@ -5,43 +5,21 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { User, Bell, CreditCard, Palette, Zap } from "lucide-react";
 import { Settings } from "lucide-react";
+import { useTranslations } from "next-intl";
 
+// Nav items hold a key; labels/descriptions resolved via
+// t(`nav.${key}.{name,description}`) in render (helper-returns-key).
 const settingsNav = [
-  {
-    name: "Profile",
-    href: "/dashboard/settings/profile",
-    icon: User,
-    description: "Manage your personal information",
-  },
-  {
-    name: "Notifications",
-    href: "/dashboard/settings/notifications",
-    icon: Bell,
-    description: "Configure notification preferences",
-  },
-
-  {
-    name: "Billing",
-    href: "/dashboard/settings/billing",
-    icon: CreditCard,
-    description: "Manage subscription and payments",
-  },
-  {
-    name: "Appearance",
-    href: "/dashboard/settings/appearance",
-    icon: Palette,
-    description: "Customize your experience",
-  },
-  {
-    name: "Integrations",
-    href: "/dashboard/settings/integrations",
-    icon: Zap,
-    description: "Connect third-party services",
-  },
+  { key: "profile", href: "/dashboard/settings/profile", icon: User },
+  { key: "notifications", href: "/dashboard/settings/notifications", icon: Bell },
+  { key: "billing", href: "/dashboard/settings/billing", icon: CreditCard },
+  { key: "appearance", href: "/dashboard/settings/appearance", icon: Palette },
+  { key: "integrations", href: "/dashboard/settings/integrations", icon: Zap },
 ];
 
 export default function SettingsLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const t = useTranslations("dashboard.accountSettings");
 
   return (
     <div className="space-y-6 p-8">
@@ -51,8 +29,8 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
           <Settings className="h-6 w-6 text-gray-500" />
         </div>
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Settings</h1>
-          <p className="text-muted-foreground">Manage your account and preferences</p>
+          <h1 className="text-3xl font-bold text-foreground">{t("shell.header")}</h1>
+          <p className="text-muted-foreground">{t("shell.subtitle")}</p>
         </div>
       </div>
 
@@ -78,8 +56,10 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
                 >
                   <Icon className="h-5 w-5 shrink-0" />
                   <div>
-                    <div className="font-medium">{item.name}</div>
-                    <div className="text-xs text-muted-foreground">{item.description}</div>
+                    <div className="font-medium">{t(`nav.${item.key}.name`)}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {t(`nav.${item.key}.description`)}
+                    </div>
                   </div>
                 </Link>
               );

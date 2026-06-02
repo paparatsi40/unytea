@@ -342,6 +342,51 @@
     }
   },
   "dashboard": {
+    "accountSettings": {
+      "shell": {
+        "header": "Settings",
+        "subtitle": "Manage your account and preferences"
+      },
+      "nav": {
+        "profile": { "name": "Profile", "description": "Manage your personal information" },
+        "notifications": {
+          "name": "Notifications",
+          "description": "Configure notification preferences"
+        },
+        "billing": { "name": "Billing", "description": "Manage subscription and payments" },
+        "appearance": { "name": "Appearance", "description": "Customize your experience" },
+        "integrations": { "name": "Integrations", "description": "Connect third-party services" }
+      },
+      "account": {
+        "title": "Account Settings",
+        "timezoneLabel": "Timezone",
+        "timezoneHint": "Used for displaying dates and scheduling sessions",
+        "saveButton": "Save Settings",
+        "savingButton": "Saving...",
+        "toasts": {
+          "saved": "Account settings saved!",
+          "saveFailed": "Failed to save"
+        },
+        "security": {
+          "title": "Security & Access",
+          "passwordTitle": "Password & Sign-in",
+          "passwordDescription": "Manage how you sign in and recover your account access.",
+          "changePasswordButton": "Change password",
+          "changePasswordPlaceholderToast": "Password reset flow will be enabled next.",
+          "sessionTitle": "Session",
+          "sessionDescription": "Sign out from this device immediately.",
+          "logoutButton": "Log out now"
+        },
+        "danger": {
+          "title": "Danger Zone",
+          "deleteTitle": "Delete Account",
+          "deleteDescription": "Permanently delete your account and all of your data. This action cannot be undone.",
+          "deleteButton": "Delete Account",
+          "confirmPrompt": "Are you absolutely sure? This cannot be undone!",
+          "deleteDisabledToast": "Account deletion temporarily disabled"
+        }
+      }
+    },
     "communityAdmin": {
       "gate": {
         "backToCommunities": "Back to Communities",
