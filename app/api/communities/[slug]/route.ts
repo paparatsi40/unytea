@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { CommunityCategory } from "@prisma/client";
+import { CommunityCategory, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/auth-utils";
 
@@ -142,7 +142,7 @@ export async function PATCH(request: NextRequest, props: { params: Promise<{ slu
     const body = await request.json().catch(() => ({}));
 
     // Whitelist what can be updated through this endpoint.
-    const data: Record<string, unknown> = {};
+    const data: Prisma.CommunityUpdateInput = {};
     if (typeof body.name === "string" && body.name.trim().length > 0) {
       data.name = body.name.trim();
     }
@@ -191,7 +191,7 @@ export async function PATCH(request: NextRequest, props: { params: Promise<{ slu
 
     const updated = await prisma.community.update({
       where: { id: community.id },
-      data: data as any,
+      data,
       select: {
         id: true,
         slug: true,

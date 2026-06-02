@@ -3,7 +3,7 @@
 import { AccessToken } from "livekit-server-sdk";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/auth-utils";
-import { ParticipationRole } from "@prisma/client";
+import { ParticipationRole, Prisma } from "@prisma/client";
 
 // LiveKit configuration
 const LIVEKIT_API_KEY = process.env.LIVEKIT_API_KEY || "";
@@ -357,7 +357,7 @@ export async function trackEngagement(
     }
 
     // Update counters based on event type
-    const updateData: Record<string, any> = {};
+    const updateData: Prisma.SessionParticipationUpdateInput = {};
     switch (eventType) {
       case "message":
         updateData.messagesCount = { increment: 1 };

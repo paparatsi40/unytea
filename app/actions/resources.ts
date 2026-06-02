@@ -445,7 +445,7 @@ export async function updateResource(
     }
 
     // Si está cambiando a PUBLISHED y no tenía publishedAt, establecerlo
-    const updates: any = { ...validated };
+    const updates: Prisma.ResourceUpdateInput = { ...validated };
     if (validated.status === "PUBLISHED" && !permission.resource.publishedAt) {
       updates.publishedAt = new Date();
     }
