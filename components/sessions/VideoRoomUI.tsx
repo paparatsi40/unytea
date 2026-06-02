@@ -70,11 +70,11 @@ interface VideoRoomUIProps {
 export function VideoRoomUI({
   sessionId,
   sessionMode = "video",
-  sessionTitle = "Weekly Community Q&A",
-  hostName = "Host",
+  sessionTitle = "",
+  hostName = "",
   hostAvatar,
   isHost = false,
-  attendeeCount = 47,
+  attendeeCount = 0,
   sessionStartTime = new Date(),
   isRecording = false,
   isRecordingBusy = false,
@@ -210,15 +210,7 @@ export function VideoRoomUI({
   // Toggle microphone
   const toggleMicrophone = useCallback(async () => {
     try {
-      console.log(
-        "[LiveKit] Toggling mic. Currently enabled:",
-        isMicrophoneEnabled,
-        "| Will enable:",
-        !isMicrophoneEnabled
-      );
-      console.log("[LiveKit] Local participant permissions:", localParticipant.permissions);
       await localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled);
-      console.log("[LiveKit] Mic toggled successfully");
     } catch (e) {
       console.error("[LiveKit] Failed to toggle microphone:", e);
     }

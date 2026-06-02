@@ -1724,6 +1724,33 @@
         "buildHabitHint": "La constancia ayuda a las comunidades a crecer más rápido",
         "goodMomentumTitle": "Buen impulso",
         "goodMomentumHint": "Mantén tu ritmo semanal"
+      },
+      "manage": {
+        "title": "Gestionar comunidades",
+        "subtitle": "Gestiona y elimina tus comunidades. Ten cuidado: las eliminaciones son permanentes.",
+        "emptyState": {
+          "description": "Aún no tienes ninguna comunidad propia.",
+          "createButton": "Crea tu primera comunidad"
+        },
+        "warning": {
+          "title": "Advertencia",
+          "description": "Eliminar una comunidad es permanente y no se puede deshacer. Todos los datos, incluidas publicaciones, miembros, mensajes y cursos, se eliminarán permanentemente."
+        },
+        "card": {
+          "noDescription": "Sin descripción",
+          "members": "{count, plural, =1 {1 miembro} other {# miembros}}",
+          "posts": "{count, plural, =1 {1 publicación} other {# publicaciones}}",
+          "viewButton": "Ver",
+          "deletingButton": "Eliminando..."
+        },
+        "deleteConfirm": "⚠️ ¿Seguro que quieres eliminar \"{name}\"?\n\nEsto eliminará permanentemente:\n- Todas las publicaciones y comentarios\n- Todos los miembros\n- Todos los canales y mensajes\n- Todos los cursos y lecciones\n- Todo lo relacionado con esta comunidad\n\n¡Esta acción NO se puede deshacer!",
+        "toasts": {
+          "deletedTitle": "Comunidad eliminada",
+          "deleted": "Comunidad eliminada correctamente",
+          "errorTitle": "Error",
+          "deleteFailed": "No se pudo eliminar la comunidad",
+          "unexpectedError": "Ocurrió un error inesperado"
+        }
       }
     },
     "library": {

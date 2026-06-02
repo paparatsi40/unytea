@@ -200,16 +200,6 @@ export default function NewCommunityPage() {
       const randomSuffix = Math.floor(Math.random() * 10000);
       slug = `${slug}-${randomSuffix}`;
 
-      console.log("🚀 Creating community with data:", {
-        name: formData.name,
-        slug,
-        description: formData.description || undefined,
-        imageUrl: formData.imageUrl || undefined,
-        coverImageUrl: formData.coverImageUrl || undefined,
-        isPrivate: formData.isPrivate,
-        requireApproval: formData.requireApproval,
-      });
-
       // Call server action - wait for result
       const result = await createCommunity({
         name: formData.name,
@@ -229,17 +219,13 @@ export default function NewCommunityPage() {
         heroSubtitle: formData.heroSubtitle || undefined,
       });
 
-      console.log("📦 Server response:", result);
-
       if (result.success && result.community) {
         const redirectUrl = `/dashboard/communities/${result.community.id}/sessions?quickStart=1`;
-        console.log("✅ Community created! Redirecting to quick schedule:", redirectUrl);
-        console.log("✅ Membership ID:", result.membership?.id);
 
         // Route host straight to first-session activation flow
         window.location.href = redirectUrl;
       } else {
-        console.error("❌ Failed to create community:", result.error);
+        console.error("Failed to create community:", result.error);
         if ((result as any).code === "PLAN_LIMIT_COMMUNITIES") {
           toast.error(result.error ?? t("toasts.createFailed"), {
             duration: 6000,
@@ -255,7 +241,7 @@ export default function NewCommunityPage() {
         setIsSubmitting(false);
       }
     } catch (error) {
-      console.error("💥 Error creating community:", error);
+      console.error("Error creating community:", error);
       alert(error instanceof Error ? error.message : t("toasts.createFailed"));
       setIsSubmitting(false);
     }

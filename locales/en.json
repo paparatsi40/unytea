@@ -1715,6 +1715,33 @@
         "buildHabitHint": "Consistency helps communities grow faster",
         "goodMomentumTitle": "Good momentum",
         "goodMomentumHint": "Keep your weekly rhythm going"
+      },
+      "manage": {
+        "title": "Manage Communities",
+        "subtitle": "Manage and delete your communities. Be careful - deletions are permanent!",
+        "emptyState": {
+          "description": "You don't own any communities yet.",
+          "createButton": "Create Your First Community"
+        },
+        "warning": {
+          "title": "Warning",
+          "description": "Deleting a community is permanent and cannot be undone. All data including posts, members, messages, and courses will be permanently deleted."
+        },
+        "card": {
+          "noDescription": "No description",
+          "members": "{count, plural, =1 {1 member} other {# members}}",
+          "posts": "{count, plural, =1 {1 post} other {# posts}}",
+          "viewButton": "View",
+          "deletingButton": "Deleting..."
+        },
+        "deleteConfirm": "⚠️ Are you sure you want to delete \"{name}\"?\n\nThis will permanently delete:\n- All posts and comments\n- All members\n- All channels and messages\n- All courses and lessons\n- Everything related to this community\n\nThis action CANNOT be undone!",
+        "toasts": {
+          "deletedTitle": "Community Deleted",
+          "deleted": "Community deleted successfully",
+          "errorTitle": "Error",
+          "deleteFailed": "Failed to delete community",
+          "unexpectedError": "An unexpected error occurred"
+        }
       }
     },
     "library": {
