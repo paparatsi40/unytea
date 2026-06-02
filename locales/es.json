@@ -2520,6 +2520,74 @@
         "descriptionFallback": "Únete a {name} para una sesión interactiva en Unytea.",
         "defaultExpert": "nuestro experto"
       }
+    },
+    "room": {
+      "header": {
+        "hostLabel": "Anfitrión: {name}",
+        "attending": "{count, plural, =1 {1 asistente} other {# asistentes}}",
+        "recordingBadge": "Grabando",
+        "startRecording": "Iniciar grabación",
+        "pauseRecording": "Pausar grabación",
+        "endSession": "Finalizar sesión",
+        "poll": "Encuesta",
+        "muteAll": "Silenciar a todos",
+        "leave": "Salir"
+      },
+      "raiseHand": {
+        "raise": "Levantar la mano",
+        "raised": "Mano levantada"
+      },
+      "speakerInvite": {
+        "message": "¡Te han invitado a hablar! Activa tu micrófono para unirte a la conversación.",
+        "enableMic": "Activar micrófono"
+      },
+      "notesPanel": {
+        "title": "Notas de la sesión",
+        "autoSaved": "Guardado automático"
+      },
+      "participants": {
+        "title": "Participantes",
+        "host": "Anfitrión",
+        "speakers": "Oradores",
+        "audience": "Audiencia",
+        "raisedHands": "Manos levantadas ({count})",
+        "noSpeakers": "Aún no hay oradores",
+        "unknown": "Desconocido",
+        "more": "+{count} más",
+        "inviteToSpeak": "Invitar a hablar",
+        "dismiss": "Descartar"
+      },
+      "handQueue": {
+        "title": "Cola de manos levantadas"
+      },
+      "controls": {
+        "muteMic": "Silenciar micrófono",
+        "unmuteMic": "Activar micrófono",
+        "turnOffCamera": "Apagar cámara",
+        "turnOnCamera": "Encender cámara",
+        "selectCamera": "Seleccionar cámara",
+        "cameraFallback": "Cámara {number}",
+        "shareScreen": "Compartir pantalla",
+        "stopShareScreen": "Dejar de compartir pantalla",
+        "whiteboard": "Pizarra",
+        "reactions": "Reacciones",
+        "activePoll": "Encuesta activa",
+        "hidePanels": "Ocultar paneles",
+        "showPanels": "Mostrar paneles",
+        "end": "Finalizar",
+        "endSessionTitle": "Finalizar sesión",
+        "leaveSessionTitle": "Salir de la sesión"
+      },
+      "panels": {
+        "notes": "Notas",
+        "chat": "Chat",
+        "participants": "Participantes"
+      },
+      "timeAgo": {
+        "justNow": "ahora mismo",
+        "minutesAgo": "hace {count} min",
+        "hoursAgo": "hace {count} h"
+      }
     }
   }
 }

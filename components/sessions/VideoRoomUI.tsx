@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useLocalParticipant, useParticipants, useRoomContext } from "@livekit/components-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import {
   ArrowLeft,
@@ -81,6 +82,7 @@ export function VideoRoomUI({
   onLeave,
   onEndSession,
 }: VideoRoomUIProps) {
+  const t = useTranslations("liveSession.room");
   const isAudioOnly = sessionMode === "audio";
 
   // Room context
@@ -283,11 +285,11 @@ export function VideoRoomUI({
   // Format time ago
   const formatTimeAgo = (timestamp: number) => {
     const seconds = Math.floor((Date.now() - timestamp) / 1000);
-    if (seconds < 60) return "just now";
+    if (seconds < 60) return t("timeAgo.justNow");
     const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes}m ago`;
+    if (minutes < 60) return t("timeAgo.minutesAgo", { count: minutes });
     const hours = Math.floor(minutes / 60);
-    return `${hours}h ago`;
+    return t("timeAgo.hoursAgo", { count: hours });
   };
 
   // Get current active poll (most recent active one)
@@ -312,12 +314,12 @@ export function VideoRoomUI({
             <div className="flex items-center gap-2 text-sm text-zinc-400">
               <span className="flex items-center gap-1">
                 <Crown className="h-3.5 w-3.5 text-amber-400" />
-                Host: {hostName}
+                {t("header.hostLabel", { name: hostName })}
               </span>
               <span>•</span>
               <span className="flex items-center gap-1">
                 <Users className="h-3.5 w-3.5" />
-                {attendeeCount} attending
+                {t("header.attending", { count: attendeeCount })}
               </span>
               <span>•</span>
               <span className="flex items-center gap-1">
@@ -332,7 +334,7 @@ export function VideoRoomUI({
         {isRecording && (
           <div className="flex items-center gap-2 rounded-full bg-red-500/10 px-3 py-1.5">
             <Radio className="h-4 w-4 animate-pulse text-red-500" />
-            <span className="text-sm font-medium text-red-400">Recording</span>
+            <span className="text-sm font-medium text-red-400">{t("header.recordingBadge")}</span>
           </div>
         )}
 
@@ -367,7 +369,7 @@ export function VideoRoomUI({
                 )}
               >
                 <BarChart3 className="h-4 w-4" />
-                <span className="hidden sm:inline">Poll</span>
+                <span className="hidden sm:inline">{t("header.poll")}</span>
               </button>
 
               {/* Mute All */}
@@ -376,7 +378,7 @@ export function VideoRoomUI({
                 className="flex items-center gap-2 rounded-full bg-zinc-800 px-3 py-1.5 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-700"
               >
                 <VolumeX className="h-4 w-4" />
-                <span className="hidden sm:inline">Mute All</span>
+                <span className="hidden sm:inline">{t("header.muteAll")}</span>
               </button>
 
               {/* Recording Control */}
@@ -391,7 +393,7 @@ export function VideoRoomUI({
                 )}
               >
                 <Radio className={cn("h-4 w-4", isRecording && "animate-pulse")} />
-                <span>{isRecording ? "Pause recording" : "Start recording"}</span>
+                <span>{isRecording ? t("header.pauseRecording") : t("header.startRecording")}</span>
               </button>
 
               {/* End Session */}
@@ -400,7 +402,7 @@ export function VideoRoomUI({
                 className="flex items-center gap-2 rounded-full bg-red-500/10 px-3 py-1.5 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/20"
               >
                 <Radio className="h-4 w-4" />
-                <span>End Session</span>
+                <span>{t("header.endSession")}</span>
               </button>
             </>
           ) : (
@@ -416,7 +418,7 @@ export function VideoRoomUI({
                 )}
               >
                 <Hand className={cn("h-4 w-4", hasRaisedHand && "animate-bounce")} />
-                <span>{hasRaisedHand ? "Hand Raised" : "Raise Hand"}</span>
+                <span>{hasRaisedHand ? t("raiseHand.raised") : t("raiseHand.raise")}</span>
               </button>
 
               {/* Leave */}
@@ -425,7 +427,7 @@ export function VideoRoomUI({
                 className="flex items-center gap-2 rounded-full bg-red-500/10 px-3 py-1.5 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/20"
               >
                 <LogOut className="h-4 w-4" />
-                <span>Leave</span>
+                <span>{t("header.leave")}</span>
               </button>
             </>
           )}
@@ -437,9 +439,7 @@ export function VideoRoomUI({
         <div className="flex items-center justify-between border-b border-emerald-800 bg-emerald-500/10 px-4 py-3">
           <div className="flex items-center gap-3">
             <Megaphone className="h-5 w-5 text-emerald-400" />
-            <p className="text-sm font-medium text-emerald-200">
-              You&apos;ve been invited to speak! Enable your microphone to join the conversation.
-            </p>
+            <p className="text-sm font-medium text-emerald-200">{t("speakerInvite.message")}</p>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -449,7 +449,7 @@ export function VideoRoomUI({
               }}
               className="rounded-full bg-emerald-500 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-emerald-600"
             >
-              Enable Mic
+              {t("speakerInvite.enableMic")}
             </button>
             <button onClick={clearSpeakerInvite} className="text-zinc-400 hover:text-zinc-200">
               <X className="h-4 w-4" />
@@ -470,9 +470,9 @@ export function VideoRoomUI({
           <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-3">
             <div className="flex items-center gap-2 text-sm font-medium text-zinc-300">
               <FileText className="h-4 w-4 text-emerald-400" />
-              Session Notes
+              {t("notesPanel.title")}
             </div>
-            <span className="text-xs text-zinc-500">Auto-saved</span>
+            <span className="text-xs text-zinc-500">{t("notesPanel.autoSaved")}</span>
           </div>
           <div className="flex-1 overflow-hidden">
             <SessionNotesEditor sessionId={sessionId || ""} />
@@ -555,7 +555,7 @@ export function VideoRoomUI({
           <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-3">
             <div className="flex items-center gap-2 text-sm font-medium text-zinc-300">
               <Users className="h-4 w-4 text-blue-400" />
-              Participants
+              {t("participants.title")}
             </div>
             <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-400">
               {participants.length + 1}
@@ -566,7 +566,9 @@ export function VideoRoomUI({
           <div className="flex-1 overflow-y-auto p-2">
             {/* Host Section */}
             <div className="mb-4">
-              <p className="mb-2 px-2 text-xs font-medium uppercase text-zinc-500">Host</p>
+              <p className="mb-2 px-2 text-xs font-medium uppercase text-zinc-500">
+                {t("participants.host")}
+              </p>
               <div className="flex items-center gap-3 rounded-lg bg-zinc-800/50 px-3 py-2">
                 <div className="relative">
                   {hostAvatar ? (
@@ -593,7 +595,7 @@ export function VideoRoomUI({
               <div className="mb-4">
                 <p className="mb-2 px-2 text-xs font-medium uppercase text-amber-400">
                   <Hand className="mr-1 inline h-3 w-3" />
-                  Raised Hands ({raisedHands.length})
+                  {t("participants.raisedHands", { count: raisedHands.length })}
                 </p>
                 {raisedHands.map((hand) => (
                   <div
@@ -612,14 +614,14 @@ export function VideoRoomUI({
                         <button
                           onClick={() => inviteSpeaker(hand.identity)}
                           className="rounded-lg bg-blue-500/20 p-1.5 text-blue-400 transition-colors hover:bg-blue-500/30"
-                          title="Invite to speak"
+                          title={t("participants.inviteToSpeak")}
                         >
                           <UserPlus className="h-3.5 w-3.5" />
                         </button>
                         <button
                           onClick={() => dismissHand(hand.identity)}
                           className="rounded-lg bg-zinc-700/50 p-1.5 text-zinc-400 transition-colors hover:bg-zinc-700"
-                          title="Dismiss"
+                          title={t("participants.dismiss")}
                         >
                           <X className="h-3.5 w-3.5" />
                         </button>
@@ -632,7 +634,9 @@ export function VideoRoomUI({
 
             {/* Speakers Section */}
             <div className="mb-4">
-              <p className="mb-2 px-2 text-xs font-medium uppercase text-zinc-500">Speakers</p>
+              <p className="mb-2 px-2 text-xs font-medium uppercase text-zinc-500">
+                {t("participants.speakers")}
+              </p>
               {participants
                 .filter((p) => p.identity !== localParticipant.identity)
                 .map((p) => (
@@ -643,7 +647,9 @@ export function VideoRoomUI({
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 text-sm font-medium text-white">
                       {p.name?.charAt(0) || "?"}
                     </div>
-                    <span className="text-sm text-zinc-300">{p.name || "Unknown"}</span>
+                    <span className="text-sm text-zinc-300">
+                      {p.name || t("participants.unknown")}
+                    </span>
                     {raisedHands.some((h) => h.identity === p.identity) && (
                       <Hand className="ml-auto h-3.5 w-3.5 animate-bounce text-amber-400" />
                     )}
@@ -655,12 +661,14 @@ export function VideoRoomUI({
                   </div>
                 ))}
               {participants.filter((p) => p.identity !== localParticipant.identity).length ===
-                0 && <p className="px-2 text-sm text-zinc-500">No speakers yet</p>}
+                0 && <p className="px-2 text-sm text-zinc-500">{t("participants.noSpeakers")}</p>}
             </div>
 
             {/* Audience Section */}
             <div>
-              <p className="mb-2 px-2 text-xs font-medium uppercase text-zinc-500">Audience</p>
+              <p className="mb-2 px-2 text-xs font-medium uppercase text-zinc-500">
+                {t("participants.audience")}
+              </p>
               {participants
                 .filter((p) => p.identity === localParticipant.identity)
                 .slice(0, 10)
@@ -672,14 +680,18 @@ export function VideoRoomUI({
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-700 text-sm font-medium text-zinc-300">
                       {p.name?.charAt(0) || "?"}
                     </div>
-                    <span className="text-sm text-zinc-400">{p.name || "Unknown"}</span>
+                    <span className="text-sm text-zinc-400">
+                      {p.name || t("participants.unknown")}
+                    </span>
                   </div>
                 ))}
               {participants.filter((p) => p.identity === localParticipant.identity).length > 10 && (
                 <p className="px-2 text-sm text-zinc-500">
-                  +
-                  {participants.filter((p) => p.identity === localParticipant.identity).length - 10}{" "}
-                  more
+                  {t("participants.more", {
+                    count:
+                      participants.filter((p) => p.identity === localParticipant.identity).length -
+                      10,
+                  })}
                 </p>
               )}
             </div>
@@ -691,7 +703,7 @@ export function VideoRoomUI({
       {isHost && showHandQueue && raisedHands.length > 0 && (
         <div className="absolute right-80 top-16 z-50 w-72 rounded-xl border border-zinc-700 bg-zinc-900/95 p-4 shadow-2xl backdrop-blur">
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="font-medium text-white">Hand Raised Queue</h3>
+            <h3 className="font-medium text-white">{t("handQueue.title")}</h3>
             <button
               onClick={() => setShowHandQueue(false)}
               className="text-zinc-500 hover:text-zinc-300"
@@ -718,14 +730,14 @@ export function VideoRoomUI({
                   <button
                     onClick={() => inviteSpeaker(request.identity)}
                     className="rounded-lg bg-blue-500/20 px-2 py-1 text-xs font-medium text-blue-400 transition-colors hover:bg-blue-500/30"
-                    title="Invite to speak"
+                    title={t("participants.inviteToSpeak")}
                   >
                     <UserPlus className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => dismissHand(request.identity)}
                     className="rounded-lg bg-zinc-700/50 px-2 py-1 text-xs font-medium text-zinc-400 transition-colors hover:bg-zinc-700"
-                    title="Dismiss"
+                    title={t("participants.dismiss")}
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -757,7 +769,7 @@ export function VideoRoomUI({
           {/* Mic */}
           <button
             onClick={toggleMicrophone}
-            title={isMicrophoneEnabled ? "Mute microphone" : "Unmute microphone"}
+            title={isMicrophoneEnabled ? t("controls.muteMic") : t("controls.unmuteMic")}
             className={cn(
               "flex h-12 w-12 items-center justify-center rounded-full transition-all",
               isMicrophoneEnabled
@@ -773,7 +785,7 @@ export function VideoRoomUI({
             <>
               <button
                 onClick={toggleCamera}
-                title={isCameraEnabled ? "Turn off camera" : "Turn on camera"}
+                title={isCameraEnabled ? t("controls.turnOffCamera") : t("controls.turnOnCamera")}
                 className={cn(
                   "flex h-12 w-12 items-center justify-center rounded-full transition-all",
                   isCameraEnabled
@@ -789,14 +801,14 @@ export function VideoRoomUI({
                   value={selectedCameraId}
                   onChange={(e) => void handleCameraDeviceChange(e.target.value)}
                   className="h-10 max-w-[220px] rounded-lg border border-zinc-700 bg-zinc-900 px-3 text-xs text-zinc-200"
-                  title="Select camera"
+                  title={t("controls.selectCamera")}
                 >
                   {videoInputs.map((device, index) => (
                     <option
                       key={device.deviceId || `${device.label}-${index}`}
                       value={device.deviceId}
                     >
-                      {device.label || `Camera ${index + 1}`}
+                      {device.label || t("controls.cameraFallback", { number: index + 1 })}
                     </option>
                   ))}
                 </select>
@@ -807,7 +819,7 @@ export function VideoRoomUI({
           {/* Screen Share */}
           <button
             onClick={toggleScreenShare}
-            title={isScreenShareEnabled ? "Stop sharing screen" : "Share screen"}
+            title={isScreenShareEnabled ? t("controls.stopShareScreen") : t("controls.shareScreen")}
             className={cn(
               "flex h-12 w-12 items-center justify-center rounded-full transition-all",
               isScreenShareEnabled
@@ -827,7 +839,7 @@ export function VideoRoomUI({
                 ? "bg-purple-500/20 text-purple-400 hover:bg-purple-500/30"
                 : "bg-zinc-800 text-white hover:bg-zinc-700"
             )}
-            title="Whiteboard"
+            title={t("controls.whiteboard")}
           >
             <Pencil className="h-5 w-5" />
           </button>
@@ -836,7 +848,7 @@ export function VideoRoomUI({
           <div className="relative">
             <button
               onClick={() => setShowReactions(!showReactions)}
-              title="Reactions"
+              title={t("controls.reactions")}
               className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-800 text-white transition-all hover:bg-zinc-700"
             >
               <Smile className="h-5 w-5" />
@@ -855,7 +867,7 @@ export function VideoRoomUI({
               className="flex h-12 items-center gap-2 rounded-full bg-purple-500/20 px-4 text-purple-400 transition-all hover:bg-purple-500/30"
             >
               <BarChart3 className="h-5 w-5" />
-              <span className="text-sm font-medium">Active Poll</span>
+              <span className="text-sm font-medium">{t("controls.activePoll")}</span>
             </button>
           )}
         </div>
@@ -876,7 +888,7 @@ export function VideoRoomUI({
                   setActivePanel(tab);
                   setShowAllPanels(false);
                 }}
-                title={tab.charAt(0).toUpperCase() + tab.slice(1)}
+                title={t(`panels.${tab}`)}
                 className={cn(
                   "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
                   activePanel === tab
@@ -894,7 +906,7 @@ export function VideoRoomUI({
           {/* Toggle All Panels (desktop) */}
           <button
             onClick={() => setShowAllPanels(!showAllPanels)}
-            title={showAllPanels ? "Hide panels" : "Show panels"}
+            title={showAllPanels ? t("controls.hidePanels") : t("controls.showPanels")}
             className="hidden h-12 w-12 items-center justify-center rounded-full bg-zinc-800 text-white transition-all hover:bg-zinc-700 md:flex"
           >
             {showAllPanels ? (
@@ -908,20 +920,20 @@ export function VideoRoomUI({
           {isHost ? (
             <button
               onClick={onEndSession}
-              title="End session"
+              title={t("controls.endSessionTitle")}
               className="flex h-12 items-center gap-2 rounded-full bg-red-500 px-4 font-medium text-white transition-colors hover:bg-red-600"
             >
               <Radio className="h-5 w-5" />
-              <span className="hidden sm:inline">End</span>
+              <span className="hidden sm:inline">{t("controls.end")}</span>
             </button>
           ) : (
             <button
               onClick={onLeave}
-              title="Leave session"
+              title={t("controls.leaveSessionTitle")}
               className="flex h-12 items-center gap-2 rounded-full bg-red-500 px-4 font-medium text-white transition-colors hover:bg-red-600"
             >
               <LogOut className="h-5 w-5" />
-              <span className="hidden sm:inline">Leave</span>
+              <span className="hidden sm:inline">{t("header.leave")}</span>
             </button>
           )}
         </div>

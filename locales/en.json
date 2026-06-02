@@ -2511,6 +2511,74 @@
         "descriptionFallback": "Join {name} for an interactive session on Unytea.",
         "defaultExpert": "our expert"
       }
+    },
+    "room": {
+      "header": {
+        "hostLabel": "Host: {name}",
+        "attending": "{count, plural, =1 {1 attending} other {# attending}}",
+        "recordingBadge": "Recording",
+        "startRecording": "Start recording",
+        "pauseRecording": "Pause recording",
+        "endSession": "End Session",
+        "poll": "Poll",
+        "muteAll": "Mute All",
+        "leave": "Leave"
+      },
+      "raiseHand": {
+        "raise": "Raise Hand",
+        "raised": "Hand Raised"
+      },
+      "speakerInvite": {
+        "message": "You've been invited to speak! Enable your microphone to join the conversation.",
+        "enableMic": "Enable Mic"
+      },
+      "notesPanel": {
+        "title": "Session Notes",
+        "autoSaved": "Auto-saved"
+      },
+      "participants": {
+        "title": "Participants",
+        "host": "Host",
+        "speakers": "Speakers",
+        "audience": "Audience",
+        "raisedHands": "Raised Hands ({count})",
+        "noSpeakers": "No speakers yet",
+        "unknown": "Unknown",
+        "more": "+{count} more",
+        "inviteToSpeak": "Invite to speak",
+        "dismiss": "Dismiss"
+      },
+      "handQueue": {
+        "title": "Hand Raised Queue"
+      },
+      "controls": {
+        "muteMic": "Mute microphone",
+        "unmuteMic": "Unmute microphone",
+        "turnOffCamera": "Turn off camera",
+        "turnOnCamera": "Turn on camera",
+        "selectCamera": "Select camera",
+        "cameraFallback": "Camera {number}",
+        "shareScreen": "Share screen",
+        "stopShareScreen": "Stop sharing screen",
+        "whiteboard": "Whiteboard",
+        "reactions": "Reactions",
+        "activePoll": "Active Poll",
+        "hidePanels": "Hide panels",
+        "showPanels": "Show panels",
+        "end": "End",
+        "endSessionTitle": "End session",
+        "leaveSessionTitle": "Leave session"
+      },
+      "panels": {
+        "notes": "Notes",
+        "chat": "Chat",
+        "participants": "Participants"
+      },
+      "timeAgo": {
+        "justNow": "just now",
+        "minutesAgo": "{count}m ago",
+        "hoursAgo": "{count}h ago"
+      }
     }
   }
 }

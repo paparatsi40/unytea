@@ -2522,6 +2522,74 @@
         "descriptionFallback": "Rejoignez {name} pour une session interactive sur Unytea.",
         "defaultExpert": "notre expert"
       }
+    },
+    "room": {
+      "header": {
+        "hostLabel": "Hôte : {name}",
+        "attending": "{count, plural, =1 {1 participant} other {# participants}}",
+        "recordingBadge": "Enregistrement",
+        "startRecording": "Démarrer l'enregistrement",
+        "pauseRecording": "Mettre en pause l'enregistrement",
+        "endSession": "Terminer la session",
+        "poll": "Sondage",
+        "muteAll": "Couper tous les micros",
+        "leave": "Quitter"
+      },
+      "raiseHand": {
+        "raise": "Lever la main",
+        "raised": "Main levée"
+      },
+      "speakerInvite": {
+        "message": "Vous avez été invité à prendre la parole ! Activez votre micro pour rejoindre la conversation.",
+        "enableMic": "Activer le micro"
+      },
+      "notesPanel": {
+        "title": "Notes de la session",
+        "autoSaved": "Enregistré automatiquement"
+      },
+      "participants": {
+        "title": "Participants",
+        "host": "Hôte",
+        "speakers": "Intervenants",
+        "audience": "Public",
+        "raisedHands": "Mains levées ({count})",
+        "noSpeakers": "Aucun intervenant pour l'instant",
+        "unknown": "Inconnu",
+        "more": "+{count} de plus",
+        "inviteToSpeak": "Inviter à parler",
+        "dismiss": "Ignorer"
+      },
+      "handQueue": {
+        "title": "File des mains levées"
+      },
+      "controls": {
+        "muteMic": "Couper le micro",
+        "unmuteMic": "Activer le micro",
+        "turnOffCamera": "Désactiver la caméra",
+        "turnOnCamera": "Activer la caméra",
+        "selectCamera": "Sélectionner la caméra",
+        "cameraFallback": "Caméra {number}",
+        "shareScreen": "Partager l'écran",
+        "stopShareScreen": "Arrêter le partage d'écran",
+        "whiteboard": "Tableau blanc",
+        "reactions": "Réactions",
+        "activePoll": "Sondage en cours",
+        "hidePanels": "Masquer les panneaux",
+        "showPanels": "Afficher les panneaux",
+        "end": "Terminer",
+        "endSessionTitle": "Terminer la session",
+        "leaveSessionTitle": "Quitter la session"
+      },
+      "panels": {
+        "notes": "Notes",
+        "chat": "Chat",
+        "participants": "Participants"
+      },
+      "timeAgo": {
+        "justNow": "à l'instant",
+        "minutesAgo": "il y a {count} min",
+        "hoursAgo": "il y a {count} h"
+      }
     }
   }
 }
