@@ -35,6 +35,18 @@ const CATEGORY_KEYS = [
   "other",
 ] as const;
 
+// Layout enum values double as i18n keys (no spaces) — labels resolved via
+// t(`steps.layout.layouts.${key}`). Wizard-local taxonomy.
+const LAYOUT_KEYS = ["MODERN_GRID", "CLASSIC_FORUM", "ACADEMY", "DASHBOARD", "MINIMALIST"] as const;
+
+// Font family: stored value (a real font name, possibly spaced) paired with
+// its i18n key, since "Open Sans" isn't a valid key segment on its own.
+const FONT_OPTIONS = [
+  { value: "Inter", key: "inter" },
+  { value: "Montserrat", key: "montserrat" },
+  { value: "Open Sans", key: "openSans" },
+] as const;
+
 const getSteps = (t: ReturnType<typeof useTranslations>) => [
   {
     id: 1,
@@ -604,7 +616,7 @@ export default function NewCommunityPage() {
               {/* Layout & Theme */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-foreground">
-                  Layout Type
+                  {t("steps.layout.layoutTypeLabel")}
                 </label>
                 <select
                   value={formData.layoutType}
@@ -621,16 +633,14 @@ export default function NewCommunityPage() {
                   }
                   className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                 >
-                  <option value="MODERN_GRID">Modern Grid - Pinterest style, visual-first</option>
-                  <option value="CLASSIC_FORUM">
-                    Classic Forum - Traditional discussion layout
-                  </option>
-                  <option value="ACADEMY">Academy - Course-focused educational</option>
-                  <option value="DASHBOARD">Dashboard - Analytics and data-visible</option>
-                  <option value="MINIMALIST">Minimalist - Clean, Notion-like</option>
+                  {LAYOUT_KEYS.map((key) => (
+                    <option key={key} value={key}>
+                      {t(`steps.layout.layouts.${key}`)}
+                    </option>
+                  ))}
                 </select>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  You can change this later in Settings → Appearance
+                  {t("steps.layout.changeLaterHint")}
                 </p>
               </div>
 
@@ -638,7 +648,7 @@ export default function NewCommunityPage() {
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <label className="mb-2 block text-sm font-medium text-foreground">
-                    Primary Color
+                    {t("steps.layout.primaryColorLabel")}
                   </label>
                   <input
                     type="color"
@@ -650,7 +660,7 @@ export default function NewCommunityPage() {
 
                 <div>
                   <label className="mb-2 block text-sm font-medium text-foreground">
-                    Secondary Color
+                    {t("steps.layout.secondaryColorLabel")}
                   </label>
                   <input
                     type="color"
@@ -662,7 +672,7 @@ export default function NewCommunityPage() {
 
                 <div>
                   <label className="mb-2 block text-sm font-medium text-foreground">
-                    Accent Color
+                    {t("steps.layout.accentColorLabel")}
                   </label>
                   <input
                     type="color"
@@ -676,43 +686,45 @@ export default function NewCommunityPage() {
               {/* Font Family */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-foreground">
-                  Font Family
+                  {t("steps.layout.fontFamilyLabel")}
                 </label>
                 <select
                   value={formData.fontFamily}
                   onChange={(e) => setFormData({ ...formData, fontFamily: e.target.value })}
                   className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                 >
-                  <option value="Inter">Inter - Modern and clean</option>
-                  <option value="Montserrat">Montserrat - Bold and friendly</option>
-                  <option value="Open Sans">Open Sans - Professional and readable</option>
+                  {FONT_OPTIONS.map((font) => (
+                    <option key={font.key} value={font.value}>
+                      {t(`steps.layout.fonts.${font.key}`)}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               {/* Hero Section */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-foreground">
-                  Hero Title (Optional)
+                  {t("steps.layout.heroTitleLabel")}
                 </label>
                 <input
                   type="text"
                   value={formData.heroTitle}
                   onChange={(e) => setFormData({ ...formData, heroTitle: e.target.value })}
                   className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  placeholder="Welcome to our community"
+                  placeholder={t("steps.layout.heroTitlePlaceholder")}
                 />
               </div>
 
               <div>
                 <label className="mb-2 block text-sm font-medium text-foreground">
-                  Hero Subtitle (Optional)
+                  {t("steps.layout.heroSubtitleLabel")}
                 </label>
                 <textarea
                   value={formData.heroSubtitle}
                   onChange={(e) => setFormData({ ...formData, heroSubtitle: e.target.value })}
                   className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                   rows={3}
-                  placeholder="This is a community for..."
+                  placeholder={t("steps.layout.heroSubtitlePlaceholder")}
                 />
               </div>
             </>
@@ -735,10 +747,10 @@ export default function NewCommunityPage() {
                       htmlFor="isPrivate"
                       className="block text-sm font-medium text-foreground"
                     >
-                      Private Community
+                      {t("steps.settings.privateLabel")}
                     </label>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      Only approved members can see the community content
+                      {t("steps.settings.privateDescription")}
                     </p>
                   </div>
                 </div>
@@ -761,10 +773,10 @@ export default function NewCommunityPage() {
                       htmlFor="requireApproval"
                       className="block text-sm font-medium text-foreground"
                     >
-                      Require Approval for New Members
+                      {t("steps.settings.requireApprovalLabel")}
                     </label>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      You'll need to approve each member before they can join
+                      {t("steps.settings.requireApprovalDescription")}
                     </p>
                   </div>
                 </div>
@@ -775,9 +787,11 @@ export default function NewCommunityPage() {
                 <div className="flex items-start space-x-3">
                   <Sparkles className="h-5 w-5 text-primary" />
                   <div>
-                    <p className="text-sm font-medium text-foreground">Custom Domain</p>
+                    <p className="text-sm font-medium text-foreground">
+                      {t("steps.settings.customDomain.label")}
+                    </p>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      Available on Professional plan and above
+                      {t("steps.settings.customDomain.description")}
                     </p>
                   </div>
                 </div>
@@ -791,7 +805,7 @@ export default function NewCommunityPage() {
                 <div className="rounded-lg border-2 border-primary bg-primary/5 p-4">
                   <p className="flex items-center gap-2 text-sm font-semibold text-primary">
                     <Sparkles className="h-4 w-4" />
-                    Live Preview - This is how your community will look
+                    {t("steps.preview.livePreviewHeader")}
                   </p>
                 </div>
 
@@ -835,13 +849,13 @@ export default function NewCommunityPage() {
                         className="mb-2 text-3xl font-bold"
                         style={{ color: formData.primaryColor }}
                       >
-                        {formData.heroTitle || formData.name || "Your Community Name"}
+                        {formData.heroTitle || formData.name || t("steps.preview.nameFallback")}
                       </h1>
 
                       <p className="mx-auto max-w-2xl text-gray-600">
                         {formData.heroSubtitle ||
                           formData.description ||
-                          "Your community description will appear here"}
+                          t("steps.preview.descriptionFallback")}
                       </p>
 
                       <button
@@ -849,22 +863,28 @@ export default function NewCommunityPage() {
                         className="mt-6 rounded-full px-8 py-3 font-semibold text-white shadow-lg"
                         style={{ backgroundColor: formData.primaryColor }}
                       >
-                        Join Community
+                        {t("steps.preview.joinButton")}
                       </button>
 
                       {/* Mini Stats */}
                       <div className="mt-8 flex justify-center gap-8">
                         <div className="text-center">
                           <div className="text-2xl font-bold text-gray-900">1+</div>
-                          <div className="text-sm text-gray-500">Members</div>
+                          <div className="text-sm text-gray-500">
+                            {t("steps.preview.stats.members")}
+                          </div>
                         </div>
                         <div className="text-center">
                           <div className="text-2xl font-bold text-gray-900">0</div>
-                          <div className="text-sm text-gray-500">Courses</div>
+                          <div className="text-sm text-gray-500">
+                            {t("steps.preview.stats.courses")}
+                          </div>
                         </div>
                         <div className="text-center">
                           <div className="text-2xl font-bold text-gray-900">0</div>
-                          <div className="text-sm text-gray-500">Posts</div>
+                          <div className="text-sm text-gray-500">
+                            {t("steps.preview.stats.posts")}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -874,9 +894,9 @@ export default function NewCommunityPage() {
                   <div className="bg-gray-50 p-8">
                     <div className="mb-6 text-center">
                       <h2 className="mb-2 text-2xl font-bold text-gray-900">
-                        What You'll Get Inside
+                        {t("steps.preview.whatYouGetTitle")}
                       </h2>
-                      <p className="text-gray-600">Preview of member benefits</p>
+                      <p className="text-gray-600">{t("steps.preview.whatYouGetSubtitle")}</p>
                     </div>
 
                     <div className="grid grid-cols-3 gap-4">
@@ -887,8 +907,12 @@ export default function NewCommunityPage() {
                         >
                           <BookOpen className="h-5 w-5" style={{ color: formData.primaryColor }} />
                         </div>
-                        <div className="text-sm font-semibold text-gray-900">Courses</div>
-                        <div className="text-xs text-gray-500">Access premium content</div>
+                        <div className="text-sm font-semibold text-gray-900">
+                          {t("steps.preview.features.courses.title")}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {t("steps.preview.features.courses.description")}
+                        </div>
                       </div>
 
                       <div className="rounded-xl bg-white p-4 text-center shadow-sm">
@@ -898,8 +922,12 @@ export default function NewCommunityPage() {
                         >
                           <Users className="h-5 w-5" style={{ color: formData.secondaryColor }} />
                         </div>
-                        <div className="text-sm font-semibold text-gray-900">Community</div>
-                        <div className="text-xs text-gray-500">Connect with peers</div>
+                        <div className="text-sm font-semibold text-gray-900">
+                          {t("steps.preview.features.community.title")}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {t("steps.preview.features.community.description")}
+                        </div>
                       </div>
 
                       <div className="rounded-xl bg-white p-4 text-center shadow-sm">
@@ -909,8 +937,12 @@ export default function NewCommunityPage() {
                         >
                           <Sparkles className="h-5 w-5" style={{ color: formData.accentColor }} />
                         </div>
-                        <div className="text-sm font-semibold text-gray-900">Live Events</div>
-                        <div className="text-xs text-gray-500">Weekly sessions</div>
+                        <div className="text-sm font-semibold text-gray-900">
+                          {t("steps.preview.features.events.title")}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {t("steps.preview.features.events.description")}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -919,29 +951,33 @@ export default function NewCommunityPage() {
                 {/* Layout & Theme Info */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="rounded-lg border border-gray-200 bg-white p-4">
-                    <div className="mb-2 text-sm font-medium text-gray-700">Selected Layout</div>
+                    <div className="mb-2 text-sm font-medium text-gray-700">
+                      {t("steps.preview.selectedLayoutLabel")}
+                    </div>
                     <div className="text-lg font-bold" style={{ color: formData.primaryColor }}>
                       {formData.layoutType.replace(/_/g, " ")}
                     </div>
                   </div>
 
                   <div className="rounded-lg border border-gray-200 bg-white p-4">
-                    <div className="mb-2 text-sm font-medium text-gray-700">Color Theme</div>
+                    <div className="mb-2 text-sm font-medium text-gray-700">
+                      {t("steps.preview.colorThemeLabel")}
+                    </div>
                     <div className="flex gap-2">
                       <div
                         className="h-8 w-8 rounded-lg shadow-sm ring-2 ring-gray-200"
                         style={{ backgroundColor: formData.primaryColor }}
-                        title="Primary"
+                        title={t("steps.preview.swatch.primary")}
                       />
                       <div
                         className="h-8 w-8 rounded-lg shadow-sm ring-2 ring-gray-200"
                         style={{ backgroundColor: formData.secondaryColor }}
-                        title="Secondary"
+                        title={t("steps.preview.swatch.secondary")}
                       />
                       <div
                         className="h-8 w-8 rounded-lg shadow-sm ring-2 ring-gray-200"
                         style={{ backgroundColor: formData.accentColor }}
-                        title="Accent"
+                        title={t("steps.preview.swatch.accent")}
                       />
                     </div>
                   </div>

@@ -1147,15 +1147,68 @@
         },
         "layout": {
           "title": "Layout",
-          "description": "Choose your community structure"
+          "description": "Choose your community structure",
+          "layoutTypeLabel": "Layout Type",
+          "layouts": {
+            "MODERN_GRID": "Modern Grid - Pinterest style, visual-first",
+            "CLASSIC_FORUM": "Classic Forum - Traditional discussion layout",
+            "ACADEMY": "Academy - Course-focused educational",
+            "DASHBOARD": "Dashboard - Analytics and data-visible",
+            "MINIMALIST": "Minimalist - Clean, Notion-like"
+          },
+          "changeLaterHint": "You can change this later in Settings → Appearance",
+          "primaryColorLabel": "Primary Color",
+          "secondaryColorLabel": "Secondary Color",
+          "accentColorLabel": "Accent Color",
+          "fontFamilyLabel": "Font Family",
+          "fonts": {
+            "inter": "Inter - Modern and clean",
+            "montserrat": "Montserrat - Bold and friendly",
+            "openSans": "Open Sans - Professional and readable"
+          },
+          "heroTitleLabel": "Hero Title (Optional)",
+          "heroTitlePlaceholder": "Welcome to our community",
+          "heroSubtitleLabel": "Hero Subtitle (Optional)",
+          "heroSubtitlePlaceholder": "This is a community for..."
         },
         "settings": {
           "title": "Settings",
-          "description": "Configure access and privacy"
+          "description": "Configure access and privacy",
+          "privateLabel": "Private Community",
+          "privateDescription": "Only approved members can see the community content",
+          "requireApprovalLabel": "Require Approval for New Members",
+          "requireApprovalDescription": "You'll need to approve each member before they can join",
+          "customDomain": {
+            "label": "Custom Domain",
+            "description": "Available on Professional plan and above"
+          }
         },
         "preview": {
           "title": "Preview",
-          "description": "Review before publishing"
+          "description": "Review before publishing",
+          "livePreviewHeader": "Live Preview - This is how your community will look",
+          "nameFallback": "Your Community Name",
+          "descriptionFallback": "Your community description will appear here",
+          "joinButton": "Join Community",
+          "stats": {
+            "members": "Members",
+            "courses": "Courses",
+            "posts": "Posts"
+          },
+          "whatYouGetTitle": "What You'll Get Inside",
+          "whatYouGetSubtitle": "Preview of member benefits",
+          "features": {
+            "courses": { "title": "Courses", "description": "Access premium content" },
+            "community": { "title": "Community", "description": "Connect with peers" },
+            "events": { "title": "Live Events", "description": "Weekly sessions" }
+          },
+          "selectedLayoutLabel": "Selected Layout",
+          "colorThemeLabel": "Color Theme",
+          "swatch": {
+            "primary": "Primary",
+            "secondary": "Secondary",
+            "accent": "Accent"
+          }
         }
       },
       "validation": {
