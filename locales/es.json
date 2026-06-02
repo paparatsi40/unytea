@@ -2698,6 +2698,29 @@
         "backToSessions": "Volver a sesiones",
         "reEnterRoom": "Volver a entrar a la sala"
       }
+    },
+    "notesEditor": {
+      "loading": "Cargando notas...",
+      "saved": "Guardado {relativeTime}",
+      "saving": "Guardando...",
+      "add": "Añadir",
+      "tabs": {
+        "insights": "Ideas ({count})",
+        "resources": "Recursos ({count})"
+      },
+      "notesHint": "Captura puntos clave, decisiones y tareas",
+      "notesPlaceholder": "Notas de la sesión\n\nPuntos clave:\n• \n\nTareas:\n• \n\nPreguntas de seguimiento:\n• ",
+      "insightsHint": "Ideas y aprendizajes clave de esta sesión",
+      "insightPlaceholder": "Añade una idea clave...",
+      "insightsEmpty": "Aún no hay ideas. Añade aprendizajes clave de esta sesión.",
+      "resourcesHint": "Enlaces, herramientas y recursos compartidos durante la sesión",
+      "resourcePlaceholder": "https://ejemplo.com o nombre del recurso",
+      "resourcesEmpty": "Aún no hay recursos. Añade enlaces y herramientas compartidos.",
+      "toasts": {
+        "loadFailed": "No se pudieron cargar las notas de la sesión",
+        "saved": "Notas guardadas",
+        "saveFailed": "No se pudieron guardar las notas"
+      }
     }
   }
 }

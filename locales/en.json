@@ -2689,6 +2689,29 @@
         "backToSessions": "Back to sessions",
         "reEnterRoom": "Re-enter Session Room"
       }
+    },
+    "notesEditor": {
+      "loading": "Loading notes...",
+      "saved": "Saved {relativeTime}",
+      "saving": "Saving...",
+      "add": "Add",
+      "tabs": {
+        "insights": "Insights ({count})",
+        "resources": "Resources ({count})"
+      },
+      "notesHint": "Capture key points, decisions, and action items",
+      "notesPlaceholder": "Session Notes\n\nKey takeaways:\n• \n\nAction items:\n• \n\nQuestions to follow up:\n• ",
+      "insightsHint": "Key insights and learnings from this session",
+      "insightPlaceholder": "Add a key insight...",
+      "insightsEmpty": "No insights yet. Add key learnings from this session.",
+      "resourcesHint": "Links, tools, and resources shared during the session",
+      "resourcePlaceholder": "https://example.com or resource name",
+      "resourcesEmpty": "No resources yet. Add links and tools shared.",
+      "toasts": {
+        "loadFailed": "Failed to load session notes",
+        "saved": "Notes saved",
+        "saveFailed": "Failed to save notes"
+      }
     }
   }
 }

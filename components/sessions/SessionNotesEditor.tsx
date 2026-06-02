@@ -16,6 +16,8 @@ import { Badge } from "@/components/ui/badge";
 import { getOrCreateSessionNotes, updateSessionNotes } from "@/app/actions/sessionNotes";
 import { toast } from "react-hot-toast";
 import { formatDistanceToNow } from "date-fns";
+import { useLocale, useTranslations } from "next-intl";
+import { getDateFnsLocale } from "@/lib/i18n/date-fns-locale";
 
 interface SessionNotesEditorProps {
   sessionId: string;
@@ -33,6 +35,10 @@ interface NoteData {
 }
 
 export function SessionNotesEditor({ sessionId, isHost }: SessionNotesEditorProps) {
+  const t = useTranslations("liveSession.notesEditor");
+  const tRoom = useTranslations("liveSession.room");
+  const tCommon = useTranslations("common");
+  const dfLocale = getDateFnsLocale(useLocale());
   const [note, setNote] = useState<NoteData | null>(null);
   const [content, setContent] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -59,13 +65,13 @@ export function SessionNotesEditor({ sessionId, isHost }: SessionNotesEditorProp
         }
       } catch (error) {
         console.error("Failed to load notes:", error);
-        toast.error("Failed to load session notes");
+        toast.error(t("toasts.loadFailed"));
       } finally {
         setIsLoading(false);
       }
     }
     loadNotes();
-  }, [sessionId]);
+  }, [sessionId, t]);
 
   // Auto-save every 3 seconds when content changes
   useEffect(() => {
@@ -121,13 +127,13 @@ export function SessionNotesEditor({ sessionId, isHost }: SessionNotesEditorProp
 
       if (result.success) {
         setLastSaved(new Date());
-        toast.success("Notes saved");
+        toast.success(t("toasts.saved"));
       } else {
-        toast.error("Failed to save notes");
+        toast.error(t("toasts.saveFailed"));
       }
     } catch (error) {
       console.error("Save failed:", error);
-      toast.error("Failed to save notes");
+      toast.error(t("toasts.saveFailed"));
     } finally {
       setIsSaving(false);
     }
@@ -158,7 +164,7 @@ export function SessionNotesEditor({ sessionId, isHost }: SessionNotesEditorProp
       <div className="flex h-full items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900">
         <div className="flex items-center gap-2 text-zinc-500">
           <Clock className="h-5 w-5 animate-spin" />
-          <span>Loading notes...</span>
+          <span>{t("loading")}</span>
         </div>
       </div>
     );
@@ -173,10 +179,10 @@ export function SessionNotesEditor({ sessionId, isHost }: SessionNotesEditorProp
       <div className="flex items-center justify-between border-b border-zinc-800 bg-zinc-950 px-4 py-3">
         <div className="flex items-center gap-2">
           <FileText className="h-4 w-4 text-purple-500" />
-          <span className="font-medium text-white">Session Notes</span>
+          <span className="font-medium text-white">{tRoom("notesPanel.title")}</span>
           {isHost && (
             <Badge variant="secondary" className="bg-purple-500/20 text-xs text-purple-400">
-              Host
+              {tRoom("participants.host")}
             </Badge>
           )}
         </div>
@@ -184,7 +190,12 @@ export function SessionNotesEditor({ sessionId, isHost }: SessionNotesEditorProp
           {lastSaved && (
             <span className="flex items-center gap-1 text-xs text-zinc-500">
               <Clock className="h-3 w-3" />
-              Saved {formatDistanceToNow(lastSaved, { addSuffix: true })}
+              {t("saved", {
+                relativeTime: formatDistanceToNow(lastSaved, {
+                  addSuffix: true,
+                  locale: dfLocale,
+                }),
+              })}
             </span>
           )}
           <Button
@@ -194,7 +205,7 @@ export function SessionNotesEditor({ sessionId, isHost }: SessionNotesEditorProp
             className="bg-purple-600 text-white hover:bg-purple-700"
           >
             <Save className="mr-1 h-4 w-4" />
-            {isSaving ? "Saving..." : "Save"}
+            {isSaving ? t("saving") : tCommon("save")}
           </Button>
         </div>
       </div>
@@ -210,7 +221,7 @@ export function SessionNotesEditor({ sessionId, isHost }: SessionNotesEditorProp
           }`}
         >
           <BookOpen className="h-4 w-4" />
-          Notes
+          {tRoom("panels.notes")}
         </button>
         <button
           onClick={() => setActiveSection("insights")}
@@ -221,7 +232,7 @@ export function SessionNotesEditor({ sessionId, isHost }: SessionNotesEditorProp
           }`}
         >
           <Lightbulb className="h-4 w-4" />
-          Insights ({insights.length})
+          {t("tabs.insights", { count: insights.length })}
         </button>
         <button
           onClick={() => setActiveSection("resources")}
@@ -232,7 +243,7 @@ export function SessionNotesEditor({ sessionId, isHost }: SessionNotesEditorProp
           }`}
         >
           <LinkIcon className="h-4 w-4" />
-          Resources ({resources.length})
+          {t("tabs.resources", { count: resources.length })}
         </button>
       </div>
 
@@ -243,21 +254,12 @@ export function SessionNotesEditor({ sessionId, isHost }: SessionNotesEditorProp
             <div className="space-y-3">
               <div className="mb-2 text-sm text-zinc-400">
                 <Sparkles className="mr-1 inline h-4 w-4" />
-                Capture key points, decisions, and action items
+                {t("notesHint")}
               </div>
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                placeholder={`Session Notes
-
-Key takeaways:
-• 
-
-Action items:
-• 
-
-Questions to follow up:
-• `}
+                placeholder={t("notesPlaceholder")}
                 className="min-h-[300px] w-full resize-none rounded-lg border border-zinc-700 bg-zinc-950 p-3 text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
               />
             </div>
@@ -267,7 +269,7 @@ Questions to follow up:
             <div className="space-y-3">
               <div className="mb-2 text-sm text-zinc-400">
                 <Lightbulb className="mr-1 inline h-4 w-4" />
-                Key insights and learnings from this session
+                {t("insightsHint")}
               </div>
 
               {/* Add new insight */}
@@ -276,7 +278,7 @@ Questions to follow up:
                   type="text"
                   value={newInsight}
                   onChange={(e) => setNewInsight(e.target.value)}
-                  placeholder="Add a key insight..."
+                  placeholder={t("insightPlaceholder")}
                   className="flex-1 rounded-md border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-yellow-500/50"
                   onKeyDown={(e) => e.key === "Enter" && addInsight()}
                 />
@@ -285,16 +287,14 @@ Questions to follow up:
                   size="sm"
                   className="bg-yellow-600 hover:bg-yellow-700"
                 >
-                  Add
+                  {t("add")}
                 </Button>
               </div>
 
               {/* Insights list */}
               <div className="space-y-2">
                 {insights.length === 0 ? (
-                  <div className="py-8 text-center text-zinc-500">
-                    No insights yet. Add key learnings from this session.
-                  </div>
+                  <div className="py-8 text-center text-zinc-500">{t("insightsEmpty")}</div>
                 ) : (
                   insights.map((insight, index) => (
                     <div
@@ -320,7 +320,7 @@ Questions to follow up:
             <div className="space-y-3">
               <div className="mb-2 text-sm text-zinc-400">
                 <LinkIcon className="mr-1 inline h-4 w-4" />
-                Links, tools, and resources shared during the session
+                {t("resourcesHint")}
               </div>
 
               {/* Add new resource */}
@@ -329,21 +329,19 @@ Questions to follow up:
                   type="text"
                   value={newResource}
                   onChange={(e) => setNewResource(e.target.value)}
-                  placeholder="https://example.com or resource name"
+                  placeholder={t("resourcePlaceholder")}
                   className="flex-1 rounded-md border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-green-500/50"
                   onKeyDown={(e) => e.key === "Enter" && addResource()}
                 />
                 <Button onClick={addResource} size="sm" className="bg-green-600 hover:bg-green-700">
-                  Add
+                  {t("add")}
                 </Button>
               </div>
 
               {/* Resources list */}
               <div className="space-y-2">
                 {resources.length === 0 ? (
-                  <div className="py-8 text-center text-zinc-500">
-                    No resources yet. Add links and tools shared.
-                  </div>
+                  <div className="py-8 text-center text-zinc-500">{t("resourcesEmpty")}</div>
                 ) : (
                   resources.map((resource, index) => (
                     <div

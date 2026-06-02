@@ -2700,6 +2700,29 @@
         "backToSessions": "Retour aux sessions",
         "reEnterRoom": "Revenir dans la salle"
       }
+    },
+    "notesEditor": {
+      "loading": "Chargement des notes...",
+      "saved": "Enregistré {relativeTime}",
+      "saving": "Enregistrement...",
+      "add": "Ajouter",
+      "tabs": {
+        "insights": "Idées ({count})",
+        "resources": "Ressources ({count})"
+      },
+      "notesHint": "Capturez les points clés, les décisions et les actions",
+      "notesPlaceholder": "Notes de la session\n\nPoints clés :\n• \n\nActions à mener :\n• \n\nQuestions à suivre :\n• ",
+      "insightsHint": "Idées et apprentissages clés de cette session",
+      "insightPlaceholder": "Ajoutez une idée clé...",
+      "insightsEmpty": "Aucune idée pour l'instant. Ajoutez les apprentissages clés de cette session.",
+      "resourcesHint": "Liens, outils et ressources partagés pendant la session",
+      "resourcePlaceholder": "https://exemple.com ou nom de la ressource",
+      "resourcesEmpty": "Aucune ressource pour l'instant. Ajoutez les liens et outils partagés.",
+      "toasts": {
+        "loadFailed": "Échec du chargement des notes de la session",
+        "saved": "Notes enregistrées",
+        "saveFailed": "Échec de l'enregistrement des notes"
+      }
     }
   }
 }
