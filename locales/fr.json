@@ -313,6 +313,7 @@
       "product": "Produit",
       "resources": "Ressources",
       "company": "Entreprise",
+      "legalLabel": "Légal",
       "legal": {
         "privacy": "Politique de Confidentialité",
         "terms": "Conditions d'Utilisation",
