@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import type Stripe from "stripe";
 import { Prisma } from "@prisma/client";
 import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
@@ -8,15 +9,22 @@ import { getPlanFromPriceId } from "@/lib/plans";
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 /**
- * Reads the subscription's current period start/end timestamps with backward
- * compatibility for the Stripe API 2025-02-24.acacia migration that moved
- * these fields from the subscription root to subscription.items.data[0].*.
- * Accessing the root path on a newer payload returns undefined →
+ * Reads the subscription's current billing-period start/end timestamps.
+ *
+ * Stripe announced moving these fields from the subscription root to
+ * subscription.items.data[0].current_period_* in a future API version. SDK
+ * 17.3.1 (apiVersion 2025-02-24.acacia) still declares them only at the
+ * subscription root (required), and SubscriptionItem does NOT carry them yet —
+ * so we read item-level first (through a cast) as forward-compat preparation
+ * and fall back to the root, which is their current location. If both are
+ * missing we throw (caught upstream) rather than letting
  * `new Date(undefined * 1000)` → Invalid Date → Prisma rejection → 500.
  * (FIX-B4 — closes the pending root cause of task #58.)
  */
-function getPeriodDates(subscription: any): { start: Date; end: Date } {
-  const item = subscription.items?.data?.[0];
+function getPeriodDates(subscription: Stripe.Subscription): { start: Date; end: Date } {
+  const item = subscription.items?.data?.[0] as
+    | { current_period_start?: number; current_period_end?: number }
+    | undefined;
   const start = item?.current_period_start ?? subscription.current_period_start;
   const end = item?.current_period_end ?? subscription.current_period_end;
   if (!start || !end) {
@@ -126,9 +134,10 @@ export async function POST(request: Request) {
 
     switch (event.type) {
       case "checkout.session.completed": {
-        const session = event.data.object as any;
+        const session = event.data.object as Stripe.Checkout.Session;
         const userId = session.metadata?.userId;
-        const customerId = session.customer;
+        const customerId =
+          typeof session.customer === "string" ? session.customer : session.customer?.id;
         const type = session.metadata?.type;
 
         if (!userId) {
@@ -167,9 +176,20 @@ export async function POST(request: Request) {
       }
 
       case "invoice.payment_succeeded": {
-        const invoice = event.data.object as any;
-        const subscriptionId = invoice.subscription;
-        const customerId = invoice.customer;
+        const invoice = event.data.object as Stripe.Invoice;
+        // Webhook payloads send these unexpanded (string ids); narrow the
+        // string | object | null union the SDK declares.
+        const subscriptionId =
+          typeof invoice.subscription === "string"
+            ? invoice.subscription
+            : invoice.subscription?.id;
+        const customerId =
+          typeof invoice.customer === "string" ? invoice.customer : invoice.customer?.id;
+
+        if (!subscriptionId) {
+          console.error("[stripe-webhook] invoice.payment_succeeded without subscription id");
+          break;
+        }
 
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
         const priceId = subscription.items.data[0]?.price.id;
@@ -285,8 +305,11 @@ export async function POST(request: Request) {
       }
 
       case "invoice.payment_failed": {
-        const invoice = event.data.object as any;
-        const subscriptionId = invoice.subscription;
+        const invoice = event.data.object as Stripe.Invoice;
+        const subscriptionId =
+          typeof invoice.subscription === "string"
+            ? invoice.subscription
+            : invoice.subscription?.id;
 
         if (subscriptionId) {
           await prisma.subscription.updateMany({
@@ -309,7 +332,7 @@ export async function POST(request: Request) {
       }
 
       case "customer.subscription.updated": {
-        const subscription = event.data.object as any;
+        const subscription = event.data.object as Stripe.Subscription;
         const subscriptionId = subscription.id;
 
         const { prismaStatus, paywallLocked } = mapStripeStatusToPaywall(subscription.status);
@@ -362,7 +385,7 @@ export async function POST(request: Request) {
       }
 
       case "customer.subscription.deleted": {
-        const subscription = event.data.object as any;
+        const subscription = event.data.object as Stripe.Subscription;
         const subscriptionId = subscription.id;
 
         await prisma.subscription.updateMany({
@@ -399,7 +422,7 @@ export async function POST(request: Request) {
       }
 
       case "customer.subscription.trial_will_end": {
-        const subscription = event.data.object as any;
+        const subscription = event.data.object as Stripe.Subscription;
         const subscriptionId = subscription.id;
         const trialEnd = subscription.trial_end ? new Date(subscription.trial_end * 1000) : null;
 
