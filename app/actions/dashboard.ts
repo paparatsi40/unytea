@@ -2,6 +2,7 @@
 
 import { getCurrentUserId } from "@/lib/auth-utils";
 import { prisma } from "@/lib/prisma";
+import type { AutopilotJobPayload } from "./autopilot";
 
 /**
  * Get dashboard metrics optimized for growth:
@@ -1561,7 +1562,8 @@ export async function getAutopilotDashboardSnapshot() {
 
     const jobs = events
       .map((event) => {
-        const ap = (event.payload as any)?.autopilot;
+        const ap = (event.payload as { autopilot?: AutopilotJobPayload["autopilot"] } | null)
+          ?.autopilot;
         if (!ap) return null;
         return {
           id: event.id,

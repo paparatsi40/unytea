@@ -14,6 +14,7 @@
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import {
   resourceCategorySchema,
   createResourceSchema,
@@ -444,7 +445,7 @@ export async function updateResource(
     }
 
     // Si está cambiando a PUBLISHED y no tenía publishedAt, establecerlo
-    const updates: any = { ...validated };
+    const updates: Prisma.ResourceUpdateInput = { ...validated };
     if (validated.status === "PUBLISHED" && !permission.resource.publishedAt) {
       updates.publishedAt = new Date();
     }
@@ -547,7 +548,7 @@ export async function getResources(
       return { success: false, error: "Sin acceso a la comunidad", code: "FORBIDDEN" };
     }
 
-    const where: any = {
+    const where: Prisma.ResourceWhereInput = {
       communityId: access.community.id,
     };
 

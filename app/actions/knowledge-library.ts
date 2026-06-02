@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getCurrentUserId } from "@/lib/auth-utils";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 
 /**
  * Get all sessions that can be converted to courses
@@ -16,7 +17,7 @@ export async function getConvertibleSessions(communityId?: string) {
       return { success: false, error: "Not authenticated" };
     }
 
-    const whereClause: any = {
+    const whereClause: Prisma.MentorSessionWhereInput = {
       mentorId: userId,
       status: "COMPLETED",
       OR: [{ recordingUrl: { not: null } }, { recording: { url: { not: null } } }],
@@ -266,7 +267,7 @@ export async function getKnowledgeImpact(communityId?: string) {
       return { success: false, error: "Not authenticated" };
     }
 
-    const whereClause: any = {
+    const whereClause: Prisma.MentorSessionWhereInput = {
       mentorId: userId,
     };
 
