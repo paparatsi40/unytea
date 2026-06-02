@@ -440,6 +440,50 @@
           "saved": "Paramètres de confidentialité enregistrés !",
           "saveFailed": "Échec de l'enregistrement"
         }
+      },
+      "notifications": {
+        "title": "Préférences de notification",
+        "email": {
+          "label": "Notifications par e-mail",
+          "description": "Recevez des notifications par e-mail"
+        },
+        "comments": {
+          "label": "Commentaires",
+          "description": "Quand quelqu'un commente votre publication"
+        },
+        "mentions": { "label": "Mentions", "description": "Quand quelqu'un vous mentionne" },
+        "reactions": {
+          "label": "Réactions",
+          "description": "Quand quelqu'un réagit à votre contenu"
+        },
+        "buddyRequests": {
+          "label": "Demandes de partenaire",
+          "description": "Quand quelqu'un veut être votre partenaire"
+        },
+        "saveButton": "Enregistrer les préférences",
+        "savingButton": "Enregistrement...",
+        "toasts": {
+          "saved": "Préférences enregistrées !",
+          "saveFailed": "Échec de l'enregistrement"
+        }
+      },
+      "integrations": {
+        "title": "Intégrations",
+        "subtitle": "Connectez des services tiers pour enrichir votre communauté",
+        "comingSoon": "Bientôt disponible",
+        "configure": "Configurer",
+        "items": {
+          "stripe": { "description": "Acceptez les paiements pour les cours et les abonnements" },
+          "zoom": { "description": "Organisez des sessions vidéo avec l'intégration Zoom" },
+          "googleCalendar": { "description": "Synchronisez vos sessions avec Google Calendar" },
+          "zapier": { "description": "Connectez Unytea à plus de 5 000 applications" },
+          "slack": { "description": "Recevez les notifications de la communauté dans Slack" },
+          "discord": { "description": "Reliez votre communauté à Discord" }
+        },
+        "request": {
+          "title": "Demander une intégration",
+          "body": "Besoin d'une intégration spécifique ? Écrivez-nous à <email>support@unytea.com</email> et nous envisagerons de l'ajouter."
+        }
       }
     },
     "communityAdmin": {

@@ -441,6 +441,47 @@
           "saved": "¡Configuración de privacidad guardada!",
           "saveFailed": "No se pudo guardar"
         }
+      },
+      "notifications": {
+        "title": "Preferencias de notificación",
+        "email": {
+          "label": "Notificaciones por correo",
+          "description": "Recibe notificaciones por correo electrónico"
+        },
+        "comments": {
+          "label": "Comentarios",
+          "description": "Cuando alguien comenta en tu publicación"
+        },
+        "mentions": { "label": "Menciones", "description": "Cuando alguien te menciona" },
+        "reactions": {
+          "label": "Reacciones",
+          "description": "Cuando alguien reacciona a tu contenido"
+        },
+        "buddyRequests": {
+          "label": "Solicitudes de compañero",
+          "description": "Cuando alguien quiere ser tu compañero"
+        },
+        "saveButton": "Guardar preferencias",
+        "savingButton": "Guardando...",
+        "toasts": { "saved": "¡Preferencias guardadas!", "saveFailed": "No se pudo guardar" }
+      },
+      "integrations": {
+        "title": "Integraciones",
+        "subtitle": "Conecta servicios de terceros para potenciar tu comunidad",
+        "comingSoon": "Próximamente",
+        "configure": "Configurar",
+        "items": {
+          "stripe": { "description": "Acepta pagos por cursos y membresías" },
+          "zoom": { "description": "Organiza sesiones de video con la integración de Zoom" },
+          "googleCalendar": { "description": "Sincroniza tus sesiones con Google Calendar" },
+          "zapier": { "description": "Conecta Unytea con más de 5.000 apps" },
+          "slack": { "description": "Recibe notificaciones de la comunidad en Slack" },
+          "discord": { "description": "Conecta tu comunidad con Discord" }
+        },
+        "request": {
+          "title": "Solicitar una integración",
+          "body": "¿Necesitas una integración específica? Escríbenos a <email>support@unytea.com</email> y la consideraremos."
+        }
       }
     },
     "communityAdmin": {

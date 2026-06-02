@@ -4,8 +4,27 @@ import { useState } from "react";
 import { Check } from "lucide-react";
 import { updateNotificationPreferences } from "@/app/actions/settings";
 import { toast } from "react-hot-toast";
+import { useTranslations } from "next-intl";
+
+type ToggleKey =
+  | "emailNotifications"
+  | "notifyOnComment"
+  | "notifyOnMention"
+  | "notifyOnReaction"
+  | "notifyOnBuddyRequest";
+
+// State key paired with its i18n key; labels resolved via
+// t(`${i18nKey}.{label,description}`) in render (helper-returns-key).
+const NOTIFICATION_TOGGLES: { stateKey: ToggleKey; i18nKey: string }[] = [
+  { stateKey: "emailNotifications", i18nKey: "email" },
+  { stateKey: "notifyOnComment", i18nKey: "comments" },
+  { stateKey: "notifyOnMention", i18nKey: "mentions" },
+  { stateKey: "notifyOnReaction", i18nKey: "reactions" },
+  { stateKey: "notifyOnBuddyRequest", i18nKey: "buddyRequests" },
+];
 
 export default function NotificationsPage() {
+  const t = useTranslations("dashboard.accountSettings.notifications");
   const [loading, setLoading] = useState(false);
   const [settings, setSettings] = useState({
     emailNotifications: true,
@@ -22,9 +41,9 @@ export default function NotificationsPage() {
     const result = await updateNotificationPreferences(settings);
 
     if (result.success) {
-      toast.success("Preferences saved!");
+      toast.success(t("toasts.saved"));
     } else {
-      toast.error(result.error || "Failed to save");
+      toast.error(result.error || t("toasts.saveFailed"));
     }
     setLoading(false);
   };
@@ -32,95 +51,29 @@ export default function NotificationsPage() {
   return (
     <div className="space-y-6">
       <div className="rounded-xl border border-border bg-card p-6">
-        <h2 className="mb-4 text-xl font-bold text-foreground">Notification Preferences</h2>
+        <h2 className="mb-4 text-xl font-bold text-foreground">{t("title")}</h2>
 
         <div className="space-y-4">
-          {/* Email Notifications */}
-          <div className="flex items-center justify-between rounded-lg border border-border p-4">
-            <div>
-              <p className="font-medium text-foreground">Email Notifications</p>
-              <p className="text-sm text-muted-foreground">Receive notifications via email</p>
+          {NOTIFICATION_TOGGLES.map(({ stateKey, i18nKey }) => (
+            <div
+              key={stateKey}
+              className="flex items-center justify-between rounded-lg border border-border p-4"
+            >
+              <div>
+                <p className="font-medium text-foreground">{t(`${i18nKey}.label`)}</p>
+                <p className="text-sm text-muted-foreground">{t(`${i18nKey}.description`)}</p>
+              </div>
+              <label className="relative inline-flex cursor-pointer items-center">
+                <input
+                  type="checkbox"
+                  checked={settings[stateKey]}
+                  onChange={(e) => setSettings({ ...settings, [stateKey]: e.target.checked })}
+                  className="peer sr-only"
+                />
+                <div className="peer h-6 w-11 rounded-full bg-muted after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-border after:bg-background after:transition-all peer-checked:bg-primary peer-checked:after:translate-x-full"></div>
+              </label>
             </div>
-            <label className="relative inline-flex cursor-pointer items-center">
-              <input
-                type="checkbox"
-                checked={settings.emailNotifications}
-                onChange={(e) => setSettings({ ...settings, emailNotifications: e.target.checked })}
-                className="peer sr-only"
-              />
-              <div className="peer h-6 w-11 rounded-full bg-muted after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-border after:bg-background after:transition-all peer-checked:bg-primary peer-checked:after:translate-x-full"></div>
-            </label>
-          </div>
-
-          {/* Comments */}
-          <div className="flex items-center justify-between rounded-lg border border-border p-4">
-            <div>
-              <p className="font-medium text-foreground">Comments</p>
-              <p className="text-sm text-muted-foreground">When someone comments on your post</p>
-            </div>
-            <label className="relative inline-flex cursor-pointer items-center">
-              <input
-                type="checkbox"
-                checked={settings.notifyOnComment}
-                onChange={(e) => setSettings({ ...settings, notifyOnComment: e.target.checked })}
-                className="peer sr-only"
-              />
-              <div className="peer h-6 w-11 rounded-full bg-muted after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-border after:bg-background after:transition-all peer-checked:bg-primary peer-checked:after:translate-x-full"></div>
-            </label>
-          </div>
-
-          {/* Mentions */}
-          <div className="flex items-center justify-between rounded-lg border border-border p-4">
-            <div>
-              <p className="font-medium text-foreground">Mentions</p>
-              <p className="text-sm text-muted-foreground">When someone mentions you</p>
-            </div>
-            <label className="relative inline-flex cursor-pointer items-center">
-              <input
-                type="checkbox"
-                checked={settings.notifyOnMention}
-                onChange={(e) => setSettings({ ...settings, notifyOnMention: e.target.checked })}
-                className="peer sr-only"
-              />
-              <div className="peer h-6 w-11 rounded-full bg-muted after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-border after:bg-background after:transition-all peer-checked:bg-primary peer-checked:after:translate-x-full"></div>
-            </label>
-          </div>
-
-          {/* Reactions */}
-          <div className="flex items-center justify-between rounded-lg border border-border p-4">
-            <div>
-              <p className="font-medium text-foreground">Reactions</p>
-              <p className="text-sm text-muted-foreground">When someone reacts to your content</p>
-            </div>
-            <label className="relative inline-flex cursor-pointer items-center">
-              <input
-                type="checkbox"
-                checked={settings.notifyOnReaction}
-                onChange={(e) => setSettings({ ...settings, notifyOnReaction: e.target.checked })}
-                className="peer sr-only"
-              />
-              <div className="peer h-6 w-11 rounded-full bg-muted after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-border after:bg-background after:transition-all peer-checked:bg-primary peer-checked:after:translate-x-full"></div>
-            </label>
-          </div>
-
-          {/* Buddy Requests */}
-          <div className="flex items-center justify-between rounded-lg border border-border p-4">
-            <div>
-              <p className="font-medium text-foreground">Buddy Requests</p>
-              <p className="text-sm text-muted-foreground">When someone wants to be your buddy</p>
-            </div>
-            <label className="relative inline-flex cursor-pointer items-center">
-              <input
-                type="checkbox"
-                checked={settings.notifyOnBuddyRequest}
-                onChange={(e) =>
-                  setSettings({ ...settings, notifyOnBuddyRequest: e.target.checked })
-                }
-                className="peer sr-only"
-              />
-              <div className="peer h-6 w-11 rounded-full bg-muted after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-border after:bg-background after:transition-all peer-checked:bg-primary peer-checked:after:translate-x-full"></div>
-            </label>
-          </div>
+          ))}
         </div>
 
         {/* Save Button */}
@@ -131,7 +84,7 @@ export default function NotificationsPage() {
             className="flex items-center gap-2 rounded-lg bg-primary px-6 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
           >
             <Check className="h-4 w-4" />
-            {loading ? "Saving..." : "Save Preferences"}
+            {loading ? t("savingButton") : t("saveButton")}
           </button>
         </div>
       </div>

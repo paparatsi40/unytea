@@ -441,6 +441,41 @@
           "saved": "Privacy settings saved!",
           "saveFailed": "Failed to save"
         }
+      },
+      "notifications": {
+        "title": "Notification Preferences",
+        "email": {
+          "label": "Email Notifications",
+          "description": "Receive notifications via email"
+        },
+        "comments": { "label": "Comments", "description": "When someone comments on your post" },
+        "mentions": { "label": "Mentions", "description": "When someone mentions you" },
+        "reactions": { "label": "Reactions", "description": "When someone reacts to your content" },
+        "buddyRequests": {
+          "label": "Buddy Requests",
+          "description": "When someone wants to be your buddy"
+        },
+        "saveButton": "Save Preferences",
+        "savingButton": "Saving...",
+        "toasts": { "saved": "Preferences saved!", "saveFailed": "Failed to save" }
+      },
+      "integrations": {
+        "title": "Integrations",
+        "subtitle": "Connect third-party services to enhance your community",
+        "comingSoon": "Coming Soon",
+        "configure": "Configure",
+        "items": {
+          "stripe": { "description": "Accept payments for courses and memberships" },
+          "zoom": { "description": "Host video sessions with Zoom integration" },
+          "googleCalendar": { "description": "Sync your sessions with Google Calendar" },
+          "zapier": { "description": "Connect Unytea with 5,000+ apps" },
+          "slack": { "description": "Get community notifications in Slack" },
+          "discord": { "description": "Bridge your community with Discord" }
+        },
+        "request": {
+          "title": "Request an Integration",
+          "body": "Need a specific integration? Let us know at <email>support@unytea.com</email> and we’ll consider adding it."
+        }
       }
     },
     "communityAdmin": {
