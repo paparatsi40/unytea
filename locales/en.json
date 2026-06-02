@@ -2630,6 +2630,24 @@
       "legendOnline": "Online",
       "legendTyping": "Typing",
       "legendYou": "You"
+    },
+    "whiteboard": {
+      "loading": "Loading whiteboard...",
+      "exportPng": "Export PNG",
+      "exportPngTooltip": "Export as PNG",
+      "clear": "Clear",
+      "clearTooltip": "Clear canvas",
+      "closeTooltip": "Close Whiteboard",
+      "sessionLabel": "Session {id}"
+    },
+    "recordingDistribution": {
+      "copyLink": "Copy link",
+      "download": "Download",
+      "linkCopied": "Link copied",
+      "copyFailed": "Failed to copy link",
+      "noLink": "No shareable link available yet",
+      "shareText": "Watch this session: {title}",
+      "socialText": "Watch this session on Unytea: {title}"
     }
   }
 }

@@ -2641,6 +2641,24 @@
       "legendOnline": "En ligne",
       "legendTyping": "En train d'écrire",
       "legendYou": "Vous"
+    },
+    "whiteboard": {
+      "loading": "Chargement du tableau blanc...",
+      "exportPng": "Exporter en PNG",
+      "exportPngTooltip": "Exporter en PNG",
+      "clear": "Effacer",
+      "clearTooltip": "Effacer le canevas",
+      "closeTooltip": "Fermer le tableau blanc",
+      "sessionLabel": "Session {id}"
+    },
+    "recordingDistribution": {
+      "copyLink": "Copier le lien",
+      "download": "Télécharger",
+      "linkCopied": "Lien copié",
+      "copyFailed": "Échec de la copie du lien",
+      "noLink": "Aucun lien de partage disponible pour l'instant",
+      "shareText": "Regardez cette session : {title}",
+      "socialText": "Regardez cette session sur Unytea : {title}"
     }
   }
 }

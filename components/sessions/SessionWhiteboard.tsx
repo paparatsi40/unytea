@@ -4,22 +4,28 @@ import { useState } from "react";
 import { X, Image as ImageIcon, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
+import { useTranslations } from "next-intl";
 
 // Excalidraw 0.18+ ships CSS as a separate export (breaking change vs 0.17 which
 // auto-injected styles). Without this import the component mounts but the toolbar,
 // color panel, and library button render unstyled (effectively invisible).
 import "@excalidraw/excalidraw/index.css";
 
-const Excalidraw = dynamic(async () => (await import("@excalidraw/excalidraw")).Excalidraw, {
-  ssr: false,
-  loading: () => (
+function WhiteboardLoading() {
+  const t = useTranslations("liveSession.whiteboard");
+  return (
     <div className="flex h-full items-center justify-center">
       <div className="text-center">
         <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-purple-600 border-t-transparent" />
-        <p className="text-sm text-gray-600">Loading whiteboard...</p>
+        <p className="text-sm text-gray-600">{t("loading")}</p>
       </div>
     </div>
-  ),
+  );
+}
+
+const Excalidraw = dynamic(async () => (await import("@excalidraw/excalidraw")).Excalidraw, {
+  ssr: false,
+  loading: () => <WhiteboardLoading />,
 });
 
 interface SessionWhiteboardProps {
@@ -33,6 +39,8 @@ export function SessionWhiteboard({
   sessionId,
   embedded = false,
 }: SessionWhiteboardProps) {
+  const t = useTranslations("liveSession.whiteboard");
+  const tControls = useTranslations("liveSession.room.controls");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [excalidrawAPI, setExcalidrawAPI] = useState<any>(null);
 
@@ -74,18 +82,18 @@ export function SessionWhiteboard({
             <button
               onClick={handleExportPNG}
               className="flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-sm text-zinc-700 transition-colors hover:bg-zinc-50"
-              title="Export as PNG"
+              title={t("exportPngTooltip")}
             >
               <ImageIcon className="h-4 w-4" />
-              Export PNG
+              {t("exportPng")}
             </button>
             <button
               onClick={handleClear}
               className="flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-sm text-zinc-700 transition-colors hover:bg-zinc-50"
-              title="Clear canvas"
+              title={t("clearTooltip")}
             >
               <Trash2 className="h-4 w-4" />
-              Clear
+              {t("clear")}
             </button>
           </div>
         </div>
@@ -120,9 +128,9 @@ export function SessionWhiteboard({
     >
       <div className="flex items-center justify-between border-b border-gray-200 bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-3">
         <div className="flex items-center gap-2">
-          <span className="text-lg font-bold text-white">Whiteboard</span>
+          <span className="text-lg font-bold text-white">{tControls("whiteboard")}</span>
           <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs text-white">
-            Session {sessionId.slice(-6)}
+            {t("sessionLabel", { id: sessionId.slice(-6) })}
           </span>
         </div>
 
@@ -130,25 +138,25 @@ export function SessionWhiteboard({
           <button
             onClick={handleExportPNG}
             className="flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-sm text-white transition-colors hover:bg-white/20"
-            title="Export as PNG"
+            title={t("exportPngTooltip")}
           >
             <ImageIcon className="h-4 w-4" />
-            Export PNG
+            {t("exportPng")}
           </button>
 
           <button
             onClick={handleClear}
             className="flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-sm text-white transition-colors hover:bg-white/20"
-            title="Clear canvas"
+            title={t("clearTooltip")}
           >
             <Trash2 className="h-4 w-4" />
-            Clear
+            {t("clear")}
           </button>
 
           <button
             onClick={onClose}
             className="ml-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
-            title="Close Whiteboard"
+            title={t("closeTooltip")}
           >
             <X className="h-5 w-5" />
           </button>
