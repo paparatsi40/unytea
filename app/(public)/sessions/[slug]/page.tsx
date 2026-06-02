@@ -1,114 +1,17 @@
-import { Metadata } from "next";
-import { notFound } from "next/navigation";
-import {
-  getPublicSession,
-  getRelatedSessions,
-  getNextCommunitySession,
-  getRelatedCommunitiesHostingThisWeek,
-} from "@/app/actions/public-sessions";
-import { PublicSessionPage } from "@/components/sessions/PublicSessionPage";
+import { permanentRedirect } from "next/navigation";
 
-interface PublicSessionRouteProps {
+// Legacy mirror of the session detail page. The canonical, i18n-enabled
+// route is /[locale]/s/[slug] (wrapped in NextIntlClientProvider in
+// app/[locale]/layout.tsx). This (public) route group has no provider, so
+// adding useTranslations to <PublicSessionPage> would crash here — instead
+// we permanently redirect to the canonical route. A 308 preserves SEO
+// (crawlers consolidate /sessions/[slug] into /en/s/[slug]); the NextIntl
+// middleware/cookie then steers returning users to their preferred locale.
+export default async function LegacySessionRedirect({
+  params,
+}: {
   params: Promise<{ slug: string }>;
-}
-
-export async function generateMetadata(props: PublicSessionRouteProps): Promise<Metadata> {
-  const params = await props.params;
-  const result = await getPublicSession(params.slug);
-
-  if (!result.success || !result.session) {
-    return {
-      title: "Session Not Found | Unytea",
-      description: "This session is not available.",
-    };
-  }
-
-  const session = result.session;
-  const hostName = session.host.name || "Host";
-  const communityName = session.community.name;
-
-  const title = `${session.title} | ${hostName} | ${communityName}`;
-  const description =
-    session.description ||
-    `Watch this session from ${communityName} hosted by ${hostName}. Join the community to access more live sessions and recordings.`;
-
-  const isIndexable = session.visibility === "public";
-
-  return {
-    title,
-    description,
-    keywords: [
-      session.title,
-      hostName,
-      communityName,
-      "live session",
-      "recording",
-      "community learning",
-    ],
-    authors: [{ name: hostName }],
-    robots: isIndexable
-      ? { index: true, follow: true }
-      : { index: false, follow: false, nocache: true },
-    openGraph: {
-      title,
-      description,
-      type: "video.other",
-      url: `https://unytea.com/sessions/${session.slug}`,
-      images: [
-        {
-          url: session.community.imageUrl || "/og-default.jpg",
-          width: 1200,
-          height: 630,
-          alt: session.title,
-        },
-      ],
-      videos: session.recording?.url
-        ? [
-            {
-              url: session.recording.url,
-              type: "video/mp4",
-            },
-          ]
-        : undefined,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: [session.community.imageUrl || "/og-default.jpg"],
-    },
-    alternates: {
-      canonical: `https://unytea.com/sessions/${session.slug}`,
-    },
-  };
-}
-
-export default async function PublicSessionRoute(props: PublicSessionRouteProps) {
-  const params = await props.params;
-  const sessionResult = await getPublicSession(params.slug);
-
-  if (!sessionResult.success || !sessionResult.session) {
-    notFound();
-  }
-
-  const session = sessionResult.session;
-
-  const relatedResult = await getRelatedSessions(session.community.id, session.id, 3);
-
-  const [nextSessionResult, relatedCommunitiesResult] = await Promise.all([
-    getNextCommunitySession(session.community.id),
-    getRelatedCommunitiesHostingThisWeek(session.community.id, 4),
-  ]);
-
-  return (
-    <PublicSessionPage
-      session={session}
-      locale="en"
-      relatedSessions={relatedResult.success ? relatedResult.sessions || [] : []}
-      relatedCommunities={
-        relatedCommunitiesResult.success ? relatedCommunitiesResult.communities || [] : []
-      }
-      nextSession={nextSessionResult.success ? (nextSessionResult.session ?? null) : null}
-    />
-  );
+}) {
+  const { slug } = await params;
+  permanentRedirect(`/en/s/${slug}`);
 }

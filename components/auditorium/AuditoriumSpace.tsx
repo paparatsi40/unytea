@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { Users, Maximize2, Minimize2 } from "lucide-react";
 import { getChannelOnlineMembers } from "@/app/actions/channels";
@@ -21,6 +22,7 @@ type Props = {
 };
 
 export function AuditoriumSpace({ channelId, communitySlug: _communitySlug }: Props) {
+  const t = useTranslations("liveSession.auditorium");
   const { user: currentUser } = useCurrentUser();
   const [members, setMembers] = useState<OnlineMember[]>([]);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -94,10 +96,8 @@ export function AuditoriumSpace({ channelId, communitySlug: _communitySlug }: Pr
             <Users className="h-5 w-5 text-white" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-gray-900">Auditorium View</h3>
-            <p className="text-sm text-gray-600">
-              {members.length} {members.length === 1 ? "person" : "people"} online
-            </p>
+            <h3 className="text-lg font-bold text-gray-900">{t("title")}</h3>
+            <p className="text-sm text-gray-600">{t("online", { count: members.length })}</p>
           </div>
         </div>
 
@@ -114,7 +114,7 @@ export function AuditoriumSpace({ channelId, communitySlug: _communitySlug }: Pr
         <div className="mx-auto max-w-4xl">
           <div className="flex items-center justify-center space-x-2 rounded-xl border-2 border-purple-300 bg-gradient-to-r from-purple-500 to-pink-500 p-6 shadow-lg">
             <span className="text-2xl">🎤</span>
-            <span className="text-lg font-bold text-white">Live Session</span>
+            <span className="text-lg font-bold text-white">{t("liveSession")}</span>
           </div>
         </div>
       </div>
@@ -124,8 +124,8 @@ export function AuditoriumSpace({ channelId, communitySlug: _communitySlug }: Pr
         {members.length === 0 ? (
           <div className="flex h-64 flex-col items-center justify-center">
             <Users className="h-16 w-16 text-gray-300" />
-            <p className="mt-4 text-lg font-medium text-gray-600">No one here yet</p>
-            <p className="text-sm text-gray-500">Be the first to join!</p>
+            <p className="mt-4 text-lg font-medium text-gray-600">{t("emptyTitle")}</p>
+            <p className="text-sm text-gray-500">{t("emptySubtitle")}</p>
           </div>
         ) : (
           <div className={`mx-auto grid ${avatarConfig.cols} ${avatarConfig.gap} max-w-4xl`}>
@@ -182,7 +182,7 @@ export function AuditoriumSpace({ channelId, communitySlug: _communitySlug }: Pr
                   <p
                     className={`mt-3 text-sm font-medium ${isCurrentUser ? "font-bold text-purple-600" : "text-gray-700"}`}
                   >
-                    {member.user.name || "Anonymous"}
+                    {member.user.name || t("anonymous")}
                   </p>
 
                   {/* Hover tooltip */}
@@ -203,15 +203,15 @@ export function AuditoriumSpace({ channelId, communitySlug: _communitySlug }: Pr
         <div className="mx-auto flex max-w-4xl items-center justify-center space-x-6 text-sm">
           <div className="flex items-center space-x-2">
             <div className="h-3 w-3 rounded-full bg-green-500" />
-            <span className="text-gray-600">Online</span>
+            <span className="text-gray-600">{t("legendOnline")}</span>
           </div>
           <div className="flex items-center space-x-2">
             <div className="h-3 w-3 animate-pulse rounded-full bg-blue-500" />
-            <span className="text-gray-600">Typing</span>
+            <span className="text-gray-600">{t("legendTyping")}</span>
           </div>
           <div className="flex items-center space-x-2">
             <div className="h-3 w-3 rounded-full bg-purple-500 ring-2 ring-purple-200" />
-            <span className="text-gray-600">You</span>
+            <span className="text-gray-600">{t("legendYou")}</span>
           </div>
         </div>
       </div>

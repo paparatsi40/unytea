@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { LiveKitRoom, RoomAudioRenderer, useLocalParticipant } from "@livekit/components-react";
 import "@livekit/components-styles";
+import { useTranslations } from "next-intl";
 import { Loader2, AlertCircle } from "lucide-react";
 import { VideoRoomUI } from "./VideoRoomUI";
 
@@ -102,6 +103,7 @@ export function VideoRoom({
   onLeave,
   onEndSession,
 }: VideoRoomProps) {
+  const t = useTranslations("liveSession.videoRoom");
   const [token, setToken] = useState<string | null>(null);
   const [wsUrl, setWsUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -120,7 +122,7 @@ export function VideoRoom({
         });
 
         if (!response.ok) {
-          throw new Error("Failed to get token");
+          throw new Error(t("tokenError"));
         }
 
         const data = await response.json();
@@ -131,7 +133,7 @@ export function VideoRoom({
         setWsUrl(data.wsUrl);
       } catch (err) {
         if (!mounted) return;
-        setError(err instanceof Error ? err.message : "Unknown error");
+        setError(err instanceof Error ? err.message : t("unknownError"));
       } finally {
         if (mounted) {
           setLoading(false);
@@ -144,7 +146,7 @@ export function VideoRoom({
     return () => {
       mounted = false;
     };
-  }, [roomName]);
+  }, [roomName, t]);
 
   if (loading) {
     return (
@@ -158,7 +160,7 @@ export function VideoRoom({
     return (
       <div className="flex h-screen items-center justify-center bg-zinc-950 text-red-500">
         <AlertCircle className="mr-2 h-5 w-5" />
-        {error || "Missing LiveKit config"}
+        {error || t("missingConfig")}
       </div>
     );
   }

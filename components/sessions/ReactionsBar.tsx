@@ -1,6 +1,7 @@
 "use client";
 
 import { useRoomContext } from "@livekit/components-react";
+import { useTranslations } from "next-intl";
 
 const REACTIONS = [
   { emoji: "👍", label: "thumbsup" },
@@ -11,6 +12,7 @@ const REACTIONS = [
 ];
 
 export function ReactionsBar() {
+  const t = useTranslations("liveSession.reactionsBar");
   const room = useRoomContext();
 
   const sendReaction = async (emoji: string, label: string) => {
@@ -39,9 +41,9 @@ export function ReactionsBar() {
           key={reaction.label}
           onClick={() => sendReaction(reaction.emoji, reaction.label)}
           className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-100 text-lg transition-all hover:scale-110 hover:bg-zinc-200"
-          title={reaction.label}
+          title={t(reaction.label)}
         >
-          <span className="sr-only">{reaction.label}</span>
+          <span className="sr-only">{t(reaction.label)}</span>
           {reaction.emoji}
         </button>
       ))}

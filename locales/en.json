@@ -2411,5 +2411,225 @@
       "documentFile": "Document file",
       "tags": "Tags"
     }
+  },
+  "liveSession": {
+    "publicPage": {
+      "nav": {
+        "back": "Back to Unytea",
+        "share": "Share"
+      },
+      "share": {
+        "shareText": "Watch \"{title}\" by {host} on Unytea",
+        "socialText": "Join this live session: {title}"
+      },
+      "header": {
+        "badgeRecordingAvailable": "Recording Available",
+        "badgeMembersOnly": "Members-only recording",
+        "duration": "{minutes} min",
+        "attended": "{count, plural, =1 {1 attended} other {# attended}}"
+      },
+      "player": {
+        "clickToPlay": "Click to play recording"
+      },
+      "replayGate": {
+        "title": "Members-only replay",
+        "body": "This recording is available to community members. Join to watch the full replay and attend the next live session."
+      },
+      "tabs": {
+        "about": "About",
+        "notes": "Notes",
+        "community": "Community"
+      },
+      "host": {
+        "hostedBy": "Hosted by {name}",
+        "roleAt": "Live session host at {community}"
+      },
+      "summary": {
+        "title": "AI Summary",
+        "keyTakeaways": "Key takeaways",
+        "chapters": "Chapters",
+        "keyQuotes": "Key quotes"
+      },
+      "notes": {
+        "sessionNotes": "Session Notes",
+        "membersOnlyTitle": "Members-only insights",
+        "membersOnlyBody": "Join the community to unlock AI summary, key takeaways, chapters, and full session notes.",
+        "unlockCta": "Join to unlock insights",
+        "tabMembersOnly": "Notes are available for community members only.",
+        "tabEmpty": "No notes available for this session."
+      },
+      "communityTab": {
+        "members": "{count, plural, =1 {1 member} other {# members}}"
+      },
+      "related": {
+        "title": "Related sessions",
+        "noPublicPage": "No public page for this session"
+      },
+      "crossCommunity": {
+        "title": "Other communities hosting this week",
+        "subtitle": "Discover active communities and join their next live sessions.",
+        "members": "{count, plural, =1 {1 member} other {# members}}",
+        "attending": "{count} attending"
+      },
+      "sidebar": {
+        "intro": "Join this community to access live sessions, recordings, and connect with like-minded people.",
+        "nextLive": "Next live session",
+        "rsvpCounts": "{attending} attending · {interested} interested",
+        "attendingBtn": "Attending",
+        "interestedBtn": "Interested",
+        "updating": "Updating...",
+        "addGoogle": "Add to Google Calendar",
+        "addApple": "Add to Apple Calendar",
+        "viewRoom": "View session room",
+        "joinToRsvp": "Join community to RSVP and participate live.",
+        "askTitle": "Ask a question for next session",
+        "askPlaceholder": "Drop your question for the host...",
+        "submitting": "Submitting...",
+        "submitQuestion": "Submit Question",
+        "goToCommunity": "Go to Community",
+        "joinCommunity": "Join Community",
+        "explore": "Explore Communities",
+        "freeToJoin": "Free to join. No credit card required."
+      },
+      "toasts": {
+        "rsvpRemoved": "RSVP removed.",
+        "rsvpAttending": "You're attending the next live session.",
+        "rsvpInterested": "Marked as interested.",
+        "rsvpFailed": "Could not update RSVP.",
+        "questionSubmitted": "Question submitted for the next live session.",
+        "questionFailed": "Could not submit your question."
+      },
+      "calendar": {
+        "defaultDescription": "Join this live session on Unytea."
+      },
+      "metadata": {
+        "notFoundTitle": "Session Not Found | Unytea",
+        "notFoundDescription": "This session could not be found.",
+        "titleLive": "LIVE: {title}",
+        "titleUpcoming": "Upcoming: {title}",
+        "titleReplay": "Replay: {title}",
+        "descriptionFallback": "Join {name} for an interactive session on Unytea.",
+        "defaultExpert": "our expert"
+      }
+    },
+    "room": {
+      "header": {
+        "hostLabel": "Host: {name}",
+        "attending": "{count, plural, =1 {1 attending} other {# attending}}",
+        "recordingBadge": "Recording",
+        "startRecording": "Start recording",
+        "pauseRecording": "Pause recording",
+        "endSession": "End Session",
+        "poll": "Poll",
+        "muteAll": "Mute All",
+        "leave": "Leave"
+      },
+      "raiseHand": {
+        "raise": "Raise Hand",
+        "raised": "Hand Raised"
+      },
+      "speakerInvite": {
+        "message": "You've been invited to speak! Enable your microphone to join the conversation.",
+        "enableMic": "Enable Mic"
+      },
+      "notesPanel": {
+        "title": "Session Notes",
+        "autoSaved": "Auto-saved"
+      },
+      "participants": {
+        "title": "Participants",
+        "host": "Host",
+        "speakers": "Speakers",
+        "audience": "Audience",
+        "raisedHands": "Raised Hands ({count})",
+        "noSpeakers": "No speakers yet",
+        "unknown": "Unknown",
+        "more": "+{count} more",
+        "inviteToSpeak": "Invite to speak",
+        "dismiss": "Dismiss"
+      },
+      "handQueue": {
+        "title": "Hand Raised Queue"
+      },
+      "controls": {
+        "muteMic": "Mute microphone",
+        "unmuteMic": "Unmute microphone",
+        "turnOffCamera": "Turn off camera",
+        "turnOnCamera": "Turn on camera",
+        "selectCamera": "Select camera",
+        "cameraFallback": "Camera {number}",
+        "shareScreen": "Share screen",
+        "stopShareScreen": "Stop sharing screen",
+        "whiteboard": "Whiteboard",
+        "reactions": "Reactions",
+        "activePoll": "Active Poll",
+        "hidePanels": "Hide panels",
+        "showPanels": "Show panels",
+        "end": "End",
+        "endSessionTitle": "End session",
+        "leaveSessionTitle": "Leave session"
+      },
+      "panels": {
+        "notes": "Notes",
+        "chat": "Chat",
+        "participants": "Participants"
+      },
+      "timeAgo": {
+        "justNow": "just now",
+        "minutesAgo": "{count}m ago",
+        "hoursAgo": "{count}h ago"
+      }
+    },
+    "videoRoom": {
+      "tokenError": "Failed to get token",
+      "unknownError": "Unknown error",
+      "missingConfig": "Missing LiveKit config"
+    },
+    "mainStage": {
+      "speaking": "Speaking...",
+      "micMuted": "Microphone is muted",
+      "whiteboardUnavailableTitle": "Whiteboard unavailable",
+      "whiteboardUnavailableDesc": "This session does not have a whiteboard linked yet.",
+      "noScreenTitle": "No screen is being shared",
+      "noScreenDesc": "Share your screen to present slides, demos, or walkthroughs.",
+      "noCameraTitle": "No camera video available",
+      "noCameraWaiting": "Waiting for video track…",
+      "noCameraDesc": "Turn on your camera or wait for another participant's camera."
+    },
+    "localVideo": {
+      "cameraOff": "Camera is off",
+      "turnOnCamera": "Turn on your camera to start the session"
+    },
+    "modeSwitcher": {
+      "video": "Video",
+      "screen": "Screen",
+      "whiteboard": "Whiteboard"
+    },
+    "reactionsBar": {
+      "thumbsup": "Thumbs up",
+      "heart": "Heart",
+      "fire": "Fire",
+      "party": "Party",
+      "clap": "Clap"
+    },
+    "sessionChat": {
+      "header": "Chat",
+      "messageCount": "{count, plural, =1 {1 message} other {# messages}}",
+      "pinQuestion": "Pin question",
+      "empty": "No messages yet",
+      "emptyHint": "Start the conversation!",
+      "placeholder": "Type a message..."
+    },
+    "auditorium": {
+      "title": "Auditorium View",
+      "online": "{count, plural, =1 {1 person online} other {# people online}}",
+      "liveSession": "Live Session",
+      "emptyTitle": "No one here yet",
+      "emptySubtitle": "Be the first to join!",
+      "anonymous": "Anonymous",
+      "legendOnline": "Online",
+      "legendTyping": "Typing",
+      "legendYou": "You"
+    }
   }
 }

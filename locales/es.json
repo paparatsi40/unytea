@@ -2420,5 +2420,225 @@
       "documentFile": "Archivo de documento",
       "tags": "Etiquetas"
     }
+  },
+  "liveSession": {
+    "publicPage": {
+      "nav": {
+        "back": "Volver a Unytea",
+        "share": "Compartir"
+      },
+      "share": {
+        "shareText": "Mira \"{title}\" de {host} en Unytea",
+        "socialText": "Únete a esta sesión en vivo: {title}"
+      },
+      "header": {
+        "badgeRecordingAvailable": "Grabación disponible",
+        "badgeMembersOnly": "Grabación solo para miembros",
+        "duration": "{minutes} min",
+        "attended": "{count, plural, =1 {1 asistente} other {# asistentes}}"
+      },
+      "player": {
+        "clickToPlay": "Haz clic para reproducir la grabación"
+      },
+      "replayGate": {
+        "title": "Repetición solo para miembros",
+        "body": "Esta grabación está disponible para los miembros de la comunidad. Únete para ver la repetición completa y asistir a la próxima sesión en vivo."
+      },
+      "tabs": {
+        "about": "Acerca de",
+        "notes": "Notas",
+        "community": "Comunidad"
+      },
+      "host": {
+        "hostedBy": "Presentado por {name}",
+        "roleAt": "Anfitrión de sesiones en vivo en {community}"
+      },
+      "summary": {
+        "title": "Resumen con IA",
+        "keyTakeaways": "Puntos clave",
+        "chapters": "Capítulos",
+        "keyQuotes": "Citas destacadas"
+      },
+      "notes": {
+        "sessionNotes": "Notas de la sesión",
+        "membersOnlyTitle": "Información solo para miembros",
+        "membersOnlyBody": "Únete a la comunidad para desbloquear el resumen con IA, los puntos clave, los capítulos y las notas completas de la sesión.",
+        "unlockCta": "Únete para desbloquear la información",
+        "tabMembersOnly": "Las notas están disponibles solo para miembros de la comunidad.",
+        "tabEmpty": "No hay notas disponibles para esta sesión."
+      },
+      "communityTab": {
+        "members": "{count, plural, =1 {1 miembro} other {# miembros}}"
+      },
+      "related": {
+        "title": "Sesiones relacionadas",
+        "noPublicPage": "No hay página pública para esta sesión"
+      },
+      "crossCommunity": {
+        "title": "Otras comunidades con sesiones esta semana",
+        "subtitle": "Descubre comunidades activas y únete a sus próximas sesiones en vivo.",
+        "members": "{count, plural, =1 {1 miembro} other {# miembros}}",
+        "attending": "{count} asistentes"
+      },
+      "sidebar": {
+        "intro": "Únete a esta comunidad para acceder a sesiones en vivo, grabaciones y conectar con personas afines.",
+        "nextLive": "Próxima sesión en vivo",
+        "rsvpCounts": "{attending} asistentes · {interested} interesados",
+        "attendingBtn": "Asistiré",
+        "interestedBtn": "Me interesa",
+        "updating": "Actualizando...",
+        "addGoogle": "Añadir a Google Calendar",
+        "addApple": "Añadir a Apple Calendar",
+        "viewRoom": "Ver sala de la sesión",
+        "joinToRsvp": "Únete a la comunidad para confirmar asistencia y participar en vivo.",
+        "askTitle": "Haz una pregunta para la próxima sesión",
+        "askPlaceholder": "Escribe tu pregunta para el anfitrión...",
+        "submitting": "Enviando...",
+        "submitQuestion": "Enviar pregunta",
+        "goToCommunity": "Ir a la comunidad",
+        "joinCommunity": "Unirse a la comunidad",
+        "explore": "Explorar comunidades",
+        "freeToJoin": "Gratis para unirte. No se requiere tarjeta de crédito."
+      },
+      "toasts": {
+        "rsvpRemoved": "Confirmación eliminada.",
+        "rsvpAttending": "Asistirás a la próxima sesión en vivo.",
+        "rsvpInterested": "Marcado como interesado.",
+        "rsvpFailed": "No se pudo actualizar la confirmación.",
+        "questionSubmitted": "Pregunta enviada para la próxima sesión en vivo.",
+        "questionFailed": "No se pudo enviar tu pregunta."
+      },
+      "calendar": {
+        "defaultDescription": "Únete a esta sesión en vivo en Unytea."
+      },
+      "metadata": {
+        "notFoundTitle": "Sesión no encontrada | Unytea",
+        "notFoundDescription": "No se pudo encontrar esta sesión.",
+        "titleLive": "EN VIVO: {title}",
+        "titleUpcoming": "Próximamente: {title}",
+        "titleReplay": "Repetición: {title}",
+        "descriptionFallback": "Únete a {name} para una sesión interactiva en Unytea.",
+        "defaultExpert": "nuestro experto"
+      }
+    },
+    "room": {
+      "header": {
+        "hostLabel": "Anfitrión: {name}",
+        "attending": "{count, plural, =1 {1 asistente} other {# asistentes}}",
+        "recordingBadge": "Grabando",
+        "startRecording": "Iniciar grabación",
+        "pauseRecording": "Pausar grabación",
+        "endSession": "Finalizar sesión",
+        "poll": "Encuesta",
+        "muteAll": "Silenciar a todos",
+        "leave": "Salir"
+      },
+      "raiseHand": {
+        "raise": "Levantar la mano",
+        "raised": "Mano levantada"
+      },
+      "speakerInvite": {
+        "message": "¡Te han invitado a hablar! Activa tu micrófono para unirte a la conversación.",
+        "enableMic": "Activar micrófono"
+      },
+      "notesPanel": {
+        "title": "Notas de la sesión",
+        "autoSaved": "Guardado automático"
+      },
+      "participants": {
+        "title": "Participantes",
+        "host": "Anfitrión",
+        "speakers": "Oradores",
+        "audience": "Audiencia",
+        "raisedHands": "Manos levantadas ({count})",
+        "noSpeakers": "Aún no hay oradores",
+        "unknown": "Desconocido",
+        "more": "+{count} más",
+        "inviteToSpeak": "Invitar a hablar",
+        "dismiss": "Descartar"
+      },
+      "handQueue": {
+        "title": "Cola de manos levantadas"
+      },
+      "controls": {
+        "muteMic": "Silenciar micrófono",
+        "unmuteMic": "Activar micrófono",
+        "turnOffCamera": "Apagar cámara",
+        "turnOnCamera": "Encender cámara",
+        "selectCamera": "Seleccionar cámara",
+        "cameraFallback": "Cámara {number}",
+        "shareScreen": "Compartir pantalla",
+        "stopShareScreen": "Dejar de compartir pantalla",
+        "whiteboard": "Pizarra",
+        "reactions": "Reacciones",
+        "activePoll": "Encuesta activa",
+        "hidePanels": "Ocultar paneles",
+        "showPanels": "Mostrar paneles",
+        "end": "Finalizar",
+        "endSessionTitle": "Finalizar sesión",
+        "leaveSessionTitle": "Salir de la sesión"
+      },
+      "panels": {
+        "notes": "Notas",
+        "chat": "Chat",
+        "participants": "Participantes"
+      },
+      "timeAgo": {
+        "justNow": "ahora mismo",
+        "minutesAgo": "hace {count} min",
+        "hoursAgo": "hace {count} h"
+      }
+    },
+    "videoRoom": {
+      "tokenError": "No se pudo obtener el token",
+      "unknownError": "Error desconocido",
+      "missingConfig": "Falta la configuración de LiveKit"
+    },
+    "mainStage": {
+      "speaking": "Hablando...",
+      "micMuted": "El micrófono está silenciado",
+      "whiteboardUnavailableTitle": "Pizarra no disponible",
+      "whiteboardUnavailableDesc": "Esta sesión aún no tiene una pizarra vinculada.",
+      "noScreenTitle": "No se está compartiendo ninguna pantalla",
+      "noScreenDesc": "Comparte tu pantalla para presentar diapositivas, demos o tutoriales.",
+      "noCameraTitle": "No hay vídeo de cámara disponible",
+      "noCameraWaiting": "Esperando la pista de vídeo…",
+      "noCameraDesc": "Enciende tu cámara o espera la cámara de otro participante."
+    },
+    "localVideo": {
+      "cameraOff": "La cámara está apagada",
+      "turnOnCamera": "Enciende tu cámara para comenzar la sesión"
+    },
+    "modeSwitcher": {
+      "video": "Vídeo",
+      "screen": "Pantalla",
+      "whiteboard": "Pizarra"
+    },
+    "reactionsBar": {
+      "thumbsup": "Me gusta",
+      "heart": "Corazón",
+      "fire": "Fuego",
+      "party": "Fiesta",
+      "clap": "Aplauso"
+    },
+    "sessionChat": {
+      "header": "Chat",
+      "messageCount": "{count, plural, =1 {1 mensaje} other {# mensajes}}",
+      "pinQuestion": "Fijar pregunta",
+      "empty": "Aún no hay mensajes",
+      "emptyHint": "¡Inicia la conversación!",
+      "placeholder": "Escribe un mensaje..."
+    },
+    "auditorium": {
+      "title": "Vista de auditorio",
+      "online": "{count, plural, =1 {1 persona en línea} other {# personas en línea}}",
+      "liveSession": "Sesión en vivo",
+      "emptyTitle": "Aún no hay nadie aquí",
+      "emptySubtitle": "¡Sé el primero en unirte!",
+      "anonymous": "Anónimo",
+      "legendOnline": "En línea",
+      "legendTyping": "Escribiendo",
+      "legendYou": "Tú"
+    }
   }
 }
