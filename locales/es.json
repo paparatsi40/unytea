@@ -2721,6 +2721,52 @@
         "saved": "Notas guardadas",
         "saveFailed": "No se pudieron guardar las notas"
       }
+    },
+    "addToCourse": {
+      "title": "Añadir sesión a un curso",
+      "subtitle": "Convierte esta sesión en vivo en contenido permanente del curso",
+      "tabExisting": "Curso existente",
+      "tabNew": "Crear nuevo",
+      "existing": {
+        "noCourses": "No se encontraron cursos en esta comunidad.",
+        "createNewInstead": "Crear un nuevo curso en su lugar",
+        "courseLabel": "Seleccionar curso",
+        "coursePlaceholder": "Elige un curso...",
+        "enrolled": "{count, plural, =1 {1 inscrito} other {# inscritos}}",
+        "moduleLabel": "Módulo (opcional: se crea \"Live Sessions\" automáticamente si se deja vacío)",
+        "modulePlaceholder": "Selecciona un módulo o déjalo vacío...",
+        "lessonTitleLabel": "Título de la lección",
+        "lessonTitlePlaceholder": "Introduce el título de la lección",
+        "makeFree": "Hacer esta lección gratuita (vista previa)",
+        "adding": "Añadiendo...",
+        "submit": "Añadir al curso"
+      },
+      "new": {
+        "courseTitleLabel": "Título del curso",
+        "courseTitlePlaceholder": "Introduce el título del curso",
+        "descriptionLabel": "Descripción",
+        "descriptionPlaceholder": "Breve descripción del curso",
+        "pricingLabel": "Precios",
+        "free": "Gratis",
+        "paid": "De pago",
+        "priceLabel": "Precio (USD)",
+        "creating": "Creando...",
+        "submit": "Crear curso desde la sesión"
+      },
+      "validation": {
+        "selectCourse": "Por favor, selecciona un curso",
+        "enterTitle": "Por favor, introduce un título de curso"
+      },
+      "toasts": {
+        "loadFailed": "No se pudieron cargar los cursos",
+        "loadError": "Error al cargar los cursos",
+        "added": "¡Sesión añadida al curso!",
+        "addFailed": "No se pudo añadir la sesión",
+        "addError": "Error al añadir la sesión al curso",
+        "created": "¡Curso creado correctamente!",
+        "createFailed": "No se pudo crear el curso",
+        "createError": "Error al crear el curso"
+      }
     }
   }
 }

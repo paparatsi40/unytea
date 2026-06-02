@@ -2712,6 +2712,52 @@
         "saved": "Notes saved",
         "saveFailed": "Failed to save notes"
       }
+    },
+    "addToCourse": {
+      "title": "Add Session to Course",
+      "subtitle": "Convert this live session into permanent course content",
+      "tabExisting": "Existing Course",
+      "tabNew": "Create New",
+      "existing": {
+        "noCourses": "No courses found in this community.",
+        "createNewInstead": "Create a new course instead",
+        "courseLabel": "Select Course",
+        "coursePlaceholder": "Choose a course...",
+        "enrolled": "{count, plural, =1 {1 enrolled} other {# enrolled}}",
+        "moduleLabel": "Module (optional - auto-creates \"Live Sessions\" if empty)",
+        "modulePlaceholder": "Select module or leave empty...",
+        "lessonTitleLabel": "Lesson Title",
+        "lessonTitlePlaceholder": "Enter lesson title",
+        "makeFree": "Make this lesson free (preview)",
+        "adding": "Adding...",
+        "submit": "Add to Course"
+      },
+      "new": {
+        "courseTitleLabel": "Course Title",
+        "courseTitlePlaceholder": "Enter course title",
+        "descriptionLabel": "Description",
+        "descriptionPlaceholder": "Brief description of the course",
+        "pricingLabel": "Pricing",
+        "free": "Free",
+        "paid": "Paid",
+        "priceLabel": "Price (USD)",
+        "creating": "Creating...",
+        "submit": "Create Course from Session"
+      },
+      "validation": {
+        "selectCourse": "Please select a course",
+        "enterTitle": "Please enter a course title"
+      },
+      "toasts": {
+        "loadFailed": "Failed to load courses",
+        "loadError": "Error loading courses",
+        "added": "Session added to course!",
+        "addFailed": "Failed to add session",
+        "addError": "Error adding session to course",
+        "created": "Course created successfully!",
+        "createFailed": "Failed to create course",
+        "createError": "Error creating course"
+      }
     }
   }
 }

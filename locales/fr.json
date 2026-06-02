@@ -2723,6 +2723,52 @@
         "saved": "Notes enregistrées",
         "saveFailed": "Échec de l'enregistrement des notes"
       }
+    },
+    "addToCourse": {
+      "title": "Ajouter la session à un cours",
+      "subtitle": "Transformez cette session en direct en contenu de cours permanent",
+      "tabExisting": "Cours existant",
+      "tabNew": "Créer un nouveau",
+      "existing": {
+        "noCourses": "Aucun cours trouvé dans cette communauté.",
+        "createNewInstead": "Créer un nouveau cours à la place",
+        "courseLabel": "Sélectionner un cours",
+        "coursePlaceholder": "Choisissez un cours...",
+        "enrolled": "{count, plural, =1 {1 inscrit} other {# inscrits}}",
+        "moduleLabel": "Module (facultatif : crée automatiquement « Live Sessions » s'il est vide)",
+        "modulePlaceholder": "Sélectionnez un module ou laissez vide...",
+        "lessonTitleLabel": "Titre de la leçon",
+        "lessonTitlePlaceholder": "Saisissez le titre de la leçon",
+        "makeFree": "Rendre cette leçon gratuite (aperçu)",
+        "adding": "Ajout...",
+        "submit": "Ajouter au cours"
+      },
+      "new": {
+        "courseTitleLabel": "Titre du cours",
+        "courseTitlePlaceholder": "Saisissez le titre du cours",
+        "descriptionLabel": "Description",
+        "descriptionPlaceholder": "Brève description du cours",
+        "pricingLabel": "Tarification",
+        "free": "Gratuit",
+        "paid": "Payant",
+        "priceLabel": "Prix (USD)",
+        "creating": "Création...",
+        "submit": "Créer un cours à partir de la session"
+      },
+      "validation": {
+        "selectCourse": "Veuillez sélectionner un cours",
+        "enterTitle": "Veuillez saisir un titre de cours"
+      },
+      "toasts": {
+        "loadFailed": "Échec du chargement des cours",
+        "loadError": "Erreur lors du chargement des cours",
+        "added": "Session ajoutée au cours !",
+        "addFailed": "Échec de l'ajout de la session",
+        "addError": "Erreur lors de l'ajout de la session au cours",
+        "created": "Cours créé avec succès !",
+        "createFailed": "Échec de la création du cours",
+        "createError": "Erreur lors de la création du cours"
+      }
     }
   }
 }
