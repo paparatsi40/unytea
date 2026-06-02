@@ -2620,6 +2620,25 @@
       "fire": "Fuego",
       "party": "Fiesta",
       "clap": "Aplauso"
+    },
+    "sessionChat": {
+      "header": "Chat",
+      "messageCount": "{count, plural, =1 {1 mensaje} other {# mensajes}}",
+      "pinQuestion": "Fijar pregunta",
+      "empty": "Aún no hay mensajes",
+      "emptyHint": "¡Inicia la conversación!",
+      "placeholder": "Escribe un mensaje..."
+    },
+    "auditorium": {
+      "title": "Vista de auditorio",
+      "online": "{count, plural, =1 {1 persona en línea} other {# personas en línea}}",
+      "liveSession": "Sesión en vivo",
+      "emptyTitle": "Aún no hay nadie aquí",
+      "emptySubtitle": "¡Sé el primero en unirte!",
+      "anonymous": "Anónimo",
+      "legendOnline": "En línea",
+      "legendTyping": "Escribiendo",
+      "legendYou": "Tú"
     }
   }
 }

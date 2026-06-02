@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 type Member = {
   id: string;
   user: {
@@ -17,6 +19,7 @@ type Props = {
 };
 
 export function MemberAvatar({ member, isCurrentUser, isHovered }: Props) {
+  const t = useTranslations("liveSession.auditorium");
   const initial = member.user.name?.charAt(0).toUpperCase() || "?";
 
   return (
@@ -118,7 +121,7 @@ export function MemberAvatar({ member, isCurrentUser, isHovered }: Props) {
             fontSize="12"
             fontWeight="500"
           >
-            {member.user.name || "Anonymous"}
+            {member.user.name || t("anonymous")}
           </text>
         </g>
       )}

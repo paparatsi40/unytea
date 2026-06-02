@@ -2611,6 +2611,25 @@
       "fire": "Fire",
       "party": "Party",
       "clap": "Clap"
+    },
+    "sessionChat": {
+      "header": "Chat",
+      "messageCount": "{count, plural, =1 {1 message} other {# messages}}",
+      "pinQuestion": "Pin question",
+      "empty": "No messages yet",
+      "emptyHint": "Start the conversation!",
+      "placeholder": "Type a message..."
+    },
+    "auditorium": {
+      "title": "Auditorium View",
+      "online": "{count, plural, =1 {1 person online} other {# people online}}",
+      "liveSession": "Live Session",
+      "emptyTitle": "No one here yet",
+      "emptySubtitle": "Be the first to join!",
+      "anonymous": "Anonymous",
+      "legendOnline": "Online",
+      "legendTyping": "Typing",
+      "legendYou": "You"
     }
   }
 }

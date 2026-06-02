@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useChat, useRoomContext } from "@livekit/components-react";
+import { useTranslations } from "next-intl";
 
 interface SessionChatProps {
   sessionId: string;
@@ -25,6 +26,8 @@ interface ChatMessage {
 const REACTIONS = ["👍", "❤️", "🔥", "👏", "💡", "🎉"];
 
 export function SessionChat({ sessionId: _sessionId, onPinQuestion }: SessionChatProps) {
+  const t = useTranslations("liveSession.sessionChat");
+  const tParticipants = useTranslations("liveSession.room.participants");
   const { chatMessages, send } = useChat();
   const room = useRoomContext();
   const [message, setMessage] = useState("");
@@ -49,7 +52,7 @@ export function SessionChat({ sessionId: _sessionId, onPinQuestion }: SessionCha
 
   const handlePin = (msg: ChatMessage) => {
     if (onPinQuestion) {
-      onPinQuestion(msg.from.name || msg.from.identity || "Unknown", msg.message);
+      onPinQuestion(msg.from.name || msg.from.identity || tParticipants("unknown"), msg.message);
     }
   };
 
@@ -58,8 +61,10 @@ export function SessionChat({ sessionId: _sessionId, onPinQuestion }: SessionCha
       {/* Header */}
       <div className="flex items-center gap-2 border-b border-zinc-800 px-4 py-3">
         <MessageSquare className="h-4 w-4 text-blue-400" />
-        <span className="text-sm font-medium text-zinc-300">Chat</span>
-        <span className="ml-auto text-xs text-zinc-500">{chatMessages.length} messages</span>
+        <span className="text-sm font-medium text-zinc-300">{t("header")}</span>
+        <span className="ml-auto text-xs text-zinc-500">
+          {t("messageCount", { count: chatMessages.length })}
+        </span>
       </div>
 
       {/* Messages */}
@@ -84,7 +89,7 @@ export function SessionChat({ sessionId: _sessionId, onPinQuestion }: SessionCha
                 {/* Sender Name */}
                 {!isMe && (
                   <p className="mb-1 text-xs font-medium text-zinc-400">
-                    {msg.from?.name || msg.from?.identity || "Unknown"}
+                    {msg.from?.name || msg.from?.identity || tParticipants("unknown")}
                   </p>
                 )}
 
@@ -98,7 +103,7 @@ export function SessionChat({ sessionId: _sessionId, onPinQuestion }: SessionCha
                     <button
                       onClick={() => handlePin(msg as ChatMessage)}
                       className="flex h-6 w-6 items-center justify-center rounded-full text-zinc-400 hover:bg-zinc-700 hover:text-white"
-                      title="Pin question"
+                      title={t("pinQuestion")}
                     >
                       <Pin className="h-3 w-3" />
                     </button>
@@ -148,8 +153,8 @@ export function SessionChat({ sessionId: _sessionId, onPinQuestion }: SessionCha
         {chatMessages.length === 0 && (
           <div className="flex h-32 flex-col items-center justify-center gap-2 text-center">
             <MessageSquare className="h-8 w-8 text-zinc-600" />
-            <p className="text-sm text-zinc-500">No messages yet</p>
-            <p className="text-xs text-zinc-600">Start the conversation!</p>
+            <p className="text-sm text-zinc-500">{t("empty")}</p>
+            <p className="text-xs text-zinc-600">{t("emptyHint")}</p>
           </div>
         )}
       </div>
@@ -159,7 +164,7 @@ export function SessionChat({ sessionId: _sessionId, onPinQuestion }: SessionCha
         <div className="flex gap-2">
           <Input
             type="text"
-            placeholder="Type a message..."
+            placeholder={t("placeholder")}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             className="flex-1 border-zinc-700 bg-zinc-800 text-white placeholder:text-zinc-500"

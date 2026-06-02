@@ -2622,6 +2622,25 @@
       "fire": "Feu",
       "party": "Fête",
       "clap": "Applaudissement"
+    },
+    "sessionChat": {
+      "header": "Chat",
+      "messageCount": "{count, plural, =1 {1 message} other {# messages}}",
+      "pinQuestion": "Épingler la question",
+      "empty": "Aucun message pour l'instant",
+      "emptyHint": "Lancez la conversation !",
+      "placeholder": "Saisissez un message..."
+    },
+    "auditorium": {
+      "title": "Vue auditorium",
+      "online": "{count, plural, =1 {1 personne en ligne} other {# personnes en ligne}}",
+      "liveSession": "Session en direct",
+      "emptyTitle": "Personne n'est encore là",
+      "emptySubtitle": "Soyez le premier à rejoindre !",
+      "anonymous": "Anonyme",
+      "legendOnline": "En ligne",
+      "legendTyping": "En train d'écrire",
+      "legendYou": "Vous"
     }
   }
 }
