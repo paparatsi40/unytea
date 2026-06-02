@@ -21,6 +21,7 @@ import {
   Radio,
   Folder,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -75,6 +76,9 @@ export function PostSessionFlow({
   onCreateClip,
   onPublishToLibrary,
 }: PostSessionFlowProps) {
+  const t = useTranslations("liveSession.postSessionFlow");
+  const tHost = useTranslations("liveSession.publicPage.host");
+  const tNotes = useTranslations("liveSession.room.notesPanel");
   const router = useRouter();
   const [activeAction, setActiveAction] = useState<string | null>(null);
   const [showNotes, setShowNotes] = useState(false);
@@ -103,11 +107,12 @@ export function PostSessionFlow({
       <div className="text-center">
         <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-green-500/10 px-4 py-2">
           <CheckCircle className="h-5 w-5 text-green-400" />
-          <span className="font-medium text-green-400">Session completed!</span>
+          <span className="font-medium text-green-400">{t("header.completed")}</span>
         </div>
         <h1 className="text-2xl font-bold text-white">{session.title}</h1>
         <p className="mt-2 text-zinc-400">
-          Hosted by {session.mentor?.name} • {attendeeCount} members attended
+          {tHost("hostedBy", { name: session.mentor?.name ?? "" })} •{" "}
+          {t("header.membersAttended", { count: attendeeCount })}
         </p>
       </div>
 
@@ -130,17 +135,17 @@ export function PostSessionFlow({
             <div className="flex-1">
               <h3 className="font-semibold text-white">
                 {isRecordingReady
-                  ? "Recording ready"
+                  ? t("recording.readyTitle")
                   : isRecordingProcessing
-                    ? "Recording is processing..."
-                    : "Recording status"}
+                    ? t("recording.processingTitle")
+                    : t("recording.defaultTitle")}
               </h3>
               <p className="text-sm text-zinc-400">
                 {isRecordingReady
-                  ? "Your session recording is ready to watch and share"
+                  ? t("recording.readyDesc")
                   : isRecordingProcessing
-                    ? "It will be ready in a few minutes"
-                    : "Processing your session recording"}
+                    ? t("recording.processingDesc")
+                    : t("recording.defaultDesc")}
               </p>
             </div>
             {isRecordingReady && session.recording?.url && (
@@ -149,7 +154,7 @@ export function PostSessionFlow({
                 className="bg-blue-600 hover:bg-blue-700"
               >
                 <Play className="mr-2 h-4 w-4" />
-                Watch
+                {t("recording.watch")}
               </Button>
             )}
           </div>
@@ -158,7 +163,7 @@ export function PostSessionFlow({
 
       {/* ==================== NEXT STEPS ==================== */}
       <div>
-        <h2 className="mb-4 text-lg font-semibold text-white">Turn this session into content</h2>
+        <h2 className="mb-4 text-lg font-semibold text-white">{t("nextSteps.title")}</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           {/* Write Notes */}
           <Card
@@ -176,14 +181,12 @@ export function PostSessionFlow({
                 <FileText className="h-6 w-6 text-emerald-400" />
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-white">Write Notes</h3>
-                <p className="text-sm text-zinc-400">
-                  Capture key takeaways, insights, and resources
-                </p>
+                <h3 className="font-semibold text-white">{t("nextSteps.notesTitle")}</h3>
+                <p className="text-sm text-zinc-400">{t("nextSteps.notesDesc")}</p>
                 {session.notes?.content && (
                   <span className="mt-2 inline-flex items-center gap-1 text-xs text-emerald-400">
                     <CheckCircle className="h-3 w-3" />
-                    Notes added
+                    {t("nextSteps.notesAdded")}
                   </span>
                 )}
               </div>
@@ -210,12 +213,12 @@ export function PostSessionFlow({
                 <Share2 className="h-6 w-6 text-blue-400" />
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-white">Share Recap</h3>
-                <p className="text-sm text-zinc-400">Post session summary to community feed</p>
+                <h3 className="font-semibold text-white">{t("nextSteps.shareTitle")}</h3>
+                <p className="text-sm text-zinc-400">{t("nextSteps.shareDesc")}</p>
                 {session.feedPostId && (
                   <span className="mt-2 inline-flex items-center gap-1 text-xs text-blue-400">
                     <CheckCircle className="h-3 w-3" />
-                    Already shared
+                    {t("nextSteps.shareDone")}
                   </span>
                 )}
               </div>
@@ -239,8 +242,8 @@ export function PostSessionFlow({
                 <BookOpen className="h-6 w-6 text-purple-400" />
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-white">Add to Course</h3>
-                <p className="text-sm text-zinc-400">Add this recording to a course module</p>
+                <h3 className="font-semibold text-white">{t("nextSteps.courseTitle")}</h3>
+                <p className="text-sm text-zinc-400">{t("nextSteps.courseDesc")}</p>
               </div>
               <ArrowRight className="h-5 w-5 text-zinc-500" />
             </CardContent>
@@ -262,8 +265,8 @@ export function PostSessionFlow({
                 <Scissors className="h-6 w-6 text-amber-400" />
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-white">Create Clips</h3>
-                <p className="text-sm text-zinc-400">Generate short clips for social media</p>
+                <h3 className="font-semibold text-white">{t("nextSteps.clipsTitle")}</h3>
+                <p className="text-sm text-zinc-400">{t("nextSteps.clipsDesc")}</p>
               </div>
               <ArrowRight className="h-5 w-5 text-zinc-500" />
             </CardContent>
@@ -285,10 +288,8 @@ export function PostSessionFlow({
                 <Folder className="h-6 w-6 text-cyan-400" />
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-white">Publish to Library</h3>
-                <p className="text-sm text-zinc-400">
-                  Turn this recap into a reusable library resource
-                </p>
+                <h3 className="font-semibold text-white">{t("nextSteps.libraryTitle")}</h3>
+                <p className="text-sm text-zinc-400">{t("nextSteps.libraryDesc")}</p>
               </div>
               <ArrowRight className="h-5 w-5 text-zinc-500" />
             </CardContent>
@@ -299,35 +300,35 @@ export function PostSessionFlow({
       {/* ==================== SESSION STATS ==================== */}
       <Card className="border-zinc-800 bg-zinc-900/50">
         <CardContent className="p-6">
-          <h3 className="mb-4 font-semibold text-white">Session Performance</h3>
+          <h3 className="mb-4 font-semibold text-white">{t("stats.title")}</h3>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             <div className="text-center">
               <div className="flex items-center justify-center gap-2 text-2xl font-bold text-white">
                 <Users className="h-5 w-5 text-zinc-400" />
                 {attendeeCount}
               </div>
-              <p className="text-xs text-zinc-500">Attendees</p>
+              <p className="text-xs text-zinc-500">{t("stats.attendees")}</p>
             </div>
             <div className="text-center">
               <div className="flex items-center justify-center gap-2 text-2xl font-bold text-white">
                 <Clock className="h-5 w-5 text-zinc-400" />
                 {duration}
               </div>
-              <p className="text-xs text-zinc-500">Minutes</p>
+              <p className="text-xs text-zinc-500">{t("stats.minutes")}</p>
             </div>
             <div className="text-center">
               <div className="flex items-center justify-center gap-2 text-2xl font-bold text-white">
                 <MessageSquare className="h-5 w-5 text-zinc-400" />
                 --
               </div>
-              <p className="text-xs text-zinc-500">Messages</p>
+              <p className="text-xs text-zinc-500">{t("stats.messages")}</p>
             </div>
             <div className="text-center">
               <div className="flex items-center justify-center gap-2 text-2xl font-bold text-white">
                 <Zap className="h-5 w-5 text-zinc-400" />
                 100%
               </div>
-              <p className="text-xs text-zinc-500">Completion</p>
+              <p className="text-xs text-zinc-500">{t("stats.completion")}</p>
             </div>
           </div>
         </CardContent>
@@ -340,7 +341,7 @@ export function PostSessionFlow({
           className="flex items-center gap-2 text-sm text-zinc-400 transition-colors hover:text-white"
         >
           <ChevronLeft className="h-4 w-4" />
-          Back to sessions
+          {t("actions.backToSessions")}
         </Link>
         {isHost && (
           <Button
@@ -349,7 +350,7 @@ export function PostSessionFlow({
             className="border-zinc-700 text-zinc-300 hover:bg-zinc-800"
           >
             <Radio className="mr-2 h-4 w-4" />
-            Re-enter Session Room
+            {t("actions.reEnterRoom")}
           </Button>
         )}
       </div>
@@ -360,7 +361,7 @@ export function PostSessionFlow({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
           <div className="w-full max-w-3xl rounded-2xl border border-zinc-800 bg-zinc-900">
             <div className="flex items-center justify-between border-b border-zinc-800 p-4">
-              <h3 className="font-semibold text-white">Session Notes</h3>
+              <h3 className="font-semibold text-white">{tNotes("title")}</h3>
               <button
                 onClick={() => setShowNotes(false)}
                 className="text-zinc-400 hover:text-white"

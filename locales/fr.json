@@ -2659,6 +2659,47 @@
       "noLink": "Aucun lien de partage disponible pour l'instant",
       "shareText": "Regardez cette session : {title}",
       "socialText": "Regardez cette session sur Unytea : {title}"
+    },
+    "postSessionFlow": {
+      "header": {
+        "completed": "Session terminée !",
+        "membersAttended": "{count, plural, =1 {1 membre a participé} other {# membres ont participé}}"
+      },
+      "recording": {
+        "readyTitle": "Enregistrement prêt",
+        "readyDesc": "L'enregistrement de votre session est prêt à être regardé et partagé",
+        "processingTitle": "L'enregistrement est en cours de traitement...",
+        "processingDesc": "Il sera prêt dans quelques minutes",
+        "defaultTitle": "État de l'enregistrement",
+        "defaultDesc": "Traitement de l'enregistrement de votre session",
+        "watch": "Regarder"
+      },
+      "nextSteps": {
+        "title": "Transformez cette session en contenu",
+        "notesTitle": "Rédiger des notes",
+        "notesDesc": "Capturez les points clés, les idées et les ressources",
+        "notesAdded": "Notes ajoutées",
+        "shareTitle": "Partager le récap",
+        "shareDesc": "Publiez le résumé de la session dans le fil de la communauté",
+        "shareDone": "Déjà partagé",
+        "courseTitle": "Ajouter à un cours",
+        "courseDesc": "Ajoutez cet enregistrement à un module de cours",
+        "clipsTitle": "Créer des clips",
+        "clipsDesc": "Générez de courts clips pour les réseaux sociaux",
+        "libraryTitle": "Publier dans la bibliothèque",
+        "libraryDesc": "Transformez ce récap en ressource réutilisable de la bibliothèque"
+      },
+      "stats": {
+        "title": "Performance de la session",
+        "attendees": "Participants",
+        "minutes": "Minutes",
+        "messages": "Messages",
+        "completion": "Achèvement"
+      },
+      "actions": {
+        "backToSessions": "Retour aux sessions",
+        "reEnterRoom": "Revenir dans la salle"
+      }
     }
   }
 }

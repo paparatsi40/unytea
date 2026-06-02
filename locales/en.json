@@ -2648,6 +2648,47 @@
       "noLink": "No shareable link available yet",
       "shareText": "Watch this session: {title}",
       "socialText": "Watch this session on Unytea: {title}"
+    },
+    "postSessionFlow": {
+      "header": {
+        "completed": "Session completed!",
+        "membersAttended": "{count, plural, =1 {1 member attended} other {# members attended}}"
+      },
+      "recording": {
+        "readyTitle": "Recording ready",
+        "readyDesc": "Your session recording is ready to watch and share",
+        "processingTitle": "Recording is processing...",
+        "processingDesc": "It will be ready in a few minutes",
+        "defaultTitle": "Recording status",
+        "defaultDesc": "Processing your session recording",
+        "watch": "Watch"
+      },
+      "nextSteps": {
+        "title": "Turn this session into content",
+        "notesTitle": "Write Notes",
+        "notesDesc": "Capture key takeaways, insights, and resources",
+        "notesAdded": "Notes added",
+        "shareTitle": "Share Recap",
+        "shareDesc": "Post session summary to community feed",
+        "shareDone": "Already shared",
+        "courseTitle": "Add to Course",
+        "courseDesc": "Add this recording to a course module",
+        "clipsTitle": "Create Clips",
+        "clipsDesc": "Generate short clips for social media",
+        "libraryTitle": "Publish to Library",
+        "libraryDesc": "Turn this recap into a reusable library resource"
+      },
+      "stats": {
+        "title": "Session Performance",
+        "attendees": "Attendees",
+        "minutes": "Minutes",
+        "messages": "Messages",
+        "completion": "Completion"
+      },
+      "actions": {
+        "backToSessions": "Back to sessions",
+        "reEnterRoom": "Re-enter Session Room"
+      }
     }
   }
 }

@@ -2657,6 +2657,47 @@
       "noLink": "Aún no hay un enlace para compartir disponible",
       "shareText": "Mira esta sesión: {title}",
       "socialText": "Mira esta sesión en Unytea: {title}"
+    },
+    "postSessionFlow": {
+      "header": {
+        "completed": "¡Sesión finalizada!",
+        "membersAttended": "{count, plural, =1 {1 miembro asistió} other {# miembros asistieron}}"
+      },
+      "recording": {
+        "readyTitle": "Grabación lista",
+        "readyDesc": "La grabación de tu sesión está lista para ver y compartir",
+        "processingTitle": "La grabación se está procesando...",
+        "processingDesc": "Estará lista en unos minutos",
+        "defaultTitle": "Estado de la grabación",
+        "defaultDesc": "Procesando la grabación de tu sesión",
+        "watch": "Ver"
+      },
+      "nextSteps": {
+        "title": "Convierte esta sesión en contenido",
+        "notesTitle": "Escribir notas",
+        "notesDesc": "Captura puntos clave, ideas y recursos",
+        "notesAdded": "Notas añadidas",
+        "shareTitle": "Compartir resumen",
+        "shareDesc": "Publica el resumen de la sesión en el feed de la comunidad",
+        "shareDone": "Ya compartido",
+        "courseTitle": "Añadir a curso",
+        "courseDesc": "Añade esta grabación a un módulo de curso",
+        "clipsTitle": "Crear clips",
+        "clipsDesc": "Genera clips cortos para redes sociales",
+        "libraryTitle": "Publicar en la biblioteca",
+        "libraryDesc": "Convierte este resumen en un recurso reutilizable de la biblioteca"
+      },
+      "stats": {
+        "title": "Rendimiento de la sesión",
+        "attendees": "Asistentes",
+        "minutes": "Minutos",
+        "messages": "Mensajes",
+        "completion": "Finalización"
+      },
+      "actions": {
+        "backToSessions": "Volver a sesiones",
+        "reEnterRoom": "Volver a entrar a la sala"
+      }
     }
   }
 }
