@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Check } from "lucide-react";
 import { updatePrivacySettings } from "@/app/actions/settings";
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 
 // Enum values double as i18n keys; option labels resolved via

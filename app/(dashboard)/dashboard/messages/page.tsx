@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
+import Image from "next/image";
 import { ConversationList } from "@/components/messages/ConversationList";
 import { MessageThread } from "@/components/messages/MessageThread";
 import { getOrCreateConversation, getSharedMessageContext } from "@/app/actions/messages";
@@ -133,12 +134,14 @@ export default function MessagesPage() {
               <p className="text-xs uppercase tracking-wide text-gray-500">{t("contact")}</p>
 
               <div className="mt-2.5 flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-purple-500 to-pink-500 font-semibold text-white">
+                <div className="relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-purple-500 to-pink-500 font-semibold text-white">
                   {activeOtherUser.image ? (
-                    <img
+                    <Image
                       src={activeOtherUser.image}
                       alt={activeOtherUser.name || t("userFallback")}
-                      className="h-full w-full object-cover"
+                      fill
+                      sizes="44px"
+                      className="object-cover"
                     />
                   ) : (
                     (activeOtherUser.firstName || activeOtherUser.name || "U")

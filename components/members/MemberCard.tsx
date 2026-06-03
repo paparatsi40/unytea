@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { MessageCircle, Video, MapPin, Sparkles } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -35,10 +36,12 @@ export function MemberCard({ member }: { member: Member }) {
         <div className="mb-4">
           <div className="relative h-16 w-16 overflow-hidden rounded-full border-2 border-white bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg">
             {member.user.image && !imageError ? (
-              <img
+              <Image
                 src={member.user.image}
                 alt={member.user.name || t("imageAlt")}
-                className="h-full w-full object-cover"
+                fill
+                sizes="64px"
+                className="object-cover"
                 onError={() => setImageError(true)}
               />
             ) : (

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Check, AlertTriangle, Shield, KeyRound, LogOut } from "lucide-react";
 import { updateAccountSettings } from "@/app/actions/settings";
 import { signOut } from "next-auth/react";
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 
 export default function AccountPage() {

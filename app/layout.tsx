@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { SessionProvider } from "next-auth/react";
-import { Toaster } from "react-hot-toast";
 import { Toaster as SonnerToaster } from "sonner";
 import { ServiceWorkerRegistrar } from "@/components/pwa/ServiceWorkerRegistrar";
 import { PWAInstallPrompt } from "@/components/pwa/PWAInstallPrompt";
@@ -198,28 +197,8 @@ export default async function RootLayout({
           {children}
           <PWAInstallPrompt />
           <CookieConsent />
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              duration: 4000,
-              style: {
-                background: "hsl(224 71% 4%)",
-                color: "hsl(213 31% 91%)",
-                border: "1px solid hsl(215 27.9% 16.9%)",
-              },
-              success: {
-                iconTheme: {
-                  primary: "hsl(263 70% 50%)",
-                  secondary: "white",
-                },
-              },
-            }}
-          />
-          {/*
-           * 26 files in this app call toast() from "sonner". Without this
-           * Toaster mounted, every one of those calls fires silently. We keep
-           * react-hot-toast above for the 15 files that already use it.
-           */}
+          {/* Single toast surface — all callers use sonner now (react-hot-toast
+              was consolidated into it in perf-4). */}
           <SonnerToaster position="top-right" richColors closeButton />
         </SessionProvider>
         {/* Vercel RUM — only ship data in production deployments; no-op locally. */}

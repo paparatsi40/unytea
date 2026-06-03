@@ -6,7 +6,7 @@ import { endSession } from "@/app/actions/session-jobs";
 import { VideoRoom } from "@/components/sessions/VideoRoom";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useRouter } from "next/navigation";
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 import {
   getRecordingStatus,
   startCompositeRecording,

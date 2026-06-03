@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Check } from "lucide-react";
 import { updateNotificationPreferences } from "@/app/actions/settings";
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 
 type ToggleKey =

@@ -4,7 +4,7 @@ import { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Lock, Sparkles, Loader2, CheckCircle, ArrowLeft, Eye, EyeOff } from "lucide-react";
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 
 function ResetPasswordContent() {
   const searchParams = useSearchParams();

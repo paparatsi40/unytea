@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Check, Sun, Moon, Monitor, Eye, LayoutTemplate, Sliders } from "lucide-react";
 import { updateAccountSettings } from "@/app/actions/settings";
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 
 // Theme enum values double as i18n keys; labels/descriptions resolved via
