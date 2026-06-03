@@ -9,7 +9,7 @@ import {
 } from "@livekit/components-react";
 import "@livekit/components-styles";
 import { Loader2, MessageSquare, BarChart3, X } from "lucide-react";
-import { RoomEvent } from "livekit-client";
+import { RoomEvent, type RemoteParticipant, type DataPacket_Kind } from "livekit-client";
 import { LiveReactions } from "@/components/live-session/LiveReactions";
 import {
   SegmentedChat,
@@ -160,7 +160,11 @@ function VideoCallInterface({ participantName, userId, isModerator }: VideoCallI
   useEffect(() => {
     if (!room) return;
 
-    const handleDataReceived = (payload: Uint8Array, _participant: any, _kind: any) => {
+    const handleDataReceived = (
+      payload: Uint8Array,
+      _participant?: RemoteParticipant,
+      _kind?: DataPacket_Kind
+    ) => {
       try {
         const decoder = new TextDecoder();
         const message = JSON.parse(decoder.decode(payload));
@@ -262,7 +266,7 @@ function VideoCallInterface({ participantName, userId, isModerator }: VideoCallI
   };
 
   // Send messages via data channel
-  const sendDataMessage = (type: string, data: any) => {
+  const sendDataMessage = (type: string, data: unknown) => {
     if (!room) return;
 
     const message = JSON.stringify({ type, data });
