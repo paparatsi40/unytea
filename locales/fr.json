@@ -2128,6 +2128,7 @@
     }
   },
   "explore": {
+    "backButton": "Retour",
     "page": {
       "title": "Explorer les communautés",
       "description": "Découvrez des communautés live-first menées par des créateurs émergents.",
