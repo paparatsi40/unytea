@@ -24,7 +24,12 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getSession, getSessionRSVPStatus, setSessionRSVPStatus } from "@/app/actions/sessions";
+import {
+  getSession,
+  getSessionRSVPStatus,
+  setSessionRSVPStatus,
+  type SessionDetail,
+} from "@/app/actions/sessions";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -44,8 +49,7 @@ export default function SessionDetailPage(props: SessionPageProps) {
   const params = use(props.params);
   const router = useRouter();
   const { user, isLoading: isAuthLoading } = useCurrentUser();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Deferred to refactor ticket: typing this useState (with the SessionDetail payload getSession now returns) requires also resolving 4 entangled issues — isProcessing checks the wrong enum, dead `status === "COMPLETED"` branches unreachable after the early return, a PostSessionFlow prop shape mismatch, and an additional under-fetch (recording for PostSessionFlow). See commit c09d372b for the full diagnosis; tracked as a dedicated follow-up of effort #57.
-  const [session, setSession] = useState<any>(null);
+  const [session, setSession] = useState<SessionDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("recording");
   const [showAddToCourse, setShowAddToCourse] = useState(false);
@@ -193,8 +197,8 @@ export default function SessionDetailPage(props: SessionPageProps) {
   }
 
   const isAudioOnly = session.mode === "AUDIO";
-  const isProcessing = session.status === "PROCESSING";
-  const hasRecording = session.recordingUrl || session.status === "COMPLETED";
+  const isProcessing = session.recording?.status === "PROCESSING";
+  const hasRecording = !!session.recordingUrl;
   const formattedDate = new Date(session.scheduledAt).toLocaleDateString("en-US", {
     weekday: "short",
     month: "short",
@@ -332,12 +336,9 @@ export default function SessionDetailPage(props: SessionPageProps) {
               <h1 className="text-lg font-semibold text-white">{session.title}</h1>
               <div className="flex items-center gap-2 text-xs text-zinc-400">
                 <span className="flex items-center gap-1">
-                  {session.status === "COMPLETED" ? (
-                    <CheckCircle className="h-3.5 w-3.5 text-green-500" />
-                  ) : (
-                    <Radio className="h-3.5 w-3.5 text-red-500" />
-                  )}
-                  {session.status === "COMPLETED" ? "Completed" : session.status}
+                  {/* Non-completed render only (COMPLETED early-returns at L286 to PostSessionFlow). */}
+                  <Radio className="h-3.5 w-3.5 text-red-500" />
+                  {session.status}
                 </span>
                 <span>•</span>
                 <span>{formattedDate}</span>
@@ -538,7 +539,7 @@ export default function SessionDetailPage(props: SessionPageProps) {
             variant="outline"
             className="gap-2 border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800"
             onClick={handleShareRecap}
-            disabled={isSharing || session?.feedPostId}
+            disabled={isSharing || !!session?.feedPostId}
           >
             <Share2 className="h-4 w-4" />
             {isSharing ? "Sharing..." : session?.feedPostId ? "Already Shared" : "Share Recap"}
@@ -718,7 +719,8 @@ export default function SessionDetailPage(props: SessionPageProps) {
                   <span
                     className={cn(
                       "text-sm font-medium",
-                      session.status === "COMPLETED" ? "text-green-400" : "text-yellow-400"
+                      // Non-completed render only (COMPLETED early-returns at L286).
+                      "text-yellow-400"
                     )}
                   >
                     {session.status}
@@ -814,7 +816,7 @@ export default function SessionDetailPage(props: SessionPageProps) {
                   variant="outline"
                   className="w-full justify-start gap-2 border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
                   onClick={handleShareRecap}
-                  disabled={isSharing || session?.feedPostId}
+                  disabled={isSharing || !!session?.feedPostId}
                 >
                   <Share2 className="h-4 w-4" />
                   {session?.feedPostId ? "Shared to Feed" : "Share Recap"}

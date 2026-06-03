@@ -30,36 +30,25 @@ import { AddToCourseDialog } from "./AddToCourseDialog";
 import { CreateSocialClipDialog } from "../public-content/CreateSocialClipDialog";
 
 interface PostSessionFlowProps {
+  // Shape aligned to SessionDetail (the getSession Prisma payload). Only the
+  // fields this component actually reads are declared; nullable fields use
+  // `null` (not `undefined`) to match what Prisma returns. Single consumer:
+  // sessions/[sessionId]/page.tsx.
   session: {
     id: string;
     title: string;
-    description?: string;
     status: string;
-    startedAt?: Date;
-    endedAt?: Date;
-    recording?: {
-      url?: string;
-      thumbnailUrl?: string;
+    startedAt: Date | null;
+    endedAt: Date | null;
+    recording: {
+      url: string | null;
       status: string;
-      durationSeconds?: number;
+      durationSeconds: number | null;
     } | null;
-    mentor?: {
-      id: string;
-      name: string;
-      image?: string;
-    };
-    community?: {
-      id: string;
-      name: string;
-    };
-    _count?: {
-      participations: number;
-    };
-    notes?: {
-      content?: string;
-      summary?: string;
-    } | null;
-    feedPostId?: string | null;
+    mentor: { name: string | null } | null;
+    _count: { participations: number };
+    notes: { content: string } | null;
+    feedPostId: string | null;
   };
   isHost: boolean;
   onShareRecap: () => Promise<void>;

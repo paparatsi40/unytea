@@ -12,13 +12,15 @@ type SessionWithMentor = Prisma.MentorSessionGetPayload<{
   include: { mentor: { select: { id: true; name: true; image: true; username: true } } };
 }>;
 
-/** Sesión de detalle: mentor + mentee + community + notes (retorno de getSession). */
+/** Sesión de detalle: mentor + mentee + community + notes + recording + _count (retorno de getSession). */
 export type SessionDetail = Prisma.MentorSessionGetPayload<{
   include: {
     mentor: { select: { id: true; name: true; image: true; username: true } };
     mentee: { select: { id: true; name: true; image: true; username: true } };
     community: { select: { id: true; name: true; slug: true } };
     notes: true;
+    recording: { select: { url: true; status: true; durationSeconds: true } };
+    _count: { select: { participations: true } };
   };
 }>;
 
@@ -259,6 +261,21 @@ export async function getSession(sessionId: string) {
           },
         },
         notes: true,
+        // recording + _count para PostSessionFlow (detail de sesión COMPLETED):
+        // antes ausentes → recordingStatus caía a "PROCESSING" hardcoded y el
+        // conteo de participantes no estaba disponible.
+        recording: {
+          select: {
+            url: true,
+            status: true,
+            durationSeconds: true,
+          },
+        },
+        _count: {
+          select: {
+            participations: true,
+          },
+        },
       },
     });
 
