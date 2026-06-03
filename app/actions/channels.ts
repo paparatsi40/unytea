@@ -134,7 +134,7 @@ export async function sendChannelMessage(
     //   io.to(`channel:${channelId}`).emit("message:new", message);
     // }
 
-    revalidatePath("/c/[slug]/chat/[channel]");
+    revalidatePath("/dashboard/c/[slug]/chat/[channel]", "page");
 
     return { success: true, message };
   } catch (error) {
@@ -177,7 +177,7 @@ export async function deleteChannelMessage(messageId: string) {
     //   io.to(`channel:${message.channelId}`).emit("message:deleted", { messageId });
     // }
 
-    revalidatePath("/c/[slug]/chat/[channel]");
+    revalidatePath("/dashboard/c/[slug]/chat/[channel]", "page");
 
     return { success: true };
   } catch (error) {

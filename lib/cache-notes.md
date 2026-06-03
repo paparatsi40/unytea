@@ -87,3 +87,25 @@ A dedicated "cache invalidation modernization" PR should:
 
 The tags are already in place (`session:${slug}`, `community:${slug}`), so the wiring
 is additive.
+
+## Fix #72 — broken revalidatePath calls (resolved)
+
+The audit flagged broken `revalidatePath` calls. Discovery found 3 classes (16 sites),
+all fixed:
+
+1. **Class 1** (9 sites) — `/c/[slug]` missing the `[locale]` segment **and** the
+   `'page'` type. Without `'page'`, `revalidatePath` treats `[slug]` as a literal path,
+   so it matched nothing even after adding the locale. Fixed via the new
+   `lib/cache-invalidation.ts` helper `revalidateLocalizedPath(path, type?)` (invalidates
+   all 3 locales). Files: `comments.ts`, `posts.ts`, `reactions.ts`, `community-landing.ts`.
+2. **Class 2** (3 sites) — missing the `/dashboard` prefix (the routes are dashboard, not
+   public/localized). Fixed to `/dashboard/c/[slug]/...` + `'page'`. Files: `channels.ts`,
+   `members.ts`.
+3. **Class 3** (4 sites) — invalid `*` wildcard syntax. Fixed to `[slug]` + `'page'`.
+   File: `buddy.ts`.
+
+**Caveat preserved:** this fixes the path/intent (the calls are no longer silent no-ops
+and now give Next a real route to invalidate), but full freshness on `/c/[slug]` (a
+dynamic + tag-keyed page) still depends on the tag-invalidation activation described
+above, pending the Next 16 cache API. `revalidatePath` does meaningfully invalidate the
+Data Cache of static/SSG routes it targets.

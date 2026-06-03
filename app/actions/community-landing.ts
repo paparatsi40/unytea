@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { buildDefaultLandingLayout } from "@/lib/community-landing-template";
 import { revalidatePath } from "next/cache";
+import { revalidateLocalizedPath } from "@/lib/cache-invalidation";
 
 /**
  * Resets a community's landingLayout to the default Patreon-style template.
@@ -55,7 +56,7 @@ export async function resetCommunityLandingToDefault(communityId: string) {
   }
 
   revalidatePath(`/dashboard/c/${community.slug}/settings/landing`);
-  revalidatePath(`/c/${community.slug}`);
+  revalidateLocalizedPath(`/c/${community.slug}`);
 
   return { success: true };
 }
