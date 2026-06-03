@@ -2,7 +2,7 @@
 
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { signOut } from "next-auth/react";
-import { Search, LogOut, User as UserIcon, MessageSquare } from "lucide-react";
+import { Search, LogOut, User as UserIcon, MessageSquare, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import {
@@ -19,7 +19,12 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { useTranslations } from "next-intl";
 
-export function DashboardHeader() {
+type Props = {
+  /** Opens the mobile sidebar drawer (hamburger is hidden at md+). */
+  onMenuClick: () => void;
+};
+
+export function DashboardHeader({ onMenuClick }: Props) {
   const { user } = useCurrentUser();
   const t = useTranslations();
 
@@ -35,9 +40,17 @@ export function DashboardHeader() {
   };
 
   return (
-    <header className="fixed left-64 right-0 top-0 z-30 h-16 border-b border-border bg-background/80 backdrop-blur-xl">
+    <header className="fixed left-0 right-0 top-0 z-30 h-16 border-b border-border bg-background/80 backdrop-blur-xl md:left-64">
       <div className="flex h-full items-center justify-between px-6">
-        <div className="flex flex-1 items-center">
+        <div className="flex flex-1 items-center gap-2">
+          <button
+            type="button"
+            onClick={onMenuClick}
+            className="-ml-2 rounded-lg p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground md:hidden"
+            aria-label={t("sidebar.openMenu")}
+          >
+            <Menu className="h-6 w-6" />
+          </button>
           <div className="relative w-full max-w-xs">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input

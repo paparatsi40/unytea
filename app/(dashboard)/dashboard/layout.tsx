@@ -68,6 +68,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [messages, setMessages] = useState<Messages>(fallbackMessages);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // Mobile off-canvas drawer state. Desktop (md+) keeps the sidebar permanently
+  // visible regardless of this flag.
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -130,10 +133,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <div className="min-h-screen bg-background">
-        <DashboardSidebar />
-        <DashboardHeader />
+        <DashboardSidebar open={mobileOpen} onClose={() => setMobileOpen(false)} />
+        <DashboardHeader onMenuClick={() => setMobileOpen(true)} />
 
-        <main className="ml-64 pt-16">
+        {/* Mobile-only backdrop behind the drawer; tap to dismiss. */}
+        {mobileOpen && (
+          <div
+            className="fixed inset-0 z-30 bg-black/50 md:hidden"
+            onClick={() => setMobileOpen(false)}
+            aria-hidden="true"
+          />
+        )}
+
+        <main className="pt-16 md:ml-64">
           <SubscriptionBannerMount />
           <div className="p-6">{children}</div>
         </main>
