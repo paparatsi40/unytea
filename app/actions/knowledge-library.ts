@@ -5,6 +5,21 @@ import { getCurrentUserId } from "@/lib/auth-utils";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 
+/** Sesión candidata a convertirse en curso (payload de getConvertibleSessions). */
+type ConvertibleSession = Prisma.MentorSessionGetPayload<{
+  include: {
+    community: { select: { id: true; name: true; slug: true } };
+    series: { select: { id: true; title: true } };
+    notes: { select: { id: true; content: true } };
+    recording: { select: { id: true; url: true; status: true } };
+    participations: { select: { id: true; userId: true } };
+    _count: { select: { participations: true; resources: true } };
+  };
+}>;
+
+/** Sesión candidata + score de engagement calculado. */
+type ScoredSession = ConvertibleSession & { engagementScore: number };
+
 /**
  * Get all sessions that can be converted to courses
  * Completed sessions with recordings that aren't yet in courses
@@ -71,7 +86,7 @@ export async function getConvertibleSessions(communityId?: string) {
 /**
  * Calculate engagement score based on attendance, duration, and resources
  */
-function calculateEngagementScore(session: any): number {
+function calculateEngagementScore(session: ConvertibleSession): number {
   let score = 0;
 
   // Attendance (max 40 points)
@@ -128,15 +143,20 @@ export async function analyzeCoursePotential(communityId?: string) {
         title: group.title,
         sessionCount: group.sessions.length,
         sessions: group.sessions,
-        totalDuration: group.sessions.reduce((sum: number, s: any) => sum + s.duration, 0),
+        totalDuration: group.sessions.reduce(
+          (sum: number, s: ScoredSession) => sum + s.duration,
+          0
+        ),
         totalAttendees: group.sessions.reduce(
-          (sum: number, s: any) => sum + (s._count?.participations || 0),
+          (sum: number, s: ScoredSession) => sum + (s._count?.participations || 0),
           0
         ),
         potentialStudents: estimatePotentialStudents(group.sessions),
         avgEngagement: Math.round(
-          group.sessions.reduce((sum: number, s: any) => sum + (s.engagementScore || 0), 0) /
-            group.sessions.length
+          group.sessions.reduce(
+            (sum: number, s: ScoredSession) => sum + (s.engagementScore || 0),
+            0
+          ) / group.sessions.length
         ),
       }))
       .sort((a, b) => b.potentialStudents - a.potentialStudents) // Sort by potential
@@ -152,8 +172,8 @@ export async function analyzeCoursePotential(communityId?: string) {
 /**
  * Group sessions by topic similarity
  */
-function groupSessionsByTopic(sessions: any[]) {
-  const groups: { title: string; sessions: any[] }[] = [];
+function groupSessionsByTopic(sessions: ScoredSession[]) {
+  const groups: { title: string; sessions: ScoredSession[] }[] = [];
 
   // Define topic keywords and their variations
   const topicKeywords: { [key: string]: string[] } = {
@@ -212,7 +232,7 @@ function groupSessionsByTopic(sessions: any[]) {
   }
 
   // Group remaining sessions by series
-  const remainingBySeries: { [key: string]: any[] } = {};
+  const remainingBySeries: { [key: string]: ScoredSession[] } = {};
   sessions.forEach((session) => {
     if (!assignedSessionIds.has(session.id) && session.seriesId) {
       if (!remainingBySeries[session.seriesId]) {
@@ -239,13 +259,13 @@ function groupSessionsByTopic(sessions: any[]) {
 /**
  * Estimate potential students based on past attendance
  */
-function estimatePotentialStudents(sessions: any[]): number {
+function estimatePotentialStudents(sessions: ScoredSession[]): number {
   // Average unique attendees across sessions
   const uniqueAttendees = new Set<string>();
   let totalAttendees = 0;
 
   sessions.forEach((session) => {
-    session.participations?.forEach((p: any) => {
+    session.participations?.forEach((p) => {
       uniqueAttendees.add(p.userId);
     });
     totalAttendees += session._count?.participations || 0;

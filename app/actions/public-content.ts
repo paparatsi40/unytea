@@ -2,6 +2,37 @@
 
 import { getCurrentUserId } from "@/lib/auth-utils";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
+
+/** Segmento destacado ("golden moment") de una sesión. */
+type Moment = {
+  startTime: number;
+  endTime: number;
+  type: "engagement" | "insight";
+  score: number;
+  label: string;
+  context: string;
+};
+
+/** Sesión con datos mínimos para generar metadata de clip. */
+type SessionForClip = Prisma.MentorSessionGetPayload<{
+  include: {
+    mentor: { select: { id: true; name: true; image: true } };
+    community: { select: { id: true; name: true; slug: true } };
+    recording: true;
+  };
+}>;
+
+/** Sesión con relaciones para analizar "golden moments" (payload de detectSessionMoments). */
+type SessionForMoments = Prisma.MentorSessionGetPayload<{
+  include: {
+    mentor: { select: { id: true; name: true; image: true } };
+    community: { select: { id: true; name: true; slug: true } };
+    participations: { include: { user: { select: { id: true; name: true } } } };
+    notes: true;
+    recording: true;
+  };
+}>;
 
 /**
  * Analyze session for "golden moments" - high-value segments
@@ -67,20 +98,15 @@ export async function detectSessionMoments(sessionId: string) {
 /**
  * Analyze session structure for "golden moments"
  */
-function analyzeMoments(session: any) {
-  const moments: {
-    startTime: number;
-    endTime: number;
-    type: "engagement" | "insight";
-    score: number;
-    label: string;
-    context: string;
-  }[] = [];
+function analyzeMoments(session: SessionForMoments): Moment[] {
+  const moments: Moment[] = [];
 
   const recording = session.recording;
   if (!recording) return moments;
 
-  const totalDuration = recording.duration || 3600;
+  // Bug fix: el campo correcto del modelo Recording es `durationSeconds` (Int?),
+  // no `duration` (inexistente) — sin esto totalDuration siempre caía a 3600.
+  const totalDuration = recording.durationSeconds || 3600;
   const attendeeCount = session.participations?.length || 0;
 
   // 1. Opening Hook (first 2-3 minutes)
@@ -155,7 +181,7 @@ function analyzeMoments(session: any) {
 /**
  * Remove overlapping moments
  */
-function dedupeMoments(moments: any[]) {
+function dedupeMoments(moments: Moment[]) {
   const result: typeof moments = [];
 
   for (const moment of moments) {
@@ -231,7 +257,7 @@ export async function generateClipMetadata(sessionId: string, startTime: number,
   }
 }
 
-function generateClipPreviewText(session: any, duration: number) {
+function generateClipPreviewText(session: SessionForClip, duration: number) {
   const hooks = [
     `The #1 thing most people get wrong about ${session.title.toLowerCase()}...`,
     `This changed how I think about ${session.title.toLowerCase()}`,
@@ -242,7 +268,7 @@ function generateClipPreviewText(session: any, duration: number) {
   return hooks[Math.floor(Math.random() * hooks.length)];
 }
 
-function generateShareText(session: any, previewText: string, clipUrl: string) {
+function generateShareText(session: SessionForClip, previewText: string, clipUrl: string) {
   return `${previewText}
 
 From: "${session.title}" with ${session.mentor?.name}
