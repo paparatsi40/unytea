@@ -4,8 +4,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAllPosts, getPostBySlug } from "../posts";
 
-export const dynamic = "force-dynamic";
-
 type RouteParams = {
   locale: string;
   slug: string;
