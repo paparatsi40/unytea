@@ -5,7 +5,7 @@ import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Chrome, Github, Mail, Lock, ArrowRight, Sparkles } from "lucide-react";
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 
 export function SignInContent() {

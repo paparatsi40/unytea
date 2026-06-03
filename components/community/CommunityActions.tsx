@@ -7,7 +7,7 @@ import Link from "next/link";
 import { joinCommunity, leaveCommunity } from "@/app/actions/communities";
 import { Button } from "@/components/ui/button";
 import { Settings, UserPlus, UserMinus, Loader2 } from "lucide-react";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 
 interface CommunityActionsProps {

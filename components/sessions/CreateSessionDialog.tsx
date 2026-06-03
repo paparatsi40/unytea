@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { Plus, Radio, Calendar, Clock, Video, Mic, Check } from "lucide-react";
 import { createSessionOrSeries } from "@/app/actions/sessions";
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { useLocale, useTranslations } from "next-intl";
