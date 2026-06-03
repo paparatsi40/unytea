@@ -5,6 +5,7 @@ import { getExploreCommunities } from "@/lib/explore-query";
 import { localizedAlternates } from "@/lib/seo/locale-metadata";
 import { ExploreFilters as ExploreFiltersComponent } from "@/components/explore/ExploreFilters";
 import { ExploreInfiniteFeed } from "@/components/explore/ExploreInfiniteFeed";
+import { ExploreBackButton } from "@/components/explore/ExploreBackButton";
 import type {
   ExploreFilters,
   ExplorePagination,
@@ -142,6 +143,8 @@ export default async function ExplorePage(props: Props) {
   return (
     <div className="container mx-auto max-w-7xl px-4 py-8">
       <header className="mb-6">
+        {/* /explore is public — fall back to the localized homepage for deep-links. */}
+        <ExploreBackButton fallbackHref={`/${locale}`} />
         <h1 className="mb-2 text-3xl font-bold tracking-tight">{t("title")}</h1>
         <p className="text-muted-foreground">{t("description")}</p>
       </header>
