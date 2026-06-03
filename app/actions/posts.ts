@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { getCurrentUserId } from "@/lib/auth-utils";
+import { PostContentType } from "@prisma/client";
 
 /**
  * Create a new post
@@ -53,7 +54,7 @@ export async function createPost(formData: FormData) {
         publishedAt: new Date(),
         attachments: parsedAttachments,
         contentType: ["DISCUSSION", "QUESTION", "ANNOUNCEMENT", "RESOURCE"].includes(contentType)
-          ? (contentType as any)
+          ? (contentType as PostContentType)
           : "DISCUSSION",
       },
     });

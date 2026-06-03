@@ -33,6 +33,21 @@ function toPayload(payload: AutopilotJobPayload): Prisma.InputJsonValue {
   return payload as unknown as Prisma.InputJsonValue;
 }
 
+/** Item de trabajo de autopilot derivado de un sessionEvent (getAutopilotOverview). */
+type AutopilotJobItem = {
+  id: string;
+  createdAt: Date;
+  sessionId: string;
+  runId: string | undefined;
+  status: string;
+  jobType: string;
+  runAt: string | undefined;
+  retries: number | undefined;
+  error: string | undefined;
+  sessionTitle: string;
+  communityName: string | undefined;
+};
+
 function createRunId(sessionId: string) {
   return `autopilot:${sessionId}:${Date.now()}`;
 }
@@ -284,7 +299,7 @@ async function executeAutopilotJob(sessionId: string, jobType: AutopilotJobType)
             sessionId: session.id,
             lifecycleStage: "autopilot_pre_questions",
             scheduledAt: session.scheduledAt.toISOString(),
-          } as any,
+          } as Prisma.InputJsonValue,
         },
       });
     }
@@ -320,7 +335,7 @@ async function executeAutopilotJob(sessionId: string, jobType: AutopilotJobType)
             sessionId: session.id,
             lifecycleStage: "autopilot_low_engagement_nudge",
             questionCountAtTrigger: questionsCount,
-          } as any,
+          } as Prisma.InputJsonValue,
         },
       });
     }
@@ -360,7 +375,7 @@ async function executeAutopilotJob(sessionId: string, jobType: AutopilotJobType)
           replayLink: session.slug
             ? `/sessions/${session.slug}`
             : `/dashboard/sessions/${session.id}`,
-        } as any,
+        } as Prisma.InputJsonValue,
       },
     });
 
@@ -400,7 +415,7 @@ async function executeAutopilotJob(sessionId: string, jobType: AutopilotJobType)
             lifecycleStage: "autopilot_queue_next",
             suggestedAt: nextSlot.toISOString(),
             actionHref: "/dashboard/sessions/create?from=autopilot_same_slot",
-          } as any,
+          } as Prisma.InputJsonValue,
         },
       });
     }
@@ -453,7 +468,7 @@ export async function getAutopilotOverview(limit: number = 20) {
         communityName: e.session?.community?.name,
       };
     })
-    .filter(Boolean) as Array<any>;
+    .filter((j): j is AutopilotJobItem => j !== null);
 
   const stats = {
     queued: jobs.filter((j) => j.status === "queued").length,
