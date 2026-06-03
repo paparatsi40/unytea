@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { SectionSchema } from "../types";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Render fns receive props as Record<string, any> from the section-builder runtime; this section validates its own prop shape via its FieldDef[] schema (registered in types.ts). The builder is generic over all SectionTypes.
 export const CTARender = (props: Record<string, any>) => {
   const { title, subtitle, ctaLabel, ctaUrl, backgroundColor = "purple" } = props;
   const t = useTranslations("community.landing.cta");

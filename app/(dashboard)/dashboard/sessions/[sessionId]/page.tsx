@@ -44,6 +44,7 @@ export default function SessionDetailPage(props: SessionPageProps) {
   const params = use(props.params);
   const router = useRouter();
   const { user, isLoading: isAuthLoading } = useCurrentUser();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Deferred to refactor ticket: typing this useState (with the SessionDetail payload getSession now returns) requires also resolving 4 entangled issues — isProcessing checks the wrong enum, dead `status === "COMPLETED"` branches unreachable after the early return, a PostSessionFlow prop shape mismatch, and an additional under-fetch (recording for PostSessionFlow). See commit c09d372b for the full diagnosis; tracked as a dedicated follow-up of effort #57.
   const [session, setSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("recording");

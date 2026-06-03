@@ -47,6 +47,7 @@ const credentialsSchema = z.object({
 });
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NextAuth v5 (beta) and @auth/prisma-adapter ship slightly divergent Adapter interfaces; PrismaAdapter's return type does not structurally match the Adapter type NextAuth expects at this boundary. Cast is required until both packages stabilize on a shared @auth/core version.
   adapter: PrismaAdapter(prisma) as any,
   session: {
     strategy: "jwt",

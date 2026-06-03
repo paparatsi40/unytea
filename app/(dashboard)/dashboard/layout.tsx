@@ -7,6 +7,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { useEffect, useState } from "react";
 
 // Type for nested translation messages - flexible structure
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- next-intl message catalogs are deeply-nested locale JSON with per-namespace shapes; next-intl does not expose a generated Messages type, so Record<string, any> is the documented shape. Translation keys are validated at build time against locales/* JSON, not at this type.
 type Messages = Record<string, any>;
 
 // Default English messages fallback

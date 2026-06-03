@@ -237,6 +237,7 @@ export function SectionBuilder({
     });
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Section props are polymorphic (Record<string, any>): updateProps merges partial updates into a section's props, whose concrete shape depends on the SectionType and is validated via its FieldDef[] schema (types.ts).
   const updateProps = useCallback((id: string, updates: Record<string, any>) => {
     setSections((prev) =>
       prev.map((s) => (s.id === id ? { ...s, props: { ...s.props, ...updates } } : s))

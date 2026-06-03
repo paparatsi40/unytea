@@ -4,6 +4,7 @@ import { useState } from "react";
 import { SectionSchema } from "../types";
 import { ChevronDown } from "lucide-react";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Render fns receive props as Record<string, any> from the section-builder runtime; this section validates its own prop shape via its FieldDef[] schema (registered in types.ts). The builder is generic over all SectionTypes.
 export const FAQRender = (props: Record<string, any>) => {
   const { title, q1, a1, q2, a2, q3, a3, q4, a4, q5, a5 } = props;
 
