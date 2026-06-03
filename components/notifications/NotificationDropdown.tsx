@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Bell, Check, Loader2, Trash2 } from "lucide-react";
-import { NotificationItem } from "./NotificationItem";
+import { NotificationItem, type NotificationItemData } from "./NotificationItem";
 import {
   getUserNotifications,
   markAllNotificationsAsRead,
@@ -10,7 +10,7 @@ import {
 } from "@/app/actions/notifications";
 
 export function NotificationDropdown() {
-  const [notifications, setNotifications] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<NotificationItemData[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isMarkingAllRead, setIsMarkingAllRead] = useState(false);
@@ -19,7 +19,9 @@ export function NotificationDropdown() {
     const result = await getUserNotifications(20);
 
     if (result.success && result.notifications) {
-      setNotifications(result.notifications);
+      // Server returns the Prisma rows (data: JsonValue, no sender/link relation);
+      // the item shape narrows those — the component reads them defensively.
+      setNotifications(result.notifications as unknown as NotificationItemData[]);
     }
 
     setIsLoading(false);

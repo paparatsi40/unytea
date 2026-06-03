@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { getUserNotifications } from "@/app/actions/notifications";
 import { NotificationList } from "@/components/notifications/NotificationList";
+import type { NotificationItemData } from "@/components/notifications/NotificationItem";
 import { NotificationHeader } from "@/components/notifications/NotificationHeader";
 import { NotificationsLoadError } from "@/components/notifications/NotificationsLoadError";
 
@@ -27,7 +28,9 @@ export default async function NotificationsPage() {
   return (
     <div className="space-y-6 p-8">
       <NotificationHeader unreadCount={unreadCount || 0} />
-      <NotificationList notifications={notifications || []} />
+      <NotificationList
+        notifications={(notifications || []) as unknown as NotificationItemData[]}
+      />
     </div>
   );
 }
