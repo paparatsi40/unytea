@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -14,13 +15,17 @@ interface Props {
   params: Promise<{ slug: string; locale: string }>;
 }
 
+// Dedupe the session fetch across generateMetadata + the page render (both run
+// in the same request). Without this React cache() the slug was queried twice.
+const getCachedSession = cache((slug: string) => getPublicSessionBySlug(slug));
+
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const params = await props.params;
   const t = await getTranslations({
     locale: params.locale,
     namespace: "liveSession.publicPage.metadata",
   });
-  const session = await getPublicSessionBySlug(params.slug);
+  const session = await getCachedSession(params.slug);
 
   if (!session) {
     return {
@@ -87,7 +92,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
 export default async function Page(props: Props) {
   const params = await props.params;
-  const session = await getPublicSessionBySlug(params.slug);
+  const session = await getCachedSession(params.slug);
 
   if (!session) {
     notFound();
