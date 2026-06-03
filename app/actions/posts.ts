@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+import { revalidateLocalizedPath } from "@/lib/cache-invalidation";
 import { getCurrentUserId } from "@/lib/auth-utils";
 import { PostContentType } from "@prisma/client";
 
@@ -69,7 +69,7 @@ export async function createPost(formData: FormData) {
       },
     });
 
-    revalidatePath(`/c/[slug]`);
+    revalidateLocalizedPath("/c/[slug]", "page");
     return { success: true, post };
   } catch (error) {
     console.error("Error creating post:", error);
@@ -131,7 +131,7 @@ export async function deletePost(postId: string) {
       },
     });
 
-    revalidatePath(`/c/[slug]`);
+    revalidateLocalizedPath("/c/[slug]", "page");
     return { success: true };
   } catch (error) {
     console.error("Error deleting post:", error);
@@ -180,7 +180,7 @@ export async function updatePost(postId: string, formData: FormData) {
       },
     });
 
-    revalidatePath(`/c/[slug]`);
+    revalidateLocalizedPath("/c/[slug]", "page");
     return { success: true, post: updatedPost };
   } catch (error) {
     console.error("Error updating post:", error);
@@ -229,7 +229,7 @@ export async function togglePostPin(postId: string) {
       },
     });
 
-    revalidatePath(`/c/[slug]`);
+    revalidateLocalizedPath("/c/[slug]", "page");
     return { success: true, isPinned: updatedPost.isPinned };
   } catch (error) {
     console.error("Error toggling pin:", error);

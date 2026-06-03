@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+import { revalidateLocalizedPath } from "@/lib/cache-invalidation";
 
 export type ReactionType = "LIKE" | "LOVE" | "CELEBRATE" | "FIRE" | "IDEA" | "CLAP";
 
@@ -25,7 +25,7 @@ export async function toggleReaction(userId: string, postId: string, reactionTyp
         where: { id: existingReaction.id },
       });
 
-      revalidatePath("/c/[slug]");
+      revalidateLocalizedPath("/c/[slug]", "page");
       return { success: true, action: "removed" };
     } else {
       // Add reaction
@@ -37,7 +37,7 @@ export async function toggleReaction(userId: string, postId: string, reactionTyp
         },
       });
 
-      revalidatePath("/c/[slug]");
+      revalidateLocalizedPath("/c/[slug]", "page");
       return { success: true, action: "added" };
     }
   } catch (error) {

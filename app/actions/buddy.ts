@@ -259,7 +259,7 @@ export async function createBuddyGoal(
       },
     });
 
-    revalidatePath(`/dashboard/c/*/buddy`);
+    revalidatePath("/dashboard/c/[slug]/buddy", "page");
 
     return { success: true, goal };
   } catch (error) {
@@ -281,7 +281,7 @@ export async function completeBuddyGoal(goalId: string) {
       },
     });
 
-    revalidatePath(`/dashboard/c/*/buddy`);
+    revalidatePath("/dashboard/c/[slug]/buddy", "page");
 
     return { success: true, goal };
   } catch (error) {
@@ -315,7 +315,7 @@ export async function createBuddyCheckIn(
       },
     });
 
-    revalidatePath(`/dashboard/c/*/buddy`);
+    revalidatePath("/dashboard/c/[slug]/buddy", "page");
 
     return { success: true, checkIn };
   } catch (error) {
@@ -337,7 +337,7 @@ export async function endBuddyPartnership(partnershipId: string) {
       },
     });
 
-    revalidatePath(`/dashboard/c/*/buddy`);
+    revalidatePath("/dashboard/c/[slug]/buddy", "page");
 
     return { success: true, partnership };
   } catch (error) {

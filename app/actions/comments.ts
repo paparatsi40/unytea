@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+import { revalidateLocalizedPath } from "@/lib/cache-invalidation";
 import { getCurrentUserId } from "@/lib/auth-utils";
 
 export async function createComment(postId: string, content: string, parentId?: string) {
@@ -40,7 +40,7 @@ export async function createComment(postId: string, content: string, parentId?: 
       },
     });
 
-    revalidatePath(`/c/[slug]`);
+    revalidateLocalizedPath("/c/[slug]", "page");
 
     return { success: true, comment };
   } catch (error) {
@@ -128,7 +128,7 @@ export async function deleteComment(commentId: string) {
       where: { id: commentId },
     });
 
-    revalidatePath(`/c/[slug]`);
+    revalidateLocalizedPath("/c/[slug]", "page");
 
     return { success: true };
   } catch (error) {
