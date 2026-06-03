@@ -7,20 +7,22 @@ import { Check, CheckCheck, MoreVertical, Trash2, Image as ImageIcon } from "luc
 import { deleteMessage } from "@/app/actions/messages";
 import { useToast } from "@/hooks/use-toast";
 
-interface MessageBubbleProps {
-  message: {
+export interface Message {
+  id: string;
+  content: string;
+  createdAt: Date;
+  isRead: boolean;
+  attachments?: string;
+  sender: {
     id: string;
-    content: string;
-    createdAt: Date;
-    isRead: boolean;
-    attachments?: string;
-    sender: {
-      id: string;
-      name: string | null;
-      firstName: string | null;
-      image: string | null;
-    };
+    name: string | null;
+    firstName: string | null;
+    image: string | null;
   };
+}
+
+interface MessageBubbleProps {
+  message: Message;
   isOwnMessage: boolean;
   onDelete?: () => void;
 }

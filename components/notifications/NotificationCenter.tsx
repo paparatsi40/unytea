@@ -30,7 +30,7 @@ interface Notification {
   message: string;
   isRead: boolean;
   createdAt: Date;
-  data?: any;
+  data?: Record<string, unknown>;
 }
 
 export function NotificationCenter() {
@@ -60,7 +60,7 @@ export function NotificationCenter() {
     setLoading(true);
     const result = await getUserNotifications(20);
     if (result.success && result.notifications) {
-      setNotifications(result.notifications as any);
+      setNotifications(result.notifications as unknown as Notification[]);
     }
     setLoading(false);
   };

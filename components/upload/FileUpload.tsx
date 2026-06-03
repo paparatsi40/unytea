@@ -25,8 +25,8 @@ export function FileUpload({
   const [files, setFiles] = useState<{ url: string; name: string }[]>(value);
   const [isUploading, setIsUploading] = useState(false);
 
-  const handleUploadComplete = (res: any) => {
-    const uploadedFiles = res.map((file: any) => ({
+  const handleUploadComplete = (res: Array<{ ufsUrl?: string; url: string; name: string }>) => {
+    const uploadedFiles = res.map((file) => ({
       url: file.ufsUrl || file.url, // Use ufsUrl (v9) with fallback to url (legacy)
       name: file.name,
     }));

@@ -1,6 +1,6 @@
 "use server";
 
-import { WebhookReceiver } from "livekit-server-sdk";
+import { WebhookReceiver, EgressStatus, type WebhookEvent } from "livekit-server-sdk";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { autoStartRecording } from "./recording";
@@ -126,7 +126,7 @@ export async function handleLiveKitWebhook(
 /**
  * Room started - Session is now live
  */
-async function handleRoomStarted(event: any) {
+async function handleRoomStarted(event: WebhookEvent) {
   const roomName = event.room?.name;
   if (!roomName) return;
 
@@ -188,7 +188,7 @@ async function handleRoomStarted(event: any) {
 /**
  * Room finished - Session has ended
  */
-async function handleRoomFinished(event: any) {
+async function handleRoomFinished(event: WebhookEvent) {
   const roomName = event.room?.name;
   if (!roomName) return;
 
@@ -245,7 +245,6 @@ async function handleRoomFinished(event: any) {
   // Log event
   await logSessionEvent(sessionId, SessionEventType.ROOM_FINISHED, {
     roomSid: event.room?.sid,
-    duration: event.room?.duration,
     numParticipants: event.room?.numParticipants,
   });
 
@@ -263,7 +262,7 @@ async function handleRoomFinished(event: any) {
 /**
  * Participant joined
  */
-async function handleParticipantJoined(event: any) {
+async function handleParticipantJoined(event: WebhookEvent) {
   const roomName = event.room?.name;
   const identity = event.participant?.identity;
   if (!roomName || !identity) return;
@@ -328,7 +327,7 @@ async function handleParticipantJoined(event: any) {
 /**
  * Participant left
  */
-async function handleParticipantLeft(event: any) {
+async function handleParticipantLeft(event: WebhookEvent) {
   const roomName = event.room?.name;
   const identity = event.participant?.identity;
   if (!roomName || !identity) return;
@@ -364,14 +363,13 @@ async function handleParticipantLeft(event: any) {
   await logSessionEvent(sessionId, SessionEventType.PARTICIPANT_LEFT, {
     userId,
     identity,
-    duration: event.participant?.duration,
   });
 }
 
 /**
  * Egress (recording) started
  */
-async function handleEgressStarted(event: any) {
+async function handleEgressStarted(event: WebhookEvent) {
   const egressInfo = event.egressInfo;
   if (!egressInfo) return;
 
@@ -407,7 +405,7 @@ async function handleEgressStarted(event: any) {
 /**
  * Egress status updated
  */
-async function handleEgressUpdated(event: any) {
+async function handleEgressUpdated(event: WebhookEvent) {
   const egressInfo = event.egressInfo;
   if (!egressInfo) return;
 
@@ -436,7 +434,7 @@ async function handleEgressUpdated(event: any) {
 /**
  * Egress finished - Recording complete
  */
-async function handleEgressEnded(event: any) {
+async function handleEgressEnded(event: WebhookEvent) {
   const egressInfo = event.egressInfo;
   if (!egressInfo) return;
 
@@ -458,8 +456,8 @@ async function handleEgressEnded(event: any) {
       data: {
         status: "READY",
         url: fileResult.filename, // This will be the S3/R2 URL
-        fileSize: fileResult.size,
-        durationSeconds: fileResult.duration,
+        fileSize: Number(fileResult.size),
+        durationSeconds: Number(fileResult.duration),
         processingEndedAt: new Date(),
       },
     });
@@ -557,13 +555,13 @@ async function handleEgressEnded(event: any) {
 /**
  * Map LiveKit egress status to our RecordingStatus
  */
-function mapEgressStatus(egressStatus: string): "PROCESSING" | "READY" | "FAILED" {
+function mapEgressStatus(egressStatus: EgressStatus): "PROCESSING" | "READY" | "FAILED" {
   switch (egressStatus) {
-    case "EGRESS_COMPLETE":
+    case EgressStatus.EGRESS_COMPLETE:
       return "READY";
-    case "EGRESS_FAILED":
+    case EgressStatus.EGRESS_FAILED:
       return "FAILED";
-    case "EGRESS_ABORTED":
+    case EgressStatus.EGRESS_ABORTED:
       return "FAILED";
     default:
       return "PROCESSING";
@@ -573,12 +571,19 @@ function mapEgressStatus(egressStatus: string): "PROCESSING" | "READY" | "FAILED
 /**
  * Log session event for audit trail
  */
-async function logSessionEvent(sessionId: string, type: SessionEventType, payload: any) {
+async function logSessionEvent(
+  sessionId: string,
+  type: SessionEventType,
+  payload: Record<string, unknown>
+) {
   await prisma.sessionEvent.create({
     data: {
       sessionId,
       type,
-      payload,
+      // Audit payloads carry optional/bigint values (LiveKit protobuf), which
+      // aren't InputJsonValue-assignable; serialize through unknown for the
+      // Json column.
+      payload: payload as unknown as Prisma.InputJsonValue,
     },
   });
 }

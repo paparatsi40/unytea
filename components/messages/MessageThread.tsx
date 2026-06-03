@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { MessageBubble } from "./MessageBubble";
+import { MessageBubble, type Message } from "./MessageBubble";
 import { MessageInput } from "./MessageInput";
 import { getConversationMessages, markMessagesAsRead } from "@/app/actions/messages";
 import { ChevronLeft, Loader2, MoreVertical } from "lucide-react";
@@ -50,7 +50,7 @@ export function MessageThread({
   onConversationRead,
 }: MessageThreadProps) {
   const { user } = useCurrentUser();
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -62,7 +62,9 @@ export function MessageThread({
     const result = await getConversationMessages(conversationId);
 
     if (result.success && result.messages) {
-      setMessages(result.messages);
+      // Prisma rows are richer/looser (nullable content, extra relations) than
+      // the bubble view shape; the component reads a known subset.
+      setMessages(result.messages as unknown as Message[]);
       setError("");
 
       await markMessagesAsRead(conversationId);

@@ -20,23 +20,25 @@ import { toast } from "sonner";
 import Link from "next/link";
 import Image from "next/image";
 
-interface NotificationItemProps {
-  notification: {
+export interface NotificationItemData {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  data?: { link?: string } & Record<string, unknown>;
+  isRead: boolean;
+  createdAt: Date;
+  sender?: {
     id: string;
-    type: string;
-    title: string;
-    message: string;
-    data?: any;
-    isRead: boolean;
-    createdAt: Date;
-    sender?: {
-      id: string;
-      name: string | null;
-      email: string;
-      image: string | null;
-    } | null;
-    link?: string | null;
-  };
+    name: string | null;
+    email: string;
+    image: string | null;
+  } | null;
+  link?: string | null;
+}
+
+interface NotificationItemProps {
+  notification: NotificationItemData;
   onUpdate?: () => void;
 }
 
