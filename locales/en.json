@@ -2116,6 +2116,7 @@
     }
   },
   "sidebar": {
+    "openMenu": "Open menu",
     "nav": {
       "dashboard": "Dashboard",
       "explore": "Explore",

@@ -2214,6 +2214,7 @@
     }
   },
   "sidebar": {
+    "openMenu": "Ouvrir le menu",
     "nav": {
       "dashboard": "Tableau de Bord",
       "explore": "Explorer",

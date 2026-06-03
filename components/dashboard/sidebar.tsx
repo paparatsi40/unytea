@@ -35,13 +35,28 @@ const navigation: NavItem[] = [
   { key: "settings", href: "/dashboard/settings", icon: Settings },
 ];
 
-export function DashboardSidebar() {
+type Props = {
+  /** Mobile drawer open state (ignored at md+ where the sidebar is permanent). */
+  open: boolean;
+  /** Close the mobile drawer (fired on backdrop tap and on nav navigation). */
+  onClose: () => void;
+};
+
+export function DashboardSidebar({ open, onClose }: Props) {
   const pathname = usePathname();
   const locale = useLocale();
   const t = useTranslations("sidebar");
 
   return (
-    <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-card/50 backdrop-blur-xl">
+    <aside
+      className={cn(
+        "fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-card/50 backdrop-blur-xl",
+        "transition-transform duration-200 ease-in-out",
+        // Off-canvas on mobile; permanently visible at md+. `open` slides it in on mobile.
+        "-translate-x-full md:translate-x-0",
+        open && "translate-x-0"
+      )}
+    >
       {/* Logo */}
       <div className="flex h-16 items-center border-b border-border px-6">
         <Link href="/dashboard" className="flex items-center space-x-2">
@@ -67,6 +82,7 @@ export function DashboardSidebar() {
             <Link
               key={item.key}
               href={href}
+              onClick={onClose}
               className={cn(
                 "flex items-center space-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
                 isActive
