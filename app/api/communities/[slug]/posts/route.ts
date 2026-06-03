@@ -94,8 +94,8 @@ export async function GET(request: NextRequest, props: { params: Promise<{ slug:
     const announcementSessionIds = posts
       .filter((p) => p.contentType === "SESSION_ANNOUNCEMENT")
       .map((p) => {
-        const attachments = p.attachments as any;
-        return attachments?.sessionId as string | undefined;
+        const attachments = p.attachments as { sessionId?: string } | null;
+        return attachments?.sessionId;
       })
       .filter((id): id is string => Boolean(id));
 
@@ -111,8 +111,8 @@ export async function GET(request: NextRequest, props: { params: Promise<{ slug:
     const getPriority = (post: (typeof posts)[number]) => {
       if (post.contentType !== "SESSION_ANNOUNCEMENT") return 3;
 
-      const attachments = post.attachments as any;
-      const sessionId = attachments?.sessionId as string | undefined;
+      const attachments = post.attachments as { sessionId?: string } | null;
+      const sessionId = attachments?.sessionId;
       if (!sessionId) return 3;
 
       const session = sessionMap.get(sessionId);

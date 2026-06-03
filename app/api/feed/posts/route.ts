@@ -82,9 +82,9 @@ export async function GET() {
     // Format posts for the feed
     const formattedPosts = posts.map((post) => {
       // Parse attachments to get images
-      let image = null;
+      let image: string | null = null;
       try {
-        const attachments = post.attachments as any;
+        const attachments = post.attachments as { images?: string[] } | null;
         if (attachments && attachments.images && attachments.images.length > 0) {
           image = attachments.images[0];
         }

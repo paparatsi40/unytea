@@ -1,6 +1,6 @@
 "use server";
 
-import { Prisma } from "@prisma/client";
+import { Prisma, type CommunityLayoutType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { getCurrentUserId } from "@/lib/auth-utils";
@@ -97,7 +97,7 @@ export async function createCommunity(data: {
           ownerId: userId,
           memberCount: 1, // Owner is the first member
           // Layout & Theme
-          layoutType: (data.layoutType as any) || "MODERN_GRID",
+          layoutType: (data.layoutType as CommunityLayoutType) || "MODERN_GRID",
           primaryColor: data.primaryColor || "#8B5CF6",
           secondaryColor: data.secondaryColor || "#EC4899",
           accentColor: data.accentColor || "#F59E0B",

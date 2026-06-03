@@ -47,8 +47,8 @@ function sanitizeChapters(value: unknown): Chapter[] {
   if (!Array.isArray(value)) return [];
 
   return value
-    .filter((v) => typeof v === "object" && !!v)
-    .map((v: any) => ({
+    .filter((v): v is Record<string, unknown> => typeof v === "object" && v !== null)
+    .map((v) => ({
       title: typeof v.title === "string" ? v.title.trim() : "",
       timestamp: normalizeTimestamp(typeof v.timestamp === "string" ? v.timestamp : undefined),
     }))
@@ -59,8 +59,8 @@ function sanitizeChapters(value: unknown): Chapter[] {
 function sanitizeQuotes(value: unknown): Quote[] {
   if (!Array.isArray(value)) return [];
   return value
-    .filter((v) => typeof v === "object" && !!v)
-    .map((v: any) => ({
+    .filter((v): v is Record<string, unknown> => typeof v === "object" && v !== null)
+    .map((v) => ({
       text: typeof v.text === "string" ? v.text.trim() : "",
       reason: typeof v.reason === "string" ? v.reason.trim() : "",
     }))

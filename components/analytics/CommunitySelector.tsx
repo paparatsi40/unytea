@@ -4,9 +4,11 @@ import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { ChevronDown } from "lucide-react";
 
+type AnalyticsCommunity = { id: string; name: string };
+
 export function CommunitySelector() {
   const t = useTranslations("dashboard.analytics");
-  const [communities, setCommunities] = useState<any[]>([]);
+  const [communities, setCommunities] = useState<AnalyticsCommunity[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 

@@ -198,7 +198,7 @@ export async function getSessionFeedState(sessionId: string) {
       });
 
       discussionCount = questionPosts.filter((p) => {
-        const att = p.attachments as any;
+        const att = p.attachments as { targetSessionId?: string } | null;
         return att?.targetSessionId === sessionId;
       }).length;
     }

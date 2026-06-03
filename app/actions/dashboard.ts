@@ -784,7 +784,7 @@ export async function getHostAnalyticsV1() {
       : 0;
 
     const totalRsvps = completedSessions.reduce((sum, session) => {
-      const count = session.participations.filter((p: any) => {
+      const count = session.participations.filter((p) => {
         const data = (p.eventsData || {}) as Record<string, unknown>;
         return data.rsvp === true || data.rsvpStatus === "attending";
       }).length;
@@ -896,7 +896,7 @@ export async function getAIPlaybookRecommendations() {
     ]);
 
     const totalRsvps = completedSessions.reduce((sum, session) => {
-      const count = session.participations.filter((p: any) => {
+      const count = session.participations.filter((p) => {
         const data = (p.eventsData || {}) as Record<string, unknown>;
         return data.rsvp === true || data.rsvpStatus === "attending";
       }).length;

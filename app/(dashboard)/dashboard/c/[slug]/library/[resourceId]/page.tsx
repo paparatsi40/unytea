@@ -30,7 +30,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { getResourceById, toggleResourceLike, deleteResource } from "@/app/actions/resources";
+import {
+  getResourceById,
+  toggleResourceLike,
+  deleteResource,
+  type ResourceDetailWithPermissions,
+} from "@/app/actions/resources";
 import type { ResourceType } from "@prisma/client";
 
 const resourceTypeIcons: Record<ResourceType, typeof FileText> = {
@@ -55,7 +60,7 @@ export default function ResourceDetailPage() {
   const communitySlug = params?.slug as string | undefined;
   const resourceId = params?.resourceId as string | undefined;
 
-  const [resource, setResource] = useState<any>(null);
+  const [resource, setResource] = useState<ResourceDetailWithPermissions | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -86,7 +91,7 @@ export default function ResourceDetailPage() {
 
     const result = await toggleResourceLike({ resourceId });
     if (result.success) {
-      setResource((prev: any) =>
+      setResource((prev) =>
         prev
           ? {
               ...prev,
@@ -294,7 +299,7 @@ export default function ResourceDetailPage() {
                     {resource.author && (
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-foreground">
-                          {t("detail.by", { name: resource.author.name })}
+                          {t("detail.by", { name: resource.author.name ?? "" })}
                         </span>
                       </div>
                     )}

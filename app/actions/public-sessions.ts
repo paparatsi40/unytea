@@ -14,11 +14,13 @@ function safeParseStringArray(value: string | null): string[] {
   }
 }
 
-function safeParseResources(value: string | null): any[] {
+function safeParseResources(value: string | null): Record<string, unknown>[] {
   if (!value) return [];
   try {
     const parsed = JSON.parse(value);
-    return Array.isArray(parsed) ? parsed : [];
+    return Array.isArray(parsed)
+      ? parsed.filter((r): r is Record<string, unknown> => typeof r === "object" && r !== null)
+      : [];
   } catch {
     return [];
   }
@@ -219,11 +221,26 @@ export async function getPublicSession(
   }
 }
 
+/** Sesión relacionada formateada para la página pública. */
+export type RelatedSession = {
+  id: string;
+  slug: string | null;
+  title: string;
+  description: string | null;
+  scheduledAt: Date;
+  host: { id: string; name: string | null; image: string | null };
+  attendeeCount: number;
+  duration: number | null;
+};
+
+/** Formato legacy: PublicSessionData + alias `mentor` del host. */
+export type LegacyPublicSession = PublicSessionData & { mentor: PublicSessionData["host"] };
+
 export async function getRelatedSessions(
   communityId: string,
   currentSessionId: string,
   limit: number = 3
-): Promise<{ success: boolean; sessions?: any[]; error?: string }> {
+): Promise<{ success: boolean; sessions?: RelatedSession[]; error?: string }> {
   try {
     const sessions = await prisma.mentorSession.findMany({
       where: {
@@ -256,7 +273,7 @@ export async function getRelatedSessions(
       scheduledAt: s.scheduledAt,
       host: s.mentor,
       attendeeCount: s._count.participations,
-      duration: s.recording?.durationSeconds,
+      duration: s.recording?.durationSeconds ?? null,
     }));
 
     return { success: true, sessions: formatted };
@@ -267,7 +284,7 @@ export async function getRelatedSessions(
 }
 
 // Alias for compatibility with existing code
-export async function getPublicSessionBySlug(slug: string): Promise<any | null> {
+export async function getPublicSessionBySlug(slug: string): Promise<LegacyPublicSession | null> {
   const result = await getPublicSession(slug);
   if (!result.success || !result.session) return null;
 

@@ -5,6 +5,7 @@ import { z } from "zod";
 import { getCurrentUserId } from "@/lib/auth-utils";
 import { prisma } from "@/lib/prisma";
 import { sanitizeHTML } from "@/lib/sanitize";
+import { Prisma, type CommunitySectionType } from "@prisma/client";
 
 /**
  * Zod schema for updateCommunityTheme input.
@@ -167,10 +168,10 @@ export async function createCommunitySection(
   data: {
     type: string;
     title?: string;
-    content?: any;
+    content?: Prisma.InputJsonValue;
     position?: number;
     isVisible?: boolean;
-    settings?: any;
+    settings?: Prisma.InputJsonValue;
   }
 ) {
   try {
@@ -203,7 +204,7 @@ export async function createCommunitySection(
     const section = await prisma.communitySection.create({
       data: {
         communityId,
-        type: data.type as any,
+        type: data.type as CommunitySectionType,
         title: data.title,
         content: data.content,
         position: data.position ?? (maxPosition?.position ?? 0) + 1,
@@ -233,9 +234,9 @@ export async function updateCommunitySection(
   sectionId: string,
   data: {
     title?: string;
-    content?: any;
+    content?: Prisma.InputJsonValue;
     isVisible?: boolean;
-    settings?: any;
+    settings?: Prisma.InputJsonValue;
   }
 ) {
   try {
