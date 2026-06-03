@@ -7,6 +7,8 @@ import { Toaster as SonnerToaster } from "sonner";
 import { ServiceWorkerRegistrar } from "@/components/pwa/ServiceWorkerRegistrar";
 import { PWAInstallPrompt } from "@/components/pwa/PWAInstallPrompt";
 import { CookieConsent } from "@/components/gdpr/CookieConsent";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -220,6 +222,9 @@ export default async function RootLayout({
            */}
           <SonnerToaster position="top-right" richColors closeButton />
         </SessionProvider>
+        {/* Vercel RUM — only ship data in production deployments; no-op locally. */}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
