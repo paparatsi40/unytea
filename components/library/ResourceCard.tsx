@@ -26,23 +26,25 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { ResourceType, ResourceStatus } from "@prisma/client";
 
+export interface ResourceCardData {
+  id: string;
+  title: string;
+  slug: string;
+  description: string | null;
+  type: ResourceType;
+  status: ResourceStatus;
+  thumbnailUrl: string | null;
+  duration: number | null;
+  tags: string[];
+  viewCount: number;
+  _count: { likes: number };
+  category?: { id: string; name: string; color: string | null } | null;
+  author: { id: string; name: string | null; image: string | null };
+  progress?: { progress: number; completed: boolean }[];
+}
+
 interface ResourceCardProps {
-  resource: {
-    id: string;
-    title: string;
-    slug: string;
-    description: string | null;
-    type: ResourceType;
-    status: ResourceStatus;
-    thumbnailUrl: string | null;
-    duration: number | null;
-    tags: string[];
-    viewCount: number;
-    _count: { likes: number };
-    category?: { id: string; name: string; color: string | null } | null;
-    author: { id: string; name: string | null; image: string | null };
-    progress?: { progress: number; completed: boolean }[];
-  };
+  resource: ResourceCardData;
   communitySlug: string;
   onLike?: () => void;
   onDelete?: () => void;

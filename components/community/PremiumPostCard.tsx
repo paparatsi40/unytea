@@ -337,7 +337,7 @@ export function PremiumPostCard({
 
           {Array.isArray(post.attachments) && post.attachments.length > 0 && (
             <div className="mb-4 grid gap-2 sm:grid-cols-2">
-              {post.attachments.map((attachment: any, index: number) => {
+              {post.attachments.map((attachment, index) => {
                 const isImage =
                   attachment?.type === "image" ||
                   /\.(png|jpe?g|gif|webp|svg)$/i.test(attachment?.url || "");
@@ -352,8 +352,8 @@ export function PremiumPostCard({
                     {isImage ? (
                       <div className="relative h-36 w-full">
                         <Image
-                          src={attachment?.url}
-                          alt={attachment?.name || t("attachment")}
+                          src={attachment.url}
+                          alt={attachment.name || t("attachment")}
                           fill
                           sizes="(min-width: 640px) 50vw, 100vw"
                           className="object-cover"

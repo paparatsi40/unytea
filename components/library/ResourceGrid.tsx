@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { ResourceCard } from "./ResourceCard";
+import { ResourceCard, type ResourceCardData } from "./ResourceCard";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
@@ -29,7 +29,7 @@ import { cn } from "@/lib/utils";
 import { ResourceType } from "@prisma/client";
 
 interface ResourceGridProps {
-  resources: any[];
+  resources: ResourceCardData[];
   communitySlug: string;
   isLoading?: boolean;
   hasMore?: boolean;

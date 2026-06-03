@@ -226,7 +226,7 @@ export default function NewCommunityPage() {
         window.location.href = redirectUrl;
       } else {
         console.error("Failed to create community:", result.error);
-        if ((result as any).code === "PLAN_LIMIT_COMMUNITIES") {
+        if ("code" in result && result.code === "PLAN_LIMIT_COMMUNITIES") {
           toast.error(result.error ?? t("toasts.createFailed"), {
             duration: 6000,
             action: {

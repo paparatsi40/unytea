@@ -1149,7 +1149,7 @@ function MonetizationItem({
   title,
   description,
 }: {
-  icon: any;
+  icon: React.ComponentType<{ className?: string }>;
   title: string;
   description: string;
 }) {

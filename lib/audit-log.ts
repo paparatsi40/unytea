@@ -26,7 +26,7 @@ export interface AuditLogData {
   resourceType?: string;
   resourceId?: string;
   communityId?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   ipAddress?: string;
   userAgent?: string;
 }
@@ -93,12 +93,12 @@ export async function getCommunityAuditLogs(
  * Helper functions for common audit log scenarios
  */
 export const AuditLog = {
-  userLogin: (userId: string, metadata?: Record<string, any>) =>
+  userLogin: (userId: string, metadata?: Record<string, unknown>) =>
     createAuditLog({ action: "USER_LOGIN", userId, metadata }),
 
   userLogout: (userId: string) => createAuditLog({ action: "USER_LOGOUT", userId }),
 
-  userRegister: (userId: string, metadata?: Record<string, any>) =>
+  userRegister: (userId: string, metadata?: Record<string, unknown>) =>
     createAuditLog({ action: "USER_REGISTER", userId, metadata }),
 
   userUpdate: (userId: string, changes: string[]) =>

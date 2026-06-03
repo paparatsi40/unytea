@@ -42,7 +42,7 @@ interface KnowledgeStats {
 interface CourseSuggestion {
   title: string;
   sessionCount: number;
-  sessions: any[];
+  sessions: ConvertibleSession[];
   totalDuration: number;
   totalAttendees: number;
   potentialStudents: number;
