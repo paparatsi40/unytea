@@ -14,7 +14,12 @@
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
+import {
+  Prisma,
+  type MemberRole,
+  type ResourceCategory,
+  type ResourceProgress,
+} from "@prisma/client";
 import {
   resourceCategorySchema,
   createResourceSchema,
@@ -39,6 +44,72 @@ type ActionResult<T> =
   | { success: false; error: string; code?: string };
 
 // ============================================
+// Tipos de payload de Prisma (compartidos)
+// ============================================
+
+/** Comunidad con sus miembros (filtrados por el `where` de la query). */
+type CommunityWithMembers = Prisma.CommunityGetPayload<{ include: { members: true } }>;
+
+/** Acceso de un miembro: rol real (member row) o sintético (OWNER). */
+type MemberAccess = { role: MemberRole; userId: string; status: string };
+
+/** Recurso con su comunidad+miembros (para checks de permiso). */
+type ResourceWithCommunity = Prisma.ResourceGetPayload<{
+  include: { community: { include: { members: true } } };
+}>;
+
+/** Recurso de listado: category + author + progress + _count.likes. */
+type ResourceListItem = Prisma.ResourceGetPayload<{
+  include: {
+    category: true;
+    author: { select: { id: true; name: true; image: true } };
+    progress: true;
+    _count: { select: { likes: true } };
+  };
+}>;
+
+/** Recurso de detalle: como el listado + `likes` del usuario. */
+type ResourceDetail = Prisma.ResourceGetPayload<{
+  include: {
+    category: true;
+    author: { select: { id: true; name: true; image: true } };
+    progress: true;
+    likes: { select: { id: true } };
+    _count: { select: { likes: true } };
+  };
+}>;
+
+/** Recurso de detalle + flags de permiso computados (retorno de getResourceById). */
+export type ResourceDetailWithPermissions = ResourceDetail & {
+  canEdit: boolean;
+  canDelete: boolean;
+};
+
+/** Recurso de tarjeta: category + author + _count.likes (sin progress). */
+type ResourceCardItem = Prisma.ResourceGetPayload<{
+  include: {
+    category: true;
+    author: { select: { id: true; name: true; image: true } };
+    _count: { select: { likes: true } };
+  };
+}>;
+
+/** Recurso de tarjeta + slug de comunidad (retorno de updateResource). */
+type ResourceWithCommunityCard = Prisma.ResourceGetPayload<{
+  include: {
+    community: { select: { slug: true } };
+    category: true;
+    author: { select: { id: true; name: true; image: true } };
+    _count: { select: { likes: true } };
+  };
+}>;
+
+/** Categoría con conteo de recursos. */
+type ResourceCategoryWithCount = Prisma.ResourceCategoryGetPayload<{
+  include: { _count: { select: { resources: true } } };
+}>;
+
+// ============================================
 // Helpers de autorización
 // ============================================
 
@@ -46,7 +117,7 @@ async function checkCommunityAccess(
   communitySlug: string,
   userId: string,
   requiredRoles: ("OWNER" | "ADMIN" | "MODERATOR" | "MENTOR" | "MEMBER")[] = ["MEMBER"]
-): Promise<{ community: any; member: any } | null> {
+): Promise<{ community: CommunityWithMembers; member: MemberAccess } | null> {
   console.log("[checkCommunityAccess] Looking for community:", communitySlug, "user:", userId);
 
   const community = await prisma.community.findUnique({
@@ -114,7 +185,7 @@ async function checkCommunityAccess(
 async function checkResourcePermission(
   resourceId: string,
   userId: string
-): Promise<{ resource: any; canEdit: boolean } | null> {
+): Promise<{ resource: ResourceWithCommunity; canEdit: boolean } | null> {
   const resource = await prisma.resource.findUnique({
     where: { id: resourceId },
     include: {
@@ -152,7 +223,7 @@ async function checkResourcePermission(
 export async function createResourceCategory(
   communitySlug: string,
   data: ResourceCategoryInput
-): Promise<ActionResult<any>> {
+): Promise<ActionResult<ResourceCategory>> {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -213,7 +284,9 @@ export async function createResourceCategory(
 /**
  * Obtener todas las categorías de una comunidad
  */
-export async function getResourceCategories(communitySlug: string): Promise<ActionResult<any[]>> {
+export async function getResourceCategories(
+  communitySlug: string
+): Promise<ActionResult<ResourceCategoryWithCount[]>> {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -253,7 +326,7 @@ export async function getResourceCategories(communitySlug: string): Promise<Acti
 export async function createResource(
   communitySlug: string,
   data: CreateResourceInput
-): Promise<ActionResult<any>> {
+): Promise<ActionResult<ResourceCardItem>> {
   try {
     console.log("[createResource] Received data:", JSON.stringify(data, null, 2));
 
@@ -424,7 +497,7 @@ export async function createResource(
 export async function updateResource(
   resourceId: string,
   data: UpdateResourceInput
-): Promise<ActionResult<any>> {
+): Promise<ActionResult<ResourceWithCommunityCard>> {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -533,7 +606,7 @@ export async function deleteResource(resourceId: string): Promise<ActionResult<v
  */
 export async function getResources(
   filters: ResourceFilterInput
-): Promise<ActionResult<{ resources: any[]; total: number; hasMore: boolean }>> {
+): Promise<ActionResult<{ resources: ResourceListItem[]; total: number; hasMore: boolean }>> {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -650,7 +723,7 @@ export async function getResources(
 export async function getResourceById(
   resourceId: string,
   communitySlug: string
-): Promise<ActionResult<any>> {
+): Promise<ActionResult<ResourceDetailWithPermissions>> {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -702,6 +775,13 @@ export async function getResourceById(
       return { success: false, error: "Sin acceso a este recurso", code: "FORBIDDEN" };
     }
 
+    // Flags de permiso para la UI de detalle (editar/borrar). Mismo criterio que
+    // checkResourcePermission (isOwner||isAuthor||isAdmin); reutilizamos isAdmin/isAuthor
+    // ya computados para no disparar una segunda query redundante. Sin estos flags el
+    // dropdown editar/borrar nunca renderizaba (canEdit/canDelete eran undefined).
+    const canEdit = isAdmin || isAuthor;
+    const canDelete = canEdit;
+
     // Incrementar view count (en background, no bloquear)
     prisma.resource
       .update({
@@ -710,7 +790,7 @@ export async function getResourceById(
       })
       .catch(console.error);
 
-    return { success: true, data: resource };
+    return { success: true, data: { ...resource, canEdit, canDelete } };
   } catch (error) {
     console.error("[getResourceById] Error:", error);
     return { success: false, error: "Error al obtener recurso", code: "INTERNAL" };
@@ -726,7 +806,7 @@ export async function getResourceById(
  */
 export async function updateResourceProgress(
   data: ResourceProgressInput
-): Promise<ActionResult<any>> {
+): Promise<ActionResult<ResourceProgress>> {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -867,7 +947,7 @@ export async function toggleResourceLike(
 export async function getPopularResources(
   communitySlug: string,
   limit: number = 5
-): Promise<ActionResult<any[]>> {
+): Promise<ActionResult<ResourceCardItem[]>> {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -915,7 +995,7 @@ export async function getPopularResources(
 export async function getContinueWatching(
   communitySlug: string,
   limit: number = 5
-): Promise<ActionResult<any[]>> {
+): Promise<ActionResult<ResourceListItem[]>> {
   try {
     const session = await auth();
     if (!session?.user?.id) {

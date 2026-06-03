@@ -30,7 +30,12 @@ import {
 } from "@/app/actions/resources";
 import { FileUpload } from "@/components/upload/FileUpload";
 import { toast } from "sonner";
-import type { ResourceType } from "@prisma/client";
+import type { ResourceType, ResourceCategory } from "@prisma/client";
+import type { ResourceCardData } from "@/components/library/ResourceCard";
+
+// El listado de recursos puede arrastrar `likes` del usuario (optimistic-UI
+// en handleLike) además de los campos que consume ResourceCard.
+type LibraryResource = ResourceCardData & { likes?: { id: string }[] };
 
 export default function LibraryPage() {
   const params = useParams();
@@ -38,10 +43,10 @@ export default function LibraryPage() {
   const t = useTranslations("library");
 
   // State - MUST declare all hooks before any early returns
-  const [resources, setResources] = useState<any[]>([]);
-  const [categories, setCategories] = useState<any[]>([]);
-  const [popularResources, setPopularResources] = useState<any[]>([]);
-  const [continueWatching, setContinueWatching] = useState<any[]>([]);
+  const [resources, setResources] = useState<LibraryResource[]>([]);
+  const [categories, setCategories] = useState<ResourceCategory[]>([]);
+  const [popularResources, setPopularResources] = useState<LibraryResource[]>([]);
+  const [continueWatching, setContinueWatching] = useState<LibraryResource[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("all");
