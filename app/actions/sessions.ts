@@ -7,6 +7,21 @@ import { Prisma } from "@prisma/client";
 import { nanoid } from "nanoid";
 import { startSessionAutopilot } from "./autopilot";
 
+/** Sesión con el mentor incluido (shape de las acciones de creación). */
+type SessionWithMentor = Prisma.MentorSessionGetPayload<{
+  include: { mentor: { select: { id: true; name: true; image: true; username: true } } };
+}>;
+
+/** Sesión de detalle: mentor + mentee + community + notes (retorno de getSession). */
+export type SessionDetail = Prisma.MentorSessionGetPayload<{
+  include: {
+    mentor: { select: { id: true; name: true; image: true; username: true } };
+    mentee: { select: { id: true; name: true; image: true; username: true } };
+    community: { select: { id: true; name: true; slug: true } };
+    notes: true;
+  };
+}>;
+
 /**
  * Create a new video session
  */
@@ -32,7 +47,7 @@ export async function createSession(data: {
     const roomId = `session-${nanoid(12)}`;
 
     // Create the session - handle case where communityId field doesn't exist in DB yet
-    const sessionData: any = {
+    const sessionData: Prisma.MentorSessionUncheckedCreateInput = {
       title: data.title,
       description: data.description,
       scheduledAt: data.scheduledAt,
@@ -234,6 +249,16 @@ export async function getSession(sessionId: string) {
             username: true,
           },
         },
+        // Incluidos para el detail page (notes tab, nombre de comunidad,
+        // redirect de reutilización). Antes faltaban → 3 features degradadas.
+        community: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+          },
+        },
+        notes: true,
       },
     });
 
@@ -246,11 +271,11 @@ export async function getSession(sessionId: string) {
     let isAuthorized = session.mentorId === userId || session.menteeId === userId;
 
     // Also allow community members to access community sessions
-    if (!isAuthorized && (session as any).communityId) {
+    if (!isAuthorized && session.communityId) {
       const membership = await prisma.member.findFirst({
         where: {
           userId,
-          communityId: (session as any).communityId,
+          communityId: session.communityId,
           status: "ACTIVE",
         },
       });
@@ -619,7 +644,7 @@ async function createSingleSession(
 ) {
   const roomId = `session-${nanoid(12)}`;
 
-  const sessionData: any = {
+  const sessionData: Prisma.MentorSessionUncheckedCreateInput = {
     title: data.title,
     description: data.description,
     scheduledAt: data.scheduledAt,
@@ -1106,12 +1131,15 @@ export async function getSessionSeries(seriesId: string) {
 /**
  * RSVP status helper
  */
-function getRsvpStatusFromEventsData(eventsData: any): "attending" | "interested" | null {
-  if (!eventsData || typeof eventsData !== "object") return null;
-  if (eventsData.rsvpStatus === "attending" || eventsData.rsvpStatus === "interested") {
-    return eventsData.rsvpStatus;
+function getRsvpStatusFromEventsData(
+  eventsData: Prisma.JsonValue | undefined
+): "attending" | "interested" | null {
+  if (!eventsData || typeof eventsData !== "object" || Array.isArray(eventsData)) return null;
+  const data = eventsData as Record<string, unknown>;
+  if (data.rsvpStatus === "attending" || data.rsvpStatus === "interested") {
+    return data.rsvpStatus;
   }
-  if (eventsData.rsvp === true) return "attending";
+  if (data.rsvp === true) return "attending";
   return null;
 }
 
@@ -1373,7 +1401,7 @@ function formatTime(date: Date): string {
 }
 
 async function createSessionFeedPost(
-  session: any,
+  session: SessionWithMentor,
   data: { title: string; description?: string; communityId?: string }
 ) {
   try {
