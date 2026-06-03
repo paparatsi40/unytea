@@ -1,8 +1,78 @@
 "use server";
 
+import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/auth-utils";
 import { PostContentType, Prisma } from "@prisma/client";
+
+/**
+ * Cached base fetch for a public session — pure DB read, NO auth and NO recording
+ * URL gating (that stays per-request in getPublicSession). Tag-invalidated via
+ * `session:${slug}` on mutations that change rendered fields; 1h fallback revalidate.
+ */
+const getCachedSessionData = (slug: string) =>
+  unstable_cache(
+    () =>
+      prisma.mentorSession.findUnique({
+        where: { slug },
+        include: {
+          mentor: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+          community: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              description: true,
+              imageUrl: true,
+              _count: {
+                select: { members: true },
+              },
+            },
+          },
+          recording: {
+            where: { status: "READY" },
+            select: {
+              id: true,
+              url: true,
+              status: true,
+              durationSeconds: true,
+            },
+          },
+          notes: {
+            select: {
+              id: true,
+              content: true,
+              summary: true,
+              keyInsights: true,
+              resources: true,
+              createdAt: true,
+            },
+          },
+          _count: {
+            select: { participations: true },
+          },
+        },
+      }),
+    ["public-session", slug],
+    {
+      // Tags are forward-ready for on-demand invalidation. Next 16's cache API is
+      // in transition (revalidateTag now requires a profile arg; updateTag is
+      // limited to server actions, so the egress webhook route handler can't use
+      // it). When the API stabilizes — or a dedicated cache-invalidation PR lands —
+      // add invalidation in the mutations that change rendered session data:
+      // markRecordingReady + the egress webhook (recording → READY),
+      // updateSessionNotes, and editSession. Until then, time-based revalidation
+      // (1h) gives acceptable staleness for immutable COMPLETED replays.
+      tags: [`session:${slug}`],
+      revalidate: 3600,
+    }
+  )();
 
 function safeParseStringArray(value: string | null): string[] {
   if (!value) return [];
@@ -91,52 +161,9 @@ export async function getPublicSession(
   slug: string
 ): Promise<{ success: boolean; session?: PublicSessionData; error?: string }> {
   try {
-    const session = await prisma.mentorSession.findUnique({
-      where: { slug },
-      include: {
-        mentor: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
-          },
-        },
-        community: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-            description: true,
-            imageUrl: true,
-            _count: {
-              select: { members: true },
-            },
-          },
-        },
-        recording: {
-          where: { status: "READY" },
-          select: {
-            id: true,
-            url: true,
-            status: true,
-            durationSeconds: true,
-          },
-        },
-        notes: {
-          select: {
-            id: true,
-            content: true,
-            summary: true,
-            keyInsights: true,
-            resources: true,
-            createdAt: true,
-          },
-        },
-        _count: {
-          select: { participations: true },
-        },
-      },
-    });
+    // Heavy DB read is cached (tag `session:${slug}`); the auth-dependent
+    // recording.url gate below stays per-request.
+    const session = await getCachedSessionData(slug);
 
     if (!session) {
       return { success: false, error: "Session not found" };

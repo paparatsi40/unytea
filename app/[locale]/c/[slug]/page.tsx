@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { unstable_cache } from "next/cache";
 import { subDays } from "date-fns";
 import { prisma } from "@/lib/prisma";
 import { SectionInstance } from "@/components/section-builder/types";
@@ -24,29 +25,42 @@ import { ArrowLeft } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { PaywallLockedView } from "@/components/community/PaywallLockedView";
 
-async function getCommunity(slug: string) {
-  const community = await prisma.community.findUnique({
-    where: { slug },
-    include: {
-      owner: {
-        select: {
-          id: true,
-          name: true,
-          image: true,
+// Cached base fetch — pure DB read. The auth-dependent paywall gate (isOwner)
+// stays per-request in the page below, so the page remains dynamic.
+const getCommunity = (slug: string) =>
+  unstable_cache(
+    () =>
+      prisma.community.findUnique({
+        where: { slug },
+        include: {
+          owner: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+          _count: {
+            select: {
+              members: true,
+              posts: true,
+              courses: true,
+            },
+          },
         },
-      },
-      _count: {
-        select: {
-          members: true,
-          posts: true,
-          courses: true,
-        },
-      },
-    },
-  });
-
-  return community;
-}
+      }),
+    ["public-community", slug],
+    {
+      // Tags forward-ready for on-demand invalidation. Next 16's cache API is in
+      // transition (see public-sessions.ts for the full explanation). Mutations to
+      // wire when it stabilizes: updateCommunity, updateCommunityLayout, and the
+      // community-builder section mutations (create/update/deleteCommunitySection).
+      // Until then, time-based revalidation (5min — shorter than session replays
+      // since hosts edit landings).
+      tags: [`community:${slug}`],
+      revalidate: 300,
+    }
+  )();
 
 // TODO(shared-helper): duplicated from lib/explore-query.ts (both private
 // there). Extract computeInitials + classifyActivity into a shared module
