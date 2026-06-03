@@ -4,8 +4,19 @@ import { BookOpen, Users, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
+interface CourseCardData {
+  id: string;
+  title: string;
+  description?: string | null;
+  imageUrl?: string | null;
+  isPaid?: boolean;
+  price?: number | null;
+  enrollmentCount: number;
+  _count?: { modules: number };
+}
+
 interface CourseCardProps {
-  course: any;
+  course: CourseCardData;
   progress?: number;
   completed?: boolean;
 }
@@ -46,10 +57,10 @@ export function CourseCard({ course, progress = 0, completed = false }: CourseCa
 
         {/* Stats */}
         <div className="mb-4 flex items-center gap-4 text-sm text-muted-foreground">
-          {course._count?.modules > 0 && (
+          {(course._count?.modules ?? 0) > 0 && (
             <div className="flex items-center gap-1">
               <BookOpen className="h-4 w-4" />
-              <span>{course._count.modules} modules</span>
+              <span>{course._count?.modules} modules</span>
             </div>
           )}
           {course.enrollmentCount > 0 && (

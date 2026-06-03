@@ -140,7 +140,7 @@ export async function updateCommunity(
     description?: string;
     imageUrl?: string;
     coverImageUrl?: string;
-    theme?: any;
+    theme?: Prisma.InputJsonValue;
     customDomain?: string;
     subdomain?: string;
     isPrivate?: boolean;
