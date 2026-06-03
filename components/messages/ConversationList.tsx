@@ -8,9 +8,32 @@ import { formatDistanceToNow } from "date-fns";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useToast } from "@/hooks/use-toast";
 
+export interface ConversationUser {
+  id: string;
+  name: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  username: string | null;
+  image: string | null;
+}
+
+interface ConversationMessagePreview {
+  createdAt: Date | string;
+  content: string | null;
+  sender: { id: string };
+}
+
+export interface Conversation {
+  id: string;
+  participant1: ConversationUser;
+  participant2: ConversationUser;
+  messages?: ConversationMessagePreview[];
+  _count?: { messages: number };
+}
+
 interface ConversationListProps {
   activeConversationId?: string;
-  onSelectConversation: (conversationId: string, otherUser: any) => void;
+  onSelectConversation: (conversationId: string, otherUser: ConversationUser) => void;
   onUnreadTotalChange?: (count: number) => void;
   refreshToken?: number;
 }
@@ -22,8 +45,8 @@ export function ConversationList({
   refreshToken,
 }: ConversationListProps) {
   const { user } = useCurrentUser();
-  const [conversations, setConversations] = useState<any[]>([]);
-  const [filteredConversations, setFilteredConversations] = useState<any[]>([]);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [filteredConversations, setFilteredConversations] = useState<Conversation[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState<"all" | "unread">("all");
   const [isLoading, setIsLoading] = useState(true);
@@ -31,17 +54,17 @@ export function ConversationList({
   const isFirstLoadRef = useRef(true);
   const { toast } = useToast();
 
-  const getOtherUser = (conversation: any) => {
+  const getOtherUser = (conversation: Conversation): ConversationUser => {
     return conversation.participant1.id === user?.id
       ? conversation.participant2
       : conversation.participant1;
   };
 
-  const getLastMessage = (conversation: any) => {
+  const getLastMessage = (conversation: Conversation) => {
     return conversation.messages?.[0];
   };
 
-  const getUnreadCount = (conversation: any) => {
+  const getUnreadCount = (conversation: Conversation) => {
     return conversation._count?.messages || 0;
   };
 
@@ -49,25 +72,25 @@ export function ConversationList({
     const result = await getUserConversations();
 
     if (result.success && result.conversations) {
-      setConversations(result.conversations);
-      setFilteredConversations(result.conversations);
+      // Prisma rows carry richer/looser field types than the view needs; the
+      // component reads a known subset.
+      const convs = result.conversations as unknown as Conversation[];
+      setConversations(convs);
+      setFilteredConversations(convs);
 
-      const unreadTotal = result.conversations.reduce(
-        (sum: number, conv: any) => sum + (conv._count?.messages || 0),
-        0
-      );
+      const unreadTotal = convs.reduce((sum, conv) => sum + (conv._count?.messages || 0), 0);
       onUnreadTotalChange?.(unreadTotal);
 
-      const nextUnreadByConversation = result.conversations.reduce(
-        (acc: Record<string, number>, conv: any) => {
+      const nextUnreadByConversation = convs.reduce(
+        (acc: Record<string, number>, conv) => {
           acc[conv.id] = conv._count?.messages || 0;
           return acc;
         },
-        {}
+        {} as Record<string, number>
       );
 
       if (!isFirstLoadRef.current) {
-        result.conversations.forEach((conv: any) => {
+        convs.forEach((conv) => {
           if (conv.id === activeConversationId) return;
 
           const previousUnread = previousUnreadByConversationRef.current[conv.id] || 0;
