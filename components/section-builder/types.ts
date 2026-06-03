@@ -33,15 +33,18 @@ export interface SectionSchema {
   description: string;
   icon: string; // emoji
   fields: FieldDef[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Polymorphic section payload: each SectionType variant has a distinct prop shape and the builder is generic over SectionType[]. Per-section validation happens via the FieldDef[] schema above; a discriminated union here would duplicate every section's schema and break the dynamic builder UX.
   defaultProps: Record<string, any>;
   // Render may be an async Server Component (e.g. data-driven sections like
   // UpcomingSessions that fetch from Prisma), hence the Promise union.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Render fns receive props as Record<string, any> from the builder runtime; each section validates its own shape via the FieldDef[] schema above. Builder is generic over all SectionTypes.
   Render: (props: Record<string, any>) => JSX.Element | Promise<JSX.Element>;
 }
 
 export interface SectionInstance {
   id: string;
   type: SectionType;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Polymorphic section payload: props shape depends on the SectionType variant and is validated per-section via FieldDef[] (see SectionSchema above). A union would duplicate every section's schema.
   props: Record<string, any>;
 }
 
