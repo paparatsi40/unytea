@@ -3,8 +3,12 @@
 import { useState, useEffect } from "react";
 import { Search, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { MemberCard } from "./MemberCard";
+import { MemberCard, type Member } from "./MemberCard";
 import { getCommunityMembers } from "@/app/actions/members";
+
+type DirectoryMember = Member & {
+  user: Member["user"] & { availabilityStatus?: string | null };
+};
 
 type Props = {
   communityId: string;
@@ -12,8 +16,8 @@ type Props = {
 
 export function MemberDirectory({ communityId }: Props) {
   const t = useTranslations("dashboard.communityAdmin.settings.memberDirectory");
-  const [members, setMembers] = useState<any[]>([]);
-  const [filteredMembers, setFilteredMembers] = useState<any[]>([]);
+  const [members, setMembers] = useState<DirectoryMember[]>([]);
+  const [filteredMembers, setFilteredMembers] = useState<DirectoryMember[]>([]);
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<"recent" | "name">("recent");
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
@@ -31,7 +35,8 @@ export function MemberDirectory({ communityId }: Props) {
     setIsLoading(true);
     const result = await getCommunityMembers(communityId, { sortBy });
     if (result.success) {
-      setMembers(result.members);
+      // Server rows carry richer relations than the directory view reads.
+      setMembers(result.members as unknown as DirectoryMember[]);
     }
     setIsLoading(false);
   };

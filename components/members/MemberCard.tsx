@@ -5,7 +5,7 @@ import Link from "next/link";
 import { MessageCircle, Video, MapPin, Sparkles } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-type Member = {
+export type Member = {
   id: string;
   communityId?: string;
   user: {

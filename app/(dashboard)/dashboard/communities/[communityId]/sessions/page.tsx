@@ -22,10 +22,35 @@ interface CommunitySessionsPageProps {
   searchParams: Promise<{ filter?: string; pastFilter?: string; window?: string }>;
 }
 
+interface AttendanceMetrics {
+  rsvpToJoinRate: number;
+  avgAttendance: number;
+  completedSessions: number;
+  replayRate: number;
+  trend?: { avgAttendanceDelta?: number; rsvpToJoinRateDelta?: number };
+}
+
+// The shape selected from prisma.mentorSession.findMany below.
+interface SessionRow {
+  id: string;
+  title: string;
+  description: string | null;
+  scheduledAt: Date;
+  duration: number | null;
+  status: string;
+  visibility: string | null;
+  slug: string | null;
+  recordingUrl: string | null;
+  mentorId: string;
+  mentor: { id: string; name: string | null; image: string | null; username: string | null } | null;
+  participations: { id: string }[];
+  _count: { participations: number };
+}
+
 // Returns a translation key + tone (resolved client-side). English text lives
 // in dashboard.communityAdmin.sessions.recommendation.* — not generated here.
 function getAttendanceRecommendation(
-  attendance: any
+  attendance: AttendanceMetrics | null | undefined
 ): { key: string; tone: "warning" | "positive" } | null {
   if (!attendance) return null;
   if (attendance.rsvpToJoinRate < 50) return { key: "lowRsvp", tone: "warning" };
@@ -41,7 +66,7 @@ function getAttendanceRecommendation(
   return null;
 }
 
-const toSummary = (s: any): SessionSummary => ({
+const toSummary = (s: SessionRow): SessionSummary => ({
   id: s.id,
   title: s.title,
   scheduledAt: new Date(s.scheduledAt).toISOString(),
@@ -86,7 +111,7 @@ export default async function CommunitySessionsPage({
     const isOwner = community.ownerId === session.user.id;
     const canCreateSessions = isOwner;
 
-    let allSessions: any[] = [];
+    let allSessions: SessionRow[] = [];
     try {
       allSessions = await prisma.mentorSession.findMany({
         where: { communityId: community.id },

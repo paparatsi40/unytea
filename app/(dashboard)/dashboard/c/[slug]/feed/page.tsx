@@ -148,7 +148,7 @@ export default async function CommunityFeedPage({ params }: { params: Promise<{ 
       <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 px-4 py-6 lg:grid-cols-12">
         <div className="lg:col-span-8">
           <PremiumPostFeed
-            posts={posts as any}
+            posts={posts as unknown as React.ComponentProps<typeof PremiumPostFeed>["posts"]}
             communityId={community.id}
             upcomingSession={mappedUpcomingSession}
             hotTopics={mappedHotTopics}
