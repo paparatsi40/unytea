@@ -374,6 +374,53 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
         </div>
       </section>
 
+      {/* 2️⃣.5 HOW IT WORKS — live-first workflow */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <div className="mb-16 text-center">
+            <Badge className="mb-4">Workflow</Badge>
+            <h2 className="mb-4 text-4xl font-bold">How Unytea works</h2>
+            <p className="mx-auto max-w-2xl text-xl text-muted-foreground">
+              Live sessions are just the start. Every session compounds into community growth.
+            </p>
+          </div>
+          <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-3 lg:grid-cols-6">
+            {[
+              { icon: Radio, title: "Session", description: "Host live with your community" },
+              { icon: Video, title: "Recording", description: "Auto-captured, ready to share" },
+              {
+                icon: Sparkles,
+                title: "AI Summary",
+                description: "Key moments extracted automatically",
+              },
+              {
+                icon: MessageSquare,
+                title: "Discussion",
+                description: "Threads continue post-session",
+              },
+              { icon: BookOpen, title: "Library", description: "Searchable knowledge that grows" },
+              {
+                icon: TrendingUp,
+                title: "Growth",
+                description: "Engagement compounds into retention",
+              },
+            ].map((step, i) => {
+              const Icon = step.icon;
+              return (
+                <div key={step.title} className="flex flex-col items-center text-center">
+                  <div className="relative mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary to-purple-600 text-lg font-bold text-white shadow-lg">
+                    {i + 1}
+                  </div>
+                  <Icon className="mb-2 h-8 w-8 text-primary" />
+                  <h3 className="mb-2 font-semibold">{step.title}</h3>
+                  <p className="text-sm text-muted-foreground">{step.description}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
       {/* 3️⃣ TU SOLUCIÓN - FEATURES */}
       <section id="features" className="py-20">
         <div className="container mx-auto px-4">
@@ -508,53 +555,6 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
                 "Direct access",
               ]}
             />
-          </div>
-        </div>
-      </section>
-
-      {/* 5️⃣ HOW IT WORKS — live-first workflow */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="mb-16 text-center">
-            <Badge className="mb-4">Workflow</Badge>
-            <h2 className="mb-4 text-4xl font-bold">How Unytea works</h2>
-            <p className="mx-auto max-w-2xl text-xl text-muted-foreground">
-              Live sessions are just the start. Every session compounds into community growth.
-            </p>
-          </div>
-          <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-3 lg:grid-cols-6">
-            {[
-              { icon: Radio, title: "Session", description: "Host live with your community" },
-              { icon: Video, title: "Recording", description: "Auto-captured, ready to share" },
-              {
-                icon: Sparkles,
-                title: "AI Summary",
-                description: "Key moments extracted automatically",
-              },
-              {
-                icon: MessageSquare,
-                title: "Discussion",
-                description: "Threads continue post-session",
-              },
-              { icon: BookOpen, title: "Library", description: "Searchable knowledge that grows" },
-              {
-                icon: TrendingUp,
-                title: "Growth",
-                description: "Engagement compounds into retention",
-              },
-            ].map((step, i) => {
-              const Icon = step.icon;
-              return (
-                <div key={step.title} className="flex flex-col items-center text-center">
-                  <div className="relative mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary to-purple-600 text-lg font-bold text-white shadow-lg">
-                    {i + 1}
-                  </div>
-                  <Icon className="mb-2 h-8 w-8 text-primary" />
-                  <h3 className="mb-2 font-semibold">{step.title}</h3>
-                  <p className="text-sm text-muted-foreground">{step.description}</p>
-                </div>
-              );
-            })}
           </div>
         </div>
       </section>
