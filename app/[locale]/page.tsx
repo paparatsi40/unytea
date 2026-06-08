@@ -916,7 +916,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
             href={`/${locale}/auth/signup`}
             className="inline-flex items-center gap-2 rounded-xl bg-white px-8 py-4 text-lg font-bold text-primary transition-colors hover:bg-white/90"
           >
-            Create Your Community Free
+            Go Live With Your Community
             <ArrowRight className="h-5 w-5" />
           </Link>
           <p className="mt-6 text-sm opacity-80">
