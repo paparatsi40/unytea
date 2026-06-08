@@ -19,8 +19,9 @@ import {
   Twitter,
   Github,
   Linkedin,
+  Radio,
+  MessageSquare,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { getLatestPosts } from "./blog/posts";
 import { localizedAlternates } from "@/lib/seo/locale-metadata";
@@ -469,47 +470,49 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
         </div>
       </section>
 
-      {/* 5️⃣ HOW IT WORKS - SIMPLIFICADO */}
+      {/* 5️⃣ HOW IT WORKS — live-first workflow */}
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="mb-16 text-center">
-            <Badge className="mb-4">Simple Process</Badge>
-            <h2 className="mb-4 text-4xl font-bold">Launch your community in minutes</h2>
-            <p className="text-xl text-muted-foreground">No technical skills required</p>
+            <Badge className="mb-4">Workflow</Badge>
+            <h2 className="mb-4 text-4xl font-bold">How Unytea works</h2>
+            <p className="mx-auto max-w-2xl text-xl text-muted-foreground">
+              Live sessions are just the start. Every session compounds into community growth.
+            </p>
           </div>
-          <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-5">
-            <StepCard
-              number={1}
-              title="Create"
-              description="Set up your community with your brand, colors, and custom domain."
-            />
-            <StepCard
-              number={2}
-              title="Invite"
-              description="Share your link and invite your first members in seconds."
-            />
-            <StepCard
-              number={3}
-              title="Go Live"
-              description="Host your first live session, course, or workshop immediately."
-            />
-            <StepCard
-              number={4}
-              title="Launch Course"
-              description="Create and publish your first course with modules and lessons."
-            />
-            <StepCard
-              number={5}
-              title="Monetize"
-              description="Set up pricing, subscriptions, and start earning revenue."
-            />
-          </div>
-          <div className="mt-12 text-center">
-            <Link href={`/${locale}/auth/signup`}>
-              <Button size="lg" className="px-8">
-                Start Building Free <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
+          <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-3 lg:grid-cols-6">
+            {[
+              { icon: Radio, title: "Session", description: "Host live with your community" },
+              { icon: Video, title: "Recording", description: "Auto-captured, ready to share" },
+              {
+                icon: Sparkles,
+                title: "AI Summary",
+                description: "Key moments extracted automatically",
+              },
+              {
+                icon: MessageSquare,
+                title: "Discussion",
+                description: "Threads continue post-session",
+              },
+              { icon: BookOpen, title: "Library", description: "Searchable knowledge that grows" },
+              {
+                icon: TrendingUp,
+                title: "Growth",
+                description: "Engagement compounds into retention",
+              },
+            ].map((step, i) => {
+              const Icon = step.icon;
+              return (
+                <div key={step.title} className="flex flex-col items-center text-center">
+                  <div className="relative mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary to-purple-600 text-lg font-bold text-white shadow-lg">
+                    {i + 1}
+                  </div>
+                  <Icon className="mb-2 h-8 w-8 text-primary" />
+                  <h3 className="mb-2 font-semibold">{step.title}</h3>
+                  <p className="text-sm text-muted-foreground">{step.description}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -1055,31 +1058,6 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
           </div>
         </div>
       </footer>
-    </div>
-  );
-}
-
-function StepCard({
-  number,
-  title,
-  description,
-}: {
-  number: number;
-  title: string;
-  description: string;
-}) {
-  return (
-    <div className="group text-center">
-      <div className="relative mx-auto mb-4 h-16 w-16">
-        <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary to-purple-600 opacity-20 transition-transform group-hover:scale-110" />
-        <div className="relative flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-primary to-purple-600 text-xl font-bold text-white shadow-lg">
-          {number}
-        </div>
-      </div>
-      <h3 className="mb-2 text-lg font-semibold transition-colors group-hover:text-primary">
-        {title}
-      </h3>
-      <p className="text-sm text-muted-foreground">{description}</p>
     </div>
   );
 }
