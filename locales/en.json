@@ -149,10 +149,6 @@
         "start_trial": "Start your free trial"
       },
       "guarantee": "✓ 14-day free trial • ✓ No credit card required • ✓ Launch in minutes",
-      "socialProof": {
-        "members": "10,000+ members",
-        "rating": "4.9/5 rating"
-      },
       "demo": {
         "live": "LIVE",
         "sessionTitle": "Community Masterclass",
@@ -164,17 +160,6 @@
         "chatMessage2": "Great tips on pricing",
         "chatMessage3": "Can you share the template?"
       }
-    },
-    "stats": {
-      "communities": "Active Communities",
-      "members": "Members Engaged",
-      "revenue": "Revenue Generated",
-      "satisfaction": "Satisfaction Rate"
-    },
-    "instructor": {
-      "badge": "Creator Spotlight",
-      "verified": "Verified Creator",
-      "bio": "Sarah helps coaches build thriving communities. 50K+ students taught."
     },
     "features": {
       "title": "Everything You Need",
@@ -190,10 +175,6 @@
       "community": {
         "title": "Community Feed",
         "description": "Engage with posts, comments, reactions"
-      },
-      "ai": {
-        "title": "AI Assistant",
-        "description": "Get help with content and moderation"
       },
       "analytics": {
         "title": "Analytics",
@@ -232,20 +213,6 @@
         "description": "Engage your community, track analytics, and start generating revenue.",
         "time": "Week 2+"
       }
-    },
-    "testimonials": {
-      "badge": "Testimonials",
-      "title": "Loved by Creators",
-      "subtitle": "Worldwide",
-      "quote1": "Unytea transformed how I engage with my audience. My community grew 300% in just 3 months!",
-      "author1": "Sarah Chen",
-      "role1": "Business Coach",
-      "quote2": "The best platform I've used. The AI assistant alone saves me 10 hours every week.",
-      "author2": "Marcus Johnson",
-      "role2": "Fitness Creator",
-      "quote3": "Finally, a platform that understands creators. The monetization features are incredible.",
-      "author3": "Emma Williams",
-      "role3": "Online Educator"
     },
     "trust": {
       "title": "Trusted by Industry Leaders",
@@ -294,13 +261,6 @@
       "a5": "Free plans include community support. Professional plans get priority email support with 24-hour response time. Premium plans get dedicated support with 4-hour response time and a dedicated success manager.",
       "q6": "Is my data secure?",
       "a6": "Security is our top priority. We're SOC 2 compliant, GDPR ready, and use enterprise-grade encryption. Your data is stored securely and never shared with third parties."
-    },
-    "cta": {
-      "title": "Ready to Build Your Dream Community?",
-      "subtitle": "Join 10,000+ creators who are already engaging, teaching, and growing with Unytea.",
-      "primary": "Start Free Trial",
-      "secondary": "Watch Demo",
-      "guarantee": "No credit card required • 14-day free trial • Cancel anytime"
     },
     "blogSection": {
       "eyebrow": "From the blog",
@@ -2081,7 +2041,7 @@
             "Unlimited members",
             "Video calls & streaming",
             "Course builder",
-            "AI assistant",
+            "AI Coach",
             "Analytics dashboard",
             "Priority support"
           ]

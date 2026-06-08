@@ -22,7 +22,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { getLatestPosts } from "./blog/posts";
 import { localizedAlternates } from "@/lib/seo/locale-metadata";
 import { HeaderAuthCTA } from "./_home/HeaderAuthCTA";
@@ -418,7 +417,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
             />
             <FeatureCard
               image="https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=400&q=80"
-              title="AI Assistant"
+              title="AI Coach"
               description="Get AI-powered suggestions, moderation, and content ideas."
             />
           </div>
@@ -534,7 +533,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
             <ComparisonRow feature="Live Video Sessions" skool="✓" unytea="✓" />
             <ComparisonRow feature="Collaborative Whiteboard" skool="✗" unytea="✓" highlighted />
             <ComparisonRow feature="Screen Sharing" skool="✗" unytea="✓" highlighted />
-            <ComparisonRow feature="AI Assistant" skool="✗" unytea="✓" highlighted />
+            <ComparisonRow feature="AI Coach" skool="✗" unytea="✓" highlighted />
             <ComparisonRow feature="Certificates" skool="✗" unytea="✓" highlighted />
             <ComparisonRow feature="Multi-language (i18n)" skool="✗" unytea="✓" highlighted />
             <ComparisonRow feature="Custom Domain" skool="✗" unytea="✓" highlighted />
@@ -589,7 +588,10 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
                 />
               </div>
             </div>
-            <div className="rounded-2xl bg-gradient-to-br from-purple-100 to-pink-100 p-8">
+            <div className="relative rounded-2xl bg-gradient-to-br from-purple-100 to-pink-100 p-8">
+              <span className="absolute right-4 top-4 z-10 rounded-md bg-muted px-2 py-1 text-xs font-medium text-muted-foreground shadow-sm">
+                Example
+              </span>
               <div className="rounded-xl bg-white p-6 shadow-lg">
                 <div className="mb-6 flex items-center justify-between">
                   <span className="font-medium">Monthly Revenue</span>
@@ -615,38 +617,10 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
                   </div>
                 </div>
               </div>
+              <p className="mt-4 text-center text-xs text-muted-foreground">
+                Sample dashboard preview — actual revenue varies by community.
+              </p>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 8️⃣ TESTIMONIALS */}
-      <section className="bg-muted/30 py-20">
-        <div className="container mx-auto px-4">
-          <div className="mb-16 text-center">
-            <Badge className="mb-4">Testimonials</Badge>
-            <h2 className="mb-4 text-4xl font-bold">Loved by creators</h2>
-            <p className="text-xl text-muted-foreground">See what our users say about Unytea</p>
-          </div>
-          <div className="grid gap-8 md:grid-cols-3">
-            <TestimonialCard
-              quote="Unytea helped me consolidate my coaching community, courses, and live sessions into one platform. Game changer!"
-              author="Sarah Chen"
-              role="Business Coach"
-              rating={5}
-            />
-            <TestimonialCard
-              quote="The live sessions feature is incredible. My students love the interactive whiteboard and screen sharing."
-              author="Marcus Johnson"
-              role="Course Creator"
-              rating={5}
-            />
-            <TestimonialCard
-              quote="The whiteboard, screen sharing, and AI assistant during live sessions changed how I run workshops. Nothing else offers this."
-              author="Emma Williams"
-              role="Community Founder"
-              rating={5}
-            />
           </div>
         </div>
       </section>
@@ -942,7 +916,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
             href={`/${locale}/auth/signup`}
             className="inline-flex items-center gap-2 rounded-xl bg-white px-8 py-4 text-lg font-bold text-primary transition-colors hover:bg-white/90"
           >
-            Create Your Community Free
+            Go Live With Your Community
             <ArrowRight className="h-5 w-5" />
           </Link>
           <p className="mt-6 text-sm opacity-80">
@@ -1161,38 +1135,6 @@ function MonetizationItem({
       <div>
         <h4 className="font-medium">{title}</h4>
         <p className="text-sm text-muted-foreground">{description}</p>
-      </div>
-    </div>
-  );
-}
-
-function TestimonialCard({
-  quote,
-  author,
-  role,
-  rating,
-}: {
-  quote: string;
-  author: string;
-  role: string;
-  rating: number;
-}) {
-  return (
-    <div className="rounded-xl border bg-white p-6">
-      <div className="mb-4 flex gap-1">
-        {Array.from({ length: rating }).map((_, i) => (
-          <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-        ))}
-      </div>
-      <p className="mb-4 italic text-muted-foreground">&ldquo;{quote}&rdquo;</p>
-      <div className="flex items-center gap-3">
-        <Avatar className="h-10 w-10">
-          <AvatarFallback>{author[0]}</AvatarFallback>
-        </Avatar>
-        <div>
-          <div className="font-medium">{author}</div>
-          <div className="text-sm text-muted-foreground">{role}</div>
-        </div>
       </div>
     </div>
   );

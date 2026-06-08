@@ -149,10 +149,6 @@
         "start_trial": "Commencer votre essai gratuit"
       },
       "guarantee": "✓ Essai gratuit de 14 jours • ✓ Sans carte bancaire • ✓ Lancez en quelques minutes",
-      "socialProof": {
-        "members": "10,000+ membres",
-        "rating": "4.9/5 évaluation"
-      },
       "demo": {
         "live": "EN DIRECT",
         "sessionTitle": "Masterclass Communauté",
@@ -164,17 +160,6 @@
         "chatMessage2": "Super conseils sur les prix",
         "chatMessage3": "Pouvez-vous partager le modèle ?"
       }
-    },
-    "stats": {
-      "communities": "Communautés Actives",
-      "members": "Membres Engagés",
-      "revenue": "Revenus Générés",
-      "satisfaction": "Taux de Satisfaction"
-    },
-    "instructor": {
-      "badge": "Créateur en Vedette",
-      "verified": "Créateur Vérifié",
-      "bio": "Sarah aide les coaches à construire des communautés prospères. 50K+ étudiants enseignés."
     },
     "features": {
       "title": "Tout ce dont Vous Avez Besoin",
@@ -190,10 +175,6 @@
       "community": {
         "title": "Fil Communautaire",
         "description": "Interagissez avec posts, commentaires, réactions"
-      },
-      "ai": {
-        "title": "Assistant IA",
-        "description": "Obtenez de l'aide pour le contenu et la modération"
       },
       "analytics": {
         "title": "Analytiques",
@@ -232,20 +213,6 @@
         "description": "Engagez votre communauté, suivez les analytiques et commencez à générer des revenus.",
         "time": "Semaine 2+"
       }
-    },
-    "testimonials": {
-      "badge": "Témoignages",
-      "title": "Adoré par les Créateurs",
-      "subtitle": "Dans le Monde Entier",
-      "quote1": "Unytea a transformé ma façon d'interagir avec mon audience. Ma communauté a grandi de 300% en seulement 3 mois !",
-      "author1": "Sarah Chen",
-      "role1": "Coach d'Affaires",
-      "quote2": "La meilleure plateforme que j'ai utilisée. L'assistant IA seul m'économise 10 heures chaque semaine.",
-      "author2": "Marcus Johnson",
-      "role2": "Créateur Fitness",
-      "quote3": "Enfin, une plateforme qui comprend les créateurs. Les fonctions de monétisation sont incroyables.",
-      "author3": "Emma Williams",
-      "role3": "Éducatrice en Ligne"
     },
     "trust": {
       "title": "Fait Confiance par les Leaders de l'Industrie",
@@ -294,13 +261,6 @@
       "a5": "Les plans gratuits incluent le support de la communauté. Les plans Professionnels obtiennent un support prioritaire par email avec un temps de réponse de 24 heures. Les plans Premium obtiennent un support dédié avec un temps de réponse de 4 heures et un responsable de succès dédié.",
       "q6": "Mes données sont-elles sécurisées ?",
       "a6": "La sécurité est notre priorité absolue. Nous sommes conformes SOC 2, prêts pour GDPR, et utilisons un chiffrement de niveau entreprise. Vos données sont stockées en toute sécurité et jamais partagées avec des tiers."
-    },
-    "cta": {
-      "title": "Prêt à Construire Votre Communauté de Rêve ?",
-      "subtitle": "Rejoignez 10,000+ créateurs qui interagissent, enseignent et grandissent déjà avec Unytea.",
-      "primary": "Commencer l'Essai Gratuit",
-      "secondary": "Voir la Démo",
-      "guarantee": "Aucune carte de crédit requise • Essai de 14 jours • Annulez quand vous voulez"
     },
     "blogSection": {
       "eyebrow": "Depuis le blog",
@@ -2093,7 +2053,7 @@
             "Membres illimités",
             "Visioconférences et streaming",
             "Constructeur de cours",
-            "Assistant IA",
+            "AI Coach",
             "Tableau de bord d'analyses",
             "Support prioritaire"
           ]
