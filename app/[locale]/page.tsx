@@ -588,7 +588,10 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
                 />
               </div>
             </div>
-            <div className="rounded-2xl bg-gradient-to-br from-purple-100 to-pink-100 p-8">
+            <div className="relative rounded-2xl bg-gradient-to-br from-purple-100 to-pink-100 p-8">
+              <span className="absolute right-4 top-4 z-10 rounded-md bg-muted px-2 py-1 text-xs font-medium text-muted-foreground shadow-sm">
+                Example
+              </span>
               <div className="rounded-xl bg-white p-6 shadow-lg">
                 <div className="mb-6 flex items-center justify-between">
                   <span className="font-medium">Monthly Revenue</span>
@@ -614,6 +617,9 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
                   </div>
                 </div>
               </div>
+              <p className="mt-4 text-center text-xs text-muted-foreground">
+                Sample dashboard preview — actual revenue varies by community.
+              </p>
             </div>
           </div>
         </div>
