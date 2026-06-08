@@ -529,10 +529,13 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
               <p className="mb-1 text-sm font-semibold uppercase tracking-wide text-purple-600">
                 AI Coach
               </p>
-              <h3 className="mb-3 text-2xl font-bold">Predictive guidance for community growth</h3>
+              <h3 className="mb-3 text-2xl font-bold">
+                Know what to do next. Before engagement drops.
+              </h3>
               <p className="text-muted-foreground">
-                Get alerted when attendance drops. Suggested actions before momentum dies.
-                &ldquo;Post a question 24h before next session&rdquo; — automated.
+                AI Coach watches your community&apos;s pulse. Alerts you when attendance trends
+                down. Suggests the exact action that brings them back — &ldquo;Post a question 24h
+                before your next session&rdquo; — automated.
               </p>
             </div>
             <div className="rounded-xl border bg-white p-8 shadow-sm transition-all hover:shadow-lg">
