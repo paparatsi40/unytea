@@ -19,8 +19,10 @@ import {
   Twitter,
   Github,
   Linkedin,
+  Radio,
+  MessageSquare,
+  RotateCw,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { getLatestPosts } from "./blog/posts";
 import { localizedAlternates } from "@/lib/seo/locale-metadata";
@@ -372,6 +374,53 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
         </div>
       </section>
 
+      {/* 2️⃣.5 HOW IT WORKS — live-first workflow */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <div className="mb-16 text-center">
+            <Badge className="mb-4">Workflow</Badge>
+            <h2 className="mb-4 text-4xl font-bold">How Unytea works</h2>
+            <p className="mx-auto max-w-2xl text-xl text-muted-foreground">
+              Live sessions are just the start. Every session compounds into community growth.
+            </p>
+          </div>
+          <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-3 lg:grid-cols-6">
+            {[
+              { icon: Radio, title: "Session", description: "Host live with your community" },
+              { icon: Video, title: "Recording", description: "Auto-captured, ready to share" },
+              {
+                icon: Sparkles,
+                title: "AI Summary",
+                description: "Key moments extracted automatically",
+              },
+              {
+                icon: MessageSquare,
+                title: "Discussion",
+                description: "Threads continue post-session",
+              },
+              { icon: BookOpen, title: "Library", description: "Searchable knowledge that grows" },
+              {
+                icon: TrendingUp,
+                title: "Growth",
+                description: "Engagement compounds into retention",
+              },
+            ].map((step, i) => {
+              const Icon = step.icon;
+              return (
+                <div key={step.title} className="flex flex-col items-center text-center">
+                  <div className="relative mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary to-purple-600 text-lg font-bold text-white shadow-lg">
+                    {i + 1}
+                  </div>
+                  <Icon className="mb-2 h-8 w-8 text-primary" />
+                  <h3 className="mb-2 font-semibold">{step.title}</h3>
+                  <p className="text-sm text-muted-foreground">{step.description}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
       {/* 3️⃣ TU SOLUCIÓN - FEATURES */}
       <section id="features" className="py-20">
         <div className="container mx-auto px-4">
@@ -424,6 +473,47 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
         </div>
       </section>
 
+      {/* 3️⃣.5 AI SECTION */}
+      <section className="bg-muted/30 py-20">
+        <div className="container mx-auto px-4">
+          <div className="mb-16 text-center">
+            <Badge className="mb-4">AI</Badge>
+            <h2 className="mb-4 text-4xl font-bold">AI that actually moves the needle</h2>
+            <p className="mx-auto max-w-2xl text-xl text-muted-foreground">
+              Two AI capabilities built around your sessions.
+            </p>
+          </div>
+          <div className="mx-auto grid max-w-4xl gap-8 md:grid-cols-2">
+            <div className="rounded-xl border bg-white p-8 shadow-sm transition-all hover:shadow-lg">
+              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-purple-100">
+                <Sparkles className="h-7 w-7 text-purple-600" />
+              </div>
+              <p className="mb-1 text-sm font-semibold uppercase tracking-wide text-purple-600">
+                AI Coach
+              </p>
+              <h3 className="mb-3 text-2xl font-bold">Predictive guidance for community growth</h3>
+              <p className="text-muted-foreground">
+                Get alerted when attendance drops. Suggested actions before momentum dies.
+                &ldquo;Post a question 24h before next session&rdquo; — automated.
+              </p>
+            </div>
+            <div className="rounded-xl border bg-white p-8 shadow-sm transition-all hover:shadow-lg">
+              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-purple-100">
+                <RotateCw className="h-7 w-7 text-purple-600" />
+              </div>
+              <p className="mb-1 text-sm font-semibold uppercase tracking-wide text-purple-600">
+                AI Recap
+              </p>
+              <h3 className="mb-3 text-2xl font-bold">Sessions → reusable content automatically</h3>
+              <p className="text-muted-foreground">
+                Live recording becomes summary, highlights, library entries, and discussion prompts.
+                One session powers a week of content.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* 4️⃣ CASOS DE USO */}
       <section className="bg-gradient-to-br from-purple-50 to-pink-50 py-20">
         <div className="container mx-auto px-4">
@@ -465,51 +555,6 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
                 "Direct access",
               ]}
             />
-          </div>
-        </div>
-      </section>
-
-      {/* 5️⃣ HOW IT WORKS - SIMPLIFICADO */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="mb-16 text-center">
-            <Badge className="mb-4">Simple Process</Badge>
-            <h2 className="mb-4 text-4xl font-bold">Launch your community in minutes</h2>
-            <p className="text-xl text-muted-foreground">No technical skills required</p>
-          </div>
-          <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-5">
-            <StepCard
-              number={1}
-              title="Create"
-              description="Set up your community with your brand, colors, and custom domain."
-            />
-            <StepCard
-              number={2}
-              title="Invite"
-              description="Share your link and invite your first members in seconds."
-            />
-            <StepCard
-              number={3}
-              title="Go Live"
-              description="Host your first live session, course, or workshop immediately."
-            />
-            <StepCard
-              number={4}
-              title="Launch Course"
-              description="Create and publish your first course with modules and lessons."
-            />
-            <StepCard
-              number={5}
-              title="Monetize"
-              description="Set up pricing, subscriptions, and start earning revenue."
-            />
-          </div>
-          <div className="mt-12 text-center">
-            <Link href={`/${locale}/auth/signup`}>
-              <Button size="lg" className="px-8">
-                Start Building Free <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
           </div>
         </div>
       </section>
@@ -1055,31 +1100,6 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
           </div>
         </div>
       </footer>
-    </div>
-  );
-}
-
-function StepCard({
-  number,
-  title,
-  description,
-}: {
-  number: number;
-  title: string;
-  description: string;
-}) {
-  return (
-    <div className="group text-center">
-      <div className="relative mx-auto mb-4 h-16 w-16">
-        <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary to-purple-600 opacity-20 transition-transform group-hover:scale-110" />
-        <div className="relative flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-primary to-purple-600 text-xl font-bold text-white shadow-lg">
-          {number}
-        </div>
-      </div>
-      <h3 className="mb-2 text-lg font-semibold transition-colors group-hover:text-primary">
-        {title}
-      </h3>
-      <p className="text-sm text-muted-foreground">{description}</p>
     </div>
   );
 }
