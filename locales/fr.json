@@ -139,12 +139,12 @@
     },
     "hero": {
       "badge": "Adopté par des créateurs, coaches et éducateurs du monde entier",
-      "title": "Plus d'une audience mérite une plateforme",
-      "titleStart": "Plus d'une audience",
-      "titleHighlight": "mérite une plateforme",
-      "description": "Unytea est la plateforme pour les créateurs qui gèrent plusieurs communautés. Sessions en direct, cours structurés et communauté durable — pour chaque audience que vous servez.",
+      "title": "Construisez des communautés où les gens viennent vraiment",
+      "titleStart": "Construisez des communautés où",
+      "titleHighlight": "les gens viennent vraiment",
+      "description": "Animez des sessions en direct et transformez-les en enregistrements, résumés et contenu de bibliothèque. Construisez un engagement qui se compose.",
       "cta": {
-        "primary": "Créer votre communauté gratuitement",
+        "primary": "Animez votre première session",
         "secondary": "Voir la Démo",
         "start_trial": "Commencer votre essai gratuit"
       },

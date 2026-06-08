@@ -139,12 +139,12 @@
     },
     "hero": {
       "badge": "Trusted by creators, coaches, and educators worldwide",
-      "title": "More than one audience deserves one platform",
-      "titleStart": "More than one audience",
-      "titleHighlight": "deserves one platform",
-      "description": "Unytea is the platform for creators running multiple communities. Live sessions, structured courses, and lasting community — across every audience you serve.",
+      "title": "Build communities people actually show up to",
+      "titleStart": "Build communities people",
+      "titleHighlight": "actually show up to",
+      "description": "Host live sessions, convert them into recordings, summaries, and library content. Build engagement that compounds.",
       "cta": {
-        "primary": "Create Your Community Free",
+        "primary": "Host your first session",
         "secondary": "Watch Demo",
         "start_trial": "Start your free trial"
       },
