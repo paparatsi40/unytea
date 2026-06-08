@@ -374,6 +374,44 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
         </div>
       </section>
 
+      {/* 2️⃣.4 WHY COMMUNITIES FAIL — creator-level pain */}
+      <section className="bg-muted/30 py-20">
+        <div className="container mx-auto px-4">
+          <div className="mb-16 text-center">
+            <Badge variant="destructive" className="mb-4">
+              The problem
+            </Badge>
+            <h2 className="mb-4 text-4xl font-bold">Why most communities fail</h2>
+            <p className="mx-auto max-w-2xl text-xl text-muted-foreground">
+              Joining is easy. Showing up isn&apos;t.
+            </p>
+          </div>
+          <div className="mx-auto mb-12 grid max-w-3xl gap-6 md:grid-cols-2">
+            <div className="flex items-start gap-3">
+              <X className="mt-1 h-6 w-6 flex-shrink-0 text-red-500" />
+              <p className="text-lg">Members join. Then they disappear.</p>
+            </div>
+            <div className="flex items-start gap-3">
+              <X className="mt-1 h-6 w-6 flex-shrink-0 text-red-500" />
+              <p className="text-lg">Content gets consumed once, then forgotten.</p>
+            </div>
+            <div className="flex items-start gap-3">
+              <X className="mt-1 h-6 w-6 flex-shrink-0 text-red-500" />
+              <p className="text-lg">Discussions die after the first week.</p>
+            </div>
+            <div className="flex items-start gap-3">
+              <X className="mt-1 h-6 w-6 flex-shrink-0 text-red-500" />
+              <p className="text-lg">Attendance drops every session.</p>
+            </div>
+          </div>
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-2xl font-semibold text-transparent">
+              Unytea turns every live session into a growth loop.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* 2️⃣.5 HOW IT WORKS — live-first workflow */}
       <section className="py-20">
         <div className="container mx-auto px-4">
