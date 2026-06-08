@@ -22,7 +22,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { getLatestPosts } from "./blog/posts";
 import { localizedAlternates } from "@/lib/seo/locale-metadata";
 import { HeaderAuthCTA } from "./_home/HeaderAuthCTA";
@@ -620,37 +619,6 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
         </div>
       </section>
 
-      {/* 8️⃣ TESTIMONIALS */}
-      <section className="bg-muted/30 py-20">
-        <div className="container mx-auto px-4">
-          <div className="mb-16 text-center">
-            <Badge className="mb-4">Testimonials</Badge>
-            <h2 className="mb-4 text-4xl font-bold">Loved by creators</h2>
-            <p className="text-xl text-muted-foreground">See what our users say about Unytea</p>
-          </div>
-          <div className="grid gap-8 md:grid-cols-3">
-            <TestimonialCard
-              quote="Unytea helped me consolidate my coaching community, courses, and live sessions into one platform. Game changer!"
-              author="Sarah Chen"
-              role="Business Coach"
-              rating={5}
-            />
-            <TestimonialCard
-              quote="The live sessions feature is incredible. My students love the interactive whiteboard and screen sharing."
-              author="Marcus Johnson"
-              role="Course Creator"
-              rating={5}
-            />
-            <TestimonialCard
-              quote="The whiteboard, screen sharing, and AI assistant during live sessions changed how I run workshops. Nothing else offers this."
-              author="Emma Williams"
-              role="Community Founder"
-              rating={5}
-            />
-          </div>
-        </div>
-      </section>
-
       {/* 9️⃣ PRICING */}
       <section id="pricing" className="py-20">
         <div className="container mx-auto px-4">
@@ -1161,38 +1129,6 @@ function MonetizationItem({
       <div>
         <h4 className="font-medium">{title}</h4>
         <p className="text-sm text-muted-foreground">{description}</p>
-      </div>
-    </div>
-  );
-}
-
-function TestimonialCard({
-  quote,
-  author,
-  role,
-  rating,
-}: {
-  quote: string;
-  author: string;
-  role: string;
-  rating: number;
-}) {
-  return (
-    <div className="rounded-xl border bg-white p-6">
-      <div className="mb-4 flex gap-1">
-        {Array.from({ length: rating }).map((_, i) => (
-          <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-        ))}
-      </div>
-      <p className="mb-4 italic text-muted-foreground">&ldquo;{quote}&rdquo;</p>
-      <div className="flex items-center gap-3">
-        <Avatar className="h-10 w-10">
-          <AvatarFallback>{author[0]}</AvatarFallback>
-        </Avatar>
-        <div>
-          <div className="font-medium">{author}</div>
-          <div className="text-sm text-muted-foreground">{role}</div>
-        </div>
       </div>
     </div>
   );
