@@ -417,7 +417,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
             />
             <FeatureCard
               image="https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=400&q=80"
-              title="AI Assistant"
+              title="AI Coach"
               description="Get AI-powered suggestions, moderation, and content ideas."
             />
           </div>
@@ -533,7 +533,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
             <ComparisonRow feature="Live Video Sessions" skool="✓" unytea="✓" />
             <ComparisonRow feature="Collaborative Whiteboard" skool="✗" unytea="✓" highlighted />
             <ComparisonRow feature="Screen Sharing" skool="✗" unytea="✓" highlighted />
-            <ComparisonRow feature="AI Assistant" skool="✗" unytea="✓" highlighted />
+            <ComparisonRow feature="AI Coach" skool="✗" unytea="✓" highlighted />
             <ComparisonRow feature="Certificates" skool="✗" unytea="✓" highlighted />
             <ComparisonRow feature="Multi-language (i18n)" skool="✗" unytea="✓" highlighted />
             <ComparisonRow feature="Custom Domain" skool="✗" unytea="✓" highlighted />

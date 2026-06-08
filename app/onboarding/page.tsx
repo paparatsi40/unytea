@@ -36,7 +36,7 @@ const plans = [
       "Unlimited members",
       "Video calls & streaming",
       "Course builder",
-      "AI assistant",
+      "AI Coach",
       "Analytics dashboard",
       "Priority support",
     ],
