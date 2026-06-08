@@ -21,6 +21,7 @@ import {
   Linkedin,
   Radio,
   MessageSquare,
+  RotateCw,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { getLatestPosts } from "./blog/posts";
@@ -421,6 +422,47 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
               title="AI Coach"
               description="Get AI-powered suggestions, moderation, and content ideas."
             />
+          </div>
+        </div>
+      </section>
+
+      {/* 3️⃣.5 AI SECTION */}
+      <section className="bg-muted/30 py-20">
+        <div className="container mx-auto px-4">
+          <div className="mb-16 text-center">
+            <Badge className="mb-4">AI</Badge>
+            <h2 className="mb-4 text-4xl font-bold">AI that actually moves the needle</h2>
+            <p className="mx-auto max-w-2xl text-xl text-muted-foreground">
+              Two AI capabilities built around your sessions.
+            </p>
+          </div>
+          <div className="mx-auto grid max-w-4xl gap-8 md:grid-cols-2">
+            <div className="rounded-xl border bg-white p-8 shadow-sm transition-all hover:shadow-lg">
+              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-purple-100">
+                <Sparkles className="h-7 w-7 text-purple-600" />
+              </div>
+              <p className="mb-1 text-sm font-semibold uppercase tracking-wide text-purple-600">
+                AI Coach
+              </p>
+              <h3 className="mb-3 text-2xl font-bold">Predictive guidance for community growth</h3>
+              <p className="text-muted-foreground">
+                Get alerted when attendance drops. Suggested actions before momentum dies.
+                &ldquo;Post a question 24h before next session&rdquo; — automated.
+              </p>
+            </div>
+            <div className="rounded-xl border bg-white p-8 shadow-sm transition-all hover:shadow-lg">
+              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-purple-100">
+                <RotateCw className="h-7 w-7 text-purple-600" />
+              </div>
+              <p className="mb-1 text-sm font-semibold uppercase tracking-wide text-purple-600">
+                AI Recap
+              </p>
+              <h3 className="mb-3 text-2xl font-bold">Sessions → reusable content automatically</h3>
+              <p className="text-muted-foreground">
+                Live recording becomes summary, highlights, library entries, and discussion prompts.
+                One session powers a week of content.
+              </p>
+            </div>
           </div>
         </div>
       </section>
