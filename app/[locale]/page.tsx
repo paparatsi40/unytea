@@ -825,101 +825,43 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
         </div>
       </section>
 
-      {/* WHAT YOU CAN RUN TODAY */}
-      <section className="bg-gray-50 py-16">
+      {/* RUN EVERYTHING FROM ONE PLACE — consolidated (was: What You Can Run Today + Operational Advantage) */}
+      <section className="bg-gray-50 py-20">
         <div className="container mx-auto px-4">
-          <div className="mb-10 text-center">
-            <Badge className="mb-4">Built In</Badge>
-            <h2 className="mb-4 text-3xl font-bold">
-              Run your community with features available today
-            </h2>
-            <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-              No mock promises — these workflows are already live in the product.
+          <div className="mb-16 text-center">
+            <Badge className="mb-4">All in one</Badge>
+            <h2 className="mb-4 text-4xl font-bold">Run everything from one place</h2>
+            <p className="mx-auto max-w-2xl text-xl text-muted-foreground">
+              Live sessions, courses, community, and content. No more juggling 5 tools.
             </p>
           </div>
-          <div className="mx-auto grid max-w-4xl gap-6 md:grid-cols-3">
-            <div className="rounded-xl border bg-white p-6 text-center transition-all hover:shadow-lg">
-              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-blue-100">
-                <LayoutDashboard className="h-7 w-7 text-blue-600" />
-              </div>
-              <h3 className="mb-2 text-lg font-semibold">Customize Landing Page</h3>
-              <p className="mb-4 text-sm text-muted-foreground">
-                Use Appearance + Section Presets to shape your public community page.
-              </p>
-              <div className="text-xs font-medium text-green-600">✓ Available now</div>
-            </div>
+          <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-3">
             <div className="rounded-xl border bg-white p-6 text-center transition-all hover:shadow-lg">
               <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-orange-100">
                 <Video className="h-7 w-7 text-orange-600" />
               </div>
-              <h3 className="mb-2 text-lg font-semibold">Host Live Sessions</h3>
-              <p className="mb-4 text-sm text-muted-foreground">
-                Schedule sessions, track attendance, and manage reminders from one control center.
+              <h3 className="mb-2 text-lg font-semibold">Host live sessions</h3>
+              <p className="text-sm text-muted-foreground">
+                Schedule, run, and record live sessions — track attendance from one hub.
               </p>
-              <div className="text-xs font-medium text-green-600">✓ Available now</div>
+            </div>
+            <div className="rounded-xl border bg-white p-6 text-center transition-all hover:shadow-lg">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-blue-100">
+                <LayoutDashboard className="h-7 w-7 text-blue-600" />
+              </div>
+              <h3 className="mb-2 text-lg font-semibold">Customize your space</h3>
+              <p className="text-sm text-muted-foreground">
+                Shape your public page with Appearance and Section Presets — no code required.
+              </p>
             </div>
             <div className="rounded-xl border bg-white p-6 text-center transition-all hover:shadow-lg">
               <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-purple-100">
                 <CreditCard className="h-7 w-7 text-purple-600" />
               </div>
-              <h3 className="mb-2 text-lg font-semibold">Monetize Access & Courses</h3>
-              <p className="mb-4 text-sm text-muted-foreground">
-                Set paid access, sell courses, and manage subscriptions with Stripe-powered
-                payments.
+              <h3 className="mb-2 text-lg font-semibold">Monetize and grow</h3>
+              <p className="text-sm text-muted-foreground">
+                Sell access and courses with Stripe, and use analytics to improve retention.
               </p>
-              <div className="text-xs font-medium text-green-600">✓ Available now</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* OPERATIONAL ADVANTAGE */}
-      <section className="bg-white py-16">
-        <div className="container mx-auto px-4">
-          <div className="mx-auto max-w-5xl">
-            <div className="mb-10 text-center">
-              <Badge className="mb-4 bg-purple-100 text-purple-700 hover:bg-purple-100">
-                Why operators choose Unytea
-              </Badge>
-              <h2 className="mb-4 text-3xl font-bold md:text-4xl">
-                Everything in one operating system
-              </h2>
-              <p className="text-lg text-muted-foreground">
-                Run sessions, content, community, and monetization without stitching together extra
-                tools.
-              </p>
-            </div>
-            <div className="grid gap-6 md:grid-cols-3">
-              <div className="rounded-xl border bg-gradient-to-br from-gray-50 to-gray-100 p-6">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-                  <Video className="h-6 w-6 text-blue-600" />
-                </div>
-                <h3 className="mb-2 font-semibold">Run live sessions with control</h3>
-                <p className="text-sm text-muted-foreground">
-                  Schedule upcoming sessions, track attendance, and manage reminders from one
-                  sessions hub.
-                </p>
-              </div>
-              <div className="rounded-xl border bg-gradient-to-br from-gray-50 to-gray-100 p-6">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-orange-100">
-                  <LayoutDashboard className="h-6 w-6 text-orange-600" />
-                </div>
-                <h3 className="mb-2 font-semibold">Shape your landing fast</h3>
-                <p className="text-sm text-muted-foreground">
-                  Use Appearance and Section Presets to customize your public page without custom
-                  code.
-                </p>
-              </div>
-              <div className="rounded-xl border bg-gradient-to-br from-gray-50 to-gray-100 p-6">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-                  <TrendingUp className="h-6 w-6 text-green-600" />
-                </div>
-                <h3 className="mb-2 font-semibold">Monetize and optimize</h3>
-                <p className="text-sm text-muted-foreground">
-                  Sell access and courses with Stripe while using analytics and achievements to
-                  improve retention.
-                </p>
-              </div>
             </div>
           </div>
         </div>
