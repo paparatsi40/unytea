@@ -1,8 +1,10 @@
 "use server";
 
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
-import { getCurrentUserId } from "@/lib/auth-utils";
+import { defineAction } from "@/lib/actions/define-action";
+import { communityOfLesson, communityOfQuiz } from "@/lib/actions/resolvers";
 
 // ── Types ─────────────────────────────────────────────────────────────
 export interface QuizQuestionOption {
@@ -18,19 +20,27 @@ export interface QuizAnswer {
 }
 
 // ── Create Quiz (for course creators) ─────────────────────────────────
-export async function createQuiz(data: {
-  lessonId: string;
-  title: string;
-  description?: string;
-  passingScore?: number;
-  maxAttempts?: number;
-  timeLimit?: number;
-  shuffleQuestions?: boolean;
-  showResults?: boolean;
-}) {
+export const createQuiz = defineAction(
+  {
+    name: "createQuiz",
+    auth: "admin",
+    args: [
+      z.object({
+        lessonId: z.string().min(1).max(64),
+        title: z.string().min(1).max(300),
+        description: z.string().max(5000).optional(),
+        passingScore: z.number().int().min(0).max(100).optional(),
+        maxAttempts: z.number().int().min(1).max(100).optional(),
+        timeLimit: z.number().int().min(1).max(1440).optional(),
+        shuffleQuestions: z.boolean().optional(),
+        showResults: z.boolean().optional(),
+      }),
+    ],
+    community: ([data]) => communityOfLesson(data.lessonId),
+  },
+  async (_ctx, data: { lessonId: string; title: string; description?: string; passingScore?: number; maxAttempts?: number; timeLimit?: number; shuffleQuestions?: boolean; showResults?: boolean; }) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) return { success: false, error: "Unauthorized" };
+
 
     const quiz = await prisma.quiz.create({
       data: {
@@ -51,19 +61,37 @@ export async function createQuiz(data: {
     return { success: false, error: "Failed to create quiz" };
   }
 }
+);
 
 // ── Add Question to Quiz ──────────────────────────────────────────────
-export async function addQuizQuestion(data: {
-  quizId: string;
-  question: string;
-  type?: "MULTIPLE_CHOICE" | "MULTI_SELECT" | "TRUE_FALSE";
-  options: QuizQuestionOption[];
-  explanation?: string;
-  points?: number;
-}) {
+export const addQuizQuestion = defineAction(
+  {
+    name: "addQuizQuestion",
+    auth: "admin",
+    args: [
+      z.object({
+        quizId: z.string().min(1).max(64),
+        question: z.string().min(1).max(5000),
+        type: z.enum(["MULTIPLE_CHOICE", "MULTI_SELECT", "TRUE_FALSE"]).optional(),
+        options: z
+          .array(
+            z.object({
+              id: z.string().min(1).max(64),
+              text: z.string().max(2000),
+              isCorrect: z.boolean(),
+            })
+          )
+          .max(50),
+        explanation: z.string().max(5000).optional(),
+        points: z.number().int().min(0).max(1000).optional(),
+        order: z.number().int().min(0).max(10_000).optional(),
+      }),
+    ],
+    community: ([data]) => communityOfQuiz(data.quizId),
+  },
+  async (_ctx, data: { quizId: string; question: string; type?: "MULTIPLE_CHOICE" | "MULTI_SELECT" | "TRUE_FALSE"; options: QuizQuestionOption[]; explanation?: string; points?: number; }) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) return { success: false, error: "Unauthorized" };
+
 
     // Get next position
     const lastQuestion = await prisma.quizQuestion.findFirst({
@@ -89,12 +117,20 @@ export async function addQuizQuestion(data: {
     return { success: false, error: "Failed to add question" };
   }
 }
+);
 
 // ── Get Quiz with Questions ───────────────────────────────────────────
-export async function getQuiz(quizId: string) {
+export const getQuiz = defineAction(
+  {
+    name: "getQuiz",
+    auth: "member",
+    args: [z.string().min(1).max(64)],
+    community: ([quizId]) => communityOfQuiz(quizId),
+  },
+  async (ctx, quizId: string) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) return { success: false, error: "Unauthorized" };
+
+    const userId = ctx.userId;
 
     const quiz = await prisma.quiz.findUnique({
       where: { id: quizId },
@@ -155,12 +191,20 @@ export async function getQuiz(quizId: string) {
     return { success: false, error: "Failed to get quiz" };
   }
 }
+);
 
 // ── Get Quizzes for a Lesson ──────────────────────────────────────────
-export async function getLessonQuizzes(lessonId: string) {
+export const getLessonQuizzes = defineAction(
+  {
+    name: "getLessonQuizzes",
+    auth: "member",
+    args: [z.string().min(1).max(64)],
+    community: ([lessonId]) => communityOfLesson(lessonId),
+  },
+  async (ctx, lessonId: string) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) return { success: false, error: "Unauthorized" };
+
+    const userId = ctx.userId;
 
     const quizzes = await prisma.quiz.findMany({
       where: { lessonId },
@@ -206,16 +250,34 @@ export async function getLessonQuizzes(lessonId: string) {
     return { success: false, error: "Failed to get quizzes" };
   }
 }
+);
 
 // ── Submit Quiz Attempt ───────────────────────────────────────────────
-export async function submitQuizAttempt(data: {
-  quizId: string;
-  answers: { questionId: string; selectedOptionIds: string[] }[];
-  timeSpent?: number;
-}) {
+export const submitQuizAttempt = defineAction(
+  {
+    name: "submitQuizAttempt",
+    auth: "member",
+    args: [
+      z.object({
+        quizId: z.string().min(1).max(64),
+        answers: z
+          .array(
+            z.object({
+              questionId: z.string().min(1).max(64),
+              selectedOptionIds: z.array(z.string().min(1).max(64)).max(50),
+            })
+          )
+          .max(500),
+        timeSpent: z.number().int().min(0).max(86_400).optional(),
+      }),
+    ],
+    community: ([data]) => communityOfQuiz(data.quizId),
+    rateLimit: "create",
+  },
+  async (ctx, data: { quizId: string; answers: { questionId: string; selectedOptionIds: string[] }[]; timeSpent?: number; }) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) return { success: false, error: "Unauthorized" };
+
+    const userId = ctx.userId;
 
     // Get the quiz with questions
     const quiz = await prisma.quiz.findUnique({
@@ -297,3 +359,4 @@ export async function submitQuizAttempt(data: {
     return { success: false, error: "Failed to submit quiz" };
   }
 }
+);
