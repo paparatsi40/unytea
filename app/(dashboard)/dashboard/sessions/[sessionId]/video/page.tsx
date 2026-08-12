@@ -167,8 +167,8 @@ export default function SessionVideoPage() {
     );
   }
 
-  // Get room name and participant name
-  const roomName = session.videoRoomName || `session-${session.id}`;
+  // The LiveKit room is resolved server-side from the session id, so the page
+  // no longer computes a room name (SEC-03).
   const isMentor = currentUserId === session.mentor.id;
   const participantName = isMentor
     ? session.mentor.name || "Mentor"
@@ -209,7 +209,7 @@ export default function SessionVideoPage() {
           {/* Enhanced Video Call with all Phase 1 features */}
           <div className="flex-1 px-6 pb-6">
             <EnhancedVideoCall
-              roomName={roomName}
+              sessionId={session.id}
               participantName={participantName}
               userId={currentUserId!}
               onDisconnect={handleLeaveCall}

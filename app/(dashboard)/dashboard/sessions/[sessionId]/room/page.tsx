@@ -168,7 +168,6 @@ export default function SessionRoomPage(props: { params: Promise<{ sessionId: st
   return (
     <div className="h-screen bg-zinc-950">
       <VideoRoom
-        roomName={roomName}
         sessionId={videoSession.id}
         sessionMode={normalizedMode}
         sessionTitle={videoSession.title}

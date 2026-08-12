@@ -6,10 +6,15 @@ import "@livekit/components-styles";
 import { useTranslations } from "next-intl";
 import { Loader2, AlertCircle } from "lucide-react";
 import { VideoRoomUI } from "./VideoRoomUI";
+import { joinSession } from "@/app/actions/livekit";
 
 interface VideoRoomProps {
-  roomName: string;
-  sessionId?: string;
+  /**
+   * The room is resolved server-side from this id. It is deliberately not a
+   * prop: accepting a client-supplied roomName is what let any account mint a
+   * publish-capable token for an arbitrary room (SEC-03).
+   */
+  sessionId: string;
   sessionMode?: "video" | "audio";
   sessionTitle?: string;
   isHost?: boolean;
@@ -58,7 +63,6 @@ function AudioUnlocker() {
 }
 
 export function VideoRoom({
-  roomName,
   sessionId,
   sessionMode = "video",
   sessionTitle,
@@ -81,22 +85,16 @@ export function VideoRoom({
     async function getToken() {
       try {
         setLoading(true);
-        const response = await fetch("/api/livekit/token", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ roomName }),
-        });
-
-        if (!response.ok) {
-          throw new Error(t("tokenError"));
-        }
-
-        const data = await response.json();
+        const result = await joinSession(sessionId);
 
         if (!mounted) return;
 
-        setToken(data.token);
-        setWsUrl(data.wsUrl);
+        if (!result.success || !("access" in result) || !result.access) {
+          throw new Error(("error" in result && result.error) || t("tokenError"));
+        }
+
+        setToken(result.access.token);
+        setWsUrl(result.access.wsUrl);
       } catch (err) {
         if (!mounted) return;
         setError(err instanceof Error ? err.message : t("unknownError"));
@@ -112,7 +110,7 @@ export function VideoRoom({
     return () => {
       mounted = false;
     };
-  }, [roomName, t]);
+  }, [sessionId, t]);
 
   if (loading) {
     return (

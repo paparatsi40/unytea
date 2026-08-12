@@ -1,187 +1,105 @@
 "use server";
 
+import { z } from "zod";
 import { AccessToken } from "livekit-server-sdk";
-import { prisma } from "@/lib/prisma";
-import { getCurrentUserId } from "@/lib/auth-utils";
 import { ParticipationRole, Prisma } from "@prisma/client";
 
-// LiveKit configuration
+import { prisma } from "@/lib/prisma";
+import { defineAction } from "@/lib/actions/define-action";
+import { assertSessionHost } from "@/lib/actions/guards";
+import { communityOfSession } from "@/lib/actions/resolvers";
+
+/**
+ * LiveKit access — the single token issuer for the product.
+ *
+ * There used to be two (C3): this module's `generateLiveKitToken`, and
+ * `POST /api/livekit/token`. Both were independently broken, in different ways:
+ *
+ *  - The API route granted `canPublish: true` for **any client-supplied
+ *    roomName** to any authenticated account, with no membership check at all.
+ *    A free account could join and broadcast in a paid private session (SEC-03).
+ *  - This module let the caller pass their own `role`. A non-participant who
+ *    sent `{ role: "host" }` kept it, because the value was only overwritten for
+ *    the mentor or for someone with an existing participation row — so they got
+ *    publish rights (SEC-04). It also accepted `roomName`, letting the grant be
+ *    redirected to an arbitrary room in the LiveKit project.
+ *
+ * The route is deleted; this is the only issuer. It accepts a sessionId and
+ * nothing else. The room, the role and therefore the publish permission are all
+ * derived server-side, and `defineAction`'s `member` level enforces ACTIVE
+ * membership of the hosting community plus the paywall gate before any of it
+ * runs.
+ */
+
 const LIVEKIT_API_KEY = process.env.LIVEKIT_API_KEY || "";
 const LIVEKIT_API_SECRET = process.env.LIVEKIT_API_SECRET || "";
-const LIVEKIT_URL = process.env.LIVEKIT_URL || "wss://unytea-livekit.livekit.cloud";
+const LIVEKIT_URL =
+  process.env.LIVEKIT_URL?.trim() ||
+  process.env.NEXT_PUBLIC_LIVEKIT_URL?.trim() ||
+  "wss://unytea-livekit.livekit.cloud";
 
-if (!LIVEKIT_API_KEY || !LIVEKIT_API_SECRET) {
-  console.warn("LiveKit credentials not configured. Token generation will fail.");
-}
+const TOKEN_TTL_SECONDS = 2 * 60 * 60;
 
-export interface TokenPayload {
+const sessionIdSchema = z.string().min(1).max(64);
+
+export interface SessionAccess {
   token: string;
-  identity: string;
+  wsUrl: string;
   roomName: string;
+  identity: string;
   role: ParticipationRole;
   expiresAt: Date;
 }
 
-export interface TokenOptions {
-  sessionId: string;
-  roomName?: string;
-  role?: ParticipationRole;
-  canPublish?: boolean;
-  canSubscribe?: boolean;
+/**
+ * Resolve the caller's role from persisted state only.
+ *
+ * Precedence: the session's host is always `host`; otherwise an existing
+ * participation row decides; otherwise `listener`. Nothing here reads input.
+ */
+async function resolveRole(sessionId: string, userId: string, mentorId: string) {
+  if (mentorId === userId) return ParticipationRole.host;
+
+  const participation = await prisma.sessionParticipation.findUnique({
+    where: { sessionId_userId: { sessionId, userId } },
+    select: { role: true },
+  });
+
+  return participation?.role ?? ParticipationRole.listener;
 }
 
 /**
- * Generate a LiveKit access token for joining a session
+ * Join a session and receive a LiveKit token scoped to it.
+ *
+ * Replaces both former token paths and `POST /api/livekit/token`.
  */
-export async function generateLiveKitToken(
-  options: TokenOptions
-): Promise<{ success: boolean; data?: TokenPayload; error?: string }> {
-  try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Authentication required" };
-    }
-
-    // Validate LiveKit credentials
+export const joinSession = defineAction(
+  {
+    name: "joinSession",
+    auth: "member",
+    args: [sessionIdSchema],
+    community: ([sessionId]) => communityOfSession(sessionId),
+    rateLimit: "create",
+  },
+  async (ctx, sessionId) => {
     if (!LIVEKIT_API_KEY || !LIVEKIT_API_SECRET) {
-      return { success: false, error: "LiveKit not configured" };
+      return { success: false as const, error: "Video is not configured." };
     }
 
-    // Get session details
-    const session = await prisma.mentorSession.findUnique({
-      where: { id: options.sessionId },
-      include: {
-        mentor: { select: { id: true, name: true } },
-        community: { select: { id: true, name: true } },
-      },
-    });
-
-    if (!session) {
-      return { success: false, error: "Session not found" };
-    }
-
-    // Determine role
-    let role = options.role || ParticipationRole.listener;
-
-    // Host is the mentor
-    if (session.mentorId === userId) {
-      role = ParticipationRole.host;
-    }
-
-    // Check if user is already a participant with a role
-    const existingParticipation = await prisma.sessionParticipation.findUnique({
-      where: {
-        sessionId_userId: {
-          sessionId: options.sessionId,
-          userId,
-        },
-      },
-    });
-
-    if (existingParticipation) {
-      role = existingParticipation.role;
-    }
-
-    // Generate unique identity
-    const identity = `${userId}-${Date.now()}`;
-
-    // Use session ID as room name (consistency with our domain)
-    const roomName = options.roomName || session.videoRoomName || `session-${session.id}`;
-
-    // Determine permissions based on role
-    const canPublish = role === ParticipationRole.host || role === ParticipationRole.speaker;
-    const canSubscribe = true; // Everyone can subscribe (listen/view)
-    const canPublishData = true; // Everyone can send data (chat, reactions)
-
-    // Create token
-    const token = new AccessToken(LIVEKIT_API_KEY, LIVEKIT_API_SECRET, {
-      identity,
-    });
-
-    // Add metadata
-    token.metadata = JSON.stringify({
-      userId,
-      sessionId: options.sessionId,
-      role,
-      communityId: session.communityId,
-    });
-
-    // Grant video room access
-    token.addGrant({
-      roomJoin: true,
-      room: roomName,
-      canPublish,
-      canSubscribe,
-      canPublishData,
-    });
-
-    // Token expires in 24 hours
-    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
-
-    // Generate JWT string
-    const jwt = await token.toJwt();
-
-    return {
-      success: true,
-      data: {
-        token: jwt,
-        identity,
-        roomName,
-        role,
-        expiresAt,
-      },
-    };
-  } catch (error) {
-    console.error("Failed to generate LiveKit token:", error);
-    return { success: false, error: "Token generation failed" };
-  }
-}
-
-/**
- * Join a session - creates participation record and returns token
- */
-export async function joinSession(sessionId: string): Promise<{
-  success: boolean;
-  token?: TokenPayload;
-  error?: string;
-  session?: {
-    id: string;
-    title: string;
-    roomName: string;
-    role: ParticipationRole;
-  };
-}> {
-  try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Authentication required" };
-    }
-
-    // Get session
     const session = await prisma.mentorSession.findUnique({
       where: { id: sessionId },
-      include: {
-        mentor: { select: { id: true, name: true } },
-      },
+      select: { id: true, title: true, mentorId: true, status: true, videoRoomName: true, roomId: true },
     });
 
     if (!session) {
-      return { success: false, error: "Session not found" };
+      return { success: false as const, error: "Session not found." };
     }
-
-    // Check session status
     if (session.status === "COMPLETED" || session.status === "CANCELLED") {
-      return { success: false, error: "Session has ended" };
+      return { success: false as const, error: "This session has ended." };
     }
 
-    // Determine role
-    let role: ParticipationRole = ParticipationRole.listener;
-    if (session.mentorId === userId) {
-      role = ParticipationRole.host;
-    }
-
-    // Ensure room name exists
-    const roomName = session.videoRoomName || `session-${session.id}`;
+    // The room name is derived from the session, never accepted from the client.
+    const roomName = session.videoRoomName || session.roomId || `session-${session.id}`;
     if (!session.videoRoomName) {
       await prisma.mentorSession.update({
         where: { id: sessionId },
@@ -189,87 +107,86 @@ export async function joinSession(sessionId: string): Promise<{
       });
     }
 
-    // Create or update participation record
+    const role = await resolveRole(sessionId, ctx.userId, session.mentorId);
+
+    // A stable identity per (session, user). The previous implementations
+    // appended Date.now(), which produced a new identity on every join and made
+    // attendance impossible to deduplicate.
+    const identity = `${sessionId}:${ctx.userId}`;
+
     await prisma.sessionParticipation.upsert({
-      where: {
-        sessionId_userId: {
-          sessionId,
-          userId,
-        },
-      },
+      where: { sessionId_userId: { sessionId, userId: ctx.userId } },
       create: {
         sessionId,
-        userId,
+        userId: ctx.userId,
         role,
         joinedAt: new Date(),
-        livekitIdentity: `${userId}-${Date.now()}`,
+        livekitIdentity: identity,
       },
-      update: {
-        // If rejoining, don't change role but update joinedAt
-        joinedAt: new Date(),
-        leftAt: null,
-      },
+      update: { joinedAt: new Date(), leftAt: null, livekitIdentity: identity },
     });
 
-    // Generate token
-    const tokenResult = await generateLiveKitToken({
+    // attendeeCount is derived from distinct participation rows rather than
+    // incremented per token request. The old API route incremented on every
+    // call, so a page refresh inflated the host's attendance metric without
+    // bound (C3).
+    const attendeeCount = await prisma.sessionParticipation.count({ where: { sessionId } });
+    await prisma.mentorSession.update({
+      where: { id: sessionId },
+      data: { attendeeCount },
+    });
+
+    const canPublish = role === ParticipationRole.host || role === ParticipationRole.speaker;
+
+    const token = new AccessToken(LIVEKIT_API_KEY, LIVEKIT_API_SECRET, {
+      identity,
+      ttl: TOKEN_TTL_SECONDS,
+    });
+    token.metadata = JSON.stringify({
+      userId: ctx.userId,
       sessionId,
-      roomName,
       role,
+      communityId: ctx.communityId,
+    });
+    token.addGrant({
+      roomJoin: true,
+      room: roomName,
+      canPublish,
+      canSubscribe: true,
+      canPublishData: true,
     });
 
-    if (!tokenResult.success || !tokenResult.data) {
-      return { success: false, error: tokenResult.error || "Token generation failed" };
-    }
-
-    return {
-      success: true,
-      token: tokenResult.data,
-      session: {
-        id: session.id,
-        title: session.title,
-        roomName,
-        role,
-      },
+    const access: SessionAccess = {
+      token: await token.toJwt(),
+      wsUrl: LIVEKIT_URL,
+      roomName,
+      identity,
+      role,
+      expiresAt: new Date(Date.now() + TOKEN_TTL_SECONDS * 1000),
     };
-  } catch (error) {
-    console.error("Failed to join session:", error);
-    return { success: false, error: "Failed to join session" };
+
+    return { success: true as const, access, session: { id: session.id, title: session.title } };
   }
-}
+);
 
-/**
- * Leave a session - updates participation record
- */
-export async function leaveSession(
-  sessionId: string
-): Promise<{ success: boolean; error?: string }> {
-  try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Authentication required" };
-    }
-
-    // Find participation record
+export const leaveSession = defineAction(
+  {
+    name: "leaveSession",
+    auth: "member",
+    args: [sessionIdSchema],
+    community: ([sessionId]) => communityOfSession(sessionId),
+  },
+  async (ctx, sessionId) => {
     const participation = await prisma.sessionParticipation.findUnique({
-      where: {
-        sessionId_userId: {
-          sessionId,
-          userId,
-        },
-      },
+      where: { sessionId_userId: { sessionId, userId: ctx.userId } },
     });
-
     if (!participation) {
-      return { success: false, error: "Not in session" };
+      return { success: false as const, error: "Not in session" };
     }
 
-    // Calculate duration
     const leftAt = new Date();
-    const joinedAt = participation.joinedAt;
-    const durationSeconds = Math.floor((leftAt.getTime() - joinedAt.getTime()) / 1000);
+    const durationSeconds = Math.floor((leftAt.getTime() - participation.joinedAt.getTime()) / 1000);
 
-    // Update participation
     await prisma.sessionParticipation.update({
       where: { id: participation.id },
       data: {
@@ -278,85 +195,55 @@ export async function leaveSession(
       },
     });
 
-    return { success: true };
-  } catch (error) {
-    console.error("Failed to leave session:", error);
-    return { success: false, error: "Failed to leave session" };
+    return { success: true as const };
   }
-}
+);
 
 /**
- * Update participant role (host only)
+ * Promote or demote a participant. Host or community admin only — and the
+ * target user id is a genuine parameter here (it identifies *someone else*),
+ * unlike the caller-identity parameters removed under SEC-05.
  */
-export async function updateParticipantRole(
-  sessionId: string,
-  userId: string,
-  newRole: ParticipationRole
-): Promise<{ success: boolean; error?: string }> {
-  try {
-    const currentUserId = await getCurrentUserId();
-    if (!currentUserId) {
-      return { success: false, error: "Authentication required" };
-    }
+export const updateParticipantRole = defineAction(
+  {
+    name: "updateParticipantRole",
+    auth: "member",
+    args: [
+      sessionIdSchema,
+      z.string().min(1).max(64),
+      z.nativeEnum(ParticipationRole),
+    ],
+    community: ([sessionId]) => communityOfSession(sessionId),
+  },
+  async (ctx, sessionId, targetUserId, newRole) => {
+    await assertSessionHost(ctx, sessionId);
 
-    // Verify host
-    const session = await prisma.mentorSession.findUnique({
-      where: { id: sessionId },
-      select: { mentorId: true },
-    });
-
-    if (!session || session.mentorId !== currentUserId) {
-      return { success: false, error: "Only host can change roles" };
-    }
-
-    // Update participation
     await prisma.sessionParticipation.update({
-      where: {
-        sessionId_userId: {
-          sessionId,
-          userId,
-        },
-      },
-      data: {
-        role: newRole,
-        wasInvited: newRole === ParticipationRole.speaker,
-      },
+      where: { sessionId_userId: { sessionId, userId: targetUserId } },
+      data: { role: newRole, wasInvited: newRole === ParticipationRole.speaker },
     });
 
-    return { success: true };
-  } catch (error) {
-    console.error("Failed to update role:", error);
-    return { success: false, error: "Failed to update role" };
+    return { success: true as const };
   }
-}
+);
 
-/**
- * Track engagement events (messages, reactions, hand raises)
- */
-export async function trackEngagement(
-  sessionId: string,
-  eventType: "message" | "reaction" | "hand_raised"
-): Promise<{ success: boolean; error?: string }> {
-  try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Authentication required" };
-    }
-
+export const trackEngagement = defineAction(
+  {
+    name: "trackEngagement",
+    auth: "member",
+    args: [sessionIdSchema, z.enum(["message", "reaction", "hand_raised"])],
+    community: ([sessionId]) => communityOfSession(sessionId),
+    rateLimit: "message",
+  },
+  async (ctx, sessionId, eventType) => {
     const participation = await prisma.sessionParticipation.findUnique({
-      where: {
-        sessionId_userId: {
-          sessionId,
-          userId,
-        },
-      },
+      where: { sessionId_userId: { sessionId, userId: ctx.userId } },
+      select: { id: true },
     });
-
     if (!participation) {
-      return { success: false, error: "Not in session" };
+      return { success: false as const, error: "Not in session" };
     }
 
-    // Update counters based on event type
     const updateData: Prisma.SessionParticipationUpdateInput = {};
     switch (eventType) {
       case "message":
@@ -375,58 +262,27 @@ export async function trackEngagement(
       data: updateData,
     });
 
-    return { success: true };
-  } catch (error) {
-    console.error("Failed to track engagement:", error);
-    return { success: false, error: "Failed to track engagement" };
+    return { success: true as const };
   }
-}
+);
 
-/**
- * Get session participants with engagement stats
- */
-export async function getSessionParticipants(sessionId: string): Promise<{
-  success: boolean;
-  participants?: Array<{
-    id: string;
-    userId: string;
-    name: string;
-    image: string | null;
-    role: ParticipationRole;
-    joinedAt: Date;
-    durationSeconds: number;
-    messagesCount: number;
-    reactionsCount: number;
-    handRaisedCount: number;
-    wasInvited: boolean;
-  }>;
-  error?: string;
-}> {
-  try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Authentication required" };
-    }
-
+export const getSessionParticipants = defineAction(
+  {
+    name: "getSessionParticipants",
+    auth: "member",
+    args: [sessionIdSchema],
+    community: ([sessionId]) => communityOfSession(sessionId),
+  },
+  async (_ctx, sessionId) => {
     const participants = await prisma.sessionParticipation.findMany({
       where: { sessionId },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
-          },
-        },
-      },
-      orderBy: [
-        { role: "asc" }, // Host first, then speakers, then listeners
-        { joinedAt: "asc" },
-      ],
+      include: { user: { select: { id: true, name: true, image: true } } },
+      orderBy: [{ role: "asc" }, { joinedAt: "asc" }],
+      take: 500,
     });
 
     return {
-      success: true,
+      success: true as const,
       participants: participants.map((p) => ({
         id: p.id,
         userId: p.user.id,
@@ -441,21 +297,18 @@ export async function getSessionParticipants(sessionId: string): Promise<{
         wasInvited: p.wasInvited,
       })),
     };
-  } catch (error) {
-    console.error("Failed to get participants:", error);
-    return { success: false, error: "Failed to get participants" };
   }
-}
+);
 
 /**
- * Get LiveKit connection info for frontend
+ * Whether video is configured, for the UI to render a useful message.
+ * Public: it exposes only the public websocket URL and a boolean, both of which
+ * ship to the browser anyway as NEXT_PUBLIC_LIVEKIT_URL.
  */
-export async function getLiveKitConnectionInfo(): Promise<{
-  url: string;
-  configured: boolean;
-}> {
-  return {
+export const getLiveKitConnectionInfo = defineAction(
+  { name: "getLiveKitConnectionInfo", auth: "public", args: [] },
+  async () => ({
     url: LIVEKIT_URL,
-    configured: !!LIVEKIT_API_KEY && !!LIVEKIT_API_SECRET,
-  };
-}
+    configured: Boolean(LIVEKIT_API_KEY && LIVEKIT_API_SECRET),
+  })
+);
