@@ -1,7 +1,8 @@
 "use server";
 
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUserId } from "@/lib/auth-utils";
+import { defineAction } from "@/lib/actions/define-action";
 
 // ── Generate Certificate Number ──────────────────────────────────────
 function generateCertificateNumber(): string {
@@ -12,10 +13,16 @@ function generateCertificateNumber(): string {
 }
 
 // ── Issue Certificate ────────────────────────────────────────────────
-export async function issueCertificate(enrollmentId: string) {
+export const issueCertificate = defineAction(
+  {
+    name: "issueCertificate",
+    auth: "user",
+    args: [z.string().min(1).max(64)],
+    rateLimit: "create",
+  },
+  async (ctx, enrollmentId: string) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) return { success: false, error: "Unauthorized" };
+    const userId = ctx.userId;
 
     // Check if certificate already exists
     const existing = await prisma.certificate.findUnique({
@@ -112,12 +119,20 @@ export async function issueCertificate(enrollmentId: string) {
     return { success: false, error: "Failed to issue certificate" };
   }
 }
+);
 
 // ── Get Certificate by ID ────────────────────────────────────────────
-export async function getCertificate(certificateId: string) {
+export const getCertificate = defineAction(
+  {
+    name: "getCertificate",
+    auth: "user",
+    args: [z.string().min(1).max(64)],
+  },
+  async (ctx, certificateId: string) => {
   try {
-    const certificate = await prisma.certificate.findUnique({
-      where: { id: certificateId },
+    // Scoped to the holder: this used to return any certificate row by id.
+    const certificate = await prisma.certificate.findFirst({
+      where: { id: certificateId, userId: ctx.userId },
     });
 
     if (!certificate) return { success: false, error: "Certificate not found" };
@@ -128,9 +143,17 @@ export async function getCertificate(certificateId: string) {
     return { success: false, error: "Failed to get certificate" };
   }
 }
+);
 
 // ── Verify Certificate by Number (public) ────────────────────────────
-export async function verifyCertificate(certificateNumber: string) {
+export const verifyCertificate = defineAction(
+  {
+    name: "verifyCertificate",
+    auth: "public",
+    args: [z.string().min(1).max(128)],
+    rateLimit: "api",
+  },
+  async (_ctx, certificateNumber: string) => {
   try {
     const certificate = await prisma.certificate.findUnique({
       where: { certificateNumber },
@@ -157,12 +180,18 @@ export async function verifyCertificate(certificateNumber: string) {
     return { success: false, error: "Failed to verify certificate" };
   }
 }
+);
 
 // ── Get User Certificates ────────────────────────────────────────────
-export async function getUserCertificates() {
+export const getUserCertificates = defineAction(
+  {
+    name: "getUserCertificates",
+    auth: "user",
+    args: [],
+  },
+  async (ctx) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) return { success: false, error: "Unauthorized" };
+    const userId = ctx.userId;
 
     const certificates = await prisma.certificate.findMany({
       where: { userId },
@@ -175,3 +204,4 @@ export async function getUserCertificates() {
     return { success: false, error: "Failed to get certificates" };
   }
 }
+);

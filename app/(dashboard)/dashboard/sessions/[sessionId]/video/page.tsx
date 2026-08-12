@@ -50,7 +50,8 @@ export default function SessionVideoPage() {
   async function checkFeedbackStatus() {
     if (!sessionId) return;
     try {
-      const hasFeedback = await hasSubmittedFeedback(sessionId);
+      // The action can return an ActionFailure; only a literal true means submitted.
+      const hasFeedback = (await hasSubmittedFeedback(sessionId)) === true;
       setAlreadyHasFeedback(hasFeedback);
     } catch (error) {
       console.error("Error checking feedback status:", error);
