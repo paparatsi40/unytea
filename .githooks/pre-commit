@@ -1,0 +1,16 @@
+#!/bin/sh
+#
+# Blocks a commit if any NEXT_PUBLIC_* variable holds a secret-shaped value.
+#
+# Installed automatically by the `prepare` npm script, which points
+# core.hooksPath at this directory. To install manually:
+#   git config core.hooksPath .githooks
+#
+# To bypass in an emergency (do not make a habit of it):
+#   git commit --no-verify
+
+node scripts/check-public-env.mjs || {
+  echo ""
+  echo "pre-commit: blocked by the public-env guard (scripts/check-public-env.mjs)."
+  exit 1
+}

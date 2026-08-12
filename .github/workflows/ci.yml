@@ -20,6 +20,21 @@ env:
   NEXTAUTH_URL: "http://localhost:3000"
 
 jobs:
+  # Blocking guard for SEC-01. NEXT_PUBLIC_* values are inlined into the client
+  # bundle at build time, so a secret stored under such a name is published to
+  # every visitor. Dependency-free by design: it runs without `npm ci` so it
+  # fails fast and cannot be broken by an install problem.
+  secret-scan:
+    name: Public env secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24.x"
+      - name: Check for secret-shaped NEXT_PUBLIC_* values
+        run: node scripts/check-public-env.mjs
+
   test:
     name: Unit tests (vitest)
     runs-on: ubuntu-latest
