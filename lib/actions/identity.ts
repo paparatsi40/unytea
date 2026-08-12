@@ -10,8 +10,19 @@ import { headers } from "next/headers";
  *
  * Authenticated callers are keyed on their user id: an attacker cannot dodge the
  * limit by rotating IPs, and a shared corporate NAT does not throttle everyone
- * behind it. Anonymous callers fall back to IP + user-agent, matching the
- * behaviour of `getIdentifier`.
+ * behind it.
+ *
+ * Anonymous callers are keyed on IP **only**. `lib/rate-limit.ts`'s
+ * `getIdentifier` mixes in the user-agent, and this function originally copied
+ * that — but the user-agent is an attacker-controlled request header, so a
+ * script that randomises it gets a fresh bucket on every call and the limit on
+ * public actions is unenforceable. The user-agent adds no security value: it
+ * cannot be trusted to distinguish clients, and the only thing it reliably
+ * separates is a well-behaved browser from an attacker who varies it.
+ *
+ * The trade-off is that distinct clients behind one NAT now share a bucket.
+ * That is the correct direction to err for unauthenticated traffic: the limit
+ * is a flood control, and any real user can sign in to get their own bucket.
  */
 export async function getActionIdentifier(userId: string | null): Promise<string> {
   if (userId) return `user:${userId}`;
@@ -23,7 +34,5 @@ export async function getActionIdentifier(userId: string | null): Promise<string
     ? forwardedFor.split(",")[0].trim()
     : (headerList.get("x-real-ip")?.trim() ?? "unknown");
 
-  const userAgent = headerList.get("user-agent") ?? "unknown";
-
-  return `anon:${ip}:${userAgent}`;
+  return `anon:${ip}`;
 }

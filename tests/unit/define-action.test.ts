@@ -360,7 +360,7 @@ describe("defineAction — rate limiting", () => {
     expect(mockRateLimitCheck).toHaveBeenCalledWith("action:limited:user:user_1");
   });
 
-  it("falls back to ip + user-agent for anonymous callers", async () => {
+  it("falls back to the IP for anonymous callers, ignoring the attacker-controlled user-agent", async () => {
     vi.mocked(auth).mockResolvedValue(null as never);
     const action = defineAction({ name: "pub", auth: "public", args: [] }, async () => ({
       success: true as const,
@@ -368,7 +368,7 @@ describe("defineAction — rate limiting", () => {
 
     await action();
 
-    expect(mockRateLimitCheck).toHaveBeenCalledWith("action:pub:anon:1.2.3.4:test");
+    expect(mockRateLimitCheck).toHaveBeenCalledWith("action:pub:anon:1.2.3.4");
   });
 
   it("returns RATE_LIMITED and skips the handler once the bucket is empty", async () => {
