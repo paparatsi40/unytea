@@ -85,7 +85,9 @@ export function PostReactions({ postId }: { postId: string }) {
   }, [postId, user?.id]);
 
   async function loadReactions() {
-    const result = await getPostReactions(postId, user?.id);
+    // The caller's identity comes from the session server-side; passing it from
+    // the client let anyone probe another account's reactions (SEC-05).
+    const result = await getPostReactions(postId);
     if (result.success) {
       setReactions(result.reactions);
       setTotalCount(result.totalCount);
@@ -118,7 +120,7 @@ export function PostReactions({ postId }: { postId: string }) {
 
     // Actual API call
     setIsLoading(true);
-    const result = await toggleReaction(user.id, postId, type);
+    const result = await toggleReaction(postId, type);
     setIsLoading(false);
 
     if (result.success) {

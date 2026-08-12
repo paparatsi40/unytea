@@ -5,7 +5,7 @@ import { getCurrentUserId } from "@/lib/auth-utils";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { nanoid } from "nanoid";
-import { startSessionAutopilot } from "./autopilot";
+import { startSessionAutopilot } from "@/lib/jobs/autopilot";
 
 /** Sesión con el mentor incluido (shape de las acciones de creación). */
 type SessionWithMentor = Prisma.MentorSessionGetPayload<{

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { handleLiveKitWebhook } from "@/app/actions/webhooks";
+import { handleLiveKitWebhook } from "@/lib/jobs/livekit-webhook";
 
 /**
  * POST /api/webhooks/livekit

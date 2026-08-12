@@ -2,7 +2,7 @@
 
 import { getCurrentUserId } from "@/lib/auth-utils";
 import { prisma } from "@/lib/prisma";
-import type { AutopilotJobPayload } from "./autopilot";
+import type { AutopilotJobPayload } from "@/lib/jobs/autopilot";
 
 /**
  * Get dashboard metrics optimized for growth:
