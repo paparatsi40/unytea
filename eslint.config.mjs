@@ -1,5 +1,6 @@
 import nextCoreWebVitals from "eslint-config-next/core-web-vitals";
 import nextTypescript from "eslint-config-next/typescript";
+import unytea from "./eslint-rules/no-bare-server-action.mjs";
 
 export default [
   {
@@ -76,6 +77,19 @@ export default [
       "jsx-a11y/alt-text": "warn",
       "react/display-name": "warn",
       "prefer-const": "warn",
+    },
+  },
+  {
+    // SEC-02 gate. Every export of a "use server" module is a public POST
+    // endpoint, so each one must declare an auth level through defineAction.
+    //
+    // Severity is "warn" only while the 224-action migration is in flight —
+    // turning it on blocking mid-migration would red the build. It is promoted
+    // to "error" in the same commit that migrates the last action.
+    files: ["app/**/*.ts", "app/**/*.tsx", "lib/**/*.ts"],
+    plugins: { unytea },
+    rules: {
+      "unytea/no-bare-server-action": "warn",
     },
   },
 ];
