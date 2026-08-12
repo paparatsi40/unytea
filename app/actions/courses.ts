@@ -106,7 +106,7 @@ export const getCommunityCourses = defineAction(
     args: [z.string().min(1).max(64)],
     community: ([communityId]) => communityById(communityId),
   },
-  async (ctx, communityId: string) => {
+  async (_ctx, communityId: string) => {
   try {
 
 
