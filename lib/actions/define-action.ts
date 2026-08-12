@@ -173,7 +173,14 @@ export function defineAction<const TSchemas extends SchemaTuple, TAuth extends A
       }
 
       // ── 3. Input validation ────────────────────────────────────────────
-      const parsed = z.tuple(config.args as unknown as [z.ZodTypeAny, ...z.ZodTypeAny[]]).safeParse(rawArgs);
+      // Zod tuples are fixed-length, so pad omitted trailing arguments with
+      // `undefined` before parsing. Optional schema members then accept the
+      // shorter call, while required ones still reject it.
+      const padded =
+        rawArgs.length < config.args.length
+          ? [...rawArgs, ...Array(config.args.length - rawArgs.length).fill(undefined)]
+          : rawArgs;
+      const parsed = z.tuple(config.args as unknown as [z.ZodTypeAny, ...z.ZodTypeAny[]]).safeParse(padded);
       if (!parsed.success) {
         const issues: Record<string, string[]> = {};
         for (const issue of parsed.error.issues) {

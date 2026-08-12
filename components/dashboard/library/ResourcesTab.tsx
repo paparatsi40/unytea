@@ -91,9 +91,10 @@ export function ResourcesTab() {
     setLoading(true);
     try {
       const [impactResult, potentialResult, sessionsResult] = await Promise.all([
-        getKnowledgeImpact(),
-        analyzeCoursePotential(),
-        getConvertibleSessions(),
+        // `undefined` = across every community the caller owns.
+        getKnowledgeImpact(undefined),
+        analyzeCoursePotential(undefined),
+        getConvertibleSessions(undefined),
       ]);
 
       if (impactResult.success && impactResult.stats) {

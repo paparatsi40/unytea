@@ -1,24 +1,34 @@
 "use server";
 
+import { z } from "zod";
 import { revalidatePath } from "next/cache";
-import { getCurrentUserId } from "@/lib/auth-utils";
 import { prisma } from "@/lib/prisma";
+import { defineAction } from "@/lib/actions/define-action";
 
 /**
  * Update user profile
  */
-export async function updateProfile(data: {
-  name?: string;
-  username?: string;
-  bio?: string;
-  tagline?: string;
-  website?: string;
-  location?: string;
-  skills?: string[];
-  interests?: string[];
-}) {
+export const updateProfile = defineAction(
+  {
+    name: "updateProfile",
+    auth: "user",
+    args: [
+      z.object({
+        name: z.string().min(1).max(100).optional(),
+        username: z.string().min(1).max(50).optional(),
+        bio: z.string().max(2000).optional(),
+        tagline: z.string().max(200).optional(),
+        website: z.string().max(500).optional(),
+        location: z.string().max(120).optional(),
+        skills: z.array(z.string().max(50)).max(30).optional(),
+        interests: z.array(z.string().max(50)).max(30).optional(),
+      }),
+    ],
+  },
+  async (ctx, data: { name?: string; username?: string; bio?: string; tagline?: string; website?: string; location?: string; skills?: string[]; interests?: string[]; }) => {
   try {
-    const userId = await getCurrentUserId();
+
+    const userId = ctx.userId;
 
     if (!userId) {
       return { success: false, error: "Not authenticated" };
@@ -59,22 +69,21 @@ export async function updateProfile(data: {
     return { success: false, error: "Failed to update profile" };
   }
 }
+);
 
 /**
  * Update notification preferences
  */
-export async function updateNotificationPreferences(data: {
-  emailNotifications?: boolean;
-  pushNotifications?: boolean;
-  notifyOnComment?: boolean;
-  notifyOnMention?: boolean;
-  notifyOnReaction?: boolean;
-  notifyOnNewPost?: boolean;
-  notifyOnBuddyRequest?: boolean;
-  emailDigest?: "daily" | "weekly" | "never";
-}) {
+export const updateNotificationPreferences = defineAction(
+  {
+    name: "updateNotificationPreferences",
+    auth: "user",
+    args: [z.record(z.string().max(64), z.unknown())],
+  },
+  async (ctx, data: { emailNotifications?: boolean; pushNotifications?: boolean; notifyOnComment?: boolean; notifyOnMention?: boolean; notifyOnReaction?: boolean; notifyOnNewPost?: boolean; notifyOnBuddyRequest?: boolean; emailDigest?: "daily" | "weekly" | "never"; }) => {
   try {
-    const userId = await getCurrentUserId();
+
+    const userId = ctx.userId;
 
     if (!userId) {
       return { success: false, error: "Not authenticated" };
@@ -107,19 +116,21 @@ export async function updateNotificationPreferences(data: {
     return { success: false, error: "Failed to update preferences" };
   }
 }
+);
 
 /**
  * Update privacy settings
  */
-export async function updatePrivacySettings(data: {
-  profileVisibility?: "public" | "members" | "private";
-  showEmail?: boolean;
-  showLocation?: boolean;
-  allowMessages?: "everyone" | "members" | "none";
-  showActivity?: boolean;
-}) {
+export const updatePrivacySettings = defineAction(
+  {
+    name: "updatePrivacySettings",
+    auth: "user",
+    args: [z.record(z.string().max(64), z.unknown())],
+  },
+  async (ctx, data: { profileVisibility?: "public" | "members" | "private"; showEmail?: boolean; showLocation?: boolean; allowMessages?: "everyone" | "members" | "none"; showActivity?: boolean; }) => {
   try {
-    const userId = await getCurrentUserId();
+
+    const userId = ctx.userId;
 
     if (!userId) {
       return { success: false, error: "Not authenticated" };
@@ -134,17 +145,21 @@ export async function updatePrivacySettings(data: {
     return { success: false, error: "Failed to update settings" };
   }
 }
+);
 
 /**
  * Update account settings
  */
-export async function updateAccountSettings(data: {
-  timezone?: string;
-  language?: string;
-  theme?: "light" | "dark" | "system";
-}) {
+export const updateAccountSettings = defineAction(
+  {
+    name: "updateAccountSettings",
+    auth: "user",
+    args: [z.record(z.string().max(64), z.unknown())],
+  },
+  async (ctx, data: { timezone?: string; language?: string; theme?: "light" | "dark" | "system"; }) => {
   try {
-    const userId = await getCurrentUserId();
+
+    const userId = ctx.userId;
 
     if (!userId) {
       return { success: false, error: "Not authenticated" };
@@ -164,13 +179,22 @@ export async function updateAccountSettings(data: {
     return { success: false, error: "Failed to update settings" };
   }
 }
+);
 
 /**
  * Delete account
  */
-export async function deleteAccount(_password: string) {
+export const deleteAccount = defineAction(
+  {
+    name: "deleteAccount",
+    auth: "user",
+    args: [z.string().max(200)],
+    rateLimit: "auth",
+  },
+  async (ctx, _password: string) => {
   try {
-    const userId = await getCurrentUserId();
+
+    const userId = ctx.userId;
 
     if (!userId) {
       return { success: false, error: "Not authenticated" };
@@ -190,13 +214,21 @@ export async function deleteAccount(_password: string) {
     return { success: false, error: "Failed to delete account" };
   }
 }
+);
 
 /**
  * Get user settings
  */
-export async function getUserSettings() {
+export const getUserSettings = defineAction(
+  {
+    name: "getUserSettings",
+    auth: "user",
+    args: [],
+  },
+  async (ctx) => {
   try {
-    const userId = await getCurrentUserId();
+
+    const userId = ctx.userId;
 
     if (!userId) {
       return { success: false, error: "Not authenticated" };
@@ -230,3 +262,4 @@ export async function getUserSettings() {
     return { success: false, error: "Failed to fetch settings" };
   }
 }
+);
