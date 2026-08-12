@@ -1,8 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getCurrentUserId } from "@/lib/auth-utils";
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { defineAction } from "@/lib/actions/define-action";
+import { communityOfCourse, communityOfSession } from "@/lib/actions/resolvers";
 
 function normalizeSource(source?: string) {
   return (source || "unknown")
@@ -29,22 +31,28 @@ function trackReuseConversion(params: {
  * Add a session to a course as a lesson
  * This converts a live session into permanent course content
  */
-export async function addSessionToCourse(
-  sessionId: string,
-  courseId: string,
-  options?: {
-    moduleId?: string; // Optional: specific module, otherwise creates "Live Sessions" module
-    lessonTitle?: string; // Optional: custom title, otherwise uses session title
-    isFree?: boolean; // Optional: make lesson free (default: false)
-    source?: string;
-  }
-) {
+export const addSessionToCourse = defineAction(
+  {
+    name: "addSessionToCourse",
+    auth: "admin",
+    args: [
+      z.string().min(1).max(64),
+      z.string().min(1).max(64),
+      z
+        .object({
+          moduleId: z.string().min(1).max(64).optional(),
+          lessonTitle: z.string().max(300).optional(),
+          isFree: z.boolean().optional(),
+          source: z.string().max(120).optional(),
+        })
+        .optional(),
+    ],
+    community: ([, courseId]) => communityOfCourse(courseId),
+  },
+  async (ctx, sessionId: string, courseId: string, options?: { moduleId?: string; lessonTitle?: string; isFree?: boolean; source?: string; }) => {
   try {
-    const userId = await getCurrentUserId();
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const userId = ctx.userId;
 
     // Fetch session data
     const session = await prisma.mentorSession.findUnique({
@@ -200,17 +208,22 @@ export async function addSessionToCourse(
     return { success: false, error: "Failed to add session to course" };
   }
 }
+);
 
 /**
  * Get courses available for a session to be added to
  */
-export async function getAvailableCourses(sessionId: string) {
+export const getAvailableCourses = defineAction(
+  {
+    name: "getAvailableCourses",
+    auth: "member",
+    args: [z.string().min(1).max(64)],
+    community: ([sessionId]) => communityOfSession(sessionId),
+  },
+  async (ctx, sessionId: string) => {
   try {
-    const userId = await getCurrentUserId();
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const userId = ctx.userId;
 
     const session = await prisma.mentorSession.findUnique({
       where: { id: sessionId },
@@ -246,27 +259,35 @@ export async function getAvailableCourses(sessionId: string) {
     return { success: false, error: "Failed to fetch courses" };
   }
 }
+);
 
 /**
  * Create a new course from a session
  * Quick action: converts session into a single-lesson course
  */
-export async function createCourseFromSession(
-  sessionId: string,
-  courseTitle: string,
-  options?: {
-    description?: string;
-    isPaid?: boolean;
-    price?: number;
-    source?: string;
-  }
-) {
+export const createCourseFromSession = defineAction(
+  {
+    name: "createCourseFromSession",
+    auth: "member",
+    args: [
+      z.string().min(1).max(64),
+      z.string().min(1).max(300),
+      z
+        .object({
+          description: z.string().max(10_000).optional(),
+          isPaid: z.boolean().optional(),
+          price: z.number().min(0).max(1_000_000).optional(),
+          source: z.string().max(120).optional(),
+        })
+        .optional(),
+    ],
+    community: ([sessionId]) => communityOfSession(sessionId),
+    rateLimit: "create",
+  },
+  async (ctx, sessionId: string, courseTitle: string, options?: { description?: string; isPaid?: boolean; price?: number; source?: string; }) => {
   try {
-    const userId = await getCurrentUserId();
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const userId = ctx.userId;
 
     const session = await prisma.mentorSession.findUnique({
       where: { id: sessionId },
@@ -376,25 +397,33 @@ export async function createCourseFromSession(
     return { success: false, error: "Failed to create course" };
   }
 }
+);
 
 /**
  * Create a library resource from a completed session recap
  */
-export async function createResourceFromSession(
-  sessionId: string,
-  options?: {
-    source?: string;
-    title?: string;
-    description?: string;
-    isPublic?: boolean;
-  }
-) {
+export const createResourceFromSession = defineAction(
+  {
+    name: "createResourceFromSession",
+    auth: "member",
+    args: [
+      z.string().min(1).max(64),
+      z
+        .object({
+          source: z.string().max(120).optional(),
+          title: z.string().max(300).optional(),
+          description: z.string().max(10_000).optional(),
+          isPublic: z.boolean().optional(),
+        })
+        .optional(),
+    ],
+    community: ([sessionId]) => communityOfSession(sessionId),
+    rateLimit: "create",
+  },
+  async (ctx, sessionId: string, options?: { source?: string; title?: string; description?: string; isPublic?: boolean; }) => {
   try {
-    const userId = await getCurrentUserId();
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const userId = ctx.userId;
 
     const session = await prisma.mentorSession.findUnique({
       where: { id: sessionId },
@@ -495,3 +524,4 @@ export async function createResourceFromSession(
     return { success: false, error: "Failed to publish session to library" };
   }
 }
+);

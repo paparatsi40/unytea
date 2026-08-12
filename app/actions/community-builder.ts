@@ -2,7 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { getCurrentUserId } from "@/lib/auth-utils";
+import { defineAction } from "@/lib/actions/define-action";
+import { communityById, communityOfSection } from "@/lib/actions/resolvers";
+import { jsonValueSchema } from "@/lib/actions/schemas";
 import { prisma } from "@/lib/prisma";
 import { sanitizeHTML } from "@/lib/sanitize";
 import { Prisma, type CommunitySectionType } from "@prisma/client";
@@ -49,29 +51,17 @@ const themeUpdateSchema = z.object({
 /**
  * Update community theme (colors, fonts, hero)
  */
-export async function updateCommunityTheme(
-  communityId: string,
-  data: {
-    primaryColor?: string;
-    secondaryColor?: string;
-    accentColor?: string;
-    fontFamily?: string;
-    heroTitle?: string;
-    heroSubtitle?: string;
-    heroCTA?: string;
-    heroCTALink?: string;
-    aboutSection?: string;
-    showStats?: boolean;
-    showMembers?: boolean;
-    showCourses?: boolean;
-    // customCSS removed in Phase 2c.5 — see schema docstring above
-  }
-) {
+export const updateCommunityTheme = defineAction(
+  {
+    name: "updateCommunityTheme",
+    auth: "admin",
+    args: [z.string().min(1).max(64), z.record(z.string().max(64), z.unknown())],
+    community: ([communityId]) => communityById(communityId),
+  },
+  async (ctx, communityId: string, data: { primaryColor?: string; secondaryColor?: string; accentColor?: string; fontFamily?: string; heroTitle?: string; heroSubtitle?: string; heroCTA?: string; heroCTALink?: string; aboutSection?: string; showStats?: boolean; showMembers?: boolean; showCourses?: boolean; }) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Unauthorized" };
-    }
+
+    const userId = ctx.userId;
 
     // Verify ownership or admin
     const member = await prisma.member.findUnique({
@@ -118,19 +108,22 @@ export async function updateCommunityTheme(
     return { success: false, error: "Failed to update theme" };
   }
 }
+);
 
 /**
  * Update community layout type
  */
-export async function updateCommunityLayout(
-  communityId: string,
-  layoutType: "MODERN_GRID" | "CLASSIC_FORUM" | "ACADEMY" | "DASHBOARD" | "MINIMALIST"
-) {
+export const updateCommunityLayout = defineAction(
+  {
+    name: "updateCommunityLayout",
+    auth: "admin",
+    args: [z.string().min(1).max(64), z.enum(["MODERN_GRID", "CLASSIC_FORUM", "ACADEMY", "DASHBOARD", "MINIMALIST"])],
+    community: ([communityId]) => communityById(communityId),
+  },
+  async (ctx, communityId: string, layoutType: "MODERN_GRID" | "CLASSIC_FORUM" | "ACADEMY" | "DASHBOARD" | "MINIMALIST") => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Unauthorized" };
-    }
+
+    const userId = ctx.userId;
 
     // Verify ownership or admin
     const member = await prisma.member.findUnique({
@@ -159,26 +152,32 @@ export async function updateCommunityLayout(
     return { success: false, error: "Failed to update layout" };
   }
 }
+);
 
 /**
  * Create a new section for community page
  */
-export async function createCommunitySection(
-  communityId: string,
-  data: {
-    type: string;
-    title?: string;
-    content?: Prisma.InputJsonValue;
-    position?: number;
-    isVisible?: boolean;
-    settings?: Prisma.InputJsonValue;
-  }
-) {
+export const createCommunitySection = defineAction(
+  {
+    name: "createCommunitySection",
+    auth: "admin",
+    args: [
+      z.string().min(1).max(64),
+      z.object({
+        type: z.string().min(1).max(64),
+        title: z.string().max(300).optional(),
+        content: jsonValueSchema.optional(),
+        position: z.number().int().min(0).max(10_000).optional(),
+        isVisible: z.boolean().optional(),
+        settings: jsonValueSchema.optional(),
+      }),
+    ],
+    community: ([communityId]) => communityById(communityId),
+  },
+  async (ctx, communityId: string, data: { type: string; title?: string; content?: Prisma.InputJsonValue; position?: number; isVisible?: boolean; settings?: Prisma.InputJsonValue; }) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Unauthorized" };
-    }
+
+    const userId = ctx.userId;
 
     // Verify ownership or admin
     const member = await prisma.member.findUnique({
@@ -226,24 +225,30 @@ export async function createCommunitySection(
     return { success: false, error: "Failed to create section" };
   }
 }
+);
 
 /**
  * Update an existing section
  */
-export async function updateCommunitySection(
-  sectionId: string,
-  data: {
-    title?: string;
-    content?: Prisma.InputJsonValue;
-    isVisible?: boolean;
-    settings?: Prisma.InputJsonValue;
-  }
-) {
+export const updateCommunitySection = defineAction(
+  {
+    name: "updateCommunitySection",
+    auth: "admin",
+    args: [
+      z.string().min(1).max(64),
+      z.object({
+        title: z.string().max(300).optional(),
+        content: jsonValueSchema.optional(),
+        isVisible: z.boolean().optional(),
+        settings: jsonValueSchema.optional(),
+      }),
+    ],
+    community: ([sectionId]) => communityOfSection(sectionId),
+  },
+  async (ctx, sectionId: string, data: { title?: string; content?: Prisma.InputJsonValue; isVisible?: boolean; settings?: Prisma.InputJsonValue; }) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Unauthorized" };
-    }
+
+    const userId = ctx.userId;
 
     // Get section to verify ownership
     const section = await prisma.communitySection.findUnique({
@@ -281,16 +286,22 @@ export async function updateCommunitySection(
     return { success: false, error: "Failed to update section" };
   }
 }
+);
 
 /**
  * Delete a section
  */
-export async function deleteCommunitySection(sectionId: string) {
+export const deleteCommunitySection = defineAction(
+  {
+    name: "deleteCommunitySection",
+    auth: "admin",
+    args: [z.string().min(1).max(64)],
+    community: ([sectionId]) => communityOfSection(sectionId),
+  },
+  async (ctx, sectionId: string) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Unauthorized" };
-    }
+
+    const userId = ctx.userId;
 
     // Get section to verify ownership
     const section = await prisma.communitySection.findUnique({
@@ -327,16 +338,22 @@ export async function deleteCommunitySection(sectionId: string) {
     return { success: false, error: "Failed to delete section" };
   }
 }
+);
 
 /**
  * Reorder sections
  */
-export async function reorderCommunitySections(communityId: string, sectionIds: string[]) {
+export const reorderCommunitySections = defineAction(
+  {
+    name: "reorderCommunitySections",
+    auth: "admin",
+    args: [z.string().min(1).max(64), z.array(z.string().min(1).max(64)).max(500)],
+    community: ([communityId]) => communityById(communityId),
+  },
+  async (ctx, communityId: string, sectionIds: string[]) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Unauthorized" };
-    }
+
+    const userId = ctx.userId;
 
     // Verify ownership or admin
     const member = await prisma.member.findUnique({
@@ -375,11 +392,19 @@ export async function reorderCommunitySections(communityId: string, sectionIds: 
     return { success: false, error: "Failed to reorder sections" };
   }
 }
+);
 
 /**
  * Get community with all sections
  */
-export async function getCommunityWithSections(slug: string) {
+export const getCommunityWithSections = defineAction(
+  {
+    name: "getCommunityWithSections",
+    auth: "public",
+    args: [z.string().min(1).max(120)],
+    rateLimit: "api",
+  },
+  async (_ctx, slug: string) => {
   try {
     console.log("🔍 getCommunityWithSections - Looking for slug:", slug);
 
@@ -419,3 +444,4 @@ export async function getCommunityWithSections(slug: string) {
     return { success: false, error: "Failed to fetch community" };
   }
 }
+);
