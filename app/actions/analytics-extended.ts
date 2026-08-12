@@ -1,14 +1,20 @@
 "use server";
 
-import { getCurrentUserId } from "@/lib/auth-utils";
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { defineAction } from "@/lib/actions/define-action";
 import { subDays, format } from "date-fns";
 
 // ── Session Analytics ────────────────────────────────────────────────
-export async function getSessionAnalytics(communityId?: string) {
+export const getSessionAnalytics = defineAction(
+  {
+    name: "getSessionAnalytics",
+    auth: "user",
+    args: [z.string().min(1).max(64).optional()],
+  },
+  async (ctx, communityId?: string) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) return { success: false, error: "Not authenticated" };
+    const userId = ctx.userId;
 
     const ownedCommunities = await prisma.community.findMany({
       where: { ownerId: userId },
@@ -104,12 +110,18 @@ export async function getSessionAnalytics(communityId?: string) {
     return { success: false, error: "Failed to fetch session analytics" };
   }
 }
+);
 
 // ── Course Analytics ─────────────────────────────────────────────────
-export async function getCourseAnalytics(communityId?: string) {
+export const getCourseAnalytics = defineAction(
+  {
+    name: "getCourseAnalytics",
+    auth: "user",
+    args: [z.string().min(1).max(64).optional()],
+  },
+  async (ctx, communityId?: string) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) return { success: false, error: "Not authenticated" };
+    const userId = ctx.userId;
 
     const ownedCommunities = await prisma.community.findMany({
       where: { ownerId: userId },
@@ -234,12 +246,18 @@ export async function getCourseAnalytics(communityId?: string) {
     return { success: false, error: "Failed to fetch course analytics" };
   }
 }
+);
 
 // ── Revenue Analytics ────────────────────────────────────────────────
-export async function getRevenueAnalytics(communityId?: string) {
+export const getRevenueAnalytics = defineAction(
+  {
+    name: "getRevenueAnalytics",
+    auth: "user",
+    args: [z.string().min(1).max(64).optional()],
+  },
+  async (ctx, communityId?: string) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) return { success: false, error: "Not authenticated" };
+    const userId = ctx.userId;
 
     const ownedCommunities = await prisma.community.findMany({
       where: { ownerId: userId },
@@ -336,5 +354,6 @@ export async function getRevenueAnalytics(communityId?: string) {
     return { success: false, error: "Failed to fetch revenue analytics" };
   }
 }
+);
 
 // ── Gamification Analytics ───────────────────────────────────────────

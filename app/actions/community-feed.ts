@@ -1,17 +1,23 @@
 "use server";
 
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUserId } from "@/lib/auth-utils";
+import { defineAction } from "@/lib/actions/define-action";
+import { communityById, communityOfSession } from "@/lib/actions/resolvers";
 
 /**
  * Get upcoming session for a community (for pre-session discussion block)
  */
-export async function getCommunityUpcomingSession(communityId: string) {
+export const getCommunityUpcomingSession = defineAction(
+  {
+    name: "getCommunityUpcomingSession",
+    auth: "member",
+    args: [z.string().min(1).max(64)],
+    community: ([communityId]) => communityById(communityId),
+  },
+  async (_ctx, communityId: string) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Unauthorized" };
-    }
+
 
     const now = new Date();
     const oneWeekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
@@ -55,16 +61,21 @@ export async function getCommunityUpcomingSession(communityId: string) {
     return { success: false, error: "Failed to load session" };
   }
 }
+);
 
 /**
  * Get hot discussions (posts with most comments) for a community
  */
-export async function getCommunityHotDiscussions(communityId: string, limit: number = 5) {
+export const getCommunityHotDiscussions = defineAction(
+  {
+    name: "getCommunityHotDiscussions",
+    auth: "member",
+    args: [z.string().min(1).max(64), z.number().int().min(1).max(50).default(5)],
+    community: ([communityId]) => communityById(communityId),
+  },
+  async (_ctx, communityId: string, limit: number = 5) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Unauthorized" };
-    }
+
 
     // Get posts with comment count, ordered by popularity
     const posts = await prisma.post.findMany({
@@ -100,16 +111,21 @@ export async function getCommunityHotDiscussions(communityId: string, limit: num
     return { success: false, error: "Failed to load discussions" };
   }
 }
+);
 
 /**
  * Get pinned session recap (recording ready) for a community
  */
-export async function getCommunityPinnedRecap(communityId: string) {
+export const getCommunityPinnedRecap = defineAction(
+  {
+    name: "getCommunityPinnedRecap",
+    auth: "member",
+    args: [z.string().min(1).max(64)],
+    community: ([communityId]) => communityById(communityId),
+  },
+  async (_ctx, communityId: string) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Unauthorized" };
-    }
+
 
     // Get the most recent completed session with recording
     const session = await prisma.mentorSession.findFirst({
@@ -153,16 +169,21 @@ export async function getCommunityPinnedRecap(communityId: string) {
     return { success: false, error: "Failed to load recap" };
   }
 }
+);
 
 /**
  * Get dynamic state for session announcement cards (pre/live/recording/discussion)
  */
-export async function getSessionFeedState(sessionId: string) {
+export const getSessionFeedState = defineAction(
+  {
+    name: "getSessionFeedState",
+    auth: "member",
+    args: [z.string().min(1).max(64)],
+    community: ([sessionId]) => communityOfSession(sessionId),
+  },
+  async (_ctx, sessionId: string) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Unauthorized" };
-    }
+
 
     const session = await prisma.mentorSession.findUnique({
       where: { id: sessionId },
@@ -219,3 +240,4 @@ export async function getSessionFeedState(sessionId: string) {
     return { success: false, error: "Failed to load session state" };
   }
 }
+);

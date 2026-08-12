@@ -1,7 +1,10 @@
 "use server";
 
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUserId } from "@/lib/auth-utils";
+import { defineAction } from "@/lib/actions/define-action";
+import { assertBuddyPartner } from "@/lib/actions/guards";
+import { communityById, communityOfBuddyGoal, communityOfPartnership } from "@/lib/actions/resolvers";
 import { subDays } from "date-fns";
 
 // ── Compatibility Score ──────────────────────────────────────────────
@@ -28,10 +31,17 @@ function computeCompatibility(
 }
 
 // ── Smart Buddy Matching ─────────────────────────────────────────────
-export async function findSmartBuddyMatch(communityId: string) {
+export const findSmartBuddyMatch = defineAction(
+  {
+    name: "findSmartBuddyMatch",
+    auth: "member",
+    args: [z.string().min(1).max(64)],
+    community: ([communityId]) => communityById(communityId),
+  },
+  async (ctx, communityId: string) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) return { success: false, error: "Not authenticated" };
+
+    const userId = ctx.userId;
 
     // Check existing active partnership
     const existing = await prisma.buddyPartnership.findFirst({
@@ -123,12 +133,21 @@ export async function findSmartBuddyMatch(communityId: string) {
     return { success: false, error: "Failed to find matches" };
   }
 }
+);
 
 // ── Buddy Stats ──────────────────────────────────────────────────────
-export async function getBuddyStats(partnershipId: string) {
+export const getBuddyStats = defineAction(
+  {
+    name: "getBuddyStats",
+    auth: "member",
+    args: [z.string().min(1).max(64)],
+    community: ([partnershipId]) => communityOfPartnership(partnershipId),
+  },
+  async (ctx, partnershipId: string) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) return { success: false, error: "Not authenticated" };
+
+    const userId = ctx.userId;
+    await assertBuddyPartner(ctx, partnershipId);
 
     const partnership = await prisma.buddyPartnership.findUnique({
       where: { id: partnershipId },
@@ -200,18 +219,28 @@ export async function getBuddyStats(partnershipId: string) {
     return { success: false, error: "Failed to get stats" };
   }
 }
+);
 
 // ── Check-in with Streak Recording ───────────────────────────────────
-export async function buddyCheckInWithStreak(
-  partnershipId: string,
-  mood: number,
-  notes?: string,
-  wins?: string[],
-  _blockers?: string[]
-) {
+export const buddyCheckInWithStreak = defineAction(
+  {
+    name: "buddyCheckInWithStreak",
+    auth: "member",
+    args: [
+      z.string().min(1).max(64),
+      z.number().int().min(1).max(5),
+      z.string().max(5000).optional(),
+      z.array(z.string().max(500)).max(50).optional(),
+      z.array(z.string().max(500)).max(50).optional(),
+    ],
+    community: ([partnershipId]) => communityOfPartnership(partnershipId),
+    rateLimit: "create",
+  },
+  async (ctx, partnershipId: string, mood: number, notes?: string, wins?: string[], _blockers?: string[]) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) return { success: false, error: "Not authenticated" };
+
+    const userId = ctx.userId;
+    await assertBuddyPartner(ctx, partnershipId);
 
     const partnership = await prisma.buddyPartnership.findUnique({
       where: { id: partnershipId },
@@ -234,10 +263,27 @@ export async function buddyCheckInWithStreak(
     return { success: false, error: "Failed to check in" };
   }
 }
+);
 
 // ── Update Goal Progress ─────────────────────────────────────────────
-export async function updateGoalProgress(goalId: string, progress: number) {
+export const updateGoalProgress = defineAction(
+  {
+    name: "updateGoalProgress",
+    auth: "member",
+    args: [z.string().min(1).max(64), z.number().min(0).max(100)],
+    community: ([goalId]) => communityOfBuddyGoal(goalId),
+  },
+  async (ctx, goalId: string, progress: number) => {
   try {
+    // Membership of the community is not enough — only a partner in this
+    // partnership may move its goals.
+    const owning = await prisma.buddyGoal.findUnique({
+      where: { id: goalId },
+      select: { partnershipId: true },
+    });
+    if (!owning) return { success: false, error: "Goal not found" };
+    await assertBuddyPartner(ctx, owning.partnershipId);
+
     const goal = await prisma.buddyGoal.update({
       where: { id: goalId },
       data: {
@@ -252,3 +298,4 @@ export async function updateGoalProgress(goalId: string, progress: number) {
     return { success: false, error: "Failed to update goal" };
   }
 }
+);
