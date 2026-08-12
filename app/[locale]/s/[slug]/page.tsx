@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { isActionFailure } from "@/lib/actions/errors";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -17,7 +18,14 @@ interface Props {
 
 // Dedupe the session fetch across generateMetadata + the page render (both run
 // in the same request). Without this React cache() the slug was queried twice.
-const getCachedSession = cache((slug: string) => getPublicSessionBySlug(slug));
+// getPublicSessionBySlug now goes through defineAction and can return an
+// ActionFailure (e.g. rate limited). Collapse that to null here so both the
+// metadata and page paths keep their existing "missing session" handling.
+const getCachedSession = cache(async (slug: string) => {
+  const result = await getPublicSessionBySlug(slug);
+  if (isActionFailure(result)) return null;
+  return result;
+});
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const params = await props.params;

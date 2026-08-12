@@ -96,6 +96,21 @@ type InferTuple<T extends SchemaTuple> = {
   -readonly [K in keyof T]: z.infer<T[K]>;
 };
 
+/**
+ * Lets callers omit trailing arguments whose schema accepts `undefined`.
+ *
+ * Zod tuples are fixed-length, so `[z.string(), z.string().optional()]` infers
+ * `[string, string | undefined]` and TypeScript would demand both arguments.
+ * This produces a union of the progressively shorter tuples, which TypeScript
+ * accepts as a rest-parameter list. The handler still receives the full tuple —
+ * the seam pads omitted arguments with `undefined` before parsing.
+ */
+type WithOptionalTail<T extends readonly unknown[]> = T extends readonly [...infer Head, infer Last]
+  ? undefined extends Last
+    ? T | WithOptionalTail<Head>
+    : T
+  : T;
+
 export interface ActionConfig<TSchemas extends SchemaTuple, TAuth extends AuthLevel> {
   /**
    * Stable identifier, used for rate-limit bucketing and error reporting.
@@ -141,7 +156,7 @@ function defaultRateLimiter(authLevel: AuthLevel): RateLimiterName {
 export function defineAction<const TSchemas extends SchemaTuple, TAuth extends AuthLevel, TResult>(
   config: ActionConfig<TSchemas, TAuth>,
   handler: (ctx: ContextFor<TAuth>, ...args: InferTuple<TSchemas>) => Promise<TResult>
-): (...args: InferTuple<TSchemas>) => Promise<TResult | ActionFailure> {
+): (...args: WithOptionalTail<InferTuple<TSchemas>>) => Promise<TResult | ActionFailure> {
   if (config.auth === "member" && !config.community) {
     // A configuration error, not a runtime one — fail at module load rather than
     // silently degrading `member` to `user`.
@@ -150,7 +165,9 @@ export function defineAction<const TSchemas extends SchemaTuple, TAuth extends A
     );
   }
 
-  return async (...rawArgs: InferTuple<TSchemas>): Promise<TResult | ActionFailure> => {
+  return async (
+    ...rawArgs: WithOptionalTail<InferTuple<TSchemas>>
+  ): Promise<TResult | ActionFailure> => {
     try {
       // ── 1. Identity ────────────────────────────────────────────────────
       const session = await auth();

@@ -2,7 +2,9 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { getCurrentUserId } from "@/lib/auth-utils";
+import { z } from "zod";
+import { defineAction } from "@/lib/actions/define-action";
+import { communityById } from "@/lib/actions/resolvers";
 import Pusher from "pusher";
 
 const pusher = new Pusher({
@@ -59,12 +61,18 @@ async function canUsersDirectMessage(
 /**
  * Get or create a conversation between two users
  */
-export async function getOrCreateConversation(otherUserId: string, communityId: string) {
+export const getOrCreateConversation = defineAction(
+  {
+    name: "getOrCreateConversation",
+    auth: "member",
+    args: [z.string().min(1).max(64), z.string().min(1).max(64)],
+    community: ([, communityId]) => communityById(communityId),
+    rateLimit: "create",
+  },
+  async (ctx, otherUserId: string, communityId: string) => {
   try {
-    const currentUserId = await getCurrentUserId();
-    if (!currentUserId) {
-      return { success: false, error: "Not authenticated" };
-    }
+
+    const currentUserId = ctx.userId;
 
     if (currentUserId === otherUserId) {
       return { success: false, error: "Cannot message yourself" };
@@ -180,16 +188,22 @@ export async function getOrCreateConversation(otherUserId: string, communityId: 
     return { success: false, error: "Failed to get conversation" };
   }
 }
+);
 
 /**
  * Send a message in a conversation
  */
-export async function sendMessage(conversationId: string, content: string, attachments?: string[]) {
+export const sendMessage = defineAction(
+  {
+    name: "sendMessage",
+    auth: "user",
+    args: [z.string().min(1).max(64), z.string().max(10_000), z.array(z.string().max(2000)).max(20).optional()],
+    rateLimit: "message",
+  },
+  async (ctx, conversationId: string, content: string, attachments?: string[]) => {
   try {
-    const currentUserId = await getCurrentUserId();
-    if (!currentUserId) {
-      return { success: false, error: "Not authenticated" };
-    }
+
+    const currentUserId = ctx.userId;
 
     // Verify user is part of conversation
     const conversation = await prisma.conversation.findFirst({
@@ -279,16 +293,21 @@ export async function sendMessage(conversationId: string, content: string, attac
     return { success: false, error: "Failed to send message" };
   }
 }
+);
 
 /**
  * Mark messages as read
  */
-export async function markMessagesAsRead(conversationId: string) {
+export const markMessagesAsRead = defineAction(
+  {
+    name: "markMessagesAsRead",
+    auth: "user",
+    args: [z.string().min(1).max(64)],
+  },
+  async (ctx, conversationId: string) => {
   try {
-    const currentUserId = await getCurrentUserId();
-    if (!currentUserId) {
-      return { success: false, error: "Not authenticated" };
-    }
+
+    const currentUserId = ctx.userId;
 
     await prisma.directMessage.updateMany({
       where: {
@@ -309,16 +328,21 @@ export async function markMessagesAsRead(conversationId: string) {
     return { success: false, error: "Failed to mark messages as read" };
   }
 }
+);
 
 /**
  * Get all conversations for current user
  */
-export async function getUserConversations() {
+export const getUserConversations = defineAction(
+  {
+    name: "getUserConversations",
+    auth: "user",
+    args: [],
+  },
+  async (ctx) => {
   try {
-    const currentUserId = await getCurrentUserId();
-    if (!currentUserId) {
-      return { success: false, error: "Not authenticated" };
-    }
+
+    const currentUserId = ctx.userId;
 
     const conversations = await prisma.conversation.findMany({
       where: {
@@ -425,16 +449,21 @@ export async function getUserConversations() {
     return { success: false, error: "Failed to get conversations" };
   }
 }
+);
 
 /**
  * Search members for starting a new direct conversation
  */
-export async function getSharedMessageContext(otherUserId: string) {
+export const getSharedMessageContext = defineAction(
+  {
+    name: "getSharedMessageContext",
+    auth: "user",
+    args: [z.string().min(1).max(64)],
+  },
+  async (ctx, otherUserId: string) => {
   try {
-    const currentUserId = await getCurrentUserId();
-    if (!currentUserId) {
-      return { success: false, error: "Not authenticated" };
-    }
+
+    const currentUserId = ctx.userId;
 
     if (!otherUserId || otherUserId === currentUserId) {
       return { success: true, sharedCommunities: [] };
@@ -481,16 +510,21 @@ export async function getSharedMessageContext(otherUserId: string) {
     return { success: false, error: "Failed to load shared communities" };
   }
 }
+);
 
 /**
  * Get messages for a conversation
  */
-export async function getConversationMessages(conversationId: string, cursor?: string) {
+export const getConversationMessages = defineAction(
+  {
+    name: "getConversationMessages",
+    auth: "user",
+    args: [z.string().min(1).max(64), z.string().min(1).max(64).optional()],
+  },
+  async (ctx, conversationId: string, cursor?: string) => {
   try {
-    const currentUserId = await getCurrentUserId();
-    if (!currentUserId) {
-      return { success: false, error: "Not authenticated" };
-    }
+
+    const currentUserId = ctx.userId;
 
     // Verify user is part of conversation
     const conversation = await prisma.conversation.findFirst({
@@ -541,16 +575,21 @@ export async function getConversationMessages(conversationId: string, cursor?: s
     return { success: false, error: "Failed to get messages" };
   }
 }
+);
 
 /**
  * Delete a message
  */
-export async function deleteMessage(messageId: string) {
+export const deleteMessage = defineAction(
+  {
+    name: "deleteMessage",
+    auth: "user",
+    args: [z.string().min(1).max(64)],
+  },
+  async (ctx, messageId: string) => {
   try {
-    const currentUserId = await getCurrentUserId();
-    if (!currentUserId) {
-      return { success: false, error: "Not authenticated" };
-    }
+
+    const currentUserId = ctx.userId;
 
     // Verify user is the sender
     const message = await prisma.directMessage.findUnique({
@@ -576,16 +615,21 @@ export async function deleteMessage(messageId: string) {
     return { success: false, error: "Failed to delete message" };
   }
 }
+);
 
 /**
  * Block/unblock a conversation
  */
-export async function toggleBlockConversation(conversationId: string) {
+export const toggleBlockConversation = defineAction(
+  {
+    name: "toggleBlockConversation",
+    auth: "user",
+    args: [z.string().min(1).max(64)],
+  },
+  async (ctx, conversationId: string) => {
   try {
-    const currentUserId = await getCurrentUserId();
-    if (!currentUserId) {
-      return { success: false, error: "Not authenticated" };
-    }
+
+    const currentUserId = ctx.userId;
 
     const conversation = await prisma.conversation.findFirst({
       where: {
@@ -615,3 +659,4 @@ export async function toggleBlockConversation(conversationId: string) {
     return { success: false, error: "Failed to update block status" };
   }
 }
+);
