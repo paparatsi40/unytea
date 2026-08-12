@@ -4,8 +4,16 @@ import path from "path";
 
 describe("Auth Security Checks", () => {
   let authFileContent: string;
+  let credentialsFileContent: string;
   beforeAll(() => {
     authFileContent = fs.readFileSync(path.resolve(__dirname, "../../lib/auth.ts"), "utf-8");
+    // The credentials `authorize` path lives in its own module so it can be
+    // exercised behaviourally — see tests/unit/auth-flows.test.ts, which is the
+    // real coverage. The source assertions below remain as cheap tripwires.
+    credentialsFileContent = fs.readFileSync(
+      path.resolve(__dirname, "../../lib/auth-credentials.ts"),
+      "utf-8"
+    );
   });
   it("should NOT have allowDangerousEmailAccountLinking", () => {
     expect(authFileContent).not.toContain("allowDangerousEmailAccountLinking");
@@ -23,14 +31,17 @@ describe("Auth Security Checks", () => {
     expect(authFileContent).toContain('sameSite: "lax"');
   });
   it("should validate with Zod", () => {
-    expect(authFileContent).toContain("credentialsSchema.parse");
+    expect(credentialsFileContent).toContain("credentialsSchema.parse");
   });
   it("should hash passwords with bcrypt", () => {
-    expect(authFileContent).toContain("bcrypt.compare");
+    expect(credentialsFileContent).toContain("bcrypt.compare");
   });
   it("should not throw on login failure", () => {
-    const section = authFileContent.split("authorize")[1]?.split("}")[0] || "";
-    expect(section).not.toContain("throw");
+    const section = credentialsFileContent.split("authorizeCredentials")[1] || "";
+    expect(section).not.toContain("throw ");
+  });
+  it("should keep the constant-time dummy hash that blocks user enumeration", () => {
+    expect(credentialsFileContent).toContain("FAKE_BCRYPT_HASH");
   });
 });
 

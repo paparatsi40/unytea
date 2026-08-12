@@ -4,8 +4,7 @@ import Google from "next-auth/providers/google";
 import GitHub from "next-auth/providers/github";
 import Credentials from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
-import bcrypt from "bcryptjs";
-import { z } from "zod";
+import { authorizeCredentials } from "@/lib/auth-credentials";
 import type { UserRole } from "@prisma/client";
 
 // Extend the built-in session types
@@ -40,11 +39,6 @@ declare module "@auth/core/jwt" {
     role?: UserRole;
   }
 }
-
-const credentialsSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-});
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NextAuth v5 (beta) and @auth/prisma-adapter ship slightly divergent Adapter interfaces; PrismaAdapter's return type does not structurally match the Adapter type NextAuth expects at this boundary. Cast is required until both packages stabilize on a shared @auth/core version.
@@ -88,54 +82,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
-        try {
-          const { email, password } = credentialsSchema.parse(credentials);
-
-          // Find user
-          const user = await prisma.user.findUnique({
-            where: { email },
-          });
-
-          // Constant-time check to mitigate user enumeration via timing attacks.
-          // Si el user no existe o no tiene password (cuenta OAuth-only), aún corremos
-          // bcrypt.compare contra un hash dummy para que el tiempo de respuesta no delate
-          // la existencia o no del email.
-          const FAKE_BCRYPT_HASH = "$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy";
-          const hashToCheck = user?.password ?? FAKE_BCRYPT_HASH;
-          const isValidPassword = await bcrypt.compare(password, hashToCheck);
-
-          if (!user || !user.password || !isValidPassword) {
-            // No logueamos el email (PII / GDPR). Solo registramos el evento con userId si existe.
-            console.warn("[auth] login_failed", {
-              userId: user?.id ?? null,
-              reason: !user
-                ? "user_not_found"
-                : !user.password
-                  ? "oauth_only_account"
-                  : "invalid_password",
-            });
-            return null;
-          }
-
-          return {
-            id: user.id,
-            email: user.email,
-            name: user.name,
-            image: user.image,
-            username: user.username,
-            isOnboarded: user.isOnboarded,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            role: user.role,
-          };
-        } catch (error) {
-          console.error("[auth] login_error", {
-            message: error instanceof Error ? error.message : "unknown",
-          });
-          return null;
-        }
-      },
+      // Delegates to lib/auth-credentials.ts so the login path is unit-testable
+      // without initialising NextAuth. Behaviour is identical.
+      authorize: authorizeCredentials,
     }),
   ],
   callbacks: {
