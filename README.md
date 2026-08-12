@@ -1,424 +1,261 @@
-# ☕ Unytea - Where Communities Unite
+# ☕ Unytea — Where Communities Unite
 
-> **Community with soul.** Like sharing tea with friends, Unytea makes online community building
-> warm, human, and genuine. Everything Skool has, plus the features and soul it's missing.
+> **Community with soul.** A live-first community platform for creators: paid or free
+> communities with built-in video sessions, courses, real-time chat and a resource library.
 
 ![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
-![Next.js](https://img.shields.io/badge/Next.js-14-black.svg)
+![Next.js](https://img.shields.io/badge/Next.js-16-black.svg)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue.svg)
 
 ---
 
-## 🎯 **Vision**
+## Status
 
-Unytea is built to be the **warmest, most human** community platform - where connection comes
-first. We took everything that works from Skool and added the soul, the warmth, and the
-features they're missing. Half the price, better features, infinite soul.
+**Pre-launch. Not production-ready.** No real users, no real data.
 
-### **Why Unytea Beats Skool**
+An independent audit (`docs/AUDIT_REPORT.md`, August 2026) put production readiness
+at roughly 55%: the feature surface is largely built, but the authorization layer,
+test coverage and CI gating are not finished. Remediation is tracked in
+`docs/REMEDIATION_PLAN.md`. Do not point real customers at this until the
+Critical and High items there are closed.
 
-| Feature             | Skool              | Unytea                           |
-| ------------------- | ------------------ | -------------------------------- |
-| **Price**           | $99/month          | **$49/month** ☕                 |
-| **Video Calls**     | ❌ External (Zoom) | ✅ **Built-in (Livekit)**        |
-| **Buddy System**    | ❌ None            | ✅ **Unique matching system** 🌟 |
-| **Auditorium View** | ❌ None            | ✅ **Real-time presence** 🌟     |
-| **Custom Branding** | ❌ Logo only       | ✅ **Complete theming**          |
-| **Custom Domain**   | ❌ Subdomain only  | ✅ **Full custom domains**       |
-| **Performance**     | ⭐⭐⭐             | ⭐⭐⭐⭐⭐ **WebSockets 0ms**    |
-| **Design**          | 2015 style         | **2024 Glassmorphism** ✨        |
-| **Analytics**       | Basic stats        | **Advanced dashboards**          |
-| **White Label**     | ❌ Not available   | ✅ **Premium tier**              |
-
-**2 Features NOBODY ELSE HAS:**
-
-- 🤝 **Buddy System**: Smart member matching for accountability
-- 🎭 **Auditorium View**: Visual real-time presence
+This file describes **what is actually in the repository**. Claims that could not
+be verified against the code have been removed.
 
 ---
 
-## ✨ **Core Features**
+## Features
 
-### **✅ COMPLETED (96% Production-Ready)**
+### Working
 
-#### **1. Live Chat System** ✅ 100%
+**Communities** — Create branded communities with custom landing pages, a section
+builder, categories, and member roles (Owner / Admin / Moderator / Member).
+Public discovery via `/explore`. Posts with threaded comments, reactions and pinning.
 
-- Multiple channels
-- Real-time messaging (WebSockets - 0ms latency)
-- Message deletion
-- Typing indicators (real-time)
-- Online presence (real-time)
-- Auto-scroll, timestamps, avatars
+**Live sessions** — Video and audio sessions powered by LiveKit: scheduling,
+recurring series, RSVP, recordings, a collaborative whiteboard (Excalidraw),
+live polls and reactions, shared session notes, post-session feedback, and
+AI-generated recaps. Public SEO pages per session.
 
-#### **2. Member Directory** ✅ 100%
+**Courses** — Modules and lessons with progress tracking, quizzes, enrolment,
+one-off course purchases, and completion certificates with public verification.
 
-- Grid view with search
-- Filter by role (all/admins/members)
-- Sort options (name/join date/points)
-- Profile cards with avatars
-- Member count
+**Chat** — Community channels with real-time messaging, presence and typing
+indicators, plus 1:1 direct messages. Real-time transport is **Pusher**.
 
-#### **3. Gamification/Leaderboard** ✅ 100%
+**Resource library** — Categorised resources with progress tracking and likes.
 
-- Points system
-- Level badges (1-50)
-- Weekly/Monthly/All-time tabs
-- Top 10 rankings with podium design
-- Progress bars, XP calculation
-- Streak tracking
+**Buddy system** — Member matching within a community, with shared goals and
+check-ins.
 
-#### **4. Buddy System** ✅ 100% 🌟 UNIQUE
+**Auditorium view** — Visual real-time presence for a community's chat.
 
-- Smart matching algorithm
-- Goals creation & tracking
-- Check-ins with notes
-- Timeline view
-- Match/Unmatch functionality
-- Progress indicators
+**Payments** — Stripe: platform subscriptions with plan limits, paid communities,
+one-off course purchases, creator payouts via Stripe Connect, and the customer
+billing portal. Subscription state is driven by webhooks, not by the client.
 
-#### **5. Auditorium View** ✅ 100% 🌟 UNIQUE
+**Notifications** — In-app notification centre plus Web Push (PWA).
 
-- Visual presence (CSS Grid avatars)
-- Dynamic sizing (1-100+ users)
-- Real-time updates (WebSockets - 0ms)
-- Gradient backgrounds
-- Animated entries/exits
-- User count
+**Internationalisation** — English, Spanish and French across the marketing site,
+auth and community pages, at full key parity. **The `/dashboard` area is
+English-only** — it sits outside the `[locale]` segment. See PROD-01 in the audit.
 
-#### **6. Notifications System** ✅ 100%
+**PWA** — Manifest, service worker, offline route, install prompt.
 
-- Toast notifications (4 variants)
-- Notification Center dropdown
-- Real-time notifications (WebSockets)
-- Mark as read/Mark all as read
-- Delete notifications
-- Unread count badge
-- 10 notification types
+**Observability** — Sentry on the client, server and edge runtimes.
 
-#### **7. Real-time WebSockets** ✅ 100%
+### Not built
 
-- Socket.io server complete
-- 5 custom React hooks
-- 0ms latency
-- 90% server load reduction
-- Auto-reconnection
-- Error handling
+These have appeared in earlier versions of this README and **do not exist** in the
+codebase: gamification (points, levels, leaderboards, streaks), achievements and
+badges, custom domains, white-labelling, and analytics export / date-range filters.
 
-#### **8. Mobile Optimization** ✅ 95%
-
-- Responsive breakpoints
-- Touch-friendly UI
-- Collapsible sidebars
-- Mobile-first design
-
-#### **9. Performance Optimization** ✅ 95%
-
-- Next.js optimized config
-- Image optimization (WebP, AVIF)
-- Database query optimization
-- Bundle optimization
-- Compression (gzip, brotli)
-
-#### **10. UI/UX Polish** ✅ 95%
-
-- Micro-animations
-- Hover effects
-- Error boundaries
-- Smooth transitions (300ms)
-- Glass morphism effects
-- Custom scrollbars
-
-#### **11. Existing Features** ✅
-
-- Dashboard home (stats overview)
-- Communities (CRUD operations)
-- Direct Messages (1-on-1)
-- Settings/Profile
-- Posts/Feed
-- Authentication (NextAuth)
-- User roles (owner/admin/member)
+The analytics dashboard exists but renders hand-built components — there is no
+charting library installed.
 
 ---
 
-### **🔄 IN PROGRESS**
+## Tech stack
 
-#### **12. Achievements System** 🔄 50%
+| Layer        | Actual                                                                                                 |
+| ------------ | ------------------------------------------------------------------------------------------------------ |
+| Framework    | Next.js 16 (App Router), React 19                                                                      |
+| Language     | TypeScript 5, `strict`                                                                                 |
+| Server logic | **Server Actions + Route Handlers** — all actions go through the `defineAction` seam in `lib/actions/` |
+| Database     | PostgreSQL (Neon) via Prisma 5                                                                         |
+| Auth         | NextAuth v5 (beta) — credentials, Google, GitHub                                                       |
+| Payments     | Stripe + Stripe Connect                                                                                |
+| Video        | LiveKit                                                                                                |
+| Real-time    | Pusher                                                                                                 |
+| Uploads      | UploadThing                                                                                            |
+| Email        | Resend                                                                                                 |
+| Push         | web-push (VAPID)                                                                                       |
+| AI           | OpenAI SDK                                                                                             |
+| Styling      | Tailwind CSS + shadcn/ui + Radix                                                                       |
+| Animation    | Framer Motion                                                                                          |
+| i18n         | next-intl                                                                                              |
+| Monitoring   | Sentry                                                                                                 |
+| Testing      | Vitest (unit), Playwright (E2E)                                                                        |
+| Hosting      | Vercel                                                                                                 |
 
-- 26 achievements defined
-- Categories: social/content/learning/community
-- Points, badges, rarity levels
-- **Pending**: Server actions, UI components, unlock logic
-
----
-
-### **📋 PLANNED (FULL MODE - 32-50 hours)**
-
-#### **13. Sessions/Video Calls** ⏳ HIGH PRIORITY
-
-- 1-on-1 and group sessions
-- Screen sharing
-- Recording & transcriptions
-- Session history
-- Livekit integration
-- **Time**: 4-6 hours
-
-#### **14. Analytics Dashboard** ⏳ MEDIUM PRIORITY
-
-- Event tracking system
-- Charts & graphs (Recharts)
-- User growth metrics
-- Engagement metrics
-- Export functionality
-- Date range filters
-- **Time**: 5-7 hours
-
-#### **15. Courses/LMS Platform** ⏳ LOW PRIORITY
-
-- Course creation interface
-- Module & lesson structure
-- Video hosting integration
-- Quiz system
-- Progress tracking
-- Certificates
-- **Time**: 15-20 hours
-
-#### **16. Advanced Settings** ⏳ LOW PRIORITY
-
-- Notification preferences
-- Privacy settings
-- Email preferences
-- Theme customization
-- Language selection
-- **Time**: 2-3 hours
+> There is **no tRPC, no Socket.io, no Zustand, no TipTap and no PostHog** in this
+> codebase, despite earlier claims. The API layer is Server Actions; real-time is
+> Pusher.
 
 ---
 
-### **🔐 CRITICAL FOR PRODUCTION**
+## Getting started
 
-#### **17. Security Audit** ⚠️ CRITICAL
+### Prerequisites
 
-- Rate limiting (API routes)
-- CSRF protection
-- Input validation (all forms)
-- SQL injection prevention
-- XSS prevention
-- Authentication/Authorization checks
-- Audit logging
-- HTTPS enforcement
-- Content Security Policy
-- **Time**: 2-3 hours
+- Node.js 24.x (see `.nvmrc`), npm ≥ 10
+- A PostgreSQL database
 
-#### **18. Testing** ⚠️ CRITICAL
-
-- Unit tests (key functions)
-- Integration tests (API routes)
-- E2E tests (user flows)
-- Multi-user testing
-- Mobile testing
-- Browser compatibility
-- Performance testing
-- Bug fixes
-- **Time**: 2-3 hours
-
----
-
-## 🛠️ **Tech Stack**
-
-### **Frontend**
-
-- **Framework**: Next.js 14 (App Router)
-- **Language**: TypeScript (strict mode)
-- **Styling**: Tailwind CSS + shadcn/ui
-- **Animations**: Framer Motion
-- **Icons**: Lucide React
-- **State**: Zustand
-- **Real-time**: Socket.io Client
-- **Rich Text**: Tiptap
-
-### **Backend**
-
-- **API**: tRPC (type-safe)
-- **Database**: PostgreSQL
-- **ORM**: Prisma
-- **Auth**: NextAuth v5
-- **Payments**: Stripe
-- **Video**: Livekit
-- **Storage**: Uploadthing
-- **Real-time**: Socket.io Server
-
-### **Infrastructure**
-
-- **Hosting**: Vercel (Frontend)
-- **Database**: PostgreSQL (Railway/Supabase)
-- **CDN**: Cloudflare
-- **Monitoring**: Sentry
-- **Analytics**: PostHog
-
----
-
-## 🚀 **Getting Started**
-
-### **Prerequisites**
-
-- Node.js 18+ and npm
-- PostgreSQL database
-- NextAuth setup
-
-### **Installation**
-
-1. **Clone the repository**
-
-```bash
-git clone https://github.com/yourusername/unytea.git
-cd unytea/web
-```
-
-2. **Install dependencies**
+### Setup
 
 ```bash
 npm install
-```
-
-3. **Set up environment variables**
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env` and add your credentials:
-
-```env
-DATABASE_URL="postgresql://..."
-NEXTAUTH_URL="http://localhost:3000"
-NEXTAUTH_SECRET="your-secret-here"
-```
-
-4. **Set up the database**
-
-```bash
-npm run db:push
-```
-
-5. **Run the development server**
-
-```bash
+cp .env.example .env.local   # then fill in the values
+npm run db:push              # or: npm run db:migrate
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) ☕
+Open <http://localhost:3000>.
+
+`npm install` also installs the git hooks (`core.hooksPath` → `.githooks`), which
+block committing a secret-shaped value under a `NEXT_PUBLIC_*` name.
 
 ---
 
-## 🎯 **Roadmap (FULL MODE)**
-
-### **Immediate (Next 8 hours)**
-
-- ✅ Rebranding complete → **Unytea**
-- 🏆 Complete Achievements (2hrs)
-- 🔐 Security Audit (2-3hrs)
-- 🧪 Testing Phase 1 (2-3hrs)
-
-### **Week 1 (Next 13 hours)**
-
-- 🎥 Sessions/Video (4-6hrs)
-- 📊 Analytics (5-7hrs)
-
-### **Week 2 (Next 17-23 hours)**
-
-- 📚 Courses/LMS (15-20hrs)
-- ⚙️ Advanced Settings (2-3hrs)
-
-### **Week 3 (Polish & Launch)**
-
-- 🎨 Final Polish (2hrs)
-- 🧪 Final Testing (2hrs)
-- 🚀 Launch Prep (1hr)
-
-**TOTAL: 40-50 hours to 100% complete**
-
----
-
-## 🏆 **Competitive Advantages**
-
-### **Features Nobody Else Has:**
-
-1. 🤝 **Buddy System** - Smart member matching
-2. 🎭 **Auditorium View** - Real-time visual presence
-
-### **Better Than Skool:**
-
-- ⚡ Real-time WebSockets (0ms latency)
-- 🎨 Modern 2024 design (not 2015)
-- 💰 Half the price ($49 vs $99)
-- 🚀 Discord-level performance
-- ☕ Soul & warmth
-
----
-
-## 📊 **Performance Targets**
-
-- **Lighthouse Score**: 95+ on all metrics
-- **LCP**: < 1.5s
-- **FID**: < 100ms
-- **CLS**: < 0.1
-- **TTI**: < 2s
-
----
-
-## 🔒 **Security**
-
-- ✅ OWASP Top 10 addressed
-- ✅ Rate limiting planned
-- ✅ CSRF protection
-- ✅ XSS prevention
-- ✅ SQL injection impossible (Prisma ORM)
-- ✅ Secure authentication (NextAuth)
-- ✅ HTTPS only in production
-
----
-
-## 📝 **Scripts**
+## Scripts
 
 ```bash
 # Development
-npm run dev          # Start dev server
-npm run build        # Build for production
-npm run start        # Start production server
+npm run dev            # dev server
+npm run start          # production server
+
+# Quality gates — all four must pass before a PR
+npm run type-check     # tsc --noEmit
+npm run lint           # eslint
+npm run test           # vitest
+npm run format:check   # prettier
+
+npm run check:env      # fail on secrets in NEXT_PUBLIC_* vars
+npm run test:e2e       # playwright
+npm run analyze        # bundle analyzer
 
 # Database
-npm run db:generate  # Generate Prisma client
-npm run db:push      # Push schema to database
-npm run db:studio    # Open Prisma Studio
+npm run db:generate
+npm run db:push
+npm run db:migrate
+npm run db:studio
+```
 
-# Quality
-npm run lint         # Run ESLint
-npm run type-check   # TypeScript check
-npm run format       # Format with Prettier
+### ⚠️ `npm run build` touches the database
+
+`build` runs `prisma migrate deploy` before `next build`, against whatever
+`DATABASE_URL` is in the environment. **To verify a build locally, run
+`npx next build` instead.** Moving migrations out of the build step is tracked as
+M9 in the remediation plan.
+
+---
+
+## Architecture notes
+
+### Server Actions go through `defineAction`
+
+Next.js exposes every exported async function in a `"use server"` file as a public
+POST endpoint — middleware does not protect them. Every action must therefore be
+declared through `lib/actions/define-action.ts`, which applies identity,
+authorization, Zod validation and rate limiting in one place:
+
+```ts
+export const deletePost = defineAction(
+  {
+    name: "deletePost",
+    auth: "member", // public | user | member | admin
+    args: [z.string().min(1).max(64)],
+    community: ([postId]) => communityOfPost(postId),
+    rateLimit: "create",
+  },
+  async (ctx, postId) => {
+    /* ctx.userId is a string; ctx.member is the caller's row */
+  }
+);
+```
+
+The ESLint rule `unytea/no-bare-server-action` enforces this, so `auth: "public"`
+is an explicit, reviewable choice rather than the default. **The migration of
+existing actions onto the seam is still in progress** — the rule is currently a
+warning and reports the remaining count.
+
+### Privileged work is not a Server Action
+
+Cron pipelines and webhook handlers live in `lib/jobs/` with **no** `"use server"`
+directive, so they are reachable only through their `CRON_SECRET`-guarded routes
+or a verified webhook signature.
+
+---
+
+## Repository layout
+
+```
+app/
+  (dashboard)/     authenticated app (outside [locale] — English only)
+  [locale]/        public marketing, auth, community and session pages
+  actions/         Server Actions (via defineAction)
+  api/             route handlers: auth, stripe, cron, webhooks, uploads
+components/        UI, grouped by feature
+lib/
+  actions/         the defineAction seam, resolvers, guards
+  jobs/            internal pipelines — never "use server"
+  authorization.ts RBAC primitives
+locales/           en / es / fr
+prisma/            schema + migrations
+tests/             vitest unit tests, playwright e2e
+docs/              audit report and remediation plan
 ```
 
 ---
 
-## 💬 **Support**
+## Security
 
-- **Email**: support@unytea.com
-- **Twitter**: [@unytea](https://twitter.com/unytea)
-- **Discord**: [Join our community](https://discord.gg/unytea)
+Current posture, honestly stated. Full detail in `docs/AUDIT_REPORT.md`.
+
+**In place**
+
+- Stripe webhook signature verification with idempotency
+- `CRON_SECRET` on cron routes, constant-time comparison, fail-closed
+- Anti-enumeration on login, signup and password reset; constant-time password compare
+- JWT sessions; `httpOnly`, `SameSite=Lax`, `Secure` + `__Secure-` prefix in production
+- HSTS (preload), `X-Frame-Options`, `nosniff`, `Referrer-Policy`, and a CSP
+- Rate limiting (Upstash Redis, in-memory fallback)
+- Zero known dependency advisories (`npm audit --omit=dev`)
+- CI guard against secrets in `NEXT_PUBLIC_*` variables
+- SQL injection is not a practical risk — Prisma everywhere, no raw string interpolation
+
+**Known gaps — do not launch before these close**
+
+- The `defineAction` migration is incomplete; some actions still lack an authorization check
+- The enforced CSP still allows `'unsafe-inline'` / `'unsafe-eval'` in `script-src`
+- JSON-LD is injected unescaped on public pages (stored XSS — H4)
+- `POST /api/email/send` and `PUT /api/pusher` are under-authorized (H1, H2)
+- No authorization test coverage yet; CI does not gate on build, E2E or lint
 
 ---
 
-## ☕ **Built with Love**
+## Contributing
+
+`type-check`, `test`, `lint` and `format:check` must pass. Never run
+`npm run build` locally — use `npx next build`. New Server Actions must go through
+`defineAction`.
+
+---
+
+## Support
+
+- Email: support@unytea.com
+
+---
 
 Made with 💜 to bring warmth and soul to online communities.
-
-**Unytea: Where Communities Unite.**
-
-Let's build something warm together. ☕
-
----
-
-### **Quick Links**
-
-- [Documentation](https://docs.unytea.com) (Coming soon)
-- [Changelog](./CHANGELOG.md) (Coming soon)
-- [API Reference](https://api.unytea.com) (Coming soon)
