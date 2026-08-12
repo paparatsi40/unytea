@@ -14,7 +14,7 @@ import { prisma } from "@/lib/prisma";
 import { nanoid } from "nanoid";
 import { revalidatePath } from "next/cache";
 import { PostContentType } from "@prisma/client";
-import { generateUpcomingSessions } from "@/app/actions/sessions";
+import { generateUpcomingSessions } from "@/lib/jobs/session-schedule";
 import { runAutopilotDueJobs } from "./autopilot";
 import { sendSessionReminderEmail } from "@/lib/email";
 import { sendPushToUser, pushTemplates } from "@/lib/push";
