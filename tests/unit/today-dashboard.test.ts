@@ -16,9 +16,30 @@ vi.mock("@/lib/auth", () => ({
   auth: vi.fn(),
 }));
 
+// getTodayDashboard now runs through defineAction, which rate-limits and reads
+// request headers before the handler.
+vi.mock("@/lib/rate-limit", () => ({
+  rateLimiters: new Proxy(
+    {},
+    { get: () => ({ check: async () => ({ success: true, remaining: 10, resetTime: 0 }) }) }
+  ),
+}));
+vi.mock("next/headers", () => ({ headers: async () => new Headers() }));
+vi.mock("@sentry/nextjs", () => ({ captureException: vi.fn() }));
+
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
-import { getTodayDashboard } from "@/app/actions/today-dashboard";
+import { getTodayDashboard as rawGetTodayDashboard } from "@/app/actions/today-dashboard";
+import { isActionFailure } from "@/lib/actions/errors";
+
+/** Unwraps the seam's failure shape so the assertions below stay focused on the data. */
+async function getTodayDashboard() {
+  const result = await rawGetTodayDashboard();
+  if (isActionFailure(result)) {
+    throw new Error(`unexpected action failure: ${result.code} ${result.error}`);
+  }
+  return result;
+}
 
 // The mocks below intentionally provide minimal/partial shapes. We assert them
 // through the real resolved return type of each method (via `unknown`) so the
@@ -61,10 +82,13 @@ beforeEach(() => {
 });
 
 describe("getTodayDashboard", () => {
-  it("returns null when no authenticated session", async () => {
+  it("rejects an unauthenticated caller", async () => {
     vi.mocked(auth).mockResolvedValue(null as unknown as AuthResult);
-    const result = await getTodayDashboard();
-    expect(result).toBeNull();
+    // Pre-seam this returned null, which a caller could mistake for "no data".
+    // The seam now returns a typed UNAUTHORIZED failure instead.
+    const result = await rawGetTodayDashboard();
+    expect(isActionFailure(result)).toBe(true);
+    expect(result).toMatchObject({ success: false, code: "UNAUTHORIZED" });
   });
 
   it("returns shape with all fields for authenticated user with no data", async () => {

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AlertCircle, Loader2, SearchX } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { isActionFailure } from "@/lib/actions/errors";
 import { loadMoreCommunitiesAction } from "@/app/[locale]/explore/actions";
 import { cn } from "@/lib/utils";
 import type { ExploreCommunity, ExploreFilters, ExploreResponse } from "@/types/explore";
@@ -95,6 +96,12 @@ export function ExploreInfiniteFeed({
         page: currentPage + 1,
         pageSize: initialData.pageSize,
       });
+      // The action can return an ActionFailure (rate limit, validation) instead
+      // of a page — never treat that as data.
+      if (isActionFailure(next)) {
+        setError("load_more_failed");
+        return;
+      }
       setCommunities((prev) => [...prev, ...next.communities]);
       setCurrentPage(next.page);
       setHasMore(next.hasMore);

@@ -1,7 +1,8 @@
 "use server";
 
-import { getCurrentUserId } from "@/lib/auth-utils";
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { defineAction } from "@/lib/actions/define-action";
 
 interface SearchResult {
   id: string;
@@ -25,18 +26,16 @@ interface SearchResponse {
  * Server action for global search across posts, courses, communities, and members
  * Can be called from client components
  */
-export async function searchGlobal(
-  query: string,
-  type: string = "all"
-): Promise<SearchResponse | { error: string }> {
-  try {
-    // 1. AUTHENTICATION CHECK
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { error: "Unauthorized - authentication required" };
-    }
-
-    // 2. VALIDATE INPUTS
+export const searchGlobal = defineAction(
+  {
+    name: "searchGlobal",
+    auth: "user",
+    args: [z.string().max(200), z.string().max(32).default("all")],
+    rateLimit: "api",
+  },
+  async (ctx, query, type): Promise<SearchResponse | { error: string }> => {
+  void ctx;
+  {
     const trimmedQuery = query.trim();
 
     if (!trimmedQuery || trimmedQuery.length < 2) {
@@ -225,8 +224,6 @@ export async function searchGlobal(
     }
 
     return response;
-  } catch (error) {
-    console.error("[search-action] Error:", error);
-    return { error: "An error occurred while searching" };
   }
-}
+  }
+);

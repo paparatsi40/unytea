@@ -45,7 +45,7 @@ export function CommentSection({
 
     const result = await getPostComments(postId);
 
-    if (result.success && result.comments) {
+    if (result.success) {
       setComments(result.comments);
     } else {
       setError(result.error || t("loadError"));

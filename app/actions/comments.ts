@@ -1,17 +1,24 @@
 "use server";
 
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { revalidateLocalizedPath } from "@/lib/cache-invalidation";
-import { getCurrentUserId } from "@/lib/auth-utils";
+import { defineAction } from "@/lib/actions/define-action";
+import { communityOfComment, communityOfPost } from "@/lib/actions/resolvers";
 
-export async function createComment(postId: string, content: string, parentId?: string) {
-  try {
-    const userId = await getCurrentUserId();
+const postIdSchema = z.string().min(1).max(64);
+const commentIdSchema = z.string().min(1).max(64);
 
-    if (!userId) {
-      return { success: false, error: "Unauthorized" };
-    }
-
+export const createComment = defineAction(
+  {
+    name: "createComment",
+    auth: "member",
+    args: [postIdSchema, z.string().max(10_000), postIdSchema.optional()],
+    community: ([postId]) => communityOfPost(postId),
+    rateLimit: "create",
+  },
+  async (ctx, postId, content, parentId) => {
+    const userId = ctx.userId;
     if (!content || content.trim().length === 0) {
       return { success: false, error: "Comment content is required" };
     }
@@ -42,15 +49,22 @@ export async function createComment(postId: string, content: string, parentId?: 
 
     revalidateLocalizedPath("/c/[slug]", "page");
 
-    return { success: true, comment };
-  } catch (error) {
-    console.error("Error creating comment:", error);
-    return { success: false, error: "Failed to create comment" };
+    return { success: true as const, comment };
   }
-}
+);
 
-export async function getPostComments(postId: string) {
-  try {
+/**
+ * Comments on a post. Was unauthenticated, so any thread in any private or paid
+ * community could be read by anyone holding a postId.
+ */
+export const getPostComments = defineAction(
+  {
+    name: "getPostComments",
+    auth: "member",
+    args: [postIdSchema],
+    community: ([postId]) => communityOfPost(postId),
+  },
+  async (_ctx, postId) => {
     const comments = await prisma.comment.findMany({
       where: {
         postId,
@@ -93,46 +107,40 @@ export async function getPostComments(postId: string) {
       orderBy: {
         createdAt: "desc",
       },
+      take: 200,
     });
 
-    return { success: true, comments };
-  } catch (error) {
-    console.error("Error fetching comments:", error);
-    return { success: false, error: "Failed to fetch comments", comments: [] };
+    return { success: true as const, comments };
   }
-}
+);
 
-export async function deleteComment(commentId: string) {
-  try {
-    const userId = await getCurrentUserId();
-
-    if (!userId) {
-      return { success: false, error: "Unauthorized" };
-    }
-
-    // Check if user is the author
+export const deleteComment = defineAction(
+  {
+    name: "deleteComment",
+    auth: "member",
+    args: [commentIdSchema],
+    community: ([commentId]) => communityOfComment(commentId),
+  },
+  async (ctx, commentId) => {
     const comment = await prisma.comment.findUnique({
       where: { id: commentId },
       select: { authorId: true },
     });
 
     if (!comment) {
-      return { success: false, error: "Comment not found" };
+      return { success: false as const, error: "Comment not found" };
     }
 
-    if (comment.authorId !== userId) {
-      return { success: false, error: "Unauthorized to delete this comment" };
+    // Author, or a moderator of the community owning the post.
+    const isModerator =
+      ctx.member != null && ["OWNER", "ADMIN", "MODERATOR"].includes(ctx.member.role);
+    if (comment.authorId !== ctx.userId && !isModerator) {
+      return { success: false as const, error: "Unauthorized to delete this comment" };
     }
 
-    await prisma.comment.delete({
-      where: { id: commentId },
-    });
-
+    await prisma.comment.delete({ where: { id: commentId } });
     revalidateLocalizedPath("/c/[slug]", "page");
 
-    return { success: true };
-  } catch (error) {
-    console.error("Error deleting comment:", error);
-    return { success: false, error: "Failed to delete comment" };
+    return { success: true as const };
   }
-}
+);
