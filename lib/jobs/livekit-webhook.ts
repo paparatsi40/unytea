@@ -10,7 +10,7 @@ import { WebhookReceiver, EgressStatus, type WebhookEvent } from "livekit-server
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { autoStartRecording } from "@/app/actions/recording";
-import { createNotification } from "@/app/actions/notifications";
+import { createNotification } from "@/lib/notifications";
 import { generateAISessionSummary } from "./session-ai";
 import { generateSessionRecap } from "./session-jobs";
 import { PostContentType, Prisma, SessionEventType } from "@prisma/client";
