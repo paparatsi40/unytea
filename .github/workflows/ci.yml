@@ -69,9 +69,14 @@ jobs:
   lint:
     name: ESLint
     runs-on: ubuntu-latest
-    # TODO: quitar continue-on-error cuando se modernice la config de ESLint
-    # (hoy emite "Invalid Options: useEslintrc, extensions").
-    continue-on-error: true
+    # Blocking. The "Invalid Options: useEslintrc, extensions" failure that
+    # justified continue-on-error is long gone — `npm run lint` exits 0 today.
+    #
+    # ESLint exits non-zero only on *errors*, so this gates the security rule
+    # `unytea/no-bare-server-action` (severity: error — every export of a
+    # "use server" module must go through defineAction) while the remaining
+    # ~180 warnings stay visible but non-blocking until M16 clears them.
+    # Raising --max-warnings to paper over those is explicitly not the plan.
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

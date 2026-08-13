@@ -83,13 +83,14 @@ export default [
     // SEC-02 gate. Every export of a "use server" module is a public POST
     // endpoint, so each one must declare an auth level through defineAction.
     //
-    // Severity is "warn" only while the 224-action migration is in flight —
-    // turning it on blocking mid-migration would red the build. It is promoted
-    // to "error" in the same commit that migrates the last action.
+    // Blocking as of the commit that migrated the last of the 224 actions.
+    // Paired with tests/unit/action-authz.test.ts, which catches the case this
+    // rule cannot see: an action that goes through defineAction but declares
+    // auth: "public" without being on the reviewed allowlist.
     files: ["app/**/*.ts", "app/**/*.tsx", "lib/**/*.ts"],
     plugins: { unytea },
     rules: {
-      "unytea/no-bare-server-action": "warn",
+      "unytea/no-bare-server-action": "error",
     },
   },
 ];

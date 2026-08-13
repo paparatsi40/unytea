@@ -138,7 +138,7 @@ export const createSession = defineAction(
           if (community?.slug) {
             revalidatePath(`/dashboard/c/${community.slug}/feed`);
           }
-        } catch (e) {
+        } catch {
           // Ignore if community lookup fails
         }
       } catch (postError) {
