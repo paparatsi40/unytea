@@ -2112,7 +2112,8 @@
         "title": "Quels sont vos objectifs ?",
         "description": "Aidez-nous à personnaliser votre expérience",
         "goals": "Parlez-nous de vos objectifs",
-        "goalsPlaceholder": "Je veux construire une communauté prospère et partager mes connaissances..."
+        "goalsPlaceholder": "Je veux construire une communauté prospère et partager mes connaissances...",
+        "optionalLabel": "facultatif"
       },
       "4": {
         "title": "Qu'est-ce qui vous intéresse ?",
@@ -2126,51 +2127,6 @@
           "Lifestyle": "Style de vie",
           "Education": "Éducation"
         }
-      },
-      "5": {
-        "title": "Choisissez Votre Plan",
-        "description": "Sélectionnez le plan qui correspond à vos besoins (modifiable à tout moment)",
-        "perMonth": "/mois",
-        "freePrice": "Gratuit",
-        "moreFeatures": "+{count} autres fonctionnalités",
-        "trialNote": "Tous les plans payants incluent 14 jours d'essai gratuit. Aucune carte bancaire requise pour commencer.",
-        "free": {
-          "name": "Gratuit",
-          "description": "Parfait pour explorer les communautés",
-          "features": [
-            "Rejoignez jusqu'à 3 communautés (sans en créer)",
-            "Accès au contenu et au fil de la communauté",
-            "Messagerie directe avec les membres",
-            "Fonctions de profil de base"
-          ]
-        },
-        "professional": {
-          "name": "Professionnel",
-          "description": "Le meilleur pour les créateurs de communauté",
-          "popular": "Plus Populaire",
-          "features": [
-            "Créez 1 communauté (la vôtre)",
-            "Membres illimités",
-            "Visioconférences et streaming",
-            "Constructeur de cours",
-            "AI Coach",
-            "Tableau de bord d'analyses",
-            "Support prioritaire"
-          ]
-        },
-        "premium": {
-          "name": "Premium",
-          "description": "Pour les utilisateurs avancés avec plusieurs communautés",
-          "features": [
-            "Créez jusqu'à 3 communautés",
-            "Toutes les fonctions Professionnelles",
-            "Options de marque blanche",
-            "Analyses avancées",
-            "Accès API",
-            "Support dédié",
-            "Intégrations personnalisées"
-          ]
-        }
       }
     },
     "navigation": {
@@ -2180,8 +2136,6 @@
       "processing": "Traitement...",
       "stepOf": "Étape {current} sur {total}",
       "continue": "Continuer",
-      "startFree": "Commencer Gratuitement",
-      "startTrial": "Démarrer l'Essai Gratuit",
       "settingUp": "Configuration...",
       "skip": "Passer pour l'instant →"
     },
@@ -2189,6 +2143,13 @@
       "title": "Tout est prêt ! 🎉",
       "description": "Bienvenue sur Unytea. Votre voyage commence maintenant.",
       "cta": "Aller au Tableau de Bord"
+    },
+    "errors": {
+      "title": "Nous n'avons pas pu terminer votre configuration",
+      "saveFailed": "Vos informations n'ont pas été enregistrées. Veuillez réessayer.",
+      "invalidDetails": "Certaines de vos informations n'ont pas pu être enregistrées. Vérifiez-les et réessayez.",
+      "network": "Impossible de joindre le serveur. Vérifiez votre connexion et réessayez.",
+      "retry": "Réessayer"
     }
   },
   "explore": {

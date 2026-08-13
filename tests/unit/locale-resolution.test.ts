@@ -212,9 +212,10 @@ describe("the onboarding wizard is translated", () => {
     expect(source).not.toContain(phrase);
   });
 
-  it("keeps prices and Stripe price IDs out of the translation files", () => {
-    // A translator must never be able to change what a user is charged.
-    expect(source).toContain("NEXT_PUBLIC_STRIPE_PROFESSIONAL_PRICE_ID");
+  it("keeps prices out of the translation files", () => {
+    // A translator must never be able to change what a user is charged. Since
+    // the plan step moved out of onboarding there is no price here at all —
+    // asserted on the wizard itself in tests/unit/onboarding-flow.test.ts.
     for (const locale of SUPPORTED_LOCALES) {
       const messages = JSON.parse(
         fs.readFileSync(path.join(REPO_ROOT, `locales/${locale}.json`), "utf8")
@@ -273,7 +274,6 @@ describe("the locale catalogs stay at exact parity", () => {
     );
 
     expect(messages.onboarding.steps["4"].categories.Business).toBeTruthy();
-    expect(messages.onboarding.steps["5"].free.features).toHaveLength(4);
     expect(messages.onboarding.navigation.stepOf).toContain("{current}");
     expect(messages.dashboard.errorBoundary.retry).toBeTruthy();
     expect(messages.dashboard.home.nextStep.inviteMembers.cta).toBeTruthy();

@@ -98,7 +98,10 @@ const sections: DocSection[] = [
       "Real-time communication for your community with channels, threads, and direct messages.",
     topics: [
       "Community channels and discussion threads",
-      "Direct messaging between members",
+      // Accurate as written: direct messages are host<->member only — a member
+      // cannot DM another member (app/actions/messages.ts XORs on the OWNER
+      // role). The previous "between members" oversold it.
+      "Direct messaging between hosts and members",
       "Real-time presence indicators",
       "File sharing and media attachments",
     ],

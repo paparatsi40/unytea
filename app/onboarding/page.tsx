@@ -4,37 +4,32 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useCurrentUser } from "@/hooks/use-current-user";
-import { Check, User, Briefcase, Target, Sparkles, Zap, Crown, Heart } from "lucide-react";
+import { AlertTriangle, User, Briefcase, Target, Heart } from "lucide-react";
 import { InterestSelector } from "@/components/onboarding/InterestSelector";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 
 /**
- * Plan structure — everything that is NOT display text.
+ * Onboarding is four steps and ends on the free plan.
  *
- * Names, descriptions and feature lists live in the `onboarding.steps.5`
- * namespace instead, keyed by `id`, so the wizard reads in the user's language.
- * Prices and Stripe price IDs stay here: they are the same in every locale and
- * a translator must never be able to change what a user is charged.
+ * It used to end on a fifth step that asked a brand-new user to choose between
+ * Free / Professional $49 / Premium $149 and sent paid picks straight to Stripe
+ * checkout. Three things were wrong with that:
+ *
+ *   1. It asked for a monetization decision before the user had seen the
+ *      product. The decision now happens where the value is obvious — at the
+ *      community-creation wall, which already gates on the plan limit and
+ *      offers the upgrade surface.
+ *   2. Those plans no longer exist. The product sells Creator / Business / Pro
+ *      (lib/plans.ts, billing.tiers); the step advertised a retired lineup
+ *      priced off NEXT_PUBLIC_STRIPE_PROFESSIONAL_PRICE_ID and
+ *      NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID, which are set nowhere.
+ *   3. Because those price IDs were empty, picking a paid plan silently fell
+ *      through to the dashboard on the free plan — the "checkout drops you
+ *      without your plan" symptom.
+ *
+ * Nothing about paid plans was deleted: checkout, billing and the plan gate are
+ * untouched. Only the point at which the question is asked has moved.
  */
-const plans = [
-  { id: "free", price: 0, priceId: "", icon: Sparkles, popular: false },
-  {
-    id: "professional",
-    price: 49,
-    priceId: process.env.NEXT_PUBLIC_STRIPE_PROFESSIONAL_PRICE_ID || "",
-    icon: Zap,
-    popular: true,
-  },
-  {
-    id: "premium",
-    price: 149,
-    priceId: process.env.NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID || "",
-    icon: Crown,
-    popular: false,
-  },
-] as const;
 
 const ROLES = ["coach", "creator", "founder", "educator", "other"] as const;
 
@@ -44,12 +39,13 @@ export default function OnboardingPage() {
   const t = useTranslations("onboarding");
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  /** Non-null only after a failed save; blocks the redirect and is shown. */
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     fullName: "",
     role: "",
     goals: "",
     interests: [] as string[],
-    selectedPlan: "free",
   });
 
   useEffect(() => {
@@ -117,8 +113,15 @@ export default function OnboardingPage() {
       fields: (
         <div className="space-y-4">
           <div>
+            {/* Optional, and labelled as such. Requiring a paragraph of prose
+                from someone three screens into signing up is the kind of
+                friction that loses completions, and nothing downstream depends
+                on it — the API composes a bio from whatever is present. */}
             <label className="mb-2 block text-sm font-medium text-foreground">
-              {t("steps.3.goals")}
+              {t("steps.3.goals")}{" "}
+              <span className="font-normal text-muted-foreground">
+                ({t("steps.3.optionalLabel")})
+              </span>
             </label>
             <textarea
               value={formData.goals}
@@ -144,81 +147,6 @@ export default function OnboardingPage() {
         />
       ),
     },
-    {
-      number: 5,
-      title: t("steps.5.title"),
-      description: t("steps.5.description"),
-      icon: Sparkles,
-      fields: (
-        <div className="space-y-4">
-          <div className="grid gap-4">
-            {plans.map((plan) => {
-              const Icon = plan.icon;
-              const isSelected = formData.selectedPlan === plan.id;
-              const features = t.raw(`steps.5.${plan.id}.features`) as string[];
-              return (
-                <Card
-                  key={plan.id}
-                  onClick={() => setFormData({ ...formData, selectedPlan: plan.id })}
-                  className={`cursor-pointer p-4 transition-all ${
-                    isSelected
-                      ? "border-primary ring-2 ring-primary/20"
-                      : "border-border hover:border-primary/50"
-                  } ${plan.popular ? "relative" : ""}`}
-                >
-                  {plan.popular && (
-                    <Badge className="absolute -top-2 left-4 bg-primary text-primary-foreground">
-                      {t("steps.5.professional.popular")}
-                    </Badge>
-                  )}
-                  <div className="flex items-start gap-4">
-                    <div
-                      className={`flex h-10 w-10 items-center justify-center rounded-lg ${
-                        isSelected ? "bg-primary text-primary-foreground" : "bg-muted"
-                      }`}
-                    >
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <h3 className="font-semibold">{t(`steps.5.${plan.id}.name`)}</h3>
-                        <div className="text-right">
-                          <span className="text-lg font-bold">
-                            {plan.price === 0 ? t("steps.5.freePrice") : `$${plan.price}`}
-                          </span>
-                          {plan.price > 0 && (
-                            <span className="text-sm text-muted-foreground">
-                              {t("steps.5.perMonth")}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        {t(`steps.5.${plan.id}.description`)}
-                      </p>
-                      <ul className="mt-3 space-y-1">
-                        {features.slice(0, 3).map((feature, i) => (
-                          <li key={i} className="flex items-center gap-2 text-sm">
-                            <Check className="h-4 w-4 flex-shrink-0 text-primary" />
-                            <span>{feature}</span>
-                          </li>
-                        ))}
-                        {features.length > 3 && (
-                          <li className="pl-6 text-sm text-muted-foreground">
-                            {t("steps.5.moreFeatures", { count: features.length - 3 })}
-                          </li>
-                        )}
-                      </ul>
-                    </div>
-                  </div>
-                </Card>
-              );
-            })}
-          </div>
-          <p className="text-center text-sm text-muted-foreground">{t("steps.5.trialNote")}</p>
-        </div>
-      ),
-    },
   ];
 
   const currentStepData = steps[currentStep - 1];
@@ -240,8 +168,9 @@ export default function OnboardingPage() {
 
   const handleComplete = async () => {
     setIsSubmitting(true);
+    setSaveError(null);
+
     try {
-      // Update user onboarding status with selected plan
       const response = await fetch("/api/user/onboarding", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -250,38 +179,23 @@ export default function OnboardingPage() {
           role: formData.role,
           goals: formData.goals,
           interests: formData.interests,
-          selectedPlan: formData.selectedPlan,
         }),
       });
 
-      if (response.ok) {
-        // If user selected a paid plan, redirect to checkout
-        const selectedPlanData = plans.find((p) => p.id === formData.selectedPlan);
-        if (selectedPlanData && selectedPlanData.price > 0 && selectedPlanData.priceId) {
-          // Redirect to Stripe checkout
-          const checkoutResponse = await fetch("/api/stripe/checkout", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              priceId: selectedPlanData.priceId,
-            }),
-          });
-
-          const checkoutData = await checkoutResponse.json();
-          if (checkoutData.url) {
-            window.location.href = checkoutData.url;
-            return;
-          }
-        }
-
-        // Otherwise go to dashboard
-        router.push("/dashboard");
+      if (!response.ok) {
+        // Previously this fell through to router.push("/dashboard"): the user
+        // was told they were set up while their name, role and interests had
+        // been thrown away, and the next screen quietly asked them to onboard
+        // again. Stay put, say so, and let the same button retry.
+        setSaveError(response.status === 400 ? t("errors.invalidDetails") : t("errors.saveFailed"));
+        setIsSubmitting(false);
+        return;
       }
+
+      router.push("/dashboard");
     } catch (error) {
       console.error("Error completing onboarding:", error);
-      // For now, redirect anyway
-      router.push("/dashboard");
-    } finally {
+      setSaveError(t("errors.network"));
       setIsSubmitting(false);
     }
   };
@@ -293,11 +207,10 @@ export default function OnboardingPage() {
       case 2:
         return formData.role.trim().length > 0;
       case 3:
-        return formData.goals.trim().length > 0;
+        // Goals are optional — see the label above.
+        return true;
       case 4:
         return formData.interests.length >= 1;
-      case 5:
-        return formData.selectedPlan.length > 0;
       default:
         return false;
     }
@@ -346,6 +259,24 @@ export default function OnboardingPage() {
           {/* Fields */}
           {currentStepData.fields}
 
+          {/* Save failure. Rendered above the buttons so the retry sits next to
+              the explanation, and role="alert" so it is announced. */}
+          {saveError && (
+            <div
+              role="alert"
+              className="mt-6 flex items-start gap-3 rounded-lg border border-destructive/40 bg-destructive/10 p-4"
+            >
+              <AlertTriangle
+                className="mt-0.5 h-4 w-4 flex-shrink-0 text-destructive"
+                aria-hidden="true"
+              />
+              <div>
+                <p className="text-sm font-medium text-foreground">{t("errors.title")}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{saveError}</p>
+              </div>
+            </div>
+          )}
+
           {/* Navigation */}
           <div className="mt-8 flex gap-4">
             {currentStep > 1 && (
@@ -364,10 +295,10 @@ export default function OnboardingPage() {
                   {t("navigation.settingUp")}
                 </div>
               ) : currentStep === steps.length ? (
-                formData.selectedPlan === "free" ? (
-                  t("navigation.startFree")
+                saveError ? (
+                  t("errors.retry")
                 ) : (
-                  t("navigation.startTrial")
+                  t("navigation.getStarted")
                 )
               ) : (
                 t("navigation.continue")

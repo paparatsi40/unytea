@@ -234,7 +234,7 @@ export default function NewCommunityPage() {
             duration: 6000,
             action: {
               label: t("toasts.upgradeAction"),
-              onClick: () => router.push("/dashboard/settings/billing"),
+              onClick: () => router.push("/dashboard/upgrade"),
             },
           });
           setPlanCheck((prev) => (prev ? { ...prev, canCreate: false } : prev));
@@ -315,7 +315,7 @@ export default function NewCommunityPage() {
 
           <div className="flex flex-col justify-center gap-3 pt-2 sm:flex-row">
             <Button
-              onClick={() => router.push("/dashboard/settings/billing")}
+              onClick={() => router.push("/dashboard/upgrade")}
               className="flex items-center gap-2"
             >
               <Zap className="h-4 w-4" />
