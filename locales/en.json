@@ -2251,7 +2251,7 @@
       "discoveryHeader": "Discovery",
       "discoveryDescription": "Control whether your community appears on Unytea's public /explore page.",
       "listToggle": "List on /explore",
-      "listToggleDescription": "When enabled, your community appears in public listings for the category and language you've selected, provided it meets quality criteria (≥3 active members, ≥1 upcoming live session, description + cover image set, ≥14 days old)."
+      "listToggleDescription": "When enabled, your community appears in public listings for the category and language you have selected. All it needs is a category, a description and a cover image — there is no minimum size, age or session schedule."
     }
   },
   "billing": {
