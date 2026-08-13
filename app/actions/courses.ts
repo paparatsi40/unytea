@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { defineAction } from "@/lib/actions/define-action";
+import { issueCertificateForEnrollment } from "@/lib/certificates";
 import { communityById, communityOfCourse, communityOfLesson, communityOfModule } from "@/lib/actions/resolvers";
 import { prisma } from "@/lib/prisma";
 import { getLimitsForPlan } from "@/lib/plans";
@@ -711,8 +712,28 @@ export const markLessonComplete = defineAction(
       },
     });
 
+    // Completing the course issues the certificate. It is a consequence of
+    // finishing, not something the learner asks for — there is no
+    // client-callable issuance path. Idempotent, so re-completing a lesson on an
+    // already-finished course does not mint a second one.
+    let certificate = null;
+    if (progressPercent === 100) {
+      try {
+        const issued = await issueCertificateForEnrollment(enrollment.id, userId);
+        if (issued.success) {
+          certificate = issued.certificate;
+        } else {
+          console.warn("[markLessonComplete] certificate not issued:", issued.error);
+        }
+      } catch (certificateError) {
+        // Never let issuance failure lose the lesson completion the learner
+        // just earned; the next completion call will retry.
+        console.error("[markLessonComplete] certificate issuance failed:", certificateError);
+      }
+    }
+
     revalidatePath(`/dashboard/courses/${lesson.module.courseId}`);
-    return { success: true, progress };
+    return { success: true, progress, courseCompleted: progressPercent === 100, certificate };
   } catch (error) {
     console.error("Error marking lesson complete:", error);
     return { success: false, error: "Failed to mark lesson complete" };
