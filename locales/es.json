@@ -2112,7 +2112,8 @@
         "title": "¿Cuáles son tus objetivos?",
         "description": "Ayúdanos a personalizar tu experiencia",
         "goals": "Cuéntanos sobre tus objetivos",
-        "goalsPlaceholder": "Quiero construir una comunidad próspera y compartir mi conocimiento..."
+        "goalsPlaceholder": "Quiero construir una comunidad próspera y compartir mi conocimiento...",
+        "optionalLabel": "opcional"
       },
       "4": {
         "title": "¿Qué te interesa?",
@@ -2126,51 +2127,6 @@
           "Lifestyle": "Estilo de vida",
           "Education": "Educación"
         }
-      },
-      "5": {
-        "title": "Elige Tu Plan",
-        "description": "Selecciona el plan que se ajuste a tus necesidades (puedes cambiarlo luego)",
-        "perMonth": "/mes",
-        "freePrice": "Gratis",
-        "moreFeatures": "+{count} funciones más",
-        "trialNote": "Todos los planes de pago incluyen 14 días de prueba gratis. No necesitas tarjeta para empezar.",
-        "free": {
-          "name": "Gratis",
-          "description": "Perfecto para explorar comunidades",
-          "features": [
-            "Únete hasta a 3 comunidades (sin crearlas)",
-            "Acceso al contenido y al feed de la comunidad",
-            "Mensajería directa con miembros",
-            "Funciones básicas de perfil"
-          ]
-        },
-        "professional": {
-          "name": "Profesional",
-          "description": "Lo mejor para creadores de comunidad",
-          "popular": "Más Popular",
-          "features": [
-            "Crea 1 comunidad (tuya)",
-            "Miembros ilimitados",
-            "Videollamadas y streaming",
-            "Constructor de cursos",
-            "AI Coach",
-            "Panel de analíticas",
-            "Soporte prioritario"
-          ]
-        },
-        "premium": {
-          "name": "Premium",
-          "description": "Para usuarios avanzados con varias comunidades",
-          "features": [
-            "Crea hasta 3 comunidades",
-            "Todas las funciones de Profesional",
-            "Opciones de marca blanca",
-            "Analíticas avanzadas",
-            "Acceso a la API",
-            "Soporte dedicado",
-            "Integraciones personalizadas"
-          ]
-        }
       }
     },
     "navigation": {
@@ -2180,8 +2136,6 @@
       "processing": "Procesando...",
       "stepOf": "Paso {current} de {total}",
       "continue": "Continuar",
-      "startFree": "Empezar Gratis",
-      "startTrial": "Empezar Prueba Gratis",
       "settingUp": "Configurando...",
       "skip": "Omitir por ahora →"
     },
@@ -2189,6 +2143,13 @@
       "title": "¡Todo listo! 🎉",
       "description": "Bienvenido a Unytea. Tu camino empieza ahora.",
       "cta": "Ir al Panel"
+    },
+    "errors": {
+      "title": "No pudimos terminar tu configuración",
+      "saveFailed": "No se guardaron tus datos. Inténtalo de nuevo.",
+      "invalidDetails": "Algunos de tus datos no se pudieron guardar. Revísalos e inténtalo de nuevo.",
+      "network": "No pudimos conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.",
+      "retry": "Reintentar"
     }
   },
   "explore": {
