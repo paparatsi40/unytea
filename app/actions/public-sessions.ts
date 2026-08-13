@@ -235,17 +235,23 @@ export const getPublicSession = defineAction(
             url: canWatchRecording ? session.recording.url : null,
           }
         : null,
-      notes: session.notes
-        ? {
-            id: session.notes.id,
-            content: session.notes.content,
-            summary: session.notes.summary,
-            keyInsights: safeParseStringArray(session.notes.keyInsights),
-            chapters: safeParseChapters(session.notes.resources),
-            quotes: safeParseQuotes(session.notes.resources),
-            createdAt: session.notes.createdAt,
-          }
-        : null,
+      // Notes are gated by exactly the same rule as the recording. They were
+      // previously returned unconditionally, so on a `visibility: "community"`
+      // session a non-member received a null video alongside the complete
+      // written notes — content, summary, key insights, chapters and quotes —
+      // which is the substantive paywalled material (H2).
+      notes:
+        canWatchRecording && session.notes
+          ? {
+              id: session.notes.id,
+              content: session.notes.content,
+              summary: session.notes.summary,
+              keyInsights: safeParseStringArray(session.notes.keyInsights),
+              chapters: safeParseChapters(session.notes.resources),
+              quotes: safeParseQuotes(session.notes.resources),
+              createdAt: session.notes.createdAt,
+            }
+          : null,
     };
 
     return { success: true, session: data };

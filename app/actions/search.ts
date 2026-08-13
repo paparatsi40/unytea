@@ -34,7 +34,6 @@ export const searchGlobal = defineAction(
     rateLimit: "api",
   },
   async (ctx, query, type): Promise<SearchResponse | { error: string }> => {
-  void ctx;
   {
     const trimmedQuery = query.trim();
 
@@ -71,6 +70,28 @@ export const searchGlobal = defineAction(
       ],
     };
 
+    /**
+     * Visibility scope for anything owned by a community.
+     *
+     * The posts and courses branches previously filtered only on
+     * `isPublished`/`deletedAt`, so any authenticated user could search the
+     * full body of posts — and the titles and descriptions of courses — inside
+     * private and paid communities they had never joined. The communities
+     * branch already got this right with `isPrivate: false`; this applies the
+     * same boundary to the two branches that carry the actual content.
+     *
+     * Public communities stay searchable by everyone; private ones are visible
+     * only to their ACTIVE members.
+     */
+    const visibleCommunity = {
+      community: {
+        OR: [
+          { isPrivate: false },
+          { members: { some: { userId: ctx.userId, status: "ACTIVE" as const } } },
+        ],
+      },
+    };
+
     // Search Posts
     if (normalizedType === "all" || normalizedType === "posts") {
       const posts = await prisma.post.findMany({
@@ -79,6 +100,7 @@ export const searchGlobal = defineAction(
             searchCondition,
             { deletedAt: null }, // Filter out soft-deleted posts
             { isPublished: true }, // Only published posts
+            visibleCommunity, // Public community, or one the caller belongs to
           ],
         },
         select: {
@@ -118,6 +140,7 @@ export const searchGlobal = defineAction(
               ],
             },
             { isPublished: true }, // Only published courses
+            visibleCommunity, // Public community, or one the caller belongs to
           ],
         },
         select: {
