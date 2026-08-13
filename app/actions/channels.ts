@@ -38,22 +38,64 @@ const DEFAULT_CHANNELS = [
   { name: "Random", slug: "random", emoji: "🎲", position: 3, description: "Off-topic chat" },
 ];
 
-export const getOrCreateDefaultChannels = defineAction(
+const PROVISIONING_ROLES = ["OWNER", "ADMIN", "MODERATOR"] as const;
+
+/**
+ * Read a community's channels.
+ *
+ * Was `getOrCreateDefaultChannels`: a `member`-gated read that silently *created*
+ * four channel rows whenever a community had none, so an ordinary member could
+ * trigger provisioning — including re-creating defaults an admin had deliberately
+ * removed (L1). Provisioning now lives in its own admin-gated action below.
+ *
+ * `canProvision` lets the UI offer that action only to callers who may perform
+ * it, instead of firing a request that would predictably be refused.
+ */
+export const getCommunityChannels = defineAction(
   {
-    name: "getOrCreateDefaultChannels",
+    name: "getCommunityChannels",
     auth: "member",
     args: [communityIdSchema],
     community: ([communityId]) => communityById(communityId),
   },
-  async (_ctx, communityId) => {
-    const existingChannels = await prisma.channel.findMany({
+  async (ctx, communityId) => {
+    const channels = await prisma.channel.findMany({
       where: { communityId },
       orderBy: { position: "asc" },
       take: 100,
     });
 
-    if (existingChannels.length > 0) {
-      return { success: true as const, channels: existingChannels };
+    const role = ctx.member?.role;
+    const canProvision =
+      role != null && (PROVISIONING_ROLES as readonly string[]).includes(role);
+
+    return { success: true as const, channels, canProvision };
+  }
+);
+
+/**
+ * Create the default channel set for a community that has none.
+ *
+ * Idempotent: a community that already has channels is left untouched.
+ */
+export const provisionDefaultChannels = defineAction(
+  {
+    name: "provisionDefaultChannels",
+    auth: "admin",
+    args: [communityIdSchema],
+    community: ([communityId]) => communityById(communityId),
+    roles: [...PROVISIONING_ROLES],
+    rateLimit: "create",
+  },
+  async (_ctx, communityId) => {
+    const existing = await prisma.channel.findMany({
+      where: { communityId },
+      orderBy: { position: "asc" },
+      take: 100,
+    });
+
+    if (existing.length > 0) {
+      return { success: true as const, channels: existing, created: false };
     }
 
     await prisma.channel.createMany({
@@ -67,7 +109,7 @@ export const getOrCreateDefaultChannels = defineAction(
       take: 100,
     });
 
-    return { success: true as const, channels };
+    return { success: true as const, channels, created: true };
   }
 );
 

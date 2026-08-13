@@ -227,28 +227,23 @@ export const deleteRecording = defineAction(
     community: ([recordingId]) => communityOfRecording(recordingId),
   },
   async (ctx, recordingId: string) => {
-  try {
-
-    const userId = ctx.userId;
-
     const recording = await prisma.recording.findUnique({
       where: { id: recordingId },
-      include: {
-        session: {
-          select: { mentorId: true },
-        },
-      },
+      select: { sessionId: true },
     });
 
     if (!recording) {
-      return { success: false, error: "Recording not found" };
+      return { success: false as const, error: "Recording not found" };
     }
 
-    // Only host or admin can delete
-    if (recording.session.mentorId !== userId) {
-      return { success: false, error: "Not authorized" };
-    }
+    // The comment here used to say "host or admin" while the code compared
+    // mentorId alone, so a community OWNER/ADMIN could not delete a recording.
+    // assertSessionHost implements the documented policy — host or community
+    // OWNER/ADMIN — and matches startCompositeRecording. Runs above the try so
+    // its ForbiddenError reaches the seam.
+    await assertSessionHost(ctx, recording.sessionId);
 
+  try {
     // TODO: Delete from S3/R2 storage
     // const s3Client = new S3Client(...);
     // await s3Client.send(new DeleteObjectCommand({...}));

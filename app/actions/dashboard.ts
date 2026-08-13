@@ -530,9 +530,11 @@ export const getCommunityActivity = defineAction(
 
     const userId = ctx.userId;
 
-    // Get user's communities
+    // Get user's communities. `status: "ACTIVE"` matches every sibling read —
+    // without it a PENDING (join-requested), REMOVED or BANNED membership row
+    // still granted sight of the community's activity (L2).
     const userCommunities = await prisma.member.findMany({
-      where: { userId },
+      where: { userId, status: "ACTIVE" },
       select: { communityId: true },
     });
     const communityIds = userCommunities.map((m) => m.communityId);
@@ -629,8 +631,9 @@ export const getRecentMembers = defineAction(
 
     const userId = ctx.userId;
 
+    // ACTIVE only: a non-ACTIVE membership row must not expose the roster (L2).
     const userCommunities = await prisma.member.findMany({
-      where: { userId },
+      where: { userId, status: "ACTIVE" },
       select: { communityId: true },
     });
     const communityIds = userCommunities.map((m) => m.communityId);

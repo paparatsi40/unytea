@@ -492,6 +492,11 @@ export const getNextCommunitySession = defineAction(
         communityId,
         status: "SCHEDULED",
         scheduledAt: { gt: new Date() },
+        // This action is anonymous-callable, so without a privacy filter it let
+        // anyone enumerate a private community's upcoming session titles and
+        // times by id (L3). The sibling getRelatedCommunitiesHostingThisWeek
+        // already filters this way.
+        community: { isPrivate: false },
       },
       orderBy: { scheduledAt: "asc" },
       select: {
