@@ -2235,7 +2235,7 @@
       "discoveryHeader": "Descubrimiento",
       "discoveryDescription": "Controla si tu comunidad aparece en la página pública /explore de Unytea.",
       "listToggle": "Aparecer en /explore",
-      "listToggleDescription": "Cuando está activo, tu comunidad aparece en listados públicos de la categoría e idioma que elegiste, siempre que cumpla los criterios de calidad (≥3 miembros activos, ≥1 sesión en vivo próxima, descripción + imagen de portada definidas, ≥14 días de antigüedad)."
+      "listToggleDescription": "Cuando está activo, tu comunidad aparece en listados públicos de la categoría e idioma que elegiste. Solo necesita una categoría, una descripción y una imagen de portada: no hay mínimo de tamaño, antigüedad ni sesiones programadas."
     }
   },
   "sidebar": {

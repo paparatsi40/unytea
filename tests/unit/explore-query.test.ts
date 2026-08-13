@@ -81,11 +81,16 @@ function makeCandidate(over: CandidateOverrides = {}) {
 
 type SetupOpts = {
   candidates: ReturnType<typeof makeCandidate>[];
-  // Active authors per community — used to satisfy/violate criterion 2.
-  // Default: 3 unique authors per candidate (passes).
+  // Post authors per community. No longer gates eligibility — it only drives
+  // the activity sparkline and the activity label on the card.
+  // Default: 3 unique authors per candidate.
   authorsByCommunity?: Record<string, string[]>;
   // Upcoming sessions per community. Default: 1 session in 2 days each.
+  // Pass [] to model a community with nothing scheduled.
   upcomingByCommunity?: Record<string, { scheduledAt: Date; title: string }[]>;
+  // Members returned for the avatar row. Pass 0 to model a community whose
+  // only member is the owner.
+  membersPerCommunity?: number;
   totalCount?: number;
 };
 
@@ -94,6 +99,7 @@ function setup(opts: SetupOpts) {
     candidates,
     authorsByCommunity,
     upcomingByCommunity,
+    membersPerCommunity = 5,
     totalCount = candidates.length,
   } = opts;
 
@@ -116,7 +122,7 @@ function setup(opts: SetupOpts) {
 
   // Sample members: 5 dummy members per community, none owners.
   const members = candidates.flatMap((c) =>
-    Array.from({ length: 5 }).map((_, i) => ({
+    Array.from({ length: membersPerCommunity }).map((_, i) => ({
       communityId: c.id,
       userId: `member-${c.id}-${i}`,
       user: { id: `member-${c.id}-${i}`, name: `Member ${i}`, image: null },
@@ -141,20 +147,24 @@ beforeEach(() => {
 });
 
 // ---------------------------------------------------------------------------
-// QUALITY BAR — WHERE-level assertions
+// ELIGIBILITY — WHERE-level assertions
 //
-// Criteria 1, 3, 4, 5 + excludeFromExplore + deletedAt are expressed in the
-// Prisma WHERE clause. We verify the constructed where matches the spec.
-// Behavioral tests (criteria 2 post-fetch, narrows for null fields) follow.
+// The bar is completeness, not maturity: listed + category + description +
+// cover image + not soft-deleted, all expressed in the Prisma WHERE. The old
+// bar also demanded a session in the next 7 days, three members active in the
+// last 30 days, and 14 days of age — gates a launch community cannot satisfy
+// while it is invisible, which is why /explore rendered empty.
 
-describe("getExploreCommunities — quality bar WHERE clause", () => {
-  it("constructs WHERE with all 5 typed quality criteria + opt-out + soft-delete", async () => {
+async function whereFor(filters = {}) {
+  await getExploreCommunities(filters, { page: 1, pageSize: 24 });
+  return vi.mocked(prisma.community.findMany).mock.calls[0][0]?.where as Record<string, unknown>;
+}
+
+describe("getExploreCommunities — eligibility WHERE clause", () => {
+  it("requires only completeness, opt-in and soft-delete", async () => {
     setup({ candidates: [makeCandidate()] });
 
-    await getExploreCommunities({}, { page: 1, pageSize: 24 });
-
-    const call = vi.mocked(prisma.community.findMany).mock.calls[0][0];
-    const where = call?.where as Record<string, unknown>;
+    const where = await whereFor();
 
     expect(where.deletedAt).toBeNull();
     expect(where.excludeFromExplore).toBe(false);
@@ -162,12 +172,21 @@ describe("getExploreCommunities — quality bar WHERE clause", () => {
     expect(where.description).toEqual({ not: null });
     expect(where.coverImageUrl).toEqual({ not: null });
     expect(where.AND).toEqual([{ description: { not: "" } }, { coverImageUrl: { not: "" } }]);
-    // createdAt < (now - 14 days)
-    const createdAtFilter = where.createdAt as { lt: Date };
-    expect(createdAtFilter.lt.getTime()).toBe(subDays(NOW, 14).getTime());
-    // sessions.some constraint
-    const sessions = where.sessions as { some: Record<string, unknown> };
-    expect(sessions.some.status).toEqual({ not: "CANCELLED" });
+  });
+
+  it("does not gate on community age", async () => {
+    setup({ candidates: [makeCandidate()] });
+
+    // Was `createdAt: { lt: now - 14 days }` — unsatisfiable on day one.
+    expect(await whereFor()).not.toHaveProperty("createdAt");
+  });
+
+  it("does not require an upcoming session", async () => {
+    setup({ candidates: [makeCandidate()] });
+
+    // Was `sessions: { some: { scheduledAt: … } }` — a host cannot fill a
+    // session for members who cannot find the community.
+    expect(await whereFor()).not.toHaveProperty("sessions");
   });
 
   it("computes the count using the same WHERE", async () => {
@@ -182,9 +201,56 @@ describe("getExploreCommunities — quality bar WHERE clause", () => {
 });
 
 // ---------------------------------------------------------------------------
-// QUALITY BAR — Post-fetch defensive narrows + criterion 2 (≥3 active members)
+// ELIGIBILITY — what a listing still has to have, and what it no longer does
 
-describe("getExploreCommunities — post-fetch quality narrows", () => {
+describe("getExploreCommunities — the launch community is listed", () => {
+  it("returns a brand-new community with no sessions and no activity at all", async () => {
+    // The case the old bar made impossible, and the whole point of relaxing it:
+    // created today, nobody has posted, nothing is scheduled, the owner is the
+    // only member — but it has a category, a description and a cover image.
+    setup({
+      candidates: [makeCandidate({ id: "day-one", createdAt: NOW })],
+      authorsByCommunity: { "day-one": [] },
+      upcomingByCommunity: { "day-one": [] },
+      membersPerCommunity: 0,
+    });
+
+    const result = await getExploreCommunities({}, { page: 1, pageSize: 24 });
+
+    expect(result.communities.map((c) => c.id)).toEqual(["day-one"]);
+  });
+
+  it("describes that community honestly rather than hiding it", async () => {
+    setup({
+      candidates: [makeCandidate({ id: "day-one", createdAt: NOW })],
+      authorsByCommunity: { "day-one": [] },
+      upcomingByCommunity: { "day-one": [] },
+      membersPerCommunity: 0,
+    });
+
+    const [community] = (await getExploreCommunities({}, { page: 1, pageSize: 24 })).communities;
+
+    // Listing it is not the same as pretending it is busy.
+    expect(community.activityStatus).toBe("quiet");
+    expect(community.liveStatus.status).toBe("none");
+    expect(community.sampleMembers).toEqual([]);
+    expect(community.activityHistory.every((n) => n === 0)).toBe(true);
+  });
+
+  it("still lists a community whose only activity is one post by one author", async () => {
+    setup({
+      candidates: [makeCandidate({ id: "one-poster" })],
+      authorsByCommunity: { "one-poster": ["solo"] },
+    });
+
+    const result = await getExploreCommunities({}, { page: 1, pageSize: 24 });
+
+    // Used to be rejected for having fewer than 3 distinct active members.
+    expect(result.communities.map((c) => c.id)).toEqual(["one-poster"]);
+  });
+});
+
+describe("getExploreCommunities — incomplete listings stay out", () => {
   it("excludes a candidate with category=null even if Prisma returned it", async () => {
     setup({ candidates: [makeCandidate({ id: "no-cat", category: null })] });
 
@@ -209,56 +275,32 @@ describe("getExploreCommunities — post-fetch quality narrows", () => {
     expect(result.communities).toEqual([]);
   });
 
-  it("excludes a community with <3 distinct active members (criterion 2)", async () => {
-    setup({
-      candidates: [makeCandidate({ id: "low-activity" })],
-      authorsByCommunity: { "low-activity": ["only-one", "only-one", "only-one"] },
-    });
+  it("excludes a candidate with an empty-string description", async () => {
+    setup({ candidates: [makeCandidate({ id: "blank-desc", description: "" })] });
 
     const result = await getExploreCommunities({}, { page: 1, pageSize: 24 });
 
     expect(result.communities).toEqual([]);
   });
+});
 
-  it("includes a community with exactly 3 distinct active members", async () => {
+describe("getExploreCommunities — comments still feed the activity sparkline", () => {
+  it("counts comments as well as posts", async () => {
     setup({
-      candidates: [makeCandidate({ id: "barely-pass" })],
-      authorsByCommunity: { "barely-pass": ["a", "b", "c"] },
-    });
-
-    const result = await getExploreCommunities({}, { page: 1, pageSize: 24 });
-
-    expect(result.communities.map((c) => c.id)).toEqual(["barely-pass"]);
-  });
-
-  it("counts comments toward active-members criterion (not just posts)", async () => {
-    const candidate = makeCandidate({ id: "comments-only" });
-    setup({
-      candidates: [candidate],
+      candidates: [makeCandidate({ id: "comments-only" })],
       authorsByCommunity: { "comments-only": [] }, // zero posts
     });
-    // Override: 3 distinct comment authors keep this community alive.
     vi.mocked(prisma.comment.findMany).mockResolvedValue([
-      {
-        authorId: "x",
-        createdAt: FIVE_DAYS_AGO,
-        post: { communityId: "comments-only" },
-      },
-      {
-        authorId: "y",
-        createdAt: TEN_DAYS_AGO,
-        post: { communityId: "comments-only" },
-      },
-      {
-        authorId: "z",
-        createdAt: FIVE_DAYS_AGO,
-        post: { communityId: "comments-only" },
-      },
+      { createdAt: FIVE_DAYS_AGO, post: { communityId: "comments-only" } },
+      { createdAt: TEN_DAYS_AGO, post: { communityId: "comments-only" } },
+      { createdAt: FIVE_DAYS_AGO, post: { communityId: "comments-only" } },
     ] as never);
 
-    const result = await getExploreCommunities({}, { page: 1, pageSize: 24 });
+    const [community] = (await getExploreCommunities({}, { page: 1, pageSize: 24 })).communities;
 
-    expect(result.communities.map((c) => c.id)).toEqual(["comments-only"]);
+    // Comments no longer decide whether it is listed — they still decide what
+    // the card says about it.
+    expect(community.activityHistory.reduce((a, b) => a + b, 0)).toBe(3);
   });
 });
 

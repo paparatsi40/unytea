@@ -432,6 +432,12 @@ Risk mitigation for quality (replaces the removal decision):
 
 (These four criteria are normative — they will be implemented as gating logic when Phase 3.5 ships. Do not paraphrase when porting to code.)
 
+**RELAXED 2026-08-13 (launch).** Criteria 1, 2 and 4 are withdrawn. The bar assumed a populated marketplace and, applied to an empty one, prevented the marketplace from existing: a new community cannot schedule sessions for members it does not have, cannot accumulate three active posters while nobody can find it, and cannot be fourteen days old on its first day. With every listing failing at least one criterion, `/explore` rendered empty — so the surface could not bootstrap the discovery it exists to provide. Criterion 3 stands, widened to include category and the host's opt-in, because those are what a listing needs to be _legible_ to a visitor rather than _proven_ to one.
+
+The bar in force is therefore: listed (`excludeFromExplore = false`), category set, description set, cover image set, not soft-deleted. Implemented in `lib/explore-query.ts`; `tests/unit/explore-query.test.ts` is the normative statement of it.
+
+This is a launch measure, not a repudiation of the quality argument in §5 Cat E. Curation still matters once there is enough inventory for it to discriminate between; revisit when `/explore` carries enough listings that an unfiltered page is worse than a sparse one.
+
 The discovery surface re-opens. The de-feat commit `e8d7e2e0` is scheduled to be reverted under Sprint 3 Phase 3.5 (a separate forthcoming change). The other surfaces originally bundled under Cat E remain reviewed individually:
 
 - **Cross-community discovery feed (/explore)** — REOPENED, gated by quality bar above.

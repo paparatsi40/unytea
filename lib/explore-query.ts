@@ -21,9 +21,14 @@ import type {
 const DEFAULT_PAGE_SIZE = 24;
 const OVERSHOOT_MULTIPLIER = 1.2;
 const ACTIVITY_WINDOW_DAYS = 30;
-const QUALITY_BAR_LOOKAHEAD_DAYS = 7;
-const MIN_COMMUNITY_AGE_DAYS = 14;
-const MIN_ACTIVE_MEMBERS = 3;
+/**
+ * How far ahead a session counts as "upcoming" for the live badge on a card.
+ *
+ * Was QUALITY_BAR_LOOKAHEAD_DAYS: the same window also gated whether a
+ * community could appear at all. It no longer does — see the WHERE below — so
+ * the name would have been describing a bar that is gone.
+ */
+const LIVE_LOOKAHEAD_DAYS = 7;
 const LIVE_NOW_BUFFER_MINUTES = 30;
 const LIVE_SOON_THRESHOLD_MINUTES = 120;
 const SAMPLE_MEMBERS_PER_COMMUNITY = 5;
@@ -64,7 +69,7 @@ function classifyLiveStatus(
     status = "live_soon";
   } else if (isSameDay(nextSession.scheduledAt, now)) {
     status = "live_today";
-  } else if (delta >= 0 && delta < QUALITY_BAR_LOOKAHEAD_DAYS * 24 * 60) {
+  } else if (delta >= 0 && delta < LIVE_LOOKAHEAD_DAYS * 24 * 60) {
     status = "live_this_week";
   } else {
     status = "none";
@@ -82,8 +87,7 @@ export async function getExploreCommunities(
 ): Promise<ExploreResponse> {
   const now = new Date();
   const thirtyDaysAgo = subDays(now, ACTIVITY_WINDOW_DAYS);
-  const fourteenDaysAgo = subDays(now, MIN_COMMUNITY_AGE_DAYS);
-  const sevenDaysFromNow = addDays(now, QUALITY_BAR_LOOKAHEAD_DAYS);
+  const sevenDaysFromNow = addDays(now, LIVE_LOOKAHEAD_DAYS);
   const liveStatusWindowStart = subMinutes(now, LIVE_NOW_BUFFER_MINUTES);
 
   const page = pagination.page ?? 1;
@@ -91,19 +95,24 @@ export async function getExploreCommunities(
   const overshoot = Math.ceil(pageSize * OVERSHOOT_MULTIPLIER);
   const offset = (page - 1) * pageSize;
 
+  /**
+   * Eligibility for /explore is completeness, not maturity.
+   *
+   * The bar used to also require a session scheduled in the next 7 days, three
+   * members who had posted or commented in the last 30 days, and 14 days of
+   * age. Every one of those is a chicken-and-egg gate at launch: a community
+   * cannot attract the members or the audience that would satisfy them while it
+   * is invisible, so /explore stayed empty and the surface could never bootstrap
+   * itself. What remains is what a listing actually needs in order to be worth
+   * showing to a visitor — a category to file it under, a description to read,
+   * a cover image to render, and the host's consent to be listed.
+   */
   const where: Prisma.CommunityWhereInput = {
     deletedAt: null,
     excludeFromExplore: false,
     category: { not: null },
     description: { not: null },
     coverImageUrl: { not: null },
-    createdAt: { lt: fourteenDaysAgo },
-    sessions: {
-      some: {
-        scheduledAt: { gte: now, lt: sevenDaysFromNow },
-        status: { not: "CANCELLED" },
-      },
-    },
     // Empty-string guards are siblings of the not-null check above:
     // Prisma's `not: null` returns true for "" since null !== "". The
     // post-fetch `.map(c => if (!c.X) return null)` narrows catch this
@@ -162,7 +171,7 @@ export async function getExploreCommunities(
         createdAt: { gte: thirtyDaysAgo },
         deletedAt: null,
       },
-      select: { communityId: true, authorId: true, createdAt: true },
+      select: { communityId: true, createdAt: true },
     }),
     prisma.comment.findMany({
       where: {
@@ -170,7 +179,6 @@ export async function getExploreCommunities(
         createdAt: { gte: thirtyDaysAgo },
       },
       select: {
-        authorId: true,
         createdAt: true,
         post: { select: { communityId: true } },
       },
@@ -200,10 +208,12 @@ export async function getExploreCommunities(
   ]);
 
   // Group derived data by communityId.
+  // Posts and comments feed the sparkline and the activity label on the card.
+  // They no longer decide whether the community is listed at all, so the
+  // distinct-author set that used to back that decision is gone with it.
   const activityByCommunity = new Map<string, number[]>();
-  const activeAuthorsByCommunity = new Map<string, Set<string>>();
 
-  function bucketAction(communityId: string, authorId: string, createdAt: Date) {
+  function bucketAction(communityId: string, createdAt: Date) {
     const dayOffset = differenceInCalendarDays(now, createdAt);
     if (dayOffset < 0 || dayOffset >= ACTIVITY_WINDOW_DAYS) return;
     const idx = ACTIVITY_WINDOW_DAYS - 1 - dayOffset; // 0 = oldest, 29 = today
@@ -211,17 +221,14 @@ export async function getExploreCommunities(
       activityByCommunity.get(communityId) ?? new Array<number>(ACTIVITY_WINDOW_DAYS).fill(0);
     buckets[idx] += 1;
     activityByCommunity.set(communityId, buckets);
-    const authors = activeAuthorsByCommunity.get(communityId) ?? new Set<string>();
-    authors.add(authorId);
-    activeAuthorsByCommunity.set(communityId, authors);
   }
 
   for (const p of posts) {
-    bucketAction(p.communityId, p.authorId, p.createdAt);
+    bucketAction(p.communityId, p.createdAt);
   }
   for (const c of comments) {
     if (!c.post?.communityId) continue;
-    bucketAction(c.post.communityId, c.authorId, c.createdAt);
+    bucketAction(c.post.communityId, c.createdAt);
   }
 
   const sampleMembersByCommunity = new Map<string, ExploreSampleMember[]>();
@@ -250,11 +257,11 @@ export async function getExploreCommunities(
     });
   }
 
-  // Build ExploreCommunity objects + apply ≥3 active members filter
+  // Build ExploreCommunity objects. The only rejections left are defensive
+  // narrows mirroring the WHERE, so nothing here can drop a row the query
+  // already vouched for.
   const built = candidates
     .map((c): ExploreCommunity | null => {
-      const activeAuthors = activeAuthorsByCommunity.get(c.id);
-      if (!activeAuthors || activeAuthors.size < MIN_ACTIVE_MEMBERS) return null;
       // category cannot be null at this point because the WHERE filter enforces it,
       // but Prisma types still mark it nullable — narrow defensively.
       if (!c.category) return null;
@@ -306,10 +313,9 @@ export async function getExploreCommunities(
 
   return {
     communities: finalCommunities,
-    // Note: `total` is an overestimate. It reflects the WHERE-level quality
-    // bar (criteria 1, 3, 4, 5) but NOT the post-fetch active-members filter
-    // (criterion 2). Acceptable for v1 pagination UI; flagged for refactor
-    // when activity data moves to a materialized view (see TODO above).
+    // `total` is now exact: every eligibility rule lives in the WHERE that
+    // count() shares, and the post-fetch narrows only restate it. It used to be
+    // an overestimate because the active-members rule ran after the query.
     total,
     page,
     pageSize,
