@@ -5,15 +5,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { defineAction } from "@/lib/actions/define-action";
 import { communityById } from "@/lib/actions/resolvers";
-import Pusher from "pusher";
-
-const pusher = new Pusher({
-  appId: process.env.PUSHER_APP_ID!,
-  key: process.env.PUSHER_KEY!,
-  secret: process.env.PUSHER_SECRET!,
-  cluster: process.env.PUSHER_CLUSTER || "us2",
-  useTLS: true,
-});
+import { emitRealtime } from "@/lib/pusher-server";
 
 /**
  * PD V1 §5 Cat B — Interpretation B (bidirectional within host↔member pair).
@@ -274,17 +266,14 @@ export const sendMessage = defineAction(
       },
     });
 
-    try {
-      await pusher.trigger(`private-channel-${conversationId}`, "message", {
-        id: message.id,
-        content: message.content,
-        senderId: currentUserId,
-        senderName: message.sender.firstName || message.sender.name || "User",
-        conversationId,
-      });
-    } catch (pusherError) {
-      console.error("Pusher trigger failed for direct message:", pusherError);
-    }
+    await emitRealtime(conversationId, "message", {
+      id: message.id,
+      content: message.content,
+      senderId: currentUserId,
+      senderName: message.sender.firstName || message.sender.name || "User",
+      timestamp: message.createdAt.toISOString(),
+      conversationId,
+    });
 
     revalidatePath("/dashboard/messages");
     return { success: true, message };

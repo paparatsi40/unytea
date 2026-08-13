@@ -1,6 +1,7 @@
 "use client";
 
 import { PublicSessionData } from "@/app/actions/public-sessions";
+import { jsonLdSafe } from "@/lib/json-ld";
 
 interface Props {
   session: PublicSessionData;
@@ -104,17 +105,17 @@ export function SessionJsonLd({ session }: Props) {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(eventData) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdSafe(eventData) }}
       />
       {videoData && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(videoData) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdSafe(videoData) }}
         />
       )}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsData) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdSafe(breadcrumbsData) }}
       />
     </>
   );

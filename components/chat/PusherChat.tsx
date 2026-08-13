@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { usePusher } from "@/hooks/use-pusher";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { sendChannelMessage } from "@/app/actions/channels";
 import { useTranslations } from "next-intl";
 
 interface Message {
@@ -26,7 +27,7 @@ interface PusherChatProps {
 export function PusherChat({ channelId, channelName }: PusherChatProps) {
   const t = useTranslations("dashboard.communityMember.pusherChat");
   const { user } = useCurrentUser();
-  const { sendMessage, onMessage, isConnected } = usePusher(channelId, user?.id || "");
+  const { onMessage, isConnected } = usePusher(channelId, user?.id || "");
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
@@ -52,20 +53,29 @@ export function PusherChat({ channelId, channelName }: PusherChatProps) {
     }
   }, [messages]);
 
-  // Send message handler
+  // Send message handler.
+  //
+  // Goes through the gated Server Action, which verifies membership, persists
+  // the message and then emits the realtime event server-side. Previously this
+  // POSTed straight to a free-form Pusher trigger (SEC-06) — which also meant
+  // community chat messages were never saved at all.
   const handleSend = useCallback(async () => {
     if (!newMessage.trim() || !user?.id) return;
 
     setIsSending(true);
     try {
-      await sendMessage(newMessage.trim(), user.name || t("anonymous"));
-      setNewMessage("");
-      inputRef.current?.focus();
+      const result = await sendChannelMessage(channelId, newMessage.trim());
+      if (result.success) {
+        setNewMessage("");
+        inputRef.current?.focus();
+      } else {
+        console.error("Failed to send message:", result.error);
+      }
     } catch (error) {
       console.error("Failed to send message:", error);
     }
     setIsSending(false);
-  }, [newMessage, user, sendMessage, t]);
+  }, [newMessage, user, channelId]);
 
   // Handle Enter key
   const handleKeyDown = useCallback(

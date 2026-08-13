@@ -15,6 +15,19 @@ interface PusherMessage {
 type MessageHandler = (message: PusherMessage) => void;
 type ConnectionHandler = (state: "connected" | "disconnected") => void;
 
+/**
+ * Subscribe to a private realtime channel.
+ *
+ * Receive-only by design. This hook used to expose `sendMessage` and
+ * `sendTyping`, which POSTed a client-chosen channel, event name and payload to
+ * a free-form `PUT /api/pusher` trigger — cross-tenant event injection
+ * (SEC-06). That endpoint is gone. Writes go through the relevant Server
+ * Action, which persists and then emits server-side once the seam has
+ * authorized the caller.
+ *
+ * `channelId` is either a community `Channel.id` or a `Conversation.id`; the
+ * auth route resolves both and checks the matching rule.
+ */
 export function usePusher(channelId: string, userId: string) {
   const pusherRef = useRef<PusherClient | null>(null);
   const channelRef = useRef<ReturnType<PusherClient["subscribe"]> | null>(null);
@@ -83,41 +96,6 @@ export function usePusher(channelId: string, userId: string) {
     };
   }, [channelId, userId]);
 
-  // Send message
-  const sendMessage = useCallback(
-    async (content: string, senderName: string) => {
-      if (!channelRef.current || !pusherRef.current) {
-        throw new Error("Not connected to Pusher");
-      }
-
-      const message: PusherMessage = {
-        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        content,
-        senderId: userId,
-        senderName,
-        timestamp: new Date().toISOString(),
-      };
-
-      // Trigger event via server API
-      const response = await fetch("/api/pusher", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          channel: `private-channel-${channelId}`,
-          event: "message",
-          data: message,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to send message");
-      }
-
-      return message;
-    },
-    [channelId, userId]
-  );
-
   // Subscribe to messages
   const onMessage = useCallback((handler: MessageHandler) => {
     messageHandlersRef.current.add(handler);
@@ -134,26 +112,9 @@ export function usePusher(channelId: string, userId: string) {
     };
   }, []);
 
-  // Send typing indicator
-  const sendTyping = useCallback(async () => {
-    if (!channelRef.current) return;
-
-    await fetch("/api/pusher", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        channel: `private-channel-${channelId}`,
-        event: "typing",
-        data: { userId },
-      }),
-    });
-  }, [channelId, userId]);
-
   return {
-    sendMessage,
     onMessage,
     onConnectionChange,
-    sendTyping,
     isConnected,
   };
 }

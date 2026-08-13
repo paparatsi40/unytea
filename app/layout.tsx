@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { GeistSans } from "geist/font/sans";
+import { jsonLdSafe } from "@/lib/json-ld";
 import { GeistMono } from "geist/font/mono";
 import { SessionProvider } from "next-auth/react";
 import { Toaster as SonnerToaster } from "sonner";
@@ -170,15 +171,15 @@ export default async function RootLayout({
         {/* JSON-LD structured data para SEO / rich snippets en Google */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD_ORGANIZATION) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdSafe(JSON_LD_ORGANIZATION) }}
         />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD_WEBSITE) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdSafe(JSON_LD_WEBSITE) }}
         />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD_SOFTWARE) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdSafe(JSON_LD_SOFTWARE) }}
         />
         <script
           dangerouslySetInnerHTML={{
