@@ -158,15 +158,16 @@ export const paginationSchema = z.object({
 // ============================================
 
 /**
- * Sanitize HTML to prevent XSS
- * Remove script tags and dangerous attributes
+ * NOTE: a regex-based `sanitizeHtml` used to live here (SEC-10). It was
+ * bypassable in the obvious way -- `<scr<script>ipt>` survives a single pass
+ * of a script-tag strip -- and it sat one import away from the real,
+ * allowlist-based sanitizer, so a future caller could easily have reached for
+ * the wrong one. It had zero callers and has been deleted.
+ *
+ * `lib/sanitize.ts` (`sanitizeHTML`, backed by the `sanitize-html` package) is
+ * the only HTML sanitizer in this codebase; the JSON-LD test suite asserts
+ * that stays true.
  */
-export function sanitizeHtml(html: string): string {
-  return html
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
-    .replace(/on\w+\s*=\s*["'][^"']*["']/gi, "")
-    .replace(/javascript:/gi, "");
-}
 
 /**
  * Sanitize user input to prevent injection

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { jsonLdSafe } from "@/lib/json-ld";
 import { getAllPosts, getPostBySlug } from "../posts";
 
 type RouteParams = {
@@ -110,7 +111,7 @@ export default async function BlogPostPage({ params }: Props) {
       <article className="container mx-auto max-w-3xl px-4 py-12">
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdSafe(jsonLd) }}
         />
 
         <p className="mb-3 text-sm text-muted-foreground">Blog</p>
