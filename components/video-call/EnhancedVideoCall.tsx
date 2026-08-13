@@ -19,6 +19,7 @@ import {
 import { LivePoll, PollCreator, Poll } from "@/components/live-session/LivePoll";
 import { Reaction, ReactionType, createReaction } from "@/lib/live-reactions";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { joinSession } from "@/app/actions/livekit";
 
 interface EnhancedVideoCallProps {
@@ -55,9 +56,7 @@ export function EnhancedVideoCall({
         const result = await joinSession(sessionId);
 
         if (!result.success || !("access" in result) || !result.access) {
-          throw new Error(
-            ("error" in result && result.error) || "Failed to get access token"
-          );
+          throw new Error(("error" in result && result.error) || "Failed to get access token");
         }
 
         setToken(result.access.token);
@@ -152,6 +151,7 @@ function VideoCallInterface({ participantName, userId, isModerator }: VideoCallI
   const [_answeredQuestions, _setAnsweredQuestions] = useState<Set<string>>(new Set());
 
   // UI State
+  const tA11y = useTranslations("a11y");
   const [showChat, setShowChat] = useState(false);
   const [showPollCreator, setShowPollCreator] = useState(false);
 
@@ -356,6 +356,8 @@ function VideoCallInterface({ participantName, userId, isModerator }: VideoCallI
       <div className="absolute bottom-4 left-4 z-50 flex flex-col gap-2">
         {/* Chat Toggle */}
         <motion.button
+          aria-label={tA11y("toggleChat")}
+          aria-pressed={showChat}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setShowChat(!showChat)}
@@ -376,6 +378,7 @@ function VideoCallInterface({ participantName, userId, isModerator }: VideoCallI
         {/* Poll Creator (Moderator only) */}
         {isModerator && (
           <motion.button
+            aria-label={tA11y("openPollCreator")}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setShowPollCreator(!showPollCreator)}

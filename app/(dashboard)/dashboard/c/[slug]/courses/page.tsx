@@ -47,6 +47,7 @@ interface Course {
 
 export default function CommunityCoursesPage() {
   const t = useTranslations("dashboard.communityAdmin.courses");
+  const tA11y = useTranslations("a11y");
   const params = useParams();
   const router = useRouter();
   const slug = params?.slug as string;
@@ -205,6 +206,7 @@ export default function CommunityCoursesPage() {
             <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
               <h2 className="text-lg font-semibold text-gray-900">{t("createDialog.title")}</h2>
               <button
+                aria-label={tA11y("close")}
                 onClick={() => setShowCreateForm(false)}
                 className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
               >
@@ -435,6 +437,7 @@ export default function CommunityCoursesPage() {
                     )}
                   </button>
                   <button
+                    aria-label={tA11y("deleteCourse")}
                     onClick={() => handleDeleteCourse(course.id)}
                     className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-red-600 transition-colors hover:border-red-200 hover:bg-red-50"
                   >

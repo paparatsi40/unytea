@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
+import { useAccessibleDialog } from "@/lib/hooks/useAccessibleDialog";
 import { motion } from "framer-motion";
 import { BarChart3, CheckCircle, X, Clock } from "lucide-react";
 
@@ -34,6 +36,12 @@ interface LivePollProps {
 }
 
 export function LivePoll({ poll, currentUserId, onVote, onClose }: LivePollProps) {
+  const tA11y = useTranslations("a11y");
+  const dialog = useAccessibleDialog({
+    onClose: onClose ?? (() => {}),
+    label: tA11y("pollDialog"),
+    enabled: Boolean(onClose),
+  });
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [hasVoted, setHasVoted] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
@@ -93,6 +101,7 @@ export function LivePoll({ poll, currentUserId, onVote, onClose }: LivePollProps
 
   return (
     <motion.div
+      {...(onClose ? dialog.props : {})}
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
@@ -114,7 +123,11 @@ export function LivePoll({ poll, currentUserId, onVote, onClose }: LivePollProps
           </div>
 
           {onClose && (
-            <button onClick={onClose} className="text-white/80 transition-colors hover:text-white">
+            <button
+              aria-label={tA11y("close")}
+              onClick={onClose}
+              className="text-white/80 transition-colors hover:text-white"
+            >
               <X className="h-5 w-5" />
             </button>
           )}
@@ -310,6 +323,8 @@ interface PollCreatorProps {
 }
 
 export function PollCreator({ onCreatePoll, onClose }: PollCreatorProps) {
+  const tA11y = useTranslations("a11y");
+  const dialog = useAccessibleDialog({ onClose, label: tA11y("pollCreatorDialog") });
   const [question, setQuestion] = useState("");
   const [options, setOptions] = useState(["", ""]);
   const [duration, setDuration] = useState<number>(60); // seconds
@@ -347,6 +362,7 @@ export function PollCreator({ onCreatePoll, onClose }: PollCreatorProps) {
 
   return (
     <motion.div
+      {...dialog.props}
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       className="w-full max-w-2xl overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-800"
@@ -355,7 +371,11 @@ export function PollCreator({ onCreatePoll, onClose }: PollCreatorProps) {
       <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-6 text-white">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-bold">Create Poll/Quiz</h3>
-          <button onClick={onClose} className="text-white/80 hover:text-white">
+          <button
+            aria-label={tA11y("close")}
+            onClick={onClose}
+            className="text-white/80 hover:text-white"
+          >
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -407,6 +427,7 @@ export function PollCreator({ onCreatePoll, onClose }: PollCreatorProps) {
                 />
                 {options.length > 2 && (
                   <button
+                    aria-label={tA11y("removeOption")}
                     onClick={() => removeOption(index)}
                     className="rounded-lg px-3 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
                   >

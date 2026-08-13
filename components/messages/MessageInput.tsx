@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, KeyboardEvent } from "react";
+import { useTranslations } from "next-intl";
 import { Send, Paperclip, Smile, Loader2, X } from "lucide-react";
 import { sendMessage } from "@/app/actions/messages";
 import { useToast } from "@/hooks/use-toast";
@@ -14,6 +15,7 @@ interface MessageInputProps {
 const MAX_MESSAGE_LENGTH = 2000;
 
 export function MessageInput({ conversationId, onMessageSent }: MessageInputProps) {
+  const tA11y = useTranslations("a11y");
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [isUploadingAttachment, setIsUploadingAttachment] = useState(false);
@@ -154,6 +156,7 @@ export function MessageInput({ conversationId, onMessageSent }: MessageInputProp
             >
               <span className="max-w-[180px] truncate">{attachment.name}</span>
               <button
+                aria-label={tA11y("removeAttachment")}
                 type="button"
                 onClick={() => removeAttachment(attachment.url)}
                 className="rounded-full p-0.5 text-gray-500 hover:bg-gray-200 hover:text-gray-800"
@@ -226,6 +229,7 @@ export function MessageInput({ conversationId, onMessageSent }: MessageInputProp
         </div>
 
         <button
+          aria-label={tA11y("send")}
           onClick={handleSend}
           disabled={
             (!message.trim() && attachments.length === 0) || isSending || isUploadingAttachment

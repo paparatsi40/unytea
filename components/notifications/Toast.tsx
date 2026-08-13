@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { X, CheckCircle, XCircle, Info, AlertCircle } from "lucide-react";
 
 type ToastType = "success" | "error" | "info" | "warning";
@@ -13,6 +14,7 @@ interface ToastProps {
 }
 
 export function Toast({ message, type = "info", duration = 3000, onClose }: ToastProps) {
+  const tA11y = useTranslations("a11y");
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
@@ -47,6 +49,7 @@ export function Toast({ message, type = "info", duration = 3000, onClose }: Toas
       {icons[type]}
       <p className="text-sm font-medium text-gray-900">{message}</p>
       <button
+        aria-label={tA11y("dismiss")}
         onClick={() => {
           setIsVisible(false);
           onClose?.();

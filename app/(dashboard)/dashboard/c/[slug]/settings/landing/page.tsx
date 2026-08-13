@@ -15,6 +15,7 @@ export default function LandingPageSettings() {
   const router = useRouter();
   const slug = (params?.slug as string) ?? "";
   const t = useTranslations("community.landing.settings");
+  const tA11y = useTranslations("a11y");
 
   const [loading, setLoading] = useState(true);
   const [communityId, setCommunityId] = useState<string | null>(null);
@@ -101,6 +102,7 @@ export default function LandingPageSettings() {
         <div>
           <div className="flex items-center gap-3">
             <Button
+              aria-label={tA11y("goBack")}
               variant="ghost"
               size="sm"
               onClick={() => router.push(`/dashboard/c/${slug}/settings`)}

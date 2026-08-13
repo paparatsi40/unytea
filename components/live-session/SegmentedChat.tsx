@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { MessageSquare, HelpCircle, Bookmark, Send, Pin, CheckCircle } from "lucide-react";
@@ -39,6 +40,7 @@ export function SegmentedChat({
   currentUserId,
   isModerator = false,
 }: SegmentedChatProps) {
+  const tA11y = useTranslations("a11y");
   const [activeTab, setActiveTab] = useState<ChatTab>("all");
   const [messageInput, setMessageInput] = useState("");
   const [messageType, setMessageType] = useState<ChatMessageType>("general");
@@ -161,6 +163,7 @@ export function SegmentedChat({
             className="flex-1 resize-none rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 placeholder-gray-500 focus:border-transparent focus:ring-2 focus:ring-purple-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
           />
           <button
+            aria-label={tA11y("send")}
             onClick={handleSend}
             disabled={!messageInput.trim()}
             className="flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-white transition-colors hover:bg-purple-700 disabled:cursor-not-allowed disabled:bg-gray-400"
