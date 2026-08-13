@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { defineAction } from "@/lib/actions/define-action";
 import { communityById, communityOfSeries, communityOfSession } from "@/lib/actions/resolvers";
+import { assertCommunityMemberIfScoped } from "@/lib/actions/guards";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { nanoid } from "nanoid";
@@ -50,8 +51,13 @@ export const createSession = defineAction(
     rateLimit: "create",
   },
   async (ctx, data: { title: string; description?: string; scheduledAt: Date; duration: number; communityId?: string; isPrivate?: boolean; recurrence?: "weekly" | "monthly"; recurrenceCount?: number; postToFeed?: boolean; }) => {
+    // The session — and the SESSION_ANNOUNCEMENT feed post it creates — is
+    // attached to a caller-supplied communityId. Without this, any
+    // authenticated non-member could inject content into an arbitrary tenant's
+    // feed (M2). communityId is nullable for standalone sessions, so the check
+    // applies only when one is supplied.
+    await assertCommunityMemberIfScoped(ctx, data.communityId);
   try {
-
     const userId = ctx.userId;
 
     // Generate unique room ID
@@ -646,8 +652,11 @@ export const createSessionOrSeries = defineAction(
     rateLimit: "create",
   },
   async (ctx, data: CreateSessionOrSeriesInput) => {
+    // Same cross-tenant hole as createSession: the series, its generated
+    // sessions, the feed post and the autopilot jobs all land in a
+    // caller-supplied community (M3).
+    await assertCommunityMemberIfScoped(ctx, data.communityId);
   try {
-
     const userId = ctx.userId;
 
     // Default to "once" if not specified

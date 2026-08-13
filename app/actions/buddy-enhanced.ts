@@ -144,11 +144,10 @@ export const getBuddyStats = defineAction(
     community: ([partnershipId]) => communityOfPartnership(partnershipId),
   },
   async (ctx, partnershipId: string) => {
+    await assertBuddyPartner(ctx, partnershipId);
   try {
 
     const userId = ctx.userId;
-    await assertBuddyPartner(ctx, partnershipId);
-
     const partnership = await prisma.buddyPartnership.findUnique({
       where: { id: partnershipId },
       include: {
@@ -237,11 +236,10 @@ export const buddyCheckInWithStreak = defineAction(
     rateLimit: "create",
   },
   async (ctx, partnershipId: string, mood: number, notes?: string, wins?: string[], _blockers?: string[]) => {
+    await assertBuddyPartner(ctx, partnershipId);
   try {
 
     const userId = ctx.userId;
-    await assertBuddyPartner(ctx, partnershipId);
-
     const partnership = await prisma.buddyPartnership.findUnique({
       where: { id: partnershipId },
     });
@@ -274,9 +272,9 @@ export const updateGoalProgress = defineAction(
     community: ([goalId]) => communityOfBuddyGoal(goalId),
   },
   async (ctx, goalId: string, progress: number) => {
-  try {
     // Membership of the community is not enough — only a partner in this
-    // partnership may move its goals.
+    // partnership may move its goals. Runs above the try so the ForbiddenError
+    // reaches the seam instead of being swallowed into a generic failure.
     const owning = await prisma.buddyGoal.findUnique({
       where: { id: goalId },
       select: { partnershipId: true },
@@ -284,6 +282,7 @@ export const updateGoalProgress = defineAction(
     if (!owning) return { success: false, error: "Goal not found" };
     await assertBuddyPartner(ctx, owning.partnershipId);
 
+  try {
     const goal = await prisma.buddyGoal.update({
       where: { id: goalId },
       data: {

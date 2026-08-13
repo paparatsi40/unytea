@@ -52,9 +52,8 @@ export const startCompositeRecording = defineAction(
     rateLimit: "create",
   },
   async (ctx, config: RecordingConfig) => {
-  try {
     await assertSessionHost(ctx, config.sessionId);
-
+  try {
     return await createSessionRecording({
       sessionId: config.sessionId,
       layout: config.layout,
@@ -81,11 +80,10 @@ export const stopRecording = defineAction(
     community: ([sessionId]) => communityOfSession(sessionId),
   },
   async (ctx, sessionId: string) => {
+    await assertSessionHost(ctx, sessionId);
   try {
 
     const userId = ctx.userId;
-    await assertSessionHost(ctx, sessionId);
-
     // Verify host
     const session = await prisma.mentorSession.findUnique({
       where: { id: sessionId },

@@ -277,9 +277,9 @@ export const createBuddyGoal = defineAction(
     rateLimit: "create",
   },
   async (ctx, partnershipId: string, title: string, description?: string, targetDate?: Date) => {
-  try {
     await assertBuddyPartner(ctx, partnershipId);
 
+  try {
     const goal = await prisma.buddyGoal.create({
       data: {
         partnershipId,
@@ -310,7 +310,6 @@ export const completeBuddyGoal = defineAction(
     community: ([goalId]) => communityOfBuddyGoal(goalId),
   },
   async (ctx, goalId: string) => {
-  try {
     const owning = await prisma.buddyGoal.findUnique({
       where: { id: goalId },
       select: { partnershipId: true },
@@ -318,6 +317,7 @@ export const completeBuddyGoal = defineAction(
     if (!owning) return { success: false, error: "Goal not found" };
     await assertBuddyPartner(ctx, owning.partnershipId);
 
+  try {
     const goal = await prisma.buddyGoal.update({
       where: { id: goalId },
       data: {
@@ -348,8 +348,15 @@ export const createBuddyCheckIn = defineAction(
     rateLimit: "create",
   },
   async (ctx, partnershipId: string, mood: number, notes?: string, completedGoals?: string[]) => {
-  try {
+    // Community membership is not enough: a community holds many partnerships
+    // and only its two participants may write check-ins into one. Without this,
+    // any member could post mood and notes into another pair's partnership by
+    // passing its id — the sibling mutations already guard this way (M1).
+    // Runs above the try so the ForbiddenError reaches the seam rather than
+    // being swallowed into a generic failure.
+    await assertBuddyPartner(ctx, partnershipId);
 
+  try {
     const userId = ctx.userId;
 
     const checkIn = await prisma.buddyCheckIn.create({
@@ -383,9 +390,9 @@ export const endBuddyPartnership = defineAction(
     community: ([partnershipId]) => communityOfPartnership(partnershipId),
   },
   async (ctx, partnershipId: string) => {
-  try {
     await assertBuddyPartner(ctx, partnershipId);
 
+  try {
     const partnership = await prisma.buddyPartnership.update({
       where: { id: partnershipId },
       data: {

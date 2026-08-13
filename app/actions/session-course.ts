@@ -268,7 +268,13 @@ export const getAvailableCourses = defineAction(
 export const createCourseFromSession = defineAction(
   {
     name: "createCourseFromSession",
-    auth: "member",
+    // Publishing a Course into the community's namespace is an authoring
+    // action, and its siblings createCourse / addSessionToCourse already
+    // require OWNER/ADMIN. This was `member` guarded only by
+    // `session.mentorId === userId`, so any member who happened to host a
+    // session could publish a course with an attacker-chosen title, isPaid and
+    // price under the community's name (M4).
+    auth: "admin",
     args: [
       z.string().min(1).max(64),
       z.string().min(1).max(300),
@@ -298,8 +304,15 @@ export const createCourseFromSession = defineAction(
       },
     });
 
-    if (!session || session.mentorId !== userId) {
-      return { success: false, error: "Session not found or unauthorized" };
+    // Authorization is the seam's admin gate on this session's own community
+    // (resolver: communityOfSession), so the caller is provably an OWNER/ADMIN
+    // of the community that owns this session. The previous
+    // `session.mentorId !== userId` equality is deliberately gone: it was the
+    // *only* check, which is what allowed a non-admin host to publish a course
+    // (M4), and keeping it would now wrongly block an admin from converting a
+    // session someone else hosted.
+    if (!session) {
+      return { success: false, error: "Session not found" };
     }
 
     if (!session.recordingUrl && !session.recording?.url) {

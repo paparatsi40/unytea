@@ -180,6 +180,39 @@ describe("H9 — Server Action authorization harness", () => {
     });
   });
 
+  /**
+   * Row-level guards throw ForbiddenError. Nearly every handler wraps its body
+   * in `try { ... } catch { return <generic failure> }`, so a guard called from
+   * *inside* that try has its typed error swallowed: the write is still
+   * prevented, but the seam never sees FORBIDDEN and the caller is told
+   * something generic instead. Authorization must therefore run before any
+   * error-swallowing.
+   */
+  describe("guards run before the handler's try block", () => {
+    function guardsInsideTry(source: string): string[] {
+      const offenders: string[] = [];
+      const lines = source.split("\n");
+      lines.forEach((line, index) => {
+        if (!/^\s*await assert[A-Z]\w*\(/.test(line)) return;
+        // Walk back to whichever comes first: the enclosing `try {` or the
+        // handler's arrow head.
+        for (let i = index - 1; i >= 0; i--) {
+          const prev = lines[i].trim();
+          if (prev === "try {") {
+            offenders.push(`${index + 1}: ${line.trim()}`);
+            return;
+          }
+          if (/^async \(_?ctx\b/.test(prev)) return;
+        }
+      });
+      return offenders;
+    }
+
+    it.each(serverModules)("%s: no guard is nested inside a try", (rel) => {
+      expect(guardsInsideTry(readSource(path.resolve(REPO_ROOT, rel)))).toEqual([]);
+    });
+  });
+
   describe("public allowlist", () => {
     const declaredPublic = serverModules.flatMap((rel) =>
       parseActions(readSource(path.resolve(REPO_ROOT, rel)))

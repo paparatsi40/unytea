@@ -369,15 +369,28 @@ export const reorderCommunitySections = defineAction(
       return { success: false, error: "Not authorized" };
     }
 
-    // Update positions in transaction
-    await prisma.$transaction(
+    // Each write is scoped to the tenant that passed the gate. Previously the
+    // where was `{ id }` alone, so an OWNER/ADMIN of community A could pass A's
+    // id to satisfy the gate and then hand in section ids belonging to
+    // community B, silently rewriting B's ordering (M5). updateMany with a
+    // communityId predicate makes a foreign id a no-op rather than a write.
+    const results = await prisma.$transaction(
       sectionIds.map((id, index) =>
-        prisma.communitySection.update({
-          where: { id },
+        prisma.communitySection.updateMany({
+          where: { id, communityId },
           data: { position: index },
         })
       )
     );
+
+    const applied = results.reduce((sum, r) => sum + r.count, 0);
+    if (applied !== sectionIds.length) {
+      // Surface the mismatch rather than reporting success for a partial write.
+      return {
+        success: false,
+        error: "One or more sections do not belong to this community",
+      };
+    }
 
     const community = await prisma.community.findUnique({
       where: { id: communityId },

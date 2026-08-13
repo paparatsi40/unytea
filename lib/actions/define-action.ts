@@ -3,7 +3,6 @@ import { z } from "zod";
 import type { Member, MemberRole } from "@prisma/client";
 
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
 import {
   ForbiddenError,
   UnauthorizedError,
@@ -13,6 +12,7 @@ import {
 import { rateLimiters } from "@/lib/rate-limit";
 
 import { actionFailure, type ActionFailure } from "./errors";
+import { isPaywallBlocked } from "./paywall";
 import { getActionIdentifier } from "./identity";
 
 /**
@@ -233,19 +233,11 @@ export function defineAction<const TSchemas extends SchemaTuple, TAuth extends A
           ? await requireCommunityRole(userId as string, communityId as string, roles)
           : await requireCommunityMember(userId as string, communityId as string);
 
-        if (!config.allowPaywallLocked) {
-          const community = await prisma.community.findUnique({
-            where: { id: communityId as string },
-            select: { paywallLocked: true, ownerId: true },
-          });
-          // The owner keeps access to their own locked community so they can
-          // resolve billing; everyone else is held at the paywall.
-          if (community?.paywallLocked && community.ownerId !== userId) {
-            return actionFailure(
-              "PAYWALL_LOCKED",
-              "This community is temporarily unavailable."
-            );
-          }
+        if (
+          !config.allowPaywallLocked &&
+          (await isPaywallBlocked(communityId as string, userId as string))
+        ) {
+          return actionFailure("PAYWALL_LOCKED", "This community is temporarily unavailable.");
         }
       } else if (config.auth === "admin") {
         if (session?.user?.role !== "ADMIN") {

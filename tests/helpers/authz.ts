@@ -22,13 +22,20 @@ export function makeMemberRow(overrides: Partial<Member> = {}): Member {
 }
 
 /**
- * The seam's paywall check selects only `{ paywallLocked, ownerId }`. This
- * fixture mirrors that projection rather than inventing the ~40 columns the
- * query never reads, so the cast is narrowing a partial select to the delegate's
- * declared return type — not papering over a missing required field.
+ * Covers the two narrow projections the action layer takes of a community: the
+ * seam's paywall check (`{ paywallLocked, ownerId }`) and the `communityById`
+ * resolver (`{ id }`). Mirrors those rather than inventing the ~40 columns the
+ * queries never read, so the cast narrows a partial select to the delegate's
+ * declared return type rather than papering over a missing required field.
  */
 export function makeCommunityRow(
-  overrides: Partial<Pick<Community, "paywallLocked" | "ownerId">> = {}
+  overrides: Partial<Pick<Community, "id" | "slug" | "paywallLocked" | "ownerId">> = {}
 ): Community {
-  return { paywallLocked: false, ownerId: "user_1", ...overrides } as Community;
+  return {
+    id: "community_1",
+    slug: "test-community",
+    paywallLocked: false,
+    ownerId: "user_1",
+    ...overrides,
+  } as Community;
 }
