@@ -115,7 +115,7 @@ describe("M1 — createBuddyCheckIn requires partnership membership", () => {
 });
 
 // ───────────────────────────────────────────────────────────────────────────
-describe("M2/M3 — session creation cannot target a foreign tenant", () => {
+describe("M2/M3 — session creation is owner-only and tenant-scoped", () => {
   const baseSession = {
     title: "Injected session",
     description: "x",
@@ -149,18 +149,36 @@ describe("M2/M3 — session creation cannot target a foreign tenant", () => {
     expect(prisma.mentorSession.create).not.toHaveBeenCalled();
   });
 
-  it("createSession rejects when the target community is paywall-locked", async () => {
-    memberOf("MEMBER");
-    vi.mocked(prisma.community.findUnique).mockResolvedValue(
-      makeCommunityRow({ paywallLocked: true, ownerId: OTHER_A })
-    );
+  describe("interaction with the paywall gate", () => {
+    it("refuses a non-owner before the paywall is even considered", async () => {
+      memberOf("MEMBER");
+      vi.mocked(prisma.community.findUnique).mockResolvedValue(
+        makeCommunityRow({ paywallLocked: true, ownerId: OTHER_A })
+      );
 
-    const result = await createSession(baseSession);
+      const result = await createSession(baseSession);
 
-    // Now that the gate lives in the seam rather than a hand-rolled guard, the
-    // paywall case reports its own dedicated code instead of a generic FORBIDDEN.
-    expect(result).toMatchObject({ success: false, code: "PAYWALL_LOCKED" });
-    expect(prisma.mentorSession.create).not.toHaveBeenCalled();
+      // The seam checks the role before the paywall, so a non-owner is refused
+      // outright rather than being told the community is locked.
+      expect(result).toMatchObject({ success: false, code: "FORBIDDEN" });
+      expect(prisma.mentorSession.create).not.toHaveBeenCalled();
+    });
+
+    it("lets the community's actual owner through a paywall lock", async () => {
+      memberOf("OWNER");
+      // The seam exempts the owner from their own community's lock so they can
+      // reach it and fix billing. With creation now owner-only, that exemption
+      // is the only way this branch is reachable at all.
+      vi.mocked(prisma.community.findUnique).mockResolvedValue(
+        makeCommunityRow({ paywallLocked: true, ownerId: CALLER })
+      );
+      vi.mocked(prisma.mentorSession.create).mockResolvedValue({ id: "s_1" } as never);
+
+      const result = await createSession(baseSession);
+
+      expect(result).not.toMatchObject({ code: "FORBIDDEN" });
+      expect(result).not.toMatchObject({ code: "PAYWALL_LOCKED" });
+    });
   });
 
   it("createSessionOrSeries rejects a non-member of the target community", async () => {
@@ -217,16 +235,66 @@ describe("M2/M3 — session creation cannot target a foreign tenant", () => {
     expect(prisma.mentorSession.create).not.toHaveBeenCalled();
   });
 
-  it("an ACTIVE member of the target community can still create a session", async () => {
-    // Sessions are member-hostable today — /dashboard/sessions offers the
-    // dialog to any ACTIVE member. Pinning that so a future role change is a
-    // deliberate edit here rather than a silent break.
-    memberOf("MEMBER");
-    vi.mocked(prisma.mentorSession.create).mockResolvedValue({ id: "s_1" } as never);
+  /**
+   * Owner-only, per Carlos's decision. This replaces the prompt-03 case that
+   * asserted any ACTIVE member could host: the policy changed deliberately, so
+   * the assertion changes with it rather than the rule loosening silently.
+   * ADMIN is intentionally excluded — widening is a one-word `roles` edit.
+   */
+  describe("only the community OWNER may host", () => {
+    it.each(["MEMBER", "MODERATOR", "ADMIN"] as const)(
+      "refuses a %s who is not the owner",
+      async (role) => {
+        memberOf(role);
 
-    const result = await createSession(baseSession);
+        const result = await createSession(baseSession);
 
-    expect(result).not.toMatchObject({ code: "FORBIDDEN" });
+        expect(result).toMatchObject({ success: false, code: "FORBIDDEN" });
+        expect(prisma.mentorSession.create).not.toHaveBeenCalled();
+      }
+    );
+
+    it.each(["MEMBER", "MODERATOR", "ADMIN"] as const)(
+      "refuses a %s creating a series",
+      async (role) => {
+        memberOf(role);
+
+        const result = await createSessionOrSeries({
+          ...baseSession,
+          timezone: "UTC",
+          repeat: "WEEKLY",
+          generateCount: 8,
+        });
+
+        expect(result).toMatchObject({ success: false, code: "FORBIDDEN" });
+        expect(prisma.mentorSession.create).not.toHaveBeenCalled();
+        expect(prisma.sessionSeries.create).not.toHaveBeenCalled();
+      }
+    );
+
+    it("admits the OWNER creating a session", async () => {
+      memberOf("OWNER");
+      vi.mocked(prisma.mentorSession.create).mockResolvedValue({ id: "s_1" } as never);
+
+      const result = await createSession(baseSession);
+
+      expect(result).not.toMatchObject({ code: "FORBIDDEN" });
+      expect(prisma.mentorSession.create).toHaveBeenCalled();
+    });
+
+    it("admits the OWNER creating a series", async () => {
+      memberOf("OWNER");
+      vi.mocked(prisma.mentorSession.create).mockResolvedValue({ id: "s_1" } as never);
+      vi.mocked(prisma.sessionSeries.create).mockResolvedValue({ id: "series_1" } as never);
+
+      const result = await createSessionOrSeries({
+        ...baseSession,
+        timezone: "UTC",
+        repeat: "once",
+      });
+
+      expect(result).not.toMatchObject({ code: "FORBIDDEN" });
+    });
   });
 });
 

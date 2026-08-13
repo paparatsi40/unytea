@@ -33,11 +33,15 @@ export type SessionDetail = Prisma.MentorSessionGetPayload<{
 export const createSession = defineAction(
   {
     name: "createSession",
-    // communityId is required (see the interface note below), so the seam can
-    // resolve the tenant itself. This replaces the assertCommunityMemberIfScoped
-    // guard that was needed while the id was optional — the gate is back where
-    // the H9 harness and the lint rule can see it.
-    auth: "member",
+    // Owner-only: hosting a live session is the community owner's act, not
+    // something any member may do. Enforced through the seam rather than a
+    // hand-rolled check, so the H9 harness and the lint rule can see it.
+    //
+    // ADMIN is deliberately excluded — widening later is a one-word change to
+    // `roles`. communityId is required (see the interface note below), so there
+    // is no ungated path around this.
+    auth: "admin",
+    roles: ["OWNER"],
     community: ([data]) => communityById(data.communityId),
     args: [
       z.object({
@@ -637,7 +641,11 @@ interface CreateSessionOrSeriesInput {
 export const createSessionOrSeries = defineAction(
   {
     name: "createSessionOrSeries",
-    auth: "member",
+    // Owner-only, matching createSession. A series additionally generates
+    // future sessions, a feed post and autopilot jobs in the community, so it
+    // must not sit below the single-session bar.
+    auth: "admin",
+    roles: ["OWNER"],
     community: ([data]) => communityById(data.communityId),
     args: [
       z.object({

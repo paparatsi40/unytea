@@ -36,6 +36,13 @@ interface SessionsPageClientProps {
   upcoming: SessionItem[];
   past: SessionItem[];
   communityId?: string;
+  /**
+   * Only the community owner may create or host a session. Mirrors
+   * `canCreateSessions` on the community-scoped sessions page, which is
+   * likewise `isOwner`. A non-owner reads their sessions but is shown no
+   * create control, because the server would refuse it.
+   */
+  canCreateSessions: boolean;
   sessionsThisWeek: number;
   liveSessionId: string | null;
   startingSoon: { id: string; startsInMinutes: number } | null;
@@ -46,6 +53,7 @@ export function SessionsPageClient({
   upcoming,
   past,
   communityId,
+  canCreateSessions,
   sessionsThisWeek,
   liveSessionId,
   startingSoon,
@@ -95,10 +103,9 @@ export function SessionsPageClient({
             </p>
           )}
         </div>
-        {/* Hosting requires a community; a user who belongs to none has nowhere
-            to put a session, so the trigger is not offered rather than failing
-            on submit. */}
-        {communityId && (
+        {/* Owner-only, matching the server gate — a non-owner is not shown a
+            control that would be refused. */}
+        {canCreateSessions && communityId && (
           <CreateSessionDialog
             triggerText={t("scheduleSession")}
             communityId={communityId}
@@ -216,7 +223,7 @@ export function SessionsPageClient({
                   {t("empty.description")}
                 </p>
                 <div className="mt-6 flex items-center gap-4">
-                  {communityId && (
+                  {canCreateSessions && communityId && (
                     <CreateSessionDialog
                       triggerText={t("scheduleSession")}
                       communityId={communityId}
@@ -290,7 +297,7 @@ export function SessionsPageClient({
                       {t("joinNextSession")}
                     </Button>
                   </Link>
-                  {communityId && (
+                  {canCreateSessions && communityId && (
                     <CreateSessionDialog
                       triggerText={t("upcoming.edit")}
                       communityId={communityId}
