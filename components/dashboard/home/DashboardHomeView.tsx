@@ -9,7 +9,6 @@ import {
   MessageSquare,
   Plus,
   BarChart3,
-  Settings,
   Video,
   TrendingUp,
   TrendingDown,
@@ -22,6 +21,7 @@ import { cn } from "@/lib/utils";
 import { OnboardingChecklist } from "@/components/onboarding/OnboardingChecklist";
 import { formatDistanceToNow, format } from "date-fns";
 import { getDateFnsLocale } from "@/lib/i18n/date-fns-locale";
+import { resolveNextStep } from "@/lib/dashboard/next-step";
 import type { OnboardingProgress } from "@/app/actions/onboarding";
 import type { TodayDashboardData } from "@/app/actions/today-dashboard";
 
@@ -35,13 +35,38 @@ export function DashboardHomeView({ data, onboardingProgress }: Props) {
   const locale = useLocale();
   const dfLocale = getDateFnsLocale(locale);
 
+  // One next step, chosen from what the account is actually missing. The
+  // "momentum" and "scheduleSession" branches share the session CTA; the rest
+  // each have their own headline and label under `nextStep`.
+  const nextStep = resolveNextStep(data);
   const s = data.weeklyStats.sessionsThisWeek;
-  const heroText =
-    s === 0
-      ? t("actionFirst.noSessions")
-      : s <= 2
-        ? t("actionFirst.fewSessions", { count: s })
-        : t("actionFirst.manySessions", { count: s });
+
+  const primaryHeadline =
+    nextStep.id === "createCommunity" ||
+    nextStep.id === "createPost" ||
+    nextStep.id === "inviteMembers"
+      ? t(`nextStep.${nextStep.id}.headline`)
+      : s === 0
+        ? t("actionFirst.noSessions")
+        : s <= 2
+          ? t("actionFirst.fewSessions", { count: s })
+          : t("actionFirst.manySessions", { count: s });
+
+  const primaryLabel =
+    nextStep.id === "createCommunity" ||
+    nextStep.id === "createPost" ||
+    nextStep.id === "inviteMembers"
+      ? t(`nextStep.${nextStep.id}.cta`)
+      : t("actionFirst.scheduleSession");
+
+  const PrimaryIcon =
+    nextStep.id === "createCommunity"
+      ? Plus
+      : nextStep.id === "createPost"
+        ? MessageSquare
+        : nextStep.id === "inviteMembers"
+          ? Users
+          : Calendar;
 
   // Onboarding checklist items, localized, built from the boolean flags.
   const onboardingItems = onboardingProgress
@@ -72,31 +97,25 @@ export function DashboardHomeView({ data, onboardingProgress }: Props) {
 
   return (
     <div className="container mx-auto max-w-6xl space-y-6 px-4 py-8">
-      {/* Header */}
-      <header className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold">{t("welcomeBack", { name: data.user.name })}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
-        </div>
-        <Button asChild>
-          <Link href="/dashboard/communities/new">
-            <Plus className="mr-2 h-4 w-4" />
-            {t("createCommunity")}
-          </Link>
-        </Button>
+      {/* Header — the "Create community" button that used to sit here competed
+          with the hero for attention; it now lives in the secondary row, and is
+          promoted to the hero only when creating a community IS the next step. */}
+      <header>
+        <h1 className="text-2xl font-semibold">{t("welcomeBack", { name: data.user.name })}</h1>
+        <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
       </header>
 
       {/* Onboarding (new users only) */}
       {onboardingItems.length > 0 && <OnboardingChecklist items={onboardingItems} />}
 
-      {/* Action-first hero — purely "what to do next", no stats. */}
+      {/* Action-first hero — the single next step, no stats. */}
       <Card className="p-5">
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <p className="max-w-2xl text-lg font-medium text-foreground">{heroText}</p>
+          <p className="max-w-2xl text-lg font-medium text-foreground">{primaryHeadline}</p>
           <Button asChild>
-            <Link href="/dashboard/sessions/create">
-              <Calendar className="mr-2 h-4 w-4" />
-              {t("actionFirst.scheduleSession")}
+            <Link href={nextStep.href}>
+              <PrimaryIcon className="mr-2 h-4 w-4" />
+              {primaryLabel}
             </Link>
           </Button>
         </div>
@@ -119,18 +138,21 @@ export function DashboardHomeView({ data, onboardingProgress }: Props) {
             value={data.weeklyStats.sessionsThisWeek}
             delta={data.weeklyStats.sessionsDelta}
             vsLabel={t("analytics.vsLastWeek")}
+            noChangeLabel={t("analytics.noChange")}
           />
           <MetricCell
             label={t("analytics.newMembers")}
             value={data.weeklyStats.newMembersThisWeek}
             delta={data.weeklyStats.newMembersDelta}
             vsLabel={t("analytics.vsLastWeek")}
+            noChangeLabel={t("analytics.noChange")}
           />
           <MetricCell
             label={t("analytics.posts")}
             value={data.weeklyStats.postsThisWeek}
             delta={data.weeklyStats.postsDelta}
             vsLabel={t("analytics.vsLastWeek")}
+            noChangeLabel={t("analytics.noChange")}
           />
         </div>
       </div>
@@ -263,24 +285,37 @@ export function DashboardHomeView({ data, onboardingProgress }: Props) {
         )}
       </section>
 
-      {/* Quick actions */}
+      {/* Secondary actions — everything the hero didn't ask for.
+          "Settings" is gone: it is a permanent sidebar item, and repeating it
+          here padded the row without adding a route. The session action appears
+          once, under one name: it and the old "Create session" pointed at the
+          same page. Whichever action the hero is already showing is dropped, so
+          the same button never appears twice on the page. */}
       <section>
         <h2 className="mb-3 text-lg font-semibold">{t("quickActions.title")}</h2>
         <div className="flex flex-wrap gap-2">
-          <QuickAction href="/dashboard/sessions/create" icon={<Calendar className="h-4 w-4" />}>
-            {t("quickActions.createSession")}
-          </QuickAction>
-          <QuickAction href="/dashboard/communities" icon={<MessageSquare className="h-4 w-4" />}>
-            {t("quickActions.createPost")}
-          </QuickAction>
-          <QuickAction href="/dashboard/communities" icon={<Users className="h-4 w-4" />}>
-            {t("quickActions.inviteMember")}
-          </QuickAction>
+          {nextStep.id !== "createCommunity" && (
+            <QuickAction href="/dashboard/communities/new" icon={<Plus className="h-4 w-4" />}>
+              {t("createCommunity")}
+            </QuickAction>
+          )}
+          {nextStep.id !== "scheduleSession" && nextStep.id !== "momentum" && (
+            <QuickAction href="/dashboard/sessions/create" icon={<Calendar className="h-4 w-4" />}>
+              {t("actionFirst.scheduleSession")}
+            </QuickAction>
+          )}
+          {nextStep.id !== "createPost" && (
+            <QuickAction href="/dashboard/communities" icon={<MessageSquare className="h-4 w-4" />}>
+              {t("quickActions.createPost")}
+            </QuickAction>
+          )}
+          {nextStep.id !== "inviteMembers" && (
+            <QuickAction href="/dashboard/communities" icon={<Users className="h-4 w-4" />}>
+              {t("quickActions.inviteMember")}
+            </QuickAction>
+          )}
           <QuickAction href="/dashboard/analytics" icon={<BarChart3 className="h-4 w-4" />}>
             {t("quickActions.viewAnalytics")}
-          </QuickAction>
-          <QuickAction href="/dashboard/settings" icon={<Settings className="h-4 w-4" />}>
-            {t("quickActions.openSettings")}
           </QuickAction>
         </div>
       </section>
@@ -293,11 +328,13 @@ function MetricCell({
   value,
   delta,
   vsLabel,
+  noChangeLabel,
 }: {
   label: string;
   value: number;
   delta: number;
   vsLabel: string;
+  noChangeLabel: string;
 }) {
   const trend = delta > 0 ? "up" : delta < 0 ? "down" : "flat";
   const TrendIcon = trend === "up" ? TrendingUp : trend === "down" ? TrendingDown : Minus;
@@ -311,11 +348,19 @@ function MetricCell({
       <div className="mb-0.5 text-2xl font-semibold">{value}</div>
       <div className={cn("inline-flex items-center gap-0.5 text-xs", trendColor)}>
         <TrendIcon className="h-3 w-3" />
-        <span>
-          {sign}
-          {delta}
-        </span>
-        <span className="ml-1 text-muted-foreground">{vsLabel}</span>
+        {/* A flat week rendered as "— 0 vs last week", which reads like a value
+            that failed to load rather than a real result. Say it in words. */}
+        {trend === "flat" ? (
+          <span className="ml-1 text-muted-foreground">{noChangeLabel}</span>
+        ) : (
+          <>
+            <span>
+              {sign}
+              {delta}
+            </span>
+            <span className="ml-1 text-muted-foreground">{vsLabel}</span>
+          </>
+        )}
       </div>
     </div>
   );

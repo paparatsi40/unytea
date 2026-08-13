@@ -308,14 +308,26 @@
         "subtitle": "Gestiona tu cuenta y preferencias"
       },
       "nav": {
-        "profile": { "name": "Perfil", "description": "Gestiona tu información personal" },
+        "profile": {
+          "name": "Perfil",
+          "description": "Gestiona tu información personal"
+        },
         "notifications": {
           "name": "Notificaciones",
           "description": "Configura las preferencias de notificación"
         },
-        "billing": { "name": "Facturación", "description": "Gestiona la suscripción y los pagos" },
-        "appearance": { "name": "Apariencia", "description": "Personaliza tu experiencia" },
-        "integrations": { "name": "Integraciones", "description": "Conecta servicios de terceros" }
+        "billing": {
+          "name": "Facturación",
+          "description": "Gestiona la suscripción y los pagos"
+        },
+        "appearance": {
+          "name": "Apariencia",
+          "description": "Personaliza tu experiencia"
+        },
+        "integrations": {
+          "name": "Integraciones",
+          "description": "Conecta servicios de terceros"
+        }
       },
       "account": {
         "title": "Configuración de la cuenta",
@@ -350,9 +362,18 @@
         "themeTitle": "Tema",
         "themeSubtitle": "Elige cómo se ve Unytea para ti",
         "themes": {
-          "light": { "label": "Claro", "description": "Tema claro" },
-          "dark": { "label": "Oscuro", "description": "Tema oscuro" },
-          "system": { "label": "Sistema", "description": "Coincidir con el sistema" }
+          "light": {
+            "label": "Claro",
+            "description": "Tema claro"
+          },
+          "dark": {
+            "label": "Oscuro",
+            "description": "Tema oscuro"
+          },
+          "system": {
+            "label": "Sistema",
+            "description": "Coincidir con el sistema"
+          }
         },
         "saveButton": "Guardar tema",
         "savingButton": "Guardando...",
@@ -412,7 +433,10 @@
           "label": "Comentarios",
           "description": "Cuando alguien comenta en tu publicación"
         },
-        "mentions": { "label": "Menciones", "description": "Cuando alguien te menciona" },
+        "mentions": {
+          "label": "Menciones",
+          "description": "Cuando alguien te menciona"
+        },
         "reactions": {
           "label": "Reacciones",
           "description": "Cuando alguien reacciona a tu contenido"
@@ -423,7 +447,10 @@
         },
         "saveButton": "Guardar preferencias",
         "savingButton": "Guardando...",
-        "toasts": { "saved": "¡Preferencias guardadas!", "saveFailed": "No se pudo guardar" }
+        "toasts": {
+          "saved": "¡Preferencias guardadas!",
+          "saveFailed": "No se pudo guardar"
+        }
       },
       "integrations": {
         "title": "Integraciones",
@@ -431,12 +458,24 @@
         "comingSoon": "Próximamente",
         "configure": "Configurar",
         "items": {
-          "stripe": { "description": "Acepta pagos por cursos y membresías" },
-          "zoom": { "description": "Organiza sesiones de video con la integración de Zoom" },
-          "googleCalendar": { "description": "Sincroniza tus sesiones con Google Calendar" },
-          "zapier": { "description": "Conecta Unytea con más de 5.000 apps" },
-          "slack": { "description": "Recibe notificaciones de la comunidad en Slack" },
-          "discord": { "description": "Conecta tu comunidad con Discord" }
+          "stripe": {
+            "description": "Acepta pagos por cursos y membresías"
+          },
+          "zoom": {
+            "description": "Organiza sesiones de video con la integración de Zoom"
+          },
+          "googleCalendar": {
+            "description": "Sincroniza tus sesiones con Google Calendar"
+          },
+          "zapier": {
+            "description": "Conecta Unytea con más de 5.000 apps"
+          },
+          "slack": {
+            "description": "Recibe notificaciones de la comunidad en Slack"
+          },
+          "discord": {
+            "description": "Conecta tu comunidad con Discord"
+          }
         },
         "request": {
           "title": "Solicitar una integración",
@@ -963,13 +1002,22 @@
           "header": "Configuración de la comunidad",
           "subtitle": "Gestiona las preferencias y la configuración de tu comunidad",
           "nav": {
-            "general": { "name": "General", "description": "Configuración básica de la comunidad" },
+            "general": {
+              "name": "General",
+              "description": "Configuración básica de la comunidad"
+            },
             "appearance": {
               "name": "Apariencia",
               "description": "Personaliza el diseño y la marca"
             },
-            "members": { "name": "Miembros", "description": "Gestiona roles y permisos" },
-            "payments": { "name": "Pagos", "description": "Configura los precios de membresía" }
+            "members": {
+              "name": "Miembros",
+              "description": "Gestiona roles y permisos"
+            },
+            "payments": {
+              "name": "Pagos",
+              "description": "Configura los precios de membresía"
+            }
           }
         },
         "general": {
@@ -1287,9 +1335,18 @@
           "whatYouGetTitle": "Lo Que Obtendrás Dentro",
           "whatYouGetSubtitle": "Vista previa de los beneficios para miembros",
           "features": {
-            "courses": { "title": "Cursos", "description": "Accede a contenido premium" },
-            "community": { "title": "Comunidad", "description": "Conecta con colegas" },
-            "events": { "title": "Eventos en Vivo", "description": "Sesiones semanales" }
+            "courses": {
+              "title": "Cursos",
+              "description": "Accede a contenido premium"
+            },
+            "community": {
+              "title": "Comunidad",
+              "description": "Conecta con colegas"
+            },
+            "events": {
+              "title": "Eventos en Vivo",
+              "description": "Sesiones semanales"
+            }
           },
           "selectedLayoutLabel": "Diseño Seleccionado",
           "colorThemeLabel": "Tema de Color",
@@ -1834,7 +1891,8 @@
         "sessions": "Sesiones",
         "newMembers": "Miembros nuevos",
         "posts": "Publicaciones",
-        "vsLastWeek": "vs semana pasada"
+        "vsLastWeek": "vs semana pasada",
+        "noChange": "Sin cambios respecto a la semana pasada"
       },
       "nextLiveSession": {
         "title": "Próxima sesión en vivo",
@@ -1857,11 +1915,23 @@
       },
       "quickActions": {
         "title": "Acciones rápidas",
-        "createSession": "Crear sesión",
         "createPost": "Crear publicación",
         "inviteMember": "Invitar miembro",
-        "viewAnalytics": "Ver analíticas",
-        "openSettings": "Configuración"
+        "viewAnalytics": "Ver analíticas"
+      },
+      "nextStep": {
+        "createCommunity": {
+          "headline": "Todavía no tienes una comunidad. Crea una y ya estarás en marcha.",
+          "cta": "Crear comunidad"
+        },
+        "createPost": {
+          "headline": "Nadie ha publicado todavía. Escribe la primera publicación para que los miembros tengan algo a lo que sumarse.",
+          "cta": "Crea tu primera publicación"
+        },
+        "inviteMembers": {
+          "headline": "Tu comunidad aún es pequeña. Invita a algunos miembros para que empiece a moverse.",
+          "cta": "Invitar miembros"
+        }
       }
     },
     "notifications": {
@@ -1991,6 +2061,22 @@
       "title": "Comunidades en Tendencia",
       "join": "Unirse",
       "viewAll": "Ver todas"
+    },
+    "errorBoundary": {
+      "retry": "Reintentar",
+      "reference": "Referencia: {digest}",
+      "dashboard": {
+        "title": "Esta página no se cargó",
+        "description": "Algo falló al cargar esta página. El resto de Unytea no está afectado."
+      },
+      "community": {
+        "title": "Esta vista de la comunidad no se cargó",
+        "description": "Algo falló al cargar esta parte de la comunidad. Puedes reintentar o cambiar de pestaña."
+      },
+      "session": {
+        "title": "Esta sesión no se cargó",
+        "description": "Algo falló al cargar la sesión. Reintenta o vuelve a tu lista de sesiones."
+      }
     }
   },
   "navigation": {
@@ -2029,16 +2115,33 @@
         "goalsPlaceholder": "Quiero construir una comunidad próspera y compartir mi conocimiento..."
       },
       "4": {
+        "title": "¿Qué te interesa?",
+        "description": "Selecciona tus intereses para obtener mejores coincidencias de comunidades y compañeros",
+        "searchPlaceholder": "Buscar intereses...",
+        "counter": "Selecciona hasta {max} intereses ({selected}/{max})",
+        "categories": {
+          "Business": "Negocios",
+          "Technology": "Tecnología",
+          "Creative": "Creatividad",
+          "Lifestyle": "Estilo de vida",
+          "Education": "Educación"
+        }
+      },
+      "5": {
         "title": "Elige Tu Plan",
-        "description": "Selecciona el plan que se ajuste a tus necesidades",
+        "description": "Selecciona el plan que se ajuste a tus necesidades (puedes cambiarlo luego)",
+        "perMonth": "/mes",
+        "freePrice": "Gratis",
+        "moreFeatures": "+{count} funciones más",
+        "trialNote": "Todos los planes de pago incluyen 14 días de prueba gratis. No necesitas tarjeta para empezar.",
         "free": {
           "name": "Gratis",
-          "description": "Perfecto para comenzar",
+          "description": "Perfecto para explorar comunidades",
           "features": [
-            "Unirte hasta 3 comunidades",
-            "Funciones básicas de perfil",
-            "Acceso al feed de comunidad",
-            "Mensajería directa"
+            "Únete hasta a 3 comunidades (sin crearlas)",
+            "Acceso al contenido y al feed de la comunidad",
+            "Mensajería directa con miembros",
+            "Funciones básicas de perfil"
           ]
         },
         "professional": {
@@ -2046,9 +2149,9 @@
           "description": "Lo mejor para creadores de comunidad",
           "popular": "Más Popular",
           "features": [
-            "1 comunidad (tuya)",
+            "Crea 1 comunidad (tuya)",
             "Miembros ilimitados",
-            "Video llamadas y streaming",
+            "Videollamadas y streaming",
             "Constructor de cursos",
             "AI Coach",
             "Panel de analíticas",
@@ -2057,13 +2160,13 @@
         },
         "premium": {
           "name": "Premium",
-          "description": "Para usuarios avanzados con múltiples comunidades",
+          "description": "Para usuarios avanzados con varias comunidades",
           "features": [
-            "3 comunidades (tuyas)",
-            "Todas las funciones Profesionales",
+            "Crea hasta 3 comunidades",
+            "Todas las funciones de Profesional",
             "Opciones de marca blanca",
             "Analíticas avanzadas",
-            "Acceso a API",
+            "Acceso a la API",
             "Soporte dedicado",
             "Integraciones personalizadas"
           ]
@@ -2075,13 +2178,17 @@
       "next": "Siguiente",
       "getStarted": "Comenzar",
       "processing": "Procesando...",
-      "step": "Paso",
-      "of": "de"
+      "stepOf": "Paso {current} de {total}",
+      "continue": "Continuar",
+      "startFree": "Empezar Gratis",
+      "startTrial": "Empezar Prueba Gratis",
+      "settingUp": "Configurando...",
+      "skip": "Omitir por ahora →"
     },
     "success": {
       "title": "¡Todo listo! 🎉",
-      "description": "Bienvenido a Unytea. Tu viaje comienza ahora.",
-      "cta": "Ir al Dashboard"
+      "description": "Bienvenido a Unytea. Tu camino empieza ahora.",
+      "cta": "Ir al Panel"
     }
   },
   "explore": {

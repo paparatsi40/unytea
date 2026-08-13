@@ -1,155 +1,25 @@
-"use client";
-
-import { DashboardSidebar } from "@/components/dashboard/sidebar";
-import { DashboardHeader } from "@/components/dashboard/header";
-import { SubscriptionBannerMount } from "@/components/dashboard/SubscriptionBannerMount";
 import { NextIntlClientProvider } from "next-intl";
-import { useEffect, useState } from "react";
+import { getLocale, getMessages } from "next-intl/server";
+import { DashboardShell } from "@/components/dashboard/DashboardShell";
 
-// Type for nested translation messages - flexible structure
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- next-intl message catalogs are deeply-nested locale JSON with per-namespace shapes; next-intl does not expose a generated Messages type, so Record<string, any> is the documented shape. Translation keys are validated at build time against locales/* JSON, not at this type.
-type Messages = Record<string, any>;
-
-// Default English messages fallback
-const fallbackMessages: Messages = {
-  common: {
-    search: "Search",
-    loading: "Loading...",
-    error: "An error occurred",
-    save: "Save",
-    cancel: "Cancel",
-    delete: "Delete",
-    edit: "Edit",
-    create: "Create",
-    submit: "Submit",
-    back: "Back",
-    next: "Next",
-    previous: "Previous",
-    close: "Close",
-    open: "Open",
-    all: "All",
-    recent: "Recent",
-    alphabetical: "Alphabetical",
-    mostPopular: "Most Popular",
-    comingSoon: "Coming soon",
-    featureInDevelopment: "Feature in Development",
-    needHelp: "Need help?",
-    contactSupport: "Contact our support team for assistance.",
-  },
-  navigation: {
-    dashboard: "Dashboard",
-    communities: "Communities",
-    messages: "Messages",
-    profile: "Profile",
-    logout: "Log out",
-    signIn: "Sign In",
-    signUp: "Sign Up",
-    signup: "Sign Up",
-    back: "Back",
-  },
-};
-
-async function loadMessages(locale: string): Promise<Messages> {
-  try {
-    if (locale === "en") {
-      // Try to import dynamically
-      const mod = await import("@/locales/en.json");
-      return mod.default || fallbackMessages;
-    }
-    const mod = await import(`@/locales/${locale}.json`);
-    return mod.default || fallbackMessages;
-  } catch {
-    return fallbackMessages;
-  }
-}
-
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const [locale, setLocale] = useState("en");
-  const [messages, setMessages] = useState<Messages>(fallbackMessages);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  // Mobile off-canvas drawer state. Desktop (md+) keeps the sidebar permanently
-  // visible regardless of this flag.
-  const [mobileOpen, setMobileOpen] = useState(false);
-
-  useEffect(() => {
-    let mounted = true;
-
-    async function initialize() {
-      try {
-        // Load locale from localStorage or default to 'en'
-        const savedLocale = localStorage.getItem("locale") || "en";
-
-        if (mounted) {
-          setLocale(savedLocale);
-          const loadedMessages = await loadMessages(savedLocale);
-          if (mounted) {
-            setMessages(loadedMessages);
-          }
-        }
-      } catch (err) {
-        console.error("Failed to load locale/messages:", err);
-        if (mounted) {
-          setError("Failed to load translations");
-        }
-      } finally {
-        if (mounted) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    initialize();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="animate-pulse text-muted-foreground">Loading...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="text-center">
-          <p className="mb-4 text-red-500">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="rounded-lg bg-primary px-4 py-2 text-white"
-          >
-            Retry
-          </button>
-        </div>
-      </div>
-    );
-  }
+/**
+ * The dashboard has no `[locale]` segment, so next-intl cannot read the
+ * language from the URL. It comes from the locale cookie instead, resolved in
+ * `src/i18n.ts` — see `lib/locale.ts` for why that cookie exists.
+ *
+ * This used to be a client component that read `localStorage` in an effect and
+ * blocked the whole tree behind a "Loading..." screen while it did. That cost a
+ * full render pass on every dashboard visit and, more importantly, left every
+ * server component below it rendering in English: server code cannot see
+ * localStorage. Resolving here makes the language available to both halves.
+ */
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const locale = await getLocale();
+  const messages = await getMessages();
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
-      <div className="min-h-screen bg-background">
-        <DashboardSidebar open={mobileOpen} onClose={() => setMobileOpen(false)} />
-        <DashboardHeader onMenuClick={() => setMobileOpen(true)} />
-
-        {/* Mobile-only backdrop behind the drawer; tap to dismiss. */}
-        {mobileOpen && (
-          <div
-            className="fixed inset-0 z-30 bg-black/50 md:hidden"
-            onClick={() => setMobileOpen(false)}
-            aria-hidden="true"
-          />
-        )}
-
-        <main className="pt-16 md:ml-64">
-          <SubscriptionBannerMount />
-          <div className="p-6">{children}</div>
-        </main>
-      </div>
+      <DashboardShell>{children}</DashboardShell>
     </NextIntlClientProvider>
   );
 }

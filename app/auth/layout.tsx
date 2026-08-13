@@ -1,17 +1,16 @@
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
-import { cookies } from "next/headers";
+import { getLocale, getMessages } from "next-intl/server";
 
+/**
+ * In practice this layout almost never renders: `proxy.ts` redirects
+ * /auth/* → /{locale}/auth/* before it runs, and the real locale detection for
+ * auth pages happens there (referer, then Accept-Language). When it does render
+ * — a bookmark hitting the unprefixed path, say — the locale comes from the
+ * cookie via `src/i18n.ts`, the same source the dashboard and onboarding use.
+ */
 export default async function AuthLayout({ children }: { children: React.ReactNode }) {
-  // Get locale from cookie or default to 'en'.
-  // In practice this layout almost never renders: the middleware redirects
-  // /auth/* → /{locale}/auth/* before this code runs. The real locale
-  // detection for auth pages happens in middleware.ts (referer + accept-language)
-  // and the rendered page lives under [locale]/auth/*.
-  const cookieStore = await cookies();
-  const locale = cookieStore.get("NEXT_LOCALE")?.value || "en";
-
-  const messages = await getMessages({ locale });
+  const locale = await getLocale();
+  const messages = await getMessages();
 
   return (
     <NextIntlClientProvider messages={messages} locale={locale}>

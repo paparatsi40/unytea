@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { Check, User, Briefcase, Target, Sparkles, Zap, Crown, Heart } from "lucide-react";
 import { InterestSelector } from "@/components/onboarding/InterestSelector";
@@ -9,64 +10,38 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
+/**
+ * Plan structure — everything that is NOT display text.
+ *
+ * Names, descriptions and feature lists live in the `onboarding.steps.5`
+ * namespace instead, keyed by `id`, so the wizard reads in the user's language.
+ * Prices and Stripe price IDs stay here: they are the same in every locale and
+ * a translator must never be able to change what a user is charged.
+ */
 const plans = [
-  {
-    id: "free",
-    name: "Free",
-    price: 0,
-    priceId: "",
-    description: "Perfect for exploring communities",
-    features: [
-      "Join up to 3 communities (no creation)",
-      "Access community content & feed",
-      "Direct messaging with members",
-      "Basic profile features",
-    ],
-    icon: Sparkles,
-    popular: false,
-  },
+  { id: "free", price: 0, priceId: "", icon: Sparkles, popular: false },
   {
     id: "professional",
-    name: "Professional",
     price: 49,
     priceId: process.env.NEXT_PUBLIC_STRIPE_PROFESSIONAL_PRICE_ID || "",
-    description: "Best for community creators",
-    features: [
-      "Create 1 community (yours)",
-      "Unlimited members",
-      "Video calls & streaming",
-      "Course builder",
-      "AI Coach",
-      "Analytics dashboard",
-      "Priority support",
-    ],
     icon: Zap,
     popular: true,
   },
   {
     id: "premium",
-    name: "Premium",
     price: 149,
     priceId: process.env.NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID || "",
-    description: "For power users with multiple communities",
-    features: [
-      "Create up to 3 communities",
-      "All Professional features",
-      "White-label options",
-      "Advanced analytics",
-      "API access",
-      "Dedicated support",
-      "Custom integrations",
-    ],
     icon: Crown,
     popular: false,
   },
-];
+] as const;
+
+const ROLES = ["coach", "creator", "founder", "educator", "other"] as const;
 
 export default function OnboardingPage() {
   const router = useRouter();
   const { user, isLoading } = useCurrentUser();
-  // const t = useTranslations("onboarding");
+  const t = useTranslations("onboarding");
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -87,19 +62,21 @@ export default function OnboardingPage() {
   const steps = [
     {
       number: 1,
-      title: "Welcome to Unytea! 🎉",
-      description: "Let's get you set up in just a few steps",
+      title: t("steps.1.title"),
+      description: t("steps.1.description"),
       icon: User,
       fields: (
         <div className="space-y-4">
           <div>
-            <label className="mb-2 block text-sm font-medium text-foreground">Full Name</label>
+            <label className="mb-2 block text-sm font-medium text-foreground">
+              {t("steps.1.fullName")}
+            </label>
             <input
               type="text"
               value={formData.fullName}
               onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
               className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-              placeholder="John Doe"
+              placeholder={t("steps.1.fullNamePlaceholder")}
             />
           </div>
         </div>
@@ -107,24 +84,26 @@ export default function OnboardingPage() {
     },
     {
       number: 2,
-      title: "What brings you here?",
-      description: "Tell us about your role",
+      title: t("steps.2.title"),
+      description: t("steps.2.description"),
       icon: Briefcase,
       fields: (
         <div className="space-y-4">
           <div>
-            <label className="mb-2 block text-sm font-medium text-foreground">Your Role</label>
+            <label className="mb-2 block text-sm font-medium text-foreground">
+              {t("steps.2.role")}
+            </label>
             <select
               value={formData.role}
               onChange={(e) => setFormData({ ...formData, role: e.target.value })}
               className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
             >
-              <option value="">Select your role...</option>
-              <option value="coach">Coach / Mentor</option>
-              <option value="creator">Course Creator</option>
-              <option value="founder">Community Founder</option>
-              <option value="educator">Educator</option>
-              <option value="other">Other</option>
+              <option value="">{t("steps.2.rolePlaceholder")}</option>
+              {ROLES.map((role) => (
+                <option key={role} value={role}>
+                  {t(`steps.2.roles.${role}`)}
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -132,21 +111,21 @@ export default function OnboardingPage() {
     },
     {
       number: 3,
-      title: "What are your goals?",
-      description: "Help us personalize your experience",
+      title: t("steps.3.title"),
+      description: t("steps.3.description"),
       icon: Target,
       fields: (
         <div className="space-y-4">
           <div>
             <label className="mb-2 block text-sm font-medium text-foreground">
-              Tell us about your goals
+              {t("steps.3.goals")}
             </label>
             <textarea
               value={formData.goals}
               onChange={(e) => setFormData({ ...formData, goals: e.target.value })}
               rows={4}
               className="w-full resize-none rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-              placeholder="I want to build a thriving community and share my knowledge..."
+              placeholder={t("steps.3.goalsPlaceholder")}
             />
           </div>
         </div>
@@ -154,8 +133,8 @@ export default function OnboardingPage() {
     },
     {
       number: 4,
-      title: "What are you interested in?",
-      description: "Select your interests to get better community and buddy matches",
+      title: t("steps.4.title"),
+      description: t("steps.4.description"),
       icon: Heart,
       fields: (
         <InterestSelector
@@ -167,8 +146,8 @@ export default function OnboardingPage() {
     },
     {
       number: 5,
-      title: "Choose Your Plan",
-      description: "Select the plan that fits your needs (you can change later)",
+      title: t("steps.5.title"),
+      description: t("steps.5.description"),
       icon: Sparkles,
       fields: (
         <div className="space-y-4">
@@ -176,6 +155,7 @@ export default function OnboardingPage() {
             {plans.map((plan) => {
               const Icon = plan.icon;
               const isSelected = formData.selectedPlan === plan.id;
+              const features = t.raw(`steps.5.${plan.id}.features`) as string[];
               return (
                 <Card
                   key={plan.id}
@@ -188,7 +168,7 @@ export default function OnboardingPage() {
                 >
                   {plan.popular && (
                     <Badge className="absolute -top-2 left-4 bg-primary text-primary-foreground">
-                      Most Popular
+                      {t("steps.5.professional.popular")}
                     </Badge>
                   )}
                   <div className="flex items-start gap-4">
@@ -201,27 +181,31 @@ export default function OnboardingPage() {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <h3 className="font-semibold">{plan.name}</h3>
+                        <h3 className="font-semibold">{t(`steps.5.${plan.id}.name`)}</h3>
                         <div className="text-right">
                           <span className="text-lg font-bold">
-                            {plan.price === 0 ? "Free" : `$${plan.price}`}
+                            {plan.price === 0 ? t("steps.5.freePrice") : `$${plan.price}`}
                           </span>
                           {plan.price > 0 && (
-                            <span className="text-sm text-muted-foreground">/month</span>
+                            <span className="text-sm text-muted-foreground">
+                              {t("steps.5.perMonth")}
+                            </span>
                           )}
                         </div>
                       </div>
-                      <p className="mt-1 text-sm text-muted-foreground">{plan.description}</p>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {t(`steps.5.${plan.id}.description`)}
+                      </p>
                       <ul className="mt-3 space-y-1">
-                        {plan.features.slice(0, 3).map((feature, i) => (
+                        {features.slice(0, 3).map((feature, i) => (
                           <li key={i} className="flex items-center gap-2 text-sm">
                             <Check className="h-4 w-4 flex-shrink-0 text-primary" />
                             <span>{feature}</span>
                           </li>
                         ))}
-                        {plan.features.length > 3 && (
+                        {features.length > 3 && (
                           <li className="pl-6 text-sm text-muted-foreground">
-                            +{plan.features.length - 3} more features
+                            {t("steps.5.moreFeatures", { count: features.length - 3 })}
                           </li>
                         )}
                       </ul>
@@ -231,9 +215,7 @@ export default function OnboardingPage() {
               );
             })}
           </div>
-          <p className="text-center text-sm text-muted-foreground">
-            All paid plans include a 14-day free trial. No credit card required to start.
-          </p>
+          <p className="text-center text-sm text-muted-foreground">{t("steps.5.trialNote")}</p>
         </div>
       ),
     },
@@ -336,7 +318,7 @@ export default function OnboardingPage() {
         <div className="mb-8">
           <div className="mb-2 flex items-center justify-between">
             <span className="text-sm font-medium text-muted-foreground">
-              Step {currentStep} of {steps.length}
+              {t("navigation.stepOf", { current: currentStep, total: steps.length })}
             </span>
             <span className="text-sm font-medium text-muted-foreground">
               {Math.round((currentStep / steps.length) * 100)}%
@@ -368,7 +350,7 @@ export default function OnboardingPage() {
           <div className="mt-8 flex gap-4">
             {currentStep > 1 && (
               <Button variant="outline" onClick={handleBack} className="flex-1">
-                Back
+                {t("navigation.back")}
               </Button>
             )}
             <Button
@@ -379,16 +361,16 @@ export default function OnboardingPage() {
               {isSubmitting ? (
                 <div className="flex items-center gap-2">
                   <div className="h-4 w-4 animate-spin rounded-full border-b-2 border-white"></div>
-                  Setting up...
+                  {t("navigation.settingUp")}
                 </div>
               ) : currentStep === steps.length ? (
                 formData.selectedPlan === "free" ? (
-                  "Start Free"
+                  t("navigation.startFree")
                 ) : (
-                  "Start Free Trial"
+                  t("navigation.startTrial")
                 )
               ) : (
-                "Continue"
+                t("navigation.continue")
               )}
             </Button>
           </div>
@@ -400,7 +382,7 @@ export default function OnboardingPage() {
             onClick={() => router.push("/dashboard")}
             className="text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
-            Skip for now →
+            {t("navigation.skip")}
           </button>
         </div>
       </div>

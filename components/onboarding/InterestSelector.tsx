@@ -1,8 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Check } from "lucide-react";
 
+/**
+ * The interest strings themselves are identifiers, not copy: they are written
+ * to `User.interests` and matched against other users' selections for buddy
+ * pairing and community suggestions. Translating them would make a Spanish
+ * user's "Marketing" a different value from an English user's, silently
+ * breaking every match across locales — so the chips stay in one language and
+ * only the surrounding chrome (search, counter, category headings) is
+ * localized. Localizing the labels properly means a shared value→label map
+ * used everywhere interests are displayed, which is a wider change than this.
+ */
 const INTEREST_CATEGORIES = [
   {
     label: "Business",
@@ -47,6 +58,7 @@ interface InterestSelectorProps {
 }
 
 export function InterestSelector({ selected, onChange, maxSelections = 8 }: InterestSelectorProps) {
+  const t = useTranslations("onboarding.steps.4");
   const [search, setSearch] = useState("");
 
   const toggleInterest = (interest: string) => {
@@ -70,19 +82,19 @@ export function InterestSelector({ selected, onChange, maxSelections = 8 }: Inte
         type="text"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        placeholder="Search interests..."
+        placeholder={t("searchPlaceholder")}
         className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 focus:border-purple-500 focus:outline-none"
       />
 
       <p className="text-xs text-zinc-500">
-        Select up to {maxSelections} interests ({selected.length}/{maxSelections})
+        {t("counter", { max: maxSelections, selected: selected.length })}
       </p>
 
       <div className="max-h-64 space-y-4 overflow-y-auto pr-1">
         {filteredCategories.map((category) => (
           <div key={category.label}>
             <p className="mb-2 text-xs font-medium uppercase tracking-wider text-zinc-500">
-              {category.label}
+              {t(`categories.${category.label}`)}
             </p>
             <div className="flex flex-wrap gap-2">
               {category.items.map((interest) => {

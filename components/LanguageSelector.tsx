@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
+import { readStoredLocale, resolveLocale, storeLocalePreference } from "@/lib/locale";
 
 const locales = [
   { code: "en", label: "English", flag: "🇺🇸" },
@@ -30,13 +31,16 @@ export function LanguageSelector() {
     if (pathLocale) {
       setCurrentLocale(pathLocale.code);
     } else {
-      const savedLocale = localStorage.getItem("locale") || "en";
-      setCurrentLocale(savedLocale);
+      setCurrentLocale(readStoredLocale());
     }
   }, [pathname]);
 
-  const handleLocaleChange = (newLocale: string) => {
-    localStorage.setItem("locale", newLocale);
+  const handleLocaleChange = (rawLocale: string) => {
+    const newLocale = resolveLocale(rawLocale);
+
+    // Persist before navigating: the server reads this cookie to render the
+    // trees that have no locale in their URL (dashboard, onboarding, auth).
+    storeLocalePreference(newLocale);
     setCurrentLocale(newLocale);
 
     // Check if we're on an i18n route
@@ -48,11 +52,11 @@ export function LanguageSelector() {
       router.push(newPathname);
       router.refresh();
     } else {
-      // Dashboard / auth route groups have no [locale] segment.
-      // NextIntlClientProvider in the layout reads the locale from
-      // localStorage at mount and doesn't observe later changes, so a soft
-      // re-render leaves every other mounted component with stale strings.
-      // Force a full reload to re-mount the provider with the new locale.
+      // Dashboard / onboarding / auth have no [locale] segment, so there is no
+      // URL to change: the language now lives in the cookie the server just
+      // received. A full reload is what re-renders those layouts against it —
+      // router.refresh() would replay the RSC request, but every already-
+      // mounted client component would keep its stale provider.
       window.location.reload();
     }
   };

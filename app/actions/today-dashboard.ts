@@ -33,6 +33,15 @@ export interface TodayDashboardData {
     communityName: string;
   } | null;
   communities: TodayCommunity[];
+  /**
+   * Posts ever written in a community the viewer owns.
+   *
+   * Distinct from `weeklyStats.postsThisWeek`: the home view's next-step CTA
+   * has to tell "nobody has posted yet" apart from "nobody posted this week",
+   * and only the all-time count answers that. A quiet week in an established
+   * community should not be told to write its first post.
+   */
+  totalPosts: number;
   weeklyStats: {
     sessionsThisWeek: number;
     newMembersThisWeek: number;
@@ -55,170 +64,177 @@ export interface TodayDashboardData {
 export const getTodayDashboard = defineAction(
   { name: "getTodayDashboard", auth: "user", args: [] },
   async (ctx): Promise<TodayDashboardData | null> => {
-  const userId = ctx.userId;
-  const now = new Date();
-  const weekAgo = subDays(now, 7);
-  const twoWeeksAgo = subDays(now, 14);
-  const sevenDaysFromNow = addDays(now, 7);
+    const userId = ctx.userId;
+    const now = new Date();
+    const weekAgo = subDays(now, 7);
+    const twoWeeksAgo = subDays(now, 14);
+    const sevenDaysFromNow = addDays(now, 7);
 
-  const [
-    user,
-    ownedCommunities,
-    memberCommunities,
-    nextSession,
-    sessionsThisWeek,
-    newMembersThisWeek,
-    postsThisWeek,
-    recentMembers,
-    recentPosts,
-    sessionsLastWeek,
-    newMembersLastWeek,
-    postsLastWeek,
-  ] = await Promise.all([
-    prisma.user.findUnique({
-      where: { id: userId },
-      select: { name: true },
-    }),
-
-    prisma.community.findMany({
-      where: { ownerId: userId, deletedAt: null },
-      select: { id: true, slug: true, name: true, imageUrl: true, memberCount: true },
-      take: 6,
-      orderBy: { updatedAt: "desc" },
-    }),
-
-    prisma.member.findMany({
-      where: { userId, status: "ACTIVE" },
-      include: {
-        community: {
-          select: { id: true, slug: true, name: true, imageUrl: true, memberCount: true },
-        },
-      },
-      take: 6,
-      orderBy: { joinedAt: "desc" },
-    }),
-
-    prisma.mentorSession.findFirst({
-      where: {
-        OR: [
-          { community: { ownerId: userId } },
-          { community: { members: { some: { userId, status: "ACTIVE" } } } },
-        ],
-        scheduledAt: { gte: now, lt: sevenDaysFromNow },
-        status: { notIn: ["CANCELLED", "COMPLETED"] },
-      },
-      select: {
-        id: true,
-        slug: true,
-        title: true,
-        scheduledAt: true,
-        duration: true,
-        community: { select: { slug: true, name: true } },
-      },
-      orderBy: { scheduledAt: "asc" },
-    }),
-
-    prisma.mentorSession.count({
-      where: { community: { ownerId: userId }, scheduledAt: { gte: weekAgo } },
-    }),
-
-    prisma.member.count({
-      where: { community: { ownerId: userId }, joinedAt: { gte: weekAgo } },
-    }),
-
-    prisma.post.count({
-      where: { community: { ownerId: userId }, createdAt: { gte: weekAgo }, deletedAt: null },
-    }),
-
-    prisma.member.findMany({
-      where: { community: { ownerId: userId }, joinedAt: { gte: weekAgo } },
-      include: {
-        user: { select: { name: true } },
-        community: { select: { slug: true, name: true } },
-      },
-      orderBy: { joinedAt: "desc" },
-      take: 5,
-    }),
-
-    prisma.post.findMany({
-      where: { community: { ownerId: userId }, createdAt: { gte: weekAgo }, deletedAt: null },
-      include: {
-        author: { select: { name: true } },
-        community: { select: { slug: true, name: true } },
-      },
-      orderBy: { createdAt: "desc" },
-      take: 5,
-    }),
-
-    // Prior 7-day window (7-14 days ago) for week-over-week deltas.
-    prisma.mentorSession.count({
-      where: { community: { ownerId: userId }, scheduledAt: { gte: twoWeeksAgo, lt: weekAgo } },
-    }),
-
-    prisma.member.count({
-      where: { community: { ownerId: userId }, joinedAt: { gte: twoWeeksAgo, lt: weekAgo } },
-    }),
-
-    prisma.post.count({
-      where: {
-        community: { ownerId: userId },
-        createdAt: { gte: twoWeeksAgo, lt: weekAgo },
-        deletedAt: null,
-      },
-    }),
-  ]);
-
-  // Owned communities first, then memberships not already owned, capped at 6.
-  const communities: TodayCommunity[] = [
-    ...ownedCommunities.map((c) => ({ ...c, role: "owner" as const })),
-    ...memberCommunities
-      .filter((m) => !ownedCommunities.some((c) => c.id === m.community.id))
-      .map((m) => ({ ...m.community, role: "member" as const })),
-  ].slice(0, 6);
-
-  const recentActivity: TodayActivity[] = [
-    ...recentMembers.map((m) => ({
-      type: "new_member" as const,
-      at: m.joinedAt,
-      actorName: m.user?.name ?? "Someone",
-      communityName: m.community.name,
-      href: `/dashboard/c/${m.community.slug}/members`,
-    })),
-    ...recentPosts.map((p) => ({
-      type: "new_post" as const,
-      at: p.createdAt,
-      actorName: p.author?.name ?? "Someone",
-      communityName: p.community.name,
-      href: `/dashboard/c/${p.community.slug}/feed`,
-    })),
-  ]
-    .sort((a, b) => b.at.getTime() - a.at.getTime())
-    .slice(0, 10);
-
-  return {
-    user: { name: user?.name ?? "there" },
-    nextLiveSession:
-      nextSession && nextSession.community
-        ? {
-            id: nextSession.id,
-            slug: nextSession.slug,
-            title: nextSession.title,
-            scheduledAt: nextSession.scheduledAt,
-            duration: nextSession.duration,
-            communitySlug: nextSession.community.slug,
-            communityName: nextSession.community.name,
-          }
-        : null,
-    communities,
-    weeklyStats: {
+    const [
+      user,
+      ownedCommunities,
+      memberCommunities,
+      nextSession,
       sessionsThisWeek,
       newMembersThisWeek,
       postsThisWeek,
-      sessionsDelta: sessionsThisWeek - sessionsLastWeek,
-      newMembersDelta: newMembersThisWeek - newMembersLastWeek,
-      postsDelta: postsThisWeek - postsLastWeek,
-    },
-    recentActivity,
-  };
+      recentMembers,
+      recentPosts,
+      sessionsLastWeek,
+      newMembersLastWeek,
+      postsLastWeek,
+      totalPosts,
+    ] = await Promise.all([
+      prisma.user.findUnique({
+        where: { id: userId },
+        select: { name: true },
+      }),
+
+      prisma.community.findMany({
+        where: { ownerId: userId, deletedAt: null },
+        select: { id: true, slug: true, name: true, imageUrl: true, memberCount: true },
+        take: 6,
+        orderBy: { updatedAt: "desc" },
+      }),
+
+      prisma.member.findMany({
+        where: { userId, status: "ACTIVE" },
+        include: {
+          community: {
+            select: { id: true, slug: true, name: true, imageUrl: true, memberCount: true },
+          },
+        },
+        take: 6,
+        orderBy: { joinedAt: "desc" },
+      }),
+
+      prisma.mentorSession.findFirst({
+        where: {
+          OR: [
+            { community: { ownerId: userId } },
+            { community: { members: { some: { userId, status: "ACTIVE" } } } },
+          ],
+          scheduledAt: { gte: now, lt: sevenDaysFromNow },
+          status: { notIn: ["CANCELLED", "COMPLETED"] },
+        },
+        select: {
+          id: true,
+          slug: true,
+          title: true,
+          scheduledAt: true,
+          duration: true,
+          community: { select: { slug: true, name: true } },
+        },
+        orderBy: { scheduledAt: "asc" },
+      }),
+
+      prisma.mentorSession.count({
+        where: { community: { ownerId: userId }, scheduledAt: { gte: weekAgo } },
+      }),
+
+      prisma.member.count({
+        where: { community: { ownerId: userId }, joinedAt: { gte: weekAgo } },
+      }),
+
+      prisma.post.count({
+        where: { community: { ownerId: userId }, createdAt: { gte: weekAgo }, deletedAt: null },
+      }),
+
+      prisma.member.findMany({
+        where: { community: { ownerId: userId }, joinedAt: { gte: weekAgo } },
+        include: {
+          user: { select: { name: true } },
+          community: { select: { slug: true, name: true } },
+        },
+        orderBy: { joinedAt: "desc" },
+        take: 5,
+      }),
+
+      prisma.post.findMany({
+        where: { community: { ownerId: userId }, createdAt: { gte: weekAgo }, deletedAt: null },
+        include: {
+          author: { select: { name: true } },
+          community: { select: { slug: true, name: true } },
+        },
+        orderBy: { createdAt: "desc" },
+        take: 5,
+      }),
+
+      // Prior 7-day window (7-14 days ago) for week-over-week deltas.
+      prisma.mentorSession.count({
+        where: { community: { ownerId: userId }, scheduledAt: { gte: twoWeeksAgo, lt: weekAgo } },
+      }),
+
+      prisma.member.count({
+        where: { community: { ownerId: userId }, joinedAt: { gte: twoWeeksAgo, lt: weekAgo } },
+      }),
+
+      prisma.post.count({
+        where: {
+          community: { ownerId: userId },
+          createdAt: { gte: twoWeeksAgo, lt: weekAgo },
+          deletedAt: null,
+        },
+      }),
+
+      // All-time, for the "has anyone posted yet?" branch of the next-step CTA.
+      prisma.post.count({
+        where: { community: { ownerId: userId }, deletedAt: null },
+      }),
+    ]);
+
+    // Owned communities first, then memberships not already owned, capped at 6.
+    const communities: TodayCommunity[] = [
+      ...ownedCommunities.map((c) => ({ ...c, role: "owner" as const })),
+      ...memberCommunities
+        .filter((m) => !ownedCommunities.some((c) => c.id === m.community.id))
+        .map((m) => ({ ...m.community, role: "member" as const })),
+    ].slice(0, 6);
+
+    const recentActivity: TodayActivity[] = [
+      ...recentMembers.map((m) => ({
+        type: "new_member" as const,
+        at: m.joinedAt,
+        actorName: m.user?.name ?? "Someone",
+        communityName: m.community.name,
+        href: `/dashboard/c/${m.community.slug}/members`,
+      })),
+      ...recentPosts.map((p) => ({
+        type: "new_post" as const,
+        at: p.createdAt,
+        actorName: p.author?.name ?? "Someone",
+        communityName: p.community.name,
+        href: `/dashboard/c/${p.community.slug}/feed`,
+      })),
+    ]
+      .sort((a, b) => b.at.getTime() - a.at.getTime())
+      .slice(0, 10);
+
+    return {
+      user: { name: user?.name ?? "there" },
+      nextLiveSession:
+        nextSession && nextSession.community
+          ? {
+              id: nextSession.id,
+              slug: nextSession.slug,
+              title: nextSession.title,
+              scheduledAt: nextSession.scheduledAt,
+              duration: nextSession.duration,
+              communitySlug: nextSession.community.slug,
+              communityName: nextSession.community.name,
+            }
+          : null,
+      communities,
+      totalPosts,
+      weeklyStats: {
+        sessionsThisWeek,
+        newMembersThisWeek,
+        postsThisWeek,
+        sessionsDelta: sessionsThisWeek - sessionsLastWeek,
+        newMembersDelta: newMembersThisWeek - newMembersLastWeek,
+        postsDelta: postsThisWeek - postsLastWeek,
+      },
+      recentActivity,
+    };
   }
 );
