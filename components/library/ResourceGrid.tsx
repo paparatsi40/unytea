@@ -60,6 +60,7 @@ export function ResourceGrid({
   totalCount,
 }: ResourceGridProps) {
   const t = useTranslations("library.grid");
+  const tA11y = useTranslations("a11y");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState<ResourceType | "ALL">("ALL");
@@ -158,6 +159,7 @@ export function ResourceGrid({
           {/* View Mode Toggle */}
           <div className="flex items-center rounded-lg border bg-background/50 p-1">
             <Button
+              aria-label={tA11y("gridView")}
               variant={viewMode === "grid" ? "secondary" : "ghost"}
               size="icon"
               className="h-8 w-8"
@@ -166,6 +168,7 @@ export function ResourceGrid({
               <Grid3X3 className="h-4 w-4" />
             </Button>
             <Button
+              aria-label={tA11y("listView")}
               variant={viewMode === "list" ? "secondary" : "ghost"}
               size="icon"
               className="h-8 w-8"
@@ -190,7 +193,13 @@ export function ResourceGrid({
             </SelectContent>
           </Select>
 
-          <Button variant="outline" size="icon" className="h-10 w-10" onClick={toggleSortOrder}>
+          <Button
+            aria-label={tA11y("toggleSortDirection")}
+            variant="outline"
+            size="icon"
+            className="h-10 w-10"
+            onClick={toggleSortOrder}
+          >
             <ChevronDown
               className={cn("h-4 w-4 transition-transform", sortOrder === "asc" && "rotate-180")}
             />

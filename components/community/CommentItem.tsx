@@ -42,6 +42,7 @@ export function CommentItem({
 }: CommentItemProps) {
   const { user } = useCurrentUser();
   const t = useTranslations("dashboard.communityAdmin.comments.item");
+  const tA11y = useTranslations("a11y");
   const locale = useLocale();
   const dfLocale = getDateFnsLocale(locale);
   const [showReplyForm, setShowReplyForm] = useState(false);
@@ -107,6 +108,7 @@ export function CommentItem({
             </span>
             {isAuthor && (
               <button
+                aria-label={tA11y("deleteComment")}
                 onClick={() => setConfirmDelete((prev) => !prev)}
                 disabled={isDeleting}
                 className="ml-auto opacity-0 transition-opacity group-hover:opacity-100"

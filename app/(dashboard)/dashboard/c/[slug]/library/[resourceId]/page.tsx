@@ -54,6 +54,7 @@ const resourceTypeColors: Record<ResourceType, string> = {
 
 export default function ResourceDetailPage() {
   const t = useTranslations("library");
+  const tA11y = useTranslations("a11y");
   const locale = useLocale();
   const dfLocale = getDateFnsLocale(locale);
   const params = useParams();
@@ -216,7 +217,7 @@ export default function ResourceDetailPage() {
               {(resource.canEdit || resource.canDelete) && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm">
+                    <Button aria-label={tA11y("moreActions")} variant="outline" size="sm">
                       <MoreVertical className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>

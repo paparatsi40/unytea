@@ -2825,5 +2825,35 @@
         "createError": "Erreur lors de la création du cours"
       }
     }
+  },
+  "a11y": {
+    "close": "Fermer",
+    "dismiss": "Ignorer",
+    "goBack": "Retour",
+    "moreActions": "Plus d'actions",
+    "send": "Envoyer le message",
+    "addEmoji": "Ajouter un emoji",
+    "editLesson": "Modifier la leçon",
+    "deleteComment": "Supprimer le commentaire",
+    "deleteCourse": "Supprimer le cours",
+    "deleteModule": "Supprimer le module",
+    "deleteLesson": "Supprimer la leçon",
+    "removeAttachment": "Retirer la pièce jointe",
+    "removeImage": "Retirer l'image",
+    "removeFile": "Retirer le fichier",
+    "removeOption": "Retirer l'option",
+    "gridView": "Afficher en grille",
+    "listView": "Afficher en liste",
+    "toggleSortDirection": "Inverser l'ordre de tri",
+    "showRaisedHands": "Voir les mains levées",
+    "unpinQuestion": "Désépingler la question",
+    "clearInvite": "Ignorer l'invitation",
+    "closeChecklist": "Masquer la liste de démarrage",
+    "feedbackDialog": "Avis sur la session",
+    "pollDialog": "Sondage en direct",
+    "pollCreatorDialog": "Créer un sondage",
+    "toggleChat": "Afficher ou masquer le chat",
+    "openPollCreator": "Créer un sondage",
+    "rateStars": "Noter {count} sur 5"
   }
 }

@@ -83,6 +83,7 @@ export function VideoRoomUI({
   onEndSession,
 }: VideoRoomUIProps) {
   const t = useTranslations("liveSession.room");
+  const tA11y = useTranslations("a11y");
   const isAudioOnly = sessionMode === "audio";
 
   // Room context
@@ -337,6 +338,7 @@ export function VideoRoomUI({
               {/* Raise Hand Queue Toggle */}
               {raisedHands.length > 0 && (
                 <button
+                  aria-label={tA11y("showRaisedHands")}
                   onClick={() => setShowHandQueue(!showHandQueue)}
                   className={cn(
                     "relative flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
@@ -443,7 +445,11 @@ export function VideoRoomUI({
             >
               {t("speakerInvite.enableMic")}
             </button>
-            <button onClick={clearSpeakerInvite} className="text-zinc-400 hover:text-zinc-200">
+            <button
+              aria-label={tA11y("clearInvite")}
+              onClick={clearSpeakerInvite}
+              className="text-zinc-400 hover:text-zinc-200"
+            >
               <X className="h-4 w-4" />
             </button>
           </div>
@@ -485,6 +491,7 @@ export function VideoRoomUI({
               </div>
               {isHost && (
                 <button
+                  aria-label={tA11y("unpinQuestion")}
                   onClick={unpinQuestion}
                   className="shrink-0 text-zinc-500 hover:text-zinc-300"
                 >
@@ -697,6 +704,7 @@ export function VideoRoomUI({
           <div className="mb-3 flex items-center justify-between">
             <h3 className="font-medium text-white">{t("handQueue.title")}</h3>
             <button
+              aria-label={tA11y("close")}
               onClick={() => setShowHandQueue(false)}
               className="text-zinc-500 hover:text-zinc-300"
             >

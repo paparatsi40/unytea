@@ -96,6 +96,7 @@ export function PremiumPostFeed({
 }) {
   const { user } = useCurrentUser();
   const t = useTranslations("dashboard.communityAdmin.feed");
+  const tA11y = useTranslations("a11y");
   // Composer-mode keys are suffixed with the capitalized mode (Default/Question/...).
   const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
   const [posts, setPosts] = useState<Post[]>(initialPosts);
@@ -511,6 +512,7 @@ export function PremiumPostFeed({
                 >
                   <span className="max-w-[200px] truncate">{attachment.name}</span>
                   <button
+                    aria-label={tA11y("removeAttachment")}
                     type="button"
                     onClick={() => removeAttachment(attachment.url)}
                     className="rounded-full p-0.5 text-gray-500 hover:bg-gray-200 hover:text-gray-800"

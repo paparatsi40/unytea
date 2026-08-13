@@ -66,6 +66,7 @@ export function CategorySidebar({
   totalResources = 0,
 }: CategorySidebarProps) {
   const t = useTranslations("library.categories");
+  const tA11y = useTranslations("a11y");
   const totalInCategories = categories.reduce((acc, cat) => acc + (cat._count?.resources || 0), 0);
   const uncategorizedCount = Math.max(0, totalResources - totalInCategories);
 
@@ -159,6 +160,7 @@ export function CategorySidebar({
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
+                        aria-label={tA11y("moreActions")}
                         variant="ghost"
                         size="icon"
                         className="mr-1 h-8 w-8 opacity-0 transition-opacity group-hover:opacity-100"

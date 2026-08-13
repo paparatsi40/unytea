@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
+import { useAccessibleDialog } from "@/lib/hooks/useAccessibleDialog";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star, X, Send } from "lucide-react";
 
@@ -12,6 +14,12 @@ interface FeedbackModalProps {
 }
 
 export function FeedbackModal({ isOpen, onClose, onSubmit, sessionTitle }: FeedbackModalProps) {
+  const tA11y = useTranslations("a11y");
+  const dialog = useAccessibleDialog({
+    onClose,
+    label: tA11y("feedbackDialog"),
+    enabled: isOpen,
+  });
   const [rating, setRating] = useState<number>(0);
   const [hoveredRating, setHoveredRating] = useState<number>(0);
   const [comment, setComment] = useState("");
@@ -62,7 +70,10 @@ export function FeedbackModal({ isOpen, onClose, onSubmit, sessionTitle }: Feedb
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-gray-800">
+            <div
+              {...dialog.props}
+              className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-gray-800"
+            >
               {!submitted ? (
                 <>
                   {/* Header */}
@@ -76,6 +87,7 @@ export function FeedbackModal({ isOpen, onClose, onSubmit, sessionTitle }: Feedb
                       </p>
                     </div>
                     <button
+                      aria-label={tA11y("close")}
                       onClick={handleSkip}
                       className="text-gray-400 transition-colors hover:text-gray-600 dark:hover:text-gray-300"
                     >
@@ -93,12 +105,16 @@ export function FeedbackModal({ isOpen, onClose, onSubmit, sessionTitle }: Feedb
                         <motion.button
                           key={star}
                           type="button"
+                          aria-label={tA11y("rateStars", { count: star })}
+                          aria-pressed={rating === star}
                           onClick={() => setRating(star)}
                           onMouseEnter={() => setHoveredRating(star)}
                           onMouseLeave={() => setHoveredRating(0)}
                           whileHover={{ scale: 1.2 }}
                           whileTap={{ scale: 0.9 }}
-                          className="focus:outline-none"
+                          // A star with no focus ring is invisible to tab —
+                          // and the rating is the one required field here.
+                          className="rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                         >
                           <Star
                             className={`h-12 w-12 transition-all ${

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { CheckCircle, Circle, X, ChevronRight, Sparkles } from "lucide-react";
 
 interface ChecklistItem {
@@ -17,6 +18,7 @@ interface OnboardingChecklistProps {
 }
 
 export function OnboardingChecklist({ items, onDismiss }: OnboardingChecklistProps) {
+  const tA11y = useTranslations("a11y");
   const [dismissed, setDismissed] = useState(false);
   const [isOpen, setIsOpen] = useState(true);
 
@@ -63,6 +65,7 @@ export function OnboardingChecklist({ items, onDismiss }: OnboardingChecklistPro
           </div>
           <span className="text-xs font-medium text-gray-500">{progress}%</span>
           <button
+            aria-label={tA11y("closeChecklist")}
             onClick={(e) => {
               e.stopPropagation();
               setDismissed(true);

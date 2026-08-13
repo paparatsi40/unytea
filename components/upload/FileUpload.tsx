@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import NextImage from "next/image";
 import { UploadDropzone } from "@uploadthing/react";
 import { X, File, Image as ImageIcon, FileText, Loader2 } from "lucide-react";
@@ -22,6 +23,7 @@ export function FileUpload({
   value = [],
   onChange,
 }: FileUploadProps) {
+  const tA11y = useTranslations("a11y");
   const [files, setFiles] = useState<{ url: string; name: string }[]>(value);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -128,6 +130,7 @@ export function FileUpload({
 
                 {/* Remove Button */}
                 <button
+                  aria-label={tA11y("removeFile")}
                   onClick={() => removeFile(file.url)}
                   className="flex-shrink-0 rounded-full p-1 text-gray-400 opacity-0 transition-all hover:bg-red-50 hover:text-red-600 group-hover:opacity-100"
                 >

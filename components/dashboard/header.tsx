@@ -79,7 +79,11 @@ export function DashboardHeader({ onMenuClick }: Props) {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex items-center space-x-3 focus:outline-none">
+              {/* `focus:outline-none` alone removed the only indication a
+                  keyboard user had of reaching the account menu — the one
+                  control on the top bar with no other focus affordance. Same
+                  ring the Button primitive uses. */}
+              <button className="flex items-center space-x-3 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
                 <div className="hidden text-right md:block">
                   <p className="text-sm font-semibold text-foreground">
                     {user?.name || t("navigation.profile")}

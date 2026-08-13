@@ -41,6 +41,7 @@ export default function LibraryPage() {
   const params = useParams();
   const communitySlug = params?.slug as string | undefined;
   const t = useTranslations("library");
+  const tA11y = useTranslations("a11y");
 
   // State - MUST declare all hooks before any early returns
   const [resources, setResources] = useState<LibraryResource[]>([]);
@@ -355,6 +356,7 @@ export default function LibraryPage() {
                 <p className="mt-1 text-sm text-gray-500">{t("upload.subtitle")}</p>
               </div>
               <button
+                aria-label={tA11y("close")}
                 onClick={() => setIsUploadModalOpen(false)}
                 className="rounded-full p-2 hover:bg-gray-100"
               >
@@ -524,6 +526,7 @@ export default function LibraryPage() {
                       {isCreatingCategorySubmitting ? "..." : t("upload.categoryNew")}
                     </Button>
                     <Button
+                      aria-label={tA11y("close")}
                       type="button"
                       size="sm"
                       variant="outline"

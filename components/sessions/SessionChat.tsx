@@ -27,6 +27,7 @@ const REACTIONS = ["👍", "❤️", "🔥", "👏", "💡", "🎉"];
 
 export function SessionChat({ sessionId: _sessionId, onPinQuestion }: SessionChatProps) {
   const t = useTranslations("liveSession.sessionChat");
+  const tA11y = useTranslations("a11y");
   const tParticipants = useTranslations("liveSession.room.participants");
   const { chatMessages, send } = useChat();
   const room = useRoomContext();
@@ -111,6 +112,7 @@ export function SessionChat({ sessionId: _sessionId, onPinQuestion }: SessionCha
 
                   {/* Reaction Button */}
                   <button
+                    aria-label={tA11y("addEmoji")}
                     onClick={() =>
                       setShowReactionsFor(showReactionsFor === messageId ? null : messageId)
                     }
@@ -170,6 +172,7 @@ export function SessionChat({ sessionId: _sessionId, onPinQuestion }: SessionCha
             className="flex-1 border-zinc-700 bg-zinc-800 text-white placeholder:text-zinc-500"
           />
           <Button
+            aria-label={tA11y("send")}
             type="submit"
             size="icon"
             className="bg-blue-600 hover:bg-blue-700"

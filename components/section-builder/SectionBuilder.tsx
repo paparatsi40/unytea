@@ -158,12 +158,9 @@ interface SectionBuilderProps {
   communityId?: string;
 }
 
-export function SectionBuilder({
-  initialSections = [],
-  onSave,
-  communityId,
-}: SectionBuilderProps) {
+export function SectionBuilder({ initialSections = [], onSave, communityId }: SectionBuilderProps) {
   const t = useTranslations();
+  const tA11y = useTranslations("a11y");
   const [sections, setSections] = useState<SectionInstance[]>(initialSections);
 
   // Sync sections when initialSections changes (e.g., after loading from API)
@@ -559,7 +556,12 @@ export function SectionBuilder({
                 <span className="rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-800">
                   Unsaved Preview
                 </span>
-                <Button variant="ghost" size="sm" onClick={() => setShowPreview(false)}>
+                <Button
+                  aria-label={tA11y("close")}
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowPreview(false)}
+                >
                   <X className="h-5 w-5" />
                 </Button>
               </div>

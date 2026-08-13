@@ -77,6 +77,7 @@ interface CourseData {
 
 export default function CourseBuilderPage() {
   const t = useTranslations("dashboard.communityAdmin.courses.builder");
+  const tA11y = useTranslations("a11y");
   const params = useParams();
   const router = useRouter();
   const slug = params?.slug as string;
@@ -561,6 +562,7 @@ export default function CourseBuilderPage() {
                 {t("modules.add")}
               </button>
               <button
+                aria-label={tA11y("close")}
                 onClick={() => {
                   setAddingModule(false);
                   setNewModuleTitle("");
@@ -606,6 +608,7 @@ export default function CourseBuilderPage() {
                   </p>
                 </div>
                 <button
+                  aria-label={tA11y("deleteModule")}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleDeleteModule(mod.id);
@@ -739,12 +742,14 @@ export default function CourseBuilderPage() {
                           )}
                           <div className="flex items-center gap-1">
                             <button
+                              aria-label={tA11y("editLesson")}
                               onClick={() => startEditLesson(lesson)}
                               className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
                             >
                               <Pencil className="h-3.5 w-3.5" />
                             </button>
                             <button
+                              aria-label={tA11y("deleteLesson")}
                               onClick={() => handleDeleteLesson(lesson.id)}
                               className="rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-500"
                             >

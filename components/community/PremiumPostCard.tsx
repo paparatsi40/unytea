@@ -68,6 +68,7 @@ export function PremiumPostCard({
 }) {
   const { user } = useCurrentUser();
   const t = useTranslations("dashboard.communityAdmin.postCard");
+  const tA11y = useTranslations("a11y");
   const locale = useLocale();
   const dfLocale = getDateFnsLocale(locale);
 
@@ -231,6 +232,7 @@ export function PremiumPostCard({
         {(isAuthor || canModeratePost) && (
           <div className="relative">
             <button
+              aria-label={tA11y("moreActions")}
               onClick={() => setShowMenu(!showMenu)}
               className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-50 hover:text-gray-600"
             >

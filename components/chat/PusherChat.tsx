@@ -26,6 +26,7 @@ interface PusherChatProps {
 
 export function PusherChat({ channelId, channelName }: PusherChatProps) {
   const t = useTranslations("dashboard.communityMember.pusherChat");
+  const tA11y = useTranslations("a11y");
   const { user } = useCurrentUser();
   const { onMessage, isConnected } = usePusher(channelId, user?.id || "");
 
@@ -226,6 +227,7 @@ export function PusherChat({ channelId, channelName }: PusherChatProps) {
             className="flex-1"
           />
           <Button
+            aria-label={tA11y("send")}
             onClick={handleSend}
             disabled={!newMessage.trim() || !isConnected || isSending}
             size="icon"

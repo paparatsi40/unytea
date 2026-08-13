@@ -82,6 +82,7 @@ export function ResourceCard({
   variant = "default",
 }: ResourceCardProps) {
   const t = useTranslations("library");
+  const tA11y = useTranslations("a11y");
   const locale = useLocale();
   const Icon = typeIcons[resource.type];
   const progress = resource.progress?.[0]?.progress ?? 0;
@@ -258,6 +259,7 @@ export function ResourceCard({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild onClick={(e) => e.preventDefault()}>
                   <Button
+                    aria-label={tA11y("moreActions")}
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8 opacity-0 transition-opacity group-hover:opacity-100"

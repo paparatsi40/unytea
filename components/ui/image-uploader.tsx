@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { Upload, Link as LinkIcon, Loader2, X } from "lucide-react";
 import { useUploadThing } from "@/lib/uploadthing";
@@ -11,6 +12,7 @@ interface ImageUploaderProps {
 }
 
 export function ImageUploader({ value, onChange, onRemove }: ImageUploaderProps) {
+  const tA11y = useTranslations("a11y");
   const [uploading, setUploading] = useState(false);
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [urlInput, setUrlInput] = useState("");
@@ -72,6 +74,7 @@ export function ImageUploader({ value, onChange, onRemove }: ImageUploaderProps)
         />
         {onRemove && (
           <Button
+            aria-label={tA11y("removeImage")}
             type="button"
             variant="destructive"
             size="sm"
