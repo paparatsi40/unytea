@@ -1,7 +1,9 @@
 "use server";
 
-import { getCurrentUserId } from "@/lib/auth-utils";
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { defineAction } from "@/lib/actions/define-action";
+import { communityOfSession } from "@/lib/actions/resolvers";
 import { Prisma } from "@prisma/client";
 
 /** Segmento destacado ("golden moment") de una sesión. */
@@ -38,12 +40,18 @@ type SessionForMoments = Prisma.MentorSessionGetPayload<{
  * Analyze session for "golden moments" - high-value segments
  * Based on session structure, participation, and notes
  */
-export async function detectSessionMoments(sessionId: string) {
+export const detectSessionMoments = defineAction(
+  {
+    name: "detectSessionMoments",
+    auth: "member",
+    args: [z.string().min(1).max(64)],
+    community: ([sessionId]) => communityOfSession(sessionId),
+    rateLimit: "ai",
+  },
+  async (ctx, sessionId: string) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Unauthorized" };
-    }
+
+    const userId = ctx.userId;
 
     // Fetch session with relevant data
     const session = await prisma.mentorSession.findUnique({
@@ -94,6 +102,7 @@ export async function detectSessionMoments(sessionId: string) {
     return { success: false, error: "Failed to analyze session" };
   }
 }
+);
 
 /**
  * Analyze session structure for "golden moments"
@@ -203,12 +212,18 @@ function dedupeMoments(moments: Moment[]) {
 /**
  * Generate shareable clip metadata
  */
-export async function generateClipMetadata(sessionId: string, startTime: number, endTime: number) {
+export const generateClipMetadata = defineAction(
+  {
+    name: "generateClipMetadata",
+    auth: "member",
+    args: [z.string().min(1).max(64), z.number().finite(), z.number().finite()],
+    community: ([sessionId]) => communityOfSession(sessionId),
+    rateLimit: "ai",
+  },
+  async (ctx, sessionId: string, startTime: number, endTime: number) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Unauthorized" };
-    }
+
+    const userId = ctx.userId;
 
     const session = await prisma.mentorSession.findUnique({
       where: { id: sessionId },
@@ -256,6 +271,7 @@ export async function generateClipMetadata(sessionId: string, startTime: number,
     return { success: false, error: "Failed to generate clip" };
   }
 }
+);
 
 function generateClipPreviewText(session: SessionForClip, duration: number) {
   const hooks = [
@@ -280,7 +296,14 @@ ${clipUrl}`;
 /**
  * Track clip shares for analytics
  */
-export async function trackClipShare(clipId: string, platform: "twitter" | "linkedin" | "copy") {
+export const trackClipShare = defineAction(
+  {
+    name: "trackClipShare",
+    auth: "public",
+    args: [z.string().min(1).max(64), z.enum(["twitter", "linkedin", "copy"])],
+    rateLimit: "api",
+  },
+  async (_ctx, clipId: string, platform: "twitter" | "linkedin" | "copy") => {
   try {
     console.log(`Clip ${clipId} shared to ${platform}`);
     return { success: true };
@@ -289,3 +312,4 @@ export async function trackClipShare(clipId: string, platform: "twitter" | "link
     return { success: false };
   }
 }
+);

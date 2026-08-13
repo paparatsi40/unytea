@@ -16,17 +16,23 @@ export default async function SessionsPage() {
     redirect("/auth/signin");
   }
 
-  // Get user's primary community to associate new sessions
-  const userCommunity = await prisma.community.findFirst({
-    where: {
-      OR: [
-        { ownerId: session.user.id },
-        { members: { some: { userId: session.user.id, status: "ACTIVE" } } },
-      ],
-    },
+  // Only the community OWNER may create or host a live session, so the
+  // community a new session would attach to must be one the viewer owns.
+  //
+  // This previously resolved owner-OR-active-member and offered the create
+  // control to everyone, which is now a server-side FORBIDDEN. Resolving the
+  // owned community instead keeps the control working for owners — matching on
+  // membership would have hidden it from an owner whose oldest community is
+  // merely one they joined.
+  //
+  // A non-owner still sees their own sessions below; getUserSessions() does not
+  // depend on this, and communityId feeds nothing but the create dialog.
+  const ownedCommunity = await prisma.community.findFirst({
+    where: { ownerId: session.user.id },
     select: { id: true },
     orderBy: { createdAt: "asc" },
   });
+  const canCreateSessions = ownedCommunity !== null;
 
   const result = await getUserSessions();
 
@@ -38,7 +44,8 @@ export default async function SessionsPage() {
       <SessionsPageClient
         upcoming={[]}
         past={[]}
-        communityId={userCommunity?.id}
+        communityId={ownedCommunity?.id}
+        canCreateSessions={canCreateSessions}
         sessionsThisWeek={0}
         liveSessionId={null}
         startingSoon={null}
@@ -91,7 +98,8 @@ export default async function SessionsPage() {
     <SessionsPageClient
       upcoming={upcoming}
       past={past}
-      communityId={userCommunity?.id}
+      communityId={ownedCommunity?.id}
+      canCreateSessions={canCreateSessions}
       sessionsThisWeek={sessionsThisWeek}
       liveSessionId={liveSession?.id ?? null}
       startingSoon={startingSoon}

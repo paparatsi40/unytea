@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { sendSessionReminders } from "@/app/actions/session-jobs";
+import { sendSessionReminders } from "@/lib/jobs/session-jobs";
 import { verifyCronAuth } from "@/lib/cron-auth";
 
 export async function GET(request: NextRequest) {

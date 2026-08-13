@@ -1,8 +1,10 @@
 "use server";
 
+import { z } from "zod";
 import { Prisma } from "@prisma/client";
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { defineAction } from "@/lib/actions/define-action";
+import { communityById } from "@/lib/actions/resolvers";
 import { buildDefaultLandingLayout } from "@/lib/community-landing-template";
 import { revalidatePath } from "next/cache";
 import { revalidateLocalizedPath } from "@/lib/cache-invalidation";
@@ -12,16 +14,21 @@ import { revalidateLocalizedPath } from "@/lib/cache-invalidation";
  * Only callable by the community owner. Idempotent — each call regenerates
  * fresh section ids and re-applies the latest template.
  */
-export async function resetCommunityLandingToDefault(communityId: string) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    throw new Error("Unauthorized");
-  }
-
-  // Atomic ownership check: the ownerId guard in the WHERE clause means a
-  // non-owner simply gets no row back (no separate ownerId comparison).
+export const resetCommunityLandingToDefault = defineAction(
+  {
+    name: "resetCommunityLandingToDefault",
+    auth: "admin",
+    args: [z.string().min(1).max(64)],
+    community: ([communityId]) => communityById(communityId),
+    roles: ["OWNER"],
+    rateLimit: "create",
+  },
+  async (ctx, communityId) => {
+  // Atomic ownership check retained on top of the seam's OWNER gate: the
+  // ownerId guard in the WHERE clause means a mid-call ownership change cannot
+  // slip a write through.
   const community = await prisma.community.findFirst({
-    where: { id: communityId, ownerId: session.user.id },
+    where: { id: communityId, ownerId: ctx.userId },
     include: {
       owner: {
         select: { name: true, image: true },
@@ -47,7 +54,7 @@ export async function resetCommunityLandingToDefault(communityId: string) {
   // change / deletion can't slip a write through. Persist the bare sections
   // array — landingLayout stores SectionInstance[].
   const result = await prisma.community.updateMany({
-    where: { id: communityId, ownerId: session.user.id },
+    where: { id: communityId, ownerId: ctx.userId },
     data: { landingLayout: layout.sections as unknown as Prisma.InputJsonValue },
   });
 
@@ -58,5 +65,6 @@ export async function resetCommunityLandingToDefault(communityId: string) {
   revalidatePath(`/dashboard/c/${community.slug}/settings/landing`);
   revalidateLocalizedPath(`/c/${community.slug}`);
 
-  return { success: true };
-}
+  return { success: true as const };
+  }
+);

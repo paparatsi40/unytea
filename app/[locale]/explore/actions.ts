@@ -1,6 +1,8 @@
 "use server";
 
+import { z } from "zod";
 import { CommunityCategory } from "@prisma/client";
+import { defineAction } from "@/lib/actions/define-action";
 import { getExploreCommunities } from "@/lib/explore-query";
 import type {
   ExploreFilters,
@@ -77,11 +79,38 @@ function sanitizePagination(input: ExplorePagination): ExplorePagination {
   };
 }
 
-export async function loadMoreCommunitiesAction(
-  filters: ExploreFilters,
-  pagination: ExplorePagination
-): Promise<ExploreResponse> {
-  const safeFilters = sanitizeFilters(filters);
-  const safePagination = sanitizePagination(pagination);
-  return getExploreCommunities(safeFilters, safePagination);
-}
+/**
+ * PUBLIC: this backs the anonymous /explore directory, which exists to be browsed
+ * without an account. It reads only communities that have opted in to discovery
+ * (`excludeFromExplore = false`) and returns no member data.
+ *
+ * The pre-existing sanitizeFilters/sanitizePagination clamp every field, so the
+ * Zod schemas below only need to reject the wrong shape; the value clamping stays
+ * where it was.
+ */
+export const loadMoreCommunitiesAction = defineAction(
+  {
+    name: "loadMoreCommunitiesAction",
+    auth: "public",
+    args: [
+      z.object({
+        category: z.string().max(64).optional(),
+        language: z.string().max(8).optional(),
+        size: z.string().max(16).optional(),
+        type: z.string().max(16).optional(),
+        search: z.string().max(100).optional(),
+        sort: z.string().max(32).optional(),
+      }),
+      z.object({
+        page: z.number().finite().optional(),
+        pageSize: z.number().finite().optional(),
+      }),
+    ],
+    rateLimit: "api",
+  },
+  async (_ctx, filters, pagination): Promise<ExploreResponse> => {
+    const safeFilters = sanitizeFilters(filters as ExploreFilters);
+    const safePagination = sanitizePagination(pagination as ExplorePagination);
+    return getExploreCommunities(safeFilters, safePagination);
+  }
+);

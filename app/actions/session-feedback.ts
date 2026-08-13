@@ -1,17 +1,24 @@
 "use server";
 
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { defineAction } from "@/lib/actions/define-action";
+import { communityOfSession } from "@/lib/actions/resolvers";
 
 /**
  * Submit feedback for a session
  */
-export async function submitSessionFeedback(sessionId: string, rating: number, comment?: string) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    throw new Error("Unauthorized");
-  }
+export const submitSessionFeedback = defineAction(
+  {
+    name: "submitSessionFeedback",
+    auth: "member",
+    args: [z.string().min(1).max(64), z.number().int().min(1).max(5), z.string().max(5000).optional()],
+    community: ([sessionId]) => communityOfSession(sessionId),
+    rateLimit: "create",
+  },
+  async (ctx, sessionId: string, rating: number, comment?: string) => {
+  const session = { user: { id: ctx.userId } };
 
   // Validate rating
   if (rating < 1 || rating > 5) {
@@ -72,15 +79,20 @@ export async function submitSessionFeedback(sessionId: string, rating: number, c
   revalidatePath(`/dashboard/sessions/${sessionId}`);
   return feedback;
 }
+);
 
 /**
  * Get feedback for a session (host only)
  */
-export async function getSessionFeedback(sessionId: string) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    throw new Error("Unauthorized");
-  }
+export const getSessionFeedback = defineAction(
+  {
+    name: "getSessionFeedback",
+    auth: "member",
+    args: [z.string().min(1).max(64)],
+    community: ([sessionId]) => communityOfSession(sessionId),
+  },
+  async (ctx, sessionId: string) => {
+  const session = { user: { id: ctx.userId } };
 
   // Check if user is the host of the session
   const mentorSession = await prisma.mentorSession.findUnique({
@@ -131,15 +143,20 @@ export async function getSessionFeedback(sessionId: string) {
     },
   };
 }
+);
 
 /**
  * Check if user has submitted feedback for a session
  */
-export async function hasSubmittedFeedback(sessionId: string): Promise<boolean> {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return false;
-  }
+export const hasSubmittedFeedback = defineAction(
+  {
+    name: "hasSubmittedFeedback",
+    auth: "member",
+    args: [z.string().min(1).max(64)],
+    community: ([sessionId]) => communityOfSession(sessionId),
+  },
+  async (ctx, sessionId: string) => {
+  const session = { user: { id: ctx.userId } };
 
   const feedback = await prisma.sessionFeedback.findFirst({
     where: {
@@ -150,3 +167,4 @@ export async function hasSubmittedFeedback(sessionId: string): Promise<boolean> 
 
   return !!feedback;
 }
+);

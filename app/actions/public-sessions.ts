@@ -1,8 +1,10 @@
 "use server";
 
 import { unstable_cache } from "next/cache";
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUserId } from "@/lib/auth-utils";
+import { defineAction } from "@/lib/actions/define-action";
+import { communityById } from "@/lib/actions/resolvers";
 import { PostContentType, Prisma } from "@prisma/client";
 
 /**
@@ -157,9 +159,14 @@ export interface PublicSessionData {
   } | null;
 }
 
-export async function getPublicSession(
-  slug: string
-): Promise<{ success: boolean; session?: PublicSessionData; error?: string }> {
+export const getPublicSession = defineAction(
+  {
+    name: "getPublicSession",
+    auth: "public",
+    args: [z.string().min(1).max(200)],
+    rateLimit: "api",
+  },
+  async (ctx, slug: string) => {
   try {
     // Heavy DB read is cached (tag `session:${slug}`); the auth-dependent
     // recording.url gate below stays per-request.
@@ -178,7 +185,7 @@ export async function getPublicSession(
       return { success: false, error: "Session community not found" };
     }
 
-    const viewerId = await getCurrentUserId();
+    const viewerId = ctx.userId;
     let isMember = false;
 
     if (viewerId) {
@@ -228,17 +235,23 @@ export async function getPublicSession(
             url: canWatchRecording ? session.recording.url : null,
           }
         : null,
-      notes: session.notes
-        ? {
-            id: session.notes.id,
-            content: session.notes.content,
-            summary: session.notes.summary,
-            keyInsights: safeParseStringArray(session.notes.keyInsights),
-            chapters: safeParseChapters(session.notes.resources),
-            quotes: safeParseQuotes(session.notes.resources),
-            createdAt: session.notes.createdAt,
-          }
-        : null,
+      // Notes are gated by exactly the same rule as the recording. They were
+      // previously returned unconditionally, so on a `visibility: "community"`
+      // session a non-member received a null video alongside the complete
+      // written notes — content, summary, key insights, chapters and quotes —
+      // which is the substantive paywalled material (H2).
+      notes:
+        canWatchRecording && session.notes
+          ? {
+              id: session.notes.id,
+              content: session.notes.content,
+              summary: session.notes.summary,
+              keyInsights: safeParseStringArray(session.notes.keyInsights),
+              chapters: safeParseChapters(session.notes.resources),
+              quotes: safeParseQuotes(session.notes.resources),
+              createdAt: session.notes.createdAt,
+            }
+          : null,
     };
 
     return { success: true, session: data };
@@ -247,6 +260,7 @@ export async function getPublicSession(
     return { success: false, error: "Failed to load session" };
   }
 }
+);
 
 /** Sesión relacionada formateada para la página pública. */
 export type RelatedSession = {
@@ -263,11 +277,14 @@ export type RelatedSession = {
 /** Formato legacy: PublicSessionData + alias `mentor` del host. */
 export type LegacyPublicSession = PublicSessionData & { mentor: PublicSessionData["host"] };
 
-export async function getRelatedSessions(
-  communityId: string,
-  currentSessionId: string,
-  limit: number = 3
-): Promise<{ success: boolean; sessions?: RelatedSession[]; error?: string }> {
+export const getRelatedSessions = defineAction(
+  {
+    name: "getRelatedSessions",
+    auth: "public",
+    args: [z.string().min(1).max(64), z.string().min(1).max(64), z.number().int().min(1).max(20).default(3)],
+    rateLimit: "api",
+  },
+  async (_ctx, communityId: string, currentSessionId: string, limit: number = 3) => {
   try {
     const sessions = await prisma.mentorSession.findMany({
       where: {
@@ -309,9 +326,17 @@ export async function getRelatedSessions(
     return { success: false, error: "Failed to load related sessions" };
   }
 }
+);
 
 // Alias for compatibility with existing code
-export async function getPublicSessionBySlug(slug: string): Promise<LegacyPublicSession | null> {
+export const getPublicSessionBySlug = defineAction(
+  {
+    name: "getPublicSessionBySlug",
+    auth: "public",
+    args: [z.string().min(1).max(200)],
+    rateLimit: "api",
+  },
+  async (_ctx, slug: string) => {
   const result = await getPublicSession(slug);
   if (!result.success || !result.session) return null;
 
@@ -326,11 +351,17 @@ export async function getPublicSessionBySlug(slug: string): Promise<LegacyPublic
     },
   };
 }
+);
 
 // For sitemap generation
-export async function getPublicSessionsForSEO(
-  limit: number = 100
-): Promise<{ slug: string; updatedAt: Date; scheduledAt: Date }[]> {
+export const getPublicSessionsForSEO = defineAction(
+  {
+    name: "getPublicSessionsForSEO",
+    auth: "public",
+    args: [z.number().int().min(1).max(1000).default(100)],
+    rateLimit: "api",
+  },
+  async (_ctx, limit: number = 100) => {
   try {
     const sessions = await prisma.mentorSession.findMany({
       where: {
@@ -356,11 +387,16 @@ export async function getPublicSessionsForSEO(
     return [];
   }
 }
+);
 
-export async function getRelatedCommunitiesHostingThisWeek(
-  currentCommunityId: string,
-  limit: number = 4
-) {
+export const getRelatedCommunitiesHostingThisWeek = defineAction(
+  {
+    name: "getRelatedCommunitiesHostingThisWeek",
+    auth: "public",
+    args: [z.string().min(1).max(64), z.number().int().min(1).max(20).default(4)],
+    rateLimit: "api",
+  },
+  async (_ctx, currentCommunityId: string, limit: number = 4) => {
   try {
     const now = new Date();
     const weekEnd = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
@@ -440,14 +476,27 @@ export async function getRelatedCommunitiesHostingThisWeek(
     return { success: false, error: "Failed to load related communities" };
   }
 }
+);
 
-export async function getNextCommunitySession(communityId: string) {
+export const getNextCommunitySession = defineAction(
+  {
+    name: "getNextCommunitySession",
+    auth: "public",
+    args: [z.string().min(1).max(64)],
+    rateLimit: "api",
+  },
+  async (_ctx, communityId: string) => {
   try {
     const nextSession = await prisma.mentorSession.findFirst({
       where: {
         communityId,
         status: "SCHEDULED",
         scheduledAt: { gt: new Date() },
+        // This action is anonymous-callable, so without a privacy filter it let
+        // anyone enumerate a private community's upcoming session titles and
+        // times by id (L3). The sibling getRelatedCommunitiesHostingThisWeek
+        // already filters this way.
+        community: { isPrivate: false },
       },
       orderBy: { scheduledAt: "asc" },
       select: {
@@ -464,17 +513,26 @@ export async function getNextCommunitySession(communityId: string) {
     return { success: false, error: "Failed to load next session" };
   }
 }
+);
 
-export async function askQuestionForNextSession(params: {
-  communityId: string;
-  question: string;
-  source?: string;
-}) {
+export const askQuestionForNextSession = defineAction(
+  {
+    name: "askQuestionForNextSession",
+    auth: "member",
+    args: [
+      z.object({
+        communityId: z.string().min(1).max(64),
+        question: z.string().min(1).max(2000),
+        source: z.string().max(120).optional(),
+      }),
+    ],
+    community: ([params]) => communityById(params.communityId),
+    rateLimit: "create",
+  },
+  async (ctx, params: { communityId: string; question: string; source?: string; }) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+
+    const userId = ctx.userId;
 
     const question = params.question.trim();
     if (question.length < 5) {
@@ -538,3 +596,4 @@ export async function askQuestionForNextSession(params: {
     return { success: false, error: "Failed to submit question" };
   }
 }
+);

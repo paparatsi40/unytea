@@ -4,7 +4,11 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { PusherChat } from "@/components/chat/PusherChat";
 import { AuditoriumSpace } from "@/components/auditorium/AuditoriumSpace";
-import { getOrCreateDefaultChannels, updateChannelPresence } from "@/app/actions/channels";
+import {
+  getCommunityChannels,
+  provisionDefaultChannels,
+  updateChannelPresence,
+} from "@/app/actions/channels";
 import { Loader2, LayoutList, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -61,11 +65,25 @@ export default function CommunityChat() {
       return;
     }
 
-    // Get or create channels
-    const result = await getOrCreateDefaultChannels(data.id);
+    const result = await getCommunityChannels(data.id);
+    if (!result.success) {
+      setIsLoading(false);
+      return;
+    }
 
-    if (result.success && result.channels.length > 0) {
-      const loadedChannels = result.channels as Channel[];
+    let loadedChannels = result.channels as Channel[];
+
+    // Provisioning the default set is an admin/moderator operation, so it is a
+    // separate gated action rather than a side effect of this read (L1). Only
+    // offer it to a caller who may actually perform it.
+    if (loadedChannels.length === 0 && result.canProvision) {
+      const provisioned = await provisionDefaultChannels(data.id);
+      if (provisioned.success) {
+        loadedChannels = provisioned.channels as Channel[];
+      }
+    }
+
+    if (loadedChannels.length > 0) {
       setChannels(loadedChannels);
       setActiveChannelId(loadedChannels[0].id);
       setActiveChannelName(loadedChannels[0].name);

@@ -36,6 +36,13 @@ interface SessionsPageClientProps {
   upcoming: SessionItem[];
   past: SessionItem[];
   communityId?: string;
+  /**
+   * Only the community owner may create or host a session. Mirrors
+   * `canCreateSessions` on the community-scoped sessions page, which is
+   * likewise `isOwner`. A non-owner reads their sessions but is shown no
+   * create control, because the server would refuse it.
+   */
+  canCreateSessions: boolean;
   sessionsThisWeek: number;
   liveSessionId: string | null;
   startingSoon: { id: string; startsInMinutes: number } | null;
@@ -46,6 +53,7 @@ export function SessionsPageClient({
   upcoming,
   past,
   communityId,
+  canCreateSessions,
   sessionsThisWeek,
   liveSessionId,
   startingSoon,
@@ -95,11 +103,15 @@ export function SessionsPageClient({
             </p>
           )}
         </div>
-        <CreateSessionDialog
-          triggerText={t("scheduleSession")}
-          communityId={communityId}
-          className="inline-flex items-center gap-2 rounded-full bg-purple-600 px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-purple-700"
-        />
+        {/* Owner-only, matching the server gate — a non-owner is not shown a
+            control that would be refused. */}
+        {canCreateSessions && communityId && (
+          <CreateSessionDialog
+            triggerText={t("scheduleSession")}
+            communityId={communityId}
+            className="inline-flex items-center gap-2 rounded-full bg-purple-600 px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-purple-700"
+          />
+        )}
       </div>
 
       {startingSoonSession && startingSoon && (
@@ -211,11 +223,13 @@ export function SessionsPageClient({
                   {t("empty.description")}
                 </p>
                 <div className="mt-6 flex items-center gap-4">
-                  <CreateSessionDialog
-                    triggerText={t("scheduleSession")}
-                    communityId={communityId}
-                    className="inline-flex items-center gap-2 rounded-full bg-purple-600 px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-purple-700"
-                  />
+                  {canCreateSessions && communityId && (
+                    <CreateSessionDialog
+                      triggerText={t("scheduleSession")}
+                      communityId={communityId}
+                      className="inline-flex items-center gap-2 rounded-full bg-purple-600 px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-purple-700"
+                    />
+                  )}
                   <span className="text-xs text-muted-foreground">{t("empty.takesMinutes")}</span>
                 </div>
                 <p className="mt-4 text-xs text-muted-foreground">{t("empty.growFaster")}</p>
@@ -283,11 +297,13 @@ export function SessionsPageClient({
                       {t("joinNextSession")}
                     </Button>
                   </Link>
-                  <CreateSessionDialog
-                    triggerText={t("upcoming.edit")}
-                    communityId={communityId}
-                    className="inline-flex items-center justify-center rounded-full border border-zinc-700 bg-transparent px-3 py-1.5 text-xs text-zinc-400 transition-all hover:bg-zinc-800 hover:text-zinc-200"
-                  />
+                  {canCreateSessions && communityId && (
+                    <CreateSessionDialog
+                      triggerText={t("upcoming.edit")}
+                      communityId={communityId}
+                      className="inline-flex items-center justify-center rounded-full border border-zinc-700 bg-transparent px-3 py-1.5 text-xs text-zinc-400 transition-all hover:bg-zinc-800 hover:text-zinc-200"
+                    />
+                  )}
                 </div>
               </div>
             ))}

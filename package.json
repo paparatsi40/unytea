@@ -16,6 +16,8 @@
     "db:studio": "prisma studio",
     "db:migrate": "prisma migrate dev",
     "postinstall": "prisma generate",
+    "prepare": "git config core.hooksPath .githooks || true",
+    "check:env": "node scripts/check-public-env.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
@@ -124,6 +126,13 @@
   },
   "overrides": {
     "effect": ">=3.20.0",
-    "postcss": "^8.5.10"
+    "postcss": "^8.5.10",
+    "@excalidraw/excalidraw": {
+      "nanoid": "^3.3.18"
+    },
+    "@excalidraw/mermaid-to-excalidraw": {
+      "nanoid": "^5.1.16"
+    },
+    "lodash-es": "^4.18.1"
   }
 }

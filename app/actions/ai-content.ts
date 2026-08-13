@@ -1,16 +1,43 @@
 "use server";
 
+import { z } from "zod";
 import { openai } from "@/lib/openai";
+import { prisma } from "@/lib/prisma";
+import { defineAction } from "@/lib/actions/define-action";
+import { communityById } from "@/lib/actions/resolvers";
 
 interface GeneratedFAQ {
   q: string;
   a: string;
 }
 
-export async function generateCommunityFAQs(
-  communityName: string,
-  communityDescription: string | null
-): Promise<GeneratedFAQ[]> {
+/**
+ * Generate FAQ copy for a community landing page.
+ *
+ * Was unauthenticated and rate-limited by nothing, so anyone could drive
+ * unbounded OpenAI spend (SEC-12/H5). It now requires OWNER/ADMIN of the
+ * community and uses the `ai` limiter (30/hour), which existed in
+ * lib/rate-limit.ts but had zero call sites.
+ *
+ * The name and description are read from the database rather than accepted from
+ * the client, so the prompt cannot be steered with another community's identity.
+ */
+export const generateCommunityFAQs = defineAction(
+  {
+    name: "generateCommunityFAQs",
+    auth: "admin",
+    args: [z.string().min(1).max(64)],
+    community: ([communityId]) => communityById(communityId),
+    rateLimit: "ai",
+  },
+  async (_ctx, communityId): Promise<GeneratedFAQ[]> => {
+  const community = await prisma.community.findUnique({
+    where: { id: communityId },
+    select: { name: true, description: true },
+  });
+  const communityName = community?.name ?? "this community";
+  const communityDescription = community?.description ?? null;
+
   try {
     const prompt = `You are a community manager creating an FAQ section for a community called "${communityName}".
     
@@ -93,4 +120,5 @@ Return ONLY a JSON array in this exact format:
       },
     ];
   }
-}
+  }
+);

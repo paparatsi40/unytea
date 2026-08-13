@@ -12,7 +12,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { auth } from "@/lib/auth";
+import { defineAction } from "@/lib/actions/define-action";
+import { communityBySlug, communityOfResource } from "@/lib/actions/resolvers";
 import { prisma } from "@/lib/prisma";
 import {
   Prisma,
@@ -220,15 +221,17 @@ async function checkResourcePermission(
  * Crear una nueva categoría de recursos
  * Requiere: ADMIN, MODERATOR, o OWNER
  */
-export async function createResourceCategory(
-  communitySlug: string,
-  data: ResourceCategoryInput
-): Promise<ActionResult<ResourceCategory>> {
+export const createResourceCategory = defineAction(
+  {
+    name: "createResourceCategory",
+    auth: "admin",
+    args: [z.string().min(1).max(120), resourceCategorySchema],
+    community: ([communitySlug]) => communityBySlug(communitySlug),
+  },
+  async (ctx, communitySlug: string, data: ResourceCategoryInput) : Promise<ActionResult<ResourceCategory>> => {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return { success: false, error: "No autorizado", code: "UNAUTHORIZED" };
-    }
+
+    const session = { user: { id: ctx.userId } };
 
     // Validar input
     const validated = resourceCategorySchema.parse(data);
@@ -280,18 +283,22 @@ export async function createResourceCategory(
     return { success: false, error: "Error al crear categoría", code: "INTERNAL" };
   }
 }
+);
 
 /**
  * Obtener todas las categorías de una comunidad
  */
-export async function getResourceCategories(
-  communitySlug: string
-): Promise<ActionResult<ResourceCategoryWithCount[]>> {
+export const getResourceCategories = defineAction(
+  {
+    name: "getResourceCategories",
+    auth: "member",
+    args: [z.string().min(1).max(120)],
+    community: ([communitySlug]) => communityBySlug(communitySlug),
+  },
+  async (ctx, communitySlug: string) : Promise<ActionResult<ResourceCategoryWithCount[]>> => {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return { success: false, error: "No autorizado", code: "UNAUTHORIZED" };
-    }
+
+    const session = { user: { id: ctx.userId } };
 
     const access = await checkCommunityAccess(communitySlug, session.user.id);
     if (!access) {
@@ -314,6 +321,7 @@ export async function getResourceCategories(
     return { success: false, error: "Error al obtener categorías", code: "INTERNAL" };
   }
 }
+);
 
 // ============================================
 // RECURSOS
@@ -323,18 +331,20 @@ export async function getResourceCategories(
  * Crear un nuevo recurso
  * Requiere: MENTOR, MODERATOR, ADMIN, o OWNER
  */
-export async function createResource(
-  communitySlug: string,
-  data: CreateResourceInput
-): Promise<ActionResult<ResourceCardItem>> {
+export const createResource = defineAction(
+  {
+    name: "createResource",
+    auth: "member",
+    args: [z.string().min(1).max(120), createResourceSchema],
+    community: ([communitySlug]) => communityBySlug(communitySlug),
+    rateLimit: "create",
+  },
+  async (ctx, communitySlug: string, data: CreateResourceInput) : Promise<ActionResult<ResourceCardItem>> => {
   try {
     console.log("[createResource] Received data:", JSON.stringify(data, null, 2));
 
-    const session = await auth();
-    if (!session?.user?.id) {
-      console.log("[createResource] No session found");
-      return { success: false, error: "No autorizado", code: "UNAUTHORIZED" };
-    }
+
+    const session = { user: { id: ctx.userId } };
     console.log("[createResource] User:", session.user.id);
 
     // Validar input
@@ -490,19 +500,22 @@ export async function createResource(
     return { success: false, error: "Error al crear recurso", code: "INTERNAL" };
   }
 }
+);
 
 /**
  * Actualizar un recurso existente
  */
-export async function updateResource(
-  resourceId: string,
-  data: UpdateResourceInput
-): Promise<ActionResult<ResourceWithCommunityCard>> {
+export const updateResource = defineAction(
+  {
+    name: "updateResource",
+    auth: "member",
+    args: [z.string().min(1).max(64), updateResourceSchema],
+    community: ([resourceId]) => communityOfResource(resourceId),
+  },
+  async (ctx, resourceId: string, data: UpdateResourceInput) : Promise<ActionResult<ResourceWithCommunityCard>> => {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return { success: false, error: "No autorizado", code: "UNAUTHORIZED" };
-    }
+
+    const session = { user: { id: ctx.userId } };
 
     // Validar input
     const validated = updateResourceSchema.parse({ ...data, id: resourceId });
@@ -558,16 +571,22 @@ export async function updateResource(
     return { success: false, error: "Error al actualizar recurso", code: "INTERNAL" };
   }
 }
+);
 
 /**
  * Eliminar un recurso
  */
-export async function deleteResource(resourceId: string): Promise<ActionResult<void>> {
+export const deleteResource = defineAction(
+  {
+    name: "deleteResource",
+    auth: "member",
+    args: [z.string().min(1).max(64)],
+    community: ([resourceId]) => communityOfResource(resourceId),
+  },
+  async (ctx, resourceId: string) : Promise<ActionResult<void>> => {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return { success: false, error: "No autorizado", code: "UNAUTHORIZED" };
-    }
+
+    const session = { user: { id: ctx.userId } };
 
     const permission = await checkResourcePermission(resourceId, session.user.id);
     if (!permission) {
@@ -600,18 +619,27 @@ export async function deleteResource(resourceId: string): Promise<ActionResult<v
     return { success: false, error: "Error al eliminar recurso", code: "INTERNAL" };
   }
 }
+);
 
 /**
  * Obtener recursos con filtros avanzados
  */
-export async function getResources(
-  filters: ResourceFilterInput
-): Promise<ActionResult<{ resources: ResourceListItem[]; total: number; hasMore: boolean }>> {
+export const getResources = defineAction(
+  {
+    name: "getResources",
+    auth: "member",
+    args: [resourceFilterSchema],
+    community: ([filters]) => {
+      const slug = (filters as { communitySlug?: string }).communitySlug;
+      return slug ? communityBySlug(slug) : null;
+    },
+  },
+  async (ctx, filters: ResourceFilterInput): Promise<
+    ActionResult<{ resources: ResourceListItem[]; total: number; hasMore: boolean }>
+  > => {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return { success: false, error: "No autorizado", code: "UNAUTHORIZED" };
-    }
+
+    const session = { user: { id: ctx.userId } };
 
     // Validar filtros
     const validated = resourceFilterSchema.parse(filters);
@@ -716,19 +744,22 @@ export async function getResources(
     return { success: false, error: "Error al obtener recursos", code: "INTERNAL" };
   }
 }
+);
 
 /**
  * Obtener un recurso por ID con detalles completos
  */
-export async function getResourceById(
-  resourceId: string,
-  communitySlug: string
-): Promise<ActionResult<ResourceDetailWithPermissions>> {
+export const getResourceById = defineAction(
+  {
+    name: "getResourceById",
+    auth: "member",
+    args: [z.string().min(1).max(64), z.string().min(1).max(120)],
+    community: ([, communitySlug]) => communityBySlug(communitySlug),
+  },
+  async (ctx, resourceId: string, communitySlug: string) : Promise<ActionResult<ResourceDetailWithPermissions>> => {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return { success: false, error: "No autorizado", code: "UNAUTHORIZED" };
-    }
+
+    const session = { user: { id: ctx.userId } };
 
     const access = await checkCommunityAccess(communitySlug, session.user.id);
     if (!access) {
@@ -796,6 +827,7 @@ export async function getResourceById(
     return { success: false, error: "Error al obtener recurso", code: "INTERNAL" };
   }
 }
+);
 
 // ============================================
 // PROGRESO Y LIKES
@@ -804,14 +836,21 @@ export async function getResourceById(
 /**
  * Actualizar progreso de un recurso
  */
-export async function updateResourceProgress(
-  data: ResourceProgressInput
-): Promise<ActionResult<ResourceProgress>> {
+export const updateResourceProgress = defineAction(
+  {
+    name: "updateResourceProgress",
+    auth: "member",
+    args: [resourceProgressSchema],
+    community: ([data]) => {
+      const resourceId = (data as { resourceId?: string }).resourceId;
+      return resourceId ? communityOfResource(resourceId) : null;
+    },
+    rateLimit: "general",
+  },
+  async (ctx, data: ResourceProgressInput) : Promise<ActionResult<ResourceProgress>> => {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return { success: false, error: "No autorizado", code: "UNAUTHORIZED" };
-    }
+
+    const session = { user: { id: ctx.userId } };
 
     const validated = resourceProgressSchema.parse(data);
 
@@ -866,18 +905,26 @@ export async function updateResourceProgress(
     return { success: false, error: "Error al actualizar progreso", code: "INTERNAL" };
   }
 }
+);
 
 /**
  * Toggle like en un recurso
  */
-export async function toggleResourceLike(
-  data: ToggleLikeInput
-): Promise<ActionResult<{ liked: boolean; likesCount: number }>> {
+export const toggleResourceLike = defineAction(
+  {
+    name: "toggleResourceLike",
+    auth: "member",
+    args: [toggleLikeSchema],
+    community: ([data]) => {
+      const resourceId = (data as { resourceId?: string }).resourceId;
+      return resourceId ? communityOfResource(resourceId) : null;
+    },
+    rateLimit: "create",
+  },
+  async (ctx, data: ToggleLikeInput): Promise<ActionResult<{ liked: boolean; likesCount: number }>> => {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return { success: false, error: "No autorizado", code: "UNAUTHORIZED" };
-    }
+
+    const session = { user: { id: ctx.userId } };
 
     const validated = toggleLikeSchema.parse(data);
 
@@ -940,19 +987,22 @@ export async function toggleResourceLike(
     return { success: false, error: "Error al procesar like", code: "INTERNAL" };
   }
 }
+);
 
 /**
  * Obtener recursos populares de una comunidad
  */
-export async function getPopularResources(
-  communitySlug: string,
-  limit: number = 5
-): Promise<ActionResult<ResourceCardItem[]>> {
+export const getPopularResources = defineAction(
+  {
+    name: "getPopularResources",
+    auth: "member",
+    args: [z.string().min(1).max(120), z.number().int().min(1).max(50).default(5)],
+    community: ([communitySlug]) => communityBySlug(communitySlug),
+  },
+  async (ctx, communitySlug: string, limit: number = 5) : Promise<ActionResult<ResourceCardItem[]>> => {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return { success: false, error: "No autorizado", code: "UNAUTHORIZED" };
-    }
+
+    const session = { user: { id: ctx.userId } };
 
     const access = await checkCommunityAccess(communitySlug, session.user.id);
     if (!access) {
@@ -988,19 +1038,22 @@ export async function getPopularResources(
     return { success: false, error: "Error al obtener recursos populares", code: "INTERNAL" };
   }
 }
+);
 
 /**
  * Obtener "Continue Watching" - recursos con progreso incompleto
  */
-export async function getContinueWatching(
-  communitySlug: string,
-  limit: number = 5
-): Promise<ActionResult<ResourceListItem[]>> {
+export const getContinueWatching = defineAction(
+  {
+    name: "getContinueWatching",
+    auth: "member",
+    args: [z.string().min(1).max(120), z.number().int().min(1).max(50).default(5)],
+    community: ([communitySlug]) => communityBySlug(communitySlug),
+  },
+  async (ctx, communitySlug: string, limit: number = 5) : Promise<ActionResult<ResourceListItem[]>> => {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return { success: false, error: "No autorizado", code: "UNAUTHORIZED" };
-    }
+
+    const session = { user: { id: ctx.userId } };
 
     const access = await checkCommunityAccess(communitySlug, session.user.id);
     if (!access) {
@@ -1049,6 +1102,7 @@ export async function getContinueWatching(
     return { success: false, error: "Error al obtener progreso", code: "INTERNAL" };
   }
 }
+);
 
 // Import z for error handling
 import { z } from "zod";

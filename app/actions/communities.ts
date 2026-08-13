@@ -3,36 +3,45 @@
 import { Prisma, type CommunityLayoutType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { getCurrentUserId } from "@/lib/auth-utils";
+import { z } from "zod";
+import { defineAction } from "@/lib/actions/define-action";
+import { communityById } from "@/lib/actions/resolvers";
 import { getLimitsForPlan } from "@/lib/plans";
 import { buildDefaultLandingLayout } from "@/lib/community-landing-template";
 
 /**
  * Create a new community
  */
-export async function createCommunity(data: {
-  name: string;
-  slug: string;
-  description?: string;
-  imageUrl?: string;
-  coverImageUrl?: string;
-  isPrivate?: boolean;
-  requireApproval?: boolean;
-  // Layout & Theme
-  layoutType?: string;
-  primaryColor?: string;
-  secondaryColor?: string;
-  accentColor?: string;
-  fontFamily?: string;
-  heroTitle?: string;
-  heroSubtitle?: string;
-}) {
+export const createCommunity = defineAction(
+  {
+    name: "createCommunity",
+    auth: "user",
+    args: [
+      z.object({
+        name: z.string().min(1).max(200),
+        slug: z.string().min(1).max(120),
+        description: z.string().max(10_000).optional(),
+        imageUrl: z.string().max(1000).optional(),
+        coverImageUrl: z.string().max(1000).optional(),
+        isPrivate: z.boolean().optional(),
+        requireApproval: z.boolean().optional(),
+        category: z.string().max(64).optional(),
+        language: z.string().max(8).optional(),
+        layoutType: z.string().max(32).optional(),
+        primaryColor: z.string().max(32).optional(),
+        secondaryColor: z.string().max(32).optional(),
+        accentColor: z.string().max(32).optional(),
+        fontFamily: z.string().max(64).optional(),
+        heroTitle: z.string().max(300).optional(),
+        heroSubtitle: z.string().max(1000).optional(),
+      }),
+    ],
+    rateLimit: "create",
+  },
+  async (ctx, data: { name: string; slug: string; description?: string; imageUrl?: string; coverImageUrl?: string; isPrivate?: boolean; requireApproval?: boolean; layoutType?: string; primaryColor?: string; secondaryColor?: string; accentColor?: string; fontFamily?: string; heroTitle?: string; heroSubtitle?: string; }) => {
   try {
-    const userId = await getCurrentUserId();
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const userId = ctx.userId;
 
     // DEBUG: Verify user exists in database
     const userExists = await prisma.user.findUnique({
@@ -149,27 +158,32 @@ export async function createCommunity(data: {
     };
   }
 }
+);
 
 /**
  * Update community details
  */
-export async function updateCommunity(
-  communityId: string,
-  data: {
-    name?: string;
-    description?: string;
-    imageUrl?: string;
-    coverImageUrl?: string;
-    isPrivate?: boolean;
-    requireApproval?: boolean;
-  }
-) {
+export const updateCommunity = defineAction(
+  {
+    name: "updateCommunity",
+    auth: "admin",
+    args: [
+      z.string().min(1).max(64),
+      z.object({
+        name: z.string().min(1).max(200).optional(),
+        description: z.string().max(10_000).optional(),
+        imageUrl: z.string().max(1000).optional(),
+        coverImageUrl: z.string().max(1000).optional(),
+        isPrivate: z.boolean().optional(),
+        requireApproval: z.boolean().optional(),
+      }),
+    ],
+    community: ([communityId]) => communityById(communityId),
+  },
+  async (ctx, communityId: string, data: { name?: string; description?: string; imageUrl?: string; coverImageUrl?: string; isPrivate?: boolean; requireApproval?: boolean; }) => {
   try {
-    const userId = await getCurrentUserId();
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const userId = ctx.userId;
 
     // Verify user is owner or admin
     const member = await prisma.member.findFirst({
@@ -196,17 +210,22 @@ export async function updateCommunity(
     return { success: false, error: "Failed to update community" };
   }
 }
+);
 
 /**
  * Join a community
  */
-export async function joinCommunity(communityId: string) {
+export const joinCommunity = defineAction(
+  {
+    name: "joinCommunity",
+    auth: "user",
+    args: [z.string().min(1).max(64)],
+    rateLimit: "create",
+  },
+  async (ctx, communityId: string) => {
   try {
-    const userId = await getCurrentUserId();
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const userId = ctx.userId;
 
     // Check if already a member
     const existingMember = await prisma.member.findUnique({
@@ -284,17 +303,23 @@ export async function joinCommunity(communityId: string) {
     return { success: false, error: "Failed to join community" };
   }
 }
+);
 
 /**
  * Leave a community
  */
-export async function leaveCommunity(communityId: string) {
+export const leaveCommunity = defineAction(
+  {
+    name: "leaveCommunity",
+    auth: "member",
+    args: [z.string().min(1).max(64)],
+    community: ([communityId]) => communityById(communityId),
+    allowPaywallLocked: true,
+  },
+  async (ctx, communityId: string) => {
   try {
-    const userId = await getCurrentUserId();
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const userId = ctx.userId;
 
     // Get member info
     const member = await prisma.member.findUnique({
@@ -348,18 +373,26 @@ export async function leaveCommunity(communityId: string) {
     return { success: false, error: "Failed to leave community" };
   }
 }
+);
 
 /**
  * Delete a community (owner only)
  */
-export async function deleteCommunity(communityId: string) {
+export const deleteCommunity = defineAction(
+  {
+    name: "deleteCommunity",
+    auth: "admin",
+    args: [z.string().min(1).max(64)],
+    community: ([communityId]) => communityById(communityId),
+    roles: ["OWNER"],
+    allowPaywallLocked: true,
+  },
+  async (ctx, communityId: string) => {
   try {
     console.log("🗑️ Attempting to delete community:", communityId);
 
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Unauthorized" };
-    }
+
+    const userId = ctx.userId;
 
     // Verify user is the owner
     const community = await prisma.community.findUnique({
@@ -490,17 +523,21 @@ export async function deleteCommunity(communityId: string) {
     };
   }
 }
+);
 
 /**
  * Get user's communities
  */
-export async function getUserCommunities() {
+export const getUserCommunities = defineAction(
+  {
+    name: "getUserCommunities",
+    auth: "user",
+    args: [],
+  },
+  async (ctx) => {
   try {
-    const userId = await getCurrentUserId();
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const userId = ctx.userId;
 
     const memberships = await prisma.member.findMany({
       where: {
@@ -548,16 +585,21 @@ export async function getUserCommunities() {
     return { success: false, error: "Failed to get communities" };
   }
 }
+);
 
 /**
  * Check if the current user can create another community based on their plan
  */
-export async function checkCommunityPlanLimit() {
+export const checkCommunityPlanLimit = defineAction(
+  {
+    name: "checkCommunityPlanLimit",
+    auth: "user",
+    args: [],
+  },
+  async (ctx) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { canCreate: false, plan: "START", current: 0, max: 1 };
-    }
+
+    const userId = ctx.userId;
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -580,3 +622,4 @@ export async function checkCommunityPlanLimit() {
     return { canCreate: true, plan: "START", current: 0, max: 1 };
   }
 }
+);

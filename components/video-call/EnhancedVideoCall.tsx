@@ -19,9 +19,15 @@ import {
 import { LivePoll, PollCreator, Poll } from "@/components/live-session/LivePoll";
 import { Reaction, ReactionType, createReaction } from "@/lib/live-reactions";
 import { motion, AnimatePresence } from "framer-motion";
+import { joinSession } from "@/app/actions/livekit";
 
 interface EnhancedVideoCallProps {
-  roomName: string;
+  /**
+   * The room is resolved server-side from this id. A client-supplied roomName
+   * is what let any account mint a publish-capable token for an arbitrary
+   * room (SEC-03), so it is no longer a prop.
+   */
+  sessionId: string;
   participantName: string;
   userId: string;
   onDisconnect?: () => void;
@@ -29,7 +35,7 @@ interface EnhancedVideoCallProps {
 }
 
 export function EnhancedVideoCall({
-  roomName,
+  sessionId,
   participantName,
   userId,
   onDisconnect,
@@ -46,23 +52,16 @@ export function EnhancedVideoCall({
         setLoading(true);
         setError(null);
 
-        const response = await fetch("/api/livekit/token", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            roomName,
-            participantName,
-          }),
-        });
+        const result = await joinSession(sessionId);
 
-        if (!response.ok) {
-          const data = await response.json();
-          throw new Error(data.error || "Failed to get access token");
+        if (!result.success || !("access" in result) || !result.access) {
+          throw new Error(
+            ("error" in result && result.error) || "Failed to get access token"
+          );
         }
 
-        const data = await response.json();
-        setToken(data.token);
-        setWsUrl(data.wsUrl);
+        setToken(result.access.token);
+        setWsUrl(result.access.wsUrl);
       } catch (err) {
         console.error("Error fetching token:", err);
         setError(err instanceof Error ? err.message : "Failed to connect to video call");
@@ -72,7 +71,7 @@ export function EnhancedVideoCall({
     }
 
     fetchToken();
-  }, [roomName, participantName]);
+  }, [sessionId]);
 
   if (loading) {
     return (

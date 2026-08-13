@@ -1,5 +1,6 @@
 import nextCoreWebVitals from "eslint-config-next/core-web-vitals";
 import nextTypescript from "eslint-config-next/typescript";
+import unytea from "./eslint-rules/no-bare-server-action.mjs";
 
 export default [
   {
@@ -76,6 +77,20 @@ export default [
       "jsx-a11y/alt-text": "warn",
       "react/display-name": "warn",
       "prefer-const": "warn",
+    },
+  },
+  {
+    // SEC-02 gate. Every export of a "use server" module is a public POST
+    // endpoint, so each one must declare an auth level through defineAction.
+    //
+    // Blocking as of the commit that migrated the last of the 224 actions.
+    // Paired with tests/unit/action-authz.test.ts, which catches the case this
+    // rule cannot see: an action that goes through defineAction but declares
+    // auth: "public" without being on the reviewed allowlist.
+    files: ["app/**/*.ts", "app/**/*.tsx", "lib/**/*.ts"],
+    plugins: { unytea },
+    rules: {
+      "unytea/no-bare-server-action": "error",
     },
   },
 ];

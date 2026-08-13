@@ -1,11 +1,14 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getCurrentUserId } from "@/lib/auth-utils";
+import { z } from "zod";
+import { defineAction } from "@/lib/actions/define-action";
+import { communityById, communityOfSeries, communityOfSession } from "@/lib/actions/resolvers";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { nanoid } from "nanoid";
-import { startSessionAutopilot } from "./autopilot";
+import { startSessionAutopilot } from "@/lib/jobs/autopilot";
+import { generateUpcomingSessions } from "@/lib/jobs/session-schedule";
 
 /** Sesión con el mentor incluido (shape de las acciones de creación). */
 type SessionWithMentor = Prisma.MentorSessionGetPayload<{
@@ -27,23 +30,37 @@ export type SessionDetail = Prisma.MentorSessionGetPayload<{
 /**
  * Create a new video session
  */
-export async function createSession(data: {
-  title: string;
-  description?: string;
-  scheduledAt: Date;
-  duration: number; // in minutes
-  communityId?: string;
-  isPrivate?: boolean;
-  recurrence?: "weekly" | "monthly";
-  recurrenceCount?: number;
-  postToFeed?: boolean; // Whether to auto-post to community feed (default: true)
-}) {
+export const createSession = defineAction(
+  {
+    name: "createSession",
+    // Owner-only: hosting a live session is the community owner's act, not
+    // something any member may do. Enforced through the seam rather than a
+    // hand-rolled check, so the H9 harness and the lint rule can see it.
+    //
+    // ADMIN is deliberately excluded — widening later is a one-word change to
+    // `roles`. communityId is required (see the interface note below), so there
+    // is no ungated path around this.
+    auth: "admin",
+    roles: ["OWNER"],
+    community: ([data]) => communityById(data.communityId),
+    args: [
+      z.object({
+        title: z.string().min(1).max(300),
+        description: z.string().max(10_000).optional(),
+        scheduledAt: z.coerce.date(),
+        duration: z.number().int().min(1).max(1440),
+        communityId: z.string().min(1).max(64),
+        isPrivate: z.boolean().optional(),
+        recurrence: z.enum(["weekly", "monthly"]).optional(),
+        recurrenceCount: z.number().int().min(1).max(52).optional(),
+        postToFeed: z.boolean().optional(),
+      }),
+    ],
+    rateLimit: "create",
+  },
+  async (ctx, data: { title: string; description?: string; scheduledAt: Date; duration: number; communityId: string; isPrivate?: boolean; recurrence?: "weekly" | "monthly"; recurrenceCount?: number; postToFeed?: boolean; }) => {
   try {
-    const userId = await getCurrentUserId();
-
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const userId = ctx.userId;
 
     // Generate unique room ID
     const roomId = `session-${nanoid(12)}`;
@@ -129,7 +146,7 @@ export async function createSession(data: {
           if (community?.slug) {
             revalidatePath(`/dashboard/c/${community.slug}/feed`);
           }
-        } catch (e) {
+        } catch {
           // Ignore if community lookup fails
         }
       } catch (postError) {
@@ -146,17 +163,21 @@ export async function createSession(data: {
     return { success: false, error: "Failed to create session" };
   }
 }
+);
 
 /**
  * Get user's sessions
  */
-export async function getUserSessions() {
+export const getUserSessions = defineAction(
+  {
+    name: "getUserSessions",
+    auth: "user",
+    args: [],
+  },
+  async (ctx) => {
   try {
-    const userId = await getCurrentUserId();
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const userId = ctx.userId;
 
     // Get community IDs where the user is an active member
     const userMemberships = await prisma.member.findMany({
@@ -220,17 +241,22 @@ export async function getUserSessions() {
     return { success: false, error: "Failed to fetch sessions" };
   }
 }
+);
 
 /**
  * Get a specific session
  */
-export async function getSession(sessionId: string) {
+export const getSession = defineAction(
+  {
+    name: "getSession",
+    auth: "member",
+    args: [z.string().min(1).max(64)],
+    community: ([sessionId]) => communityOfSession(sessionId),
+  },
+  async (ctx, sessionId: string) => {
   try {
-    const userId = await getCurrentUserId();
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const userId = ctx.userId;
 
     const session = await prisma.mentorSession.findUnique({
       where: { id: sessionId },
@@ -309,17 +335,22 @@ export async function getSession(sessionId: string) {
     return { success: false, error: "Failed to fetch session" };
   }
 }
+);
 
 /**
  * Start a session
  */
-export async function startSession(sessionId: string) {
+export const startSession = defineAction(
+  {
+    name: "startSession",
+    auth: "member",
+    args: [z.string().min(1).max(64)],
+    community: ([sessionId]) => communityOfSession(sessionId),
+  },
+  async (ctx, sessionId: string) => {
   try {
-    const userId = await getCurrentUserId();
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const userId = ctx.userId;
 
     const session = await prisma.mentorSession.findUnique({
       where: { id: sessionId },
@@ -349,58 +380,23 @@ export async function startSession(sessionId: string) {
     return { success: false, error: "Failed to start session" };
   }
 }
+);
 
-/**
- * End a session
- */
-export async function endSession(sessionId: string, notes?: string) {
-  try {
-    const userId = await getCurrentUserId();
-
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
-
-    const session = await prisma.mentorSession.findUnique({
-      where: { id: sessionId },
-    });
-
-    if (!session) {
-      return { success: false, error: "Session not found" };
-    }
-
-    // Check if user is mentor
-    if (session.mentorId !== userId) {
-      return { success: false, error: "Only the host can end the session" };
-    }
-
-    const updatedSession = await prisma.mentorSession.update({
-      where: { id: sessionId },
-      data: {
-        status: "COMPLETED",
-        endedAt: new Date(),
-        mentorNotes: notes,
-      },
-    });
-
-    revalidatePath("/dashboard/sessions");
-    return { success: true, session: updatedSession };
-  } catch (error) {
-    console.error("Error ending session:", error);
-    return { success: false, error: "Failed to end session" };
-  }
-}
 
 /**
  * Cancel a session
  */
-export async function cancelSession(sessionId: string) {
+export const cancelSession = defineAction(
+  {
+    name: "cancelSession",
+    auth: "member",
+    args: [z.string().min(1).max(64)],
+    community: ([sessionId]) => communityOfSession(sessionId),
+  },
+  async (ctx, sessionId: string) => {
   try {
-    const userId = await getCurrentUserId();
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const userId = ctx.userId;
 
     const session = await prisma.mentorSession.findUnique({
       where: { id: sessionId },
@@ -429,14 +425,21 @@ export async function cancelSession(sessionId: string) {
     return { success: false, error: "Failed to cancel session" };
   }
 }
+);
 
 /**
  * Delete a session
  */
-export async function getCommunityAttendanceMetrics(communityId: string, days: number = 30) {
+export const getCommunityAttendanceMetrics = defineAction(
+  {
+    name: "getCommunityAttendanceMetrics",
+    auth: "member",
+    args: [z.string().min(1).max(64), z.number().int().min(1).max(365).default(30)],
+    community: ([communityId]) => communityById(communityId),
+  },
+  async (_ctx, communityId: string, days: number = 30) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) return { success: false, error: "Not authenticated" };
+
 
     const now = Date.now();
     const since = new Date(now - days * 24 * 60 * 60 * 1000);
@@ -560,14 +563,19 @@ export async function getCommunityAttendanceMetrics(communityId: string, days: n
     return { success: false, error: "Failed to load attendance metrics" };
   }
 }
+);
 
-export async function deleteSession(sessionId: string) {
+export const deleteSession = defineAction(
+  {
+    name: "deleteSession",
+    auth: "member",
+    args: [z.string().min(1).max(64)],
+    community: ([sessionId]) => communityOfSession(sessionId),
+  },
+  async (ctx, sessionId: string) => {
   try {
-    const userId = await getCurrentUserId();
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const userId = ctx.userId;
 
     const session = await prisma.mentorSession.findUnique({
       where: { id: sessionId },
@@ -593,6 +601,7 @@ export async function deleteSession(sessionId: string) {
     return { success: false, error: "Failed to delete session" };
   }
 }
+);
 
 // ============================================
 // RECURRING SESSIONS V1
@@ -606,7 +615,15 @@ interface CreateSessionOrSeriesInput {
   scheduledAt: Date;
   duration: number;
   timezone: string;
-  communityId?: string;
+  /**
+   * Required. The column is nullable for backward compatibility, but a session
+   * with no community escapes the tenant gate entirely and is half-broken
+   * downstream: it cannot be converted to a course (session-course.ts rejects
+   * it), gets no autopilot (lib/jobs/autopilot.ts bails) and no recap
+   * (lib/jobs/session-jobs.ts bails). There is no standalone-session feature in
+   * the UI, so every session is created inside a community.
+   */
+  communityId: string;
   postToFeed?: boolean;
   mode?: "VIDEO" | "AUDIO"; // Session mode: video or audio-only
   // Recurrence fields
@@ -621,13 +638,37 @@ interface CreateSessionOrSeriesInput {
  * Create a single session or a recurring series
  * This is the main entry point for V1 recurring sessions
  */
-export async function createSessionOrSeries(data: CreateSessionOrSeriesInput) {
+export const createSessionOrSeries = defineAction(
+  {
+    name: "createSessionOrSeries",
+    // Owner-only, matching createSession. A series additionally generates
+    // future sessions, a feed post and autopilot jobs in the community, so it
+    // must not sit below the single-session bar.
+    auth: "admin",
+    roles: ["OWNER"],
+    community: ([data]) => communityById(data.communityId),
+    args: [
+      z.object({
+        title: z.string().min(1).max(300),
+        description: z.string().max(10_000).optional(),
+        scheduledAt: z.coerce.date(),
+        duration: z.number().int().min(1).max(1440),
+        timezone: z.string().max(64),
+        communityId: z.string().min(1).max(64),
+        postToFeed: z.boolean().optional(),
+        mode: z.enum(["VIDEO", "AUDIO"]).optional(),
+        repeat: z.enum(["once", "WEEKLY", "MONTHLY"]).optional(),
+        interval: z.number().int().min(1).max(52).optional(),
+        dayOfWeek: z.number().int().min(0).max(6).optional(),
+        dayOfMonth: z.number().int().min(1).max(31).optional(),
+        generateCount: z.number().int().min(1).max(52).optional(),
+      }),
+    ],
+    rateLimit: "create",
+  },
+  async (ctx, data: CreateSessionOrSeriesInput) => {
   try {
-    const userId = await getCurrentUserId();
-
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const userId = ctx.userId;
 
     // Default to "once" if not specified
     const repeat = data.repeat || "once";
@@ -652,6 +693,7 @@ export async function createSessionOrSeries(data: CreateSessionOrSeriesInput) {
     return { success: false, error: "Failed to create session" };
   }
 }
+);
 
 /**
  * Create a single one-time session
@@ -805,107 +847,32 @@ async function createRecurringSeries(
   };
 }
 
-/**
- * Generate upcoming session dates for a series
- * Pure function - no DB operations
- */
-export async function generateUpcomingSessions(
-  series: {
-    frequency: SessionFrequency;
-    interval: number;
-    dayOfWeek?: number | null;
-    dayOfMonth?: number | null;
-    startTime: string;
-    durationMinutes: number;
-    timezone: string;
-    startsAt: Date;
-  },
-  count: number
-): Promise<Array<{ scheduledAt: Date; endsAt: Date }>> {
-  const instances: Array<{ scheduledAt: Date; endsAt: Date }> = [];
 
-  let currentDate = new Date(series.startsAt);
-
-  for (let i = 0; i < count; i++) {
-    // Calculate next occurrence
-    if (
-      series.frequency === "WEEKLY" &&
-      series.dayOfWeek !== null &&
-      series.dayOfWeek !== undefined
-    ) {
-      // Set to the correct day of week
-      const dayDiff = series.dayOfWeek - currentDate.getDay();
-      currentDate.setDate(currentDate.getDate() + dayDiff);
-
-      // If we've passed this day this week, move to next week
-      if (dayDiff < 0 || (dayDiff === 0 && i > 0)) {
-        currentDate.setDate(currentDate.getDate() + 7 * series.interval);
-      }
-    } else if (
-      series.frequency === "MONTHLY" &&
-      series.dayOfMonth !== null &&
-      series.dayOfMonth !== undefined
-    ) {
-      // Set to the correct day of month
-      currentDate.setDate(series.dayOfMonth);
-
-      // Move to next month if needed
-      if (i > 0) {
-        currentDate.setMonth(currentDate.getMonth() + series.interval);
-      }
-    } else {
-      // Simple interval (add days or months)
-      if (series.frequency === "WEEKLY") {
-        currentDate.setDate(currentDate.getDate() + 7 * series.interval);
-      } else {
-        currentDate.setMonth(currentDate.getMonth() + series.interval);
-      }
-    }
-
-    // Parse startTime (e.g., "10:00") and apply to currentDate
-    const [hours, minutes] = series.startTime.split(":").map(Number);
-    const scheduledAt = new Date(currentDate);
-    scheduledAt.setHours(hours, minutes, 0, 0);
-
-    // Calculate end time
-    const endsAt = new Date(scheduledAt);
-    endsAt.setMinutes(endsAt.getMinutes() + series.durationMinutes);
-
-    instances.push({ scheduledAt, endsAt });
-
-    // Advance for next iteration
-    if (series.frequency === "WEEKLY") {
-      currentDate = new Date(scheduledAt);
-      currentDate.setDate(currentDate.getDate() + 7 * series.interval);
-    } else {
-      currentDate = new Date(scheduledAt);
-      currentDate.setMonth(currentDate.getMonth() + series.interval);
-    }
-  }
-
-  return instances;
-}
 
 /**
  * Edit a single session instance
  * Use when user selects "This session only"
  */
-export async function editSession(
-  sessionId: string,
-  data: {
-    title?: string;
-    description?: string;
-    scheduledAt?: Date;
-    duration?: number;
-    status?: "SCHEDULED" | "CANCELLED";
-  }
-) {
+export const editSession = defineAction(
+  {
+    name: "editSession",
+    auth: "member",
+    args: [
+      z.string().min(1).max(64),
+      z.object({
+        title: z.string().min(1).max(300).optional(),
+        description: z.string().max(10_000).optional(),
+        scheduledAt: z.coerce.date().optional(),
+        duration: z.number().int().min(1).max(1440).optional(),
+        status: z.enum(["SCHEDULED", "CANCELLED"]).optional(),
+      }),
+    ],
+    community: ([sessionId]) => communityOfSession(sessionId),
+  },
+  async (ctx, sessionId: string, data: { title?: string; description?: string; scheduledAt?: Date; duration?: number; status?: "SCHEDULED" | "CANCELLED"; }) => {
   try {
-    const userId = await getCurrentUserId();
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const userId = ctx.userId;
 
     const session = await prisma.mentorSession.findUnique({
       where: { id: sessionId },
@@ -945,29 +912,34 @@ export async function editSession(
     return { success: false, error: "Failed to edit session" };
   }
 }
+);
 
 /**
  * Edit series from a session instance
  * Use when user selects "This and future sessions"
  * Updates the series rules and regenerates future instances
  */
-export async function editSeriesFromSession(
-  sessionId: string,
-  data: {
-    title?: string;
-    description?: string;
-    scheduledAt?: Date; // new start date/time
-    duration?: number;
-    interval?: number;
-    isActive?: boolean;
-  }
-) {
+export const editSeriesFromSession = defineAction(
+  {
+    name: "editSeriesFromSession",
+    auth: "member",
+    args: [
+      z.string().min(1).max(64),
+      z.object({
+        title: z.string().min(1).max(300).optional(),
+        description: z.string().max(10_000).optional(),
+        scheduledAt: z.coerce.date().optional(),
+        duration: z.number().int().min(1).max(1440).optional(),
+        interval: z.number().int().min(1).max(52).optional(),
+        isActive: z.boolean().optional(),
+      }),
+    ],
+    community: ([sessionId]) => communityOfSession(sessionId),
+  },
+  async (ctx, sessionId: string, data: { title?: string; description?: string; scheduledAt?: Date; duration?: number; interval?: number; isActive?: boolean; }) => {
   try {
-    const userId = await getCurrentUserId();
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const userId = ctx.userId;
 
     const session = await prisma.mentorSession.findUnique({
       where: { id: sessionId },
@@ -1063,17 +1035,21 @@ export async function editSeriesFromSession(
     return { success: false, error: "Failed to update series" };
   }
 }
+);
 
 /**
  * Get sessions for a community (including recurring series instances)
  */
-export async function getCommunitySessions(communityId: string) {
+export const getCommunitySessions = defineAction(
+  {
+    name: "getCommunitySessions",
+    auth: "member",
+    args: [z.string().min(1).max(64)],
+    community: ([communityId]) => communityById(communityId),
+  },
+  async (_ctx, communityId: string) => {
   try {
-    const userId = await getCurrentUserId();
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
 
     const sessions = await prisma.mentorSession.findMany({
       where: {
@@ -1101,17 +1077,22 @@ export async function getCommunitySessions(communityId: string) {
     return { success: false, error: "Failed to fetch sessions" };
   }
 }
+);
 
 /**
  * Get a session series with its instances
  */
-export async function getSessionSeries(seriesId: string) {
+export const getSessionSeries = defineAction(
+  {
+    name: "getSessionSeries",
+    auth: "member",
+    args: [z.string().min(1).max(64)],
+    community: ([seriesId]) => communityOfSeries(seriesId),
+  },
+  async (ctx, seriesId: string) => {
   try {
-    const userId = await getCurrentUserId();
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const userId = ctx.userId;
 
     const series = await prisma.sessionSeries.findUnique({
       where: { id: seriesId },
@@ -1144,6 +1125,7 @@ export async function getSessionSeries(seriesId: string) {
     return { success: false, error: "Failed to fetch series" };
   }
 }
+);
 
 /**
  * RSVP status helper
@@ -1163,17 +1145,18 @@ function getRsvpStatusFromEventsData(
 /**
  * Set RSVP status for a scheduled session
  */
-export async function setSessionRSVPStatus(
-  sessionId: string,
-  status: "attending" | "interested" | "none",
-  revalidateTargetPath?: string
-) {
+export const setSessionRSVPStatus = defineAction(
+  {
+    name: "setSessionRSVPStatus",
+    auth: "member",
+    args: [z.string().min(1).max(64), z.enum(["attending", "interested", "none"]), z.string().max(300).optional()],
+    community: ([sessionId]) => communityOfSession(sessionId),
+    rateLimit: "create",
+  },
+  async (ctx, sessionId: string, status: "attending" | "interested" | "none", revalidateTargetPath?: string) => {
   try {
-    const userId = await getCurrentUserId();
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const userId = ctx.userId;
 
     const session = await prisma.mentorSession.findUnique({
       where: { id: sessionId },
@@ -1307,11 +1290,20 @@ export async function setSessionRSVPStatus(
     return { success: false, error: "Failed to update RSVP" };
   }
 }
+);
 
 /**
  * RSVP toggle (backward compatibility)
  */
-export async function toggleSessionRSVP(sessionId: string, revalidateTargetPath?: string) {
+export const toggleSessionRSVP = defineAction(
+  {
+    name: "toggleSessionRSVP",
+    auth: "member",
+    args: [z.string().min(1).max(64), z.string().max(300).optional()],
+    community: ([sessionId]) => communityOfSession(sessionId),
+    rateLimit: "create",
+  },
+  async (_ctx, sessionId: string, revalidateTargetPath?: string) => {
   const result = await setSessionRSVPStatus(sessionId, "attending", revalidateTargetPath);
   if (!result.success) return result;
 
@@ -1324,15 +1316,23 @@ export async function toggleSessionRSVP(sessionId: string, revalidateTargetPath?
     isInterested: result.isInterested,
   };
 }
+);
 
 /**
  * Get RSVP status for current user + attending/interested counts
  */
-export async function getSessionRSVPStatus(sessionId: string) {
+export const getSessionRSVPStatus = defineAction(
+  {
+    name: "getSessionRSVPStatus",
+    auth: "member",
+    args: [z.string().min(1).max(64)],
+    community: ([sessionId]) => communityOfSession(sessionId),
+  },
+  async (ctx, sessionId: string) => {
   try {
-    const userId = await getCurrentUserId();
 
-    const [attendingCount, interestedCount, existing, attendingPreview] = await Promise.all([
+    const userId = ctx.userId;
+const [attendingCount, interestedCount, existing, attendingPreview] = await Promise.all([
       prisma.sessionParticipation.count({
         where: {
           sessionId,
@@ -1404,6 +1404,7 @@ export async function getSessionRSVPStatus(sessionId: string) {
     };
   }
 }
+);
 
 // ============================================
 // HELPERS

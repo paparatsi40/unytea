@@ -1,238 +1,179 @@
 "use server";
 
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { revalidateLocalizedPath } from "@/lib/cache-invalidation";
-import { getCurrentUserId } from "@/lib/auth-utils";
 import { PostContentType } from "@prisma/client";
+import { defineAction } from "@/lib/actions/define-action";
+import { assertPostAuthor, assertPostAuthorOrModerator } from "@/lib/actions/guards";
+import { communityById, communityOfPost } from "@/lib/actions/resolvers";
+
+const postIdSchema = z.string().min(1).max(64);
 
 /**
- * Create a new post
+ * Posts.
+ *
+ * These already carried hand-written membership and role checks, which were
+ * correct. Routing them through the seam keeps that behaviour but moves the
+ * decision into one reviewable place, adds Zod bounds on user content, and
+ * brings rate limiting — none of these had any.
  */
-export async function createPost(formData: FormData) {
-  try {
-    const userId = await getCurrentUserId();
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
-
+export const createPost = defineAction(
+  {
+    name: "createPost",
+    auth: "member",
+    args: [z.instanceof(FormData)],
+    community: ([formData]) => {
+      const communityId = formData.get("communityId");
+      return typeof communityId === "string" && communityId ? communityById(communityId) : null;
+    },
+    rateLimit: "create",
+  },
+  async (ctx, formData) => {
     const communityId = formData.get("communityId") as string;
     const content = formData.get("content") as string;
     const title = formData.get("title") as string | null;
     const contentType = (formData.get("contentType") as string | null) || "DISCUSSION";
     const attachmentsRaw = formData.get("attachments") as string | null;
 
-    if (!communityId || (!content?.trim() && !attachmentsRaw)) {
-      return { success: false, error: "Missing required fields" };
+    if (!content?.trim() && !attachmentsRaw) {
+      return { success: false as const, error: "Missing required fields" };
+    }
+    // FormData bypasses the args schema for its individual fields, so bound the
+    // user-supplied strings explicitly here.
+    if ((content?.length ?? 0) > 50_000 || (title?.length ?? 0) > 300) {
+      return { success: false as const, error: "Content is too long" };
     }
 
-    // Verify user is a member
-    const member = await prisma.member.findUnique({
-      where: {
-        userId_communityId: {
-          userId,
-          communityId,
-        },
-      },
-    });
-
-    if (!member || member.status !== "ACTIVE") {
-      return { success: false, error: "Not a member of this community" };
-    }
-
-    const parsedAttachments = attachmentsRaw ? JSON.parse(attachmentsRaw) : null;
-    const normalizedContent = content?.trim() || (parsedAttachments ? "Shared an attachment" : "");
-
-    // Create post
-    const post = await prisma.post.create({
-      data: {
-        title: title || null,
-        content: normalizedContent,
-        authorId: userId,
-        communityId,
-        isPublished: true,
-        publishedAt: new Date(),
-        attachments: parsedAttachments,
-        contentType: ["DISCUSSION", "QUESTION", "ANNOUNCEMENT", "RESOURCE"].includes(contentType)
-          ? (contentType as PostContentType)
-          : "DISCUSSION",
-      },
-    });
-
-    // Update community post count
-    await prisma.community.update({
-      where: { id: communityId },
-      data: {
-        postCount: {
-          increment: 1,
-        },
-      },
-    });
-
-    revalidateLocalizedPath("/c/[slug]", "page");
-    return { success: true, post };
-  } catch (error) {
-    console.error("Error creating post:", error);
-    return { success: false, error: "Failed to create post" };
-  }
-}
-
-/**
- * Delete a post
- */
-export async function deletePost(postId: string) {
-  try {
-    const userId = await getCurrentUserId();
-
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
-
-    // Get post
-    const post = await prisma.post.findUnique({
-      where: { id: postId },
-      include: {
-        community: true,
-      },
-    });
-
-    if (!post) {
-      return { success: false, error: "Post not found" };
-    }
-
-    // Check if user is author or community owner/admin
-    if (post.authorId !== userId) {
-      const member = await prisma.member.findUnique({
-        where: {
-          userId_communityId: {
-            userId,
-            communityId: post.communityId,
-          },
-        },
-      });
-
-      if (!member || !["OWNER", "ADMIN", "MODERATOR"].includes(member.role)) {
-        return { success: false, error: "Not authorized to delete this post" };
+    let parsedAttachments: unknown = null;
+    if (attachmentsRaw) {
+      try {
+        parsedAttachments = JSON.parse(attachmentsRaw);
+      } catch {
+        return { success: false as const, error: "Invalid attachments" };
       }
     }
 
-    // Delete post
-    await prisma.post.delete({
-      where: { id: postId },
-    });
+    const normalizedContent = content?.trim() || (parsedAttachments ? "Shared an attachment" : "");
 
-    // Update community post count
-    await prisma.community.update({
-      where: { id: post.communityId },
-      data: {
-        postCount: {
-          decrement: 1,
+    // Post and counter written together so a mid-write failure cannot leave
+    // community.postCount drifting from reality (ARCH-04).
+    const post = await prisma.$transaction(async (tx) => {
+      const created = await tx.post.create({
+        data: {
+          title: title || null,
+          content: normalizedContent,
+          authorId: ctx.userId,
+          communityId,
+          isPublished: true,
+          publishedAt: new Date(),
+          attachments: parsedAttachments as never,
+          contentType: ["DISCUSSION", "QUESTION", "ANNOUNCEMENT", "RESOURCE"].includes(contentType)
+            ? (contentType as PostContentType)
+            : "DISCUSSION",
         },
-      },
+      });
+
+      await tx.community.update({
+        where: { id: communityId },
+        data: { postCount: { increment: 1 } },
+      });
+
+      return created;
     });
 
     revalidateLocalizedPath("/c/[slug]", "page");
-    return { success: true };
-  } catch (error) {
-    console.error("Error deleting post:", error);
-    return { success: false, error: "Failed to delete post" };
+    return { success: true as const, post };
   }
-}
+);
 
-/**
- * Update a post
- */
-export async function updatePost(postId: string, formData: FormData) {
-  try {
-    const userId = await getCurrentUserId();
+export const deletePost = defineAction(
+  {
+    name: "deletePost",
+    auth: "member",
+    args: [postIdSchema],
+    community: ([postId]) => communityOfPost(postId),
+  },
+  async (ctx, postId) => {
+    await assertPostAuthorOrModerator(ctx, postId);
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
+    const post = await prisma.post.findUnique({
+      where: { id: postId },
+      select: { communityId: true },
+    });
+    if (!post) {
+      return { success: false as const, error: "Post not found" };
     }
+
+    await prisma.$transaction(async (tx) => {
+      await tx.post.delete({ where: { id: postId } });
+      await tx.community.update({
+        where: { id: post.communityId },
+        data: { postCount: { decrement: 1 } },
+      });
+    });
+
+    revalidateLocalizedPath("/c/[slug]", "page");
+    return { success: true as const };
+  }
+);
+
+export const updatePost = defineAction(
+  {
+    name: "updatePost",
+    auth: "member",
+    args: [postIdSchema, z.instanceof(FormData)],
+    community: ([postId]) => communityOfPost(postId),
+  },
+  async (ctx, postId, formData) => {
+    // Editing is author-only — a moderator may remove a post but must not
+    // rewrite someone else's words.
+    await assertPostAuthor(ctx, postId);
 
     const content = formData.get("content") as string;
     const title = formData.get("title") as string | null;
 
     if (!content) {
-      return { success: false, error: "Content is required" };
+      return { success: false as const, error: "Content is required" };
+    }
+    if (content.length > 50_000 || (title?.length ?? 0) > 300) {
+      return { success: false as const, error: "Content is too long" };
     }
 
-    // Get post
-    const post = await prisma.post.findUnique({
-      where: { id: postId },
-    });
-
-    if (!post) {
-      return { success: false, error: "Post not found" };
-    }
-
-    // Check if user is author
-    if (post.authorId !== userId) {
-      return { success: false, error: "Not authorized to edit this post" };
-    }
-
-    // Update post
     const updatedPost = await prisma.post.update({
       where: { id: postId },
-      data: {
-        title: title || null,
-        content,
-      },
+      data: { title: title || null, content },
     });
 
     revalidateLocalizedPath("/c/[slug]", "page");
-    return { success: true, post: updatedPost };
-  } catch (error) {
-    console.error("Error updating post:", error);
-    return { success: false, error: "Failed to update post" };
+    return { success: true as const, post: updatedPost };
   }
-}
+);
 
-/**
- * Toggle post pin
- */
-export async function togglePostPin(postId: string) {
-  try {
-    const userId = await getCurrentUserId();
-
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
-
+export const togglePostPin = defineAction(
+  {
+    name: "togglePostPin",
+    auth: "admin",
+    args: [postIdSchema],
+    community: ([postId]) => communityOfPost(postId),
+    roles: ["OWNER", "ADMIN", "MODERATOR"],
+  },
+  async (_ctx, postId) => {
     const post = await prisma.post.findUnique({
       where: { id: postId },
+      select: { isPinned: true },
     });
-
     if (!post) {
-      return { success: false, error: "Post not found" };
+      return { success: false as const, error: "Post not found" };
     }
 
-    // Check if user is owner/admin/moderator
-    const member = await prisma.member.findUnique({
-      where: {
-        userId_communityId: {
-          userId,
-          communityId: post.communityId,
-        },
-      },
-    });
-
-    if (!member || !["OWNER", "ADMIN", "MODERATOR"].includes(member.role)) {
-      return { success: false, error: "Not authorized" };
-    }
-
-    // Toggle pin
     const updatedPost = await prisma.post.update({
       where: { id: postId },
-      data: {
-        isPinned: !post.isPinned,
-      },
+      data: { isPinned: !post.isPinned },
     });
 
     revalidateLocalizedPath("/c/[slug]", "page");
-    return { success: true, isPinned: updatedPost.isPinned };
-  } catch (error) {
-    console.error("Error toggling pin:", error);
-    return { success: false, error: "Failed to toggle pin" };
+    return { success: true as const, isPinned: updatedPost.isPinned };
   }
-}
+);

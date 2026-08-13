@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { getCurrentUserId } from "@/lib/auth-utils";
+import { defineAction } from "@/lib/actions/define-action";
 
 export interface OnboardingProgress {
   hasProfile: boolean;
@@ -12,15 +12,10 @@ export interface OnboardingProgress {
   hasBuddy: boolean;
 }
 
-export async function getOnboardingProgress(): Promise<{
-  success: boolean;
-  progress?: OnboardingProgress;
-  showChecklist?: boolean;
-}> {
-  try {
-    const userId = await getCurrentUserId();
-    if (!userId) return { success: false };
-
+export const getOnboardingProgress = defineAction(
+  { name: "getOnboardingProgress", auth: "user", args: [] },
+  async (ctx) => {
+    const userId = ctx.userId;
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -72,8 +67,5 @@ export async function getOnboardingProgress(): Promise<{
       progress,
       showChecklist: !allDone,
     };
-  } catch (error) {
-    console.error("[getOnboardingProgress] Error:", error);
-    return { success: false };
   }
-}
+);

@@ -1,7 +1,8 @@
 "use server";
 
-import { getCurrentUserId } from "@/lib/auth-utils";
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { defineAction } from "@/lib/actions/define-action";
 
 interface SearchResult {
   id: string;
@@ -25,18 +26,15 @@ interface SearchResponse {
  * Server action for global search across posts, courses, communities, and members
  * Can be called from client components
  */
-export async function searchGlobal(
-  query: string,
-  type: string = "all"
-): Promise<SearchResponse | { error: string }> {
-  try {
-    // 1. AUTHENTICATION CHECK
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { error: "Unauthorized - authentication required" };
-    }
-
-    // 2. VALIDATE INPUTS
+export const searchGlobal = defineAction(
+  {
+    name: "searchGlobal",
+    auth: "user",
+    args: [z.string().max(200), z.string().max(32).default("all")],
+    rateLimit: "api",
+  },
+  async (ctx, query, type): Promise<SearchResponse | { error: string }> => {
+  {
     const trimmedQuery = query.trim();
 
     if (!trimmedQuery || trimmedQuery.length < 2) {
@@ -72,6 +70,28 @@ export async function searchGlobal(
       ],
     };
 
+    /**
+     * Visibility scope for anything owned by a community.
+     *
+     * The posts and courses branches previously filtered only on
+     * `isPublished`/`deletedAt`, so any authenticated user could search the
+     * full body of posts — and the titles and descriptions of courses — inside
+     * private and paid communities they had never joined. The communities
+     * branch already got this right with `isPrivate: false`; this applies the
+     * same boundary to the two branches that carry the actual content.
+     *
+     * Public communities stay searchable by everyone; private ones are visible
+     * only to their ACTIVE members.
+     */
+    const visibleCommunity = {
+      community: {
+        OR: [
+          { isPrivate: false },
+          { members: { some: { userId: ctx.userId, status: "ACTIVE" as const } } },
+        ],
+      },
+    };
+
     // Search Posts
     if (normalizedType === "all" || normalizedType === "posts") {
       const posts = await prisma.post.findMany({
@@ -80,6 +100,7 @@ export async function searchGlobal(
             searchCondition,
             { deletedAt: null }, // Filter out soft-deleted posts
             { isPublished: true }, // Only published posts
+            visibleCommunity, // Public community, or one the caller belongs to
           ],
         },
         select: {
@@ -119,6 +140,7 @@ export async function searchGlobal(
               ],
             },
             { isPublished: true }, // Only published courses
+            visibleCommunity, // Public community, or one the caller belongs to
           ],
         },
         select: {
@@ -225,8 +247,6 @@ export async function searchGlobal(
     }
 
     return response;
-  } catch (error) {
-    console.error("[search-action] Error:", error);
-    return { error: "An error occurred while searching" };
   }
-}
+  }
+);

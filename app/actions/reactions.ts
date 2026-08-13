@@ -1,78 +1,74 @@
 "use server";
 
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { revalidateLocalizedPath } from "@/lib/cache-invalidation";
+import { defineAction } from "@/lib/actions/define-action";
+import { communityOfPost } from "@/lib/actions/resolvers";
 
 export type ReactionType = "LIKE" | "LOVE" | "CELEBRATE" | "FIRE" | "IDEA" | "CLAP";
 
+const reactionTypeSchema = z.enum(["LIKE", "LOVE", "CELEBRATE", "FIRE", "IDEA", "CLAP"]);
+const postIdSchema = z.string().min(1).max(64);
+
 /**
- * Toggle reaction on a post
+ * Toggle the caller's reaction on a post.
+ *
+ * SEC-05: this previously took `userId` as its first argument and the client
+ * passed its own `user.id`, so any caller could react as anybody. Identity now
+ * comes from the session and the parameter is gone.
  */
-export async function toggleReaction(userId: string, postId: string, reactionType: ReactionType) {
-  try {
-    // Check if reaction already exists
+export const toggleReaction = defineAction(
+  {
+    name: "toggleReaction",
+    auth: "member",
+    args: [postIdSchema, reactionTypeSchema],
+    community: ([postId]) => communityOfPost(postId),
+    rateLimit: "create",
+  },
+  async (ctx, postId, reactionType) => {
     const existingReaction = await prisma.reaction.findFirst({
-      where: {
-        userId,
-        postId,
-        type: reactionType,
-      },
+      where: { userId: ctx.userId, postId, type: reactionType },
     });
 
     if (existingReaction) {
-      // Remove reaction
-      await prisma.reaction.delete({
-        where: { id: existingReaction.id },
-      });
-
+      await prisma.reaction.delete({ where: { id: existingReaction.id } });
       revalidateLocalizedPath("/c/[slug]", "page");
-      return { success: true, action: "removed" };
-    } else {
-      // Add reaction
-      await prisma.reaction.create({
-        data: {
-          userId,
-          postId,
-          type: reactionType,
-        },
-      });
-
-      revalidateLocalizedPath("/c/[slug]", "page");
-      return { success: true, action: "added" };
+      return { success: true as const, action: "removed" as const };
     }
-  } catch (error) {
-    console.error("Error toggling reaction:", error);
-    return { success: false, error: "Failed to toggle reaction" };
-  }
-}
 
-/**
- * Get reactions for a post
- */
-export async function getPostReactions(postId: string, currentUserId?: string) {
-  try {
-    const reactions = await prisma.reaction.findMany({
-      where: { postId },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
-          },
-        },
-      },
+    await prisma.reaction.create({
+      data: { userId: ctx.userId, postId, type: reactionType },
     });
 
-    // Group by type
+    revalidateLocalizedPath("/c/[slug]", "page");
+    return { success: true as const, action: "added" as const };
+  }
+);
+
+/**
+ * Reaction summary for a post.
+ *
+ * `currentUserId` was previously a parameter; it is now derived from the
+ * session, so `userReacted` cannot be probed for another account.
+ */
+export const getPostReactions = defineAction(
+  {
+    name: "getPostReactions",
+    auth: "member",
+    args: [postIdSchema],
+    community: ([postId]) => communityOfPost(postId),
+  },
+  async (ctx, postId) => {
+    const reactions = await prisma.reaction.findMany({
+      where: { postId },
+      include: { user: { select: { id: true, name: true, image: true } } },
+    });
+
     const grouped = reactions.reduce(
       (acc, reaction) => {
         if (!acc[reaction.type]) {
-          acc[reaction.type] = {
-            count: 0,
-            users: [],
-            userReacted: false,
-          };
+          acc[reaction.type] = { count: 0, users: [], userReacted: false };
         }
         acc[reaction.type].count++;
         acc[reaction.type].users.push({
@@ -80,7 +76,7 @@ export async function getPostReactions(postId: string, currentUserId?: string) {
           name: reaction.user.name || "Unknown",
           imageUrl: reaction.user.image,
         });
-        if (currentUserId && reaction.userId === currentUserId) {
+        if (reaction.userId === ctx.userId) {
           acc[reaction.type].userReacted = true;
         }
         return acc;
@@ -95,11 +91,6 @@ export async function getPostReactions(postId: string, currentUserId?: string) {
       >
     );
 
-    const totalCount = reactions.length;
-
-    return { success: true, reactions: grouped, totalCount };
-  } catch (error) {
-    console.error("Error getting reactions:", error);
-    return { success: false, error: "Failed to get reactions", reactions: {}, totalCount: 0 };
+    return { success: true as const, reactions: grouped, totalCount: reactions.length };
   }
-}
+);

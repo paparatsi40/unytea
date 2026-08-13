@@ -154,15 +154,14 @@ function renderSection(section: SectionInstance, t: ReturnType<typeof useTransla
 interface SectionBuilderProps {
   initialSections?: SectionInstance[];
   onSave?: (sections: SectionInstance[]) => Promise<void>;
-  communityName?: string;
-  communityDescription?: string | null;
+  /** Required for AI FAQ generation — the copy is generated server-side from this. */
+  communityId?: string;
 }
 
 export function SectionBuilder({
   initialSections = [],
   onSave,
-  communityName,
-  communityDescription,
+  communityId,
 }: SectionBuilderProps) {
   const t = useTranslations();
   const [sections, setSections] = useState<SectionInstance[]>(initialSections);
@@ -440,18 +439,19 @@ export function SectionBuilder({
                 variant="outline"
                 size="sm"
                 onClick={async () => {
-                  if (!communityName) {
-                    toast.error("Community name is required to generate FAQs");
+                  if (!communityId) {
+                    toast.error("Community is required to generate FAQs");
                     return;
                   }
                   setGeneratingAI(true);
                   try {
-                    const faqs = await generateCommunityFAQs(
-                      communityName,
-                      communityDescription ?? null
-                    );
+                    const result = await generateCommunityFAQs(communityId);
+                    if (!Array.isArray(result)) {
+                      toast.error(result.error || "Failed to generate FAQs");
+                      return;
+                    }
                     const updates: Record<string, string> = {};
-                    faqs.forEach((faq, i) => {
+                    result.forEach((faq, i) => {
                       updates[`q${i + 1}`] = faq.q;
                       updates[`a${i + 1}`] = faq.a;
                     });

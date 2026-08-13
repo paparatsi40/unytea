@@ -1,28 +1,38 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getCurrentUserId } from "@/lib/auth-utils";
+import { z } from "zod";
+import { defineAction } from "@/lib/actions/define-action";
+import { issueCertificateForEnrollment } from "@/lib/certificates";
+import { communityById, communityOfCourse, communityOfLesson, communityOfModule } from "@/lib/actions/resolvers";
 import { prisma } from "@/lib/prisma";
 import { getLimitsForPlan } from "@/lib/plans";
 
 /**
  * Create a new course
  */
-export async function createCourse(data: {
-  title: string;
-  slug: string;
-  description?: string;
-  imageUrl?: string;
-  communityId: string;
-  isPaid?: boolean;
-  price?: number;
-}) {
+export const createCourse = defineAction(
+  {
+    name: "createCourse",
+    auth: "admin",
+    args: [
+      z.object({
+        communityId: z.string().min(1).max(64),
+        title: z.string().min(1).max(300),
+        slug: z.string().min(1).max(120),
+        description: z.string().max(20_000).optional(),
+        imageUrl: z.string().max(2000).optional(),
+        isPaid: z.boolean().optional(),
+        price: z.number().min(0).max(1_000_000).optional(),
+      }),
+    ],
+    community: ([data]) => communityById(data.communityId),
+    rateLimit: "create",
+  },
+  async (ctx, data: { title: string; slug: string; description?: string; imageUrl?: string; communityId: string; isPaid?: boolean; price?: number; }) => {
   try {
-    const userId = await getCurrentUserId();
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const userId = ctx.userId;
 
     // Verify user owns the community
     const community = await prisma.community.findFirst({
@@ -85,17 +95,21 @@ export async function createCourse(data: {
     return { success: false, error: "Failed to create course" };
   }
 }
+);
 
 /**
  * Get courses for a community
  */
-export async function getCommunityCourses(communityId: string) {
+export const getCommunityCourses = defineAction(
+  {
+    name: "getCommunityCourses",
+    auth: "member",
+    args: [z.string().min(1).max(64)],
+    community: ([communityId]) => communityById(communityId),
+  },
+  async (_ctx, communityId: string) => {
   try {
-    const userId = await getCurrentUserId();
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
 
     const courses = await prisma.course.findMany({
       where: { communityId },
@@ -116,17 +130,22 @@ export async function getCommunityCourses(communityId: string) {
     return { success: false, error: "Failed to fetch courses" };
   }
 }
+);
 
 /**
  * Get a specific course with modules and lessons
  */
-export async function getCourse(courseId: string) {
+export const getCourse = defineAction(
+  {
+    name: "getCourse",
+    auth: "member",
+    args: [z.string().min(1).max(64)],
+    community: ([courseId]) => communityOfCourse(courseId),
+  },
+  async (ctx, courseId: string) => {
   try {
-    const userId = await getCurrentUserId();
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const userId = ctx.userId;
 
     const course = await prisma.course.findUnique({
       where: { id: courseId },
@@ -170,27 +189,32 @@ export async function getCourse(courseId: string) {
     return { success: false, error: "Failed to fetch course" };
   }
 }
+);
 
 /**
  * Update a course
  */
-export async function updateCourse(
-  courseId: string,
-  data: {
-    title?: string;
-    description?: string;
-    imageUrl?: string;
-    isPaid?: boolean;
-    price?: number;
-    isPublished?: boolean;
-  }
-) {
+export const updateCourse = defineAction(
+  {
+    name: "updateCourse",
+    auth: "admin",
+    args: [
+      z.string().min(1).max(64),
+      z.object({
+        title: z.string().min(1).max(300).optional(),
+        description: z.string().max(20_000).optional(),
+        imageUrl: z.string().max(2000).optional(),
+        isPaid: z.boolean().optional(),
+        price: z.number().min(0).max(1_000_000).optional(),
+        isPublished: z.boolean().optional(),
+      }),
+    ],
+    community: ([courseId]) => communityOfCourse(courseId),
+  },
+  async (ctx, courseId: string, data: { title?: string; description?: string; imageUrl?: string; isPaid?: boolean; price?: number; isPublished?: boolean; }) => {
   try {
-    const userId = await getCurrentUserId();
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const userId = ctx.userId;
 
     const course = await prisma.course.findUnique({
       where: { id: courseId },
@@ -234,17 +258,22 @@ export async function updateCourse(
     return { success: false, error: "Failed to update course" };
   }
 }
+);
 
 /**
  * Delete a course
  */
-export async function deleteCourse(courseId: string) {
+export const deleteCourse = defineAction(
+  {
+    name: "deleteCourse",
+    auth: "admin",
+    args: [z.string().min(1).max(64)],
+    community: ([courseId]) => communityOfCourse(courseId),
+  },
+  async (ctx, courseId: string) => {
   try {
-    const userId = await getCurrentUserId();
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const userId = ctx.userId;
 
     const course = await prisma.course.findUnique({
       where: { id: courseId },
@@ -270,22 +299,29 @@ export async function deleteCourse(courseId: string) {
     return { success: false, error: "Failed to delete course" };
   }
 }
+);
 
 /**
  * Create a module
  */
-export async function createModule(data: {
-  courseId: string;
-  title: string;
-  description?: string;
-  position: number;
-}) {
+export const createModule = defineAction(
+  {
+    name: "createModule",
+    auth: "admin",
+    args: [
+      z.object({
+        courseId: z.string().min(1).max(64),
+        title: z.string().min(1).max(300),
+        description: z.string().max(10_000).optional(),
+        position: z.number().int().min(0).max(10_000),
+      }),
+    ],
+    community: ([data]) => communityOfCourse(data.courseId),
+  },
+  async (ctx, data: { courseId: string; title: string; description?: string; position: number; }) => {
   try {
-    const userId = await getCurrentUserId();
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const userId = ctx.userId;
 
     const course = await prisma.course.findUnique({
       where: { id: data.courseId },
@@ -312,26 +348,33 @@ export async function createModule(data: {
     return { success: false, error: "Failed to create module" };
   }
 }
+);
 
 /**
  * Create a lesson
  */
-export async function createLesson(data: {
-  moduleId: string;
-  title: string;
-  content: string;
-  contentType?: "TEXT" | "VIDEO" | "AUDIO";
-  videoUrl?: string;
-  duration?: number;
-  position: number;
-  isFree?: boolean;
-}) {
+export const createLesson = defineAction(
+  {
+    name: "createLesson",
+    auth: "admin",
+    args: [
+      z.object({
+        moduleId: z.string().min(1).max(64),
+        title: z.string().min(1).max(300),
+        content: z.string().max(200_000),
+        contentType: z.enum(["TEXT", "VIDEO", "AUDIO"]).optional(),
+        videoUrl: z.string().max(2000).optional(),
+        duration: z.number().int().min(0).max(1_000_000).optional(),
+        position: z.number().int().min(0).max(10_000),
+        isFree: z.boolean().optional(),
+      }),
+    ],
+    community: ([data]) => communityOfModule(data.moduleId),
+  },
+  async (ctx, data: { moduleId: string; title: string; content: string; contentType?: "TEXT" | "VIDEO" | "AUDIO"; videoUrl?: string; duration?: number; position: number; isFree?: boolean; }) => {
   try {
-    const userId = await getCurrentUserId();
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const userId = ctx.userId;
 
     const courseModule = await prisma.module.findUnique({
       where: { id: data.moduleId },
@@ -367,17 +410,29 @@ export async function createLesson(data: {
     return { success: false, error: "Failed to create lesson" };
   }
 }
+);
 
 /**
  * Update a module
  */
-export async function updateModule(
-  moduleId: string,
-  data: { title?: string; description?: string; position?: number }
-) {
+export const updateModule = defineAction(
+  {
+    name: "updateModule",
+    auth: "admin",
+    args: [
+      z.string().min(1).max(64),
+      z.object({
+        title: z.string().min(1).max(300).optional(),
+        description: z.string().max(10_000).optional(),
+        position: z.number().int().min(0).max(10_000).optional(),
+      }),
+    ],
+    community: ([moduleId]) => communityOfModule(moduleId),
+  },
+  async (ctx, moduleId: string, data: { title?: string; description?: string; position?: number }) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) return { success: false, error: "Not authenticated" };
+
+    const userId = ctx.userId;
 
     const mod = await prisma.module.findUnique({
       where: { id: moduleId },
@@ -398,14 +453,22 @@ export async function updateModule(
     return { success: false, error: "Failed to update module" };
   }
 }
+);
 
 /**
  * Delete a module
  */
-export async function deleteModule(moduleId: string) {
+export const deleteModule = defineAction(
+  {
+    name: "deleteModule",
+    auth: "admin",
+    args: [z.string().min(1).max(64)],
+    community: ([moduleId]) => communityOfModule(moduleId),
+  },
+  async (ctx, moduleId: string) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) return { success: false, error: "Not authenticated" };
+
+    const userId = ctx.userId;
 
     const mod = await prisma.module.findUnique({
       where: { id: moduleId },
@@ -423,26 +486,34 @@ export async function deleteModule(moduleId: string) {
     return { success: false, error: "Failed to delete module" };
   }
 }
+);
 
 /**
  * Update a lesson
  */
-export async function updateLesson(
-  lessonId: string,
-  data: {
-    title?: string;
-    content?: string;
-    contentType?: "TEXT" | "VIDEO" | "AUDIO";
-    videoUrl?: string;
-    duration?: number;
-    position?: number;
-    isFree?: boolean;
-    isPublished?: boolean;
-  }
-) {
+export const updateLesson = defineAction(
+  {
+    name: "updateLesson",
+    auth: "admin",
+    args: [
+      z.string().min(1).max(64),
+      z.object({
+        title: z.string().min(1).max(300).optional(),
+        content: z.string().max(200_000).optional(),
+        contentType: z.enum(["TEXT", "VIDEO", "AUDIO"]).optional(),
+        videoUrl: z.string().max(2000).optional(),
+        duration: z.number().int().min(0).max(1_000_000).optional(),
+        position: z.number().int().min(0).max(10_000).optional(),
+        isFree: z.boolean().optional(),
+        isPublished: z.boolean().optional(),
+      }),
+    ],
+    community: ([lessonId]) => communityOfLesson(lessonId),
+  },
+  async (ctx, lessonId: string, data: { title?: string; content?: string; contentType?: "TEXT" | "VIDEO" | "AUDIO"; videoUrl?: string; duration?: number; position?: number; isFree?: boolean; isPublished?: boolean; }) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) return { success: false, error: "Not authenticated" };
+
+    const userId = ctx.userId;
 
     const lesson = await prisma.lesson.findUnique({
       where: { id: lessonId },
@@ -463,14 +534,22 @@ export async function updateLesson(
     return { success: false, error: "Failed to update lesson" };
   }
 }
+);
 
 /**
  * Delete a lesson
  */
-export async function deleteLesson(lessonId: string) {
+export const deleteLesson = defineAction(
+  {
+    name: "deleteLesson",
+    auth: "admin",
+    args: [z.string().min(1).max(64)],
+    community: ([lessonId]) => communityOfLesson(lessonId),
+  },
+  async (ctx, lessonId: string) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) return { success: false, error: "Not authenticated" };
+
+    const userId = ctx.userId;
 
     const lesson = await prisma.lesson.findUnique({
       where: { id: lessonId },
@@ -488,17 +567,23 @@ export async function deleteLesson(lessonId: string) {
     return { success: false, error: "Failed to delete lesson" };
   }
 }
+);
 
 /**
  * Enroll in a course
  */
-export async function enrollInCourse(courseId: string) {
+export const enrollInCourse = defineAction(
+  {
+    name: "enrollInCourse",
+    auth: "member",
+    args: [z.string().min(1).max(64)],
+    community: ([courseId]) => communityOfCourse(courseId),
+    rateLimit: "create",
+  },
+  async (ctx, courseId: string) => {
   try {
-    const userId = await getCurrentUserId();
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const userId = ctx.userId;
 
     // Check if already enrolled
     const existing = await prisma.enrollment.findFirst({
@@ -534,17 +619,22 @@ export async function enrollInCourse(courseId: string) {
     return { success: false, error: "Failed to enroll" };
   }
 }
+);
 
 /**
  * Mark lesson as complete
  */
-export async function markLessonComplete(lessonId: string) {
+export const markLessonComplete = defineAction(
+  {
+    name: "markLessonComplete",
+    auth: "member",
+    args: [z.string().min(1).max(64)],
+    community: ([lessonId]) => communityOfLesson(lessonId),
+  },
+  async (ctx, lessonId: string) => {
   try {
-    const userId = await getCurrentUserId();
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const userId = ctx.userId;
 
     const lesson = await prisma.lesson.findUnique({
       where: { id: lessonId },
@@ -622,24 +712,48 @@ export async function markLessonComplete(lessonId: string) {
       },
     });
 
+    // Completing the course issues the certificate. It is a consequence of
+    // finishing, not something the learner asks for — there is no
+    // client-callable issuance path. Idempotent, so re-completing a lesson on an
+    // already-finished course does not mint a second one.
+    let certificate = null;
+    if (progressPercent === 100) {
+      try {
+        const issued = await issueCertificateForEnrollment(enrollment.id, userId);
+        if (issued.success) {
+          certificate = issued.certificate;
+        } else {
+          console.warn("[markLessonComplete] certificate not issued:", issued.error);
+        }
+      } catch (certificateError) {
+        // Never let issuance failure lose the lesson completion the learner
+        // just earned; the next completion call will retry.
+        console.error("[markLessonComplete] certificate issuance failed:", certificateError);
+      }
+    }
+
     revalidatePath(`/dashboard/courses/${lesson.module.courseId}`);
-    return { success: true, progress };
+    return { success: true, progress, courseCompleted: progressPercent === 100, certificate };
   } catch (error) {
     console.error("Error marking lesson complete:", error);
     return { success: false, error: "Failed to mark lesson complete" };
   }
 }
+);
 
 /**
  * Get user's enrollments
  */
-export async function getUserEnrollments() {
+export const getUserEnrollments = defineAction(
+  {
+    name: "getUserEnrollments",
+    auth: "user",
+    args: [],
+  },
+  async (ctx) => {
   try {
-    const userId = await getCurrentUserId();
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const userId = ctx.userId;
 
     const enrollments = await prisma.enrollment.findMany({
       where: { userId },
@@ -669,3 +783,4 @@ export async function getUserEnrollments() {
     return { success: false, error: "Failed to fetch enrollments" };
   }
 }
+);

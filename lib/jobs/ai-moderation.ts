@@ -1,5 +1,11 @@
-"use server";
-
+/**
+ * Internal pipeline — deliberately NOT a "use server" module.
+ *
+ * Next.js turns every export of a "use server" file into a public POST
+ * endpoint, which made these reachable without the CRON_SECRET that guards
+ * the cron routes calling them (SEC-11). They are imported directly by those
+ * routes instead, so the secret is the only way in.
+ */
 import { moderateContent } from "@/lib/openai";
 import { prisma } from "@/lib/prisma";
 

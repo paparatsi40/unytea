@@ -64,7 +64,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let sessionEntries: MetadataRoute.Sitemap = [];
   try {
     const sessions = await getPublicSessionsForSEO(200);
-    sessionEntries = sessions.flatMap((s) =>
+    // The action can return an ActionFailure (e.g. rate limited); a partial
+    // sitemap is the correct degradation, matching the catch below.
+    sessionEntries = (Array.isArray(sessions) ? sessions : []).flatMap((s) =>
       buildLocalizedEntry(`/s/${s.slug}`, s.updatedAt ?? now, "weekly", 0.6)
     );
   } catch (error) {

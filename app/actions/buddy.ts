@@ -1,18 +1,26 @@
 "use server";
 
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUserId } from "@/lib/auth-utils";
+import { defineAction } from "@/lib/actions/define-action";
+import { assertBuddyPartner } from "@/lib/actions/guards";
+import { communityById, communityOfBuddyGoal, communityOfPartnership } from "@/lib/actions/resolvers";
 import { revalidatePath } from "next/cache";
 
 /**
  * Find a buddy match for a user in a community
  */
-export async function findBuddyMatch(communityId: string) {
+export const findBuddyMatch = defineAction(
+  {
+    name: "findBuddyMatch",
+    auth: "member",
+    args: [z.string().min(1).max(64)],
+    community: ([communityId]) => communityById(communityId),
+  },
+  async (ctx, communityId: string) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+
+    const userId = ctx.userId;
 
     // Check if user already has an active buddy in this community
     const existingPartnership = await prisma.buddyPartnership.findFirst({
@@ -84,13 +92,23 @@ export async function findBuddyMatch(communityId: string) {
     return { success: false, error: "Failed to find buddy match" };
   }
 }
+);
 
 /**
  * Create a buddy partnership
  */
-export async function createBuddyPartnership(buddyId: string, communityId: string) {
+export const createBuddyPartnership = defineAction(
+  {
+    name: "createBuddyPartnership",
+    auth: "member",
+    args: [z.string().min(1).max(64), z.string().min(1).max(64)],
+    community: ([, communityId]) => communityById(communityId),
+    rateLimit: "create",
+  },
+  async (ctx, buddyId: string, communityId: string) => {
   try {
-    const userId = await getCurrentUserId();
+
+    const userId = ctx.userId;
 
     if (!userId) {
       return { success: false, error: "Not authenticated" };
@@ -175,16 +193,22 @@ export async function createBuddyPartnership(buddyId: string, communityId: strin
     return { success: false, error: "Failed to create partnership" };
   }
 }
+);
 
 /**
  * Get current user's buddy partnership
  */
-export async function getMyBuddyPartnership(communityId: string) {
+export const getMyBuddyPartnership = defineAction(
+  {
+    name: "getMyBuddyPartnership",
+    auth: "member",
+    args: [z.string().min(1).max(64)],
+    community: ([communityId]) => communityById(communityId),
+  },
+  async (ctx, communityId: string) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Not authenticated", partnership: null };
-    }
+
+    const userId = ctx.userId;
 
     const partnership = await prisma.buddyPartnership.findFirst({
       where: {
@@ -239,16 +263,22 @@ export async function getMyBuddyPartnership(communityId: string) {
     return { success: false, error: "Failed to get partnership", partnership: null };
   }
 }
+);
 
 /**
  * Create a shared goal
  */
-export async function createBuddyGoal(
-  partnershipId: string,
-  title: string,
-  description?: string,
-  targetDate?: Date
-) {
+export const createBuddyGoal = defineAction(
+  {
+    name: "createBuddyGoal",
+    auth: "member",
+    args: [z.string().min(1).max(64), z.string().min(1).max(300), z.string().max(5000).optional(), z.coerce.date().optional()],
+    community: ([partnershipId]) => communityOfPartnership(partnershipId),
+    rateLimit: "create",
+  },
+  async (ctx, partnershipId: string, title: string, description?: string, targetDate?: Date) => {
+    await assertBuddyPartner(ctx, partnershipId);
+
   try {
     const goal = await prisma.buddyGoal.create({
       data: {
@@ -267,11 +297,26 @@ export async function createBuddyGoal(
     return { success: false, error: "Failed to create goal" };
   }
 }
+);
 
 /**
  * Complete a goal
  */
-export async function completeBuddyGoal(goalId: string) {
+export const completeBuddyGoal = defineAction(
+  {
+    name: "completeBuddyGoal",
+    auth: "member",
+    args: [z.string().min(1).max(64)],
+    community: ([goalId]) => communityOfBuddyGoal(goalId),
+  },
+  async (ctx, goalId: string) => {
+    const owning = await prisma.buddyGoal.findUnique({
+      where: { id: goalId },
+      select: { partnershipId: true },
+    });
+    if (!owning) return { success: false, error: "Goal not found" };
+    await assertBuddyPartner(ctx, owning.partnershipId);
+
   try {
     const goal = await prisma.buddyGoal.update({
       where: { id: goalId },
@@ -289,21 +334,30 @@ export async function completeBuddyGoal(goalId: string) {
     return { success: false, error: "Failed to complete goal" };
   }
 }
+);
 
 /**
  * Create a check-in
  */
-export async function createBuddyCheckIn(
-  partnershipId: string,
-  mood: number,
-  notes?: string,
-  completedGoals?: string[]
-) {
+export const createBuddyCheckIn = defineAction(
+  {
+    name: "createBuddyCheckIn",
+    auth: "member",
+    args: [z.string().min(1).max(64), z.number().int().min(1).max(5), z.string().max(5000).optional(), z.array(z.string().max(64)).max(100).optional()],
+    community: ([partnershipId]) => communityOfPartnership(partnershipId),
+    rateLimit: "create",
+  },
+  async (ctx, partnershipId: string, mood: number, notes?: string, completedGoals?: string[]) => {
+    // Community membership is not enough: a community holds many partnerships
+    // and only its two participants may write check-ins into one. Without this,
+    // any member could post mood and notes into another pair's partnership by
+    // passing its id — the sibling mutations already guard this way (M1).
+    // Runs above the try so the ForbiddenError reaches the seam rather than
+    // being swallowed into a generic failure.
+    await assertBuddyPartner(ctx, partnershipId);
+
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const userId = ctx.userId;
 
     const checkIn = await prisma.buddyCheckIn.create({
       data: {
@@ -323,11 +377,21 @@ export async function createBuddyCheckIn(
     return { success: false, error: "Failed to create check-in" };
   }
 }
+);
 
 /**
  * End a buddy partnership
  */
-export async function endBuddyPartnership(partnershipId: string) {
+export const endBuddyPartnership = defineAction(
+  {
+    name: "endBuddyPartnership",
+    auth: "member",
+    args: [z.string().min(1).max(64)],
+    community: ([partnershipId]) => communityOfPartnership(partnershipId),
+  },
+  async (ctx, partnershipId: string) => {
+    await assertBuddyPartner(ctx, partnershipId);
+
   try {
     const partnership = await prisma.buddyPartnership.update({
       where: { id: partnershipId },
@@ -345,3 +409,4 @@ export async function endBuddyPartnership(partnershipId: string) {
     return { success: false, error: "Failed to end partnership" };
   }
 }
+);

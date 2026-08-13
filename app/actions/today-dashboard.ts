@@ -1,7 +1,7 @@
 "use server";
 
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { defineAction } from "@/lib/actions/define-action";
 import { subDays, addDays } from "date-fns";
 
 export interface TodayCommunity {
@@ -52,11 +52,10 @@ export interface TodayDashboardData {
  * view can localize them — onboarding is loaded separately via
  * getOnboardingProgress (see dashboard/page.tsx).
  */
-export async function getTodayDashboard(): Promise<TodayDashboardData | null> {
-  const session = await auth();
-  if (!session?.user?.id) return null;
-
-  const userId = session.user.id;
+export const getTodayDashboard = defineAction(
+  { name: "getTodayDashboard", auth: "user", args: [] },
+  async (ctx): Promise<TodayDashboardData | null> => {
+  const userId = ctx.userId;
   const now = new Date();
   const weekAgo = subDays(now, 7);
   const twoWeeksAgo = subDays(now, 14);
@@ -221,4 +220,5 @@ export async function getTodayDashboard(): Promise<TodayDashboardData | null> {
     },
     recentActivity,
   };
-}
+  }
+);

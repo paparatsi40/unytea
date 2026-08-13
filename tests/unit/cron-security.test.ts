@@ -2,11 +2,11 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { NextRequest } from "next/server";
 import { verifyCronAuth } from "@/lib/cron-auth";
 
-vi.mock("@/app/actions/session-jobs", () => ({
+vi.mock("@/lib/jobs/session-jobs", () => ({
   runSessionJobs: vi.fn().mockResolvedValue({ success: true, results: [] }),
   sendSessionReminders: vi.fn().mockResolvedValue({ success: true }),
 }));
-vi.mock("@/app/actions/autopilot", () => ({
+vi.mock("@/lib/jobs/autopilot", () => ({
   runAutopilotDueJobs: vi.fn().mockResolvedValue({ success: true }),
 }));
 

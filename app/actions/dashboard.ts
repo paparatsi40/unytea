@@ -1,8 +1,9 @@
 "use server";
 
-import { getCurrentUserId } from "@/lib/auth-utils";
+import { z } from "zod";
+import { defineAction } from "@/lib/actions/define-action";
 import { prisma } from "@/lib/prisma";
-import type { AutopilotJobPayload } from "./autopilot";
+import type { AutopilotJobPayload } from "@/lib/jobs/autopilot";
 
 /**
  * Get dashboard metrics optimized for growth:
@@ -11,12 +12,16 @@ import type { AutopilotJobPayload } from "./autopilot";
  * - Sessions this week
  * - Engagement metrics
  */
-export async function getDashboardMetrics() {
+export const getDashboardMetrics = defineAction(
+  {
+    name: "getDashboardMetrics",
+    auth: "user",
+    args: [],
+  },
+  async (ctx) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Unauthorized" };
-    }
+
+    const userId = ctx.userId;
 
     // Get user's communities
     const communities = await prisma.community.findMany({
@@ -104,11 +109,18 @@ export async function getDashboardMetrics() {
     return { success: false, error: "Failed to load metrics" };
   }
 }
+);
 
-export async function getActivationEngineSnapshot() {
+export const getActivationEngineSnapshot = defineAction(
+  {
+    name: "getActivationEngineSnapshot",
+    auth: "user",
+    args: [],
+  },
+  async (ctx) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) return { success: false, error: "Unauthorized" };
+
+    const userId = ctx.userId;
 
     const now = new Date();
     const in14Days = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
@@ -243,13 +255,18 @@ export async function getActivationEngineSnapshot() {
     return { success: false, error: "Failed to load activation snapshot" };
   }
 }
+);
 
-export async function getUserIdentitySnapshot(limitCommunities: number = 6) {
+export const getUserIdentitySnapshot = defineAction(
+  {
+    name: "getUserIdentitySnapshot",
+    auth: "user",
+    args: [z.number().int().min(1).max(100).default(6)],
+  },
+  async (ctx, limitCommunities: number = 6) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Unauthorized" };
-    }
+
+    const userId = ctx.userId;
 
     const now = new Date();
 
@@ -353,16 +370,21 @@ export async function getUserIdentitySnapshot(limitCommunities: number = 6) {
     return { success: false, error: "Failed to load user identity" };
   }
 }
+);
 
 /**
  * Get next upcoming live session
  */
-export async function getNextLiveSession() {
+export const getNextLiveSession = defineAction(
+  {
+    name: "getNextLiveSession",
+    auth: "user",
+    args: [],
+  },
+  async (ctx) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Unauthorized" };
-    }
+
+    const userId = ctx.userId;
 
     const now = new Date();
 
@@ -424,16 +446,21 @@ export async function getNextLiveSession() {
     return { success: false, error: "Failed to load session" };
   }
 }
+);
 
 /**
  * Get upcoming sessions list
  */
-export async function getUpcomingSessions(limit: number = 5) {
+export const getUpcomingSessions = defineAction(
+  {
+    name: "getUpcomingSessions",
+    auth: "user",
+    args: [z.number().int().min(1).max(100).default(5)],
+  },
+  async (ctx, limit: number = 5) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Unauthorized" };
-    }
+
+    const userId = ctx.userId;
 
     const now = new Date();
 
@@ -487,20 +514,27 @@ export async function getUpcomingSessions(limit: number = 5) {
     return { success: false, error: "Failed to load sessions" };
   }
 }
+);
 
 /**
  * Get recent community activity
  */
-export async function getCommunityActivity(limit: number = 6) {
+export const getCommunityActivity = defineAction(
+  {
+    name: "getCommunityActivity",
+    auth: "user",
+    args: [z.number().int().min(1).max(100).default(6)],
+  },
+  async (ctx, limit: number = 6) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Unauthorized" };
-    }
 
-    // Get user's communities
+    const userId = ctx.userId;
+
+    // Get user's communities. `status: "ACTIVE"` matches every sibling read —
+    // without it a PENDING (join-requested), REMOVED or BANNED membership row
+    // still granted sight of the community's activity (L2).
     const userCommunities = await prisma.member.findMany({
-      where: { userId },
+      where: { userId, status: "ACTIVE" },
       select: { communityId: true },
     });
     const communityIds = userCommunities.map((m) => m.communityId);
@@ -581,19 +615,25 @@ export async function getCommunityActivity(limit: number = 6) {
     return { success: false, error: "Failed to load activity" };
   }
 }
+);
 
 /**
  * Get recent members for social proof
  */
-export async function getRecentMembers(limit: number = 4) {
+export const getRecentMembers = defineAction(
+  {
+    name: "getRecentMembers",
+    auth: "user",
+    args: [z.number().int().min(1).max(100).default(4)],
+  },
+  async (ctx, limit: number = 4) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Unauthorized" };
-    }
 
+    const userId = ctx.userId;
+
+    // ACTIVE only: a non-ACTIVE membership row must not expose the roster (L2).
     const userCommunities = await prisma.member.findMany({
-      where: { userId },
+      where: { userId, status: "ACTIVE" },
       select: { communityId: true },
     });
     const communityIds = userCommunities.map((m) => m.communityId);
@@ -623,16 +663,21 @@ export async function getRecentMembers(limit: number = 4) {
     return { success: false, error: "Failed to load members" };
   }
 }
+);
 
 /**
  * Get community performance snapshot
  */
-export async function getPerformanceSnapshot() {
+export const getPerformanceSnapshot = defineAction(
+  {
+    name: "getPerformanceSnapshot",
+    auth: "user",
+    args: [],
+  },
+  async (ctx) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Unauthorized" };
-    }
+
+    const userId = ctx.userId;
 
     const userCommunities = await prisma.member.findMany({
       where: { userId },
@@ -707,13 +752,18 @@ export async function getPerformanceSnapshot() {
     return { success: false, error: "Failed to load snapshot" };
   }
 }
+);
 
-export async function getHostAnalyticsV1() {
+export const getHostAnalyticsV1 = defineAction(
+  {
+    name: "getHostAnalyticsV1",
+    auth: "user",
+    args: [],
+  },
+  async (ctx) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Unauthorized" };
-    }
+
+    const userId = ctx.userId;
 
     const hostMemberships = await prisma.member.findMany({
       where: {
@@ -815,13 +865,18 @@ export async function getHostAnalyticsV1() {
     return { success: false, error: "Failed to load host analytics" };
   }
 }
+);
 
-export async function getAIPlaybookRecommendations() {
+export const getAIPlaybookRecommendations = defineAction(
+  {
+    name: "getAIPlaybookRecommendations",
+    auth: "user",
+    args: [],
+  },
+  async (ctx) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Unauthorized" };
-    }
+
+    const userId = ctx.userId;
 
     const now = new Date();
     const last14Days = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
@@ -1061,8 +1116,15 @@ export async function getAIPlaybookRecommendations() {
     return { success: false, error: "Failed to load AI recommendations" };
   }
 }
+);
 
-export async function getNextRecommendedAction() {
+export const getNextRecommendedAction = defineAction(
+  {
+    name: "getNextRecommendedAction",
+    auth: "user",
+    args: [],
+  },
+  async (_ctx) => {
   try {
     const [metricsRes, nextSessionRes, hostAnalyticsRes] = await Promise.all([
       getDashboardMetrics(),
@@ -1144,13 +1206,18 @@ export async function getNextRecommendedAction() {
     return { success: false, error: "Failed to load recommendation" };
   }
 }
+);
 
-export async function getHostAlerts() {
+export const getHostAlerts = defineAction(
+  {
+    name: "getHostAlerts",
+    auth: "user",
+    args: [],
+  },
+  async (ctx) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Unauthorized" };
-    }
+
+    const userId = ctx.userId;
 
     const now = new Date();
     const in14Days = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
@@ -1281,13 +1348,18 @@ export async function getHostAlerts() {
     return { success: false, error: "Failed to load host alerts" };
   }
 }
+);
 
-export async function getCommunityOSSnapshot() {
+export const getCommunityOSSnapshot = defineAction(
+  {
+    name: "getCommunityOSSnapshot",
+    auth: "user",
+    args: [],
+  },
+  async (ctx) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Unauthorized" };
-    }
+
+    const userId = ctx.userId;
 
     const now = new Date();
     const weekStart = new Date(now);
@@ -1508,6 +1580,7 @@ export async function getCommunityOSSnapshot() {
     return { success: false, error: "Failed to load community OS snapshot" };
   }
 }
+);
 
 // NOTE (Sub-Phase E Commit 9): getDashboardSnapshot was removed — the Commit 4
 // home rewrite replaced it with getTodayDashboard, leaving it with 0 consumers.
@@ -1517,12 +1590,16 @@ export async function getCommunityOSSnapshot() {
 // current consumers but are the telemetry an Advanced dashboard route would
 // reuse, and getUserIdentitySnapshot/getNextLiveSession are still used elsewhere.
 // Tracked for a deliberate dead-code pass if the Advanced route is dropped.
-export async function getAutopilotDashboardSnapshot() {
+export const getAutopilotDashboardSnapshot = defineAction(
+  {
+    name: "getAutopilotDashboardSnapshot",
+    auth: "user",
+    args: [],
+  },
+  async (ctx) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Unauthorized" };
-    }
+
+    const userId = ctx.userId;
 
     const hostCommunities = await prisma.member.findMany({
       where: { userId, role: { in: ["OWNER", "ADMIN", "MODERATOR"] } },
@@ -1629,3 +1706,4 @@ export async function getAutopilotDashboardSnapshot() {
     return { success: false, error: "Failed to load autopilot snapshot" };
   }
 }
+);

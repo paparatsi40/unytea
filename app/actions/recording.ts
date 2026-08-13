@@ -1,7 +1,11 @@
 "use server";
 
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUserId } from "@/lib/auth-utils";
+import { defineAction } from "@/lib/actions/define-action";
+import { assertSessionHost } from "@/lib/actions/guards";
+import { communityById, communityOfRecording, communityOfSession } from "@/lib/actions/resolvers";
+import { createSessionRecording } from "@/lib/jobs/recording";
 
 // Check LiveKit credentials
 const LIVEKIT_API_KEY = process.env.LIVEKIT_API_KEY || "";
@@ -32,71 +36,35 @@ export interface RecordingInfo {
  * Egress configuration. This function validates permissions and creates the DB record.
  * The actual recording starts when the webhook 'egress_started' arrives.
  */
-export async function startCompositeRecording(
-  config: RecordingConfig
-): Promise<{ success: boolean; recording?: RecordingInfo; error?: string }> {
+export const startCompositeRecording = defineAction(
+  {
+    name: "startCompositeRecording",
+    auth: "member",
+    args: [
+      z.object({
+        sessionId: z.string().min(1).max(64),
+        roomName: z.string().max(200),
+        layout: z.enum(["grid", "speaker", "single-speaker"]).optional(),
+        audioOnly: z.boolean().optional(),
+      }),
+    ],
+    community: ([config]) => communityOfSession(config.sessionId),
+    rateLimit: "create",
+  },
+  async (ctx, config: RecordingConfig) => {
+    await assertSessionHost(ctx, config.sessionId);
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Authentication required" };
-    }
-
-    // Verify host
-    const session = await prisma.mentorSession.findUnique({
-      where: { id: config.sessionId },
-      select: { mentorId: true, status: true, videoRoomName: true },
+    return await createSessionRecording({
+      sessionId: config.sessionId,
+      layout: config.layout,
+      audioOnly: config.audioOnly,
     });
-
-    if (!session) {
-      return { success: false, error: "Session not found" };
-    }
-
-    if (session.mentorId !== userId) {
-      return { success: false, error: "Only host can start recording" };
-    }
-
-    if (session.status !== "IN_PROGRESS") {
-      return { success: false, error: "Session not live" };
-    }
-
-    // Check if recording already exists
-    const existing = await prisma.recording.findUnique({
-      where: { sessionId: config.sessionId },
-    });
-
-    if (existing && existing.status === "PROCESSING") {
-      return { success: false, error: "Recording already in progress" };
-    }
-
-    // For V1: Recording is auto-started via LiveKit Cloud dashboard config
-    // We just create the DB record here with a placeholder egressId
-    // The webhook handler will update this when the actual egress starts
-    const recording = await prisma.recording.create({
-      data: {
-        sessionId: config.sessionId,
-        status: "PROCESSING",
-        egressId: `pending-${Date.now()}`, // Placeholder until webhook arrives
-        processingStartedAt: new Date(),
-        storageProvider: "s3",
-      },
-    });
-
-    console.log(`[Recording] Recording initialized for session ${config.sessionId}`);
-    console.log(`[Recording] Actual recording will start via LiveKit Cloud webhook`);
-
-    return {
-      success: true,
-      recording: {
-        egressId: recording.egressId || "",
-        status: "PENDING_WEBHOOK",
-        startedAt: new Date(),
-      },
-    };
   } catch (error) {
     console.error("[Recording] Failed to start:", error);
     return { success: false, error: "Failed to start recording" };
   }
 }
+);
 
 /**
  * Stop recording for a session
@@ -104,15 +72,18 @@ export async function startCompositeRecording(
  * NOTE: For V1, recording stops automatically when room ends or via LiveKit dashboard.
  * This function marks the recording as stopped in our DB.
  */
-export async function stopRecording(
-  sessionId: string
-): Promise<{ success: boolean; error?: string }> {
+export const stopRecording = defineAction(
+  {
+    name: "stopRecording",
+    auth: "member",
+    args: [z.string().min(1).max(64)],
+    community: ([sessionId]) => communityOfSession(sessionId),
+  },
+  async (ctx, sessionId: string) => {
+    await assertSessionHost(ctx, sessionId);
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Authentication required" };
-    }
 
+    const userId = ctx.userId;
     // Verify host
     const session = await prisma.mentorSession.findUnique({
       where: { id: sessionId },
@@ -146,21 +117,19 @@ export async function stopRecording(
     return { success: false, error: "Failed to stop recording" };
   }
 }
+);
 
 /**
  * Get recording status and info
  */
-export async function getRecordingStatus(sessionId: string): Promise<{
-  success: boolean;
-  recording?: {
-    id: string;
-    status: string;
-    url: string | null;
-    durationSeconds: number | null;
-    processingProgress?: number;
-  };
-  error?: string;
-}> {
+export const getRecordingStatus = defineAction(
+  {
+    name: "getRecordingStatus",
+    auth: "member",
+    args: [z.string().min(1).max(64)],
+    community: ([sessionId]) => communityOfSession(sessionId),
+  },
+  async (_ctx, sessionId: string) => {
   try {
     const recording = await prisma.recording.findUnique({
       where: { sessionId },
@@ -184,30 +153,28 @@ export async function getRecordingStatus(sessionId: string): Promise<{
     return { success: false, error: "Failed to get recording status" };
   }
 }
+);
 
 /**
  * List recordings for a community
  */
-export async function listRecordings(
-  communityId: string,
-  options?: {
-    limit?: number;
-    offset?: number;
-    status?: "PROCESSING" | "READY" | "FAILED";
-  }
-): Promise<{
-  success: boolean;
-  recordings?: Array<{
-    id: string;
-    sessionId: string;
-    sessionTitle: string;
-    status: string;
-    url: string | null;
-    durationSeconds: number | null;
-    createdAt: Date;
-  }>;
-  error?: string;
-}> {
+export const listRecordings = defineAction(
+  {
+    name: "listRecordings",
+    auth: "member",
+    args: [
+      z.string().min(1).max(64),
+      z
+        .object({
+          limit: z.number().int().min(1).max(100).optional(),
+          offset: z.number().int().min(0).max(100_000).optional(),
+          status: z.enum(["PROCESSING", "READY", "FAILED"]).optional(),
+        })
+        .optional(),
+    ],
+    community: ([communityId]) => communityById(communityId),
+  },
+  async (_ctx, communityId: string, options?: { limit?: number; offset?: number; status?: "PROCESSING" | "READY" | "FAILED"; }) => {
   try {
     const recordings = await prisma.recording.findMany({
       where: {
@@ -247,37 +214,36 @@ export async function listRecordings(
     return { success: false, error: "Failed to list recordings" };
   }
 }
+);
 
 /**
  * Delete a recording
  */
-export async function deleteRecording(
-  recordingId: string
-): Promise<{ success: boolean; error?: string }> {
-  try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Authentication required" };
-    }
-
+export const deleteRecording = defineAction(
+  {
+    name: "deleteRecording",
+    auth: "member",
+    args: [z.string().min(1).max(64)],
+    community: ([recordingId]) => communityOfRecording(recordingId),
+  },
+  async (ctx, recordingId: string) => {
     const recording = await prisma.recording.findUnique({
       where: { id: recordingId },
-      include: {
-        session: {
-          select: { mentorId: true },
-        },
-      },
+      select: { sessionId: true },
     });
 
     if (!recording) {
-      return { success: false, error: "Recording not found" };
+      return { success: false as const, error: "Recording not found" };
     }
 
-    // Only host or admin can delete
-    if (recording.session.mentorId !== userId) {
-      return { success: false, error: "Not authorized" };
-    }
+    // The comment here used to say "host or admin" while the code compared
+    // mentorId alone, so a community OWNER/ADMIN could not delete a recording.
+    // assertSessionHost implements the documented policy — host or community
+    // OWNER/ADMIN — and matches startCompositeRecording. Runs above the try so
+    // its ForbiddenError reaches the seam.
+    await assertSessionHost(ctx, recording.sessionId);
 
+  try {
     // TODO: Delete from S3/R2 storage
     // const s3Client = new S3Client(...);
     // await s3Client.send(new DeleteObjectCommand({...}));
@@ -293,60 +259,25 @@ export async function deleteRecording(
     return { success: false, error: "Failed to delete recording" };
   }
 }
+);
 
-/**
- * Auto-start recording when session goes live
- * Call this from the room_started webhook handler
- */
-export async function autoStartRecording(sessionId: string): Promise<void> {
-  try {
-    const session = await prisma.mentorSession.findUnique({
-      where: { id: sessionId },
-      select: {
-        videoRoomName: true,
-        mode: true,
-      },
-    });
 
-    if (!session || !session.videoRoomName) {
-      console.error(`[Recording] No room name for session ${sessionId}`);
-      return;
-    }
-
-    // Check if recording already exists
-    const existing = await prisma.recording.findUnique({
-      where: { sessionId },
-    });
-
-    if (existing) {
-      console.log(`[Recording] Already exists for session ${sessionId}`);
-      return;
-    }
-
-    // Create recording record
-    await startCompositeRecording({
-      sessionId,
-      roomName: session.videoRoomName,
-      layout: "grid",
-      audioOnly: session.mode === "AUDIO",
-    });
-  } catch (error) {
-    console.error("[Recording] Auto-start error:", error);
-  }
-}
 
 /**
  * Generate signed URL for private recording access
  * Optional: if you want to keep recordings private
  */
-export async function getSignedRecordingUrl(
-  recordingId: string
-): Promise<{ success: boolean; url?: string; error?: string }> {
+export const getSignedRecordingUrl = defineAction(
+  {
+    name: "getSignedRecordingUrl",
+    auth: "member",
+    args: [z.string().min(1).max(64)],
+    community: ([recordingId]) => communityOfRecording(recordingId),
+  },
+  async (_ctx, recordingId: string) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Authentication required" };
-    }
+
+
 
     const recording = await prisma.recording.findUnique({
       where: { id: recordingId },
@@ -374,3 +305,4 @@ export async function getSignedRecordingUrl(
     return { success: false, error: "Failed to generate URL" };
   }
 }
+);

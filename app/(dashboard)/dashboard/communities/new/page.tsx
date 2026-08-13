@@ -97,7 +97,10 @@ export default function NewCommunityPage() {
   } | null>(null);
 
   useEffect(() => {
-    checkCommunityPlanLimit().then(setPlanCheck);
+    checkCommunityPlanLimit().then((result) => {
+      // The action can return an ActionFailure; only a real limit payload is state.
+      setPlanCheck("canCreate" in result ? result : null);
+    });
   }, []);
   const [logoInputType, setLogoInputType] = useState<"upload" | "url">("upload");
   const [coverInputType, setCoverInputType] = useState<"upload" | "url">("upload");

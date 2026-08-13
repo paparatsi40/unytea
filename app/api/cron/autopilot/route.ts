@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { runAutopilotDueJobs } from "@/app/actions/autopilot";
+import { runAutopilotDueJobs } from "@/lib/jobs/autopilot";
 import { verifyCronAuth } from "@/lib/cron-auth";
 
 /**

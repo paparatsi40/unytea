@@ -1,10 +1,16 @@
-"use server";
-
+/**
+ * Internal pipeline — deliberately NOT a "use server" module.
+ *
+ * Next.js turns every export of a "use server" file into a public POST
+ * endpoint, which made these reachable without the CRON_SECRET that guards
+ * the cron routes calling them (SEC-11). They are imported directly by those
+ * routes instead, so the secret is the only way in.
+ */
 import { WebhookReceiver, EgressStatus, type WebhookEvent } from "livekit-server-sdk";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { autoStartRecording } from "./recording";
-import { createNotification } from "./notifications";
+import { autoStartRecording } from "@/lib/jobs/recording";
+import { createNotification } from "@/lib/notifications";
 import { generateAISessionSummary } from "./session-ai";
 import { generateSessionRecap } from "./session-jobs";
 import { PostContentType, Prisma, SessionEventType } from "@prisma/client";

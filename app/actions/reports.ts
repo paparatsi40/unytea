@@ -1,18 +1,29 @@
 "use server";
 
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUserId } from "@/lib/auth-utils";
 import { ReportReason, ReportStatus, ReportTargetType } from "@prisma/client";
+import { defineAction } from "@/lib/actions/define-action";
+import { communityOfReport } from "@/lib/actions/resolvers";
 
-export interface CreateReportInput {
-  targetType: ReportTargetType;
-  reason: ReportReason;
-  postId?: string;
-  commentId?: string;
-  userId?: string;
-  messageId?: string;
-  description?: string;
-}
+/**
+ * Content reporting and the moderation queue.
+ *
+ * SEC-09: `resolveReport` and `getReports` both carried
+ * `// TODO: Add permission check to ensure user is admin/moderator`, and neither
+ * ever got one. Any authenticated account could read the entire moderation
+ * queue and resolve or dismiss any report — including every report filed against
+ * itself — with the audit trail recording the abuser as the resolver.
+ *
+ * The Report model has no `communityId`; it stores a `targetType` plus loose
+ * post/comment/user/message ids. `communityOfReport` walks to the owning
+ * community through the reported artefact. USER and MESSAGE reports have no
+ * community at all, so they resolve to null and only platform staff can action
+ * them — which is what `allowPlatformAdmin` expresses.
+ */
+
+const reportIdSchema = z.string().min(1).max(64);
+const targetIdSchema = z.string().min(1).max(64).optional();
 
 export interface ReportWithRelations {
   id: string;
@@ -30,67 +41,53 @@ export interface ReportWithRelations {
   resolution: string | null;
   createdAt: Date;
   updatedAt: Date;
-  reporter?: {
-    id: string;
-    name: string | null;
-    email: string;
-    image: string | null;
-  };
 }
 
-/**
- * Create a new report
- * Prevents duplicate reports from the same user on the same target
- */
-export async function createReport(data: CreateReportInput) {
-  try {
-    const reporterId = await getCurrentUserId();
-
-    if (!reporterId) {
-      return {
-        success: false,
-        error: "You must be authenticated to report content",
-      };
-    }
-
-    // Validate that at least one target is specified
+export const createReport = defineAction(
+  {
+    name: "createReport",
+    auth: "user",
+    args: [
+      z.object({
+        targetType: z.nativeEnum(ReportTargetType),
+        reason: z.nativeEnum(ReportReason),
+        postId: targetIdSchema,
+        commentId: targetIdSchema,
+        userId: targetIdSchema,
+        messageId: targetIdSchema,
+        description: z.string().max(5000).optional(),
+      }),
+    ],
+    rateLimit: "create",
+  },
+  async (ctx, data) => {
     const hasTarget = data.postId || data.commentId || data.userId || data.messageId;
     if (!hasTarget) {
-      return {
-        success: false,
-        error: "You must specify what you are reporting",
-      };
+      return { success: false as const, error: "You must specify what you are reporting" };
     }
 
-    // Check for duplicate reports from the same user on the same target
     const existingReport = await prisma.report.findFirst({
       where: {
-        reporterId,
+        reporterId: ctx.userId,
         targetType: data.targetType,
         postId: data.postId || undefined,
         commentId: data.commentId || undefined,
         userId: data.userId || undefined,
         messageId: data.messageId || undefined,
-        status: {
-          in: ["PENDING", "REVIEWING"],
-        },
+        status: { in: ["PENDING", "REVIEWING"] },
       },
     });
 
     if (existingReport) {
-      return {
-        success: false,
-        error: "You have already reported this content",
-      };
+      return { success: false as const, error: "You have already reported this content" };
     }
 
-    // Create the report
     const report = await prisma.report.create({
       data: {
         targetType: data.targetType,
         reason: data.reason,
         description: data.description,
-        reporterId,
+        reporterId: ctx.userId,
         postId: data.postId,
         commentId: data.commentId,
         userId: data.userId,
@@ -98,148 +95,94 @@ export async function createReport(data: CreateReportInput) {
       },
     });
 
-    return {
-      success: true,
-      data: report,
-    };
-  } catch (error) {
-    console.error("[createReport] Error:", error);
-    return {
-      success: false,
-      error: "Failed to create report",
-    };
+    return { success: true as const, data: report };
   }
-}
+);
 
 /**
- * Get reports (for admins/moderators)
- * Optionally filter by status
+ * The moderation queue for one community.
+ *
+ * `communityId` is now required. It used to be `_communityId` — accepted and
+ * discarded — so the query returned every report on the platform to any
+ * authenticated caller.
  */
-export async function getReports(status?: ReportStatus | string, _communityId?: string) {
-  try {
-    const userId = await getCurrentUserId();
-
-    if (!userId) {
-      return {
-        success: false,
-        error: "You must be authenticated",
-      };
-    }
-
-    // TODO: Add permission check to ensure user is admin/moderator
-    // You may want to add checks like:
-    // const user = await prisma.user.findUnique({ where: { id: userId }, include: { ... } })
-    // if (!isAdmin) throw new Error('Unauthorized');
+export const getReports = defineAction(
+  {
+    name: "getReports",
+    auth: "admin",
+    args: [
+      z.string().min(1).max(64),
+      z.nativeEnum(ReportStatus).optional(),
+    ],
+    community: ([communityId]) => communityId,
+    roles: ["OWNER", "ADMIN", "MODERATOR"],
+    allowPlatformAdmin: true,
+  },
+  async (_ctx, communityId, status) => {
+    // Scope to artefacts belonging to this community.
+    const [postIds, commentIds] = await Promise.all([
+      prisma.post.findMany({ where: { communityId }, select: { id: true }, take: 5000 }),
+      prisma.comment.findMany({
+        where: { post: { communityId } },
+        select: { id: true },
+        take: 5000,
+      }),
+    ]);
 
     const reports = await prisma.report.findMany({
       where: {
-        ...(status && { status: status as ReportStatus }),
+        ...(status ? { status } : {}),
+        OR: [
+          { postId: { in: postIds.map((p) => p.id) } },
+          { commentId: { in: commentIds.map((c) => c.id) } },
+        ],
       },
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: { createdAt: "desc" },
+      take: 200,
     });
 
-    return {
-      success: true,
-      data: reports,
-    };
-  } catch (error) {
-    console.error("[getReports] Error:", error);
-    return {
-      success: false,
-      error: "Failed to fetch reports",
-    };
+    return { success: true as const, data: reports };
   }
-}
+);
 
-/**
- * Resolve a report
- */
-export async function resolveReport(
-  reportId: string,
-  resolution: string,
-  status: "RESOLVED" | "DISMISSED"
-) {
-  try {
-    const userId = await getCurrentUserId();
-
-    if (!userId) {
-      return {
-        success: false,
-        error: "You must be authenticated",
-      };
-    }
-
-    // TODO: Add permission check to ensure user is admin/moderator
-    // const user = await prisma.user.findUnique({ where: { id: userId }, include: { ... } })
-    // if (!isAdmin) throw new Error('Unauthorized');
-
-    // Validate status
-    if (!["RESOLVED", "DISMISSED"].includes(status)) {
-      return {
-        success: false,
-        error: "Invalid status. Must be RESOLVED or DISMISSED",
-      };
-    }
-
+export const resolveReport = defineAction(
+  {
+    name: "resolveReport",
+    auth: "admin",
+    args: [reportIdSchema, z.string().max(5000), z.enum(["RESOLVED", "DISMISSED"])],
+    community: ([reportId]) => communityOfReport(reportId),
+    roles: ["OWNER", "ADMIN", "MODERATOR"],
+    allowPlatformAdmin: true,
+  },
+  async (ctx, reportId, resolution, status) => {
     const report = await prisma.report.update({
       where: { id: reportId },
       data: {
         status: status as ReportStatus,
         resolution,
-        resolvedBy: userId,
+        resolvedBy: ctx.userId,
         resolvedAt: new Date(),
       },
     });
 
-    return {
-      success: true,
-      data: report,
-    };
-  } catch (error) {
-    console.error("[resolveReport] Error:", error);
-    return {
-      success: false,
-      error: "Failed to resolve report",
-    };
+    return { success: true as const, data: report };
   }
-}
+);
 
-/**
- * Get a single report by ID
- */
-export async function getReportById(reportId: string) {
-  try {
-    const userId = await getCurrentUserId();
-
-    if (!userId) {
-      return {
-        success: false,
-        error: "You must be authenticated",
-      };
-    }
-
-    const report = await prisma.report.findUnique({
-      where: { id: reportId },
-    });
-
+export const getReportById = defineAction(
+  {
+    name: "getReportById",
+    auth: "admin",
+    args: [reportIdSchema],
+    community: ([reportId]) => communityOfReport(reportId),
+    roles: ["OWNER", "ADMIN", "MODERATOR"],
+    allowPlatformAdmin: true,
+  },
+  async (_ctx, reportId) => {
+    const report = await prisma.report.findUnique({ where: { id: reportId } });
     if (!report) {
-      return {
-        success: false,
-        error: "Report not found",
-      };
+      return { success: false as const, error: "Report not found" };
     }
-
-    return {
-      success: true,
-      data: report,
-    };
-  } catch (error) {
-    console.error("[getReportById] Error:", error);
-    return {
-      success: false,
-      error: "Failed to fetch report",
-    };
+    return { success: true as const, data: report };
   }
-}
+);

@@ -1,8 +1,10 @@
 "use server";
 
+import { z } from "zod";
 import { revalidatePath } from "next/cache";
-import { getCurrentUserId } from "@/lib/auth-utils";
 import { prisma } from "@/lib/prisma";
+import { defineAction } from "@/lib/actions/define-action";
+import { communityById } from "@/lib/actions/resolvers";
 import { Prisma } from "@prisma/client";
 
 /** Sesión candidata a convertirse en curso (payload de getConvertibleSessions). */
@@ -24,9 +26,16 @@ type ScoredSession = ConvertibleSession & { engagementScore: number };
  * Get all sessions that can be converted to courses
  * Completed sessions with recordings that aren't yet in courses
  */
-export async function getConvertibleSessions(communityId?: string) {
+export const getConvertibleSessions = defineAction(
+  {
+    name: "getConvertibleSessions",
+    auth: "user",
+    args: [z.string().min(1).max(64).optional()],
+  },
+  async (ctx, communityId?: string) => {
   try {
-    const userId = await getCurrentUserId();
+
+    const userId = ctx.userId;
 
     if (!userId) {
       return { success: false, error: "Not authenticated" };
@@ -82,6 +91,7 @@ export async function getConvertibleSessions(communityId?: string) {
     return { success: false, error: "Failed to fetch sessions" };
   }
 }
+);
 
 /**
  * Calculate engagement score based on attendance, duration, and resources
@@ -118,9 +128,16 @@ function calculateEngagementScore(session: ConvertibleSession): number {
  * Analyze sessions and suggest course groupings
  * Groups by title similarity and community
  */
-export async function analyzeCoursePotential(communityId?: string) {
+export const analyzeCoursePotential = defineAction(
+  {
+    name: "analyzeCoursePotential",
+    auth: "user",
+    args: [z.string().min(1).max(64).optional()],
+  },
+  async (ctx, communityId?: string) => {
   try {
-    const userId = await getCurrentUserId();
+
+    const userId = ctx.userId;
 
     if (!userId) {
       return { success: false, error: "Not authenticated" };
@@ -168,6 +185,7 @@ export async function analyzeCoursePotential(communityId?: string) {
     return { success: false, error: "Failed to analyze" };
   }
 }
+);
 
 /**
  * Group sessions by topic similarity
@@ -279,9 +297,16 @@ function estimatePotentialStudents(sessions: ScoredSession[]): number {
 /**
  * Get knowledge impact stats for the user
  */
-export async function getKnowledgeImpact(communityId?: string) {
+export const getKnowledgeImpact = defineAction(
+  {
+    name: "getKnowledgeImpact",
+    auth: "user",
+    args: [z.string().min(1).max(64).optional()],
+  },
+  async (ctx, communityId?: string) => {
   try {
-    const userId = await getCurrentUserId();
+
+    const userId = ctx.userId;
 
     if (!userId) {
       return { success: false, error: "Not authenticated" };
@@ -372,22 +397,32 @@ export async function getKnowledgeImpact(communityId?: string) {
     return { success: false, error: "Failed to get stats" };
   }
 }
+);
 
 /**
  * Create a course from multiple selected sessions
  */
-export async function createCourseFromSessions(
-  sessionIds: string[],
-  courseData: {
-    title: string;
-    description?: string;
-    communityId: string;
-    isPaid?: boolean;
-    price?: number;
-  }
-) {
+export const createCourseFromSessions = defineAction(
+  {
+    name: "createCourseFromSessions",
+    auth: "admin",
+    args: [
+      z.array(z.string().min(1).max(64)).min(1).max(100),
+      z.object({
+        title: z.string().min(1).max(300),
+        description: z.string().max(10_000).optional(),
+        communityId: z.string().min(1).max(64),
+        isPaid: z.boolean().optional(),
+        price: z.number().min(0).max(1_000_000).optional(),
+      }),
+    ],
+    community: ([, courseData]) => communityById(courseData.communityId),
+    rateLimit: "create",
+  },
+  async (ctx, sessionIds: string[], courseData: { title: string; description?: string; communityId: string; isPaid?: boolean; price?: number; }) => {
   try {
-    const userId = await getCurrentUserId();
+
+    const userId = ctx.userId;
 
     if (!userId) {
       return { success: false, error: "Not authenticated" };
@@ -518,3 +553,4 @@ export async function createCourseFromSessions(
     return { success: false, error: "Failed to create course" };
   }
 }
+);

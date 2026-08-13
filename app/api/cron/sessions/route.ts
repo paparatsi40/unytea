@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { runSessionJobs } from "@/app/actions/session-jobs";
+import { runSessionJobs } from "@/lib/jobs/session-jobs";
 import { verifyCronAuth } from "@/lib/cron-auth";
 
 /**

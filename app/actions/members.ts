@@ -1,11 +1,33 @@
 "use server";
 
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { getCurrentUserId } from "@/lib/auth-utils";
 import type { MemberStatus, Prisma } from "@prisma/client";
+import { defineAction } from "@/lib/actions/define-action";
+import { communityById } from "@/lib/actions/resolvers";
 
-// Optimized select for member data
+/**
+ * Member directory.
+ *
+ * SEC-02a: `getCommunityMembers` and `getMemberProfile` had no authentication at
+ * all, and the projection below includes `email`. Since Next.js exposes every
+ * "use server" export as a public POST endpoint, an unauthenticated caller who
+ * knew a communityId — they are returned by the public /explore listing — could
+ * pull the full roster of any private, paid community: every member's address,
+ * real name, location, bio and last-active time, unpaginated. Both now require
+ * ACTIVE membership of the community being read.
+ */
+
+const communityIdSchema = z.string().min(1).max(64);
+const userIdSchema = z.string().min(1).max(64);
+
+/**
+ * `email` is deliberately absent. A member directory needs a display identity,
+ * not a contact address; exposing it turned any membership into a mailing list.
+ * Direct messaging goes through app/actions/messages.ts, which never needs the
+ * address either.
+ */
 const memberSelect = {
   id: true,
   role: true,
@@ -15,7 +37,6 @@ const memberSelect = {
     select: {
       id: true,
       name: true,
-      email: true,
       image: true,
       username: true,
       bio: true,
@@ -27,69 +48,83 @@ const memberSelect = {
       lastActiveAt: true,
     },
   },
-};
+} satisfies Prisma.MemberSelect;
 
-/**
- * Get all members of a community with optional filters
- */
-export async function getCommunityMembers(
-  communityId: string,
-  filters?: {
-    search?: string;
-    status?: string;
-    sortBy?: "recent" | "name";
-  }
-) {
-  try {
+export const getCommunityMembers = defineAction(
+  {
+    name: "getCommunityMembers",
+    auth: "member",
+    args: [
+      communityIdSchema,
+      z
+        .object({
+          search: z.string().max(200).optional(),
+          status: z.string().max(50).optional(),
+          sortBy: z.enum(["recent", "name"]).optional(),
+        })
+        .optional(),
+    ],
+    community: ([communityId]) => communityById(communityId),
+  },
+  async (_ctx, communityId, filters) => {
+    // Search runs in SQL rather than over a full unbounded fetch filtered in JS,
+    // which previously transferred every member row on each keystroke (PERF-01).
     const where: Prisma.MemberWhereInput = {
       communityId,
       status: "ACTIVE" as MemberStatus,
+      ...(filters?.search
+        ? {
+            user: {
+              OR: [
+                { name: { contains: filters.search, mode: "insensitive" } },
+                { bio: { contains: filters.search, mode: "insensitive" } },
+                { tagline: { contains: filters.search, mode: "insensitive" } },
+                { skills: { has: filters.search } },
+                { interests: { has: filters.search } },
+              ],
+            },
+          }
+        : {}),
+      ...(filters?.status ? { user: { availabilityStatus: filters.status } } : {}),
     };
 
-    // Build query
     const members = await prisma.member.findMany({
       where,
       select: memberSelect,
       orderBy: filters?.sortBy === "recent" ? { joinedAt: "desc" } : { user: { name: "asc" } },
+      take: 200,
     });
 
-    // Apply client-side filters
-    let filteredMembers = members;
-
-    if (filters?.search) {
-      const searchLower = filters.search.toLowerCase();
-      filteredMembers = filteredMembers.filter(
-        (m) =>
-          m.user.name?.toLowerCase().includes(searchLower) ||
-          m.user.bio?.toLowerCase().includes(searchLower) ||
-          m.user.tagline?.toLowerCase().includes(searchLower) ||
-          m.user.skills?.some((s) => s.toLowerCase().includes(searchLower)) ||
-          m.user.interests?.some((i) => i.toLowerCase().includes(searchLower))
-      );
-    }
-
-    if (filters?.status) {
-      filteredMembers = filteredMembers.filter((m) => m.user.availabilityStatus === filters.status);
-    }
-
-    return { success: true, members: filteredMembers };
-  } catch (error) {
-    console.error("Error getting community members:", error);
-    return { success: false, error: "Failed to get members", members: [] };
+    return { success: true as const, members };
   }
-}
+);
 
-/**
- * Get member profile
- */
-export async function getMemberProfile(userId: string, communityId?: string) {
-  try {
+export const getMemberProfile = defineAction(
+  {
+    name: "getMemberProfile",
+    auth: "member",
+    args: [userIdSchema, communityIdSchema],
+    // Scoped to the community the profile is being viewed within, so a caller
+    // can only read profiles of people in a community they belong to.
+    community: ([, communityId]) => communityById(communityId),
+  },
+  async (_ctx, userId, communityId) => {
+    // Only surface a profile if the subject actually belongs to this community —
+    // otherwise the action becomes a lookup of any user by id.
+    const membership = await prisma.member.findUnique({
+      where: { userId_communityId: { userId, communityId } },
+      select: { role: true, joinedAt: true, status: true },
+    });
+
+    if (!membership || membership.status !== "ACTIVE") {
+      return { success: false as const, error: "Member not found" };
+    }
+
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: {
         id: true,
         name: true,
-        email: true,
         image: true,
         username: true,
         bio: true,
@@ -102,140 +137,81 @@ export async function getMemberProfile(userId: string, communityId?: string) {
         availabilityStatus: true,
         createdAt: true,
         lastActiveAt: true,
+        _count: { select: { posts: true, comments: true, channelMessages: true } },
       },
     });
 
     if (!user) {
-      return { success: false, error: "User not found" };
+      return { success: false as const, error: "Member not found" };
     }
 
-    // Get membership info if communityId provided
-    let membership = null;
-    if (communityId) {
-      membership = await prisma.member.findUnique({
-        where: {
-          userId_communityId: {
-            userId,
-            communityId,
-          },
-        },
-        select: {
-          role: true,
-          joinedAt: true,
-        },
-      });
-    }
-
-    // Get stats
-    const stats = await prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        _count: {
-          select: {
-            posts: true,
-            comments: true,
-            channelMessages: true,
-          },
-        },
-      },
-    });
-
+    const { _count, ...profile } = user;
     return {
-      success: true,
-      user,
-      membership,
-      stats: stats?._count,
+      success: true as const,
+      user: profile,
+      membership: { role: membership.role, joinedAt: membership.joinedAt },
+      stats: _count,
     };
-  } catch (error) {
-    console.error("Error getting member profile:", error);
-    return { success: false, error: "Failed to get profile" };
   }
-}
+);
 
-/**
- * Update user profile
- */
-export async function updateUserProfile(data: {
-  name?: string;
-  bio?: string;
-  tagline?: string;
-  skills?: string[];
-  interests?: string[];
-  website?: string;
-  location?: string;
-  availabilityStatus?: string;
-}) {
-  try {
-    const userId = await getCurrentUserId();
-
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
-
+export const updateUserProfile = defineAction(
+  {
+    name: "updateUserProfile",
+    auth: "user",
+    args: [
+      z.object({
+        name: z.string().min(1).max(100).optional(),
+        bio: z.string().max(2000).optional(),
+        tagline: z.string().max(200).optional(),
+        skills: z.array(z.string().max(50)).max(30).optional(),
+        interests: z.array(z.string().max(50)).max(30).optional(),
+        website: z.string().url().max(500).optional().or(z.literal("")),
+        location: z.string().max(120).optional(),
+        availabilityStatus: z.enum(["AVAILABLE", "BUSY", "DO_NOT_DISTURB", "MENTORING"]).optional(),
+      }),
+    ],
+  },
+  async (ctx, data) => {
     const user = await prisma.user.update({
-      where: { id: userId },
-      data: {
-        ...data,
-        updatedAt: new Date(),
-      },
+      where: { id: ctx.userId },
+      data: { ...data, updatedAt: new Date() },
     });
 
     revalidatePath("/dashboard/settings/profile");
     revalidatePath("/dashboard/c/[slug]/members", "page");
 
-    return { success: true, user };
-  } catch (error) {
-    console.error("Error updating profile:", error);
-    return { success: false, error: "Failed to update profile" };
+    return { success: true as const, user };
   }
-}
+);
 
-/**
- * Get online members count
- */
-export async function getOnlineMembersCount(communityId: string) {
-  try {
-    // Get members who were active in last 5 minutes
+export const getOnlineMembersCount = defineAction(
+  {
+    name: "getOnlineMembersCount",
+    auth: "member",
+    args: [communityIdSchema],
+    community: ([communityId]) => communityById(communityId),
+  },
+  async (_ctx, communityId) => {
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-
     const count = await prisma.member.count({
       where: {
         communityId,
         status: "ACTIVE",
-        user: {
-          lastActiveAt: {
-            gte: fiveMinutesAgo,
-          },
-        },
+        user: { lastActiveAt: { gte: fiveMinutesAgo } },
       },
     });
-
-    return { success: true, count };
-  } catch (error) {
-    console.error("Error getting online count:", error);
-    return { success: false, error: "Failed to get count", count: 0 };
+    return { success: true as const, count };
   }
-}
+);
 
-/**
- * Update last active timestamp
- */
-export async function updateLastActive() {
-  try {
-    const userId = await getCurrentUserId();
-
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
-
+export const updateLastActive = defineAction(
+  { name: "updateLastActive", auth: "user", args: [], rateLimit: "general" },
+  async (ctx) => {
     await prisma.user.update({
-      where: { id: userId },
+      where: { id: ctx.userId },
       data: { lastActiveAt: new Date() },
     });
-
-    return { success: true };
-  } catch (error) {
-    console.error("Error updating last active:", error);
-    return { success: false, error: "Failed to update" };
+    return { success: true as const };
   }
-}
+);

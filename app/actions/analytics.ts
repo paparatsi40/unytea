@@ -1,19 +1,23 @@
 "use server";
 
-import { getCurrentUserId } from "@/lib/auth-utils";
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { defineAction } from "@/lib/actions/define-action";
 import { addWeeks, endOfWeek, startOfDay, startOfWeek, subDays } from "date-fns";
 
 /**
  * Get overview analytics for dashboard
  */
-export async function getOverviewAnalytics() {
+export const getOverviewAnalytics = defineAction(
+  {
+    name: "getOverviewAnalytics",
+    auth: "user",
+    args: [],
+  },
+  async (ctx) => {
   try {
-    const userId = await getCurrentUserId();
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const userId = ctx.userId;
 
     // Get user's communities
     const ownedCommunities = await prisma.community.findMany({
@@ -88,17 +92,21 @@ export async function getOverviewAnalytics() {
     return { success: false, error: "Failed to fetch analytics" };
   }
 }
+);
 
 /**
  * Get community-specific analytics
  */
-export async function getCommunityAnalytics(communityId: string) {
+export const getCommunityAnalytics = defineAction(
+  {
+    name: "getCommunityAnalytics",
+    auth: "user",
+    args: [z.string().min(1).max(64)],
+  },
+  async (ctx, communityId: string) => {
   try {
-    const userId = await getCurrentUserId();
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const userId = ctx.userId;
 
     // Verify user owns the community
     const community = await prisma.community.findFirst({
@@ -217,17 +225,21 @@ export async function getCommunityAnalytics(communityId: string) {
     return { success: false, error: "Failed to fetch analytics" };
   }
 }
+);
 
 /**
  * Get engagement analytics
  */
-export async function getEngagementAnalytics(communityId: string) {
+export const getEngagementAnalytics = defineAction(
+  {
+    name: "getEngagementAnalytics",
+    auth: "user",
+    args: [z.string().min(1).max(64)],
+  },
+  async (ctx, communityId: string) => {
   try {
-    const userId = await getCurrentUserId();
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const userId = ctx.userId;
 
     // Verify ownership
     const community = await prisma.community.findFirst({
@@ -350,17 +362,21 @@ export async function getEngagementAnalytics(communityId: string) {
     return { success: false, error: "Failed to fetch engagement analytics" };
   }
 }
+);
 
 /**
  * Get member analytics
  */
-export async function getMemberAnalytics(communityId: string) {
+export const getMemberAnalytics = defineAction(
+  {
+    name: "getMemberAnalytics",
+    auth: "user",
+    args: [z.string().min(1).max(64)],
+  },
+  async (ctx, communityId: string) => {
   try {
-    const userId = await getCurrentUserId();
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const userId = ctx.userId;
 
     // Verify ownership
     const community = await prisma.community.findFirst({
@@ -413,13 +429,18 @@ export async function getMemberAnalytics(communityId: string) {
     return { success: false, error: "Failed to fetch member analytics" };
   }
 }
+);
 
-export async function getLiveCommunityHealthMetrics(communityId?: string) {
+export const getLiveCommunityHealthMetrics = defineAction(
+  {
+    name: "getLiveCommunityHealthMetrics",
+    auth: "user",
+    args: [z.string().min(1).max(64).optional()],
+  },
+  async (ctx, communityId?: string) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+
+    const userId = ctx.userId;
 
     const ownedCommunities = await prisma.community.findMany({
       where: { ownerId: userId },
@@ -521,11 +542,18 @@ export async function getLiveCommunityHealthMetrics(communityId?: string) {
     return { success: false, error: "Failed to fetch live community health metrics" };
   }
 }
+);
 
-export async function getNorthStarDecisionSnapshot(communityId?: string) {
+export const getNorthStarDecisionSnapshot = defineAction(
+  {
+    name: "getNorthStarDecisionSnapshot",
+    auth: "user",
+    args: [z.string().min(1).max(64).optional()],
+  },
+  async (ctx, communityId?: string) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) return { success: false, error: "Not authenticated" };
+
+    const userId = ctx.userId;
 
     const ownedCommunities = await prisma.community.findMany({
       where: { ownerId: userId },
@@ -722,13 +750,18 @@ export async function getNorthStarDecisionSnapshot(communityId?: string) {
     return { success: false, error: "Failed to fetch north star snapshot" };
   }
 }
+);
 
-export async function getRetentionCohorts(communityId?: string) {
+export const getRetentionCohorts = defineAction(
+  {
+    name: "getRetentionCohorts",
+    auth: "user",
+    args: [z.string().min(1).max(64).optional()],
+  },
+  async (ctx, communityId?: string) => {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+
+    const userId = ctx.userId;
 
     const ownedCommunities = await prisma.community.findMany({
       where: { ownerId: userId },
@@ -862,3 +895,4 @@ export async function getRetentionCohorts(communityId?: string) {
     return { success: false, error: "Failed to fetch retention cohorts" };
   }
 }
+);
