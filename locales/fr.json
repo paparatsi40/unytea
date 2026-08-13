@@ -308,14 +308,26 @@
         "subtitle": "Gérez votre compte et vos préférences"
       },
       "nav": {
-        "profile": { "name": "Profil", "description": "Gérez vos informations personnelles" },
+        "profile": {
+          "name": "Profil",
+          "description": "Gérez vos informations personnelles"
+        },
         "notifications": {
           "name": "Notifications",
           "description": "Configurez les préférences de notification"
         },
-        "billing": { "name": "Facturation", "description": "Gérez l'abonnement et les paiements" },
-        "appearance": { "name": "Apparence", "description": "Personnalisez votre expérience" },
-        "integrations": { "name": "Intégrations", "description": "Connectez des services tiers" }
+        "billing": {
+          "name": "Facturation",
+          "description": "Gérez l'abonnement et les paiements"
+        },
+        "appearance": {
+          "name": "Apparence",
+          "description": "Personnalisez votre expérience"
+        },
+        "integrations": {
+          "name": "Intégrations",
+          "description": "Connectez des services tiers"
+        }
       },
       "account": {
         "title": "Paramètres du compte",
@@ -350,9 +362,18 @@
         "themeTitle": "Thème",
         "themeSubtitle": "Choisissez l'apparence d'Unytea pour vous",
         "themes": {
-          "light": { "label": "Clair", "description": "Thème clair" },
-          "dark": { "label": "Sombre", "description": "Thème sombre" },
-          "system": { "label": "Système", "description": "Suivre le système" }
+          "light": {
+            "label": "Clair",
+            "description": "Thème clair"
+          },
+          "dark": {
+            "label": "Sombre",
+            "description": "Thème sombre"
+          },
+          "system": {
+            "label": "Système",
+            "description": "Suivre le système"
+          }
         },
         "saveButton": "Enregistrer le thème",
         "savingButton": "Enregistrement...",
@@ -412,7 +433,10 @@
           "label": "Commentaires",
           "description": "Quand quelqu'un commente votre publication"
         },
-        "mentions": { "label": "Mentions", "description": "Quand quelqu'un vous mentionne" },
+        "mentions": {
+          "label": "Mentions",
+          "description": "Quand quelqu'un vous mentionne"
+        },
         "reactions": {
           "label": "Réactions",
           "description": "Quand quelqu'un réagit à votre contenu"
@@ -434,12 +458,24 @@
         "comingSoon": "Bientôt disponible",
         "configure": "Configurer",
         "items": {
-          "stripe": { "description": "Acceptez les paiements pour les cours et les abonnements" },
-          "zoom": { "description": "Organisez des sessions vidéo avec l'intégration Zoom" },
-          "googleCalendar": { "description": "Synchronisez vos sessions avec Google Calendar" },
-          "zapier": { "description": "Connectez Unytea à plus de 5 000 applications" },
-          "slack": { "description": "Recevez les notifications de la communauté dans Slack" },
-          "discord": { "description": "Reliez votre communauté à Discord" }
+          "stripe": {
+            "description": "Acceptez les paiements pour les cours et les abonnements"
+          },
+          "zoom": {
+            "description": "Organisez des sessions vidéo avec l'intégration Zoom"
+          },
+          "googleCalendar": {
+            "description": "Synchronisez vos sessions avec Google Calendar"
+          },
+          "zapier": {
+            "description": "Connectez Unytea à plus de 5 000 applications"
+          },
+          "slack": {
+            "description": "Recevez les notifications de la communauté dans Slack"
+          },
+          "discord": {
+            "description": "Reliez votre communauté à Discord"
+          }
         },
         "request": {
           "title": "Demander une intégration",
@@ -966,13 +1002,22 @@
           "header": "Paramètres de la communauté",
           "subtitle": "Gérez les préférences et la configuration de votre communauté",
           "nav": {
-            "general": { "name": "Général", "description": "Paramètres de base de la communauté" },
+            "general": {
+              "name": "Général",
+              "description": "Paramètres de base de la communauté"
+            },
             "appearance": {
               "name": "Apparence",
               "description": "Personnalisez la mise en page et la marque"
             },
-            "members": { "name": "Membres", "description": "Gérez les rôles et les permissions" },
-            "payments": { "name": "Paiements", "description": "Configurez les tarifs d'adhésion" }
+            "members": {
+              "name": "Membres",
+              "description": "Gérez les rôles et les permissions"
+            },
+            "payments": {
+              "name": "Paiements",
+              "description": "Configurez les tarifs d'adhésion"
+            }
           }
         },
         "general": {
@@ -1290,9 +1335,18 @@
           "whatYouGetTitle": "Ce Que Vous Obtiendrez",
           "whatYouGetSubtitle": "Aperçu des avantages pour les membres",
           "features": {
-            "courses": { "title": "Cours", "description": "Accédez à du contenu premium" },
-            "community": { "title": "Communauté", "description": "Connectez-vous avec vos pairs" },
-            "events": { "title": "Événements en Direct", "description": "Sessions hebdomadaires" }
+            "courses": {
+              "title": "Cours",
+              "description": "Accédez à du contenu premium"
+            },
+            "community": {
+              "title": "Communauté",
+              "description": "Connectez-vous avec vos pairs"
+            },
+            "events": {
+              "title": "Événements en Direct",
+              "description": "Sessions hebdomadaires"
+            }
           },
           "selectedLayoutLabel": "Mise en Page Sélectionnée",
           "colorThemeLabel": "Thème de Couleur",
@@ -1837,7 +1891,8 @@
         "sessions": "Sessions",
         "newMembers": "Nouveaux membres",
         "posts": "Publications",
-        "vsLastWeek": "vs semaine dernière"
+        "vsLastWeek": "vs semaine dernière",
+        "noChange": "Aucun changement par rapport à la semaine dernière"
       },
       "nextLiveSession": {
         "title": "Prochaine session en direct",
@@ -1860,11 +1915,23 @@
       },
       "quickActions": {
         "title": "Actions rapides",
-        "createSession": "Créer une session",
         "createPost": "Créer une publication",
         "inviteMember": "Inviter un membre",
-        "viewAnalytics": "Voir les analytiques",
-        "openSettings": "Paramètres"
+        "viewAnalytics": "Voir les analytiques"
+      },
+      "nextStep": {
+        "createCommunity": {
+          "headline": "Vous n'avez pas encore de communauté. Créez-en une et vous êtes lancé.",
+          "cta": "Créer une communauté"
+        },
+        "createPost": {
+          "headline": "Personne n'a encore publié. Écrivez le premier message pour donner aux membres une raison de vous rejoindre.",
+          "cta": "Créez votre premier message"
+        },
+        "inviteMembers": {
+          "headline": "Votre communauté est encore petite. Invitez quelques membres pour la faire vivre.",
+          "cta": "Inviter des membres"
+        }
       }
     },
     "notifications": {
@@ -1994,6 +2061,22 @@
       "title": "Communautés Tendance",
       "join": "Rejoindre",
       "viewAll": "Voir tout"
+    },
+    "errorBoundary": {
+      "retry": "Réessayer",
+      "reference": "Référence : {digest}",
+      "dashboard": {
+        "title": "Cette page ne s'est pas chargée",
+        "description": "Le chargement de cette page a échoué. Le reste d'Unytea n'est pas affecté."
+      },
+      "community": {
+        "title": "Cette vue de la communauté ne s'est pas chargée",
+        "description": "Le chargement de cette partie de la communauté a échoué. Réessayez ou changez d'onglet."
+      },
+      "session": {
+        "title": "Cette session ne s'est pas chargée",
+        "description": "Le chargement de la session a échoué. Réessayez ou revenez à votre liste de sessions."
+      }
     }
   },
   "navigation": {
@@ -2032,16 +2115,33 @@
         "goalsPlaceholder": "Je veux construire une communauté prospère et partager mes connaissances..."
       },
       "4": {
+        "title": "Qu'est-ce qui vous intéresse ?",
+        "description": "Sélectionnez vos centres d'intérêt pour de meilleures suggestions de communautés et de binômes",
+        "searchPlaceholder": "Rechercher des centres d'intérêt...",
+        "counter": "Sélectionnez jusqu'à {max} centres d'intérêt ({selected}/{max})",
+        "categories": {
+          "Business": "Business",
+          "Technology": "Technologie",
+          "Creative": "Création",
+          "Lifestyle": "Style de vie",
+          "Education": "Éducation"
+        }
+      },
+      "5": {
         "title": "Choisissez Votre Plan",
-        "description": "Sélectionnez le plan qui correspond à vos besoins",
+        "description": "Sélectionnez le plan qui correspond à vos besoins (modifiable à tout moment)",
+        "perMonth": "/mois",
+        "freePrice": "Gratuit",
+        "moreFeatures": "+{count} autres fonctionnalités",
+        "trialNote": "Tous les plans payants incluent 14 jours d'essai gratuit. Aucune carte bancaire requise pour commencer.",
         "free": {
           "name": "Gratuit",
-          "description": "Parfait pour commencer",
+          "description": "Parfait pour explorer les communautés",
           "features": [
-            "Rejoindre jusqu'à 3 communautés",
-            "Fonctions de profil de base",
-            "Accès au fil d'actualité",
-            "Messagerie directe"
+            "Rejoignez jusqu'à 3 communautés (sans en créer)",
+            "Accès au contenu et au fil de la communauté",
+            "Messagerie directe avec les membres",
+            "Fonctions de profil de base"
           ]
         },
         "professional": {
@@ -2049,7 +2149,7 @@
           "description": "Le meilleur pour les créateurs de communauté",
           "popular": "Plus Populaire",
           "features": [
-            "1 communauté (la vôtre)",
+            "Créez 1 communauté (la vôtre)",
             "Membres illimités",
             "Visioconférences et streaming",
             "Constructeur de cours",
@@ -2062,7 +2162,7 @@
           "name": "Premium",
           "description": "Pour les utilisateurs avancés avec plusieurs communautés",
           "features": [
-            "3 communautés (les vôtres)",
+            "Créez jusqu'à 3 communautés",
             "Toutes les fonctions Professionnelles",
             "Options de marque blanche",
             "Analyses avancées",
@@ -2078,8 +2178,12 @@
       "next": "Suivant",
       "getStarted": "Commencer",
       "processing": "Traitement...",
-      "step": "Étape",
-      "of": "sur"
+      "stepOf": "Étape {current} sur {total}",
+      "continue": "Continuer",
+      "startFree": "Commencer Gratuitement",
+      "startTrial": "Démarrer l'Essai Gratuit",
+      "settingUp": "Configuration...",
+      "skip": "Passer pour l'instant →"
     },
     "success": {
       "title": "Tout est prêt ! 🎉",

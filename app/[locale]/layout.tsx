@@ -1,6 +1,7 @@
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { LocalePreferenceSync } from "@/components/LocalePreferenceSync";
 
 const locales = ["en", "es", "fr"] as const;
 
@@ -36,6 +37,9 @@ export default async function LocaleLayout(props: {
 
   return (
     <NextIntlClientProvider messages={messages} locale={locale}>
+      {/* Records the URL locale so the dashboard, onboarding and auth trees —
+          which have no [locale] segment — render in the same language. */}
+      <LocalePreferenceSync />
       {children}
     </NextIntlClientProvider>
   );
