@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
+import { localizedAlternates } from "@/lib/seo/locale-metadata";
 
 const SUPPORT_EMAIL = "support@unytea.com";
 const SUPPORTED_LOCALES = ["en", "es", "fr"] as const;
@@ -70,20 +71,17 @@ export async function generateMetadata(props: {
   const locale = resolveLocale(params.locale);
   const t = COPY[locale];
 
-  const baseUrl = "https://www.unytea.com";
-  const path = "/contact";
-
+  // Alternates come from the shared helper rather than being spelled out
+  // again here: this page had its own copy of the rule and, being a copy, had
+  // already drifted — it emitted no x-default.
   return {
     title: t.metaTitle,
     description: t.metaDescription,
-    alternates: {
-      canonical: `${baseUrl}/${locale}${path}`,
-      languages: Object.fromEntries(SUPPORTED_LOCALES.map((l) => [l, `${baseUrl}/${l}${path}`])),
-    },
+    ...localizedAlternates({ path: "/contact", locale }),
     openGraph: {
       title: t.metaTitle,
       description: t.metaDescription,
-      url: `${baseUrl}/${locale}${path}`,
+      url: `https://www.unytea.com/${locale}/contact`,
       type: "website",
     },
   };
