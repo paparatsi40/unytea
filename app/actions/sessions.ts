@@ -4,7 +4,6 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { defineAction } from "@/lib/actions/define-action";
 import { communityById, communityOfSeries, communityOfSession } from "@/lib/actions/resolvers";
-import { assertCommunityMemberIfScoped } from "@/lib/actions/guards";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { nanoid } from "nanoid";
@@ -34,14 +33,19 @@ export type SessionDetail = Prisma.MentorSessionGetPayload<{
 export const createSession = defineAction(
   {
     name: "createSession",
-    auth: "user",
+    // communityId is required (see the interface note below), so the seam can
+    // resolve the tenant itself. This replaces the assertCommunityMemberIfScoped
+    // guard that was needed while the id was optional — the gate is back where
+    // the H9 harness and the lint rule can see it.
+    auth: "member",
+    community: ([data]) => communityById(data.communityId),
     args: [
       z.object({
         title: z.string().min(1).max(300),
         description: z.string().max(10_000).optional(),
         scheduledAt: z.coerce.date(),
         duration: z.number().int().min(1).max(1440),
-        communityId: z.string().min(1).max(64).optional(),
+        communityId: z.string().min(1).max(64),
         isPrivate: z.boolean().optional(),
         recurrence: z.enum(["weekly", "monthly"]).optional(),
         recurrenceCount: z.number().int().min(1).max(52).optional(),
@@ -50,13 +54,7 @@ export const createSession = defineAction(
     ],
     rateLimit: "create",
   },
-  async (ctx, data: { title: string; description?: string; scheduledAt: Date; duration: number; communityId?: string; isPrivate?: boolean; recurrence?: "weekly" | "monthly"; recurrenceCount?: number; postToFeed?: boolean; }) => {
-    // The session — and the SESSION_ANNOUNCEMENT feed post it creates — is
-    // attached to a caller-supplied communityId. Without this, any
-    // authenticated non-member could inject content into an arbitrary tenant's
-    // feed (M2). communityId is nullable for standalone sessions, so the check
-    // applies only when one is supplied.
-    await assertCommunityMemberIfScoped(ctx, data.communityId);
+  async (ctx, data: { title: string; description?: string; scheduledAt: Date; duration: number; communityId: string; isPrivate?: boolean; recurrence?: "weekly" | "monthly"; recurrenceCount?: number; postToFeed?: boolean; }) => {
   try {
     const userId = ctx.userId;
 
@@ -613,7 +611,15 @@ interface CreateSessionOrSeriesInput {
   scheduledAt: Date;
   duration: number;
   timezone: string;
-  communityId?: string;
+  /**
+   * Required. The column is nullable for backward compatibility, but a session
+   * with no community escapes the tenant gate entirely and is half-broken
+   * downstream: it cannot be converted to a course (session-course.ts rejects
+   * it), gets no autopilot (lib/jobs/autopilot.ts bails) and no recap
+   * (lib/jobs/session-jobs.ts bails). There is no standalone-session feature in
+   * the UI, so every session is created inside a community.
+   */
+  communityId: string;
   postToFeed?: boolean;
   mode?: "VIDEO" | "AUDIO"; // Session mode: video or audio-only
   // Recurrence fields
@@ -631,7 +637,8 @@ interface CreateSessionOrSeriesInput {
 export const createSessionOrSeries = defineAction(
   {
     name: "createSessionOrSeries",
-    auth: "user",
+    auth: "member",
+    community: ([data]) => communityById(data.communityId),
     args: [
       z.object({
         title: z.string().min(1).max(300),
@@ -639,7 +646,7 @@ export const createSessionOrSeries = defineAction(
         scheduledAt: z.coerce.date(),
         duration: z.number().int().min(1).max(1440),
         timezone: z.string().max(64),
-        communityId: z.string().min(1).max(64).optional(),
+        communityId: z.string().min(1).max(64),
         postToFeed: z.boolean().optional(),
         mode: z.enum(["VIDEO", "AUDIO"]).optional(),
         repeat: z.enum(["once", "WEEKLY", "MONTHLY"]).optional(),
@@ -652,10 +659,6 @@ export const createSessionOrSeries = defineAction(
     rateLimit: "create",
   },
   async (ctx, data: CreateSessionOrSeriesInput) => {
-    // Same cross-tenant hole as createSession: the series, its generated
-    // sessions, the feed post and the autopilot jobs all land in a
-    // caller-supplied community (M3).
-    await assertCommunityMemberIfScoped(ctx, data.communityId);
   try {
     const userId = ctx.userId;
 

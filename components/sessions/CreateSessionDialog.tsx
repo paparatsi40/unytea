@@ -16,7 +16,13 @@ type SessionType = "video" | "audio";
 interface CreateSessionDialogProps {
   triggerText?: string;
   className?: string;
-  communityId?: string;
+  /**
+   * Required: every session is hosted inside a community. A session with no
+   * community escapes the tenant gate and is half-broken downstream, and there
+   * is no standalone-session feature. Callers that may not have a community
+   * must not render this dialog.
+   */
+  communityId: string;
   defaultDuration?: number;
   presetTitle?: string;
   presetDescription?: string;

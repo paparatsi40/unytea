@@ -157,7 +157,9 @@ describe("M2/M3 — session creation cannot target a foreign tenant", () => {
 
     const result = await createSession(baseSession);
 
-    expect(result).toMatchObject({ success: false, code: "FORBIDDEN" });
+    // Now that the gate lives in the seam rather than a hand-rolled guard, the
+    // paywall case reports its own dedicated code instead of a generic FORBIDDEN.
+    expect(result).toMatchObject({ success: false, code: "PAYWALL_LOCKED" });
     expect(prisma.mentorSession.create).not.toHaveBeenCalled();
   });
 
@@ -188,13 +190,41 @@ describe("M2/M3 — session creation cannot target a foreign tenant", () => {
     expect(prisma.sessionSeries.create).not.toHaveBeenCalled();
   });
 
-  it("still allows a standalone session with no community", async () => {
-    notAMember();
+  it("rejects a session with no community — the standalone path is closed", async () => {
+    memberOf("MEMBER");
     vi.mocked(prisma.mentorSession.create).mockResolvedValue({ id: "s_1" } as never);
 
-    // communityId is nullable for standalone sessions; the guard must not turn
-    // that legitimate path into a rejection.
-    const result = await createSession({ ...baseSession, communityId: undefined });
+    // communityId was nullable, so a session with no community escaped the
+    // tenant gate entirely. There is no standalone-session feature (it cannot be
+    // converted to a course, gets no autopilot and no recap), so the id is now
+    // required and Zod rejects its absence before the handler runs.
+    const result = await (
+      createSession as unknown as (d: Record<string, unknown>) => Promise<unknown>
+    )({ ...baseSession, communityId: undefined });
+
+    expect(result).toMatchObject({ success: false, code: "VALIDATION" });
+    expect(prisma.mentorSession.create).not.toHaveBeenCalled();
+  });
+
+  it("rejects an empty-string communityId", async () => {
+    memberOf("MEMBER");
+
+    const result = await (
+      createSession as unknown as (d: Record<string, unknown>) => Promise<unknown>
+    )({ ...baseSession, communityId: "" });
+
+    expect(result).toMatchObject({ success: false, code: "VALIDATION" });
+    expect(prisma.mentorSession.create).not.toHaveBeenCalled();
+  });
+
+  it("an ACTIVE member of the target community can still create a session", async () => {
+    // Sessions are member-hostable today — /dashboard/sessions offers the
+    // dialog to any ACTIVE member. Pinning that so a future role change is a
+    // deliberate edit here rather than a silent break.
+    memberOf("MEMBER");
+    vi.mocked(prisma.mentorSession.create).mockResolvedValue({ id: "s_1" } as never);
+
+    const result = await createSession(baseSession);
 
     expect(result).not.toMatchObject({ code: "FORBIDDEN" });
   });

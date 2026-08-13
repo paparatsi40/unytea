@@ -1,6 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { ForbiddenError, requireCommunityMember } from "@/lib/authorization";
-import { isPaywallBlocked } from "./paywall";
+import { ForbiddenError } from "@/lib/authorization";
 import type { AuthedActionContext } from "./define-action";
 
 /**
@@ -92,34 +91,5 @@ export async function assertBuddyPartner(
 export function assertCommunityOwner(ctx: AuthedActionContext): void {
   if (ctx.member?.role !== "OWNER") {
     throw new ForbiddenError("Only the community owner can do this");
-  }
-}
-
-/**
- * ACTIVE membership of a community supplied as an *optional* argument.
- *
- * `defineAction`'s `member` level cannot express this: its `community` resolver
- * returning null means "resource not found", which is the right answer for a
- * missing post or session but the wrong one for an action where omitting the
- * community is legitimate. `createSession` and `createSessionOrSeries` both take
- * an optional `communityId` — the column is nullable for standalone sessions —
- * so they stay `auth: "user"` and call this when, and only when, an id is given.
- *
- * Applies exactly the checks the seam's member level would: ACTIVE membership
- * plus the shared paywall gate. Without it, any authenticated non-member could
- * attach a session to an arbitrary tenant and post an announcement into its
- * feed (M2/M3).
- */
-export async function assertCommunityMemberIfScoped(
-  ctx: AuthedActionContext,
-  communityId: string | null | undefined
-): Promise<void> {
-  if (!communityId) return;
-
-  // Throws ForbiddenError when there is no ACTIVE membership row.
-  await requireCommunityMember(ctx.userId, communityId);
-
-  if (await isPaywallBlocked(communityId, ctx.userId)) {
-    throw new ForbiddenError("This community is temporarily unavailable");
   }
 }
