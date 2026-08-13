@@ -48,7 +48,7 @@ const TRANSLATIONS: Record<
     title: "Cookie Preferences",
     description:
       "We use cookies to keep you signed in, remember your preferences, and understand how you use Unytea. You choose which optional cookies to allow.",
-    learnMore: "Learn more",
+    learnMore: "Learn more about our cookie policy",
     acceptAll: "Accept All",
     rejectNonEssential: "Reject Non-Essential",
     customize: "Customize",
@@ -70,7 +70,7 @@ const TRANSLATIONS: Record<
     title: "Preferencias de cookies",
     description:
       "Usamos cookies para mantenerte conectado, recordar tus preferencias y entender cómo usas Unytea. Tú decides qué cookies opcionales permitir.",
-    learnMore: "Saber más",
+    learnMore: "Más información sobre nuestra política de cookies",
     acceptAll: "Aceptar todo",
     rejectNonEssential: "Rechazar no esenciales",
     customize: "Personalizar",
@@ -92,7 +92,7 @@ const TRANSLATIONS: Record<
     title: "Préférences des cookies",
     description:
       "Nous utilisons des cookies pour vous maintenir connecté, mémoriser vos préférences et comprendre comment vous utilisez Unytea. Vous choisissez quels cookies optionnels autoriser.",
-    learnMore: "En savoir plus",
+    learnMore: "En savoir plus sur notre politique de cookies",
     acceptAll: "Tout accepter",
     rejectNonEssential: "Refuser les non essentiels",
     customize: "Personnaliser",
