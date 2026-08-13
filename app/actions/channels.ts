@@ -6,6 +6,7 @@ import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { defineAction } from "@/lib/actions/define-action";
 import { communityById, communityOfChannel, communityOfChannelMessage } from "@/lib/actions/resolvers";
+import { emitRealtime } from "@/lib/pusher-server";
 
 /**
  * Community chat channels.
@@ -155,6 +156,19 @@ export const sendChannelMessage = defineAction(
       include: { author: { select: { id: true, name: true, image: true } } },
     });
 
+    // Realtime is emitted here, after the seam has proven membership — not by
+    // the client. The old path had PusherChat POST straight to a free-form
+    // trigger endpoint, which both bypassed authorization (SEC-06) and never
+    // persisted the message.
+    await emitRealtime(channelId, "message", {
+      id: message.id,
+      content: message.content,
+      senderId: ctx.userId,
+      senderName: message.author.name || "User",
+      timestamp: message.createdAt.toISOString(),
+      channelId,
+    });
+
     revalidatePath("/dashboard/c/[slug]/chat/[channel]", "page");
 
     return { success: true as const, message };
@@ -171,7 +185,7 @@ export const deleteChannelMessage = defineAction(
   async (ctx, messageId) => {
     const message = await prisma.channelMessage.findUnique({
       where: { id: messageId },
-      select: { authorId: true },
+      select: { authorId: true, channelId: true },
     });
 
     if (!message) {
@@ -186,6 +200,9 @@ export const deleteChannelMessage = defineAction(
     }
 
     await prisma.channelMessage.delete({ where: { id: messageId } });
+
+    await emitRealtime(message.channelId, "message:deleted", { messageId });
+
     revalidatePath("/dashboard/c/[slug]/chat/[channel]", "page");
 
     return { success: true as const };
