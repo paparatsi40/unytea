@@ -101,13 +101,39 @@ const nextConfig = {
       "frame-ancestors 'self'",
       "object-src 'none'",
       "worker-src 'self' blob:",
-      "script-src 'self' 'wasm-unsafe-eval' 'unsafe-inline' https://js.stripe.com https://vercel.live https://*.vercel.app https://*.livekit.cloud https://*.livekit.io",
+      // js.pusher.com is the loader for Pusher's SockJS transport, not a
+      // general CDN. pusher-js 8.5.0 does not bundle SockJS: the transport
+      // declares `file: 'sockjs'` and reports `isInitialized()` as
+      // `window.SockJS !== undefined`, so on first use the connection
+      // initializer calls `Dependencies.load('sockjs', { useTLS })`, which
+      // injects <script src="https://js.pusher.com/8.5.0/sockjs.js"> (cdn_https
+      // + VERSION + empty dependency_suffix). Without this source that script
+      // is blocked and the transport can never initialize.
+      //
+      // Paired with `https://*.pusher.com` in connect-src below: that authorizes
+      // the data channel the loaded transport then opens
+      // (`sockjs-<cluster>.pusher.com` over https). Authorizing one without the
+      // other buys nothing — a loader with no channel, or a channel whose code
+      // never loads. tests/unit/csp-headers.test.ts fails if they drift apart.
+      "script-src 'self' 'wasm-unsafe-eval' 'unsafe-inline' https://js.stripe.com https://js.pusher.com https://vercel.live https://*.vercel.app https://*.livekit.cloud https://*.livekit.io",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https://utfs.io https://*.uploadthing.com https://lh3.googleusercontent.com https://avatars.githubusercontent.com https://images.unsplash.com",
       "media-src 'self' blob: https://utfs.io https://*.livekit.cloud",
       "font-src 'self' data:",
       "frame-src 'self' https://js.stripe.com https://vercel.live",
-      "connect-src 'self' https://api.stripe.com https://*.uploadthing.com https://utfs.io https://*.livekit.cloud wss://*.livekit.cloud https://*.pusher.com wss://*.pusher.com wss://ws-*.pusher.com wss://sockjs-*.pusher.com https://*.sentry.io https://*.ingest.sentry.io https://*.ingest.us.sentry.io",
+      // Pusher: `wss://*.pusher.com` and `https://*.pusher.com` cover every
+      // host the client talks to — `ws-<cluster>.pusher.com` for the WebSocket
+      // transport and `sockjs-<cluster>.pusher.com` for the SockJS fallback,
+      // which speaks XHR over https rather than wss.
+      //
+      // This list used to also carry `wss://ws-*.pusher.com` and
+      // `wss://sockjs-*.pusher.com`. In CSP a `*` is only valid as an entire
+      // leftmost label; a wildcard inside a label is a syntax error and the
+      // browser discards the whole source expression with a console warning.
+      // They were redundant with the two wildcards above, so nothing was
+      // actually unauthorized — but had they been the only Pusher entries,
+      // realtime would have died the moment this policy was enforced.
+      "connect-src 'self' https://api.stripe.com https://*.uploadthing.com https://utfs.io https://*.livekit.cloud wss://*.livekit.cloud https://*.pusher.com wss://*.pusher.com https://*.sentry.io https://*.ingest.sentry.io https://*.ingest.us.sentry.io",
       // Phase 4c-pre: capture real-user violations against the tightened CSP.
       // Persisted to the csp_violations table by app/api/csp-report.
       "report-uri /api/csp-report",
