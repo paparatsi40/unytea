@@ -79,6 +79,26 @@
           "membershipTiers": "Les tiers d'abonnement apparaîtront ici sur la page publiée."
         }
       }
+    },
+    "join": {
+      "heading": "Rejoindre {community}",
+      "membersCount": "{count, plural, =1 {1 membre} other {# membres}}",
+      "freeBadge": "Gratuit",
+      "paidBadge": "Adhésion payante",
+      "approvalNotice": "L'hôte examine chaque demande, votre adhésion démarre donc comme en attente.",
+      "joinCta": "Rejoindre la communauté",
+      "joinPaidCta": "Continuer vers le paiement",
+      "signInCta": "Connectez-vous pour rejoindre",
+      "signInHint": "Vous reviendrez directement ici pour finaliser votre adhésion.",
+      "joining": "Adhésion en cours…",
+      "joined": "Vous y êtes. Direction la communauté…",
+      "pendingTitle": "Votre demande attend une validation",
+      "pendingBody": "L'hôte de {community} a reçu votre demande. Vous aurez accès dès qu'il l'aura validée.",
+      "backToExplore": "Voir d'autres communautés",
+      "errorGeneric": "Nous n'avons pas pu finaliser votre adhésion. Veuillez réessayer.",
+      "errorPaymentRequired": "Cette communauté requiert une adhésion payante.",
+      "errorFull": "Cette communauté a atteint sa limite de membres.",
+      "errorAlreadyMember": "Vous êtes déjà membre."
     }
   },
   "common": {

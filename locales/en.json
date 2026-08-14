@@ -79,6 +79,26 @@
           "membershipTiers": "Membership tiers will appear here on the published page."
         }
       }
+    },
+    "join": {
+      "heading": "Join {community}",
+      "membersCount": "{count, plural, =1 {1 member} other {# members}}",
+      "freeBadge": "Free to join",
+      "paidBadge": "Paid membership",
+      "approvalNotice": "The host reviews each request, so your membership starts as pending.",
+      "joinCta": "Join community",
+      "joinPaidCta": "Continue to payment",
+      "signInCta": "Sign in to join",
+      "signInHint": "You will come straight back here to finish joining.",
+      "joining": "Joining…",
+      "joined": "You are in. Taking you to the community…",
+      "pendingTitle": "Your request is waiting for approval",
+      "pendingBody": "The host of {community} has your request. You will get access as soon as they approve it.",
+      "backToExplore": "Browse other communities",
+      "errorGeneric": "We could not complete your join. Please try again.",
+      "errorPaymentRequired": "This community requires a paid membership.",
+      "errorFull": "This community has reached its member limit.",
+      "errorAlreadyMember": "You are already a member."
     }
   },
   "common": {
