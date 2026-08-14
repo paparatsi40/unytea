@@ -116,6 +116,12 @@ describe("Pusher is authorized by the tightened policy", () => {
     }
   });
 
+  it("allows the SockJS transport's loader script", () => {
+    // pusher-js 8.5.0 does not bundle SockJS; the transport is fetched at
+    // runtime from https://js.pusher.com/8.5.0/sockjs.js.
+    expect(directive(reportOnly, "script-src")).toContain("https://js.pusher.com");
+  });
+
   it("does not allow hosts the client never contacts", () => {
     // pusher-js 8.5 defaults `enableStats` to false and the client passes
     // neither enableStats nor disableStats, so stats.pusher.com is never hit;
@@ -123,6 +129,42 @@ describe("Pusher is authorized by the tightened policy", () => {
     // Widening a policy for traffic that does not exist is just a bigger hole.
     expect(reportOnly).not.toContain("stats.pusher.com");
     expect(reportOnly).not.toContain("pusherapp.com");
+  });
+});
+
+/**
+ * The SockJS fallback needs two authorizations in two different directives, and
+ * either one alone is useless: a loader with no data channel, or a data channel
+ * whose code can never load. They are far apart in the file and easy to change
+ * independently, so the coherence is asserted rather than assumed.
+ */
+describe("the SockJS fallback is authorized coherently across directives", () => {
+  const LOADER = "https://js.pusher.com"; // script-src — fetches sockjs.js
+  const CHANNEL = "https://*.pusher.com"; // connect-src — sockjs-<cluster>.pusher.com
+
+  it("authorizes the loader and the channel together, or neither", () => {
+    const loaderAllowed = directive(reportOnly, "script-src").includes(LOADER);
+    const channelAllowed = directive(reportOnly, "connect-src").includes(CHANNEL);
+
+    // Deliberately an equality, not two separate truthiness checks: removing
+    // either source has to fail this test, whichever one it is.
+    expect({ loaderAllowed, channelAllowed }).toEqual({
+      loaderAllowed: true,
+      channelAllowed: true,
+    });
+  });
+
+  it("does not put the loader in connect-src or the channel in script-src", () => {
+    // The two are not interchangeable — a script fetch is governed by
+    // script-src, an XHR by connect-src. Swapping them silently breaks both.
+    expect(directive(reportOnly, "script-src")).not.toContain("wss://");
+    expect(directive(reportOnly, "connect-src")).not.toContain("js.pusher.com");
+  });
+
+  it("still authorizes the WebSocket transport that the fallback backs up", () => {
+    // SockJS only engages when the direct WebSocket fails; if wss were dropped,
+    // every connection would take the slow path.
+    expect(directive(reportOnly, "connect-src")).toContain("wss://*.pusher.com");
   });
 });
 

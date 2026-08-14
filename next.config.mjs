@@ -101,7 +101,21 @@ const nextConfig = {
       "frame-ancestors 'self'",
       "object-src 'none'",
       "worker-src 'self' blob:",
-      "script-src 'self' 'wasm-unsafe-eval' 'unsafe-inline' https://js.stripe.com https://vercel.live https://*.vercel.app https://*.livekit.cloud https://*.livekit.io",
+      // js.pusher.com is the loader for Pusher's SockJS transport, not a
+      // general CDN. pusher-js 8.5.0 does not bundle SockJS: the transport
+      // declares `file: 'sockjs'` and reports `isInitialized()` as
+      // `window.SockJS !== undefined`, so on first use the connection
+      // initializer calls `Dependencies.load('sockjs', { useTLS })`, which
+      // injects <script src="https://js.pusher.com/8.5.0/sockjs.js"> (cdn_https
+      // + VERSION + empty dependency_suffix). Without this source that script
+      // is blocked and the transport can never initialize.
+      //
+      // Paired with `https://*.pusher.com` in connect-src below: that authorizes
+      // the data channel the loaded transport then opens
+      // (`sockjs-<cluster>.pusher.com` over https). Authorizing one without the
+      // other buys nothing — a loader with no channel, or a channel whose code
+      // never loads. tests/unit/csp-headers.test.ts fails if they drift apart.
+      "script-src 'self' 'wasm-unsafe-eval' 'unsafe-inline' https://js.stripe.com https://js.pusher.com https://vercel.live https://*.vercel.app https://*.livekit.cloud https://*.livekit.io",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https://utfs.io https://*.uploadthing.com https://lh3.googleusercontent.com https://avatars.githubusercontent.com https://images.unsplash.com",
       "media-src 'self' blob: https://utfs.io https://*.livekit.cloud",
