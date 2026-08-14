@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
-import { Prisma } from "@prisma/client";
 import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import { getPlanFromPriceId } from "@/lib/plans";
+import { isUniqueConstraintViolation } from "@/lib/prisma-errors";
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
@@ -154,16 +154,36 @@ export async function POST(request: Request) {
               data: { status: "completed" },
             });
 
-            await prisma.enrollment.upsert({
-              where: { userId_courseId: { userId, courseId } },
-              update: {},
-              create: { userId, courseId, progress: 0, enrolledAt: new Date() },
-            });
+            // Same defect as the membership branch below, same fix. The
+            // upsert is idempotent but the increment is not, so a retry after
+            // any later failure — the event id is only recorded once the whole
+            // handler succeeds — no-ops the upsert and counts the enrollment a
+            // second time. Pairing them in one transaction, and only counting
+            // when a row is actually created, makes the retry a no-op.
+            try {
+              await prisma.$transaction(async (tx) => {
+                const existing = await tx.enrollment.findUnique({
+                  where: { userId_courseId: { userId, courseId } },
+                });
 
-            await prisma.course.update({
-              where: { id: courseId },
-              data: { enrollmentCount: { increment: 1 } },
-            });
+                // Already enrolled: the counter already includes them. This is
+                // what `upsert`'s empty `update: {}` expressed, kept verbatim.
+                if (existing) return;
+
+                await tx.enrollment.create({
+                  data: { userId, courseId, progress: 0, enrolledAt: new Date() },
+                });
+                await tx.course.update({
+                  where: { id: courseId },
+                  data: { enrollmentCount: { increment: 1 } },
+                });
+              });
+            } catch (error) {
+              if (!isUniqueConstraintViolation(error)) throw error;
+              console.log(
+                `[stripe-webhook] enrollment for user ${userId} in ${courseId} already created by a concurrent delivery`
+              );
+            }
 
             console.log(`Course purchase completed for user ${userId}, course ${courseId}`);
           }
@@ -199,28 +219,64 @@ export async function POST(request: Request) {
         const userId = subscription.metadata?.userId;
 
         if (type === "community_membership" && communityId && userId) {
-          const existingMember = await prisma.member.findFirst({
-            where: { userId, communityId },
-          });
+          // Stripe delivers at-least-once, and the event-id guard above does
+          // NOT cover a retry after a mid-handler failure: the
+          // ProcessedStripeEvent row is written only once the handler
+          // succeeds, deliberately, so a throw means the whole branch runs
+          // again from the top.
+          //
+          // This used to be findFirst → create → increment, unguarded, which
+          // gave two ways to corrupt memberCount:
+          //
+          //   1. The create commits and the increment then fails (timeout,
+          //      deploy mid-request). The retry's findFirst NOW FINDS the
+          //      member, takes the update branch, and never increments. The
+          //      counter is permanently one short, and nothing reconciles it.
+          //   2. Two deliveries overlap. Both pass findFirst, both create, the
+          //      loser hits the (userId, communityId) unique index and throws
+          //      → 500 → Stripe retries harder.
+          //
+          // One transaction closes (1): a retry either sees no member and does
+          // both writes, or sees the member and correctly skips the increment
+          // the winning transaction already made. Catching P2002 closes (2).
+          try {
+            await prisma.$transaction(async (tx) => {
+              const existingMember = await tx.member.findFirst({
+                where: { userId, communityId },
+              });
 
-          if (existingMember) {
-            await prisma.member.update({
-              where: { id: existingMember.id },
-              data: { status: "ACTIVE" },
+              if (existingMember) {
+                // Reactivating an existing row: the counter already includes
+                // them, so it must not move.
+                await tx.member.update({
+                  where: { id: existingMember.id },
+                  data: { status: "ACTIVE" },
+                });
+                return;
+              }
+
+              await tx.member.create({
+                data: { userId, communityId, role: "MEMBER", status: "ACTIVE" },
+              });
+              await tx.community.update({
+                where: { id: communityId },
+                data: { memberCount: { increment: 1 } },
+              });
             });
-          } else {
-            await prisma.member.create({
-              data: { userId, communityId, role: "MEMBER", status: "ACTIVE" },
-            });
-            await prisma.community.update({
-              where: { id: communityId },
-              data: { memberCount: { increment: 1 } },
-            });
+
+            console.log(
+              `Community membership created for user ${userId} in community ${communityId}`
+            );
+          } catch (error) {
+            if (!isUniqueConstraintViolation(error)) throw error;
+            // A concurrent delivery of this same event won the race. It created
+            // the member and moved the counter inside its own transaction, so
+            // there is nothing left to do and nothing to compensate. Falling
+            // through returns 200 and stops Stripe retrying.
+            console.log(
+              `[stripe-webhook] membership for user ${userId} in ${communityId} already created by a concurrent delivery`
+            );
           }
-
-          console.log(
-            `Community membership created for user ${userId} in community ${communityId}`
-          );
         } else {
           // ── PLATFORM PLAN CHECK (Creator / Business / Pro) ──────────────
           const platformPlan = getPlanFromPriceId(priceId ?? "");
@@ -470,7 +526,7 @@ export async function POST(request: Request) {
         data: { id: event.id, type: event.type },
       });
     } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
+      if (isUniqueConstraintViolation(err)) {
         console.log(`[stripe-webhook] race-condition duplicate ${event.id}`);
       } else {
         console.error("[stripe-webhook] failed to record event id:", err);
