@@ -79,6 +79,26 @@
           "membershipTiers": "Los tiers de membresía aparecerán aquí en la página publicada."
         }
       }
+    },
+    "join": {
+      "heading": "Únete a {community}",
+      "membersCount": "{count, plural, =1 {1 miembro} other {# miembros}}",
+      "freeBadge": "Gratis",
+      "paidBadge": "Membresía de pago",
+      "approvalNotice": "El host revisa cada solicitud, así que tu membresía empieza como pendiente.",
+      "joinCta": "Unirme a la comunidad",
+      "joinPaidCta": "Continuar al pago",
+      "signInCta": "Inicia sesión para unirte",
+      "signInHint": "Volverás aquí directamente para terminar de unirte.",
+      "joining": "Uniéndote…",
+      "joined": "Ya estás dentro. Te llevamos a la comunidad…",
+      "pendingTitle": "Tu solicitud está esperando aprobación",
+      "pendingBody": "El host de {community} tiene tu solicitud. Tendrás acceso en cuanto la apruebe.",
+      "backToExplore": "Ver otras comunidades",
+      "errorGeneric": "No pudimos completar tu unión. Inténtalo de nuevo.",
+      "errorPaymentRequired": "Esta comunidad requiere una membresía de pago.",
+      "errorFull": "Esta comunidad alcanzó su límite de miembros.",
+      "errorAlreadyMember": "Ya eres miembro."
     }
   },
   "common": {
