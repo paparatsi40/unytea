@@ -183,7 +183,9 @@ export function defineAction<const TSchemas extends SchemaTuple, TAuth extends A
       if (config.rateLimit !== false) {
         const limiterName = config.rateLimit ?? defaultRateLimiter(config.auth);
         const identifier = await getActionIdentifier(userId);
-        const { success } = await rateLimiters[limiterName].check(`action:${config.name}:${identifier}`);
+        const { success } = await rateLimiters[limiterName].check(
+          `action:${config.name}:${identifier}`
+        );
         if (!success) {
           return actionFailure("RATE_LIMITED", "Too many requests. Please slow down.");
         }
@@ -197,7 +199,9 @@ export function defineAction<const TSchemas extends SchemaTuple, TAuth extends A
         rawArgs.length < config.args.length
           ? [...rawArgs, ...Array(config.args.length - rawArgs.length).fill(undefined)]
           : rawArgs;
-      const parsed = z.tuple(config.args as unknown as [z.ZodTypeAny, ...z.ZodTypeAny[]]).safeParse(padded);
+      const parsed = z
+        .tuple(config.args as unknown as [z.ZodTypeAny, ...z.ZodTypeAny[]])
+        .safeParse(padded);
       if (!parsed.success) {
         const issues: Record<string, string[]> = {};
         for (const issue of parsed.error.issues) {
@@ -213,8 +217,7 @@ export function defineAction<const TSchemas extends SchemaTuple, TAuth extends A
       let member: Member | null = null;
 
       // Platform staff bypass the community gate where the action opts in.
-      const isPlatformAdmin =
-        config.allowPlatformAdmin === true && session?.user?.role === "ADMIN";
+      const isPlatformAdmin = config.allowPlatformAdmin === true && session?.user?.role === "ADMIN";
 
       if (config.community) {
         communityId = await config.community(args);
@@ -249,6 +252,13 @@ export function defineAction<const TSchemas extends SchemaTuple, TAuth extends A
       const ctx = { userId, communityId, member } as ContextFor<TAuth>;
       return await handler(ctx, ...args);
     } catch (error) {
+      // Next signals redirect() and notFound() by THROWING a sentinel error.
+      // Catching it here would turn a navigation into an INTERNAL failure and
+      // leave the caller sitting where it was — silently, since the shape looks
+      // like any other handled error. Re-throw so the framework can act on it.
+      if (isNextControlFlow(error)) {
+        throw error;
+      }
       if (error instanceof UnauthorizedError) {
         return actionFailure("UNAUTHORIZED", error.message);
       }
@@ -263,4 +273,20 @@ export function defineAction<const TSchemas extends SchemaTuple, TAuth extends A
       return actionFailure("INTERNAL", "Something went wrong. Please try again.");
     }
   };
+}
+
+/**
+ * Is this one of Next's control-flow signals rather than a real failure?
+ *
+ * `redirect()` and `notFound()` communicate by throwing an error whose `digest`
+ * starts with a known marker. Matched on the digest rather than by importing
+ * Next's `isRedirectError`, which lives in an internal path that has moved
+ * between releases.
+ */
+function isNextControlFlow(error: unknown): boolean {
+  const digest = (error as { digest?: unknown } | null)?.digest;
+  return (
+    typeof digest === "string" &&
+    (digest.startsWith("NEXT_REDIRECT") || digest === "NEXT_NOT_FOUND")
+  );
 }

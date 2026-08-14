@@ -6,6 +6,7 @@ import Credentials from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import { authorizeCredentials } from "@/lib/auth-credentials";
 import type { UserRole } from "@prisma/client";
+import { sessionCookieName, shouldUseSecureCookies } from "@/lib/auth-cookies";
 
 // Extend the built-in session types
 declare module "next-auth" {
@@ -49,15 +50,31 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   cookies: {
     sessionToken: {
-      name:
-        process.env.NODE_ENV === "production"
-          ? "__Secure-next-auth.session-token"
-          : "next-auth.session-token",
+      // Keyed on the auth URL's protocol, which is the same signal @auth/core
+      // uses for every cookie it names itself:
+      //   defaultCookies(config.useSecureCookies ?? url.protocol === "https:")
+      //
+      // This block previously keyed on NODE_ENV instead, and the app's config
+      // is merged ON TOP of @auth/core's defaults — so the two halves decided
+      // "are we secure?" from different inputs and could disagree. Wherever
+      // they did (local dev and Vercel preview deploys, where the auth URL is
+      // https but NODE_ENV is not "production"), the CSRF cookie went out as
+      // `__Host-authjs.csrf-token; Secure` while the session cookie went out
+      // plain. A browser refuses to store a __Host-/Secure cookie over http, so
+      // the next POST to /api/auth/signout arrived with no CSRF cookie and was
+      // refused — with HTTP 200 and no Set-Cookie, which is why the failure was
+      // invisible. See app/actions/auth.ts for the full capture.
+      //
+      // Production is unaffected: the auth URL is https there, so the name is
+      // still `__Secure-next-auth.session-token` and existing sessions stay
+      // valid. Local development needs NEXTAUTH_URL to be the URL actually
+      // being served (http://localhost:3000), not the production one.
+      name: sessionCookieName(),
       options: {
         httpOnly: true,
         sameSite: "lax",
         path: "/",
-        secure: process.env.NODE_ENV === "production",
+        secure: shouldUseSecureCookies(),
       },
     },
   },

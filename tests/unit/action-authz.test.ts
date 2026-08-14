@@ -38,7 +38,12 @@ vi.mock("livekit-server-sdk", () => ({
   },
   EgressStatus: {},
 }));
-vi.mock("pusher", () => ({ default: class { trigger() {} authorizeChannel() {} } }));
+vi.mock("pusher", () => ({
+  default: class {
+    trigger() {}
+    authorizeChannel() {}
+  },
+}));
 vi.mock("@/lib/push", () => ({ sendPushToUser: vi.fn(), pushTemplates: {} }));
 vi.mock("@sentry/nextjs", () => ({ captureException: vi.fn() }));
 vi.mock("next/headers", () => ({ headers: async () => new Headers() }));
@@ -61,6 +66,8 @@ import { auth } from "@/lib/auth";
  * a reviewable diff.
  */
 const PUBLIC_ALLOWLIST: Record<string, string> = {
+  logout:
+    "Ending a session must work when the session is already expired, malformed or half-cleared — exactly the state a user reaches for the button in. Requiring a valid session to end one would fail closed precisely when it is needed. Reads and returns nothing; the worst an anonymous POST achieves is clearing cookies it does not have.",
   loadMoreCommunitiesAction:
     "Backs the anonymous /explore directory. Reads only communities that opted into discovery; returns no member data.",
   getCommunityWithSections:

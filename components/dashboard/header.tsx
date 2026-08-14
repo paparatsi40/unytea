@@ -1,8 +1,8 @@
 "use client";
 
 import { useCurrentUser } from "@/hooks/use-current-user";
-import { signOut } from "next-auth/react";
-import { Search, LogOut, User as UserIcon, MessageSquare, Menu } from "lucide-react";
+import { LogoutButton } from "@/components/auth/LogoutButton";
+import { Search, User as UserIcon, MessageSquare, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import {
@@ -116,12 +116,11 @@ export function DashboardHeader({ onMenuClick }: Props) {
 
               <DropdownMenuSeparator />
 
-              <DropdownMenuItem
-                onClick={() => signOut({ callbackUrl: "/" })}
-                className="text-red-600 focus:text-red-600"
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>{t("navigation.logout")}</span>
+              {/* Ends the session on the server before anything navigates —
+                  see app/actions/auth.ts for why the client signOut() could
+                  not. */}
+              <DropdownMenuItem asChild className="text-red-600 focus:text-red-600">
+                <LogoutButton className="flex w-full items-center" />
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
