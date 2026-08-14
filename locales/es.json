@@ -2103,7 +2103,8 @@
     "messages": "Mensajes",
     "profile": "Perfil",
     "logout": "Cerrar sesión",
-    "back": "Atrás"
+    "back": "Atrás",
+    "logoutRetry": "Cerrar sesión — reintentar"
   },
   "onboarding": {
     "title": "¡Bienvenido a Unytea!",

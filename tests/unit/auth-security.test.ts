@@ -25,7 +25,14 @@ describe("Auth Security Checks", () => {
     expect(authFileContent).toContain("httpOnly: true");
   });
   it("should have secure cookies in production", () => {
-    expect(authFileContent).toContain('secure: process.env.NODE_ENV === "production"');
+    // Was asserted as `secure: process.env.NODE_ENV === "production"`. That is
+    // the wrong question and it disagreed with @auth/core, which derives the
+    // same decision from the auth URL's protocol for every cookie it names
+    // itself; where the two disagreed the browser dropped the __Host- CSRF
+    // cookie and signout was silently refused. Both now come from
+    // lib/auth-cookies.ts, which is asserted directly in logout-flow.test.ts.
+    expect(authFileContent).toContain("secure: shouldUseSecureCookies()");
+    expect(authFileContent).not.toContain('process.env.NODE_ENV === "production"');
   });
   it("should have sameSite policy", () => {
     expect(authFileContent).toContain('sameSite: "lax"');

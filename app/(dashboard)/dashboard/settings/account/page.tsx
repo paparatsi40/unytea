@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Check, AlertTriangle, Shield, KeyRound, LogOut } from "lucide-react";
 import { updateAccountSettings } from "@/app/actions/settings";
-import { signOut } from "next-auth/react";
+import { LogoutButton } from "@/components/auth/LogoutButton";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 
@@ -96,13 +96,7 @@ export default function AccountPage() {
               <h3 className="font-semibold text-foreground">{t("security.sessionTitle")}</h3>
             </div>
             <p className="mb-3 text-sm text-muted-foreground">{t("security.sessionDescription")}</p>
-            <button
-              type="button"
-              onClick={() => signOut({ callbackUrl: "/" })}
-              className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
-            >
-              {t("security.logoutButton")}
-            </button>
+            <LogoutButton className="inline-flex items-center rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted" />
           </div>
         </div>
       </div>
