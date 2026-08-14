@@ -107,7 +107,19 @@ const nextConfig = {
       "media-src 'self' blob: https://utfs.io https://*.livekit.cloud",
       "font-src 'self' data:",
       "frame-src 'self' https://js.stripe.com https://vercel.live",
-      "connect-src 'self' https://api.stripe.com https://*.uploadthing.com https://utfs.io https://*.livekit.cloud wss://*.livekit.cloud https://*.pusher.com wss://*.pusher.com wss://ws-*.pusher.com wss://sockjs-*.pusher.com https://*.sentry.io https://*.ingest.sentry.io https://*.ingest.us.sentry.io",
+      // Pusher: `wss://*.pusher.com` and `https://*.pusher.com` cover every
+      // host the client talks to — `ws-<cluster>.pusher.com` for the WebSocket
+      // transport and `sockjs-<cluster>.pusher.com` for the SockJS fallback,
+      // which speaks XHR over https rather than wss.
+      //
+      // This list used to also carry `wss://ws-*.pusher.com` and
+      // `wss://sockjs-*.pusher.com`. In CSP a `*` is only valid as an entire
+      // leftmost label; a wildcard inside a label is a syntax error and the
+      // browser discards the whole source expression with a console warning.
+      // They were redundant with the two wildcards above, so nothing was
+      // actually unauthorized — but had they been the only Pusher entries,
+      // realtime would have died the moment this policy was enforced.
+      "connect-src 'self' https://api.stripe.com https://*.uploadthing.com https://utfs.io https://*.livekit.cloud wss://*.livekit.cloud https://*.pusher.com wss://*.pusher.com https://*.sentry.io https://*.ingest.sentry.io https://*.ingest.us.sentry.io",
       // Phase 4c-pre: capture real-user violations against the tightened CSP.
       // Persisted to the csp_violations table by app/api/csp-report.
       "report-uri /api/csp-report",
