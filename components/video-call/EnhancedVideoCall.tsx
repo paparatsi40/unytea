@@ -20,6 +20,7 @@ import { LivePoll, PollCreator, Poll } from "@/components/live-session/LivePoll"
 import { Reaction, ReactionType, createReaction } from "@/lib/live-reactions";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslations } from "next-intl";
+import { ROOM_OPTIONS } from "@/lib/livekit/room-options";
 import { joinSession } from "@/app/actions/livekit";
 
 interface EnhancedVideoCallProps {
@@ -118,6 +119,9 @@ export function EnhancedVideoCall({
       token={token}
       serverUrl={wsUrl}
       connect={true}
+      // Same bandwidth options as the primary room — neither may run on
+      // livekit-client's defaults. See lib/livekit/room-options.ts.
+      options={ROOM_OPTIONS}
       video={true}
       audio={true}
       onDisconnected={onDisconnect}
