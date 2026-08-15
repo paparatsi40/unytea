@@ -27,7 +27,7 @@ vi.mock("@/lib/prisma", () => ({
   prisma: {
     processedStripeEvent: { create: vi.fn(), findUnique: vi.fn() },
     coursePurchase: { updateMany: vi.fn() },
-    enrollment: { upsert: vi.fn() },
+    enrollment: { upsert: vi.fn(), findUnique: vi.fn(), create: vi.fn() },
     course: { update: vi.fn() },
     member: { findFirst: vi.fn(), update: vi.fn(), create: vi.fn() },
     // Fase C Commit 4: setCommunitiesPaywallLocked uses updateMany; trial_will_end
@@ -41,6 +41,11 @@ vi.mock("@/lib/prisma", () => ({
     },
     subscriptionPlan: { findFirst: vi.fn() },
     user: { update: vi.fn(), findUnique: vi.fn() },
+    // The membership and enrollment writes are now transactional. The stub
+    // hands the callback the same mock client, so per-model assertions still
+    // see every call — while `$transaction` itself records that they were
+    // grouped.
+    $transaction: vi.fn(),
   },
 }));
 
@@ -75,6 +80,12 @@ beforeEach(() => {
   // a default resolution, the helper crashes with "Cannot read properties of
   // undefined" whenever a webhook path goes through paywall toggling.
   vi.mocked(prisma.community.updateMany).mockResolvedValue({ count: 0 } as never);
+  // Run the interactive callback against the same mocked client by default.
+  vi.mocked(prisma.$transaction).mockImplementation(((arg: unknown) =>
+    typeof arg === "function"
+      ? Promise.resolve((arg as (tx: unknown) => unknown)(prisma))
+      : Promise.all(arg as unknown[])) as never);
+  vi.mocked(prisma.enrollment.findUnique).mockResolvedValue(null as never);
 });
 
 describe("Stripe webhook — signature verification & idempotency", () => {
@@ -180,13 +191,13 @@ describe("Stripe webhook — signature verification & idempotency", () => {
 
     // First delivery succeeds and the handler runs the downstream Prisma writes.
     vi.mocked(prisma.coursePurchase.updateMany).mockResolvedValue({ count: 1 } as never);
-    vi.mocked(prisma.enrollment.upsert).mockResolvedValue({} as never);
+    vi.mocked(prisma.enrollment.create).mockResolvedValue({} as never);
     vi.mocked(prisma.course.update).mockResolvedValue({} as never);
 
     const POST = await loadPOST();
     const res1 = await POST(makeRequest());
     expect(res1.status).toBe(200);
-    expect(prisma.enrollment.upsert).toHaveBeenCalledTimes(1);
+    expect(prisma.enrollment.create).toHaveBeenCalledTimes(1);
     expect(prisma.course.update).toHaveBeenCalledTimes(1);
 
     // Second delivery (retry): findUnique now returns the recorded event row,
@@ -200,7 +211,7 @@ describe("Stripe webhook — signature verification & idempotency", () => {
     expect(res2.status).toBe(200);
     expect((await res2.json()).duplicate).toBe(true);
     // No additional downstream calls on the retry.
-    expect(prisma.enrollment.upsert).toHaveBeenCalledTimes(1);
+    expect(prisma.enrollment.create).toHaveBeenCalledTimes(1);
     expect(prisma.course.update).toHaveBeenCalledTimes(1);
   });
 });
@@ -219,7 +230,7 @@ describe("Stripe webhook — checkout.session.completed", () => {
       },
     });
     vi.mocked(prisma.coursePurchase.updateMany).mockResolvedValue({ count: 1 } as never);
-    vi.mocked(prisma.enrollment.upsert).mockResolvedValue({} as never);
+    vi.mocked(prisma.enrollment.create).mockResolvedValue({} as never);
     vi.mocked(prisma.course.update).mockResolvedValue({} as never);
 
     const POST = await loadPOST();
@@ -230,10 +241,14 @@ describe("Stripe webhook — checkout.session.completed", () => {
       where: { userId: "u1", courseId: "course_1", stripeSessionId: "cs_abc" },
       data: { status: "completed" },
     });
-    expect(prisma.enrollment.upsert).toHaveBeenCalledWith({
+    // Was an upsert with an empty `update: {}`; now a guarded create inside a
+    // transaction with the counter, so a retry cannot count the enrollment
+    // twice. The "do nothing if already enrolled" semantic is unchanged.
+    expect(prisma.enrollment.findUnique).toHaveBeenCalledWith({
       where: { userId_courseId: { userId: "u1", courseId: "course_1" } },
-      update: {},
-      create: expect.objectContaining({
+    });
+    expect(prisma.enrollment.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
         userId: "u1",
         courseId: "course_1",
         progress: 0,
@@ -395,6 +410,213 @@ describe("Stripe webhook — invoice.payment_succeeded (community_membership)", 
     expect(res.status).toBe(200);
     expect(prisma.member.findFirst).not.toHaveBeenCalled();
     expect(prisma.member.create).not.toHaveBeenCalled();
+  });
+});
+
+/**
+ * Stripe delivers at-least-once. The event-id guard at the top of the handler
+ * does NOT cover a retry after a mid-handler failure: the ProcessedStripeEvent
+ * row is written only once the handler succeeds, deliberately, so a throw means
+ * the branch runs again from the top.
+ *
+ * The membership write used to be findFirst then create then increment,
+ * unguarded, which corrupted memberCount two ways:
+ *   1. create commits, increment fails — the retry finds the member, takes the
+ *      update branch, never increments. Permanently one short.
+ *   2. Two deliveries overlap — both create, the loser throws P2002, 500, and
+ *      Stripe retries harder.
+ */
+describe("Stripe webhook — community_membership is idempotent under retry", () => {
+  function communitySub() {
+    return {
+      id: "sub_comm",
+      items: { data: [{ price: { id: "price_comm" } }] },
+      metadata: { type: "community_membership", communityId: "comm_1", userId: "u_member" },
+      current_period_start: 1_700_000_000,
+      current_period_end: 1_702_592_000,
+      cancel_at_period_end: false,
+    };
+  }
+
+  function membershipEvent(id = "evt_dup") {
+    return {
+      id,
+      type: "invoice.payment_succeeded",
+      data: { object: { subscription: "sub_comm", customer: "cus_c" } },
+    };
+  }
+
+  beforeEach(() => {
+    mockConstructEvent.mockReturnValue(membershipEvent());
+    mockSubscriptionsRetrieve.mockResolvedValue(communitySub());
+    vi.mocked(prisma.member.create).mockResolvedValue({ id: "m1" } as never);
+    vi.mocked(prisma.member.update).mockResolvedValue({} as never);
+    vi.mocked(prisma.community.update).mockResolvedValue({} as never);
+  });
+
+  it("delivering the same event twice creates the member once and counts it once", async () => {
+    const POST = await loadPOST();
+
+    // First delivery: no member yet.
+    vi.mocked(prisma.member.findFirst).mockResolvedValueOnce(null);
+    const first = await POST(makeRequest());
+    expect(first.status).toBe(200);
+
+    // Second delivery. The event-id guard is deliberately not in play here —
+    // this models the retry-after-failure path, where the row was never
+    // written and the handler runs again from the top.
+    vi.mocked(prisma.member.findFirst).mockResolvedValueOnce({ id: "m1" } as never);
+    const second = await POST(makeRequest());
+
+    expect(second.status).toBe(200);
+    expect(prisma.member.create).toHaveBeenCalledTimes(1);
+    // The counter moved exactly once, on the delivery that created the row.
+    expect(prisma.community.update).toHaveBeenCalledTimes(1);
+  });
+
+  it("reactivating an existing member never touches the counter", async () => {
+    vi.mocked(prisma.member.findFirst).mockResolvedValue({ id: "m1" } as never);
+
+    const POST = await loadPOST();
+    const res = await POST(makeRequest());
+
+    expect(res.status).toBe(200);
+    expect(prisma.member.update).toHaveBeenCalledWith({
+      where: { id: "m1" },
+      data: { status: "ACTIVE" },
+    });
+    expect(prisma.community.update).not.toHaveBeenCalled();
+  });
+
+  it("creates the member and moves the counter inside ONE transaction", async () => {
+    // Two sequential writes are what allowed a member the counter never saw.
+    vi.mocked(prisma.member.findFirst).mockResolvedValue(null);
+
+    const POST = await loadPOST();
+    await POST(makeRequest());
+
+    expect(prisma.$transaction).toHaveBeenCalledTimes(1);
+    expect(prisma.member.create).toHaveBeenCalled();
+    expect(prisma.community.update).toHaveBeenCalledWith({
+      where: { id: "comm_1" },
+      data: { memberCount: { increment: 1 } },
+    });
+  });
+
+  it("a failing counter update takes the member down with it", async () => {
+    // With both writes in one transaction the create cannot survive a failing
+    // increment; modelled by the transaction rejecting as a unit.
+    vi.mocked(prisma.member.findFirst).mockResolvedValue(null);
+    vi.mocked(prisma.$transaction).mockRejectedValueOnce(new Error("counter update failed"));
+
+    const POST = await loadPOST();
+    const res = await POST(makeRequest());
+
+    // A real failure still reaches Stripe as a 5xx so it retries — and because
+    // the transaction rolled back, that retry starts from a clean slate.
+    expect(res.status).toBe(500);
+    expect(prisma.processedStripeEvent.create).not.toHaveBeenCalled();
+  });
+
+  it("absorbs the P2002 of a concurrent delivery and answers 200, not 5xx", async () => {
+    vi.mocked(prisma.member.findFirst).mockResolvedValue(null);
+    // Rejected at the create, not at $transaction: the old code called create
+    // directly, so a $transaction-level stub would never fire against it and
+    // the test would pass vacuously on the very code it must catch.
+    vi.mocked(prisma.member.create).mockRejectedValueOnce(
+      Object.assign(new Error("Unique constraint failed"), {
+        code: "P2002",
+        meta: { target: ["userId", "communityId"] },
+      })
+    );
+
+    const POST = await loadPOST();
+    const res = await POST(makeRequest());
+
+    expect(res.status).toBe(200);
+    // And the event is recorded, so Stripe stops retrying.
+    expect(prisma.processedStripeEvent.create).toHaveBeenCalled();
+  });
+
+  it("does not compensate the counter on the P2002 path", async () => {
+    // The delivery that won already incremented; touching it here would
+    // double-count the very thing this fix exists to prevent.
+    vi.mocked(prisma.member.findFirst).mockResolvedValue(null);
+    vi.mocked(prisma.member.create).mockRejectedValueOnce(
+      Object.assign(new Error("Unique constraint failed"), { code: "P2002" })
+    );
+
+    const POST = await loadPOST();
+    await POST(makeRequest());
+
+    expect(prisma.community.update).not.toHaveBeenCalled();
+  });
+
+  it("still fails loudly on an error that is not P2002", async () => {
+    // "Already processed" must not become a catch-all that hides real faults.
+    vi.mocked(prisma.member.findFirst).mockResolvedValue(null);
+    vi.mocked(prisma.$transaction).mockRejectedValueOnce(
+      Object.assign(new Error("connection lost"), { code: "P1001" })
+    );
+
+    const POST = await loadPOST();
+    const res = await POST(makeRequest());
+
+    expect(res.status).toBe(500);
+    expect(prisma.processedStripeEvent.create).not.toHaveBeenCalled();
+  });
+});
+
+/** The same defect, and the same fix, on the course-enrollment counter. */
+describe("Stripe webhook — course enrollment is idempotent under retry", () => {
+  function purchaseEvent() {
+    return {
+      id: "evt_course_dup",
+      type: "checkout.session.completed",
+      data: {
+        object: {
+          id: "cs_abc",
+          customer: "cus_abc",
+          metadata: { userId: "u1", type: "course_purchase", courseId: "course_1" },
+        },
+      },
+    };
+  }
+
+  beforeEach(() => {
+    mockConstructEvent.mockReturnValue(purchaseEvent());
+    vi.mocked(prisma.coursePurchase.updateMany).mockResolvedValue({ count: 1 } as never);
+    vi.mocked(prisma.enrollment.create).mockResolvedValue({} as never);
+    vi.mocked(prisma.course.update).mockResolvedValue({} as never);
+  });
+
+  it("counts the enrollment once across two deliveries", async () => {
+    const POST = await loadPOST();
+
+    vi.mocked(prisma.enrollment.findUnique).mockResolvedValueOnce(null as never);
+    await POST(makeRequest());
+
+    // Retry: already enrolled. The old upsert no-opped but the increment ran
+    // again regardless, inflating enrollmentCount.
+    vi.mocked(prisma.enrollment.findUnique).mockResolvedValueOnce({ id: "e1" } as never);
+    const second = await POST(makeRequest());
+
+    expect(second.status).toBe(200);
+    expect(prisma.enrollment.create).toHaveBeenCalledTimes(1);
+    expect(prisma.course.update).toHaveBeenCalledTimes(1);
+  });
+
+  it("pairs the enrollment and the counter in one transaction", async () => {
+    vi.mocked(prisma.enrollment.findUnique).mockResolvedValue(null as never);
+
+    const POST = await loadPOST();
+    await POST(makeRequest());
+
+    expect(prisma.$transaction).toHaveBeenCalledTimes(1);
+    expect(prisma.course.update).toHaveBeenCalledWith({
+      where: { id: "course_1" },
+      data: { enrollmentCount: { increment: 1 } },
+    });
   });
 });
 

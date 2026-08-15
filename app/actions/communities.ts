@@ -8,6 +8,7 @@ import { defineAction } from "@/lib/actions/define-action";
 import { communityById } from "@/lib/actions/resolvers";
 import { getLimitsForPlan } from "@/lib/plans";
 import { buildDefaultLandingLayout } from "@/lib/community-landing-template";
+import { isUniqueConstraintViolation } from "@/lib/prisma-errors";
 
 /**
  * Create a new community
@@ -242,19 +243,6 @@ export const updateCommunity = defineAction(
 /**
  * Join a community
  */
-/**
- * Prisma's unique-constraint violation (P2002).
- *
- * Narrowed by code rather than by `instanceof`: a Prisma client instantiated in
- * a different module realm (which the generated client does under Next's
- * bundling) fails the instance check while still carrying the code.
- */
-function isUniqueConstraintViolation(error: unknown): boolean {
-  return error instanceof Prisma.PrismaClientKnownRequestError
-    ? error.code === "P2002"
-    : typeof error === "object" && error !== null && (error as { code?: unknown }).code === "P2002";
-}
-
 export const joinCommunity = defineAction(
   {
     name: "joinCommunity",
