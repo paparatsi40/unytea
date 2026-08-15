@@ -72,6 +72,8 @@ interface VideoRoomUIProps {
   attendeeCount?: number;
   sessionStartTime?: Date;
   isRecording?: boolean;
+  /** Still accepted so the parent's wiring survives untouched; unread while
+   *  the recording control below is disabled. */
   isRecordingBusy?: boolean;
   onToggleRecording?: () => void;
   onLeave?: () => void;
@@ -88,8 +90,6 @@ export function VideoRoomUI({
   attendeeCount = 0,
   sessionStartTime,
   isRecording = false,
-  isRecordingBusy = false,
-  onToggleRecording,
   onLeave,
   onEndSession,
 }: VideoRoomUIProps) {
@@ -390,19 +390,29 @@ export function VideoRoomUI({
                 <span className="hidden sm:inline">{t("header.muteAll")}</span>
               </button>
 
-              {/* Recording Control */}
+              {/* Recording control — disabled and labelled as unavailable,
+                  because pressing it did not start a recording. It wrote a
+                  Recording row with `egressId: "pending-…"` and flipped the
+                  badge, but the app never calls the Egress API:
+                  lib/jobs/livekit-webhook.ts's startRecording is a console.log
+                  with `TODO: Implement actual Egress API call`. A host would
+                  leave believing the session was captured.
+
+                  Note this disables the *control*, not the feature. Per
+                  lib/jobs/recording.ts, V1 expects the egress to be started by
+                  LiveKit Cloud project config, with `egress_started` /
+                  `egress_ended` webhooks filling in the row — so recordings
+                  that appear in the library may be perfectly real. What was
+                  false was this button claiming to start one. */}
               <button
-                onClick={onToggleRecording}
-                disabled={isRecordingBusy}
-                className={cn(
-                  "flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60",
-                  isRecording
-                    ? "bg-amber-500/15 text-amber-400 hover:bg-amber-500/25"
-                    : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
-                )}
+                type="button"
+                disabled
+                aria-disabled="true"
+                title={t("header.recordingComingSoonHint")}
+                className="flex cursor-not-allowed items-center gap-2 rounded-full bg-zinc-800/60 px-3 py-1.5 text-sm font-medium text-zinc-500"
               >
-                <Radio className={cn("h-4 w-4", isRecording && "animate-pulse")} />
-                <span>{isRecording ? t("header.pauseRecording") : t("header.startRecording")}</span>
+                <Radio className="h-4 w-4" />
+                <span>{t("header.recordingComingSoon")}</span>
               </button>
 
               {/* End Session */}

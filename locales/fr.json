@@ -242,29 +242,6 @@
       "uptime": "99.99% Uptime",
       "support": "Support 24/7"
     },
-    "pricing": {
-      "badge": "Tarifs",
-      "title": "Tarifs Simples et",
-      "subtitle": "Transparents",
-      "description": "Commencez gratuitement, passez à la version supérieure quand vous êtes prêt. Pas de frais cachés, pas de surprises.",
-      "free": {
-        "name": "Gratuit",
-        "description": "Parfait pour commencer",
-        "cta": "Commencer"
-      },
-      "professional": {
-        "name": "Professionnel",
-        "badge": "Plus Populaire",
-        "description": "Pour les créateurs en croissance",
-        "cta": "Commencer l'Essai Gratuit"
-      },
-      "premium": {
-        "name": "Premium",
-        "description": "Pour les utilisateurs avancés",
-        "cta": "Contacter les Ventes"
-      },
-      "guarantee": "Tous les plans incluent un essai gratuit de 14 jours. Aucune carte de crédit requise."
-    },
     "faq": {
       "badge": "FAQ",
       "title": "Questions Courantes",
@@ -1829,7 +1806,9 @@
         "proTipBody": "Les enregistrements sont sauvegardés automatiquement après chaque session en direct. Utilisez-les pour :",
         "proTip1": "Les ajouter à vos cours comme contenu premium",
         "proTip2": "Les partager avec les membres qui ont manqué la session en direct",
-        "proTip3": "Les réutiliser comme courts clips pour les réseaux sociaux"
+        "proTip3": "Les réutiliser comme courts clips pour les réseaux sociaux",
+        "comingSoonTitle": "Les enregistrements de sessions arrivent bientôt",
+        "comingSoonBody": "L'enregistrement n'est pas encore disponible, il n'y a donc rien à afficher ici. Vos sessions passées sont préservées : les enregistrements apparaîtront une fois la fonctionnalité activée."
       },
       "resources": {
         "loading": "Chargement de votre bibliothèque de connaissances...",
@@ -2291,7 +2270,9 @@
       "trialNoCC": "Sans carte requise",
       "featuredLabel": "Le plus populaire",
       "freeForMembersTitle": "Conçu pour les hosts, gratuit pour les members.",
-      "freeForMembersBody": "Chacun peut créer un compte, explorer les communautés et rejoindre gratuitement. Les hosts paient à Unytea un forfait mensuel plus une petite commission (3-8%) sur les abonnements des members qu'ils collectent. Aucun frais caché."
+      "freeForMembersBody": "Chacun peut créer un compte, explorer les communautés et rejoindre gratuitement. Les hosts paient à Unytea un forfait mensuel plus une petite commission (3-8%) sur les abonnements des members qu'ils collectent. Aucun frais caché.",
+      "commissionZero": "0% de commission — vous gardez 100% de vos revenus",
+      "intervalUnavailable": "La facturation annuelle n'est pas encore disponible pour ce plan"
     },
     "tiers": {
       "creator": {
@@ -2299,7 +2280,6 @@
         "description": "Pour les créateurs émergents lançant leur première communauté",
         "features": [
           "Members illimités",
-          "Sessions live jusqu'à 100 participants simultanés",
           "Cours payants",
           "Feed de communauté + bibliothèque",
           "Analytics basiques"
@@ -2310,7 +2290,6 @@
         "description": "Pour les hosts établis qui font grandir leur communauté",
         "features": [
           "Tout ce qui est dans Creator",
-          "Sessions live jusqu'à 300 participants simultanés",
           "Domaine personnalisé",
           "Analytics avancés",
           "Jusqu'à 5 admins"
@@ -2321,7 +2300,6 @@
         "description": "Pour les équipes qui font passer à l'échelle plusieurs communautés",
         "features": [
           "Tout ce qui est dans Business",
-          "Sessions live jusqu'à 1000 participants simultanés",
           "Expérience white-label",
           "Accès API",
           "Admins illimités"
@@ -2520,7 +2498,9 @@
       },
       "replayGate": {
         "title": "Rediffusion réservée aux membres",
-        "body": "Cet enregistrement est disponible pour les membres de la communauté. Rejoignez-la pour voir la rediffusion complète et assister à la prochaine session en direct."
+        "body": "Cet enregistrement est disponible pour les membres de la communauté. Rejoignez-la pour voir la rediffusion complète et assister à la prochaine session en direct.",
+        "comingSoonTitle": "Les rediffusions arrivent bientôt",
+        "comingSoonBody": "L'enregistrement des sessions n'est pas encore disponible, il n'y a donc pas de rediffusion."
       },
       "tabs": {
         "about": "À propos",
@@ -2609,7 +2589,9 @@
         "endSession": "Terminer la session",
         "poll": "Sondage",
         "muteAll": "Couper tous les micros",
-        "leave": "Quitter"
+        "leave": "Quitter",
+        "recordingComingSoon": "Enregistrement (bientôt)",
+        "recordingComingSoonHint": "L'enregistrement des sessions n'est pas encore disponible."
       },
       "raiseHand": {
         "raise": "Lever la main",
@@ -2748,7 +2730,9 @@
         "processingDesc": "Il sera prêt dans quelques minutes",
         "defaultTitle": "État de l'enregistrement",
         "defaultDesc": "Traitement de l'enregistrement de votre session",
-        "watch": "Regarder"
+        "watch": "Regarder",
+        "comingSoonTitle": "Enregistrement bientôt disponible",
+        "comingSoonDesc": "Cette session n'a pas été enregistrée. L'enregistrement n'est pas encore disponible."
       },
       "nextSteps": {
         "title": "Transformez cette session en contenu",

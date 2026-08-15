@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import { PLAN_PRICING } from "@/lib/plans";
 
 // Plan order for comparison (lower = entry tier; higher = more capability).
 // START is kept as the implicit "no active subscription" sentinel state used
@@ -28,30 +29,18 @@ const PLAN_ORDER: Record<string, number> = {
 };
 
 // Plan copy (description + features) is localized via dashboard.billing.plans.*;
-// only the stable, non-translatable fields live here.
+// prices and Stripe price ids come from lib/plans.ts. This list used to hold
+// its own "$15" / "$49" / "$149" and its own env lookups — a second, unlinked
+// copy of the marketing card's numbers, free to drift away from it.
 const plans = [
-  {
-    key: "CREATOR",
-    name: "Creator",
-    price: "$15",
-    priceId: process.env.NEXT_PUBLIC_STRIPE_CREATOR_PRICE_ID ?? "",
-    popular: false,
-  },
-  {
-    key: "BUSINESS",
-    name: "Business",
-    price: "$49",
-    priceId: process.env.NEXT_PUBLIC_STRIPE_BUSINESS_PRICE_ID ?? "",
-    popular: true,
-  },
-  {
-    key: "PRO",
-    name: "Pro",
-    price: "$149",
-    priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID ?? "",
-    popular: false,
-  },
-];
+  { key: "CREATOR" as const, name: "Creator", popular: false },
+  { key: "BUSINESS" as const, name: "Business", popular: true },
+  { key: "PRO" as const, name: "Pro", popular: false },
+].map((plan) => ({
+  ...plan,
+  price: `$${PLAN_PRICING[plan.key].monthly}`,
+  priceId: PLAN_PRICING[plan.key].stripePriceIdMonthly,
+}));
 
 type Subscription = {
   id: string;
