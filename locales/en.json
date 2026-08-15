@@ -2870,11 +2870,7 @@
     "unpinQuestion": "Unpin question",
     "clearInvite": "Dismiss invitation",
     "closeChecklist": "Hide the getting-started checklist",
-    "feedbackDialog": "Session feedback",
     "pollDialog": "Live poll",
-    "pollCreatorDialog": "Create a poll",
-    "toggleChat": "Toggle chat",
-    "openPollCreator": "Create a poll",
-    "rateStars": "Rate {count} out of 5"
+    "pollCreatorDialog": "Create a poll"
   }
 }

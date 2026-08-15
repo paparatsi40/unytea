@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { Loader2, AlertCircle } from "lucide-react";
 import { VideoRoomUI } from "./VideoRoomUI";
 import { joinSession } from "@/app/actions/livekit";
+import { ROOM_OPTIONS } from "@/lib/livekit/room-options";
 
 interface VideoRoomProps {
   /**
@@ -135,6 +136,10 @@ export function VideoRoom({
         token={token}
         serverUrl={wsUrl}
         connect={true}
+        // adaptiveStream + dynacast. Without them this room ran on
+        // livekit-client's defaults, which pull the 720p layer for every tile
+        // regardless of its rendered size. See lib/livekit/room-options.ts.
+        options={ROOM_OPTIONS}
         video={sessionMode === "video"}
         audio={true}
         onDisconnected={() => {

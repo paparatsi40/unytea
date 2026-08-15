@@ -4,7 +4,7 @@ import { render, screen, cleanup, fireEvent } from "@testing-library/react";
 import { useAccessibleDialog } from "@/lib/hooks/useAccessibleDialog";
 
 /**
- * UX_REVIEW Tier 3 — the hand-rolled overlays in live-session/ and video-call/
+ * UX_REVIEW Tier 3 — the hand-rolled overlays in live-session/
  * were not dialogs to a keyboard user.
  *
  * They rendered a backdrop and a panel and nothing else: Escape did nothing, so
