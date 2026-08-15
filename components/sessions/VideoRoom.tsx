@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import { LiveKitRoom, RoomAudioRenderer } from "@livekit/components-react";
+import type { MediaDeviceFailure } from "livekit-client";
 import "@livekit/components-styles";
 import { useTranslations } from "next-intl";
 import { Loader2, AlertCircle } from "lucide-react";
@@ -63,6 +64,16 @@ function AudioUnlocker() {
   return null;
 }
 
+/**
+ * What went wrong fetching the token, stored as a discriminant rather than as
+ * an already-translated string.
+ *
+ * Holding the translated text here would mean calling `t()` inside the fetch
+ * effect, which would put the translator in that effect's dependency array —
+ * and that is what made the room reconnect forever. See the effect below.
+ */
+type TokenError = { type: "server"; message: string } | { type: "tokenError" | "unknownError" };
+
 export function VideoRoom({
   sessionId,
   sessionMode = "video",
@@ -78,29 +89,53 @@ export function VideoRoom({
   const [token, setToken] = useState<string | null>(null);
   const [wsUrl, setWsUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<TokenError | null>(null);
 
+  /**
+   * Mint the room token. Exactly once per session — the identity of this effect
+   * decides whether the call below stays connected or is torn down and rebuilt.
+   *
+   * This used to depend on `[sessionId, t]`. `t` is memoised against the
+   * next-intl context value, which is rebuilt from a freshly deserialised
+   * `messages` object every time the RSC payload for the route is refreshed —
+   * something a Server Action can trigger, and this effect calls one. So `t`
+   * changed identity, the effect re-ran, `setLoading(true)` swapped the tree
+   * below for the spinner, `<LiveKitRoom>` unmounted, `@livekit/components-react`
+   * disconnected the room on unmount, and the whole thing remounted with a new
+   * token and a new `Room` — which issued the Server Action again. That is the
+   * reconnect loop: disconnect, unpublish, connect, publish, repeat.
+   *
+   * Nothing translated may enter this array. Errors are kept as discriminants
+   * and translated at render time instead.
+   */
   useEffect(() => {
-    let mounted = true;
+    let cancelled = false;
 
     async function getToken() {
       try {
         setLoading(true);
+        setError(null);
         const result = await joinSession(sessionId);
 
-        if (!mounted) return;
+        if (cancelled) return;
 
         if (!result.success || !("access" in result) || !result.access) {
-          throw new Error(("error" in result && result.error) || t("tokenError"));
+          const serverMessage = "error" in result ? result.error : undefined;
+          setError(
+            serverMessage ? { type: "server", message: serverMessage } : { type: "tokenError" }
+          );
+          return;
         }
 
         setToken(result.access.token);
         setWsUrl(result.access.wsUrl);
       } catch (err) {
-        if (!mounted) return;
-        setError(err instanceof Error ? err.message : t("unknownError"));
+        if (cancelled) return;
+        setError(
+          err instanceof Error ? { type: "server", message: err.message } : { type: "unknownError" }
+        );
       } finally {
-        if (mounted) {
+        if (!cancelled) {
           setLoading(false);
         }
       }
@@ -109,9 +144,31 @@ export function VideoRoom({
     getToken();
 
     return () => {
-      mounted = false;
+      cancelled = true;
     };
-  }, [sessionId, t]);
+  }, [sessionId]);
+
+  /**
+   * Stable identities for the three room callbacks.
+   *
+   * `useLiveKitRoom` lists `onError` in the dependency array of the effect that
+   * calls `room.connect()`, and `onError`/`onDisconnected`/`onMediaDeviceFailure`
+   * in the one that binds its RoomEvent listeners. Passing inline arrows re-ran
+   * both on every single render — that is the `already connected to room …`
+   * line repeating in the console, and a listener rebind for every render on
+   * top of it.
+   */
+  const handleDisconnected = useCallback(() => {
+    onLeave?.();
+  }, [onLeave]);
+
+  const handleError = useCallback((err: Error) => {
+    console.error("[LiveKit] Error:", err);
+  }, []);
+
+  const handleMediaDeviceFailure = useCallback((failure?: MediaDeviceFailure) => {
+    console.error("[LiveKit] Media device failure:", failure);
+  }, []);
 
   if (loading) {
     return (
@@ -122,10 +179,13 @@ export function VideoRoom({
   }
 
   if (error || !token || !wsUrl) {
+    const message =
+      error === null ? t("missingConfig") : error.type === "server" ? error.message : t(error.type);
+
     return (
       <div className="flex h-screen items-center justify-center bg-zinc-950 text-red-500">
         <AlertCircle className="mr-2 h-5 w-5" />
-        {error || t("missingConfig")}
+        {message}
       </div>
     );
   }
@@ -142,15 +202,9 @@ export function VideoRoom({
         options={ROOM_OPTIONS}
         video={sessionMode === "video"}
         audio={true}
-        onDisconnected={() => {
-          onLeave?.();
-        }}
-        onError={(err) => {
-          console.error("[LiveKit] Error:", err);
-        }}
-        onMediaDeviceFailure={(failure) => {
-          console.error("[LiveKit] Media device failure:", failure);
-        }}
+        onDisconnected={handleDisconnected}
+        onError={handleError}
+        onMediaDeviceFailure={handleMediaDeviceFailure}
         className="flex h-full flex-col"
       >
         <VideoRoomUI
