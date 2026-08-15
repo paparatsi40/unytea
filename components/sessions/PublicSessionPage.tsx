@@ -401,8 +401,12 @@ export function PublicSessionPage({
 
         {session.recording && !session.recording.url && (
           <div className="mb-8 rounded-xl border border-amber-500/30 bg-amber-500/10 p-6">
-            <h3 className="text-lg font-semibold text-white">{t("replayGate.title")}</h3>
-            <p className="mt-2 text-sm text-zinc-300">{t("replayGate.body")}</p>
+            {/* Shown when a Recording row exists without a URL. That state
+                used to read as "your replay is on its way"; with no egress it
+                never arrives. The player above is untouched — it is gated on a
+                URL, so a real recording still plays. */}
+            <h3 className="text-lg font-semibold text-white">{t("replayGate.comingSoonTitle")}</h3>
+            <p className="mt-2 text-sm text-zinc-300">{t("replayGate.comingSoonBody")}</p>
           </div>
         )}
 

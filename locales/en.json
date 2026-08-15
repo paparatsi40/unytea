@@ -242,13 +242,6 @@
       "uptime": "99.99% Uptime",
       "support": "24/7 Support"
     },
-    "pricing": {
-      "badge": "Pricing",
-      "title": "Simple, Transparent",
-      "subtitle": "Pricing",
-      "description": "Start free, upgrade when you're ready. No hidden fees, no surprises.",
-      "guarantee": "All plans include a 14-day free trial. No credit card required."
-    },
     "faq": {
       "badge": "FAQ",
       "title": "Common Questions",
@@ -1813,7 +1806,9 @@
         "proTipBody": "Recordings are automatically saved after each live session. Use them to:",
         "proTip1": "Add to your courses as premium content",
         "proTip2": "Share with members who missed the live session",
-        "proTip3": "Repurpose as short clips for social media"
+        "proTip3": "Repurpose as short clips for social media",
+        "comingSoonTitle": "Session recordings are coming soon",
+        "comingSoonBody": "Recording isn't available yet, so there's nothing to show here. Your past sessions are safe — recordings will appear once we turn the feature on."
       },
       "resources": {
         "loading": "Loading your knowledge library...",
@@ -2503,7 +2498,9 @@
       },
       "replayGate": {
         "title": "Members-only replay",
-        "body": "This recording is available to community members. Join to watch the full replay and attend the next live session."
+        "body": "This recording is available to community members. Join to watch the full replay and attend the next live session.",
+        "comingSoonTitle": "Replays are coming soon",
+        "comingSoonBody": "Session recording isn't available yet, so there's no replay for this one."
       },
       "tabs": {
         "about": "About",
@@ -2733,7 +2730,9 @@
         "processingDesc": "It will be ready in a few minutes",
         "defaultTitle": "Recording status",
         "defaultDesc": "Processing your session recording",
-        "watch": "Watch"
+        "watch": "Watch",
+        "comingSoonTitle": "Recording coming soon",
+        "comingSoonDesc": "This session wasn't recorded. Recording isn't available yet."
       },
       "nextSteps": {
         "title": "Turn this session into content",

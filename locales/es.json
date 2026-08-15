@@ -242,13 +242,6 @@
       "uptime": "99.99% Uptime",
       "support": "Soporte 24/7"
     },
-    "pricing": {
-      "badge": "Precios",
-      "title": "Precios Simples y",
-      "subtitle": "Transparentes",
-      "description": "Comienza gratis, actualiza cuando estés listo. Sin tarifas ocultas, sin sorpresas.",
-      "guarantee": "Todos los planes incluyen prueba de 14 días. No requiere tarjeta de crédito."
-    },
     "faq": {
       "badge": "FAQ",
       "title": "Preguntas Frecuentes",
@@ -1813,7 +1806,9 @@
         "proTipBody": "Las grabaciones se guardan automáticamente después de cada sesión en vivo. Úsalas para:",
         "proTip1": "Agregarlas a tus cursos como contenido premium",
         "proTip2": "Compartirlas con members que se perdieron la sesión en vivo",
-        "proTip3": "Reutilizarlas como clips cortos para redes sociales"
+        "proTip3": "Reutilizarlas como clips cortos para redes sociales",
+        "comingSoonTitle": "Las grabaciones de sesiones llegan pronto",
+        "comingSoonBody": "La grabación aún no está disponible, así que no hay nada que mostrar aquí. Tus sesiones pasadas están a salvo: las grabaciones aparecerán cuando activemos la función."
       },
       "resources": {
         "loading": "Cargando tu biblioteca de conocimiento...",
@@ -2503,7 +2498,9 @@
       },
       "replayGate": {
         "title": "Repetición solo para miembros",
-        "body": "Esta grabación está disponible para los miembros de la comunidad. Únete para ver la repetición completa y asistir a la próxima sesión en vivo."
+        "body": "Esta grabación está disponible para los miembros de la comunidad. Únete para ver la repetición completa y asistir a la próxima sesión en vivo.",
+        "comingSoonTitle": "Las repeticiones llegan pronto",
+        "comingSoonBody": "La grabación de sesiones aún no está disponible, así que no hay repetición de esta."
       },
       "tabs": {
         "about": "Acerca de",
@@ -2733,7 +2730,9 @@
         "processingDesc": "Estará lista en unos minutos",
         "defaultTitle": "Estado de la grabación",
         "defaultDesc": "Procesando la grabación de tu sesión",
-        "watch": "Ver"
+        "watch": "Ver",
+        "comingSoonTitle": "Grabación muy pronto",
+        "comingSoonDesc": "Esta sesión no se grabó. La grabación aún no está disponible."
       },
       "nextSteps": {
         "title": "Convierte esta sesión en contenido",

@@ -242,13 +242,6 @@
       "uptime": "99.99% Uptime",
       "support": "Support 24/7"
     },
-    "pricing": {
-      "badge": "Tarifs",
-      "title": "Tarifs Simples et",
-      "subtitle": "Transparents",
-      "description": "Commencez gratuitement, passez à la version supérieure quand vous êtes prêt. Pas de frais cachés, pas de surprises.",
-      "guarantee": "Tous les plans incluent un essai gratuit de 14 jours. Aucune carte de crédit requise."
-    },
     "faq": {
       "badge": "FAQ",
       "title": "Questions Courantes",
@@ -1813,7 +1806,9 @@
         "proTipBody": "Les enregistrements sont sauvegardés automatiquement après chaque session en direct. Utilisez-les pour :",
         "proTip1": "Les ajouter à vos cours comme contenu premium",
         "proTip2": "Les partager avec les membres qui ont manqué la session en direct",
-        "proTip3": "Les réutiliser comme courts clips pour les réseaux sociaux"
+        "proTip3": "Les réutiliser comme courts clips pour les réseaux sociaux",
+        "comingSoonTitle": "Les enregistrements de sessions arrivent bientôt",
+        "comingSoonBody": "L'enregistrement n'est pas encore disponible, il n'y a donc rien à afficher ici. Vos sessions passées sont préservées : les enregistrements apparaîtront une fois la fonctionnalité activée."
       },
       "resources": {
         "loading": "Chargement de votre bibliothèque de connaissances...",
@@ -2503,7 +2498,9 @@
       },
       "replayGate": {
         "title": "Rediffusion réservée aux membres",
-        "body": "Cet enregistrement est disponible pour les membres de la communauté. Rejoignez-la pour voir la rediffusion complète et assister à la prochaine session en direct."
+        "body": "Cet enregistrement est disponible pour les membres de la communauté. Rejoignez-la pour voir la rediffusion complète et assister à la prochaine session en direct.",
+        "comingSoonTitle": "Les rediffusions arrivent bientôt",
+        "comingSoonBody": "L'enregistrement des sessions n'est pas encore disponible, il n'y a donc pas de rediffusion."
       },
       "tabs": {
         "about": "À propos",
@@ -2733,7 +2730,9 @@
         "processingDesc": "Il sera prêt dans quelques minutes",
         "defaultTitle": "État de l'enregistrement",
         "defaultDesc": "Traitement de l'enregistrement de votre session",
-        "watch": "Regarder"
+        "watch": "Regarder",
+        "comingSoonTitle": "Enregistrement bientôt disponible",
+        "comingSoonDesc": "Cette session n'a pas été enregistrée. L'enregistrement n'est pas encore disponible."
       },
       "nextSteps": {
         "title": "Transformez cette session en contenu",

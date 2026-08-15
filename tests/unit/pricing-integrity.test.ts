@@ -44,6 +44,16 @@ function code(relativePath: string): string {
     .replace(/(^|[^:])\/\/[^\n]*/g, "$1");
 }
 
+function walkTsx(dir: string, out: string[] = []): string[] {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const p = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      if (![".next", "node_modules"].includes(entry.name)) walkTsx(p, out);
+    } else if (/\.tsx?$/.test(entry.name)) out.push(p);
+  }
+  return out;
+}
+
 function locale(name: string) {
   return JSON.parse(read(`locales/${name}.json`));
 }
@@ -256,6 +266,111 @@ describe("displayed prices are one copy", () => {
     // Annual is 10× monthly, i.e. two months free — the "Save 16%" badge.
     for (const plan of PAID_PLANS) {
       expect(PLAN_PRICING[plan].annual).toBe(PLAN_PRICING[plan].monthly * 10);
+    }
+  });
+});
+
+/**
+ * Confirmed from the LiveKit Cloud dashboard: no auto-egress is configured and
+ * the Egresses tab is empty. Combined with the stubbed Egress call, NO path
+ * produces a recording. Every surface that presented recordings as a working
+ * feature therefore had to say otherwise — not be deleted, since the code and
+ * the data model are ready for egress whenever it is built.
+ */
+describe("no recording surface presents a working feature", () => {
+  it("the library shows coming-soon, not an empty shelf inviting you to fill it", () => {
+    const view = code("components/dashboard/library/RecordingsTabView.tsx");
+    expect(view).toContain('t("comingSoonTitle")');
+    expect(view).toContain('t("comingSoonBody")');
+    // "Create your first session" implied a session would produce a recording.
+    expect(view).not.toContain('t("createFirstSession")');
+    expect(view).not.toContain('t("noRecordingsTitle")');
+  });
+
+  it("the library still renders real recordings if any ever exist", () => {
+    // Marking the empty state must not hide data. The grid is untouched.
+    const view = read("components/dashboard/library/RecordingsTabView.tsx");
+    expect(view).toContain("recordings.map(");
+  });
+
+  it("the post-session card stops claiming a recording is processing", () => {
+    // recordingStatus defaults to PROCESSING with no row, so every completed
+    // session showed a spinner and "processing your recording" forever.
+    const flow = code("components/sessions/PostSessionFlow.tsx");
+    expect(flow).toContain('t("recording.comingSoonTitle")');
+    expect(flow).not.toContain('t("recording.processingTitle")');
+    expect(flow).not.toContain('t("recording.processingDesc")');
+    // A genuinely READY recording still says so.
+    expect(flow).toContain('t("recording.readyTitle")');
+  });
+
+  it("the public replay gate says coming soon rather than 'on its way'", () => {
+    const page = code("components/sessions/PublicSessionPage.tsx");
+    expect(page).toContain('t("replayGate.comingSoonTitle")');
+    expect(page).not.toContain('t("replayGate.title")');
+    // The player is gated on a URL, so a real recording still plays.
+    expect(page).toContain("session.recording?.url &&");
+  });
+
+  it("no recording surface calls the stubbed start path", () => {
+    const surfaces = [
+      "components/sessions/VideoRoomUI.tsx",
+      "components/dashboard/library/RecordingsTabView.tsx",
+      "components/sessions/PostSessionFlow.tsx",
+      "components/sessions/PublicSessionPage.tsx",
+    ];
+    for (const file of surfaces) {
+      expect(code(file), `${file} should not start a recording`).not.toContain(
+        "startCompositeRecording"
+      );
+    }
+  });
+
+  it.each(LOCALES)("%s has every coming-soon string these surfaces render", (name) => {
+    const data = locale(name);
+    expect(data.dashboard.library.recordings.comingSoonTitle).toBeTruthy();
+    expect(data.dashboard.library.recordings.comingSoonBody).toBeTruthy();
+    expect(data.liveSession.postSessionFlow.recording.comingSoonTitle).toBeTruthy();
+    expect(data.liveSession.postSessionFlow.recording.comingSoonDesc).toBeTruthy();
+    expect(data.liveSession.publicPage.replayGate.comingSoonTitle).toBeTruthy();
+    expect(data.liveSession.publicPage.replayGate.comingSoonBody).toBeTruthy();
+  });
+});
+
+describe("the dead landing.pricing namespace stays gone", () => {
+  it.each(LOCALES)("%s has no landing.pricing", (name) => {
+    // 29 keys are read from the `landing` namespace; none under `pricing.`.
+    // The home page renders PricingSection, which reads billing.*.
+    expect(locale(name).landing?.pricing).toBeUndefined();
+  });
+
+  it("nothing in the code reads a landing.pricing key", () => {
+    const files = [
+      ...walkTsx(path.join(REPO_ROOT, "app")),
+      ...walkTsx(path.join(REPO_ROOT, "components")),
+    ];
+
+    const offenders: string[] = [];
+    for (const file of files) {
+      const source = fs.readFileSync(file, "utf8");
+      if (/["`]landing\.pricing/.test(source)) {
+        offenders.push(path.relative(REPO_ROOT, file).split(path.sep).join("/"));
+      }
+      // A component bound to the parent `landing` namespace reaching into it.
+      if (/(useTranslations|getTranslations)\(\s*["`]landing["`]\s*\)/.test(source)) {
+        for (const m of source.matchAll(/t\(\s*["`]pricing\.[^"`]+["`]/g)) {
+          offenders.push(`${path.relative(REPO_ROOT, file)}: ${m[0]}`);
+        }
+      }
+    }
+
+    expect(offenders).toEqual([]);
+  });
+
+  it("the landing namespace still exists and is still used", () => {
+    // Guard against the deletion having taken the parent with it.
+    for (const name of LOCALES) {
+      expect(Object.keys(locale(name).landing).length).toBeGreaterThan(3);
     }
   });
 });
