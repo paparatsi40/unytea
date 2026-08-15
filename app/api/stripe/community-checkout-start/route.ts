@@ -1,14 +1,8 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getPlatformFeePercent } from "@/lib/plans";
 import { stripe, getOrCreateStripeCustomer } from "@/lib/stripe";
-
-const PLATFORM_FEE_BY_PLAN: Record<string, number> = {
-  start: 8,
-  creator: 5,
-  business: 2,
-  pro: 0,
-};
 
 async function getPlatformFeePercentForOwner(ownerId: string): Promise<number> {
   const ownerSubscription = await prisma.subscription.findFirst({
@@ -24,10 +18,11 @@ async function getPlatformFeePercentForOwner(ownerId: string): Promise<number> {
     orderBy: { createdAt: "desc" },
   });
 
-  const planName = ownerSubscription?.plan?.name?.toLowerCase()?.trim();
-  if (!planName) return 5;
+  const planName = ownerSubscription?.plan?.name;
 
-  return PLATFORM_FEE_BY_PLAN[planName] ?? 5;
+  // Single source: lib/plans.ts. This route used to carry its own copy of
+  // the fee table, as did two sibling routes.
+  return getPlatformFeePercent(planName);
 }
 
 export const dynamic = "force-dynamic";

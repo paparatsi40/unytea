@@ -247,22 +247,6 @@
       "title": "Tarifs Simples et",
       "subtitle": "Transparents",
       "description": "Commencez gratuitement, passez à la version supérieure quand vous êtes prêt. Pas de frais cachés, pas de surprises.",
-      "free": {
-        "name": "Gratuit",
-        "description": "Parfait pour commencer",
-        "cta": "Commencer"
-      },
-      "professional": {
-        "name": "Professionnel",
-        "badge": "Plus Populaire",
-        "description": "Pour les créateurs en croissance",
-        "cta": "Commencer l'Essai Gratuit"
-      },
-      "premium": {
-        "name": "Premium",
-        "description": "Pour les utilisateurs avancés",
-        "cta": "Contacter les Ventes"
-      },
       "guarantee": "Tous les plans incluent un essai gratuit de 14 jours. Aucune carte de crédit requise."
     },
     "faq": {
@@ -2291,7 +2275,9 @@
       "trialNoCC": "Sans carte requise",
       "featuredLabel": "Le plus populaire",
       "freeForMembersTitle": "Conçu pour les hosts, gratuit pour les members.",
-      "freeForMembersBody": "Chacun peut créer un compte, explorer les communautés et rejoindre gratuitement. Les hosts paient à Unytea un forfait mensuel plus une petite commission (3-8%) sur les abonnements des members qu'ils collectent. Aucun frais caché."
+      "freeForMembersBody": "Chacun peut créer un compte, explorer les communautés et rejoindre gratuitement. Les hosts paient à Unytea un forfait mensuel plus une petite commission (3-8%) sur les abonnements des members qu'ils collectent. Aucun frais caché.",
+      "commissionZero": "0% de commission — vous gardez 100% de vos revenus",
+      "intervalUnavailable": "La facturation annuelle n'est pas encore disponible pour ce plan"
     },
     "tiers": {
       "creator": {
@@ -2299,7 +2285,6 @@
         "description": "Pour les créateurs émergents lançant leur première communauté",
         "features": [
           "Members illimités",
-          "Sessions live jusqu'à 100 participants simultanés",
           "Cours payants",
           "Feed de communauté + bibliothèque",
           "Analytics basiques"
@@ -2310,7 +2295,6 @@
         "description": "Pour les hosts établis qui font grandir leur communauté",
         "features": [
           "Tout ce qui est dans Creator",
-          "Sessions live jusqu'à 300 participants simultanés",
           "Domaine personnalisé",
           "Analytics avancés",
           "Jusqu'à 5 admins"
@@ -2321,7 +2305,6 @@
         "description": "Pour les équipes qui font passer à l'échelle plusieurs communautés",
         "features": [
           "Tout ce qui est dans Business",
-          "Sessions live jusqu'à 1000 participants simultanés",
           "Expérience white-label",
           "Accès API",
           "Admins illimités"
@@ -2609,7 +2592,9 @@
         "endSession": "Terminer la session",
         "poll": "Sondage",
         "muteAll": "Couper tous les micros",
-        "leave": "Quitter"
+        "leave": "Quitter",
+        "recordingComingSoon": "Enregistrement (bientôt)",
+        "recordingComingSoonHint": "L'enregistrement des sessions n'est pas encore disponible."
       },
       "raiseHand": {
         "raise": "Lever la main",

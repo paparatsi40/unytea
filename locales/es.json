@@ -247,22 +247,6 @@
       "title": "Precios Simples y",
       "subtitle": "Transparentes",
       "description": "Comienza gratis, actualiza cuando estés listo. Sin tarifas ocultas, sin sorpresas.",
-      "free": {
-        "name": "Gratis",
-        "description": "Perfecto para comenzar",
-        "cta": "Comenzar"
-      },
-      "professional": {
-        "name": "Profesional",
-        "badge": "Más Popular",
-        "description": "Para creadores en crecimiento",
-        "cta": "Comenzar Prueba Gratis"
-      },
-      "premium": {
-        "name": "Premium",
-        "description": "Para usuarios avanzados",
-        "cta": "Contactar Ventas"
-      },
       "guarantee": "Todos los planes incluyen prueba de 14 días. No requiere tarjeta de crédito."
     },
     "faq": {
@@ -2291,7 +2275,9 @@
       "trialNoCC": "Sin tarjeta requerida",
       "featuredLabel": "Más popular",
       "freeForMembersTitle": "Diseñado para hosts, gratis para members.",
-      "freeForMembersBody": "Cualquiera puede crear cuenta, explorar comunidades, y unirse gratis. Los hosts pagan a Unytea una mensualidad fija más una pequeña comisión (3-8%) sobre las membresías que cobran. Sin costos ocultos."
+      "freeForMembersBody": "Cualquiera puede crear cuenta, explorar comunidades, y unirse gratis. Los hosts pagan a Unytea una mensualidad fija más una pequeña comisión (3-8%) sobre las membresías que cobran. Sin costos ocultos.",
+      "commissionZero": "0% de comisión — te quedas con el 100% de tus ingresos",
+      "intervalUnavailable": "El pago anual aún no está disponible para este plan"
     },
     "tiers": {
       "creator": {
@@ -2299,7 +2285,6 @@
         "description": "Para creators emergentes lanzando su primera comunidad",
         "features": [
           "Members ilimitados",
-          "Live sessions con hasta 100 participantes concurrentes",
           "Cursos pagados",
           "Feed de comunidad + biblioteca",
           "Analytics básicos"
@@ -2310,7 +2295,6 @@
         "description": "Para hosts establecidos creciendo su comunidad",
         "features": [
           "Todo lo de Creator",
-          "Live sessions con hasta 300 participantes concurrentes",
           "Dominio custom",
           "Analytics avanzados",
           "Hasta 5 admins"
@@ -2321,7 +2305,6 @@
         "description": "Para teams escalando múltiples comunidades",
         "features": [
           "Todo lo de Business",
-          "Live sessions con hasta 1000 participantes concurrentes",
           "Experiencia white-label",
           "Acceso a API",
           "Admins ilimitados"
@@ -2609,7 +2592,9 @@
         "endSession": "Finalizar sesión",
         "poll": "Encuesta",
         "muteAll": "Silenciar a todos",
-        "leave": "Salir"
+        "leave": "Salir",
+        "recordingComingSoon": "Grabación (muy pronto)",
+        "recordingComingSoonHint": "La grabación de sesiones aún no está disponible."
       },
       "raiseHand": {
         "raise": "Levantar la mano",
