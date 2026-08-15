@@ -10,6 +10,7 @@ import { CookieConsent } from "@/components/gdpr/CookieConsent";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
+import { SITE_URL } from "@/lib/site-url";
 
 export const viewport: Viewport = {
   themeColor: "#7c3aed",
@@ -21,7 +22,7 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   // metadataBase resuelve URLs relativas (og:image, etc.) a absolutas en producción.
-  metadataBase: new URL("https://www.unytea.com"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Unytea — Where Communities Unite",
     template: "%s | Unytea",
@@ -71,7 +72,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     alternateLocale: ["es_ES", "fr_FR"],
-    url: "https://www.unytea.com",
+    url: SITE_URL,
     title: "Unytea — Where Communities Unite",
     description:
       "The community platform for creators with more than one audience. Live sessions, courses, gamification, monetization. Multilingual from day one.",
@@ -124,8 +125,8 @@ const JSON_LD_ORGANIZATION = {
   "@context": "https://schema.org",
   "@type": "Organization",
   name: "Unytea",
-  url: "https://www.unytea.com",
-  logo: "https://www.unytea.com/icons/icon-512x512.png",
+  url: SITE_URL,
+  logo: `${SITE_URL}/icons/icon-512x512.png`,
   description:
     "Community platform for creators with multiple audiences. Live sessions, courses, gamification and monetization in one multilingual app.",
   sameAs: [
@@ -139,7 +140,7 @@ const JSON_LD_WEBSITE = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   name: "Unytea",
-  url: "https://www.unytea.com",
+  url: SITE_URL,
   inLanguage: ["en", "es", "fr"],
 };
 
@@ -157,7 +158,7 @@ const JSON_LD_SOFTWARE = {
   },
   description:
     "Build and grow online communities with live sessions, courses, gamification, and monetization tools.",
-  url: "https://www.unytea.com",
+  url: SITE_URL,
 };
 
 export default async function RootLayout({

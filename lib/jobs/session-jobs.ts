@@ -18,6 +18,7 @@ import { generateUpcomingSessions } from "@/lib/jobs/session-schedule";
 import { runAutopilotDueJobs } from "./autopilot";
 import { sendSessionReminderEmail } from "@/lib/email";
 import { sendPushToUser, pushTemplates } from "@/lib/push";
+import { SITE_URL } from "@/lib/site-url";
 
 /**
  * Session Jobs - Background tasks for recurring sessions
@@ -362,7 +363,7 @@ export async function sendSessionReminders() {
               });
 
               if (user?.email) {
-                const appUrl = process.env.NEXTAUTH_URL || "https://unytea.com";
+                const appUrl = SITE_URL;
                 await sendSessionReminderEmail(user.email, {
                   userName: user.name || "there",
                   sessionTitle: session.title,
@@ -556,8 +557,6 @@ Share your thoughts below or ask follow-up questions.
   }
 }
 
-
-
 // Helper functions
 function safeParseStringArray(value: string | null): string[] {
   if (!value) return [];
@@ -597,8 +596,6 @@ function formatTimeUntil(date: Date): string {
   }
   return `in ${minutes} minute${minutes > 1 ? "s" : ""}`;
 }
-
-
 
 /**
  * Session end lifecycle: mark completed, then queue the recap.

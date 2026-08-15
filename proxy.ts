@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 import createIntlMiddleware from "next-intl/middleware";
+import { CANONICAL_HOST, LEGACY_WWW_HOST } from "@/lib/site-url";
 
 const locales = ["en", "es", "fr"] as const;
 const defaultLocale = "en";
@@ -147,7 +148,50 @@ function appendAcceptEncodingVary(response: Response): Response {
 }
 
 // Dispatcher: decide si la request necesita auth() o solo intl.
+/**
+ * Send `www.unytea.com` to the apex, permanently.
+ *
+ * The site answers on both hosts, and auth cookies carry `__Host-` /
+ * `__Secure-` prefixes, which pin a cookie to the exact host that set it — a
+ * `__Host-` cookie may not even declare a Domain. A CSRF or session cookie
+ * written on one host is therefore missing on the other, which is how logout
+ * broke in production and how login can break at random.
+ *
+ * Only the production `www` is touched. Preview deploys (`*.vercel.app`) and
+ * localhost are left exactly as they are: they are single-host already, and
+ * rewriting their origin would send a preview's traffic to production.
+ *
+ * No loop is possible — the apex is not `www`, so the condition is false for
+ * the target of the redirect.
+ *
+ * 308 rather than 301: it forbids the method rewrite to GET that 301 permits,
+ * so a POST that lands here keeps its method. Note that /api/* is outside the
+ * matcher below and never reaches this function, which is deliberate: OAuth
+ * callbacks and the Stripe webhook must hit the canonical host directly rather
+ * than be bounced, so those URLs are registered with the provider (see the
+ * deploy checklist in the PR).
+ */
+function canonicalHostRedirect(req: NextRequest): Response | null {
+  // `host` over `nextUrl.host`: behind Vercel's proxy the forwarded host is
+  // what the visitor actually typed.
+  const host = req.headers.get("host")?.toLowerCase();
+  if (host !== LEGACY_WWW_HOST) return null;
+
+  const url = new URL(req.url);
+  url.protocol = "https:";
+  url.host = CANONICAL_HOST;
+  url.port = "";
+
+  // Path and query survive; only the host changes.
+  return NextResponse.redirect(url, 308);
+}
+
 export default async function proxy(req: NextRequest) {
+  // Before auth and before intl: everything downstream reads cookies, and on
+  // the wrong host those cookies do not exist.
+  const canonical = canonicalHostRedirect(req);
+  if (canonical) return canonical;
+
   const response: Response = routeNeedsAuth(req.nextUrl.pathname)
     ? // El cast es seguro: auth() acepta NextRequest y construye NextAuthRequest internamente.
       await (authMiddleware as unknown as (r: NextRequest) => Response | Promise<Response>)(req)

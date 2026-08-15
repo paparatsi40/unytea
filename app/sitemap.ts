@@ -2,7 +2,7 @@ import { MetadataRoute } from "next";
 import { getAllPosts } from "@/app/[locale]/blog/posts";
 import { getPublicSessionsForSEO } from "@/app/actions/public-sessions";
 
-const BASE_URL = "https://www.unytea.com";
+import { SITE_URL as BASE_URL } from "@/lib/site-url";
 const LOCALES = ["en", "es", "fr"] as const;
 const DEFAULT_LOCALE = "en";
 

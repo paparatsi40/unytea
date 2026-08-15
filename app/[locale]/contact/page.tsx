@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import { localizedAlternates } from "@/lib/seo/locale-metadata";
+import { SITE_URL } from "@/lib/site-url";
 
 const SUPPORT_EMAIL = "support@unytea.com";
 const SUPPORTED_LOCALES = ["en", "es", "fr"] as const;
@@ -81,7 +82,7 @@ export async function generateMetadata(props: {
     openGraph: {
       title: t.metaTitle,
       description: t.metaDescription,
-      url: `https://www.unytea.com/${locale}/contact`,
+      url: `${SITE_URL}/${locale}/contact`,
       type: "website",
     },
   };

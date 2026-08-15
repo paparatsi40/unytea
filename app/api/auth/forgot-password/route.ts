@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { sendPasswordResetEmail } from "@/lib/email";
 import { randomBytes } from "crypto";
 import { rateLimiters, getIP } from "@/lib/rate-limit";
+import { SITE_URL } from "@/lib/site-url";
 
 export async function POST(request: NextRequest) {
   try {
@@ -56,7 +57,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Send email
-    const appUrl = process.env.NEXTAUTH_URL || "https://unytea.com";
+    const appUrl = SITE_URL;
     const resetLink = `${appUrl}/auth/reset-password?token=${token}`;
 
     await sendPasswordResetEmail(user.email, {

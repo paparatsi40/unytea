@@ -11,6 +11,7 @@ import {
 } from "@/app/actions/public-sessions";
 import { PublicSessionPage } from "@/components/sessions/PublicSessionPage";
 import { SessionJsonLd } from "@/components/sessions/SessionJsonLd";
+import { SITE_URL } from "@/lib/site-url";
 
 interface Props {
   params: Promise<{ slug: string; locale: string }>;
@@ -56,7 +57,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     t("descriptionFallback", { name: session.mentor.name || t("defaultExpert") });
 
   const imageUrl =
-    session.community?.imageUrl || session.mentor.image || "https://www.unytea.com/og-image.png";
+    session.community?.imageUrl || session.mentor.image || `${SITE_URL}/og-image.png`;
 
   return {
     title,
@@ -82,7 +83,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
       images: [imageUrl],
     },
     alternates: {
-      canonical: `https://www.unytea.com/s/${params.slug}`,
+      canonical: `${SITE_URL}/s/${params.slug}`,
     },
     robots: {
       index: true,
