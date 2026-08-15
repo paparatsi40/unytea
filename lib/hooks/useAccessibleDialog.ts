@@ -8,9 +8,9 @@ import { useCallback, useEffect, useRef } from "react";
  * where it came from when it closes.
  *
  * Why a hook rather than converting these overlays to `@radix-ui/react-dialog`
- * (which does all of this): the three panels in `live-session/` are framer-motion
- * elements whose backdrop is rendered by the *caller* (EnhancedVideoCall mounts
- * `<div className="absolute inset-0 …"><PollCreator/></div>`), inside an
+ * (which does all of this): the panels in `live-session/` are framer-motion
+ * elements whose backdrop is rendered by the *caller* — a
+ * `<div className="absolute inset-0 …">` wrapping the panel, inside an
  * `AnimatePresence`. Moving them onto Radix means restructuring both the panels
  * and their mount points, and re-deriving the enter/exit animation through
  * Radix's own portal and overlay. That is a rewrite of working UI to obtain

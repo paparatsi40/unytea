@@ -218,9 +218,7 @@ describe("the dense icon surfaces are named", () => {
     ["components/community/CommentItem.tsx", ["deleteComment"]],
     ["components/notifications/Toast.tsx", ["dismiss"]],
     ["components/sessions/VideoRoomUI.tsx", ["showRaisedHands", "unpinQuestion", "clearInvite"]],
-    ["components/video-call/EnhancedVideoCall.tsx", ["toggleChat", "openPollCreator"]],
     ["components/live-session/LivePoll.tsx", ["close", "removeOption"]],
-    ["components/live-session/FeedbackModal.tsx", ["close", "rateStars"]],
   ];
 
   it.each(SURFACES)("%s labels its controls", (file, keys) => {

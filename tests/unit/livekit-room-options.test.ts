@@ -23,11 +23,14 @@ import { ROOM_OPTIONS } from "@/lib/livekit/room-options";
 
 const REPO_ROOT = path.resolve(__dirname, "../..");
 
-/** Every component that mounts a LiveKit room. */
-const ROOM_COMPONENTS = [
-  "components/sessions/VideoRoom.tsx",
-  "components/video-call/EnhancedVideoCall.tsx",
-];
+/**
+ * Every component that mounts a LiveKit room.
+ *
+ * One, since the orphaned /video route and its EnhancedVideoCall were removed:
+ * it had no inbound links, authorized against the retired mentor/mentee model,
+ * and forced `video={true}` regardless of a session's AUDIO mode.
+ */
+const ROOM_COMPONENTS = ["components/sessions/VideoRoom.tsx"];
 
 function read(relativePath: string): string {
   return fs.readFileSync(path.join(REPO_ROOT, relativePath), "utf8");

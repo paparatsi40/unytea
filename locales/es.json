@@ -2870,11 +2870,7 @@
     "unpinQuestion": "Dejar de fijar la pregunta",
     "clearInvite": "Descartar la invitación",
     "closeChecklist": "Ocultar la lista de primeros pasos",
-    "feedbackDialog": "Valoración de la sesión",
     "pollDialog": "Encuesta en vivo",
-    "pollCreatorDialog": "Crear una encuesta",
-    "toggleChat": "Mostrar u ocultar el chat",
-    "openPollCreator": "Crear una encuesta",
-    "rateStars": "Puntuar con {count} de 5"
+    "pollCreatorDialog": "Crear una encuesta"
   }
 }
