@@ -32,8 +32,17 @@ const REPO_ROOT = path.resolve(__dirname, "../..");
  */
 const ROOM_COMPONENTS = ["components/sessions/VideoRoom.tsx"];
 
+/**
+ * Strip comments before matching. Doc comments legitimately quote both
+ * `<LiveKitRoom>` and the option names these tests scan for — the reconnect-loop
+ * write-up in VideoRoom.tsx does exactly that — and a comment is not a mount.
+ */
+function code(source: string): string {
+  return source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+}
+
 function read(relativePath: string): string {
-  return fs.readFileSync(path.join(REPO_ROOT, relativePath), "utf8");
+  return code(fs.readFileSync(path.join(REPO_ROOT, relativePath), "utf8"));
 }
 
 function walk(dir: string, out: string[] = []): string[] {
@@ -96,7 +105,7 @@ describe("no LiveKitRoom may mount without options", () => {
   const componentsWithRoom = [
     ...walk(path.join(REPO_ROOT, "app")),
     ...walk(path.join(REPO_ROOT, "components")),
-  ].filter((file) => /<LiveKitRoom[\s>]/.test(fs.readFileSync(file, "utf8")));
+  ].filter((file) => /<LiveKitRoom[\s>]/.test(code(fs.readFileSync(file, "utf8"))));
 
   it("finds the rooms it claims to check", () => {
     // Guards the assertion below against passing because the scan found none.
@@ -116,7 +125,7 @@ describe("no LiveKitRoom may mount without options", () => {
     const offenders: string[] = [];
 
     for (const file of componentsWithRoom) {
-      const source = fs.readFileSync(file, "utf8");
+      const source = code(fs.readFileSync(file, "utf8"));
       // Take each opening tag and check the props between `<LiveKitRoom` and
       // the closing `>` of that tag.
       for (const match of source.matchAll(/<LiveKitRoom\b([\s\S]*?)>/g)) {

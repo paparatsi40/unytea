@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useLocalParticipant, useParticipants, useRoomContext } from "@livekit/components-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
@@ -51,6 +51,17 @@ interface PinnedQuestion {
   timestamp: number;
 }
 
+/**
+ * `enumerateDevices()` returns new objects every call, so identity tells you
+ * nothing about whether the hardware changed. Compare what we actually render.
+ */
+function sameDeviceList(a: MediaDeviceInfo[], b: MediaDeviceInfo[]): boolean {
+  return (
+    a.length === b.length &&
+    a.every((device, i) => device.deviceId === b[i].deviceId && device.label === b[i].label)
+  );
+}
+
 interface VideoRoomUIProps {
   sessionId?: string;
   sessionMode?: "video" | "audio";
@@ -75,7 +86,7 @@ export function VideoRoomUI({
   hostAvatar,
   isHost = false,
   attendeeCount = 0,
-  sessionStartTime = new Date(),
+  sessionStartTime,
   isRecording = false,
   isRecordingBusy = false,
   onToggleRecording,
@@ -94,7 +105,15 @@ export function VideoRoomUI({
   const isCameraEnabled = localParticipantData.isCameraEnabled;
   const isMicrophoneEnabled = localParticipantData.isMicrophoneEnabled;
   const isScreenShareEnabled = localParticipantData.isScreenShareEnabled;
-  const preferredCameraCheckedRef = useRef(false);
+
+  /**
+   * `sessionStartTime` used to default to `new Date()` in the parameter list,
+   * which evaluates on every render — so the timer effect below, keyed on it,
+   * tore down and rebuilt its interval on every render too. Under a busy room
+   * that fires faster than once a second, the clock never ticks at all.
+   */
+  const [fallbackStartTime] = useState(() => new Date());
+  const startedAt = sessionStartTime ?? fallbackStartTime;
 
   // ── Data Channel (hand raise, polls, moderation) ────────────────────
   const {
@@ -147,53 +166,39 @@ export function VideoRoomUI({
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
-      const diff = Math.floor((now.getTime() - sessionStartTime.getTime()) / 1000);
+      const diff = Math.floor((now.getTime() - startedAt.getTime()) / 1000);
       const minutes = Math.floor(diff / 60);
       const seconds = diff % 60;
       setElapsedTime(`${minutes}:${seconds.toString().padStart(2, "0")}`);
     }, 1000);
     return () => clearInterval(interval);
-  }, [sessionStartTime]);
+  }, [startedAt]);
 
+  /**
+   * Read the camera list into state.
+   *
+   * Two things here are deliberate. It does not depend on `selectedCameraId`
+   * even though it seeds it — a callback that both reads and writes a value it
+   * depends on invalidates itself on every write, and the effect below is keyed
+   * on its identity. And it only writes `videoInputs` when the list actually
+   * changed: `enumerateDevices()` hands back a fresh array of fresh objects
+   * every call, so an unconditional `setVideoInputs` re-renders the whole room
+   * each time it runs, whether or not a camera was plugged in or out.
+   */
   const refreshVideoInputs = useCallback(async () => {
     try {
       if (!navigator.mediaDevices?.enumerateDevices) return;
       const devices = await navigator.mediaDevices.enumerateDevices();
       const inputs = devices.filter((d) => d.kind === "videoinput");
-      setVideoInputs(inputs);
-      if (!selectedCameraId && inputs[0]?.deviceId) {
-        setSelectedCameraId(inputs[0].deviceId);
+
+      setVideoInputs((current) => (sameDeviceList(current, inputs) ? current : inputs));
+      if (inputs[0]?.deviceId) {
+        setSelectedCameraId((current) => current || inputs[0].deviceId);
       }
     } catch (e) {
       console.warn("Could not enumerate video inputs:", e);
     }
-  }, [selectedCameraId]);
-
-  const switchToPreferredExternalCamera = useCallback(async () => {
-    try {
-      if (!navigator.mediaDevices?.enumerateDevices) return;
-
-      const devices = await navigator.mediaDevices.enumerateDevices();
-      const inputs = devices.filter((d) => d.kind === "videoinput");
-      if (inputs.length <= 1) return;
-
-      const integratedPatterns = ["integrated", "built-in", "facetime", "internal"];
-      const external = inputs.find((d) => {
-        const label = d.label.toLowerCase();
-        return !integratedPatterns.some((p) => label.includes(p));
-      });
-
-      if (!external?.deviceId) return;
-
-      if (!room) return;
-
-      await room.switchActiveDevice("videoinput", external.deviceId);
-      setSelectedCameraId(external.deviceId);
-      await refreshVideoInputs();
-    } catch (e) {
-      console.warn("Could not switch to external camera:", e);
-    }
-  }, [room, refreshVideoInputs]);
+  }, []);
 
   const handleCameraDeviceChange = useCallback(
     async (deviceId: string) => {
@@ -220,16 +225,13 @@ export function VideoRoomUI({
   // Toggle camera
   const toggleCamera = useCallback(async () => {
     try {
-      const willEnable = !isCameraEnabled;
-      await localParticipant.setCameraEnabled(willEnable);
-
-      if (willEnable) {
-        await switchToPreferredExternalCamera();
-      }
+      // Turning the camera on no longer re-guesses the device. It comes up on
+      // whatever the user last picked, which is what livekit already tracks.
+      await localParticipant.setCameraEnabled(!isCameraEnabled);
     } catch (e) {
       console.error("Failed to toggle camera:", e);
     }
-  }, [localParticipant, isCameraEnabled, switchToPreferredExternalCamera]);
+  }, [localParticipant, isCameraEnabled]);
 
   // Toggle screen share
   const toggleScreenShare = useCallback(async () => {
@@ -253,12 +255,25 @@ export function VideoRoomUI({
     };
   }, [refreshVideoInputs]);
 
-  useEffect(() => {
-    if (!isCameraEnabled || preferredCameraCheckedRef.current) return;
-
-    preferredCameraCheckedRef.current = true;
-    void switchToPreferredExternalCamera();
-  }, [isCameraEnabled, switchToPreferredExternalCamera]);
+  /*
+   * There was an effect here that, on every mount where the camera was on,
+   * guessed which camera you "really" wanted — anything whose label did not say
+   * integrated/built-in/facetime/internal — and called
+   * `room.switchActiveDevice("videoinput", …)` for you.
+   *
+   * It was guarded by a ref, so it fired once per mount. That is fine until
+   * something remounts the room, and something did (see VideoRoom.tsx): every
+   * reconnect re-ran the guess, and `switchActiveDevice` restarts the published
+   * camera track. When the next teardown landed while a restart was still in
+   * flight, livekit-client logged `track was stopped during a restart, stopping
+   * restarted track` and the camera came back dead.
+   *
+   * It is gone rather than re-guarded. Switching the camera is a user decision,
+   * and there is a picker in the toolbar for it — `handleCameraDeviceChange` is
+   * now the only caller of `switchActiveDevice` in the app. A label heuristic
+   * cannot know that the unlabelled capture card is a document camera and the
+   * "Integrated Webcam" is the one pointed at your face.
+   */
 
   // Pin question
   const pinQuestion = useCallback((author: string, content: string) => {
