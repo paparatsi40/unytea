@@ -8,6 +8,8 @@ import { authorizeCredentials } from "@/lib/auth-credentials";
 import type { UserRole } from "@prisma/client";
 import { sessionCookieName, shouldUseSecureCookies } from "@/lib/auth-cookies";
 import { oauthCredentials } from "@/lib/auth-providers";
+import { normalizeEmail } from "@/lib/normalize-email";
+import type { Adapter } from "next-auth/adapters";
 
 // Extend the built-in session types
 declare module "next-auth" {
@@ -45,9 +47,36 @@ declare module "@auth/core/jwt" {
 const googleCredentials = oauthCredentials("google");
 const githubCredentials = oauthCredentials("github");
 
+/**
+ * PrismaAdapter with normalized email identity.
+ *
+ * `@auth/prisma-adapter` implements `getUserByEmail` as
+ * `p.user.findUnique({ where: { email } })` — a byte comparison against
+ * whatever the provider sent. That method is what @auth/core calls to resolve
+ * `allowDangerousEmailAccountLinking`, so an account stored as `Carlos@X.com`
+ * never matched the `carlos@x.com` Google returns, and a second account was
+ * created instead of the two being linked.
+ *
+ * Google does normalize the `email` claim it sends, but relying on that would
+ * put the correctness of account linking in a third party's hands and leave any
+ * future provider free to break it. Normalizing on our side of the boundary is
+ * what makes the guarantee ours: `createUser` writes the canonical form, and
+ * `getUserByEmail` looks up the canonical form, whatever arrives.
+ */
+function normalizedEmailAdapter(base: Adapter): Adapter {
+  return {
+    ...base,
+    createUser: (user) =>
+      base.createUser!({ ...user, email: normalizeEmail(user.email) }) as ReturnType<
+        NonNullable<Adapter["createUser"]>
+      >,
+    getUserByEmail: (email) => base.getUserByEmail!(normalizeEmail(email)),
+  };
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NextAuth v5 (beta) and @auth/prisma-adapter ship slightly divergent Adapter interfaces; PrismaAdapter's return type does not structurally match the Adapter type NextAuth expects at this boundary. Cast is required until both packages stabilize on a shared @auth/core version.
-  adapter: PrismaAdapter(prisma) as any,
+  adapter: normalizedEmailAdapter(PrismaAdapter(prisma) as any),
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
@@ -138,15 +167,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async signIn({ user, account }) {
       // For OAuth providers, ensure user exists in database
       if (account?.provider === "google" || account?.provider === "github") {
+        // Same canonical form the adapter uses, or this path would recreate
+        // the row the adapter just matched.
+        const email = normalizeEmail(user.email!);
         const existingUser = await prisma.user.findUnique({
-          where: { email: user.email! },
+          where: { email },
         });
 
         if (!existingUser) {
           // Create user if doesn't exist - will go through onboarding
           await prisma.user.create({
             data: {
-              email: user.email!,
+              email,
               name: user.name,
               image: user.image,
               emailVerified: new Date(),

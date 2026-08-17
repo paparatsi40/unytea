@@ -4,10 +4,12 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { rateLimiters, getIP } from "@/lib/rate-limit";
 import { sendWelcomeEmail } from "@/lib/email";
+import { normalizeEmail } from "@/lib/normalize-email";
 
 const signUpSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  email: z.string().email("Invalid email address"),
+  // Trimmed before validation for the same reason as the login schema.
+  email: z.string().trim().email("Invalid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
@@ -27,7 +29,10 @@ export async function POST(request: NextRequest) {
 
     // Validate input
     const validatedData = signUpSchema.parse(body);
-    const { name, email, password } = validatedData;
+    const { name, password } = validatedData;
+    // Normalized before the lookup and before the write, so the row this
+    // creates is the same row every other path will find.
+    const email = normalizeEmail(validatedData.email);
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
