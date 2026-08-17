@@ -1670,7 +1670,8 @@
         "recordingAvailable": "Recording available",
         "enterRoom": "Enter Room",
         "watch": "Watch",
-        "viewAll": "{count, plural, =1 {View all # past session} other {View all # past sessions}}"
+        "viewAll": "{count, plural, =1 {View all # past session} other {View all # past sessions}}",
+        "showLess": "Show less"
       },
       "detail": {
         "loading": "Loading session…",

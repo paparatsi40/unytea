@@ -21,6 +21,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import Image from "next/image";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
+
+/** Past sessions shown before the list asks to be expanded. */
+const VISIBLE_PAST = 6;
 
 export interface SessionItem {
   id: string;
@@ -59,6 +64,7 @@ export function SessionsPageClient({
   startingSoon,
   error,
 }: SessionsPageClientProps) {
+  const [showAllPast, setShowAllPast] = useState(false);
   const t = useTranslations("dashboard.sessions");
   usePageTitle("metaTitle", "dashboard.sessions");
   const locale = useLocale();
@@ -323,13 +329,20 @@ export function SessionsPageClient({
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {past.slice(0, 6).map((s) => (
+            {(showAllPast ? past : past.slice(0, VISIBLE_PAST)).map((s) => (
               <div
                 key={s.id}
                 className="group relative overflow-hidden rounded-xl border border-border bg-card p-5 transition-all hover:border-border/80 hover:bg-accent/40"
               >
-                {/* Recording Badge */}
-                {s.status === "COMPLETED" && (
+                {/* Recording Badge — gated on there being a recording.
+                    It used to key off `status === "COMPLETED"`, so every past
+                    session claimed one while the "Watch" button below, which
+                    does check `recordingUrl`, appeared on none of them. Nothing
+                    writes `recordingUrl` except the egress-finished webhook,
+                    and egress is still a TODO, so the badge was false on every
+                    card. Keyed off the file, it disappears today and comes back
+                    on its own the day recordings exist. */}
+                {s.recordingUrl && (
                   <div className="absolute right-3 top-3">
                     <Badge className="border-green-500/20 bg-green-500/10 text-xs text-green-400">
                       <VideoIcon className="mr-1 h-3 w-3" />
@@ -387,11 +400,23 @@ export function SessionsPageClient({
             ))}
           </div>
 
-          {past.length > 6 && (
+          {/* This was a bare <Button> — no href, no onClick, nothing. It could
+              not navigate because there was nowhere to navigate to: no
+              full-listing route for past sessions exists. Rather than invent
+              one, the hub expands in place, which is what the control was
+              promising. */}
+          {past.length > VISIBLE_PAST && (
             <div className="text-center">
-              <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
-                {t("past.viewAll", { count: past.length })}
-                <ArrowRight className="ml-2 h-4 w-4" />
+              <Button
+                variant="ghost"
+                onClick={() => setShowAllPast((open) => !open)}
+                aria-expanded={showAllPast}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                {showAllPast ? t("past.showLess") : t("past.viewAll", { count: past.length })}
+                <ArrowRight
+                  className={cn("ml-2 h-4 w-4 transition-transform", showAllPast && "rotate-90")}
+                />
               </Button>
             </div>
           )}

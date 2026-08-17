@@ -1680,7 +1680,8 @@
         "recordingAvailable": "Enregistrement disponible",
         "enterRoom": "Entrer dans la salle",
         "watch": "Regarder",
-        "viewAll": "{count, plural, =1 {Voir # session passée} other {Voir les # sessions passées}}"
+        "viewAll": "{count, plural, =1 {Voir # session passée} other {Voir les # sessions passées}}",
+        "showLess": "Voir moins"
       },
       "detail": {
         "loading": "Chargement de la session…",
