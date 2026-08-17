@@ -37,17 +37,17 @@ const META = {
   en: {
     title: "Unytea — One platform for every audience you serve",
     description:
-      "Unytea is the live platform for creators running multiple communities. Live sessions, courses, gamification — for every audience you serve.",
+      "Unytea is the live platform for creators running multiple communities. Live sessions, courses, monetization — for every audience you serve.",
   },
   es: {
     title: "Unytea — Una plataforma para cada audiencia",
     description:
-      "Unytea es la plataforma para creadores que gestionan varias comunidades. Sesiones en vivo, cursos, gamificación — para cada audiencia que sirves.",
+      "Unytea es la plataforma para creadores que gestionan varias comunidades. Sesiones en vivo, cursos y monetización — para cada audiencia que sirves.",
   },
   fr: {
     title: "Unytea — Une plateforme pour chaque audience",
     description:
-      "Unytea est la plateforme pour les créateurs qui gèrent plusieurs communautés. Sessions en direct, cours, gamification — pour chaque audience que vous servez.",
+      "Unytea est la plateforme pour les créateurs qui gèrent plusieurs communautés. Sessions en direct, cours, monétisation — pour chaque audience que vous servez.",
   },
 } as const;
 

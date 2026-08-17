@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     template: "%s | Unytea",
   },
   description:
-    "Un perfil, todas tus comunidades. Sesiones en vivo, cursos, gamificación y monetización en una sola plataforma multiidioma. Alternativa moderna a Skool, Circle y Mighty Networks.",
+    "Un perfil, todas tus comunidades. Sesiones en vivo, cursos y monetización en una sola plataforma multiidioma. Alternativa moderna a Skool, Circle y Mighty Networks.",
   keywords: [
     "plataforma de comunidades",
     "alternativa a skool",
@@ -39,7 +39,6 @@ export const metadata: Metadata = {
     "community building",
     "live sessions",
     "online courses",
-    "gamification",
     "creators",
     "coaching communities",
     "buddy system",
@@ -75,7 +74,7 @@ export const metadata: Metadata = {
     url: SITE_URL,
     title: "Unytea — Where Communities Unite",
     description:
-      "The community platform for creators with more than one audience. Live sessions, courses, gamification, monetization. Multilingual from day one.",
+      "The community platform for creators with more than one audience. Live sessions, courses, monetization. Multilingual from day one.",
     siteName: "Unytea",
     images: [
       {
@@ -128,7 +127,7 @@ const JSON_LD_ORGANIZATION = {
   url: SITE_URL,
   logo: `${SITE_URL}/icons/icon-512x512.png`,
   description:
-    "Community platform for creators with multiple audiences. Live sessions, courses, gamification and monetization in one multilingual app.",
+    "Community platform for creators with multiple audiences. Live sessions, courses and monetization in one multilingual app.",
   sameAs: [
     "https://twitter.com/unytea",
     "https://linkedin.com/company/unytea",
@@ -157,7 +156,7 @@ const JSON_LD_SOFTWARE = {
     description: "Free to start, paid plans available for monetization features.",
   },
   description:
-    "Build and grow online communities with live sessions, courses, gamification, and monetization tools.",
+    "Build and grow online communities with live sessions, courses, and monetization tools.",
   url: SITE_URL,
 };
 
