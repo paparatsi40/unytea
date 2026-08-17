@@ -22,7 +22,10 @@ export async function POST(request: NextRequest) {
 
     if (!resetToken) {
       return NextResponse.json(
-        { error: "Invalid or expired reset link. Please request a new one." },
+        {
+          error: "Invalid or expired reset link. Please request a new one.",
+          code: "RESET_LINK_INVALID",
+        },
         { status: 400 }
       );
     }
@@ -32,7 +35,10 @@ export async function POST(request: NextRequest) {
       // Clean up expired token
       await prisma.passwordResetToken.delete({ where: { id: resetToken.id } });
       return NextResponse.json(
-        { error: "This reset link has expired. Please request a new one." },
+        {
+          error: "This reset link has expired. Please request a new one.",
+          code: "RESET_LINK_EXPIRED",
+        },
         { status: 400 }
       );
     }
@@ -63,6 +69,9 @@ export async function POST(request: NextRequest) {
     }
 
     console.error("[reset-password] Error:", error);
-    return NextResponse.json({ error: "Something went wrong. Please try again." }, { status: 500 });
+    return NextResponse.json(
+      { error: "Something went wrong. Please try again.", code: "SERVER_ERROR" },
+      { status: 500 }
+    );
   }
 }

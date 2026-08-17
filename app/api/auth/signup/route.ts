@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     const { success: rateLimitOk } = await rateLimiters.auth.check(`signup:${ip}`);
     if (!rateLimitOk) {
       return NextResponse.json(
-        { error: "Too many attempts. Please try again later." },
+        { error: "Too many attempts. Please try again later.", code: "RATE_LIMITED" },
         { status: 429 }
       );
     }
@@ -78,10 +78,22 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: error.errors[0].message }, { status: 400 });
+      const field = String(error.errors[0]?.path?.[0] ?? "");
+      const code =
+        field === "name"
+          ? "VALIDATION_NAME"
+          : field === "email"
+            ? "VALIDATION_EMAIL"
+            : field === "password"
+              ? "VALIDATION_PASSWORD"
+              : "SERVER_ERROR";
+      return NextResponse.json({ error: error.errors[0].message, code }, { status: 400 });
     }
 
     console.error("[signup] Error:", error instanceof Error ? error.message : "Unknown error");
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error", code: "SERVER_ERROR" },
+      { status: 500 }
+    );
   }
 }

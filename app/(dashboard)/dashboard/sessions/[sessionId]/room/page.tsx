@@ -19,6 +19,19 @@ export default function SessionRoomPage(props: { params: Promise<{ sessionId: st
   const router = useRouter();
   const { user, isLoading: isAuthLoading } = useCurrentUser();
   const t = useTranslations("liveSession.room");
+  // Held in a ref, and the callbacks below read `tRef.current` rather than
+  // closing over `t`. next-intl memoises the translator against the intl
+  // context, which is rebuilt every time the route's RSC payload is
+  // re-delivered — so `t` changes identity for no semantic reason. Putting it
+  // in a useCallback dependency array would rebuild `onEndSession` and
+  // `onToggleRecording` on each of those, and handing `VideoRoom` fresh props
+  // is exactly the shape that produced the live-room reconnect loop
+  // (tests/unit/room-reconnect.test.tsx). The ref keeps the copy current
+  // without making the callbacks churn.
+  const tRef = useRef(t);
+  useEffect(() => {
+    tRef.current = t;
+  }, [t]);
   const [videoSession, setVideoSession] = useState<SessionDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEnding, setIsEnding] = useState(false);
@@ -65,7 +78,7 @@ export default function SessionRoomPage(props: { params: Promise<{ sessionId: st
       }
     } catch (error) {
       console.error("Failed to load session:", error);
-      toast.error("Failed to load session");
+      toast.error(tRef.current("toasts.loadFailed"));
     } finally {
       setLoading(false);
     }
@@ -84,7 +97,7 @@ export default function SessionRoomPage(props: { params: Promise<{ sessionId: st
     try {
       const result = await endSession(params.sessionId);
       if (result.success) {
-        toast.success("Session ended! Recap will be available shortly.");
+        toast.success(tRef.current("toasts.ended"));
         // Redirect to session recap page
         setTimeout(() => {
           router.push(`/dashboard/sessions/${params.sessionId}`);
@@ -95,7 +108,7 @@ export default function SessionRoomPage(props: { params: Promise<{ sessionId: st
       }
     } catch (error) {
       console.error("Error ending session:", error);
-      toast.error("An error occurred while ending the session");
+      toast.error(tRef.current("toasts.endError"));
       setIsEnding(false);
     }
   }, [params.sessionId, router]);
@@ -116,7 +129,7 @@ export default function SessionRoomPage(props: { params: Promise<{ sessionId: st
         const result = await stopRecording(videoSession.id);
         if (result.success) {
           setIsRecording(false);
-          toast.success("Recording paused");
+          toast.success(tRef.current("toasts.recordingPaused"));
         } else {
           toast.error(result.error || "Failed to pause recording");
         }
@@ -130,14 +143,14 @@ export default function SessionRoomPage(props: { params: Promise<{ sessionId: st
 
         if (result.success) {
           setIsRecording(true);
-          toast.success("Recording started");
+          toast.success(tRef.current("toasts.recordingStarted"));
         } else {
           toast.error(result.error || "Failed to start recording");
         }
       }
     } catch (error) {
       console.error("Error toggling recording:", error);
-      toast.error("Failed to update recording state");
+      toast.error(tRef.current("toasts.recordingFailed"));
     } finally {
       setIsRecordingBusy(false);
     }

@@ -144,7 +144,71 @@
     "signInError": "Error signing in",
     "accountCreated": "Account created successfully!",
     "resetPassword": "Reset Password",
-    "passwordResetComingSoon": "Password reset is coming soon. In the meantime, please contact support."
+    "passwordResetComingSoon": "Password reset is coming soon. In the meantime, please contact support.",
+    "signup": {
+      "title": "Create your account",
+      "subtitle": "Join the best community platform today ☕",
+      "fullName": "Full Name",
+      "fullNamePlaceholder": "John Doe",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "password": "Password",
+      "passwordPlaceholder": "••••••••",
+      "passwordStrong": "Strong password",
+      "passwordHint": "At least 8 characters required",
+      "confirmPassword": "Confirm Password",
+      "confirmPasswordPlaceholder": "••••••••",
+      "submit": "Create Account",
+      "legal": "By signing up, you agree to our <terms>Terms of Service</terms> and <privacy>Privacy Policy</privacy>",
+      "haveAccount": "Already have an account?",
+      "signIn": "Sign in"
+    },
+    "forgot": {
+      "title": "Reset Password",
+      "subtitle": "Enter your email and we'll send you a reset link",
+      "subtitleSent": "Check your email for a reset link",
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "Enter your email",
+      "submit": "Send Reset Link",
+      "submitting": "Sending…",
+      "sentTitle": "Email Sent!",
+      "sentBody": "If an account with <em>{email}</em> exists, you'll receive a password reset link shortly. Check your spam folder if you don't see it.",
+      "tryAnother": "Try a different email",
+      "backToSignIn": "Back to Sign In",
+      "emailRequired": "Please enter your email address"
+    },
+    "reset": {
+      "invalidTitle": "Invalid Reset Link",
+      "invalidBody": "This password reset link is invalid or has been used. Please request a new one.",
+      "requestNew": "Request New Reset Link",
+      "title": "Set New Password",
+      "subtitle": "Choose a strong password for your account",
+      "titleDone": "Password Reset!",
+      "subtitleDone": "Redirecting you to sign in…",
+      "doneBody": "Your password has been updated. You'll be redirected to sign in shortly.",
+      "signInNow": "Sign In Now",
+      "newPassword": "New Password",
+      "newPasswordPlaceholder": "Minimum 8 characters",
+      "confirmPassword": "Confirm Password",
+      "confirmPasswordPlaceholder": "Repeat your password",
+      "submit": "Reset Password",
+      "submitting": "Resetting…",
+      "backToSignIn": "Back to Sign In",
+      "tooShort": "Password must be at least 8 characters",
+      "mismatch": "Passwords do not match",
+      "success": "Password reset successfully!"
+    },
+    "errors": {
+      "RATE_LIMITED": "Too many attempts. Please try again in a few minutes.",
+      "SERVER_ERROR": "Something went wrong. Please try again.",
+      "EMAIL_REQUIRED": "Please enter your email address",
+      "RESET_LINK_INVALID": "That reset link is not valid. Request a new one.",
+      "RESET_LINK_EXPIRED": "That reset link has expired. Request a new one.",
+      "VALIDATION_NAME": "Please enter your name",
+      "VALIDATION_EMAIL": "That email address doesn't look right",
+      "VALIDATION_PASSWORD": "Password must be at least 8 characters",
+      "generic": "Something went wrong. Please try again."
+    }
   },
   "landing": {
     "nav": {
@@ -1614,6 +1678,84 @@
         "enterRoom": "Enter Room",
         "watch": "Watch",
         "viewAll": "{count, plural, =1 {View all # past session} other {View all # past sessions}}"
+      },
+      "detail": {
+        "loading": "Loading session…",
+        "back": "Back to Sessions",
+        "audioOnly": "Audio only",
+        "joinNext": "Join Next Session",
+        "addToGoogleCalendar": "Add to Google Calendar",
+        "addToAppleCalendar": "Add to Apple Calendar",
+        "inviteMembers": "Invite members",
+        "shareOn": "Share on {network}",
+        "watchRecording": "Watch Recording",
+        "addToCourse": "Add to Course",
+        "createClip": "Create Clip",
+        "download": "Download",
+        "tabs": {
+          "recording": "Recording",
+          "notes": "Notes",
+          "resources": "Resources",
+          "discussion": "Discussion"
+        },
+        "recording": {
+          "processingTitle": "Processing recording…",
+          "processingBody": "The video will be available soon. You can review notes in the meantime.",
+          "unsupported": "Your browser does not support the video tag.",
+          "noneTitle": "No recording available",
+          "noneBody": "This session was not recorded or the recording is still being processed."
+        },
+        "notes": {
+          "title": "Session Notes",
+          "emptyTitle": "No notes yet",
+          "emptyBody": "Capture key takeaways, resources, and action items from this session.",
+          "add": "Add Notes"
+        },
+        "resources": {
+          "emptyTitle": "No resources added yet",
+          "emptyBody": "Add links, templates, or files from this session."
+        },
+        "discussion": {
+          "emptyTitle": "No follow-up discussion yet",
+          "emptyBody": "Start a conversation with your community about this session.",
+          "start": "Start Discussion"
+        },
+        "summary": {
+          "title": "Session Summary",
+          "status": "Status",
+          "date": "Date",
+          "time": "Time",
+          "duration": "Duration",
+          "mode": "Mode",
+          "host": "Host",
+          "community": "Community",
+          "postedToFeed": "Posted to community feed"
+        },
+        "quickActions": {
+          "title": "Quick Actions",
+          "scheduleFollowUp": "Schedule Follow-up"
+        },
+        "share": {
+          "already": "This session has already been shared to the community feed",
+          "success": "Session recap shared to community feed!",
+          "failed": "Failed to share recap",
+          "error": "Error sharing recap",
+          "sharing": "Sharing…",
+          "shared": "Already Shared",
+          "sharedToFeed": "Shared to Feed",
+          "shareRecap": "Share Recap"
+        },
+        "library": {
+          "success": "Session published to library",
+          "failed": "Failed to publish to library"
+        },
+        "rsvp": {
+          "removed": "RSVP removed",
+          "attending": "You are attending this session",
+          "interested": "Marked as interested",
+          "failed": "Failed to update RSVP"
+        },
+        "inviteCopied": "Invite link copied"
       }
     },
     "analytics": {
@@ -2794,6 +2936,14 @@
         "loading": "Loading session…",
         "endingTitle": "Ending session…",
         "endingBody": "Marking the session complete and updating your dashboard"
+      },
+      "toasts": {
+        "loadFailed": "Failed to load session",
+        "ended": "Session ended. Your recap is ready to review.",
+        "endError": "An error occurred while ending the session",
+        "recordingPaused": "Recording paused",
+        "recordingStarted": "Recording started",
+        "recordingFailed": "Failed to update recording state"
       }
     },
     "videoRoom": {

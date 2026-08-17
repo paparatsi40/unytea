@@ -39,6 +39,7 @@ import { CreateSocialClipDialog } from "@/components/public-content/CreateSocial
 import { RecapReviewPanel } from "@/components/sessions/RecapReviewPanel";
 import { PostSessionFlow } from "@/components/sessions/PostSessionFlow";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { getRecapDraft, shareSessionRecap } from "@/app/actions/session-jobs";
 import { createResourceFromSession } from "@/app/actions/session-course";
 
@@ -50,6 +51,7 @@ export default function SessionDetailPage(props: SessionPageProps) {
   const params = use(props.params);
   const router = useRouter();
   const { user, isLoading: isAuthLoading } = useCurrentUser();
+  const t = useTranslations("dashboard.sessions.detail");
   const [session, setSession] = useState<SessionDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("recording");
@@ -123,21 +125,21 @@ export default function SessionDetailPage(props: SessionPageProps) {
     setIsSharing(true);
     try {
       if (session.feedPostId) {
-        toast.info("This session has already been shared to the community feed");
+        toast.info(t("share.already"));
         return false;
       }
 
       const result = await shareSessionRecap(session.id, content);
       if (result.success) {
-        toast.success("Session recap shared to community feed!");
+        toast.success(t("share.success"));
         // Reload session to get updated feedPostId
         await loadSession();
         return true;
       }
-      toast.error(result.error || "Failed to share recap");
+      toast.error(result.error || t("share.failed"));
       return false;
     } catch {
-      toast.error("Error sharing recap");
+      toast.error(t("share.error"));
       return false;
     } finally {
       setIsSharing(false);
@@ -153,17 +155,17 @@ export default function SessionDetailPage(props: SessionPageProps) {
       });
 
       if (!result.success) {
-        toast.error(result.error || "Failed to publish to library");
+        toast.error(result.error || t("library.failed"));
         return;
       }
 
-      toast.success("Session published to library");
+      toast.success(t("library.success"));
       if (session.community?.slug) {
         router.push(`/dashboard/c/${session.community.slug}/library?src=session_reuse`);
       }
       await loadSession();
     } catch {
-      toast.error("Failed to publish to library");
+      toast.error(t("library.failed"));
     }
   }
 
@@ -174,7 +176,7 @@ export default function SessionDetailPage(props: SessionPageProps) {
     try {
       const result = await setSessionRSVPStatus(session.id, status, window.location.pathname);
       if (!result.success) {
-        toast.error(result.error || "Failed to update RSVP");
+        toast.error(result.error || t("rsvp.failed"));
         return;
       }
 
@@ -184,14 +186,14 @@ export default function SessionDetailPage(props: SessionPageProps) {
       setAttendingPreview(result.attendingPreview || []);
 
       if (!result.status) {
-        toast.success("RSVP removed");
+        toast.success(t("rsvp.removed"));
       } else if (result.status === "attending") {
-        toast.success("You are attending this session");
+        toast.success(t("rsvp.attending"));
       } else {
-        toast.success("Marked as interested");
+        toast.success(t("rsvp.interested"));
       }
     } catch {
-      toast.error("Failed to update RSVP");
+      toast.error(t("rsvp.failed"));
     } finally {
       setIsRSVPLoading(false);
     }
@@ -202,7 +204,7 @@ export default function SessionDetailPage(props: SessionPageProps) {
       <div className="flex min-h-screen items-center justify-center bg-zinc-950">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
-          <p className="text-zinc-400">Loading session...</p>
+          <p className="text-zinc-400">{t("loading")}</p>
         </div>
       </div>
     );
@@ -239,7 +241,7 @@ export default function SessionDetailPage(props: SessionPageProps) {
 
   const handleCopyInviteLink = async () => {
     await navigator.clipboard.writeText(publicSessionUrl);
-    toast.success("Invite link copied");
+    toast.success(t("inviteCopied"));
   };
 
   const shareToNetwork = (network: "twitter" | "linkedin" | "whatsapp") => {
@@ -346,7 +348,7 @@ export default function SessionDetailPage(props: SessionPageProps) {
               className="flex items-center gap-2 text-sm text-zinc-400 transition-colors hover:text-white"
             >
               <ArrowLeft className="h-4 w-4" />
-              <span>Back to Sessions</span>
+              <span>{t("back")}</span>
             </Link>
 
             {/* Center: Session info */}
@@ -391,7 +393,7 @@ export default function SessionDetailPage(props: SessionPageProps) {
                     <span>•</span>
                     <span className="flex items-center gap-1 text-blue-400">
                       <Headphones className="h-3 w-3" />
-                      Audio only
+                      {t("audioOnly")}
                     </span>
                   </>
                 )}
@@ -414,7 +416,7 @@ export default function SessionDetailPage(props: SessionPageProps) {
             </div>
             <Link href={`/dashboard/sessions/${session.id}/room`}>
               <Button size="sm" className="bg-amber-500 text-zinc-900 hover:bg-amber-400">
-                Join Next Session
+                {t("joinNext")}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
@@ -427,7 +429,7 @@ export default function SessionDetailPage(props: SessionPageProps) {
             <Link href={`/dashboard/sessions/${session.id}/room`}>
               <Button className="gap-2 bg-purple-600 hover:bg-purple-700">
                 <Play className="h-4 w-4" />
-                Join Next Session
+                {t("joinNext")}
               </Button>
             </Link>
           )}
@@ -478,7 +480,7 @@ export default function SessionDetailPage(props: SessionPageProps) {
               >
                 <a href={buildGoogleCalendarUrl()} target="_blank" rel="noreferrer">
                   <Calendar className="h-4 w-4" />
-                  Add to Google Calendar
+                  {t("addToGoogleCalendar")}
                 </a>
               </Button>
               <Button
@@ -487,7 +489,7 @@ export default function SessionDetailPage(props: SessionPageProps) {
                 onClick={downloadAppleCalendarIcs}
               >
                 <Calendar className="h-4 w-4" />
-                Add to Apple Calendar
+                {t("addToAppleCalendar")}
               </Button>
               <Button
                 variant="outline"
@@ -495,28 +497,28 @@ export default function SessionDetailPage(props: SessionPageProps) {
                 onClick={handleCopyInviteLink}
               >
                 <Users className="h-4 w-4" />
-                Invite members
+                {t("inviteMembers")}
               </Button>
               <Button
                 variant="outline"
                 className="gap-2 border-zinc-700 bg-zinc-900 text-zinc-200 hover:bg-zinc-800"
                 onClick={() => shareToNetwork("twitter")}
               >
-                Share X
+                {t("shareOn", { network: "X" })}
               </Button>
               <Button
                 variant="outline"
                 className="gap-2 border-zinc-700 bg-zinc-900 text-zinc-200 hover:bg-zinc-800"
                 onClick={() => shareToNetwork("linkedin")}
               >
-                Share LinkedIn
+                {t("shareOn", { network: "LinkedIn" })}
               </Button>
               <Button
                 variant="outline"
                 className="gap-2 border-zinc-700 bg-zinc-900 text-zinc-200 hover:bg-zinc-800"
                 onClick={() => shareToNetwork("whatsapp")}
               >
-                Share WhatsApp
+                {t("shareOn", { network: "WhatsApp" })}
               </Button>
             </>
           )}
@@ -527,7 +529,7 @@ export default function SessionDetailPage(props: SessionPageProps) {
               onClick={() => setActiveTab("recording")}
             >
               <Play className="h-4 w-4" />
-              Watch Recording
+              {t("watchRecording")}
             </Button>
           )}
 
@@ -539,7 +541,7 @@ export default function SessionDetailPage(props: SessionPageProps) {
                 onClick={() => setShowAddToCourse(true)}
               >
                 <BookOpen className="h-4 w-4" />
-                Add to Course
+                {t("addToCourse")}
               </Button>
 
               <Button
@@ -548,7 +550,7 @@ export default function SessionDetailPage(props: SessionPageProps) {
                 onClick={() => setShowCreateClip(true)}
               >
                 <Sparkles className="h-4 w-4" />
-                Create Clip
+                {t("createClip")}
               </Button>
             </>
           )}
@@ -567,7 +569,7 @@ export default function SessionDetailPage(props: SessionPageProps) {
             <Button variant="ghost" className="gap-2 text-zinc-400 hover:text-white" asChild>
               <a href={session.recordingUrl} download>
                 <Download className="h-4 w-4" />
-                Download
+                {t("download")}
               </a>
             </Button>
           )}
@@ -583,28 +585,28 @@ export default function SessionDetailPage(props: SessionPageProps) {
                   className="flex-1 data-[state=active]:bg-zinc-800 data-[state=active]:text-white"
                 >
                   <Play className="mr-2 h-4 w-4" />
-                  Recording
+                  {t("tabs.recording")}
                 </TabsTrigger>
                 <TabsTrigger
                   value="notes"
                   className="flex-1 data-[state=active]:bg-zinc-800 data-[state=active]:text-white"
                 >
                   <FileText className="mr-2 h-4 w-4" />
-                  Notes
+                  {t("tabs.notes")}
                 </TabsTrigger>
                 <TabsTrigger
                   value="resources"
                   className="flex-1 data-[state=active]:bg-zinc-800 data-[state=active]:text-white"
                 >
                   <Folder className="mr-2 h-4 w-4" />
-                  Resources
+                  {t("tabs.resources")}
                 </TabsTrigger>
                 <TabsTrigger
                   value="discussion"
                   className="flex-1 data-[state=active]:bg-zinc-800 data-[state=active]:text-white"
                 >
                   <MessageSquare className="mr-2 h-4 w-4" />
-                  Discussion
+                  {t("tabs.discussion")}
                 </TabsTrigger>
               </TabsList>
 
@@ -617,10 +619,10 @@ export default function SessionDetailPage(props: SessionPageProps) {
                         <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
                       </div>
                       <div className="text-center">
-                        <p className="text-lg font-medium text-white">Processing recording...</p>
-                        <p className="text-sm text-zinc-400">
-                          The video will be available soon. You can review notes in the meantime.
+                        <p className="text-lg font-medium text-white">
+                          {t("recording.processingTitle")}
                         </p>
+                        <p className="text-sm text-zinc-400">{t("recording.processingBody")}</p>
                       </div>
                     </div>
                   ) : session.recordingUrl ? (
@@ -631,7 +633,7 @@ export default function SessionDetailPage(props: SessionPageProps) {
                         className="h-full w-full"
                         poster="/images/video-poster.jpg"
                       >
-                        Your browser does not support the video tag.
+                        {t("recording.unsupported")}
                       </video>
                     </div>
                   ) : (
@@ -640,10 +642,8 @@ export default function SessionDetailPage(props: SessionPageProps) {
                         <Play className="h-8 w-8 text-zinc-500" />
                       </div>
                       <div className="text-center">
-                        <p className="text-lg font-medium text-white">No recording available</p>
-                        <p className="text-sm text-zinc-400">
-                          This session was not recorded or the recording is still being processed.
-                        </p>
+                        <p className="text-lg font-medium text-white">{t("recording.noneTitle")}</p>
+                        <p className="text-sm text-zinc-400">{t("recording.noneBody")}</p>
                       </div>
                     </div>
                   )}
@@ -655,7 +655,7 @@ export default function SessionDetailPage(props: SessionPageProps) {
                 <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
                   {session.notes ? (
                     <div className="prose prose-invert max-w-none">
-                      <h3 className="mb-4 text-lg font-semibold text-white">Session Notes</h3>
+                      <h3 className="mb-4 text-lg font-semibold text-white">{t("notes.title")}</h3>
                       <div className="whitespace-pre-wrap text-zinc-300">
                         {session.notes.content || "No notes content yet."}
                       </div>
@@ -664,16 +664,14 @@ export default function SessionDetailPage(props: SessionPageProps) {
                     <div className="flex flex-col items-center justify-center gap-4 py-12">
                       <FileText className="h-12 w-12 text-zinc-600" />
                       <div className="text-center">
-                        <p className="text-lg font-medium text-white">No notes yet</p>
-                        <p className="text-sm text-zinc-400">
-                          Capture key takeaways, resources, and action items from this session.
-                        </p>
+                        <p className="text-lg font-medium text-white">{t("notes.emptyTitle")}</p>
+                        <p className="text-sm text-zinc-400">{t("notes.emptyBody")}</p>
                       </div>
                       <Button
                         variant="outline"
                         className="mt-2 border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
                       >
-                        Add Notes
+                        {t("notes.add")}
                       </Button>
                     </div>
                   )}
@@ -686,10 +684,8 @@ export default function SessionDetailPage(props: SessionPageProps) {
                   <div className="flex flex-col items-center justify-center gap-4 py-12">
                     <Folder className="h-12 w-12 text-zinc-600" />
                     <div className="text-center">
-                      <p className="text-lg font-medium text-white">No resources added yet</p>
-                      <p className="text-sm text-zinc-400">
-                        Add links, templates, or files from this session.
-                      </p>
+                      <p className="text-lg font-medium text-white">{t("resources.emptyTitle")}</p>
+                      <p className="text-sm text-zinc-400">{t("resources.emptyBody")}</p>
                     </div>
                     <Button
                       variant="outline"
@@ -707,16 +703,14 @@ export default function SessionDetailPage(props: SessionPageProps) {
                   <div className="flex flex-col items-center justify-center gap-4 py-12">
                     <MessageSquare className="h-12 w-12 text-zinc-600" />
                     <div className="text-center">
-                      <p className="text-lg font-medium text-white">No follow-up discussion yet</p>
-                      <p className="text-sm text-zinc-400">
-                        Start a conversation with your community about this session.
-                      </p>
+                      <p className="text-lg font-medium text-white">{t("discussion.emptyTitle")}</p>
+                      <p className="text-sm text-zinc-400">{t("discussion.emptyBody")}</p>
                     </div>
                     <Button
                       variant="outline"
                       className="mt-2 border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
                     >
-                      Start Discussion
+                      {t("discussion.start")}
                     </Button>
                   </div>
                 </div>
@@ -728,12 +722,12 @@ export default function SessionDetailPage(props: SessionPageProps) {
           <div className="lg:col-span-1">
             <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
               <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-zinc-500">
-                Session Summary
+                {t("summary.title")}
               </h3>
 
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-zinc-400">Status</span>
+                  <span className="text-sm text-zinc-400">{t("summary.status")}</span>
                   <span
                     className={cn(
                       "text-sm font-medium",
@@ -746,22 +740,22 @@ export default function SessionDetailPage(props: SessionPageProps) {
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-zinc-400">Date</span>
+                  <span className="text-sm text-zinc-400">{t("summary.date")}</span>
                   <span className="text-sm text-white">{formattedDate}</span>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-zinc-400">Time</span>
+                  <span className="text-sm text-zinc-400">{t("summary.time")}</span>
                   <span className="text-sm text-white">{formattedTime}</span>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-zinc-400">Duration</span>
+                  <span className="text-sm text-zinc-400">{t("summary.duration")}</span>
                   <span className="text-sm text-white">{session.duration} min</span>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-zinc-400">Mode</span>
+                  <span className="text-sm text-zinc-400">{t("summary.mode")}</span>
                   <span
                     className={cn(
                       "text-sm font-medium",
@@ -773,13 +767,13 @@ export default function SessionDetailPage(props: SessionPageProps) {
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-zinc-400">Host</span>
+                  <span className="text-sm text-zinc-400">{t("summary.host")}</span>
                   <span className="text-sm text-white">{session.mentor?.name || "Unknown"}</span>
                 </div>
 
                 {session.communityId && (
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-zinc-400">Community</span>
+                    <span className="text-sm text-zinc-400">{t("summary.community")}</span>
                     <span className="text-sm text-white">
                       {session.community?.name || "Unknown"}
                     </span>
@@ -797,7 +791,7 @@ export default function SessionDetailPage(props: SessionPageProps) {
                   <div className="border-t border-zinc-800 pt-4">
                     <div className="flex items-center gap-2 text-sm text-green-400">
                       <CheckCircle className="h-4 w-4" />
-                      <span>Posted to community feed</span>
+                      <span>{t("summary.postedToFeed")}</span>
                     </div>
                   </div>
                 )}
@@ -807,7 +801,7 @@ export default function SessionDetailPage(props: SessionPageProps) {
             {/* Quick Actions Card */}
             <div className="mt-4 rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
               <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-zinc-500">
-                Quick Actions
+                {t("quickActions.title")}
               </h3>
               <div className="space-y-2">
                 {session?.mentorId === user?.id && (
@@ -817,7 +811,7 @@ export default function SessionDetailPage(props: SessionPageProps) {
                     onClick={() => setShowAddToCourse(true)}
                   >
                     <BookOpen className="h-4 w-4" />
-                    Add to Course
+                    {t("addToCourse")}
                   </Button>
                 )}
                 {session?.mentorId === user?.id && (
@@ -827,7 +821,7 @@ export default function SessionDetailPage(props: SessionPageProps) {
                     onClick={() => setShowCreateClip(true)}
                   >
                     <Sparkles className="h-4 w-4" />
-                    Create Clip
+                    {t("createClip")}
                   </Button>
                 )}
                 <Button
@@ -845,7 +839,7 @@ export default function SessionDetailPage(props: SessionPageProps) {
                   onClick={() => router.push(`/dashboard/sessions/create?template=${session.id}`)}
                 >
                   <Calendar className="h-4 w-4" />
-                  Schedule Follow-up
+                  {t("quickActions.scheduleFollowUp")}
                 </Button>
               </div>
             </div>

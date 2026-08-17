@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { usePathname } from "next/navigation";
 import { Download, X, Smartphone } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -9,7 +10,54 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
+/**
+ * Copy lives here rather than in /locales for the same reason it does in
+ * components/gdpr/CookieConsent.tsx: this banner is mounted in app/layout.tsx,
+ * which sits OUTSIDE every NextIntlClientProvider in the app. `useTranslations`
+ * throws there — it fails the prerender of every static page, which is exactly
+ * what happened when this component first reached for it.
+ *
+ * Wrapping the root layout in a provider would fix the throw and cost the
+ * static prerender of the whole marketing site, since resolving the locale
+ * server-side means reading a cookie. Not worth it for four strings.
+ */
+const SUPPORTED = ["en", "es", "fr"] as const;
+type SupportedLocale = (typeof SUPPORTED)[number];
+
+const TRANSLATIONS: Record<
+  SupportedLocale,
+  { title: string; body: string; accept: string; dismiss: string }
+> = {
+  en: {
+    title: "Install Unytea",
+    body: "Get the full app experience — faster access, push notifications, and offline support.",
+    accept: "Install",
+    dismiss: "Not now",
+  },
+  es: {
+    title: "Instala Unytea",
+    body: "Llévate la app completa: acceso más rápido, notificaciones y uso sin conexión.",
+    accept: "Instalar",
+    dismiss: "Ahora no",
+  },
+  fr: {
+    title: "Installez Unytea",
+    body: "Profitez de l'app complète : accès plus rapide, notifications et mode hors ligne.",
+    accept: "Installer",
+    dismiss: "Plus tard",
+  },
+};
+
+function useLocaleFromPath(): SupportedLocale {
+  const pathname = usePathname();
+  const firstSeg = pathname?.split("/").filter(Boolean)[0];
+  return (SUPPORTED as readonly string[]).includes(firstSeg ?? "")
+    ? (firstSeg as SupportedLocale)
+    : "en";
+}
+
 export function PWAInstallPrompt() {
+  const t = TRANSLATIONS[useLocaleFromPath()];
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showBanner, setShowBanner] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
@@ -86,10 +134,8 @@ export function PWAInstallPrompt() {
 
           {/* Content */}
           <div className="min-w-0 flex-1">
-            <h3 className="text-sm font-semibold text-white">Install Unytea</h3>
-            <p className="mt-1 text-xs text-zinc-400">
-              Get the full app experience — faster access, push notifications, and offline support.
-            </p>
+            <h3 className="text-sm font-semibold text-white">{t.title}</h3>
+            <p className="mt-1 text-xs text-zinc-400">{t.body}</p>
 
             {/* Actions */}
             <div className="mt-3 flex items-center gap-2">
@@ -98,13 +144,13 @@ export function PWAInstallPrompt() {
                 className="flex items-center gap-1.5 rounded-lg bg-purple-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-purple-700"
               >
                 <Download className="h-3.5 w-3.5" />
-                Install
+                {t.accept}
               </button>
               <button
                 onClick={handleDismiss}
                 className="rounded-lg px-3 py-1.5 text-xs font-medium text-zinc-400 transition-colors hover:text-zinc-200"
               >
-                Not now
+                {t.dismiss}
               </button>
             </div>
           </div>

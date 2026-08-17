@@ -144,7 +144,71 @@
     "signInError": "Error al iniciar sesión",
     "accountCreated": "¡Cuenta creada exitosamente!",
     "resetPassword": "Restablecer contraseña",
-    "passwordResetComingSoon": "El restablecimiento de contraseña llega pronto. Mientras tanto, contacta a soporte."
+    "passwordResetComingSoon": "El restablecimiento de contraseña llega pronto. Mientras tanto, contacta a soporte.",
+    "signup": {
+      "title": "Crea tu cuenta",
+      "subtitle": "Únete hoy a la mejor plataforma de comunidades ☕",
+      "fullName": "Nombre completo",
+      "fullNamePlaceholder": "Ana García",
+      "email": "Correo",
+      "emailPlaceholder": "tu@ejemplo.com",
+      "password": "Contraseña",
+      "passwordPlaceholder": "••••••••",
+      "passwordStrong": "Contraseña segura",
+      "passwordHint": "Mínimo 8 caracteres",
+      "confirmPassword": "Repite la contraseña",
+      "confirmPasswordPlaceholder": "••••••••",
+      "submit": "Crear cuenta",
+      "legal": "Al registrarte aceptas nuestros <terms>Términos del servicio</terms> y nuestra <privacy>Política de privacidad</privacy>",
+      "haveAccount": "¿Ya tienes cuenta?",
+      "signIn": "Inicia sesión"
+    },
+    "forgot": {
+      "title": "Recuperar contraseña",
+      "subtitle": "Escribe tu correo y te enviamos un enlace para restablecerla",
+      "subtitleSent": "Revisa tu correo: te hemos enviado el enlace",
+      "emailLabel": "Correo electrónico",
+      "emailPlaceholder": "Escribe tu correo",
+      "submit": "Enviar enlace",
+      "submitting": "Enviando…",
+      "sentTitle": "¡Correo enviado!",
+      "sentBody": "Si existe una cuenta con <em>{email}</em>, recibirás el enlace en unos momentos. Mira también en spam por si acaso.",
+      "tryAnother": "Probar con otro correo",
+      "backToSignIn": "Volver al inicio de sesión",
+      "emailRequired": "Escribe tu correo electrónico"
+    },
+    "reset": {
+      "invalidTitle": "Enlace no válido",
+      "invalidBody": "Este enlace ya no sirve o ya se ha usado. Pide uno nuevo.",
+      "requestNew": "Pedir un enlace nuevo",
+      "title": "Elige una contraseña nueva",
+      "subtitle": "Escoge una contraseña segura para tu cuenta",
+      "titleDone": "¡Contraseña cambiada!",
+      "subtitleDone": "Te llevamos al inicio de sesión…",
+      "doneBody": "Tu contraseña se ha actualizado. En un momento te llevamos al inicio de sesión.",
+      "signInNow": "Iniciar sesión ahora",
+      "newPassword": "Contraseña nueva",
+      "newPasswordPlaceholder": "Mínimo 8 caracteres",
+      "confirmPassword": "Repite la contraseña",
+      "confirmPasswordPlaceholder": "Vuelve a escribirla",
+      "submit": "Cambiar contraseña",
+      "submitting": "Cambiando…",
+      "backToSignIn": "Volver al inicio de sesión",
+      "tooShort": "La contraseña debe tener al menos 8 caracteres",
+      "mismatch": "Las contraseñas no coinciden",
+      "success": "¡Contraseña cambiada!"
+    },
+    "errors": {
+      "RATE_LIMITED": "Demasiados intentos. Vuelve a probar en unos minutos.",
+      "SERVER_ERROR": "Algo ha fallado. Inténtalo de nuevo.",
+      "EMAIL_REQUIRED": "Escribe tu correo electrónico",
+      "RESET_LINK_INVALID": "Ese enlace no es válido. Pide uno nuevo.",
+      "RESET_LINK_EXPIRED": "Ese enlace ha caducado. Pide uno nuevo.",
+      "VALIDATION_NAME": "Escribe tu nombre",
+      "VALIDATION_EMAIL": "Ese correo no parece correcto",
+      "VALIDATION_PASSWORD": "La contraseña debe tener al menos 8 caracteres",
+      "generic": "Algo ha fallado. Inténtalo de nuevo."
+    }
   },
   "landing": {
     "nav": {
@@ -1624,6 +1688,84 @@
         "enterRoom": "Entrar a la sala",
         "watch": "Ver",
         "viewAll": "{count, plural, =1 {Ver # sesión pasada} other {Ver las # sesiones pasadas}}"
+      },
+      "detail": {
+        "loading": "Cargando la sesión…",
+        "back": "Volver a Sesiones",
+        "audioOnly": "Solo audio",
+        "joinNext": "Entrar a la próxima sesión",
+        "addToGoogleCalendar": "Añadir a Google Calendar",
+        "addToAppleCalendar": "Añadir a Apple Calendar",
+        "inviteMembers": "Invitar miembros",
+        "shareOn": "Compartir en {network}",
+        "watchRecording": "Ver la grabación",
+        "addToCourse": "Añadir a un curso",
+        "createClip": "Crear clip",
+        "download": "Descargar",
+        "tabs": {
+          "recording": "Grabación",
+          "notes": "Notas",
+          "resources": "Recursos",
+          "discussion": "Conversación"
+        },
+        "recording": {
+          "processingTitle": "Procesando la grabación…",
+          "processingBody": "El vídeo estará disponible en breve. Mientras tanto puedes repasar las notas.",
+          "unsupported": "Tu navegador no admite la reproducción de vídeo.",
+          "noneTitle": "No hay grabación",
+          "noneBody": "Esta sesión no se grabó o la grabación aún se está procesando."
+        },
+        "notes": {
+          "title": "Notas de la sesión",
+          "emptyTitle": "Todavía no hay notas",
+          "emptyBody": "Recoge las ideas clave, los recursos y las tareas que salieron de la sesión.",
+          "add": "Añadir notas"
+        },
+        "resources": {
+          "emptyTitle": "Todavía no hay recursos",
+          "emptyBody": "Añade enlaces, plantillas o archivos de esta sesión."
+        },
+        "discussion": {
+          "emptyTitle": "Todavía no hay conversación",
+          "emptyBody": "Abre un hilo con tu comunidad sobre esta sesión.",
+          "start": "Abrir conversación"
+        },
+        "summary": {
+          "title": "Resumen de la sesión",
+          "status": "Estado",
+          "date": "Fecha",
+          "time": "Hora",
+          "duration": "Duración",
+          "mode": "Modo",
+          "host": "Anfitrión",
+          "community": "Comunidad",
+          "postedToFeed": "Publicado en el feed de la comunidad"
+        },
+        "quickActions": {
+          "title": "Acciones rápidas",
+          "scheduleFollowUp": "Programar seguimiento"
+        },
+        "share": {
+          "already": "Esta sesión ya se compartió en el feed de la comunidad",
+          "success": "¡Recap compartido en el feed de la comunidad!",
+          "failed": "No se pudo compartir el recap",
+          "error": "Error al compartir el recap",
+          "sharing": "Compartiendo…",
+          "shared": "Ya compartido",
+          "sharedToFeed": "Compartido en el feed",
+          "shareRecap": "Compartir recap"
+        },
+        "library": {
+          "success": "Sesión publicada en la biblioteca",
+          "failed": "No se pudo publicar en la biblioteca"
+        },
+        "rsvp": {
+          "removed": "Confirmación retirada",
+          "attending": "Vas a asistir a esta sesión",
+          "interested": "Marcada como de interés",
+          "failed": "No se pudo actualizar tu confirmación"
+        },
+        "inviteCopied": "Enlace de invitación copiado"
       }
     },
     "analytics": {
@@ -2804,6 +2946,14 @@
         "loading": "Cargando la sesión…",
         "endingTitle": "Cerrando la sesión…",
         "endingBody": "Marcando la sesión como finalizada y actualizando tu panel"
+      },
+      "toasts": {
+        "loadFailed": "No se pudo cargar la sesión",
+        "ended": "Sesión cerrada. Tu recap está listo para revisar.",
+        "endError": "Ha ocurrido un error al cerrar la sesión",
+        "recordingPaused": "Grabación en pausa",
+        "recordingStarted": "Grabación iniciada",
+        "recordingFailed": "No se pudo cambiar el estado de la grabación"
       }
     },
     "videoRoom": {
