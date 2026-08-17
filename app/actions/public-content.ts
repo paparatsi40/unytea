@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { defineAction } from "@/lib/actions/define-action";
 import { communityOfSession } from "@/lib/actions/resolvers";
 import { Prisma } from "@prisma/client";
+import { SITE_URL } from "@/lib/site-url";
 
 /** Segmento destacado ("golden moment") de una sesión. */
 type Moment = {
@@ -49,59 +50,58 @@ export const detectSessionMoments = defineAction(
     rateLimit: "ai",
   },
   async (ctx, sessionId: string) => {
-  try {
+    try {
+      const userId = ctx.userId;
 
-    const userId = ctx.userId;
-
-    // Fetch session with relevant data
-    const session = await prisma.mentorSession.findUnique({
-      where: { id: sessionId },
-      include: {
-        mentor: { select: { id: true, name: true, image: true } },
-        community: { select: { id: true, name: true, slug: true } },
-        participations: {
-          include: {
-            user: { select: { id: true, name: true } },
+      // Fetch session with relevant data
+      const session = await prisma.mentorSession.findUnique({
+        where: { id: sessionId },
+        include: {
+          mentor: { select: { id: true, name: true, image: true } },
+          community: { select: { id: true, name: true, slug: true } },
+          participations: {
+            include: {
+              user: { select: { id: true, name: true } },
+            },
           },
+          notes: true,
+          recording: true,
         },
-        notes: true,
-        recording: true,
-      },
-    });
+      });
 
-    if (!session) {
-      return { success: false, error: "Session not found" };
+      if (!session) {
+        return { success: false, error: "Session not found" };
+      }
+
+      if (session.mentorId !== userId) {
+        return { success: false, error: "Only mentor can create clips" };
+      }
+
+      if (!session.recording || session.recording.status !== "READY") {
+        return { success: false, error: "Recording not ready" };
+      }
+
+      const moments = analyzeMoments(session);
+
+      return {
+        success: true,
+        moments,
+        session: {
+          id: session.id,
+          title: session.title,
+          description: session.description,
+          recordingUrl: session.recording?.url,
+          thumbnailUrl: null, // No thumbnail in Recording model
+          duration: session.recording?.durationSeconds || 0,
+          mentor: session.mentor,
+          community: session.community,
+        },
+      };
+    } catch (error) {
+      console.error("Error detecting moments:", error);
+      return { success: false, error: "Failed to analyze session" };
     }
-
-    if (session.mentorId !== userId) {
-      return { success: false, error: "Only mentor can create clips" };
-    }
-
-    if (!session.recording || session.recording.status !== "READY") {
-      return { success: false, error: "Recording not ready" };
-    }
-
-    const moments = analyzeMoments(session);
-
-    return {
-      success: true,
-      moments,
-      session: {
-        id: session.id,
-        title: session.title,
-        description: session.description,
-        recordingUrl: session.recording?.url,
-        thumbnailUrl: null, // No thumbnail in Recording model
-        duration: session.recording?.durationSeconds || 0,
-        mentor: session.mentor,
-        community: session.community,
-      },
-    };
-  } catch (error) {
-    console.error("Error detecting moments:", error);
-    return { success: false, error: "Failed to analyze session" };
   }
-}
 );
 
 /**
@@ -221,56 +221,55 @@ export const generateClipMetadata = defineAction(
     rateLimit: "ai",
   },
   async (ctx, sessionId: string, startTime: number, endTime: number) => {
-  try {
+    try {
+      const userId = ctx.userId;
 
-    const userId = ctx.userId;
+      const session = await prisma.mentorSession.findUnique({
+        where: { id: sessionId },
+        include: {
+          mentor: { select: { id: true, name: true, image: true } },
+          community: { select: { id: true, name: true, slug: true } },
+          recording: true,
+        },
+      });
 
-    const session = await prisma.mentorSession.findUnique({
-      where: { id: sessionId },
-      include: {
-        mentor: { select: { id: true, name: true, image: true } },
-        community: { select: { id: true, name: true, slug: true } },
-        recording: true,
-      },
-    });
+      if (!session || session.mentorId !== userId) {
+        return { success: false, error: "Unauthorized" };
+      }
 
-    if (!session || session.mentorId !== userId) {
-      return { success: false, error: "Unauthorized" };
+      const clipDuration = endTime - startTime;
+      const clipId = `clip_${sessionId}_${startTime}_${endTime}`;
+
+      const baseUrl = SITE_URL;
+      const clipUrl = `${baseUrl}/clip/${clipId}`;
+      const sessionUrl = `${baseUrl}/s/${session.community?.slug || "c"}/${session.slug}`;
+
+      const previewText = generateClipPreviewText(session, clipDuration);
+
+      return {
+        success: true,
+        clip: {
+          id: clipId,
+          sessionId: session.id,
+          sessionTitle: session.title,
+          hostName: session.mentor?.name,
+          communityName: session.community?.name ?? null,
+          startTime,
+          endTime,
+          duration: clipDuration,
+          clipUrl,
+          sessionUrl,
+          thumbnailUrl: null, // No thumbnail in Recording model
+          videoUrl: session.recording?.url ?? null,
+          previewText,
+          shareText: generateShareText(session, previewText, clipUrl),
+        },
+      };
+    } catch (error) {
+      console.error("Error generating clip:", error);
+      return { success: false, error: "Failed to generate clip" };
     }
-
-    const clipDuration = endTime - startTime;
-    const clipId = `clip_${sessionId}_${startTime}_${endTime}`;
-
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://unytea.com";
-    const clipUrl = `${baseUrl}/clip/${clipId}`;
-    const sessionUrl = `${baseUrl}/s/${session.community?.slug || "c"}/${session.slug}`;
-
-    const previewText = generateClipPreviewText(session, clipDuration);
-
-    return {
-      success: true,
-      clip: {
-        id: clipId,
-        sessionId: session.id,
-        sessionTitle: session.title,
-        hostName: session.mentor?.name,
-        communityName: session.community?.name ?? null,
-        startTime,
-        endTime,
-        duration: clipDuration,
-        clipUrl,
-        sessionUrl,
-        thumbnailUrl: null, // No thumbnail in Recording model
-        videoUrl: session.recording?.url ?? null,
-        previewText,
-        shareText: generateShareText(session, previewText, clipUrl),
-      },
-    };
-  } catch (error) {
-    console.error("Error generating clip:", error);
-    return { success: false, error: "Failed to generate clip" };
   }
-}
 );
 
 function generateClipPreviewText(session: SessionForClip, duration: number) {
@@ -304,12 +303,12 @@ export const trackClipShare = defineAction(
     rateLimit: "api",
   },
   async (_ctx, clipId: string, platform: "twitter" | "linkedin" | "copy") => {
-  try {
-    console.log(`Clip ${clipId} shared to ${platform}`);
-    return { success: true };
-  } catch (error) {
-    console.error("Error tracking share:", error);
-    return { success: false };
+    try {
+      console.log(`Clip ${clipId} shared to ${platform}`);
+      return { success: true };
+    } catch (error) {
+      console.error("Error tracking share:", error);
+      return { success: false };
+    }
   }
-}
 );

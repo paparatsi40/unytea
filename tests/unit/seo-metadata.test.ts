@@ -2,13 +2,15 @@ import { describe, it, expect } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
 import { localizedAlternates, SUPPORTED_LOCALES } from "@/lib/seo/locale-metadata";
+import { SITE_URL } from "@/lib/site-url";
 
 /**
  * Two Lighthouse SEO failures on the marketing site.
  *
  * 1. "Document does not have a valid rel=canonical — points to another hreflang
  *    location." The homepage passed `path: ""` to `localizedAlternates`, which
- *    normalized it to `"/"` and emitted `https://www.unytea.com/en/`. That URL
+ *    normalized it to `"/"` and emitted `https://www.unytea.com/en/` (the host
+ *    has since been canonicalized to the apex). That URL
  *    is not the page: `trailingSlash` is off, so `/en/` 308-redirects to `/en`.
  *    Every hreflang carried the same slash, so the canonical resolved to one of
  *    the alternates rather than to this document. Sub-pages such as
@@ -21,7 +23,10 @@ import { localizedAlternates, SUPPORTED_LOCALES } from "@/lib/seo/locale-metadat
  */
 
 const REPO_ROOT = path.resolve(__dirname, "../..");
-const BASE = "https://www.unytea.com";
+// Read from the shared origin rather than restated: the host was canonicalized
+// to the apex, and a test carrying its own copy of it is how the codebase ended
+// up split between www and the apex in the first place.
+const BASE = SITE_URL;
 
 function read(relativePath: string): string {
   return fs.readFileSync(path.join(REPO_ROOT, relativePath), "utf8");

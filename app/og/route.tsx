@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
 
-const SITE_URL = "https://www.unytea.com";
+import { SITE_URL } from "@/lib/site-url";
 
 /**
  * Open Graph image (1200x630) used as the share preview on every social

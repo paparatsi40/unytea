@@ -2,6 +2,7 @@
 
 import { PublicSessionData } from "@/app/actions/public-sessions";
 import { jsonLdSafe } from "@/lib/json-ld";
+import { SITE_URL } from "@/lib/site-url";
 
 interface Props {
   session: PublicSessionData;
@@ -16,8 +17,7 @@ export function SessionJsonLd({ session }: Props) {
     "@type": "Event",
     name: session.title,
     description: session.description || `Join ${session.host.name} for an interactive session`,
-    image:
-      session.community?.imageUrl || session.host.image || "https://www.unytea.com/og-image.png",
+    image: session.community?.imageUrl || session.host.image || `${SITE_URL}/og-image.png`,
     startDate: session.scheduledAt.toISOString(),
     endDate: new Date(
       session.scheduledAt.getTime() + (session.duration || 60) * 60000
@@ -30,13 +30,13 @@ export function SessionJsonLd({ session }: Props) {
     eventAttendanceMode: "https://schema.org/OnlineEventAttendanceMode",
     location: {
       "@type": "VirtualLocation",
-      url: `https://www.unytea.com/s/${session.slug}`,
+      url: `${SITE_URL}/s/${session.slug}`,
     },
     organizer: session.community
       ? {
           "@type": "Organization",
           name: session.community.name,
-          url: `https://www.unytea.com/c/${session.community.slug}`,
+          url: `${SITE_URL}/c/${session.community.slug}`,
         }
       : undefined,
     performer: {
@@ -49,7 +49,7 @@ export function SessionJsonLd({ session }: Props) {
       price: "0",
       priceCurrency: "USD",
       availability: isUpcoming ? "https://schema.org/InStock" : "https://schema.org/SoldOut",
-      url: `https://www.unytea.com/s/${session.slug}`,
+      url: `${SITE_URL}/s/${session.slug}`,
     },
     isAccessibleForFree: true,
     duration: `PT${session.duration}M`,
@@ -80,7 +80,7 @@ export function SessionJsonLd({ session }: Props) {
         "@type": "ListItem",
         position: 1,
         name: "Unytea",
-        item: "https://www.unytea.com",
+        item: SITE_URL,
       },
       ...(session.community
         ? [
@@ -88,7 +88,7 @@ export function SessionJsonLd({ session }: Props) {
               "@type": "ListItem",
               position: 2,
               name: session.community.name,
-              item: `https://www.unytea.com/c/${session.community.slug}`,
+              item: `${SITE_URL}/c/${session.community.slug}`,
             },
           ]
         : []),
@@ -96,7 +96,7 @@ export function SessionJsonLd({ session }: Props) {
         "@type": "ListItem",
         position: session.community ? 3 : 2,
         name: session.title,
-        item: `https://www.unytea.com/s/${session.slug}`,
+        item: `${SITE_URL}/s/${session.slug}`,
       },
     ],
   };

@@ -23,7 +23,7 @@ import type { Metadata } from "next";
  * country/language targeting.
  */
 
-const BASE_URL = "https://www.unytea.com";
+import { SITE_URL as BASE_URL } from "@/lib/site-url";
 export const SUPPORTED_LOCALES = ["en", "es", "fr"] as const;
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 

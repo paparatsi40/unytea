@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Users } from "lucide-react";
 import { headers } from "next/headers";
+import { SITE_URL } from "@/lib/site-url";
 
 function formatHostName(owner: {
   name: string | null;
@@ -117,8 +118,8 @@ export async function generateMetadata(props: {
   const host = formatHostName(community.owner);
   const description =
     community.description?.slice(0, 160) || `Join ${community.name} hosted by ${host} on Unytea.`;
-  const canonical = `https://www.unytea.com/${params.locale}/community/${params.slug}`;
-  const image = community.imageUrl || "https://www.unytea.com/og-image.png";
+  const canonical = `${SITE_URL}/${params.locale}/community/${params.slug}`;
+  const image = community.imageUrl || `${SITE_URL}/og-image.png`;
 
   return {
     title,

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { jsonLdSafe } from "@/lib/json-ld";
 import { getAllPosts, getPostBySlug } from "../posts";
+import { SITE_URL } from "@/lib/site-url";
 
 type RouteParams = {
   locale: string;
@@ -14,21 +15,11 @@ type Props = {
   params: Promise<RouteParams>;
 };
 
-function getSafeBaseUrl() {
-  const raw = process.env.NEXT_PUBLIC_APP_URL?.trim();
-
-  if (!raw) {
-    return "https://unytea.com";
-  }
-
-  try {
-    const normalized = raw.startsWith("http") ? raw : `https://${raw}`;
-    const parsed = new URL(normalized);
-    return parsed.origin;
-  } catch {
-    return "https://unytea.com";
-  }
-}
+// The origin lives in lib/site-url.ts, which already normalizes
+// NEXT_PUBLIC_APP_URL to a bare origin and falls back to the canonical apex.
+// This file used to repeat that logic, including its own copy of the host —
+// which is exactly how the codebase ended up split between www and the apex.
+const getSafeBaseUrl = () => SITE_URL;
 
 export function generateStaticParams() {
   return getAllPosts().map((post) => ({ slug: post.slug }));
@@ -140,7 +131,7 @@ export default async function BlogPostPage({ params }: Props) {
           <h2 className="mb-2 text-2xl font-bold">Ready to build your virtual studio?</h2>
           <p className="mb-6 text-muted-foreground">Start free — no credit card required.</p>
           <a
-            href="https://www.unytea.com/en#pricing"
+            href={`${SITE_URL}/en#pricing`}
             className="inline-block rounded-full bg-primary px-8 py-3 font-semibold text-primary-foreground transition-opacity hover:opacity-90"
           >
             Start Free

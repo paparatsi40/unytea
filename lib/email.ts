@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { SITE_URL } from "@/lib/site-url";
 
 // ── Resend client (lazy init so builds don't fail without the key) ────
 let _resend: Resend | null = null;
@@ -15,7 +16,7 @@ function getResend(): Resend {
 }
 
 const FROM_EMAIL = process.env.EMAIL_FROM || "Unytea <noreply@unytea.com>";
-const APP_URL = process.env.NEXTAUTH_URL || "https://unytea.com";
+const APP_URL = SITE_URL;
 
 // ── Types ─────────────────────────────────────────────────────────────
 export interface SendEmailOptions {

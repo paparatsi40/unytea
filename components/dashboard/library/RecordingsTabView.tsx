@@ -7,6 +7,7 @@ import { getDateFnsLocale } from "@/lib/i18n/date-fns-locale";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import type { RecordingRow, NextLiveSession } from "./RecordingsTab";
+import { SITE_URL } from "@/lib/site-url";
 
 export function RecordingsTabView({
   recordings,
@@ -184,9 +185,7 @@ export function RecordingsTabView({
                 <div className="mt-2">
                   <RecordingDistributionActions
                     recordingUrl={recording.recording?.url || recording.recordingUrl || null}
-                    publicUrl={
-                      recording.slug ? `https://www.unytea.com/sessions/${recording.slug}` : null
-                    }
+                    publicUrl={recording.slug ? `${SITE_URL}/sessions/${recording.slug}` : null}
                     title={recording.title}
                   />
                 </div>

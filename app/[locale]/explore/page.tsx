@@ -6,6 +6,7 @@ import { localizedAlternates } from "@/lib/seo/locale-metadata";
 import { ExploreFilters as ExploreFiltersComponent } from "@/components/explore/ExploreFilters";
 import { ExploreInfiniteFeed } from "@/components/explore/ExploreInfiniteFeed";
 import { ExploreBackButton } from "@/components/explore/ExploreBackButton";
+import { SITE_URL } from "@/lib/site-url";
 import type {
   ExploreFilters,
   ExplorePagination,
@@ -57,7 +58,7 @@ export async function generateMetadata({
     openGraph: {
       title: t("ogTitle"),
       description: t("ogDescription"),
-      url: `https://www.unytea.com/${locale}/explore`,
+      url: `${SITE_URL}/${locale}/explore`,
       type: "website",
     },
   };

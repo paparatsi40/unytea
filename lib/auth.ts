@@ -213,7 +213,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   // trustHost: true tells NextAuth to trust the X-Forwarded-Host header
   // sent by the reverse proxy (Vercel edge) instead of validating against
   // AUTH_URL. Required for Vercel preview deploys (*.vercel.app) where
-  // the actual host differs from production AUTH_URL=www.unytea.com.
+  // the actual host differs from production AUTH_URL=unytea.com.
   //
   // Safety: Vercel sets X-Forwarded-Host server-side at the edge, not from
   // client input — attackers cannot forge this header in incoming requests.
