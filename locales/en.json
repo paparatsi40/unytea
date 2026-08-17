@@ -162,7 +162,7 @@
       "title": "Build communities people actually show up to",
       "titleStart": "Build communities people",
       "titleHighlight": "actually show up to",
-      "description": "Host live sessions, convert them into recordings, summaries, and library content. Build engagement that compounds.",
+      "description": "Host live sessions and turn them into recaps, discussion, and library content. Build engagement that compounds.",
       "cta": {
         "primary": "Host your first session",
         "secondary": "Watch Demo",
@@ -233,31 +233,6 @@
         "description": "Engage your community, track analytics, and start generating revenue.",
         "time": "Week 2+"
       }
-    },
-    "trust": {
-      "title": "Trusted by Industry Leaders",
-      "subtitle": "Secure, reliable, and built for scale",
-      "soc2": "SOC 2 Compliant",
-      "gdpr": "GDPR Ready",
-      "uptime": "99.99% Uptime",
-      "support": "24/7 Support"
-    },
-    "faq": {
-      "badge": "FAQ",
-      "title": "Common Questions",
-      "subtitle": "Everything you need to know about Unytea",
-      "q1": "Can I migrate from Skool or other platforms?",
-      "a1": "Absolutely! We offer free migration assistance from Skool, Circle, Facebook Groups, and other platforms. Our team will help you transfer your members, content, and data seamlessly.",
-      "q2": "Do I need technical skills to use Unytea?",
-      "a2": "Not at all! Unytea is designed to be user-friendly for everyone. Our drag-and-drop builder and intuitive interface mean you can set up your community in minutes, no coding required.",
-      "q3": "How does the 14-day free trial work?",
-      "a3": "You get full access to all Professional features for 14 days. No credit card required to start. At the end of your trial, choose the plan that fits your needs or continue with our free tier.",
-      "q4": "Can I monetize my community?",
-      "a4": "Yes! Unytea has built-in monetization features including paid memberships, course sales, and subscription billing. We integrate with Stripe for secure payment processing with just 5% platform fee.",
-      "q5": "What support options are available?",
-      "a5": "Free plans include community support. Professional plans get priority email support with 24-hour response time. Premium plans get dedicated support with 4-hour response time and a dedicated success manager.",
-      "q6": "Is my data secure?",
-      "a6": "Security is our top priority. We're SOC 2 compliant, GDPR ready, and use enterprise-grade encryption. Your data is stored securely and never shared with third parties."
     },
     "blogSection": {
       "eyebrow": "From the blog",
@@ -344,7 +319,7 @@
       },
       "recording": {
         "title": "Recording",
-        "description": "Auto-captured, ready to share"
+        "description": "Coming soon — recording isn't available yet"
       },
       "summary": {
         "title": "AI Summary",
@@ -369,7 +344,7 @@
       "subtitle": "One platform. All your tools. Zero integration headaches.",
       "live": {
         "title": "🎥 Live Sessions",
-        "description": "Interactive video calls with whiteboard, screen sharing, and recordings. Our most loved feature."
+        "description": "Interactive video calls with whiteboard and screen sharing. Our most loved feature."
       },
       "courses": {
         "title": "Courses",
@@ -403,8 +378,8 @@
       },
       "recap": {
         "eyebrow": "AI Recap",
-        "title": "Sessions → reusable content automatically",
-        "description": "Live recording becomes summary, highlights, library entries, and discussion prompts. One session powers a week of content."
+        "title": "Sessions → a recap ready to review",
+        "description": "Every session turns into a recap — key takeaways, chapters and a discussion prompt, drawn from the notes taken during the session. You read it and edit it before it reaches your community."
       }
     },
     "useCases": {
@@ -447,8 +422,8 @@
         "quizzes": "Quizzes & Assessments",
         "platformFee": "Platform Fee"
       },
-      "unyteaFee": "5% flat",
-      "footnote": "* Skool fee depends on plan: 10% on Hobby ($9/mo), 2.9% on Pro ($99/mo). Stripe processing extra in both.",
+      "unyteaFee": "From {min}%",
+      "footnote": "* Skool fee depends on plan: 10% on Hobby ($9/mo), 2.9% on Pro ($99/mo). Unytea's drops as you grow: {max}% on Creator, 2% on Business, {min}% on Pro. Stripe processing extra in both.",
       "switchers": "Used by creators switching from Skool, Circle, Mighty Networks, and Facebook Groups"
     },
     "monetization": {
@@ -468,8 +443,8 @@
         "description": "Host paid live sessions and events"
       },
       "fee": {
-        "title": "Flat Platform Fee",
-        "description": "One simple 5% on all plans, plus Stripe processing"
+        "title": "A fee that drops as you grow",
+        "description": "{max}% on Creator, 2% on Business, {min}% on Pro — plus Stripe processing"
       },
       "example": {
         "badge": "Example",
@@ -513,7 +488,7 @@
       "subtitle": "Live sessions, courses, community, and content. No more juggling 5 tools.",
       "host": {
         "title": "Host live sessions",
-        "description": "Schedule, run, and record live sessions — track attendance from one hub."
+        "description": "Schedule, run, and follow up on live sessions — track attendance from one hub."
       },
       "customize": {
         "title": "Customize your space",
@@ -1293,7 +1268,7 @@
           "subtitle": "Configure paid memberships and connect your Stripe account",
           "connect": {
             "cardTitle": "Stripe Connect",
-            "cardDescription": "Connect your Stripe account to receive payments from community members. You keep 95% of all revenue, platform fee is 5%.",
+            "cardDescription": "Connect your Stripe account to receive payments from community members. Unytea's commission depends on your plan and is shown on the billing page.",
             "notConnected": {
               "alertTitle": "Stripe account not connected",
               "alertBody": "You need to connect a Stripe account before you can charge for memberships.",
@@ -2228,8 +2203,7 @@
             "Live sessions up to 100 concurrent participants",
             "Paid courses",
             "Community feed + library",
-            "Basic analytics",
-            "8% commission on member revenue"
+            "Basic analytics"
           ]
         },
         "BUSINESS": {
@@ -2239,8 +2213,7 @@
             "Live sessions up to 300 concurrent participants",
             "Custom domain",
             "Advanced analytics",
-            "Up to 5 admins",
-            "5% commission on member revenue"
+            "Up to 5 admins"
           ]
         },
         "PRO": {
@@ -2250,8 +2223,7 @@
             "Live sessions up to 1000 concurrent participants",
             "White-label experience",
             "API access",
-            "Unlimited admins",
-            "3% commission on member revenue"
+            "Unlimited admins"
           ]
         }
       }
@@ -2880,6 +2852,11 @@
         "justNow": "just now",
         "minutesAgo": "{count}m ago",
         "hoursAgo": "{count}h ago"
+      },
+      "status": {
+        "loading": "Loading session…",
+        "endingTitle": "Ending session…",
+        "endingBody": "Marking the session complete and updating your dashboard"
       }
     },
     "videoRoom": {

@@ -162,7 +162,7 @@
       "title": "Construisez des communautés où les gens viennent vraiment",
       "titleStart": "Construisez des communautés où",
       "titleHighlight": "les gens viennent vraiment",
-      "description": "Animez des sessions en direct et transformez-les en enregistrements, résumés et contenu de bibliothèque. Construisez un engagement qui se compose.",
+      "description": "Animez des sessions en direct et transformez-les en récaps, en discussions et en contenu de bibliothèque. Créez un engagement qui s'accumule.",
       "cta": {
         "primary": "Animez votre première session",
         "secondary": "Voir la Démo",
@@ -233,31 +233,6 @@
         "description": "Engagez votre communauté, suivez les analytiques et commencez à générer des revenus.",
         "time": "Semaine 2+"
       }
-    },
-    "trust": {
-      "title": "Fait Confiance par les Leaders de l'Industrie",
-      "subtitle": "Sûr, fiable et conçu pour évoluer",
-      "soc2": "Certifié SOC 2",
-      "gdpr": "Conforme GDPR",
-      "uptime": "99.99% Uptime",
-      "support": "Support 24/7"
-    },
-    "faq": {
-      "badge": "FAQ",
-      "title": "Questions Courantes",
-      "subtitle": "Tout ce que vous devez savoir sur Unytea",
-      "q1": "Puis-je migrer depuis Skool ou d'autres plateformes ?",
-      "a1": "Absolument ! Nous proposons une assistance de migration gratuite depuis Skool, Circle, Facebook Groups et d'autres plateformes. Notre équipe vous aidera à transférer vos membres, contenu et données sans problème.",
-      "q2": "Ai-je besoin de compétences techniques pour utiliser Unytea ?",
-      "a2": "Pas du tout ! Unytea est conçu pour être facile à utiliser pour tout le monde. Notre constructeur drag-and-drop et interface intuitive vous permettent de configurer votre communauté en minutes, sans coder.",
-      "q3": "Comment fonctionne l'essai gratuit de 14 jours ?",
-      "a3": "Vous obtenez un accès complet à toutes les fonctions Professionnelles pendant 14 jours. Aucune carte de crédit requise pour commencer. À la fin de votre essai, choisissez le plan qui correspond à vos besoins ou continuez avec notre plan gratuit.",
-      "q4": "Puis-je monétiser ma communauté ?",
-      "a4": "Oui ! Unytea dispose de fonctions de monétisation intégrées incluant des adhésions payantes, vente de cours et facturation d'abonnements. Nous nous intégrons avec Stripe pour le traitement sécurisé des paiements avec seulement 5% de commission de plateforme.",
-      "q5": "Quelles options de support sont disponibles ?",
-      "a5": "Les plans gratuits incluent le support de la communauté. Les plans Professionnels obtiennent un support prioritaire par email avec un temps de réponse de 24 heures. Les plans Premium obtiennent un support dédié avec un temps de réponse de 4 heures et un responsable de succès dédié.",
-      "q6": "Mes données sont-elles sécurisées ?",
-      "a6": "La sécurité est notre priorité absolue. Nous sommes conformes SOC 2, prêts pour GDPR, et utilisons un chiffrement de niveau entreprise. Vos données sont stockées en toute sécurité et jamais partagées avec des tiers."
     },
     "blogSection": {
       "eyebrow": "Depuis le blog",
@@ -344,7 +319,7 @@
       },
       "recording": {
         "title": "Enregistrement",
-        "description": "Capturé tout seul, prêt à partager"
+        "description": "Bientôt : l'enregistrement n'est pas encore disponible"
       },
       "summary": {
         "title": "Résumé par IA",
@@ -369,7 +344,7 @@
       "subtitle": "Une seule plateforme. Tous vos outils. Aucune intégration à maintenir.",
       "live": {
         "title": "🎥 Sessions en direct",
-        "description": "Visio interactive avec tableau blanc, partage d'écran et enregistrement. La fonctionnalité préférée."
+        "description": "Visio interactive avec tableau blanc et partage d'écran. La fonctionnalité préférée."
       },
       "courses": {
         "title": "Cours",
@@ -403,8 +378,8 @@
       },
       "recap": {
         "eyebrow": "Récap IA",
-        "title": "De la session au contenu réutilisable, tout seul",
-        "description": "L'enregistrement devient résumé, temps forts, fiches de bibliothèque et sujets de discussion. Une session alimente une semaine de contenu."
+        "title": "De la session à un récap prêt à relire",
+        "description": "Chaque session devient un récap — idées clés, chapitres et une question pour lancer la discussion — à partir des notes prises pendant la session. Vous le relisez et le modifiez avant qu'il n'arrive à votre communauté."
       }
     },
     "useCases": {
@@ -457,8 +432,8 @@
         "quizzes": "Quiz et évaluations",
         "platformFee": "Commission de la plateforme"
       },
-      "unyteaFee": "5 % fixe",
-      "footnote": "* La commission Skool dépend du plan : 10 % sur Hobby (9 $/mois) et 2,9 % sur Pro (99 $/mois). Les frais Stripe s'ajoutent dans les deux cas.",
+      "unyteaFee": "À partir de {min} %",
+      "footnote": "* La commission Skool dépend du plan : 10 % sur Hobby (9 $/mois) et 2,9 % sur Pro (99 $/mois). Celle d'Unytea baisse à mesure que vous grandissez : {max} % sur Creator, 2 % sur Business et {min} % sur Pro. Les frais Stripe s'ajoutent dans les deux cas.",
       "switchers": "Adopté par des créateurs venus de Skool, Circle, Mighty Networks et des groupes Facebook"
     },
     "monetization": {
@@ -478,8 +453,8 @@
         "description": "Organisez des sessions et des événements payants en direct"
       },
       "fee": {
-        "title": "Commission unique",
-        "description": "5 % sur tous les plans, plus les frais Stripe"
+        "title": "Une commission qui baisse à mesure que vous grandissez",
+        "description": "{max} % sur Creator, 2 % sur Business et {min} % sur Pro, plus les frais Stripe"
       },
       "example": {
         "badge": "Exemple",
@@ -523,7 +498,7 @@
       "subtitle": "Sessions en direct, cours, communauté et contenu. Fini de jongler entre cinq outils.",
       "host": {
         "title": "Animez vos sessions en direct",
-        "description": "Programmez, animez et enregistrez vos sessions, et suivez la présence depuis un seul tableau de bord."
+        "description": "Programmez, animez et suivez vos sessions en direct, et gardez un œil sur la présence depuis un seul tableau de bord."
       },
       "customize": {
         "title": "Personnalisez votre espace",
@@ -1303,7 +1278,7 @@
           "subtitle": "Configurez les adhésions payantes et connectez votre compte Stripe",
           "connect": {
             "cardTitle": "Stripe Connect",
-            "cardDescription": "Connectez votre compte Stripe pour recevoir des paiements des membres de la communauté. Vous conservez 95% de tous les revenus, les frais de plateforme sont de 5%.",
+            "cardDescription": "Connectez votre compte Stripe pour recevoir les paiements de vos membres. La commission d'Unytea dépend de votre plan et s'affiche sur la page de facturation.",
             "notConnected": {
               "alertTitle": "Compte Stripe non connecté",
               "alertBody": "Vous devez connecter un compte Stripe avant de pouvoir facturer les adhésions.",
@@ -2238,8 +2213,7 @@
             "Sessions live jusqu'à 100 participants simultanés",
             "Cours payants",
             "Fil et bibliothèque de communauté",
-            "Analyses de base",
-            "8% de commission sur les revenus des membres"
+            "Analyses de base"
           ]
         },
         "BUSINESS": {
@@ -2249,8 +2223,7 @@
             "Sessions live jusqu'à 300 participants simultanés",
             "Domaine personnalisé",
             "Analyses avancées",
-            "Jusqu'à 5 admins",
-            "5% de commission sur les revenus des membres"
+            "Jusqu'à 5 admins"
           ]
         },
         "PRO": {
@@ -2260,8 +2233,7 @@
             "Sessions live jusqu'à 1000 participants simultanés",
             "Expérience white-label",
             "Accès API",
-            "Admins illimités",
-            "3% de commission sur les revenus des membres"
+            "Admins illimités"
           ]
         }
       }
@@ -2890,6 +2862,11 @@
         "justNow": "à l'instant",
         "minutesAgo": "il y a {count} min",
         "hoursAgo": "il y a {count} h"
+      },
+      "status": {
+        "loading": "Chargement de la session…",
+        "endingTitle": "Clôture de la session…",
+        "endingBody": "La session est marquée comme terminée et votre tableau de bord se met à jour"
       }
     },
     "videoRoom": {

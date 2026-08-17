@@ -33,6 +33,7 @@ import { FeatureCard } from "./_home/FeatureCard";
 import { UseCaseCard } from "./_home/UseCaseCard";
 import { ProblemImage } from "./_home/ProblemImage";
 import { PricingSection } from "@/components/marketing/PricingSection";
+import { PAID_PLANS, PLATFORM_FEE_PERCENT } from "@/lib/plans";
 
 const META = {
   en: {
@@ -87,6 +88,13 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
   setRequestLocale(locale);
 
   const t = await getTranslations("landing");
+  // The platform fee is tiered, not flat. Both numbers come from
+  // PLATFORM_FEE_PERCENT so the page cannot drift from what Stripe charges —
+  // the copy used to claim "5% flat", which was wrong for Business and Pro and
+  // buried the 0% that Pro actually gets.
+  const paidPlanFees = PAID_PLANS.map((plan) => PLATFORM_FEE_PERCENT[plan]);
+  const minFee = Math.min(...paidPlanFees);
+  const maxFee = Math.max(...paidPlanFees);
   const tBilling = await getTranslations("billing.pricing");
 
   return (
@@ -629,12 +637,12 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
             <ComparisonRow
               feature={t("comparison.rows.platformFee")}
               skool="2.9–10%*"
-              unytea={t("comparison.unyteaFee")}
+              unytea={t("comparison.unyteaFee", { min: minFee })}
               highlighted
             />
           </div>
           <p className="mt-6 text-center text-sm text-muted-foreground">
-            {t("comparison.footnote")}
+            {t("comparison.footnote", { min: minFee, max: maxFee })}
           </p>
           <p className="mt-2 text-center text-sm text-muted-foreground">
             {t("comparison.switchers")}
@@ -669,7 +677,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
                 <MonetizationItem
                   icon={CreditCard}
                   title={t("monetization.fee.title")}
-                  description={t("monetization.fee.description")}
+                  description={t("monetization.fee.description", { min: minFee, max: maxFee })}
                 />
               </div>
             </div>
