@@ -242,29 +242,6 @@
       "uptime": "99.99% Uptime",
       "support": "24/7 Support"
     },
-    "pricing": {
-      "badge": "Pricing",
-      "title": "Simple, Transparent",
-      "subtitle": "Pricing",
-      "description": "Start free, upgrade when you're ready. No hidden fees, no surprises.",
-      "free": {
-        "name": "Free",
-        "description": "Perfect for getting started",
-        "cta": "Get Started"
-      },
-      "professional": {
-        "name": "Professional",
-        "badge": "Most Popular",
-        "description": "For growing creators",
-        "cta": "Start Free Trial"
-      },
-      "premium": {
-        "name": "Premium",
-        "description": "For power users",
-        "cta": "Contact Sales"
-      },
-      "guarantee": "All plans include a 14-day free trial. No credit card required."
-    },
     "faq": {
       "badge": "FAQ",
       "title": "Common Questions",
@@ -1829,7 +1806,9 @@
         "proTipBody": "Recordings are automatically saved after each live session. Use them to:",
         "proTip1": "Add to your courses as premium content",
         "proTip2": "Share with members who missed the live session",
-        "proTip3": "Repurpose as short clips for social media"
+        "proTip3": "Repurpose as short clips for social media",
+        "comingSoonTitle": "Session recordings are coming soon",
+        "comingSoonBody": "Recording isn't available yet, so there's nothing to show here. Your past sessions are safe — recordings will appear once we turn the feature on."
       },
       "resources": {
         "loading": "Loading your knowledge library...",
@@ -2291,7 +2270,9 @@
       "trialNoCC": "No card required",
       "featuredLabel": "Most popular",
       "freeForMembersTitle": "Built for hosts, free for members.",
-      "freeForMembersBody": "Anyone can create an account, explore communities, and join for free. Hosts pay Unytea a flat monthly fee plus a small commission (3-8%) on member subscriptions they collect. No hidden fees."
+      "freeForMembersBody": "Anyone can create an account, explore communities, and join for free. Hosts pay Unytea a flat monthly fee plus a small commission (3-8%) on member subscriptions they collect. No hidden fees.",
+      "commissionZero": "0% platform fee — keep 100% of your revenue",
+      "intervalUnavailable": "Annual billing isn't available for this plan yet"
     },
     "tiers": {
       "creator": {
@@ -2299,7 +2280,6 @@
         "description": "For emerging creators launching their first community",
         "features": [
           "Unlimited members",
-          "Live sessions up to 100 concurrent participants",
           "Paid courses",
           "Community feed + library",
           "Basic analytics"
@@ -2310,7 +2290,6 @@
         "description": "For established hosts growing their community",
         "features": [
           "Everything in Creator",
-          "Live sessions up to 300 concurrent participants",
           "Custom domain",
           "Advanced analytics",
           "Up to 5 admins"
@@ -2321,7 +2300,6 @@
         "description": "For teams scaling multiple communities",
         "features": [
           "Everything in Business",
-          "Live sessions up to 1000 concurrent participants",
           "White-label experience",
           "API access",
           "Unlimited admins"
@@ -2520,7 +2498,9 @@
       },
       "replayGate": {
         "title": "Members-only replay",
-        "body": "This recording is available to community members. Join to watch the full replay and attend the next live session."
+        "body": "This recording is available to community members. Join to watch the full replay and attend the next live session.",
+        "comingSoonTitle": "Replays are coming soon",
+        "comingSoonBody": "Session recording isn't available yet, so there's no replay for this one."
       },
       "tabs": {
         "about": "About",
@@ -2609,7 +2589,9 @@
         "endSession": "End Session",
         "poll": "Poll",
         "muteAll": "Mute All",
-        "leave": "Leave"
+        "leave": "Leave",
+        "recordingComingSoon": "Recording (coming soon)",
+        "recordingComingSoonHint": "Session recording isn't available yet."
       },
       "raiseHand": {
         "raise": "Raise Hand",
@@ -2748,7 +2730,9 @@
         "processingDesc": "It will be ready in a few minutes",
         "defaultTitle": "Recording status",
         "defaultDesc": "Processing your session recording",
-        "watch": "Watch"
+        "watch": "Watch",
+        "comingSoonTitle": "Recording coming soon",
+        "comingSoonDesc": "This session wasn't recorded. Recording isn't available yet."
       },
       "nextSteps": {
         "title": "Turn this session into content",
@@ -2870,11 +2854,7 @@
     "unpinQuestion": "Unpin question",
     "clearInvite": "Dismiss invitation",
     "closeChecklist": "Hide the getting-started checklist",
-    "feedbackDialog": "Session feedback",
     "pollDialog": "Live poll",
-    "pollCreatorDialog": "Create a poll",
-    "toggleChat": "Toggle chat",
-    "openPollCreator": "Create a poll",
-    "rateStars": "Rate {count} out of 5"
+    "pollCreatorDialog": "Create a poll"
   }
 }

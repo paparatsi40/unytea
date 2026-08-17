@@ -104,15 +104,16 @@ export function RecordingsTabView({
           <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
             <Video className="h-8 w-8 text-muted-foreground" />
           </div>
-          <h3 className="mb-2 text-lg font-semibold text-foreground">{t("noRecordingsTitle")}</h3>
-          <p className="mb-6 text-sm text-muted-foreground">{t("noRecordingsBody")}</p>
-          <Link
-            href="/dashboard/sessions"
-            className="inline-flex items-center gap-2 rounded-full bg-purple-600 px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-purple-700"
-          >
-            <Plus className="h-4 w-4" />
-            {t("createFirstSession")}
-          </Link>
+          {/* Coming-soon, not "you have none yet". Nothing produces a
+              recording by any path: the in-room control is disabled, the
+              Egress API is never called (lib/jobs/livekit-webhook.ts still
+              carries `TODO: Implement actual Egress API call`), and LiveKit
+              Cloud has no auto-egress configured. Telling a host to "create
+              your first session" to fill this library promises something no
+              session can deliver. The grid below is untouched, so real
+              recordings render the moment egress exists. */}
+          <h3 className="mb-2 text-lg font-semibold text-foreground">{t("comingSoonTitle")}</h3>
+          <p className="text-sm text-muted-foreground">{t("comingSoonBody")}</p>
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

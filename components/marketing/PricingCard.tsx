@@ -17,9 +17,11 @@ export interface PricingCardProps {
   monthlyPrice: number; // dollars (not cents)
   annualPrice: number; // dollars
   interval: Interval;
-  commissionPercent: number; // 8 / 5 / 3
+  /** Whole-number percent, from PLATFORM_FEE_PERCENT — never a literal. */
+  commissionPercent: number;
   stripePriceIdMonthly: string;
-  stripePriceIdYearly: string;
+  /** Empty when annual is not configured for this plan. */
+  stripePriceIdAnnual: string;
   featured?: boolean;
   locale: string;
 }
@@ -31,7 +33,7 @@ export function PricingCard({
   interval,
   commissionPercent,
   stripePriceIdMonthly,
-  stripePriceIdYearly,
+  stripePriceIdAnnual,
   featured = false,
   locale,
 }: PricingCardProps) {
@@ -40,7 +42,11 @@ export function PricingCard({
   const t = useTranslations("billing.pricing");
   const tTier = useTranslations(`billing.tiers.${tierKey}`);
 
-  const priceId = interval === "monthly" ? stripePriceIdMonthly : stripePriceIdYearly;
+  const priceId = interval === "monthly" ? stripePriceIdMonthly : stripePriceIdAnnual;
+  // A price with no Stripe id behind it cannot be bought. Rather than let the
+  // visitor pick it and hit "Stripe price ID not configured" after the click,
+  // the card says so up front and the button is disabled.
+  const unavailable = priceId === "";
   const displayPrice = interval === "monthly" ? monthlyPrice : annualPrice;
   const displayUnit = interval === "monthly" ? t("perMonth") : t("perYear");
   const monthlyEquivalent = monthlyPrice * 12;
@@ -53,10 +59,9 @@ export function PricingCard({
   const features = tTier.raw("features") as string[];
 
   async function handleCheckout() {
-    if (!priceId) {
-      toast.error("Stripe price ID not configured");
-      return;
-    }
+    // Defence in depth: the button is disabled when this is true, so reaching
+    // here means something rendered it enabled anyway.
+    if (!priceId) return;
     setIsLoading(true);
     try {
       const response = await fetch("/api/stripe/checkout", {
@@ -127,11 +132,17 @@ export function PricingCard({
         ))}
       </ul>
 
+      {unavailable && (
+        <p className="mb-3 text-center text-xs text-muted-foreground" role="status">
+          {t("intervalUnavailable")}
+        </p>
+      )}
+
       <Button
         className="w-full"
         variant={featured ? "default" : "outline"}
         onClick={handleCheckout}
-        disabled={isLoading || !priceId}
+        disabled={isLoading || unavailable}
       >
         {isLoading ? (
           <>
@@ -145,9 +156,18 @@ export function PricingCard({
 
       <p className="mt-3 text-center text-xs text-muted-foreground">{t("trialNoCC")}</p>
 
-      <p className="mt-4 border-t border-border pt-3 text-center text-xs text-muted-foreground">
-        {t("commission", { percent: commissionPercent })}
-      </p>
+      {/* Zero commission is the strongest thing on the Pro card; rendering it
+          as "+ 0% commission on member revenue" buries it in the same grey
+          footnote as a cost. */}
+      {commissionPercent === 0 ? (
+        <p className="mt-4 border-t border-border pt-3 text-center text-xs font-medium text-green-700 dark:text-green-400">
+          {t("commissionZero")}
+        </p>
+      ) : (
+        <p className="mt-4 border-t border-border pt-3 text-center text-xs text-muted-foreground">
+          {t("commission", { percent: commissionPercent })}
+        </p>
+      )}
     </div>
   );
 }

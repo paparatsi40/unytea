@@ -85,7 +85,6 @@ export function PostSessionFlow({
   // Recording status
   const recordingStatus = session.recording?.status || "PROCESSING";
   const isRecordingReady = recordingStatus === "READY";
-  const isRecordingProcessing = recordingStatus === "PROCESSING";
 
   // Stats
   const attendeeCount = session._count?.participations || 0;
@@ -122,19 +121,16 @@ export function PostSessionFlow({
               )}
             </div>
             <div className="flex-1">
+              {/* `recordingStatus` defaults to PROCESSING when there is no
+                  Recording row, so every completed session showed a spinner
+                  and "processing your recording" — forever, since nothing
+                  produces one. A recording that is genuinely READY still says
+                  so; anything short of that now says what is actually true. */}
               <h3 className="font-semibold text-white">
-                {isRecordingReady
-                  ? t("recording.readyTitle")
-                  : isRecordingProcessing
-                    ? t("recording.processingTitle")
-                    : t("recording.defaultTitle")}
+                {isRecordingReady ? t("recording.readyTitle") : t("recording.comingSoonTitle")}
               </h3>
               <p className="text-sm text-zinc-400">
-                {isRecordingReady
-                  ? t("recording.readyDesc")
-                  : isRecordingProcessing
-                    ? t("recording.processingDesc")
-                    : t("recording.defaultDesc")}
+                {isRecordingReady ? t("recording.readyDesc") : t("recording.comingSoonDesc")}
               </p>
             </div>
             {isRecordingReady && session.recording?.url && (
