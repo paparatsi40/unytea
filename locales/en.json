@@ -266,7 +266,7 @@
       "readMore": "Read all posts"
     },
     "footer": {
-      "description": "The modern platform for creators to build, engage, and monetize their communities.",
+      "description": "The live platform for community-based learning.",
       "product": "Product",
       "resources": "Resources",
       "company": "Company",
@@ -287,15 +287,248 @@
         "privacy": "Privacy"
       },
       "legal": {
-        "privacy": "Privacy Policy",
-        "terms": "Terms of Service",
-        "cookies": "Cookie Policy"
+        "privacy": "Privacy",
+        "terms": "Terms",
+        "cookies": "Cookies"
       }
     },
     "demoModal": {
       "title": "Demo Video Coming Soon",
       "description": "We're preparing an amazing demo video for you!",
       "close": "Close"
+    },
+    "bullets": {
+      "live": "Live sessions",
+      "courses": "Courses",
+      "discussions": "Community discussions",
+      "monetization": "Built-in monetization"
+    },
+    "problem": {
+      "titleStart": "Most community platforms are built like ",
+      "titleHighlight": "forums from 2010",
+      "subtitle": "They focus on posts and discussions. But modern communities need more:",
+      "live": {
+        "title": "Live interaction",
+        "description": "Missing real-time video, whiteboard, screen sharing",
+        "imageAlt": "Boring meeting"
+      },
+      "learning": {
+        "title": "Structured learning",
+        "description": "No integrated courses or workshops",
+        "imageAlt": "Disorganized materials"
+      },
+      "monetization": {
+        "title": "Monetization tools",
+        "description": "Complex payment setups, high fees",
+        "imageAlt": "Complex payments"
+      },
+      "conclusion": "<brand>Unytea</brand> was built for modern community businesses."
+    },
+    "whyFail": {
+      "badge": "The problem",
+      "title": "Why most communities fail",
+      "subtitle": "Joining is easy. Showing up isn't.",
+      "pain1": "Members join. Then they disappear.",
+      "pain2": "Content gets consumed once, then forgotten.",
+      "pain3": "Discussions die after the first week.",
+      "pain4": "Attendance drops every session.",
+      "conclusion": "Unytea turns every live session into a growth loop."
+    },
+    "howItWorks": {
+      "badge": "Workflow",
+      "title": "How Unytea works",
+      "subtitle": "Live sessions are just the start. Every session compounds into community growth.",
+      "session": {
+        "title": "Session",
+        "description": "Host live with your community"
+      },
+      "recording": {
+        "title": "Recording",
+        "description": "Auto-captured, ready to share"
+      },
+      "summary": {
+        "title": "AI Summary",
+        "description": "Key moments extracted automatically"
+      },
+      "discussion": {
+        "title": "Discussion",
+        "description": "Threads continue post-session"
+      },
+      "library": {
+        "title": "Library",
+        "description": "Searchable knowledge that grows"
+      },
+      "growth": {
+        "title": "Growth",
+        "description": "Engagement compounds into retention"
+      }
+    },
+    "featureGrid": {
+      "badge": "Features",
+      "title": "Everything you need to run a community business",
+      "subtitle": "One platform. All your tools. Zero integration headaches.",
+      "live": {
+        "title": "🎥 Live Sessions",
+        "description": "Interactive video calls with whiteboard, screen sharing, and recordings. Our most loved feature."
+      },
+      "courses": {
+        "title": "Courses",
+        "description": "Create, host, and sell courses with progress tracking and certificates."
+      },
+      "feed": {
+        "title": "Community Feed",
+        "description": "Engage your members with posts, comments, reactions, and direct messaging."
+      },
+      "whiteboard": {
+        "title": "Whiteboard",
+        "description": "Collaborate visually in real-time during live sessions."
+      },
+      "screenShare": {
+        "title": "Screen Sharing",
+        "description": "Present slides, demos, and tutorials seamlessly."
+      },
+      "aiCoach": {
+        "title": "AI Coach",
+        "description": "Get AI-powered suggestions, moderation, and content ideas."
+      }
+    },
+    "aiSection": {
+      "badge": "AI",
+      "title": "AI that actually moves the needle",
+      "subtitle": "Two AI capabilities built around your sessions.",
+      "coach": {
+        "eyebrow": "AI Coach",
+        "title": "Know what to do next. Before engagement drops.",
+        "description": "AI Coach watches your community's pulse. Alerts you when attendance trends down. Suggests the exact action that brings them back — “Post a question 24h before your next session” — automated."
+      },
+      "recap": {
+        "eyebrow": "AI Recap",
+        "title": "Sessions → reusable content automatically",
+        "description": "Live recording becomes summary, highlights, library entries, and discussion prompts. One session powers a week of content."
+      }
+    },
+    "useCases": {
+      "badge": "Use Cases",
+      "title": "Communities built on Unytea",
+      "subtitle": "See how different creators use our platform",
+      "coaching": {
+        "title": "Coaching Communities",
+        "features": [
+          "Weekly group calls",
+          "Paid memberships",
+          "Student discussions",
+          "1-on-1 scheduling"
+        ]
+      },
+      "learning": {
+        "title": "Learning Communities",
+        "features": ["Online courses", "Live workshops", "Community support", "Progress tracking"]
+      },
+      "expert": {
+        "title": "Expert Communities",
+        "features": ["Mastermind groups", "Live Q&A sessions", "Premium content", "Direct access"]
+      }
+    },
+    "comparison": {
+      "badge": "Comparison",
+      "title": "Why creators choose Unytea",
+      "subtitle": "See how we compare to other platforms",
+      "headerFeature": "Feature",
+      "rows": {
+        "feed": "Community Feed",
+        "courses": "Courses",
+        "liveVideo": "Live Video Sessions",
+        "whiteboard": "Collaborative Whiteboard",
+        "screenShare": "Screen Sharing",
+        "aiCoach": "AI Coach",
+        "certificates": "Certificates",
+        "multiLanguage": "Multi-language (i18n)",
+        "customDomain": "Custom Domain",
+        "quizzes": "Quizzes & Assessments",
+        "platformFee": "Platform Fee"
+      },
+      "unyteaFee": "5% flat",
+      "footnote": "* Skool fee depends on plan: 10% on Hobby ($9/mo), 2.9% on Pro ($99/mo). Stripe processing extra in both.",
+      "switchers": "Used by creators switching from Skool, Circle, Mighty Networks, and Facebook Groups"
+    },
+    "monetization": {
+      "badge": "Monetization",
+      "title": "Turn your community into a business with live sessions",
+      "description": "Members can pay for access to your content, courses, and live sessions. All powered by Stripe.",
+      "memberships": {
+        "title": "Paid Memberships",
+        "description": "Charge monthly or annual access fees"
+      },
+      "courses": {
+        "title": "Courses",
+        "description": "Sell one-time or drip courses"
+      },
+      "workshops": {
+        "title": "Workshops",
+        "description": "Host paid live sessions and events"
+      },
+      "fee": {
+        "title": "Flat Platform Fee",
+        "description": "One simple 5% on all plans, plus Stripe processing"
+      },
+      "example": {
+        "badge": "Example",
+        "revenueLabel": "Monthly Revenue",
+        "periodBadge": "This Month",
+        "delta": "+23% from last month",
+        "memberships": "Memberships",
+        "courses": "Courses",
+        "workshops": "Workshops",
+        "disclaimer": "Sample dashboard preview — actual revenue varies by community."
+      }
+    },
+    "pricingFaq": {
+      "q1": "Do members pay to use Unytea?",
+      "a1": "No. Members can create an account, explore communities, and join for free. They only pay if a host charges for community access or sells a course.",
+      "q2": "When do transaction fees apply?",
+      "a2": "Transaction fees apply only when you sell paid community access or courses through Unytea.",
+      "q3": "Is there a free trial?",
+      "a3": "Yes. Every plan starts with a 14-day free trial — no credit card required. At day 14, if you haven't added payment, your community is paywalled (your data stays safe, members just can't interact) until you add a card. You can come back any time.",
+      "q4": "Can I change plans later?",
+      "a4": "Yes. You can upgrade as your community grows and unlock lower transaction fees, more tools, and more operational control.",
+      "q5": "Who is Pro for?",
+      "a5": "Pro is for operators managing multiple communities, brands, or teams that need white-labeling, API access, and zero transaction fees."
+    },
+    "replaceStack": {
+      "badge": "Consolidate Your Stack",
+      "title": "Replace your entire community stack",
+      "subtitle": "Run your entire community business with one platform",
+      "zoom": "→ Live sessions",
+      "kajabi": "→ Courses",
+      "facebook": "→ Community",
+      "slack": "→ Chat",
+      "skool": "→ Memberships",
+      "tagline": "One platform. Everything you need.",
+      "closing": "No integrations. No complexity. Just one platform.",
+      "savings": "Save $300+/month • Cancel 5 subscriptions • Everything connected"
+    },
+    "allInOne": {
+      "badge": "All in one",
+      "title": "Run everything from one place",
+      "subtitle": "Live sessions, courses, community, and content. No more juggling 5 tools.",
+      "host": {
+        "title": "Host live sessions",
+        "description": "Schedule, run, and record live sessions — track attendance from one hub."
+      },
+      "customize": {
+        "title": "Customize your space",
+        "description": "Shape your public page with Appearance and Section Presets — no code required."
+      },
+      "monetize": {
+        "title": "Monetize and grow",
+        "description": "Sell access and courses with Stripe, and use analytics to improve retention."
+      }
+    },
+    "finalCta": {
+      "title": "Start building your community today",
+      "description": "Create your community, invite members, and host your first live session — all in less than 5 minutes.",
+      "cta": "Go Live With Your Community",
+      "guarantee": "✓ 14-day free trial • ✓ No credit card required • ✓ Cancel anytime"
     }
   },
   "dashboard": {

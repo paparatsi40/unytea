@@ -266,15 +266,15 @@
       "readMore": "Voir tous les articles"
     },
     "footer": {
-      "description": "La plateforme moderne pour que les créateurs construisent, engagent et monétisent leurs communautés.",
+      "description": "La plateforme en direct pour apprendre en communauté.",
       "product": "Produit",
       "resources": "Ressources",
       "company": "Entreprise",
       "legalLabel": "Légal",
       "legal": {
-        "privacy": "Politique de Confidentialité",
-        "terms": "Conditions d'Utilisation",
-        "cookies": "Politique des Cookies"
+        "privacy": "Confidentialité",
+        "terms": "Conditions",
+        "cookies": "Cookies"
       },
       "rights": "Tous droits réservés.",
       "links": {
@@ -296,6 +296,249 @@
       "title": "Vidéo Démo Bientôt Disponible",
       "description": "Nous préparons une vidéo démo incroyable pour vous !",
       "close": "Fermer"
+    },
+    "bullets": {
+      "live": "Sessions en direct",
+      "courses": "Cours",
+      "discussions": "Échanges avec votre communauté",
+      "monetization": "Monétisation intégrée"
+    },
+    "problem": {
+      "titleStart": "La plupart des plateformes communautaires ressemblent encore à des ",
+      "titleHighlight": "forums de 2010",
+      "subtitle": "Elles s'arrêtent aux publications et aux commentaires. Une communauté d'aujourd'hui demande bien plus :",
+      "live": {
+        "title": "Interaction en direct",
+        "description": "Ni vidéo en temps réel, ni tableau blanc, ni partage d'écran",
+        "imageAlt": "Réunion ennuyeuse"
+      },
+      "learning": {
+        "title": "Apprentissage structuré",
+        "description": "Aucun cours ni atelier intégré",
+        "imageAlt": "Ressources désorganisées"
+      },
+      "monetization": {
+        "title": "Outils de monétisation",
+        "description": "Des paiements compliqués et des commissions élevées",
+        "imageAlt": "Paiements complexes"
+      },
+      "conclusion": "<brand>Unytea</brand> est conçu pour les activités communautaires d'aujourd'hui."
+    },
+    "whyFail": {
+      "badge": "Le problème",
+      "title": "Pourquoi la plupart des communautés s'éteignent",
+      "subtitle": "S'inscrire est facile. Revenir, beaucoup moins.",
+      "pain1": "Les membres s'inscrivent. Puis ils disparaissent.",
+      "pain2": "Le contenu est consommé une fois, puis oublié.",
+      "pain3": "Les discussions s'arrêtent après la première semaine.",
+      "pain4": "Chaque session réunit moins de monde que la précédente.",
+      "conclusion": "Unytea transforme chaque session en direct en moteur de croissance."
+    },
+    "howItWorks": {
+      "badge": "Fonctionnement",
+      "title": "Comment fonctionne Unytea",
+      "subtitle": "La session en direct n'est qu'un début. Chacune alimente la croissance de votre communauté.",
+      "session": {
+        "title": "Session",
+        "description": "Animez en direct avec votre communauté"
+      },
+      "recording": {
+        "title": "Enregistrement",
+        "description": "Capturé tout seul, prêt à partager"
+      },
+      "summary": {
+        "title": "Résumé par IA",
+        "description": "Les moments clés extraits automatiquement"
+      },
+      "discussion": {
+        "title": "Discussion",
+        "description": "Les échanges continuent après la session"
+      },
+      "library": {
+        "title": "Bibliothèque",
+        "description": "Un savoir consultable qui s'enrichit"
+      },
+      "growth": {
+        "title": "Croissance",
+        "description": "L'engagement se transforme en fidélité"
+      }
+    },
+    "featureGrid": {
+      "badge": "Fonctionnalités",
+      "title": "Tout pour faire vivre votre communauté",
+      "subtitle": "Une seule plateforme. Tous vos outils. Aucune intégration à maintenir.",
+      "live": {
+        "title": "🎥 Sessions en direct",
+        "description": "Visio interactive avec tableau blanc, partage d'écran et enregistrement. La fonctionnalité préférée."
+      },
+      "courses": {
+        "title": "Cours",
+        "description": "Créez, hébergez et vendez des cours avec suivi de progression et certificats."
+      },
+      "feed": {
+        "title": "Fil de la communauté",
+        "description": "Faites vivre votre communauté : publications, commentaires, réactions et messages privés."
+      },
+      "whiteboard": {
+        "title": "Tableau blanc",
+        "description": "Travaillez ensemble sur le même support, en direct."
+      },
+      "screenShare": {
+        "title": "Partage d'écran",
+        "description": "Présentez diapositives, démos et tutoriels sans accroc."
+      },
+      "aiCoach": {
+        "title": "Coach IA",
+        "description": "Suggestions, modération et idées de contenu propulsées par l'IA."
+      }
+    },
+    "aiSection": {
+      "badge": "IA",
+      "title": "Une IA qui change vraiment la donne",
+      "subtitle": "Deux capacités d'IA pensées autour de vos sessions.",
+      "coach": {
+        "eyebrow": "Coach IA",
+        "title": "Savoir quoi faire avant que l'engagement ne retombe.",
+        "description": "Le Coach IA prend le pouls de votre communauté. Il vous alerte dès que la participation faiblit et vous propose l'action précise qui la relance — « publiez une question 24 h avant la prochaine session » — automatiquement."
+      },
+      "recap": {
+        "eyebrow": "Récap IA",
+        "title": "De la session au contenu réutilisable, tout seul",
+        "description": "L'enregistrement devient résumé, temps forts, fiches de bibliothèque et sujets de discussion. Une session alimente une semaine de contenu."
+      }
+    },
+    "useCases": {
+      "badge": "Cas d'usage",
+      "title": "Des communautés qui tournent déjà sur Unytea",
+      "subtitle": "Comment différents créateurs utilisent la plateforme",
+      "coaching": {
+        "title": "Communautés de coaching",
+        "features": [
+          "Sessions de groupe hebdomadaires",
+          "Abonnements payants",
+          "Échanges entre participants",
+          "Rendez-vous individuels"
+        ]
+      },
+      "learning": {
+        "title": "Communautés d'apprentissage",
+        "features": [
+          "Cours en ligne",
+          "Ateliers en direct",
+          "Entraide de la communauté",
+          "Suivi de progression"
+        ]
+      },
+      "expert": {
+        "title": "Communautés d'experts",
+        "features": [
+          "Groupes mastermind",
+          "Sessions de questions en direct",
+          "Contenu premium",
+          "Accès direct"
+        ]
+      }
+    },
+    "comparison": {
+      "badge": "Comparatif",
+      "title": "Pourquoi les créateurs choisissent Unytea",
+      "subtitle": "Comparez-nous aux autres plateformes",
+      "headerFeature": "Fonctionnalité",
+      "rows": {
+        "feed": "Fil de la communauté",
+        "courses": "Cours",
+        "liveVideo": "Sessions vidéo en direct",
+        "whiteboard": "Tableau blanc collaboratif",
+        "screenShare": "Partage d'écran",
+        "aiCoach": "Coach IA",
+        "certificates": "Certificats",
+        "multiLanguage": "Multilingue (i18n)",
+        "customDomain": "Domaine personnalisé",
+        "quizzes": "Quiz et évaluations",
+        "platformFee": "Commission de la plateforme"
+      },
+      "unyteaFee": "5 % fixe",
+      "footnote": "* La commission Skool dépend du plan : 10 % sur Hobby (9 $/mois) et 2,9 % sur Pro (99 $/mois). Les frais Stripe s'ajoutent dans les deux cas.",
+      "switchers": "Adopté par des créateurs venus de Skool, Circle, Mighty Networks et des groupes Facebook"
+    },
+    "monetization": {
+      "badge": "Monétisation",
+      "title": "Faites de votre communauté une activité, grâce au direct",
+      "description": "Vos membres peuvent payer pour accéder à vos contenus, vos cours et vos sessions en direct. Le tout via Stripe.",
+      "memberships": {
+        "title": "Abonnements payants",
+        "description": "Facturez l'accès au mois ou à l'année"
+      },
+      "courses": {
+        "title": "Cours",
+        "description": "Vendez des cours à l'unité ou en plusieurs volets"
+      },
+      "workshops": {
+        "title": "Ateliers",
+        "description": "Organisez des sessions et des événements payants en direct"
+      },
+      "fee": {
+        "title": "Commission unique",
+        "description": "5 % sur tous les plans, plus les frais Stripe"
+      },
+      "example": {
+        "badge": "Exemple",
+        "revenueLabel": "Revenus du mois",
+        "periodBadge": "Ce mois-ci",
+        "delta": "+23 % par rapport au mois dernier",
+        "memberships": "Abonnements",
+        "courses": "Cours",
+        "workshops": "Ateliers",
+        "disclaimer": "Aperçu d'exemple du tableau de bord : les revenus réels varient selon la communauté."
+      }
+    },
+    "pricingFaq": {
+      "q1": "Les membres paient-ils pour utiliser Unytea ?",
+      "a1": "Non. Chacun peut créer un compte, explorer les communautés et les rejoindre gratuitement. On ne paie que si l'hôte fait payer l'accès ou vend un cours.",
+      "q2": "Quand les commissions s'appliquent-elles ?",
+      "a2": "Uniquement lorsque vous vendez un accès payant à votre communauté ou des cours via Unytea.",
+      "q3": "Y a-t-il un essai gratuit ?",
+      "a3": "Oui. Chaque plan démarre par 14 jours gratuits, sans carte bancaire. Au 14e jour, si vous n'avez pas ajouté de moyen de paiement, votre communauté est mise en pause (vos données restent intactes, les membres ne peuvent simplement plus interagir) jusqu'à ce que vous ajoutiez une carte. Vous pouvez revenir quand vous voulez.",
+      "q4": "Puis-je changer de plan plus tard ?",
+      "a4": "Oui. Vous pouvez monter en gamme à mesure que votre communauté grandit et débloquer des commissions plus basses, plus d'outils et plus de contrôle.",
+      "q5": "À qui s'adresse le plan Pro ?",
+      "a5": "À celles et ceux qui gèrent plusieurs communautés, marques ou équipes et qui ont besoin de marque blanche, d'un accès API et de zéro commission par transaction."
+    },
+    "replaceStack": {
+      "badge": "Regroupez vos outils",
+      "title": "Remplacez toute votre pile d'outils",
+      "subtitle": "Pilotez toute votre activité communautaire depuis une seule plateforme",
+      "zoom": "→ Sessions en direct",
+      "kajabi": "→ Cours",
+      "facebook": "→ Communauté",
+      "slack": "→ Chat",
+      "skool": "→ Abonnements",
+      "tagline": "Une plateforme. Tout ce qu'il vous faut.",
+      "closing": "Aucune intégration. Aucune complexité. Une seule plateforme.",
+      "savings": "Économisez plus de 300 $/mois • Résiliez 5 abonnements • Tout est connecté"
+    },
+    "allInOne": {
+      "badge": "Tout-en-un",
+      "title": "Pilotez tout depuis un seul endroit",
+      "subtitle": "Sessions en direct, cours, communauté et contenu. Fini de jongler entre cinq outils.",
+      "host": {
+        "title": "Animez vos sessions en direct",
+        "description": "Programmez, animez et enregistrez vos sessions, et suivez la présence depuis un seul tableau de bord."
+      },
+      "customize": {
+        "title": "Personnalisez votre espace",
+        "description": "Composez votre page publique avec Apparence et Préréglages de section, sans écrire une ligne de code."
+      },
+      "monetize": {
+        "title": "Monétisez et développez",
+        "description": "Vendez des accès et des cours via Stripe, et appuyez-vous sur les analyses pour fidéliser."
+      }
+    },
+    "finalCta": {
+      "title": "Lancez votre communauté dès aujourd'hui",
+      "description": "Créez votre communauté, invitez vos membres et animez votre première session en direct. Le tout en moins de 5 minutes.",
+      "cta": "Passez en direct avec votre communauté",
+      "guarantee": "✓ 14 jours d'essai • ✓ Sans carte bancaire • ✓ Résiliable à tout moment"
     }
   },
   "dashboard": {
