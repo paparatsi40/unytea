@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
-import { PLAN_PRICING } from "@/lib/plans";
+import { PLAN_PRICING, PLATFORM_FEE_PERCENT } from "@/lib/plans";
 
 // Plan order for comparison (lower = entry tier; higher = more capability).
 // START is kept as the implicit "no active subscription" sentinel state used
@@ -52,6 +52,7 @@ type Subscription = {
 
 export default function BillingPage() {
   const t = useTranslations("dashboard.billing");
+  const tPricing = useTranslations("billing.pricing");
   const locale = useLocale();
   // "START" is the sentinel for the 'no active subscription' state.
   // Display logic in CardTitle/CardDescription branches on this value.
@@ -255,6 +256,18 @@ export default function BillingPage() {
                       <span className="text-sm">{feature}</span>
                     </li>
                   ))}
+                  {/* The commission was the sixth entry of each localized
+                      feature list, and it was wrong: 8/5/3 against the 5/2/0
+                      Stripe applies via `application_fee_percent`. A Pro host
+                      read 3% and was charged 0%. PricingSection was fixed the
+                      same way — the number is read from PLATFORM_FEE_PERCENT,
+                      never restated. */}
+                  <li className="flex items-start gap-2">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                    <span className="text-sm">
+                      {tPricing("commission", { percent: PLATFORM_FEE_PERCENT[plan.key] })}
+                    </span>
+                  </li>
                 </ul>
               </CardContent>
 

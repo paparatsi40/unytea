@@ -7,6 +7,7 @@ import { VideoRoom } from "@/components/sessions/VideoRoom";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import {
   getRecordingStatus,
   startCompositeRecording,
@@ -17,6 +18,7 @@ export default function SessionRoomPage(props: { params: Promise<{ sessionId: st
   const params = use(props.params);
   const router = useRouter();
   const { user, isLoading: isAuthLoading } = useCurrentUser();
+  const t = useTranslations("liveSession.room");
   const [videoSession, setVideoSession] = useState<SessionDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEnding, setIsEnding] = useState(false);
@@ -146,7 +148,7 @@ export default function SessionRoomPage(props: { params: Promise<{ sessionId: st
       <div className="flex min-h-screen items-center justify-center bg-zinc-950">
         <div className="text-center">
           <div className="mb-4 h-8 w-8 animate-spin rounded-full border-2 border-purple-500 border-t-transparent" />
-          <p className="text-zinc-400">Loading session...</p>
+          <p className="text-zinc-400">{t("status.loading")}</p>
         </div>
       </div>
     );
@@ -183,8 +185,13 @@ export default function SessionRoomPage(props: { params: Promise<{ sessionId: st
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
           <div className="text-center">
             <div className="border-3 mb-4 h-12 w-12 animate-spin rounded-full border-purple-500 border-t-transparent" />
-            <p className="text-lg font-medium text-white">Ending session...</p>
-            <p className="text-sm text-zinc-400">Generating recap and processing recording</p>
+            <p className="text-lg font-medium text-white">{t("status.endingTitle")}</p>
+            {/* Says only what `endSessionJob` does: mark the session COMPLETED
+                and revalidate. It used to promise a recap and a recording —
+                neither runs here. The recap is drafted on demand when the host
+                opens the review panel, and nothing produces a recording at
+                all (the Egress call is still a TODO). */}
+            <p className="text-sm text-zinc-400">{t("status.endingBody")}</p>
           </div>
         </div>
       )}
