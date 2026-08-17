@@ -12,7 +12,6 @@ import { revalidatePath } from "next/cache";
 import { autoStartRecording } from "@/lib/jobs/recording";
 import { createNotification } from "@/lib/notifications";
 import { generateAISessionSummary } from "./session-ai";
-import { generateSessionRecap } from "./session-jobs";
 import { PostContentType, Prisma, SessionEventType } from "@prisma/client";
 import { markAutopilotStep } from "./autopilot";
 
@@ -699,9 +698,10 @@ async function triggerPostProcessing(sessionId: string, recordingId: string) {
     body: "Recording is now available. Watch the replay and continue the conversation.",
   });
 
-  // 4) Recap post with AI summary package
-  const recapResult = await generateSessionRecap(sessionId);
-
+  // The recap post used to be created here, a second automatic publish on top
+  // of the one at end-of-session. A recording becoming available is not the
+  // host deciding to share; the draft is theirs to review in the post-session
+  // flow, and only their explicit share creates the post.
   const postProcessingSession = await prisma.mentorSession.findUnique({
     where: { id: sessionId },
     select: { communityId: true },
@@ -709,7 +709,6 @@ async function triggerPostProcessing(sessionId: string, recordingId: string) {
 
   await markAutopilotStep(sessionId, postProcessingSession?.communityId, "packaged", {
     summaryGenerated: summaryResult.success,
-    recapGenerated: recapResult.success,
   });
 
   await markAutopilotStep(sessionId, postProcessingSession?.communityId, "distributed", {
@@ -718,9 +717,10 @@ async function triggerPostProcessing(sessionId: string, recordingId: string) {
 
   await logSessionEvent(sessionId, SessionEventType.POST_PROCESSING_TRIGGERED, {
     recordingId,
-    jobs: ["transcript", "summary", "recording_ready", "recap", "course_suggestion"],
+    // "recap" is no longer one of the jobs run here — the draft waits for the
+    // host instead of being published on the recording's schedule.
+    jobs: ["transcript", "summary", "recording_ready", "course_suggestion"],
     summaryGenerated: summaryResult.success,
-    recapGenerated: recapResult.success,
   });
 }
 

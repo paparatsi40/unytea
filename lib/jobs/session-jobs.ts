@@ -13,7 +13,6 @@
 import { prisma } from "@/lib/prisma";
 import { nanoid } from "nanoid";
 import { revalidatePath } from "next/cache";
-import { PostContentType } from "@prisma/client";
 import { generateUpcomingSessions } from "@/lib/jobs/session-schedule";
 import { runAutopilotDueJobs } from "./autopilot";
 import { sendSessionReminderEmail } from "@/lib/email";
@@ -429,162 +428,6 @@ export async function runSessionJobs() {
   };
 }
 
-/**
- * Generate Session Recap - Auto-create feed post after session ends
- * This converts a live session into a permanent community asset
- *
- * Features:
- * - Creates feed post with session recording
- * - Includes key takeaways from notes
- * - Links to full session recap page
- * - Engages community in follow-up discussion
- */
-export async function generateSessionRecap(sessionId: string) {
-  try {
-    // Fetch complete session data
-    const session = await prisma.mentorSession.findUnique({
-      where: { id: sessionId },
-      include: {
-        mentor: {
-          select: { id: true, name: true, image: true, username: true },
-        },
-        community: {
-          select: { id: true, name: true, slug: true },
-        },
-        notes: true,
-        series: true,
-      },
-    });
-
-    if (!session) {
-      return { success: false, error: "Session not found" };
-    }
-
-    if (!session.communityId) {
-      return { success: false, error: "Session not linked to a community" };
-    }
-
-    // Check if recap already exists
-    if (session.feedPostId) {
-      return { success: false, error: "Recap already generated" };
-    }
-
-    // Build recap content
-    const isAudioOnly = session.mode === "AUDIO";
-    const sessionDate = session.scheduledAt.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-    });
-
-    // Extract AI summary package (if available)
-    const noteSummary = session.notes?.summary?.trim() || "";
-    const parsedInsights = safeParseStringArray(session.notes?.keyInsights || null);
-    const parsedChapters = safeParseChapters(session.notes?.resources || null);
-
-    let keyTakeaways = "";
-    if (parsedInsights.length > 0) {
-      keyTakeaways = parsedInsights
-        .slice(0, 5)
-        .map((item) => `• ${item}`)
-        .join("\n");
-    } else if (session.notes?.content) {
-      const lines = session.notes.content.split("\n").filter((l: string) => l.trim());
-      keyTakeaways = lines
-        .slice(0, 5)
-        .map((l: string) => `• ${l}`)
-        .join("\n");
-    }
-
-    const chaptersBlock = parsedChapters.length
-      ? `**Chapters:**\n${parsedChapters
-          .slice(0, 5)
-          .map((c) => `• ${c.timestamp ? `${c.timestamp} — ` : ""}${c.title}`)
-          .join("\n")}\n\n`
-      : "";
-
-    // Build rich content for the recap post
-    const recapContent = `🎥 **Session Recap**
-
-${session.title}
-${isAudioOnly ? "🎙️ Audio session" : "🎬 Video session"} • ${session.duration} min • ${sessionDate}
-
-${session.description ? `*${session.description}*\n\n` : ""}${noteSummary ? `**Summary:**\n${noteSummary}\n\n` : ""}${keyTakeaways ? `**Key Takeaways:**\n${keyTakeaways}\n\n` : ""}${chaptersBlock}💬 **What was your biggest takeaway?**
-Share your thoughts below or ask follow-up questions.
-
-[Watch Recording →](/dashboard/sessions/${session.id}?src=recap_post)
-[Reuse in Course/Library →](/dashboard/sessions/${session.id}?src=recap_reuse_cta)
-`;
-
-    // Create the feed post
-    const post = await prisma.post.create({
-      data: {
-        id: nanoid(),
-        content: recapContent,
-        authorId: session.mentorId,
-        communityId: session.communityId,
-        contentType: PostContentType.SESSION_ANNOUNCEMENT,
-        attachments: {
-          sessionId: session.id,
-          sessionTitle: session.title,
-          recordingUrl: session.recordingUrl,
-          isAudioOnly,
-          duration: session.duration,
-          attendeeCount: session.attendeeCount,
-        },
-      },
-    });
-
-    // Link post to session
-    await prisma.mentorSession.update({
-      where: { id: sessionId },
-      data: { feedPostId: post.id },
-    });
-
-    // Revalidate feed
-    revalidatePath(`/dashboard/communities/${session.community?.slug}/feed`);
-    revalidatePath("/dashboard/communities");
-
-    console.log(`[generateSessionRecap] Created recap post ${post.id} for session ${sessionId}`);
-
-    return {
-      success: true,
-      postId: post.id,
-      communityId: session.communityId,
-    };
-  } catch (error) {
-    console.error("[generateSessionRecap] Error:", error);
-    return { success: false, error: String(error) };
-  }
-}
-
-// Helper functions
-function safeParseStringArray(value: string | null): string[] {
-  if (!value) return [];
-  try {
-    const parsed = JSON.parse(value);
-    return Array.isArray(parsed) ? parsed.filter((item) => typeof item === "string") : [];
-  } catch {
-    return [];
-  }
-}
-
-function safeParseChapters(value: string | null): { title: string; timestamp?: string }[] {
-  if (!value) return [];
-  try {
-    const parsed = JSON.parse(value);
-    if (!Array.isArray(parsed)) return [];
-
-    return parsed
-      .filter((item) => item?.type === "chapter" && typeof item?.title === "string")
-      .map((item) => ({
-        title: item.title as string,
-        timestamp: typeof item.timestamp === "string" ? item.timestamp : undefined,
-      }));
-  } catch {
-    return [];
-  }
-}
-
 function formatTimeUntil(date: Date): string {
   const now = new Date();
   const diff = date.getTime() - now.getTime();
@@ -598,7 +441,13 @@ function formatTimeUntil(date: Date): string {
 }
 
 /**
- * Session end lifecycle: mark completed, then queue the recap.
+ * Session end lifecycle: mark the session completed. Nothing is published.
+ *
+ * This used to fire `generateSessionRecap` here, which wrote a recap straight
+ * to the community feed before the host had read a word of it. Ending a session
+ * is not consent to publish, so the call is gone rather than deferred: the
+ * recap is drafted on demand by `lib/jobs/session-recap.ts` and reaches the
+ * feed only through the host's explicit share.
  *
  * Was one of three `endSession` implementations (session-jobs, session-core,
  * sessions) with differing auth postures — the classic "hardened one copy"
@@ -612,15 +461,10 @@ export async function endSessionJob(sessionId: string) {
       data: { status: "COMPLETED", endedAt: new Date() },
     });
 
-    // Recap generation is best-effort and must not fail the end-of-session call.
-    generateSessionRecap(sessionId).catch((err) => {
-      console.error("[endSessionJob] Failed to generate recap:", err);
-    });
-
     revalidatePath("/dashboard/sessions");
     revalidatePath(`/dashboard/sessions/${sessionId}`);
 
-    return { success: true as const, session, recapQueued: true };
+    return { success: true as const, session };
   } catch (error) {
     console.error("[endSessionJob] Error:", error);
     return { success: false as const, error: String(error) };

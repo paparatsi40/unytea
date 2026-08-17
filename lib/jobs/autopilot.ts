@@ -9,7 +9,6 @@
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
-import { generateSessionRecap } from "@/lib/jobs/session-jobs";
 
 export type AutopilotJobType =
   | "auto_promote"
@@ -366,8 +365,11 @@ async function executeAutopilotJob(sessionId: string, jobType: AutopilotJobType)
   }
 
   if (jobType === "auto_distribute") {
-    await generateSessionRecap(session.id);
-
+    // No recap is published here. This job used to call `generateSessionRecap`,
+    // which posted the recap to the feed on a timer — the third automatic
+    // publish, and the least visible of them. The nudge below stays: it tells
+    // the host their recap is ready to share, which is now literally true, and
+    // it is the host who decides whether members ever read it.
     await prisma.post.create({
       data: {
         title: `📣 Share highlights: ${session.title}`,

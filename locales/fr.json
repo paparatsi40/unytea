@@ -2740,14 +2740,15 @@
         "notesDesc": "Capturez les points clés, les idées et les ressources",
         "notesAdded": "Notes ajoutées",
         "shareTitle": "Partager le récap",
-        "shareDesc": "Publiez le résumé de la session dans le fil de la communauté",
+        "shareDesc": "Relisez le résumé, puis publiez-le dans le fil de la communauté",
         "shareDone": "Déjà partagé",
         "courseTitle": "Ajouter à un cours",
         "courseDesc": "Ajoutez cet enregistrement à un module de cours",
         "clipsTitle": "Créer des clips",
         "clipsDesc": "Générez de courts clips pour les réseaux sociaux",
         "libraryTitle": "Publier dans la bibliothèque",
-        "libraryDesc": "Transformez ce récap en ressource réutilisable de la bibliothèque"
+        "libraryDesc": "Transformez ce récap en ressource réutilisable de la bibliothèque",
+        "shareNotShared": "Brouillon — non partagé"
       },
       "stats": {
         "title": "Performance de la session",
@@ -2759,6 +2760,18 @@
       "actions": {
         "backToSessions": "Retour aux sessions",
         "reEnterRoom": "Revenir dans la salle"
+      },
+      "recap": {
+        "title": "Relire le récap avant de le partager",
+        "subtitle": "Rien n'est publié dans le fil tant que vous n'appuyez pas sur partager. Modifiez à votre guise.",
+        "statusDraft": "Brouillon — non partagé",
+        "statusEdited": "Modifié — non partagé",
+        "statusShared": "Partagé dans le fil",
+        "editorLabel": "Contenu du récap",
+        "loading": "Préparation du brouillon…",
+        "loadError": "Le brouillon n'a pas pu être chargé. Rien n'a été publié.",
+        "share": "Partager dans le fil",
+        "dismiss": "Ignorer"
       }
     },
     "notesEditor": {

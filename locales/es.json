@@ -2740,14 +2740,15 @@
         "notesDesc": "Captura puntos clave, ideas y recursos",
         "notesAdded": "Notas añadidas",
         "shareTitle": "Compartir resumen",
-        "shareDesc": "Publica el resumen de la sesión en el feed de la comunidad",
+        "shareDesc": "Revisa el resumen y publícalo en el feed de la comunidad",
         "shareDone": "Ya compartido",
         "courseTitle": "Añadir a curso",
         "courseDesc": "Añade esta grabación a un módulo de curso",
         "clipsTitle": "Crear clips",
         "clipsDesc": "Genera clips cortos para redes sociales",
         "libraryTitle": "Publicar en la biblioteca",
-        "libraryDesc": "Convierte este resumen en un recurso reutilizable de la biblioteca"
+        "libraryDesc": "Convierte este resumen en un recurso reutilizable de la biblioteca",
+        "shareNotShared": "Borrador — sin compartir"
       },
       "stats": {
         "title": "Rendimiento de la sesión",
@@ -2759,6 +2760,18 @@
       "actions": {
         "backToSessions": "Volver a sesiones",
         "reEnterRoom": "Volver a entrar a la sala"
+      },
+      "recap": {
+        "title": "Revisa el recap antes de compartirlo",
+        "subtitle": "No se publica nada en el feed hasta que pulses compartir. Edita lo que quieras.",
+        "statusDraft": "Borrador — sin compartir",
+        "statusEdited": "Editado — sin compartir",
+        "statusShared": "Compartido en el feed",
+        "editorLabel": "Contenido del recap",
+        "loading": "Preparando el borrador…",
+        "loadError": "No se pudo cargar el borrador. No se publicó nada.",
+        "share": "Compartir al feed",
+        "dismiss": "Descartar"
       }
     },
     "notesEditor": {
