@@ -12,12 +12,27 @@ export function SessionJsonLd({ session }: Props) {
   const isLive = session.status === "IN_PROGRESS";
   const isUpcoming = session.status === "SCHEDULED";
 
+  /**
+   * The image Google shows for this session, best available first.
+   *
+   * The fallback used to be `${SITE_URL}/og-image.png`, which is not in
+   * `public/` — so every session without a community cover or a host avatar
+   * handed Google a 404 as its structured-data image. `/og` is the route that
+   * renders one, and it is what the Open Graph defaults already use, so the
+   * rich snippet and the social card no longer disagree.
+   *
+   * One constant for both blocks below: `thumbnailUrl` had no fallback at all
+   * and emitted a literal `null` into the VideoObject when neither image
+   * existed, which is invalid structured data rather than an absent field.
+   */
+  const previewImage = session.community?.imageUrl || session.host.image || `${SITE_URL}/og`;
+
   const eventData = {
     "@context": "https://schema.org",
     "@type": "Event",
     name: session.title,
     description: session.description || `Join ${session.host.name} for an interactive session`,
-    image: session.community?.imageUrl || session.host.image || `${SITE_URL}/og-image.png`,
+    image: previewImage,
     startDate: session.scheduledAt.toISOString(),
     endDate: new Date(
       session.scheduledAt.getTime() + (session.duration || 60) * 60000
@@ -62,7 +77,7 @@ export function SessionJsonLd({ session }: Props) {
         "@type": "VideoObject",
         name: `Recording: ${session.title}`,
         description: session.description || session.title,
-        thumbnailUrl: session.community?.imageUrl || session.host.image,
+        thumbnailUrl: previewImage,
         uploadDate: session.scheduledAt.toISOString(),
         duration: session.recording.durationSeconds
           ? `PT${Math.floor(session.recording.durationSeconds / 60)}M${session.recording.durationSeconds % 60}S`
