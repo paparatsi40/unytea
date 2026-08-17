@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { BCRYPT_COST } from "@/lib/auth-hashing";
 import { NextRequest } from "next/server";
 
 /**
@@ -100,8 +101,12 @@ describe("credentials login — authorizeCredentials", () => {
     await authorizeCredentials({ email: "nobody@example.com", password: "any-password" });
 
     expect(bcrypt.compare).toHaveBeenCalledTimes(1);
-    // Compared against the dummy digest, not against undefined.
-    expect(vi.mocked(bcrypt.compare).mock.calls[0][1]).toMatch(/^\$2a\$10\$/);
+    // Compared against the dummy digest, not against undefined — and at the
+    // current cost. Pinning a literal here is what would let the decoy drift
+    // behind real hashes and reopen the timing oracle it exists to close.
+    expect(vi.mocked(bcrypt.compare).mock.calls[0][1]).toMatch(
+      new RegExp(`^\\$2[aby]\\$${BCRYPT_COST}\\$`)
+    );
   });
 
   it("still runs bcrypt.compare for an OAuth-only account with no password", async () => {

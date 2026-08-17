@@ -5,6 +5,7 @@ import { z } from "zod";
 import { rateLimiters, getIP } from "@/lib/rate-limit";
 import { sendWelcomeEmail } from "@/lib/email";
 import { normalizeEmail } from "@/lib/normalize-email";
+import { BCRYPT_COST } from "@/lib/auth-hashing";
 
 const signUpSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -51,7 +52,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, BCRYPT_COST);
 
     // Create user
     await prisma.user.create({

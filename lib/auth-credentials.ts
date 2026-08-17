@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { normalizeEmail } from "@/lib/normalize-email";
+import { BCRYPT_COST, FAKE_BCRYPT_HASH } from "@/lib/auth-hashing";
 import type { UserRole } from "@prisma/client";
 
 /**
@@ -10,8 +11,8 @@ import type { UserRole } from "@prisma/client";
  * load, which makes the inline `authorize` callback unreachable from a unit
  * test; this module has no such side effect.
  *
- * Behaviour is unchanged from the inline version — see the constant-time note
- * on FAKE_BCRYPT_HASH below.
+ * The cost and the constant-time decoy both come from `lib/auth-hashing.ts`,
+ * which is also where the reason they have to move together is written down.
  */
 
 export const credentialsSchema = z.object({
@@ -35,12 +36,47 @@ export interface AuthorizedUser {
 }
 
 /**
- * A valid bcrypt digest of a value no user can supply. When the account does not
- * exist, or exists but is OAuth-only, we still run `bcrypt.compare` against this
- * so the response time does not reveal which case occurred. Removing this
- * reintroduces user enumeration via timing.
+ * Move a password onto the current cost, in the background, after the user has
+ * already proved they know it.
+ *
+ * bcrypt records its cost in the digest, so an old hash keeps verifying
+ * forever at the cost it was written with. A successful login is the only
+ * moment the plaintext is available to re-hash — so it is the only moment this
+ * can happen, and taking it means old hashes climb on their own instead of
+ * needing a migration nobody can write.
+ *
+ * Never blocking, and never able to fail a login: the user typed the right
+ * password, and a database write that did not work is not their problem. The
+ * next login will simply try again.
  */
-const FAKE_BCRYPT_HASH = "$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy";
+async function upgradePasswordCostInBackground(
+  userId: string,
+  storedHash: string,
+  plaintext: string
+): Promise<void> {
+  let currentCost: number;
+  try {
+    currentCost = bcrypt.getRounds(storedHash);
+  } catch {
+    // Not a digest we can read the cost from. Leave it alone rather than
+    // rewrite something we do not understand.
+    return;
+  }
+
+  if (currentCost >= BCRYPT_COST) return;
+
+  try {
+    const upgraded = await bcrypt.hash(plaintext, BCRYPT_COST);
+    await prisma.user.update({ where: { id: userId }, data: { password: upgraded } });
+    console.info("[auth] password_cost_upgraded", { userId, from: currentCost, to: BCRYPT_COST });
+  } catch (error) {
+    // Swallowed on purpose. Logged without the email or the password.
+    console.error("[auth] password_cost_upgrade_failed", {
+      userId,
+      message: error instanceof Error ? error.message : "unknown",
+    });
+  }
+}
 
 export async function authorizeCredentials(credentials: unknown): Promise<AuthorizedUser | null> {
   try {
@@ -64,6 +100,11 @@ export async function authorizeCredentials(credentials: unknown): Promise<Author
       });
       return null;
     }
+
+    // The password is correct and still in hand, which is the only window in
+    // which its cost can be raised. Awaited so a failure cannot surface as an
+    // unhandled rejection, but it cannot fail the login — see the helper.
+    await upgradePasswordCostInBackground(user.id, user.password, password);
 
     return {
       id: user.id,
