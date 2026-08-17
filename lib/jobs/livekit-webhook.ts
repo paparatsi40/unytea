@@ -13,6 +13,7 @@ import { autoStartRecording } from "@/lib/jobs/recording";
 import { createNotification } from "@/lib/notifications";
 import { generateAISessionSummary } from "./session-ai";
 import { PostContentType, Prisma, SessionEventType } from "@prisma/client";
+import { meterCompletedSession } from "@/lib/usage/video-usage";
 import { markAutopilotStep } from "./autopilot";
 
 // LiveKit configuration
@@ -220,26 +221,9 @@ async function handleRoomFinished(event: WebhookEvent) {
     },
   });
 
-  // Close any open participations (users who didn't properly leave)
-  const openParticipations = await prisma.sessionParticipation.findMany({
-    where: {
-      sessionId,
-      leftAt: null,
-    },
-  });
-
-  const now = new Date();
-  for (const participation of openParticipations) {
-    const durationSeconds = Math.floor((now.getTime() - participation.joinedAt.getTime()) / 1000);
-
-    await prisma.sessionParticipation.update({
-      where: { id: participation.id },
-      data: {
-        leftAt: now,
-        durationSeconds: (participation.durationSeconds || 0) + durationSeconds,
-      },
-    });
-  }
+  // Closes any participation left open (users who didn't properly leave) and
+  // counts the session against its community's allowance. Never throws.
+  await meterCompletedSession(sessionId);
 
   // Feed lifecycle post: discussion thread after live
   await ensureSessionLifecyclePost(sessionId, "discussion_thread", {
@@ -274,43 +258,38 @@ async function handleParticipantJoined(event: WebhookEvent) {
 
   const sessionId = roomName.replace("session-", "");
 
-  // Extract user ID from identity (format: "{userId}-{timestamp}")
-  const userId = identity.split("-")[0];
+  // Looked up by identity, never parsed out of it.
+  //
+  // This used to read `identity.split("-")[0]`, for a `{userId}-{timestamp}`
+  // shape the token stopped emitting: `joinSession` mints
+  // `${sessionId}:${userId}`, which has no hyphen, so the split returned the
+  // whole string. That value went into a column with a foreign key to User.id,
+  // raised P2003, and the catch below only swallows P2002 — so this handler
+  // threw before it ever reached the attendee count, and `participant_left`
+  // silently found no row and never wrote a duration.
+  //
+  // `livekitIdentity` is written by `joinSession` and carries a unique index,
+  // so the row can be found by the exact value the token carries. The webhook
+  // now has no opinion about the identity's internal shape, which is what stops
+  // this class of drift from recurring.
+  const participation = await prisma.sessionParticipation.findUnique({
+    where: { livekitIdentity: identity },
+    select: { id: true, userId: true },
+  });
 
-  // Update or create participation.
-  // Wrapped in try/catch for P2002: two concurrent webhook deliveries for the
-  // same participant can both decide the row is missing, both insert, and the
-  // second hits the unique(livekitIdentity) constraint (not the composite one
-  // used in the where clause). Treat as idempotent — second writer's data is
-  // identical anyway.
-  try {
-    await prisma.sessionParticipation.upsert({
-      where: {
-        sessionId_userId: {
-          sessionId,
-          userId,
-        },
-      },
-      create: {
-        sessionId,
-        userId,
-        livekitIdentity: identity,
-        joinedAt: new Date(),
-      },
-      update: {
-        livekitIdentity: identity,
-        leftAt: null, // Rejoining
-      },
-    });
-  } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
-      console.info(
-        `[livekit-webhook] participant_joined duplicate race ignored: session=${sessionId} user=${userId} identity=${identity}`
-      );
-      return;
-    }
-    throw error;
+  if (!participation) {
+    // The room was joined without going through `joinSession` — the only place
+    // that mints an identity — or the row was deleted. Nothing to attribute.
+    console.warn(
+      `[livekit-webhook] participant_joined for unknown identity=${identity} (session=${sessionId}). Ack & skip.`
+    );
+    return;
   }
+
+  await prisma.sessionParticipation.update({
+    where: { id: participation.id },
+    data: { leftAt: null }, // Rejoining
+  });
 
   // Update attendee count
   await prisma.mentorSession.update({
@@ -323,7 +302,7 @@ async function handleParticipantJoined(event: WebhookEvent) {
   });
 
   await logSessionEvent(sessionId, SessionEventType.PARTICIPANT_JOINED, {
-    userId,
+    userId: participation.userId,
     identity,
     metadata: event.participant?.metadata,
   });
@@ -338,35 +317,43 @@ async function handleParticipantLeft(event: WebhookEvent) {
   if (!roomName || !identity) return;
 
   const sessionId = roomName.replace("session-", "");
-  const userId = identity.split("-")[0];
 
-  // Find participation
+  // Same lookup as the join path: by identity, never parsed. This is the write
+  // that fills `durationSeconds`, and it is the whole reason the metering in
+  // lib/usage/video-usage.ts can be exact rather than estimated.
   const participation = await prisma.sessionParticipation.findUnique({
-    where: {
-      sessionId_userId: {
-        sessionId,
-        userId,
-      },
+    where: { livekitIdentity: identity },
+  });
+
+  if (!participation) {
+    console.warn(
+      `[livekit-webhook] participant_left for unknown identity=${identity} (session=${sessionId}). Ack & skip.`
+    );
+    return;
+  }
+
+  // Closed once. `leaveSession` accumulates the same span from the app side,
+  // and LiveKit itself can redeliver an event; either would count the time
+  // twice. Only `joinSession` reopens the stretch by clearing `leftAt`.
+  if (participation.leftAt) {
+    return;
+  }
+
+  const leftAt = new Date();
+  const durationSeconds = Math.floor((leftAt.getTime() - participation.joinedAt.getTime()) / 1000);
+
+  await prisma.sessionParticipation.update({
+    where: { id: participation.id },
+    data: {
+      leftAt,
+      // Accumulated, not replaced: a participant who drops and rejoins is one
+      // row, and both stretches count.
+      durationSeconds: (participation.durationSeconds || 0) + durationSeconds,
     },
   });
 
-  if (participation) {
-    const leftAt = new Date();
-    const durationSeconds = Math.floor(
-      (leftAt.getTime() - participation.joinedAt.getTime()) / 1000
-    );
-
-    await prisma.sessionParticipation.update({
-      where: { id: participation.id },
-      data: {
-        leftAt,
-        durationSeconds: (participation.durationSeconds || 0) + durationSeconds,
-      },
-    });
-  }
-
   await logSessionEvent(sessionId, SessionEventType.PARTICIPANT_LEFT, {
-    userId,
+    userId: participation.userId,
     identity,
   });
 }
