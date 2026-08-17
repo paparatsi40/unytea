@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { isSafeAttachmentUrl } from "@/lib/attachments";
 import Image from "next/image";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { PostReactions } from "@/components/community/PostReactions";
@@ -71,6 +72,15 @@ export function PremiumPostCard({
   const tA11y = useTranslations("a11y");
   const locale = useLocale();
   const dfLocale = getDateFnsLocale(locale);
+
+  // Belt and braces. `createPost` now validates attachment URLs, but rows
+  // written before it did are still in the database, and a `javascript:` URL
+  // reaching the `href` below is script execution on our origin — React does
+  // not sanitize href. Anything that is not an absolute http/https URL is not
+  // rendered at all.
+  const safeAttachments = Array.isArray(post.attachments)
+    ? post.attachments.filter((a) => isSafeAttachmentUrl(a?.url))
+    : [];
 
   // IMPORTANT: All hooks must be called BEFORE any early return (Rules of Hooks).
   const [showMenu, setShowMenu] = useState(false);
@@ -337,9 +347,9 @@ export function PremiumPostCard({
             {post.content}
           </div>
 
-          {Array.isArray(post.attachments) && post.attachments.length > 0 && (
+          {Array.isArray(post.attachments) && safeAttachments.length > 0 && (
             <div className="mb-4 grid gap-2 sm:grid-cols-2">
-              {post.attachments.map((attachment, index) => {
+              {safeAttachments.map((attachment, index) => {
                 const isImage =
                   attachment?.type === "image" ||
                   /\.(png|jpe?g|gif|webp|svg)$/i.test(attachment?.url || "");

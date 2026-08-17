@@ -1,11 +1,16 @@
 "use server";
 
 import { z } from "zod";
+import { postAttachmentsSchema } from "@/lib/attachments";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { defineAction } from "@/lib/actions/define-action";
-import { communityById, communityOfChannel, communityOfChannelMessage } from "@/lib/actions/resolvers";
+import {
+  communityById,
+  communityOfChannel,
+  communityOfChannelMessage,
+} from "@/lib/actions/resolvers";
 import { emitRealtime } from "@/lib/pusher-server";
 
 /**
@@ -27,7 +32,13 @@ const communityIdSchema = z.string().min(1).max(64);
 const messageIdSchema = z.string().min(1).max(64);
 
 const DEFAULT_CHANNELS = [
-  { name: "General", slug: "general", emoji: "💬", position: 0, description: "General discussions" },
+  {
+    name: "General",
+    slug: "general",
+    emoji: "💬",
+    position: 0,
+    description: "General discussions",
+  },
   {
     name: "Announcements",
     slug: "announcements",
@@ -67,8 +78,7 @@ export const getCommunityChannels = defineAction(
     });
 
     const role = ctx.member?.role;
-    const canProvision =
-      role != null && (PROVISIONING_ROLES as readonly string[]).includes(role);
+    const canProvision = role != null && (PROVISIONING_ROLES as readonly string[]).includes(role);
 
     return { success: true as const, channels, canProvision };
   }
@@ -137,7 +147,7 @@ export const sendChannelMessage = defineAction(
   {
     name: "sendChannelMessage",
     auth: "member",
-    args: [channelIdSchema, z.string().max(10_000), z.unknown().optional()],
+    args: [channelIdSchema, z.string().max(10_000), postAttachmentsSchema.optional()],
     community: ([channelId]) => communityOfChannel(channelId),
     rateLimit: "message",
   },

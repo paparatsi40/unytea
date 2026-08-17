@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { isSafeAttachmentUrl } from "@/lib/attachments";
 import NextImage from "next/image";
 import { formatDistanceToNow } from "date-fns";
 import { Check, CheckCheck, MoreVertical, Trash2, Image as ImageIcon } from "lucide-react";
@@ -33,16 +34,23 @@ export function MessageBubble({ message, isOwnMessage, onDelete }: MessageBubble
   const [isDeleting, setIsDeleting] = useState(false);
   const { toast } = useToast();
 
-  const attachments = (() => {
+  const attachments: string[] = (() => {
     if (!message.attachments) return [];
 
+    let decoded: unknown;
     try {
-      return typeof message.attachments === "string"
-        ? JSON.parse(message.attachments)
-        : message.attachments;
+      decoded =
+        typeof message.attachments === "string"
+          ? JSON.parse(message.attachments)
+          : message.attachments;
     } catch {
       return [];
     }
+
+    // Each of these becomes an `<a href>` below, and React does not sanitize
+    // href — a `javascript:` URL stored before `sendMessage` validated them
+    // would execute on our origin when the recipient clicked it.
+    return Array.isArray(decoded) ? decoded.filter(isSafeAttachmentUrl) : [];
   })();
 
   const handleDelete = async () => {
