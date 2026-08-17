@@ -65,7 +65,7 @@ const sections: DocSection[] = [
       "Community logo, banner, and color scheme",
       "Custom landing page for public visitors",
       "Category and topic organization",
-      "Custom domain setup (coming soon)",
+      "Custom domain setup (not available yet)",
     ],
   },
   {

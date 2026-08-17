@@ -2282,7 +2282,6 @@
           "description": "Pour les créateurs émergents lançant leur première communauté",
           "features": [
             "Membres de communauté illimités",
-            "Sessions live jusqu'à 100 participants simultanés",
             "Cours payants",
             "Fil et bibliothèque de communauté",
             "Analyses de base"
@@ -2290,22 +2289,11 @@
         },
         "BUSINESS": {
           "description": "Pour les hôtes établis développant leur communauté",
-          "features": [
-            "Tout ce qui est dans Creator",
-            "Sessions live jusqu'à 300 participants simultanés",
-            "Analyses avancées",
-            "Jusqu'à 5 admins"
-          ]
+          "features": ["Tout ce qui est dans Creator"]
         },
         "PRO": {
           "description": "Pour les équipes gérant plusieurs communautés",
-          "features": [
-            "Tout ce qui est dans Business",
-            "Sessions live jusqu'à 1000 participants simultanés",
-            "Expérience white-label",
-            "Accès API",
-            "Admins illimités"
-          ]
+          "features": ["Tout ce qui est dans Business", "Jusqu'à 3 communautés"]
         }
       }
     },
@@ -2574,17 +2562,12 @@
       "business": {
         "name": "Business",
         "description": "Pour les hosts établis qui font grandir leur communauté",
-        "features": ["Tout ce qui est dans Creator", "Analytics avancés", "Jusqu'à 5 admins"]
+        "features": ["Tout ce qui est dans Creator"]
       },
       "pro": {
         "name": "Pro",
         "description": "Pour les équipes qui font passer à l'échelle plusieurs communautés",
-        "features": [
-          "Tout ce qui est dans Business",
-          "Expérience white-label",
-          "Accès API",
-          "Admins illimités"
-        ]
+        "features": ["Tout ce qui est dans Business", "Jusqu'à 3 communautés"]
       }
     },
     "trial": {

@@ -206,11 +206,59 @@ describe("the cards do not advertise limits nothing enforces", () => {
   });
 
   it.each(LOCALES)("%s still lists real features", (name) => {
-    // Guard against the removal having emptied the cards.
+    // Guard against the removal having emptied the cards — but only that.
+    //
+    // This asked for more than two per tier, which turned out to be pressure in
+    // the wrong direction: Business survives the honesty audit with a single
+    // true bullet, because the only thing it actually buys over Creator is the
+    // lower transaction fee, and that is rendered separately by the card. A
+    // threshold that demands three is a threshold that rewards inventing a
+    // third.
     const tiers = locale(name).billing.tiers as Record<string, { features: string[] }>;
     for (const [tier, value] of Object.entries(tiers)) {
-      expect(value.features.length, `${tier} should still have features`).toBeGreaterThan(2);
+      expect(value.features.length, `${tier} should still have features`).toBeGreaterThan(0);
     }
+  });
+
+  // The participant caps were removed from billing.tiers by the pricing pass
+  // and survived in dashboard.billing.plans — the list a paying host reads —
+  // for the same reason the stale commission numbers did: different namespace,
+  // different page, same claim. Both lists are guarded now.
+  it.each(LOCALES)("%s dashboard plan features make no participant-cap claim", (name) => {
+    const plans = locale(name).dashboard.billing.plans as Record<string, { features: string[] }>;
+    const offenders: string[] = [];
+
+    for (const [plan, value] of Object.entries(plans)) {
+      for (const feature of value.features) {
+        if (/(100|300|1000)/.test(feature) || /participant|participante/i.test(feature)) {
+          offenders.push(`${plan}: ${feature}`);
+        }
+      }
+    }
+
+    expect(offenders).toEqual([]);
+  });
+
+  // Four perks were listed that no code delivers: white-label and API access
+  // are flags with zero readers and no implementation; "advanced analytics" is
+  // the same single screen Creator gets; admin seats have a limit enforced only
+  // in a module nothing imports, and no UI promotes anyone to admin at all.
+  it.each(LOCALES)("%s advertises no unbuilt perk", (name) => {
+    const catalog = locale(name);
+    const lists = [
+      ...Object.values(catalog.billing.tiers as Record<string, { features: string[] }>),
+      ...Object.values(catalog.dashboard.billing.plans as Record<string, { features: string[] }>),
+    ];
+
+    const banned =
+      /white.?label|api access|acceso a (la )?api|accès (à l.)?api|advanced analytics|anal[í i]ticas avanzadas|analytics avanzados|analyses avancées|admins?|administradores|administrateurs/i;
+
+    const offenders: string[] = [];
+    for (const list of lists) {
+      for (const feature of list.features) if (banned.test(feature)) offenders.push(feature);
+    }
+
+    expect(offenders).toEqual([]);
   });
 });
 
