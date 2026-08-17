@@ -1,11 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { authErrorMessage } from "@/lib/auth-error-message";
 import Link from "next/link";
 import { ArrowLeft, Mail, Sparkles, Loader2, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 export default function ForgotPasswordPage() {
+  const t = useTranslations("auth.forgot");
+  const tError = useTranslations("auth.errors");
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -14,7 +18,7 @@ export default function ForgotPasswordPage() {
     e.preventDefault();
 
     if (!email.trim()) {
-      toast.error("Please enter your email address");
+      toast.error(t("emailRequired"));
       return;
     }
 
@@ -28,13 +32,13 @@ export default function ForgotPasswordPage() {
 
       if (!res.ok) {
         const data = await res.json();
-        toast.error(data.error || "Something went wrong");
+        toast.error(authErrorMessage(tError, data.code));
         return;
       }
 
       setSent(true);
     } catch {
-      toast.error("Something went wrong. Please try again.");
+      toast.error(tError("generic"));
     } finally {
       setIsLoading(false);
     }
@@ -53,12 +57,8 @@ export default function ForgotPasswordPage() {
               Unytea
             </span>
           </div>
-          <h1 className="mb-2 text-3xl font-bold text-gray-900">Reset Password</h1>
-          <p className="text-gray-600">
-            {sent
-              ? "Check your email for a reset link"
-              : "Enter your email and we'll send you a reset link"}
-          </p>
+          <h1 className="mb-2 text-3xl font-bold text-gray-900">{t("title")}</h1>
+          <p className="text-gray-600">{sent ? t("subtitleSent") : t("subtitle")}</p>
         </div>
 
         {/* Main Card */}
@@ -68,10 +68,12 @@ export default function ForgotPasswordPage() {
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
                 <CheckCircle className="h-8 w-8 text-green-600" />
               </div>
-              <h2 className="mb-2 text-xl font-semibold text-gray-900">Email Sent!</h2>
+              <h2 className="mb-2 text-xl font-semibold text-gray-900">{t("sentTitle")}</h2>
               <p className="mb-6 text-gray-600">
-                If an account with <strong>{email}</strong> exists, you&apos;ll receive a password
-                reset link shortly. Check your spam folder if you don&apos;t see it.
+                {t.rich("sentBody", {
+                  email,
+                  em: (chunks) => <strong>{chunks}</strong>,
+                })}
               </p>
               <button
                 onClick={() => {
@@ -80,14 +82,14 @@ export default function ForgotPasswordPage() {
                 }}
                 className="text-sm font-medium text-purple-600 hover:text-purple-700"
               >
-                Try a different email
+                {t("tryAnother")}
               </button>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-gray-700">
-                  Email Address
+                  {t("emailLabel")}
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
@@ -96,7 +98,7 @@ export default function ForgotPasswordPage() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email"
+                    placeholder={t("emailPlaceholder")}
                     className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3 pl-11 pr-4 text-gray-900 transition-all placeholder:text-gray-400 focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
                     required
                   />
@@ -111,10 +113,10 @@ export default function ForgotPasswordPage() {
                 {isLoading ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Sending...
+                    {t("submitting")}
                   </>
                 ) : (
-                  "Send Reset Link"
+                  t("submit")
                 )}
               </button>
             </form>
@@ -126,7 +128,7 @@ export default function ForgotPasswordPage() {
               className="inline-flex items-center gap-2 text-sm font-medium text-purple-600 hover:text-purple-700"
             >
               <ArrowLeft className="h-4 w-4" />
-              Back to Sign In
+              {t("backToSignIn")}
             </Link>
           </div>
         </div>

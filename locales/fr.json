@@ -144,7 +144,71 @@
     "signInError": "Erreur de connexion",
     "accountCreated": "Compte créé avec succès !",
     "resetPassword": "Réinitialiser le mot de passe",
-    "passwordResetComingSoon": "La réinitialisation du mot de passe arrive bientôt. En attendant, contactez le support."
+    "passwordResetComingSoon": "La réinitialisation du mot de passe arrive bientôt. En attendant, contactez le support.",
+    "signup": {
+      "title": "Créez votre compte",
+      "subtitle": "Rejoignez dès aujourd'hui la meilleure plateforme de communautés ☕",
+      "fullName": "Nom complet",
+      "fullNamePlaceholder": "Camille Martin",
+      "email": "E-mail",
+      "emailPlaceholder": "vous@exemple.com",
+      "password": "Mot de passe",
+      "passwordPlaceholder": "••••••••",
+      "passwordStrong": "Mot de passe solide",
+      "passwordHint": "8 caractères minimum",
+      "confirmPassword": "Confirmez le mot de passe",
+      "confirmPasswordPlaceholder": "••••••••",
+      "submit": "Créer mon compte",
+      "legal": "En vous inscrivant, vous acceptez nos <terms>Conditions d'utilisation</terms> et notre <privacy>Politique de confidentialité</privacy>",
+      "haveAccount": "Vous avez déjà un compte ?",
+      "signIn": "Connectez-vous"
+    },
+    "forgot": {
+      "title": "Réinitialiser le mot de passe",
+      "subtitle": "Indiquez votre e-mail et nous vous enverrons un lien",
+      "subtitleSent": "Consultez votre boîte mail, le lien est parti",
+      "emailLabel": "Adresse e-mail",
+      "emailPlaceholder": "Votre e-mail",
+      "submit": "Envoyer le lien",
+      "submitting": "Envoi…",
+      "sentTitle": "E-mail envoyé !",
+      "sentBody": "Si un compte existe avec <em>{email}</em>, vous recevrez le lien dans un instant. Pensez à regarder dans les spams.",
+      "tryAnother": "Essayer une autre adresse",
+      "backToSignIn": "Retour à la connexion",
+      "emailRequired": "Indiquez votre adresse e-mail"
+    },
+    "reset": {
+      "invalidTitle": "Lien invalide",
+      "invalidBody": "Ce lien n'est plus valable ou a déjà été utilisé. Demandez-en un nouveau.",
+      "requestNew": "Demander un nouveau lien",
+      "title": "Choisissez un nouveau mot de passe",
+      "subtitle": "Optez pour un mot de passe solide",
+      "titleDone": "Mot de passe modifié !",
+      "subtitleDone": "Redirection vers la connexion…",
+      "doneBody": "Votre mot de passe est à jour. Vous allez être redirigé vers la connexion.",
+      "signInNow": "Se connecter maintenant",
+      "newPassword": "Nouveau mot de passe",
+      "newPasswordPlaceholder": "8 caractères minimum",
+      "confirmPassword": "Confirmez le mot de passe",
+      "confirmPasswordPlaceholder": "Saisissez-le à nouveau",
+      "submit": "Modifier le mot de passe",
+      "submitting": "Modification…",
+      "backToSignIn": "Retour à la connexion",
+      "tooShort": "Le mot de passe doit faire au moins 8 caractères",
+      "mismatch": "Les mots de passe ne correspondent pas",
+      "success": "Mot de passe modifié !"
+    },
+    "errors": {
+      "RATE_LIMITED": "Trop de tentatives. Réessayez dans quelques minutes.",
+      "SERVER_ERROR": "Une erreur est survenue. Réessayez.",
+      "EMAIL_REQUIRED": "Indiquez votre adresse e-mail",
+      "RESET_LINK_INVALID": "Ce lien n'est pas valide. Demandez-en un nouveau.",
+      "RESET_LINK_EXPIRED": "Ce lien a expiré. Demandez-en un nouveau.",
+      "VALIDATION_NAME": "Indiquez votre nom",
+      "VALIDATION_EMAIL": "Cette adresse e-mail semble incorrecte",
+      "VALIDATION_PASSWORD": "Le mot de passe doit faire au moins 8 caractères",
+      "generic": "Une erreur est survenue. Réessayez."
+    }
   },
   "landing": {
     "nav": {
@@ -1624,6 +1688,84 @@
         "enterRoom": "Entrer dans la salle",
         "watch": "Regarder",
         "viewAll": "{count, plural, =1 {Voir # session passée} other {Voir les # sessions passées}}"
+      },
+      "detail": {
+        "loading": "Chargement de la session…",
+        "back": "Retour aux sessions",
+        "audioOnly": "Audio seul",
+        "joinNext": "Rejoindre la prochaine session",
+        "addToGoogleCalendar": "Ajouter à Google Agenda",
+        "addToAppleCalendar": "Ajouter à Apple Calendrier",
+        "inviteMembers": "Inviter des membres",
+        "shareOn": "Partager sur {network}",
+        "watchRecording": "Voir l'enregistrement",
+        "addToCourse": "Ajouter à un cours",
+        "createClip": "Créer un extrait",
+        "download": "Télécharger",
+        "tabs": {
+          "recording": "Enregistrement",
+          "notes": "Notes",
+          "resources": "Ressources",
+          "discussion": "Discussion"
+        },
+        "recording": {
+          "processingTitle": "Traitement de l'enregistrement…",
+          "processingBody": "La vidéo sera disponible sous peu. En attendant, vous pouvez relire les notes.",
+          "unsupported": "Votre navigateur ne prend pas en charge la lecture vidéo.",
+          "noneTitle": "Aucun enregistrement",
+          "noneBody": "Cette session n'a pas été enregistrée, ou l'enregistrement est en cours."
+        },
+        "notes": {
+          "title": "Notes de la session",
+          "emptyTitle": "Pas encore de notes",
+          "emptyBody": "Notez les idées clés, les ressources et les actions issues de la session.",
+          "add": "Ajouter des notes"
+        },
+        "resources": {
+          "emptyTitle": "Pas encore de ressources",
+          "emptyBody": "Ajoutez des liens, des modèles ou des fichiers issus de cette session."
+        },
+        "discussion": {
+          "emptyTitle": "Pas encore de discussion",
+          "emptyBody": "Lancez un échange avec votre communauté à propos de cette session.",
+          "start": "Lancer la discussion"
+        },
+        "summary": {
+          "title": "Récapitulatif de la session",
+          "status": "Statut",
+          "date": "Date",
+          "time": "Heure",
+          "duration": "Durée",
+          "mode": "Mode",
+          "host": "Hôte",
+          "community": "Communauté",
+          "postedToFeed": "Publié dans le fil de la communauté"
+        },
+        "quickActions": {
+          "title": "Actions rapides",
+          "scheduleFollowUp": "Planifier un suivi"
+        },
+        "share": {
+          "already": "Cette session a déjà été partagée dans le fil de la communauté",
+          "success": "Récap partagé dans le fil de la communauté !",
+          "failed": "Le partage du récap a échoué",
+          "error": "Erreur lors du partage du récap",
+          "sharing": "Partage…",
+          "shared": "Déjà partagé",
+          "sharedToFeed": "Partagé dans le fil",
+          "shareRecap": "Partager le récap"
+        },
+        "library": {
+          "success": "Session publiée dans la bibliothèque",
+          "failed": "La publication dans la bibliothèque a échoué"
+        },
+        "rsvp": {
+          "removed": "Inscription retirée",
+          "attending": "Vous participez à cette session",
+          "interested": "Marquée comme intéressante",
+          "failed": "Impossible de mettre à jour votre inscription"
+        },
+        "inviteCopied": "Lien d'invitation copié"
       }
     },
     "analytics": {
@@ -2804,6 +2946,14 @@
         "loading": "Chargement de la session…",
         "endingTitle": "Clôture de la session…",
         "endingBody": "La session est marquée comme terminée et votre tableau de bord se met à jour"
+      },
+      "toasts": {
+        "loadFailed": "Impossible de charger la session",
+        "ended": "Session terminée. Votre récap est prêt à relire.",
+        "endError": "Une erreur est survenue à la fermeture de la session",
+        "recordingPaused": "Enregistrement en pause",
+        "recordingStarted": "Enregistrement lancé",
+        "recordingFailed": "Impossible de modifier l'état de l'enregistrement"
       }
     },
     "videoRoom": {

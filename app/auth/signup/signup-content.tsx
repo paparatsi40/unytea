@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Mail, Lock, User, ArrowRight, Sparkles, Check } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
+import { authErrorMessage } from "@/lib/auth-error-message";
 import { OAuthButtons } from "@/components/auth/OAuthButtons";
 import type { OAuthProviderId } from "@/lib/auth-providers";
 
@@ -18,6 +19,7 @@ interface SignUpContentProps {
 export function SignUpContent({ oauthProviders }: SignUpContentProps) {
   const router = useRouter();
   const t = useTranslations();
+  const tError = useTranslations("auth.errors");
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -69,7 +71,7 @@ export function SignUpContent({ oauthProviders }: SignUpContentProps) {
       const data = await response.json();
 
       if (!response.ok) {
-        toast.error(data.error || t("common.error"));
+        toast.error(authErrorMessage(tError, data.code));
         return;
       }
 
@@ -109,8 +111,8 @@ export function SignUpContent({ oauthProviders }: SignUpContentProps) {
               Unytea
             </span>
           </div>
-          <h1 className="mb-2 text-3xl font-bold text-gray-900">Create your account</h1>
-          <p className="text-gray-600">Join the best community platform today ☕</p>
+          <h1 className="mb-2 text-3xl font-bold text-gray-900">{t("auth.signup.title")}</h1>
+          <p className="text-gray-600">{t("auth.signup.subtitle")}</p>
         </div>
 
         {/* Main Card */}
@@ -127,7 +129,7 @@ export function SignUpContent({ oauthProviders }: SignUpContentProps) {
           <form onSubmit={handleSignUp} className="space-y-4">
             <div>
               <label htmlFor="name" className="mb-2 block text-sm font-medium text-gray-700">
-                Full Name
+                {t("auth.signup.fullName")}
               </label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
@@ -136,7 +138,7 @@ export function SignUpContent({ oauthProviders }: SignUpContentProps) {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="John Doe"
+                  placeholder={t("auth.signup.fullNamePlaceholder")}
                   disabled={isLoading}
                   className="w-full rounded-xl border-2 border-gray-200 py-3 pl-10 pr-4 outline-none transition-all focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 disabled:cursor-not-allowed disabled:opacity-50"
                 />
@@ -145,7 +147,7 @@ export function SignUpContent({ oauthProviders }: SignUpContentProps) {
 
             <div>
               <label htmlFor="email" className="mb-2 block text-sm font-medium text-gray-700">
-                Email
+                {t("auth.signup.email")}
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
@@ -154,7 +156,7 @@ export function SignUpContent({ oauthProviders }: SignUpContentProps) {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
+                  placeholder={t("auth.signup.emailPlaceholder")}
                   disabled={isLoading}
                   className="w-full rounded-xl border-2 border-gray-200 py-3 pl-10 pr-4 outline-none transition-all focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 disabled:cursor-not-allowed disabled:opacity-50"
                 />
@@ -163,7 +165,7 @@ export function SignUpContent({ oauthProviders }: SignUpContentProps) {
 
             <div>
               <label htmlFor="password" className="mb-2 block text-sm font-medium text-gray-700">
-                Password
+                {t("auth.signup.password")}
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
@@ -172,7 +174,7 @@ export function SignUpContent({ oauthProviders }: SignUpContentProps) {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder={t("auth.signup.passwordPlaceholder")}
                   disabled={isLoading}
                   className="w-full rounded-xl border-2 border-gray-200 py-3 pl-10 pr-4 outline-none transition-all focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 disabled:cursor-not-allowed disabled:opacity-50"
                 />
@@ -182,10 +184,10 @@ export function SignUpContent({ oauthProviders }: SignUpContentProps) {
                   {passwordStrength ? (
                     <>
                       <Check className="h-4 w-4 text-green-500" />
-                      <span className="text-green-600">Strong password</span>
+                      <span className="text-green-600">{t("auth.signup.passwordStrong")}</span>
                     </>
                   ) : (
-                    <span className="text-amber-600">At least 8 characters required</span>
+                    <span className="text-amber-600">{t("auth.signup.passwordHint")}</span>
                   )}
                 </div>
               )}
@@ -196,7 +198,7 @@ export function SignUpContent({ oauthProviders }: SignUpContentProps) {
                 htmlFor="confirmPassword"
                 className="mb-2 block text-sm font-medium text-gray-700"
               >
-                Confirm Password
+                {t("auth.signup.confirmPassword")}
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
@@ -205,7 +207,7 @@ export function SignUpContent({ oauthProviders }: SignUpContentProps) {
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder={t("auth.signup.confirmPasswordPlaceholder")}
                   disabled={isLoading}
                   className="w-full rounded-xl border-2 border-gray-200 py-3 pl-10 pr-4 outline-none transition-all focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 disabled:cursor-not-allowed disabled:opacity-50"
                 />
@@ -221,21 +223,25 @@ export function SignUpContent({ oauthProviders }: SignUpContentProps) {
                 <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
               ) : (
                 <>
-                  Create Account
+                  {t("auth.signup.submit")}
                   <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                 </>
               )}
             </button>
 
             <p className="text-center text-xs text-gray-500">
-              By signing up, you agree to our{" "}
-              <Link href="/terms" className="text-purple-600 hover:text-purple-700">
-                Terms of Service
-              </Link>{" "}
-              and{" "}
-              <Link href="/privacy" className="text-purple-600 hover:text-purple-700">
-                Privacy Policy
-              </Link>
+              {t.rich("auth.signup.legal", {
+                terms: (chunks) => (
+                  <Link href="/terms" className="text-purple-600 hover:text-purple-700">
+                    {chunks}
+                  </Link>
+                ),
+                privacy: (chunks) => (
+                  <Link href="/privacy" className="text-purple-600 hover:text-purple-700">
+                    {chunks}
+                  </Link>
+                ),
+              })}
             </p>
           </form>
         </div>
@@ -243,9 +249,9 @@ export function SignUpContent({ oauthProviders }: SignUpContentProps) {
         {/* Footer Links */}
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
-            Already have an account?{" "}
+            {t("auth.signup.haveAccount")}{" "}
             <Link href="/auth/signin" className="font-medium text-purple-600 hover:text-purple-700">
-              Sign in
+              {t("auth.signup.signIn")}
             </Link>
           </p>
         </div>

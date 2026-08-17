@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     const { success: rateLimitOk } = await rateLimiters.auth.check(`forgot:${ip}`);
     if (!rateLimitOk) {
       return NextResponse.json(
-        { error: "Too many attempts. Please try again later." },
+        { error: "Too many attempts. Please try again later.", code: "RATE_LIMITED" },
         { status: 429 }
       );
     }
@@ -21,7 +21,10 @@ export async function POST(request: NextRequest) {
     const { email } = await request.json();
 
     if (!email || typeof email !== "string") {
-      return NextResponse.json({ error: "Email is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Email is required", code: "EMAIL_REQUIRED" },
+        { status: 400 }
+      );
     }
 
     // Always return success to prevent email enumeration
@@ -69,6 +72,9 @@ export async function POST(request: NextRequest) {
     return genericResponse;
   } catch (error) {
     console.error("[forgot-password] Error:", error);
-    return NextResponse.json({ error: "Something went wrong. Please try again." }, { status: 500 });
+    return NextResponse.json(
+      { error: "Something went wrong. Please try again.", code: "SERVER_ERROR" },
+      { status: 500 }
+    );
   }
 }

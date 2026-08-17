@@ -5,8 +5,12 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Lock, Sparkles, Loader2, CheckCircle, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
+import { authErrorMessage } from "@/lib/auth-error-message";
 
 function ResetPasswordContent() {
+  const t = useTranslations("auth.reset");
+  const tError = useTranslations("auth.errors");
   const searchParams = useSearchParams();
   const router = useRouter();
   const token = searchParams?.get("token") || "";
@@ -21,12 +25,12 @@ function ResetPasswordContent() {
     e.preventDefault();
 
     if (password.length < 8) {
-      toast.error("Password must be at least 8 characters");
+      toast.error(t("tooShort"));
       return;
     }
 
     if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
+      toast.error(t("mismatch"));
       return;
     }
 
@@ -41,17 +45,17 @@ function ResetPasswordContent() {
       const data = await res.json();
 
       if (!res.ok) {
-        toast.error(data.error || "Something went wrong");
+        toast.error(authErrorMessage(tError, data.code));
         return;
       }
 
       setSuccess(true);
-      toast.success("Password reset successfully!");
+      toast.success(t("success"));
 
       // Redirect to login after 3 seconds
       setTimeout(() => router.push("/auth/signin"), 3000);
     } catch {
-      toast.error("Something went wrong. Please try again.");
+      toast.error(tError("generic"));
     } finally {
       setIsLoading(false);
     }
@@ -62,15 +66,13 @@ function ResetPasswordContent() {
       <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-purple-50 via-white to-pink-50 p-4">
         <div className="w-full max-w-md text-center">
           <div className="rounded-2xl border border-gray-100 bg-white/80 p-8 shadow-xl backdrop-blur-xl">
-            <h2 className="mb-2 text-xl font-semibold text-gray-900">Invalid Reset Link</h2>
-            <p className="mb-6 text-gray-600">
-              This password reset link is invalid or has been used. Please request a new one.
-            </p>
+            <h2 className="mb-2 text-xl font-semibold text-gray-900">{t("invalidTitle")}</h2>
+            <p className="mb-6 text-gray-600">{t("invalidBody")}</p>
             <Link
               href="/auth/forgot-password"
               className="inline-flex items-center gap-2 font-medium text-purple-600 hover:text-purple-700"
             >
-              Request New Reset Link
+              {t("requestNew")}
             </Link>
           </div>
         </div>
@@ -92,13 +94,9 @@ function ResetPasswordContent() {
             </span>
           </div>
           <h1 className="mb-2 text-3xl font-bold text-gray-900">
-            {success ? "Password Reset!" : "Set New Password"}
+            {success ? t("titleDone") : t("title")}
           </h1>
-          <p className="text-gray-600">
-            {success
-              ? "Redirecting you to sign in..."
-              : "Choose a strong password for your account"}
-          </p>
+          <p className="text-gray-600">{success ? t("subtitleDone") : t("subtitle")}</p>
         </div>
 
         {/* Main Card */}
@@ -108,14 +106,12 @@ function ResetPasswordContent() {
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
                 <CheckCircle className="h-8 w-8 text-green-600" />
               </div>
-              <p className="mb-4 text-gray-600">
-                Your password has been updated. You&apos;ll be redirected to sign in shortly.
-              </p>
+              <p className="mb-4 text-gray-600">{t("doneBody")}</p>
               <Link
                 href="/auth/signin"
                 className="font-medium text-purple-600 hover:text-purple-700"
               >
-                Sign In Now
+                {t("signInNow")}
               </Link>
             </div>
           ) : (
@@ -125,7 +121,7 @@ function ResetPasswordContent() {
                   htmlFor="password"
                   className="mb-1.5 block text-sm font-medium text-gray-700"
                 >
-                  New Password
+                  {t("newPassword")}
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
@@ -134,7 +130,7 @@ function ResetPasswordContent() {
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Minimum 8 characters"
+                    placeholder={t("newPasswordPlaceholder")}
                     className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3 pl-11 pr-11 text-gray-900 transition-all placeholder:text-gray-400 focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
                     required
                     minLength={8}
@@ -154,7 +150,7 @@ function ResetPasswordContent() {
                   htmlFor="confirmPassword"
                   className="mb-1.5 block text-sm font-medium text-gray-700"
                 >
-                  Confirm Password
+                  {t("confirmPassword")}
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
@@ -163,7 +159,7 @@ function ResetPasswordContent() {
                     type={showPassword ? "text" : "password"}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Repeat your password"
+                    placeholder={t("confirmPasswordPlaceholder")}
                     className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3 pl-11 pr-4 text-gray-900 transition-all placeholder:text-gray-400 focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
                     required
                     minLength={8}
@@ -179,10 +175,10 @@ function ResetPasswordContent() {
                 {isLoading ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Resetting...
+                    {t("submitting")}
                   </>
                 ) : (
-                  "Reset Password"
+                  t("submit")
                 )}
               </button>
             </form>
@@ -194,7 +190,7 @@ function ResetPasswordContent() {
               className="inline-flex items-center gap-2 text-sm font-medium text-purple-600 hover:text-purple-700"
             >
               <ArrowLeft className="h-4 w-4" />
-              Back to Sign In
+              {t("backToSignIn")}
             </Link>
           </div>
         </div>
