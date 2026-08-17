@@ -590,12 +590,6 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
               highlighted
             />
             <ComparisonRow
-              feature={t("comparison.rows.screenShare")}
-              skool="✗"
-              unytea="✓"
-              highlighted
-            />
-            <ComparisonRow
               feature={t("comparison.rows.certificates")}
               skool="✗"
               unytea="✓"
@@ -603,18 +597,6 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
             />
             <ComparisonRow
               feature={t("comparison.rows.multiLanguage")}
-              skool="✗"
-              unytea="✓"
-              highlighted
-            />
-            <ComparisonRow
-              feature={t("comparison.rows.customDomain")}
-              skool="✗"
-              unytea="✓"
-              highlighted
-            />
-            <ComparisonRow
-              feature={t("comparison.rows.quizzes")}
               skool="✗"
               unytea="✓"
               highlighted

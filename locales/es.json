@@ -425,12 +425,9 @@
         "feed": "Muro de la comunidad",
         "courses": "Cursos",
         "liveVideo": "Sesiones de vídeo en directo",
-        "whiteboard": "Pizarra colaborativa",
-        "screenShare": "Pantalla compartida",
+        "whiteboard": "Pizarra colaborativa en la llamada",
         "certificates": "Certificados",
         "multiLanguage": "Varios idiomas",
-        "customDomain": "Dominio propio",
-        "quizzes": "Cuestionarios y evaluaciones",
         "platformFee": "Comisión de plataforma"
       },
       "unyteaFee": "Desde el {min} %",
