@@ -1732,7 +1732,9 @@
           "mode": "Mode",
           "host": "Hôte",
           "community": "Communauté",
-          "postedToFeed": "Publié dans le fil de la communauté"
+          "postedToFeed": "Publié dans le fil de la communauté",
+          "hostUnnamed": "Hôte sans nom",
+          "communityUnnamed": "Communauté sans nom"
         },
         "quickActions": {
           "title": "Actions rapides",
@@ -2200,7 +2202,8 @@
         "title": "Activité récente",
         "noActivity": "Aucune activité récente. Tout apparaîtra ici à mesure que vos communautés grandissent.",
         "newMember": "{actor} a rejoint {community}",
-        "newPost": "{actor} a publié dans {community}"
+        "newPost": "{actor} a publié dans {community}",
+        "newPostTitled": "{actor} a publié « {summary} » dans {community}"
       },
       "quickActions": {
         "title": "Actions rapides",
@@ -2876,10 +2879,10 @@
         "audience": "Public",
         "raisedHands": "Mains levées ({count})",
         "noSpeakers": "Aucun intervenant pour l'instant",
-        "unknown": "Inconnu",
         "more": "+{count} de plus",
         "inviteToSpeak": "Inviter à parler",
-        "dismiss": "Ignorer"
+        "dismiss": "Ignorer",
+        "guest": "Invité"
       },
       "handQueue": {
         "title": "File des mains levées"
@@ -2938,8 +2941,8 @@
       "whiteboardUnavailableDesc": "Cette session n'a pas encore de tableau blanc associé.",
       "noScreenTitle": "Aucun écran n'est partagé",
       "noScreenDesc": "Partagez votre écran pour présenter des diapositives, des démos ou des tutoriels.",
-      "noCameraTitle": "Aucune vidéo de caméra disponible",
-      "noCameraWaiting": "En attente de la piste vidéo…",
+      "noCameraTitle": "En attente de la vidéo…",
+      "noCameraWaiting": "Votre caméra est activée. En attente du démarrage de la vidéo.",
       "noCameraDesc": "Activez votre caméra ou attendez la caméra d'un autre participant."
     },
     "localVideo": {

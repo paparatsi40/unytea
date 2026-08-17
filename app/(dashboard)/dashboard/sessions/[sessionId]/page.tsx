@@ -768,14 +768,16 @@ export default function SessionDetailPage(props: SessionPageProps) {
 
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-zinc-400">{t("summary.host")}</span>
-                  <span className="text-sm text-white">{session.mentor?.name || "Unknown"}</span>
+                  <span className="text-sm text-white">
+                    {session.mentor?.name || t("summary.hostUnnamed")}
+                  </span>
                 </div>
 
                 {session.communityId && (
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-zinc-400">{t("summary.community")}</span>
                     <span className="text-sm text-white">
-                      {session.community?.name || "Unknown"}
+                      {session.community?.name || t("summary.communityUnnamed")}
                     </span>
                   </div>
                 )}

@@ -267,10 +267,16 @@ export function DashboardHomeView({ data, onboardingProgress }: Props) {
                         actor: event.actorName,
                         community: event.communityName,
                       })
-                    : t("recentActivity.newPost", {
-                        actor: event.actorName,
-                        community: event.communityName,
-                      })}
+                    : event.summary
+                      ? t("recentActivity.newPostTitled", {
+                          actor: event.actorName,
+                          summary: event.summary,
+                          community: event.communityName,
+                        })
+                      : t("recentActivity.newPost", {
+                          actor: event.actorName,
+                          community: event.communityName,
+                        })}
                 </p>
                 <span className="flex-shrink-0 text-xs text-muted-foreground">
                   {formatDistanceToNow(new Date(event.at), { addSuffix: true, locale: dfLocale })}
