@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { normalizeEmail } from "@/lib/normalize-email";
 import type { UserRole } from "@prisma/client";
 
 /**
@@ -14,7 +15,10 @@ import type { UserRole } from "@prisma/client";
  */
 
 export const credentialsSchema = z.object({
-  email: z.string().email(),
+  // `.trim()` before `.email()`: a pasted address with a trailing space is not
+  // a valid email to Zod, so without this the request was rejected as bad
+  // credentials before normalization could do anything about it.
+  email: z.string().trim().email(),
   password: z.string().min(8),
 });
 
@@ -42,7 +46,8 @@ export async function authorizeCredentials(credentials: unknown): Promise<Author
   try {
     const { email, password } = credentialsSchema.parse(credentials);
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    // Normalized so a mixed-case login finds the row sign-up wrote.
+    const user = await prisma.user.findUnique({ where: { email: normalizeEmail(email) } });
 
     const hashToCheck = user?.password ?? FAKE_BCRYPT_HASH;
     const isValidPassword = await bcrypt.compare(password, hashToCheck);

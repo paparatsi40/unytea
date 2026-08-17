@@ -1,0 +1,75 @@
+-- ═══════════════════════════════════════════════════════════════════════════
+-- PREPARED, NOT APPLIED. This file is NOT a Prisma migration and will NOT run
+-- on deploy — it lives in prisma/sql/, which `prisma migrate deploy` ignores.
+-- Applying it is a decision, not a consequence of pushing.
+-- ═══════════════════════════════════════════════════════════════════════════
+--
+-- WHY YOU MIGHT WANT IT
+--
+-- The application now normalizes on every path, and the migration normalized
+-- the rows that already existed. Both are code and data — neither is a rule the
+-- database enforces. If a future code path writes an email without going
+-- through `normalizeEmail`, nothing stops it, and the duplicate-account bug
+-- comes back quietly.
+--
+-- `users.email` is already UNIQUE, but that constraint compares bytes:
+-- 'Carlos@X.com' and 'carlos@x.com' are two different values to it. A unique
+-- index on the lowercased expression is what actually says "one account per
+-- mailbox".
+--
+-- PRECONDITION: the normalization migration must have run and
+-- prisma/sql/detect-duplicate-emails.sql must return no rows. This index cannot
+-- be created while duplicates exist.
+
+-- ── Option A (recommended): unique index on the lowered expression ──────────
+--
+-- Trade-off: it is one statement, reversible with one statement, and needs no
+-- extension or type change. It does not make comparisons case-insensitive —
+-- `WHERE email = 'Carlos@X.com'` still misses the row — so the application
+-- must keep normalizing on read. That is fine here, because normalizing on
+-- read is what `lib/normalize-email.ts` already guarantees and what the guard
+-- test enforces; the index is the backstop, not the mechanism.
+--
+-- CONCURRENTLY so it does not take an ACCESS EXCLUSIVE lock on `users` for the
+-- duration of the build. It cannot run inside a transaction block, which is the
+-- other reason this is not a Prisma migration: Prisma wraps migrations in one.
+-- Run it directly against the database, outside any transaction.
+
+CREATE UNIQUE INDEX CONCURRENTLY IF NOT EXISTS users_email_lower_key
+  ON users (lower(email));
+
+-- Undo:
+--   DROP INDEX CONCURRENTLY IF EXISTS users_email_lower_key;
+
+-- Verify it took (should report INVALID = false):
+--   SELECT indexrelid::regclass AS index, indisvalid
+--   FROM pg_index
+--   WHERE indexrelid = 'users_email_lower_key'::regclass;
+--
+-- CREATE INDEX CONCURRENTLY can leave an INVALID index behind if it fails
+-- partway. If indisvalid is false, drop it and re-run.
+
+-- ── Option B (rejected here): citext ───────────────────────────────────────
+--
+--   CREATE EXTENSION IF NOT EXISTS citext;
+--   ALTER TABLE users ALTER COLUMN email TYPE citext;
+--
+-- This makes every comparison case-insensitive, so `WHERE email = 'Carlos@X.com'`
+-- would find the row and the existing UNIQUE constraint would do the right
+-- thing with no second index. It is the more complete answer to the problem.
+--
+-- Rejected for now, for three reasons that are specific to this project:
+--
+--   1. It rewrites the whole column, taking a full table lock. Option A with
+--      CONCURRENTLY does not.
+--   2. Prisma has no `citext` scalar. The column would have to be mapped with
+--      `@db.Citext` (or left as String and drifted), and every future
+--      `prisma migrate dev` risks generating an ALTER that reverts the type.
+--      A schema the ORM does not model is a trap for whoever migrates next.
+--   3. It needs the extension available on Neon and enabled per-database. It
+--      is, but that is one more thing that has to be true in every environment
+--      including a fresh local database, and nothing checks it.
+--
+-- Option A costs one index and keeps the schema honest about what Prisma knows.
+-- If the application ever needs genuine case-insensitive comparison rather than
+-- just uniqueness, revisit B.

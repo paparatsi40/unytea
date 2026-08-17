@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendPasswordResetEmail } from "@/lib/email";
+import { normalizeEmail } from "@/lib/normalize-email";
 import { randomBytes } from "crypto";
 import { rateLimiters, getIP } from "@/lib/rate-limit";
 import { SITE_URL } from "@/lib/site-url";
@@ -30,7 +31,7 @@ export async function POST(request: NextRequest) {
 
     // Find user
     const user = await prisma.user.findUnique({
-      where: { email: email.toLowerCase().trim() },
+      where: { email: normalizeEmail(email) },
       select: { id: true, name: true, email: true, password: true },
     });
 

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { normalizeEmail } from "@/lib/normalize-email";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
@@ -40,7 +41,10 @@ export async function POST(request: NextRequest) {
 
     // Update user password
     await prisma.user.update({
-      where: { email: resetToken.email },
+      // A token issued before this normalization landed still carries the old
+      // casing, so it has to be normalized here too or an in-flight reset would
+      // stop resolving the moment the data migration runs.
+      where: { email: normalizeEmail(resetToken.email) },
       data: { password: hashedPassword },
     });
 
