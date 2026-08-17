@@ -188,12 +188,12 @@ model Community {
   paywallLocked   Boolean   @default(false) // true when host's platform subscription is past_due or canceled
   paywallLockedAt DateTime? // timestamp of last lock event (audit + email reminder timing)
 
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
   deletedAt         DateTime?
   ownerId           String
   channels          Channel[]
-  owner             User               @relation("CommunityOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  owner             User                  @relation("CommunityOwner", fields: [ownerId], references: [id], onDelete: Cascade)
   courses           Course[]
   members           Member[]
   posts             Post[]
@@ -201,6 +201,7 @@ model Community {
   buddyPartnerships BuddyPartnership[]
   sections          CommunitySection[] // Drag & drop sections
   sessions          MentorSession[] // Community live sessions
+  videoUsage        CommunityVideoUsage[] // Participant-hour metering
   sessionSeries     SessionSeries[] // Recurring session series
   sessionEvents     SessionEvent[] // Audit events
 
@@ -422,6 +423,7 @@ model MentorSession {
   recording      Recording?
   events         SessionEvent[]
   resources      SessionResource[]
+  usageAccrual   SessionUsageAccrual?
 
   @@index([mentorId])
   @@index([menteeId])
@@ -1017,6 +1019,74 @@ model SessionFeedback {
   @@map("session_feedback")
 }
 
+// ============================================
+// VIDEO USAGE METERING
+// ============================================
+
+/// The participant-hour counter, one row per community per billing cycle.
+///
+/// Seconds, not hours: an integer cannot drift, and hours would round on every
+/// accrual. `periodStart`/`periodEnd` are anchored once when the row is created
+/// and never recomputed — recomputing on read would silently re-anchor every
+/// community the moment a subscription changed.
+model CommunityVideoUsage {
+  id          String   @id @default(cuid())
+  communityId String
+  periodStart DateTime
+  periodEnd   DateTime
+
+  /// Sum of `appliedSeconds` across every accrual in this period.
+  usedSeconds Int @default(0)
+
+  /// Notification guards for Step B. Non-null means "already sent this cycle";
+  /// a new period opens a new row, which re-arms both.
+  warnedAt80  DateTime?
+  warnedAt100 DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  community Community             @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  accruals  SessionUsageAccrual[]
+
+  @@unique([communityId, periodStart])
+  @@index([communityId])
+  @@map("community_video_usage")
+}
+
+/// One row per session, ever. `sessionId` is unique, which is what makes
+/// accrual idempotent: `endSessionJob`, the `room_finished` webhook and the
+/// hourly cron sweep all converge on the same row, and the second and third
+/// writers are refused by the database rather than by a check someone can
+/// forget to write. Idempotency is structural here, not defensive.
+model SessionUsageAccrual {
+  id          String @id @default(cuid())
+  sessionId   String @unique
+  communityId String
+  usageId     String
+
+  /// Sum of per-participant connected seconds. Requires the LiveKit webhook.
+  exactSeconds   Int
+  /// attendeeCount x real elapsed. Available without any webhook.
+  approxSeconds  Int
+  /// max(exact, approx) — the figure actually added to the counter.
+  appliedSeconds Int
+  /// "exact" | "approx", recording which of the two won.
+  basis          String
+
+  attendeeCount  Int
+  elapsedSeconds Int
+
+  accruedAt DateTime @default(now())
+
+  session MentorSession       @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  usage   CommunityVideoUsage @relation(fields: [usageId], references: [id], onDelete: Cascade)
+
+  @@index([communityId])
+  @@index([usageId])
+  @@map("session_usage_accruals")
+}
+
 enum PlatformPlan {
   START
   CREATOR
@@ -1440,19 +1510,19 @@ model ProcessedStripeEvent {
 // enforced and Report-Only policies declared in next.config.mjs, enabling the
 // "monitoring window" that Phase 4c needs before promoting Report-Only directives.
 model CspViolation {
-  id           String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  directive    String   // e.g. "script-src", "connect-src"
-  blockedUri   String   // The blocked resource URL (truncated to 2000 chars upstream)
-  documentUri  String?  // Page where the violation occurred
-  sourceFile   String?  // Source file of the violating script (if available)
+  directive    String // e.g. "script-src", "connect-src"
+  blockedUri   String // The blocked resource URL (truncated to 2000 chars upstream)
+  documentUri  String? // Page where the violation occurred
+  sourceFile   String? // Source file of the violating script (if available)
   lineNumber   Int?
   columnNumber Int?
 
-  userAgent    String?  // Request user-agent (truncated to 500 chars upstream)
-  mode         String   // "report-only" | "enforce" — derived from CSP disposition
+  userAgent String? // Request user-agent (truncated to 500 chars upstream)
+  mode      String // "report-only" | "enforce" — derived from CSP disposition
 
-  createdAt    DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@index([directive, createdAt])
   @@index([blockedUri])
