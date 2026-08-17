@@ -61,10 +61,14 @@ export const createCommunity = defineAction(
     try {
       const userId = ctx.userId;
 
-      // DEBUG: Verify user exists in database
+      // Not debug despite the label it used to carry: `platformPlan` feeds the
+      // plan gate below. `email` was selected only to be logged, so it is no
+      // longer read — the log printed a user's address into production logs on
+      // every community creation, which is the same PII leak the session jobs
+      // deliberately avoid.
       const userExists = await prisma.user.findUnique({
         where: { id: userId },
-        select: { id: true, email: true, platformPlan: true },
+        select: { id: true, platformPlan: true },
       });
 
       if (!userExists) {
@@ -74,8 +78,6 @@ export const createCommunity = defineAction(
           error: "User account not found. Please sign in again.",
         };
       }
-
-      console.log("Creating community for user:", userExists.email);
 
       // ── PLAN GATE: community limit ────────────────────────────────────────
       const planLimits = getLimitsForPlan(userExists.platformPlan);

@@ -87,6 +87,35 @@ jobs:
       - name: Lint
         run: npm run lint
 
+  build:
+    name: Next build
+    runs-on: ubuntu-latest
+    # Blocking. Without this, a build that compiles nowhere but Vercel is only
+    # discovered after merge, on the deploy — type-check and lint do not catch
+    # what the bundler catches (a bad dynamic import, a client component
+    # reaching for a server-only module, a route that fails to prerender).
+    #
+    # `npx next build`, never `npm run build`: the npm script is
+    # `prisma generate && prisma migrate deploy && next build`, and
+    # `migrate deploy` would try to run migrations against whatever DATABASE_URL
+    # resolves to. CI must never migrate a database, least of all production.
+    # `npm ci` already runs `prisma generate` through postinstall, so the client
+    # exists by the time the bundler needs its types.
+    #
+    # The dummy DATABASE_URL at the top of this file points at a port with
+    # nothing behind it. That is deliberate and sufficient: pages that query
+    # during prerender handle their own failures, so the build completes without
+    # a reachable database — verified before this job was added.
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24.x"
+          cache: "npm"
+      - run: npm ci
+      - name: Build
+        run: npx next build
+
   format-check:
     name: Prettier format check
     runs-on: ubuntu-latest

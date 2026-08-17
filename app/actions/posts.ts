@@ -7,6 +7,7 @@ import { PostContentType } from "@prisma/client";
 import { defineAction } from "@/lib/actions/define-action";
 import { assertPostAuthor, assertPostAuthorOrModerator } from "@/lib/actions/guards";
 import { communityById, communityOfPost } from "@/lib/actions/resolvers";
+import { postAttachmentsSchema, type PostAttachment } from "@/lib/attachments";
 
 const postIdSchema = z.string().min(1).max(64);
 
@@ -46,13 +47,24 @@ export const createPost = defineAction(
       return { success: false as const, error: "Content is too long" };
     }
 
-    let parsedAttachments: unknown = null;
+    // Parsed AND validated. This used to be a bare `JSON.parse` written to the
+    // row cast to `never`, so an attachment could carry a `javascript:` URL
+    // that `PremiumPostCard` then rendered into an `<a href>` — stored XSS on
+    // click. `postAttachmentsSchema` admits only absolute http/https URLs.
+    let parsedAttachments: PostAttachment[] | null = null;
     if (attachmentsRaw) {
+      let decoded: unknown;
       try {
-        parsedAttachments = JSON.parse(attachmentsRaw);
+        decoded = JSON.parse(attachmentsRaw);
       } catch {
         return { success: false as const, error: "Invalid attachments" };
       }
+
+      const validated = postAttachmentsSchema.safeParse(decoded);
+      if (!validated.success) {
+        return { success: false as const, error: "Invalid attachments" };
+      }
+      parsedAttachments = validated.data;
     }
 
     const normalizedContent = content?.trim() || (parsedAttachments ? "Shared an attachment" : "");
@@ -68,7 +80,7 @@ export const createPost = defineAction(
           communityId,
           isPublished: true,
           publishedAt: new Date(),
-          attachments: parsedAttachments as never,
+          attachments: parsedAttachments ?? undefined,
           contentType: ["DISCUSSION", "QUESTION", "ANNOUNCEMENT", "RESOURCE"].includes(contentType)
             ? (contentType as PostContentType)
             : "DISCUSSION",

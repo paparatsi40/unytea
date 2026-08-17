@@ -1,7 +1,7 @@
 {
   "name": "Unytea - Where Communities Unite",
   "short_name": "Unytea",
-  "description": "Build and grow thriving communities with video calls, courses, gamification, and more.",
+  "description": "Build and grow thriving communities with live sessions, courses, and monetization.",
   "start_url": "/dashboard",
   "display": "standalone",
   "background_color": "#0a0a1a",

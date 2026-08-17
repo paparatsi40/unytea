@@ -11,6 +11,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 import { SITE_URL } from "@/lib/site-url";
+import { baseOpenGraph } from "@/lib/seo/open-graph";
 
 export const viewport: Viewport = {
   themeColor: "#7c3aed",
@@ -28,7 +29,7 @@ export const metadata: Metadata = {
     template: "%s | Unytea",
   },
   description:
-    "Un perfil, todas tus comunidades. Sesiones en vivo, cursos, gamificación y monetización en una sola plataforma multiidioma. Alternativa moderna a Skool, Circle y Mighty Networks.",
+    "Un perfil, todas tus comunidades. Sesiones en vivo, cursos y monetización en una sola plataforma multiidioma. Alternativa moderna a Skool, Circle y Mighty Networks.",
   keywords: [
     "plataforma de comunidades",
     "alternativa a skool",
@@ -39,7 +40,6 @@ export const metadata: Metadata = {
     "community building",
     "live sessions",
     "online courses",
-    "gamification",
     "creators",
     "coaching communities",
     "buddy system",
@@ -68,24 +68,13 @@ export const metadata: Metadata = {
       "x-default": "/",
     },
   },
+  // Spread, never inline — see lib/seo/open-graph.ts. A page that writes its
+  // own `openGraph` object replaces this one whole.
   openGraph: {
-    type: "website",
-    locale: "en_US",
-    alternateLocale: ["es_ES", "fr_FR"],
-    url: SITE_URL,
+    ...baseOpenGraph,
     title: "Unytea — Where Communities Unite",
     description:
-      "The community platform for creators with more than one audience. Live sessions, courses, gamification, monetization. Multilingual from day one.",
-    siteName: "Unytea",
-    images: [
-      {
-        url: "/og",
-        width: 1200,
-        height: 630,
-        alt: "Unytea — Where Communities Unite",
-        type: "image/png",
-      },
-    ],
+      "The community platform for creators with more than one audience. Live sessions, courses, monetization. Multilingual from day one.",
   },
   twitter: {
     card: "summary_large_image",
@@ -128,7 +117,7 @@ const JSON_LD_ORGANIZATION = {
   url: SITE_URL,
   logo: `${SITE_URL}/icons/icon-512x512.png`,
   description:
-    "Community platform for creators with multiple audiences. Live sessions, courses, gamification and monetization in one multilingual app.",
+    "Community platform for creators with multiple audiences. Live sessions, courses and monetization in one multilingual app.",
   sameAs: [
     "https://twitter.com/unytea",
     "https://linkedin.com/company/unytea",
@@ -157,7 +146,7 @@ const JSON_LD_SOFTWARE = {
     description: "Free to start, paid plans available for monetization features.",
   },
   description:
-    "Build and grow online communities with live sessions, courses, gamification, and monetization tools.",
+    "Build and grow online communities with live sessions, courses, and monetization tools.",
   url: SITE_URL,
 };
 

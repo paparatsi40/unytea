@@ -110,7 +110,7 @@ export async function sendWelcomeEmail(to: string, data: WelcomeEmailData) {
       </h1>
       <p style="color: #a1a1aa; font-size: 16px; line-height: 1.6; margin: 0 0 24px 0;">
         Hey ${data.userName}, we're thrilled to have you. Unytea is where communities
-        come alive — with live sessions, courses, gamification, and real human connection.
+        come alive — with live sessions, courses, and real human connection.
       </p>
       <p style="color: #a1a1aa; font-size: 16px; line-height: 1.6; margin: 0 0 32px 0;">
         Here's what you can do right away:

@@ -13,5 +13,10 @@ Sentry.init({
 
   // Enable sending user PII (Personally Identifiable Information)
   // https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/options/#sendDefaultPii
-  sendDefaultPii: true,
+  // false, deliberately. Sentry's default attaches IP addresses, cookies and
+  // request headers to every event, which contradicts the privacy posture the
+  // rest of the codebase keeps — lib/jobs/session-jobs.ts logs a userId and
+  // explicitly refuses to log the email beside it. An error report is not a
+  // reason to ship user identifiers to a third party.
+  sendDefaultPii: false,
 });

@@ -653,9 +653,6 @@ export const getResources = defineAction(
       communityId: access.community.id,
     };
 
-    console.log("[getResources] Community ID:", access.community.id);
-    console.log("[getResources] User ID:", session.user.id);
-    console.log("[getResources] User role:", access.member.role);
 
     // Filtros opcionales
     if (validated.type) where.type = validated.type;
@@ -677,18 +674,9 @@ export const getResources = defineAction(
     // Solo mostrar públicos o del autor (para no-admins)
     const isAdmin = ["OWNER", "ADMIN", "MODERATOR"].includes(access.member.role);
 
-    console.log("[getResources] isAdmin:", isAdmin);
     if (!isAdmin) {
       where.OR = [...(where.OR || []), { isPublic: true }, { authorId: session.user.id }];
     }
-
-    console.log("[getResources] Where clause:", JSON.stringify(where, null, 2));
-
-    // DEBUG: Check ALL resources in community (no filters)
-    const allResources = await prisma.resource.count({
-      where: { communityId: access.community.id },
-    });
-    console.log("[getResources] ALL resources in community (no filters):", allResources);
 
     const skip = (validated.page - 1) * validated.limit;
 
@@ -718,16 +706,6 @@ export const getResources = defineAction(
       prisma.resource.count({ where }),
     ]);
 
-    console.log("[getResources] Total resources found:", total);
-    console.log("[getResources] Resources count:", resources.length);
-    if (resources.length > 0) {
-      console.log(
-        "[getResources] First resource:",
-        resources[0].title,
-        "by",
-        resources[0].authorId
-      );
-    }
 
     // Verificar si hay más resultados
     const hasMore = skip + resources.length < total;

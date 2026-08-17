@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { attachmentUrlListSchema } from "@/lib/attachments";
 import { defineAction } from "@/lib/actions/define-action";
 import { communityById } from "@/lib/actions/resolvers";
 import { emitRealtime } from "@/lib/pusher-server";
@@ -189,7 +190,7 @@ export const sendMessage = defineAction(
   {
     name: "sendMessage",
     auth: "user",
-    args: [z.string().min(1).max(64), z.string().max(10_000), z.array(z.string().max(2000)).max(20).optional()],
+    args: [z.string().min(1).max(64), z.string().max(10_000), attachmentUrlListSchema.optional()],
     rateLimit: "message",
   },
   async (ctx, conversationId: string, content: string, attachments?: string[]) => {
