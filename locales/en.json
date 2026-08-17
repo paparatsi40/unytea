@@ -1517,11 +1517,7 @@
           "privateLabel": "Private Community",
           "privateDescription": "Only approved members can see the community content",
           "requireApprovalLabel": "Require Approval for New Members",
-          "requireApprovalDescription": "You'll need to approve each member before they can join",
-          "customDomain": {
-            "label": "Custom Domain",
-            "description": "Available on Professional plan and above"
-          }
+          "requireApprovalDescription": "You'll need to approve each member before they can join"
         },
         "preview": {
           "title": "Preview",
@@ -2287,7 +2283,6 @@
           "features": [
             "Everything in Creator",
             "Live sessions up to 300 concurrent participants",
-            "Custom domain",
             "Advanced analytics",
             "Up to 5 admins"
           ]
@@ -2569,12 +2564,7 @@
       "business": {
         "name": "Business",
         "description": "For established hosts growing their community",
-        "features": [
-          "Everything in Creator",
-          "Custom domain",
-          "Advanced analytics",
-          "Up to 5 admins"
-        ]
+        "features": ["Everything in Creator", "Advanced analytics", "Up to 5 admins"]
       },
       "pro": {
         "name": "Pro",

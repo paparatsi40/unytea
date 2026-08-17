@@ -771,20 +771,21 @@ export default function NewCommunityPage() {
                 </div>
               </div>
 
-              {/* Custom Domain (Premium Feature) */}
-              <div className="rounded-lg border border-border bg-accent/50 p-4">
-                <div className="flex items-start space-x-3">
-                  <Sparkles className="h-5 w-5 text-primary" />
-                  <div>
-                    <p className="text-sm font-medium text-foreground">
-                      {t("steps.settings.customDomain.label")}
-                    </p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {t("steps.settings.customDomain.description")}
-                    </p>
-                  </div>
-                </div>
-              </div>
+              {/* Custom domain — DEFERRED, not dropped. A teaser card sat here
+                  offering "Custom Domain / Available on Professional plan and
+                  above", and nothing behind it worked: proxy.ts resolves
+                  requests by host only to redirect www to the apex, so a domain
+                  a host entered would never serve anything. (The copy was wrong
+                  twice over — "Professional" is not a plan we sell.)
+
+                  The scaffolding is left in place on purpose: the
+                  `Community.customDomain` column, the `PLAN_LIMITS.customDomain`
+                  flag and the `updateCommunity` parameter all still exist. Put
+                  this card back, and the feature line back into
+                  `billing.tiers.business.features` and
+                  `dashboard.billing.plans.BUSINESS.features`, once proxy.ts
+                  actually resolves a community from the request host.
+                  Roadmap: Pro / white-label. */}
             </>
           )}
 
