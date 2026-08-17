@@ -281,17 +281,91 @@ describe("sign-up page buttons", () => {
 });
 
 // ───────────────────────────────────────────────────────────────────────────
+describe("email account linking", () => {
+  /** The config object `lib/auth.ts` passed for one provider id. */
+  async function providerOptions(
+    id: string,
+    env: Record<string, string>
+  ): Promise<Record<string, unknown> | undefined> {
+    for (const key of OAUTH_ENV_KEYS) {
+      delete process.env[key];
+    }
+    Object.assign(process.env, env);
+
+    capturedConfigs.length = 0;
+    vi.resetModules();
+    await import("@/lib/auth");
+
+    const provider = capturedConfigs[0].providers.find((p) => p.id === id) as
+      | { options?: Record<string, unknown> }
+      | undefined;
+    return provider?.options;
+  }
+
+  it("lets Google link to an existing account for the same verified email", async () => {
+    // Without this, a user who signed up with email and password and later
+    // clicks "Continue with Google" gets OAuthAccountNotLinked and can never
+    // reach their account that way.
+    const options = await providerOptions("google", {
+      GOOGLE_CLIENT_ID: "gid",
+      GOOGLE_CLIENT_SECRET: "gsecret",
+    });
+
+    expect(options?.allowDangerousEmailAccountLinking).toBe(true);
+  });
+
+  it("does not let GitHub link by email, even once configured", async () => {
+    // The flag is safe only because Google verifies email ownership. GitHub is
+    // currently switched off, so this pins the intent for whenever it is not.
+    const options = await providerOptions("github", {
+      GOOGLE_CLIENT_ID: "gid",
+      GOOGLE_CLIENT_SECRET: "gsecret",
+      GITHUB_CLIENT_ID: "hid",
+      GITHUB_CLIENT_SECRET: "hsecret",
+    });
+
+    expect(options).toBeDefined();
+    expect(options?.allowDangerousEmailAccountLinking).toBeUndefined();
+  });
+
+  it("is the only provider carrying the flag", async () => {
+    for (const key of OAUTH_ENV_KEYS) {
+      delete process.env[key];
+    }
+    Object.assign(process.env, {
+      GOOGLE_CLIENT_ID: "gid",
+      GOOGLE_CLIENT_SECRET: "gsecret",
+      GITHUB_CLIENT_ID: "hid",
+      GITHUB_CLIENT_SECRET: "hsecret",
+    });
+
+    capturedConfigs.length = 0;
+    vi.resetModules();
+    await import("@/lib/auth");
+
+    const linking = capturedConfigs[0].providers.filter(
+      (p) => (p as { options?: Record<string, unknown> }).options?.allowDangerousEmailAccountLinking
+    );
+
+    expect(linking.map((p) => p.id)).toEqual(["google"]);
+  });
+});
+
+// ───────────────────────────────────────────────────────────────────────────
+// Structural assertions have to read code, not prose: the comments above the
+// providers array quote the old shape literally and would match. Same helper as
+// tests/unit/livekit-room-options.test.ts.
+function code(source: string): string {
+  return source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+}
+
 describe("lib/auth.ts source tripwires", () => {
   it("no longer asserts non-null on OAuth credentials", () => {
-    const source = fs.readFileSync(path.join(REPO_ROOT, "lib/auth.ts"), "utf8");
-    // Strip comments first: the ones above the providers array describe the old
-    // shape and would otherwise match. Same helper pattern as
-    // tests/unit/livekit-room-options.test.ts.
-    const code = source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/.*$/gm, "$1");
+    const source = code(fs.readFileSync(path.join(REPO_ROOT, "lib/auth.ts"), "utf8"));
 
-    expect(code).not.toContain("process.env.GOOGLE_CLIENT_ID!");
-    expect(code).not.toContain("process.env.GOOGLE_CLIENT_SECRET!");
-    expect(code).not.toContain("process.env.GITHUB_CLIENT_ID!");
-    expect(code).not.toContain("process.env.GITHUB_CLIENT_SECRET!");
+    expect(source).not.toContain("process.env.GOOGLE_CLIENT_ID!");
+    expect(source).not.toContain("process.env.GOOGLE_CLIENT_SECRET!");
+    expect(source).not.toContain("process.env.GITHUB_CLIENT_ID!");
+    expect(source).not.toContain("process.env.GITHUB_CLIENT_SECRET!");
   });
 });

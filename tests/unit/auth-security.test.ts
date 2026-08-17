@@ -2,6 +2,13 @@ import { describe, it, expect, beforeAll } from "vitest";
 import fs from "fs";
 import path from "path";
 
+// Structural assertions have to read code, not prose: a comment explaining a
+// pattern quotes it literally and would match. Same helper as
+// tests/unit/livekit-room-options.test.ts.
+function code(source: string): string {
+  return source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+}
+
 describe("Auth Security Checks", () => {
   let authFileContent: string;
   let credentialsFileContent: string;
@@ -15,8 +22,19 @@ describe("Auth Security Checks", () => {
       "utf-8"
     );
   });
-  it("should NOT have allowDangerousEmailAccountLinking", () => {
-    expect(authFileContent).not.toContain("allowDangerousEmailAccountLinking");
+  it("should enable allowDangerousEmailAccountLinking at most once", () => {
+    // This was a blanket ban. Google now carries the flag deliberately: it
+    // verifies email ownership, so linking an OAuth account to the existing
+    // password account for the same verified address is safe, and without it a
+    // user who signed up by email hits OAuthAccountNotLinked forever.
+    //
+    // The ban is narrowed rather than dropped, because the danger the original
+    // test guarded against is real for providers that do NOT verify ownership.
+    // Which provider carries it is asserted behaviourally against the config
+    // handed to NextAuth — see tests/unit/oauth-provider-gating.test.tsx. This
+    // remains a cheap tripwire against it spreading to a second provider.
+    const occurrences = code(authFileContent).split("allowDangerousEmailAccountLinking").length - 1;
+    expect(occurrences).toBe(1);
   });
   it("should use JWT session strategy", () => {
     expect(authFileContent).toContain('strategy: "jwt"');

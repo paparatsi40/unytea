@@ -99,7 +99,29 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   // assertions here. Those assertions were the reason a missing variable
   // travelled all the way to the OAuth handshake before failing.
   providers: [
-    ...(googleCredentials ? [Google(googleCredentials)] : []),
+    ...(googleCredentials
+      ? [
+          Google({
+            ...googleCredentials,
+            // Someone who signed up with email and password and later clicks
+            // "Continue with Google" on the same address used to hit
+            // OAuthAccountNotLinked: NextAuth refuses by default to attach an
+            // OAuth account to an existing user, because for a provider that
+            // does not verify email ownership, anyone who can claim an address
+            // at that provider could take over the account.
+            //
+            // Google does verify ownership, so the address in the profile is
+            // proof the person controls the mailbox — the same proof a password
+            // reset would rely on. Linking on it is the standard configuration
+            // for this provider.
+            //
+            // Deliberately scoped to Google alone. It must not be copied to
+            // GitHub or to any provider added later without first establishing
+            // that the provider verifies email ownership.
+            allowDangerousEmailAccountLinking: true,
+          }),
+        ]
+      : []),
     ...(githubCredentials ? [GitHub(githubCredentials)] : []),
     Credentials({
       name: "credentials",
