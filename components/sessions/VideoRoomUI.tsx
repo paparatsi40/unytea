@@ -99,6 +99,13 @@ export function VideoRoomUI({
 
   // Room context
   const participants = useParticipants();
+  // Speakers and audience are decided by publishing permission, which is what
+  // the token grants from the session role. Both lists used to key off
+  // `identity === localParticipant.identity`, so "Speakers" meant "everyone but
+  // me" and "Audience" meant "me" — which is why a host saw themselves filed
+  // under AUDIENCE regardless of role.
+  const speakers = participants.filter((p) => p.permissions?.canPublish);
+  const audience = participants.filter((p) => !p.permissions?.canPublish);
   const room = useRoomContext();
   const localParticipantData = useLocalParticipant();
   const localParticipant = localParticipantData.localParticipant;
@@ -661,31 +668,28 @@ export function VideoRoomUI({
               <p className="mb-2 px-2 text-xs font-medium uppercase text-zinc-500">
                 {t("participants.speakers")}
               </p>
-              {participants
-                .filter((p) => p.identity !== localParticipant.identity)
-                .map((p) => (
-                  <div
-                    key={p.identity}
-                    className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-zinc-800/50"
-                  >
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 text-sm font-medium text-white">
-                      {p.name?.charAt(0) || "?"}
-                    </div>
-                    <span className="text-sm text-zinc-300">
-                      {p.name || t("participants.unknown")}
-                    </span>
-                    {raisedHands.some((h) => h.identity === p.identity) && (
-                      <Hand className="ml-auto h-3.5 w-3.5 animate-bounce text-amber-400" />
-                    )}
-                    {p.isMicrophoneEnabled && (
-                      <div className="ml-auto flex items-center gap-1">
-                        <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-400" />
-                      </div>
-                    )}
+              {speakers.map((p) => (
+                <div
+                  key={p.identity}
+                  className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-zinc-800/50"
+                >
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 text-sm font-medium text-white">
+                    {p.name?.charAt(0) || "?"}
                   </div>
-                ))}
-              {participants.filter((p) => p.identity !== localParticipant.identity).length ===
-                0 && <p className="px-2 text-sm text-zinc-500">{t("participants.noSpeakers")}</p>}
+                  <span className="text-sm text-zinc-300">{p.name || t("participants.guest")}</span>
+                  {raisedHands.some((h) => h.identity === p.identity) && (
+                    <Hand className="ml-auto h-3.5 w-3.5 animate-bounce text-amber-400" />
+                  )}
+                  {p.isMicrophoneEnabled && (
+                    <div className="ml-auto flex items-center gap-1">
+                      <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-400" />
+                    </div>
+                  )}
+                </div>
+              ))}
+              {speakers.length === 0 && (
+                <p className="px-2 text-sm text-zinc-500">{t("participants.noSpeakers")}</p>
+              )}
             </div>
 
             {/* Audience Section */}
@@ -693,29 +697,20 @@ export function VideoRoomUI({
               <p className="mb-2 px-2 text-xs font-medium uppercase text-zinc-500">
                 {t("participants.audience")}
               </p>
-              {participants
-                .filter((p) => p.identity === localParticipant.identity)
-                .slice(0, 10)
-                .map((p) => (
-                  <div
-                    key={p.identity}
-                    className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-zinc-800/50"
-                  >
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-700 text-sm font-medium text-zinc-300">
-                      {p.name?.charAt(0) || "?"}
-                    </div>
-                    <span className="text-sm text-zinc-400">
-                      {p.name || t("participants.unknown")}
-                    </span>
+              {audience.slice(0, 10).map((p) => (
+                <div
+                  key={p.identity}
+                  className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-zinc-800/50"
+                >
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-700 text-sm font-medium text-zinc-300">
+                    {p.name?.charAt(0) || "?"}
                   </div>
-                ))}
-              {participants.filter((p) => p.identity === localParticipant.identity).length > 10 && (
+                  <span className="text-sm text-zinc-400">{p.name || t("participants.guest")}</span>
+                </div>
+              ))}
+              {audience.length > 10 && (
                 <p className="px-2 text-sm text-zinc-500">
-                  {t("participants.more", {
-                    count:
-                      participants.filter((p) => p.identity === localParticipant.identity).length -
-                      10,
-                  })}
+                  {t("participants.more", { count: audience.length - 10 })}
                 </p>
               )}
             </div>

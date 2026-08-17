@@ -88,7 +88,14 @@ export const joinSession = defineAction(
 
     const session = await prisma.mentorSession.findUnique({
       where: { id: sessionId },
-      select: { id: true, title: true, mentorId: true, status: true, videoRoomName: true, roomId: true },
+      select: {
+        id: true,
+        title: true,
+        mentorId: true,
+        status: true,
+        videoRoomName: true,
+        roomId: true,
+      },
     });
 
     if (!session) {
@@ -138,8 +145,29 @@ export const joinSession = defineAction(
 
     const canPublish = role === ParticipationRole.host || role === ParticipationRole.speaker;
 
+    // LiveKit populates `Participant.name` from the token's `name` claim and
+    // from nothing else. This token only ever carried `identity`, so every
+    // participant arrived nameless and the room rendered the "unknown" fallback
+    // for all of them — the label read as a bug because it was one, on our side
+    // of the connection. `identity` cannot double as the name: it is
+    // `${sessionId}:${userId}`, deliberately opaque and stable for attendance
+    // dedup.
+    const profile = await prisma.user.findUnique({
+      where: { id: ctx.userId },
+      select: { name: true, firstName: true, lastName: true, username: true },
+    });
+    const displayName =
+      profile?.name?.trim() ||
+      [profile?.firstName, profile?.lastName].filter(Boolean).join(" ").trim() ||
+      profile?.username?.trim() ||
+      "";
+
     const token = new AccessToken(LIVEKIT_API_KEY, LIVEKIT_API_SECRET, {
       identity,
+      // Empty is omitted rather than sent: an empty name would overwrite
+      // nothing but reads as "we set it", and the client fallback is the place
+      // that decides what a nameless participant is called.
+      ...(displayName ? { name: displayName } : {}),
       ttl: TOKEN_TTL_SECONDS,
     });
     token.metadata = JSON.stringify({
@@ -185,7 +213,9 @@ export const leaveSession = defineAction(
     }
 
     const leftAt = new Date();
-    const durationSeconds = Math.floor((leftAt.getTime() - participation.joinedAt.getTime()) / 1000);
+    const durationSeconds = Math.floor(
+      (leftAt.getTime() - participation.joinedAt.getTime()) / 1000
+    );
 
     await prisma.sessionParticipation.update({
       where: { id: participation.id },
@@ -208,11 +238,7 @@ export const updateParticipantRole = defineAction(
   {
     name: "updateParticipantRole",
     auth: "member",
-    args: [
-      sessionIdSchema,
-      z.string().min(1).max(64),
-      z.nativeEnum(ParticipationRole),
-    ],
+    args: [sessionIdSchema, z.string().min(1).max(64), z.nativeEnum(ParticipationRole)],
     community: ([sessionId]) => communityOfSession(sessionId),
   },
   async (ctx, sessionId, targetUserId, newRole) => {
@@ -286,7 +312,9 @@ export const getSessionParticipants = defineAction(
       participants: participants.map((p) => ({
         id: p.id,
         userId: p.user.id,
-        name: p.user.name || "Unknown",
+        // Null rather than a literal: the surface that renders it owns the
+        // wording, and it has to be localized.
+        name: p.user.name,
         image: p.user.image,
         role: p.role,
         joinedAt: p.joinedAt,

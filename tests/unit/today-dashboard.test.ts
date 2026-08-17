@@ -216,6 +216,64 @@ describe("getTodayDashboard", () => {
     expect(result?.recentActivity[2].actorName).toBe("Alice");
   });
 
+  /**
+   * Every post row used to read "X posted in Y", so five posts in one community
+   * rendered as five identical lines. The row now carries what the post was
+   * about, taken from the same query that was already fetching it.
+   */
+  describe("post rows say what the post was about", () => {
+    function mockPost(post: Record<string, unknown>) {
+      vi.mocked(prisma.member.findMany).mockResolvedValueOnce([]).mockResolvedValueOnce([]);
+      vi.mocked(prisma.post.findMany).mockResolvedValue([
+        {
+          author: { name: "Carlos" },
+          createdAt: new Date("2026-05-20"),
+          community: { slug: "unytea", name: "unytea" },
+          ...post,
+        },
+      ] as unknown as PostResult);
+    }
+
+    it("uses the title when the post has one", async () => {
+      mockPost({ title: "Weekly retro", content: "body text" });
+
+      const result = await getTodayDashboard();
+      expect(result?.recentActivity[0].summary).toBe("Weekly retro");
+    });
+
+    it("falls back to an excerpt of the body when there is no title", async () => {
+      mockPost({ title: null, content: "## Heading\n\nSomething **worth** reading" });
+
+      const summary = (await getTodayDashboard())?.recentActivity[0].summary;
+      // Markup stripped, whitespace collapsed.
+      expect(summary).toBe("Heading Something worth reading");
+    });
+
+    it("truncates a long body instead of shipping it whole", async () => {
+      mockPost({ title: null, content: "x".repeat(500) });
+
+      const summary = (await getTodayDashboard())?.recentActivity[0].summary ?? "";
+      expect(summary.length).toBeLessThanOrEqual(60);
+      expect(summary.endsWith("…")).toBe(true);
+    });
+
+    it("leaves the summary out when there is nothing to say", async () => {
+      mockPost({ title: null, content: "   " });
+
+      expect((await getTodayDashboard())?.recentActivity[0].summary).toBeUndefined();
+    });
+
+    it("survives a post row with no content at all", async () => {
+      // Non-null in the schema, but a decorative line must not be able to take
+      // the whole dashboard down.
+      mockPost({ title: null, content: undefined });
+
+      const result = await getTodayDashboard();
+      expect(result?.recentActivity).toHaveLength(1);
+      expect(result?.recentActivity[0].summary).toBeUndefined();
+    });
+  });
+
   it("recentActivity capped at 10 events", async () => {
     const members = Array.from({ length: 8 }, (_, i) => ({
       user: { name: `User${i}` },

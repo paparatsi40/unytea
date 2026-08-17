@@ -13,12 +13,49 @@ export interface TodayCommunity {
   role: "owner" | "member";
 }
 
+/**
+ * The one-line gist of a post: its title, or the opening of the body when it
+ * has none. Markup is stripped and whitespace collapsed, because `content` is a
+ * plain column that may carry light markdown.
+ */
+function postSummary(
+  title: string | null | undefined,
+  content: string | null | undefined
+): string | undefined {
+  const trimmedTitle = title?.trim();
+  if (trimmedTitle) return truncate(trimmedTitle, 60);
+
+  // Both nullable on purpose. `content` is non-null in the schema, but one row
+  // arriving without it must not take the whole dashboard down for a decorative
+  // line — the card simply falls back to "posted in {community}".
+  const plain = (content ?? "")
+    .replace(/<[^>]*>/g, "")
+    .replace(/[*_`#>]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  return plain ? truncate(plain, 60) : undefined;
+}
+
+function truncate(value: string, max: number): string {
+  return value.length <= max ? value : `${value.slice(0, max - 1).trimEnd()}…`;
+}
+
 export interface TodayActivity {
   type: "new_member" | "new_post";
   at: Date;
   actorName: string;
   communityName: string;
   href: string;
+  /**
+   * What the post was about — its title, or an excerpt of the body when it has
+   * none. Absent for member joins, and absent for a post with neither.
+   *
+   * Without it every post row read "X posted in Y", so five posts in the same
+   * community rendered as five identical lines and the card carried no
+   * information at all.
+   */
+  summary?: string;
 }
 
 export interface TodayDashboardData {
@@ -150,9 +187,16 @@ export const getTodayDashboard = defineAction(
         take: 5,
       }),
 
+      // `select`, not `include`: this used to pull every scalar on Post — the
+      // full body of five posts, up to 50k characters each — to render one
+      // line. It now fetches exactly the four fields the card needs, still in
+      // the same single query, so the title arrives with no extra round trip.
       prisma.post.findMany({
         where: { community: { ownerId: userId }, createdAt: { gte: weekAgo }, deletedAt: null },
-        include: {
+        select: {
+          title: true,
+          content: true,
+          createdAt: true,
           author: { select: { name: true } },
           community: { select: { slug: true, name: true } },
         },
@@ -205,6 +249,9 @@ export const getTodayDashboard = defineAction(
         actorName: p.author?.name ?? "Someone",
         communityName: p.community.name,
         href: `/dashboard/c/${p.community.slug}/feed`,
+        // Truncated here rather than in the component: the body never needs to
+        // cross the wire in full for a one-line row.
+        summary: postSummary(p.title, p.content),
       })),
     ]
       .sort((a, b) => b.at.getTime() - a.at.getTime())

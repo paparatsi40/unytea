@@ -1732,7 +1732,9 @@
           "mode": "Modo",
           "host": "Anfitrión",
           "community": "Comunidad",
-          "postedToFeed": "Publicado en el feed de la comunidad"
+          "postedToFeed": "Publicado en el feed de la comunidad",
+          "hostUnnamed": "Anfitrión sin nombre",
+          "communityUnnamed": "Comunidad sin nombre"
         },
         "quickActions": {
           "title": "Acciones rápidas",
@@ -2200,7 +2202,8 @@
         "title": "Actividad reciente",
         "noActivity": "No hay actividad reciente. Aparecerá aquí a medida que crezcan tus comunidades.",
         "newMember": "{actor} se unió a {community}",
-        "newPost": "{actor} publicó en {community}"
+        "newPost": "{actor} publicó en {community}",
+        "newPostTitled": "{actor} publicó «{summary}» en {community}"
       },
       "quickActions": {
         "title": "Acciones rápidas",
@@ -2876,10 +2879,10 @@
         "audience": "Audiencia",
         "raisedHands": "Manos levantadas ({count})",
         "noSpeakers": "Aún no hay oradores",
-        "unknown": "Desconocido",
         "more": "+{count} más",
         "inviteToSpeak": "Invitar a hablar",
-        "dismiss": "Descartar"
+        "dismiss": "Descartar",
+        "guest": "Invitado"
       },
       "handQueue": {
         "title": "Cola de manos levantadas"
@@ -2938,8 +2941,8 @@
       "whiteboardUnavailableDesc": "Esta sesión aún no tiene una pizarra vinculada.",
       "noScreenTitle": "No se está compartiendo ninguna pantalla",
       "noScreenDesc": "Comparte tu pantalla para presentar diapositivas, demos o tutoriales.",
-      "noCameraTitle": "No hay vídeo de cámara disponible",
-      "noCameraWaiting": "Esperando la pista de vídeo…",
+      "noCameraTitle": "Esperando a que empiece el vídeo…",
+      "noCameraWaiting": "Tu cámara está encendida. Esperando a que empiece el vídeo.",
       "noCameraDesc": "Enciende tu cámara o espera la cámara de otro participante."
     },
     "localVideo": {

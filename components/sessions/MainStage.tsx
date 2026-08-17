@@ -9,7 +9,7 @@ import {
 } from "@livekit/components-react";
 import { Track, LocalTrack } from "livekit-client";
 import { useTranslations } from "next-intl";
-import { Monitor, Video, Pencil, Headphones } from "lucide-react";
+import { Monitor, Pencil, Headphones, Sparkles } from "lucide-react";
 import { SessionMode } from "./ModeSwitcher";
 import { SessionWhiteboard } from "./SessionWhiteboard";
 import { LocalVideo } from "./LocalVideo";
@@ -37,6 +37,40 @@ function EmptyStage({
       <div className="flex max-w-md flex-col items-center gap-4 rounded-2xl border border-zinc-800 bg-zinc-900/80 px-8 py-10 text-center shadow-2xl">
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-purple-600/90">
           <Icon className="h-8 w-8 text-white" />
+        </div>
+        <div>
+          <p className="text-lg font-semibold text-white">{title}</p>
+          <p className="mt-1 text-sm text-zinc-400">{description}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * The empty video stage, with a face on it.
+ *
+ * When nobody has a camera on, the stage used to be a flat near-black rectangle
+ * with a small card floating in it — indistinguishable, at a glance, from a
+ * player that failed to load. This fills the surface with a soft brand gradient
+ * and puts the Unytea mark on it, so an empty room reads as waiting rather than
+ * broken.
+ *
+ * Only the empty branch uses it. When there is a track to show, the stage is
+ * untouched — video still renders on black, which is what video wants.
+ */
+function BrandedEmptyStage({ title, description }: { title: string; description: string }) {
+  return (
+    <div className="relative flex h-full min-h-[420px] items-center justify-center overflow-hidden bg-gradient-to-br from-zinc-900 via-purple-950/40 to-zinc-900">
+      {/* Soft halo behind the mark, so the surface reads as lit rather than off. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-purple-600/20 blur-3xl"
+      />
+      <div className="relative flex max-w-md flex-col items-center gap-5 px-8 text-center">
+        {/* The same lockup the auth pages and the footer use. */}
+        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 shadow-lg">
+          <Sparkles className="h-8 w-8 text-white" />
         </div>
         <div>
           <p className="text-lg font-semibold text-white">{title}</p>
@@ -205,8 +239,7 @@ export function MainStage({
             <VideoTrack className="h-full w-full object-cover" trackRef={mainCameraTrack} />
           </div>
         ) : (
-          <EmptyStage
-            icon={Video}
+          <BrandedEmptyStage
             title={t("noCameraTitle")}
             description={isCameraEnabled ? t("noCameraWaiting") : t("noCameraDesc")}
           />

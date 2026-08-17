@@ -1722,7 +1722,9 @@
           "mode": "Mode",
           "host": "Host",
           "community": "Community",
-          "postedToFeed": "Posted to community feed"
+          "postedToFeed": "Posted to community feed",
+          "hostUnnamed": "Unnamed host",
+          "communityUnnamed": "Untitled community"
         },
         "quickActions": {
           "title": "Quick Actions",
@@ -2190,7 +2192,8 @@
         "title": "Recent activity",
         "noActivity": "No recent activity. Things will show up here as your communities grow.",
         "newMember": "{actor} joined {community}",
-        "newPost": "{actor} posted in {community}"
+        "newPost": "{actor} posted in {community}",
+        "newPostTitled": "{actor} posted “{summary}” in {community}"
       },
       "quickActions": {
         "title": "Quick actions",
@@ -2866,10 +2869,10 @@
         "audience": "Audience",
         "raisedHands": "Raised Hands ({count})",
         "noSpeakers": "No speakers yet",
-        "unknown": "Unknown",
         "more": "+{count} more",
         "inviteToSpeak": "Invite to speak",
-        "dismiss": "Dismiss"
+        "dismiss": "Dismiss",
+        "guest": "Guest"
       },
       "handQueue": {
         "title": "Hand Raised Queue"
@@ -2928,8 +2931,8 @@
       "whiteboardUnavailableDesc": "This session does not have a whiteboard linked yet.",
       "noScreenTitle": "No screen is being shared",
       "noScreenDesc": "Share your screen to present slides, demos, or walkthroughs.",
-      "noCameraTitle": "No camera video available",
-      "noCameraWaiting": "Waiting for video track…",
+      "noCameraTitle": "Waiting for video…",
+      "noCameraWaiting": "Your camera is on — waiting for the video to start.",
       "noCameraDesc": "Turn on your camera or wait for another participant's camera."
     },
     "localVideo": {
