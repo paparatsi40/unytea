@@ -63,13 +63,19 @@ export interface PlanLimits {
   maxMembers: number;
   transactionFee: number;
   /**
-   * DEFERRED — nothing reads this, and nothing serves a custom domain.
+   * DEFERRED — false on every plan, deliberately.
+
+   * Nothing reads this and nothing serves a custom domain.
    *
    * `proxy.ts` resolves the request host only to redirect www to the apex; no
-   * code maps a host to a community. The values below are kept as the intended
-   * plan design rather than flipped to false, so whoever builds this knows
-   * which tiers it was meant for — but they are a plan, not a promise, and no
-   * user-facing surface may present them as one until the resolution exists.
+   * code maps a host to a community. Every plan is now `false` so that a future
+   * reader of this flag cannot render the perk by accident — a `true` sitting
+   * here waiting for someone to wire a checkmark to it is how a promise comes
+   * back without anyone deciding to make it.
+   *
+   * The intent is recorded here instead: this was designed as a Business and
+   * Pro perk. Set BUSINESS and PRO back to `true` when `proxy.ts` resolves a
+   * community from the request host.
    *
    * The claim used to appear in three places, all removed:
    * `billing.tiers.business.features`, `dashboard.billing.plans.BUSINESS.features`,
@@ -114,7 +120,7 @@ export const PLAN_LIMITS: Record<PlatformPlan, PlanLimits> = {
     maxCommunities: 1,
     maxMembers: Infinity,
     transactionFee: percentToRate(PLATFORM_FEE_PERCENT.BUSINESS),
-    customDomain: true,
+    customDomain: false,
     whiteLabel: false,
     apiAccess: false,
     maxAdmins: 5,
@@ -126,7 +132,7 @@ export const PLAN_LIMITS: Record<PlatformPlan, PlanLimits> = {
     maxCommunities: 3,
     maxMembers: Infinity,
     transactionFee: percentToRate(PLATFORM_FEE_PERCENT.PRO),
-    customDomain: true,
+    customDomain: false,
     whiteLabel: true,
     apiAccess: true,
     maxAdmins: Infinity,
