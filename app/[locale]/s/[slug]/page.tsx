@@ -12,6 +12,7 @@ import {
 import { PublicSessionPage } from "@/components/sessions/PublicSessionPage";
 import { SessionJsonLd } from "@/components/sessions/SessionJsonLd";
 import { SITE_URL } from "@/lib/site-url";
+import { baseOpenGraph } from "@/lib/seo/open-graph";
 
 interface Props {
   params: Promise<{ slug: string; locale: string }>;
@@ -56,8 +57,15 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     session.description?.slice(0, 160) ||
     t("descriptionFallback", { name: session.mentor.name || t("defaultExpert") });
 
-  const imageUrl =
-    session.community?.imageUrl || session.mentor.image || `${SITE_URL}/og-image.png`;
+  // Same broken fallback as the community page: /og-image.png is not in
+  // public/. Left undefined, the shared defaults supply the /og route instead.
+  const imageUrl = session.community?.imageUrl || session.mentor.image;
+
+  // This page's canonical carries no locale prefix, so its og:url cannot come
+  // from `localizedOpenGraph`. It has to match the canonical below exactly —
+  // og:url is the page's identity in the graph, and one pointing at the
+  // homepage would attribute every share of a session to the homepage.
+  const canonical = `${SITE_URL}/s/${params.slug}`;
 
   return {
     title,
@@ -70,20 +78,20 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
       session.community?.name || "",
     ].filter(Boolean),
     openGraph: {
+      ...baseOpenGraph,
+      url: canonical,
       title,
       description,
-      type: "website",
-      images: [{ url: imageUrl, width: 1200, height: 630 }],
-      siteName: "Unytea",
+      ...(imageUrl ? { images: [{ url: imageUrl, width: 1200, height: 630 }] } : {}),
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: [imageUrl],
+      images: [imageUrl ?? "/og"],
     },
     alternates: {
-      canonical: `${SITE_URL}/s/${params.slug}`,
+      canonical,
     },
     robots: {
       index: true,

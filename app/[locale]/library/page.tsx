@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { localizedAlternates } from "@/lib/seo/locale-metadata";
+import { localizedOpenGraph } from "@/lib/seo/open-graph";
 import { Badge } from "@/components/ui/badge";
 import { BookOpen, PlayCircle, Sparkles, TrendingUp } from "lucide-react";
-import { SITE_URL } from "@/lib/site-url";
 
 function formatDate(date: Date) {
   return date.toLocaleDateString("en-US", {
@@ -43,7 +43,6 @@ export async function generateMetadata(props: {
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const params = await props.params;
-  const canonical = `${SITE_URL}/${params.locale}/library`;
   const title = "Knowledge Library | Unytea";
   const description =
     "Watch curated session replays, discover key topics, and learn from the best community sessions on Unytea.";
@@ -52,19 +51,20 @@ export async function generateMetadata(props: {
     title,
     description,
     ...localizedAlternates({ path: "/library", locale: params.locale }),
+    // The images this used to declare pointed at /og-image.png, which does not
+    // exist in public/ — a 404 where the preview card should be, which is worse
+    // than no image at all. Falling through to the shared defaults uses the /og
+    // route that actually renders one.
     openGraph: {
+      ...localizedOpenGraph(params.locale, "/library"),
       title,
       description,
-      type: "website",
-      url: canonical,
-      images: [{ url: `${SITE_URL}/og-image.png`, width: 1200, height: 630 }],
-      siteName: "Unytea",
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: [`${SITE_URL}/og-image.png`],
+      images: ["/og"],
     },
     robots: { index: true, follow: true },
   };

@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getAllPosts } from "./posts";
 import { localizedAlternates } from "@/lib/seo/locale-metadata";
+import { localizedOpenGraph } from "@/lib/seo/open-graph";
 
 const META = {
   title: "Blog | Unytea",
@@ -17,9 +18,9 @@ export async function generateMetadata(props: {
     title: META.title,
     description: META.description,
     openGraph: {
+      ...localizedOpenGraph(params.locale, "/blog"),
       title: META.title,
       description: META.description,
-      type: "website",
     },
     twitter: {
       card: "summary_large_image",
