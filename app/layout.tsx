@@ -11,6 +11,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 import { SITE_URL } from "@/lib/site-url";
+import { baseOpenGraph } from "@/lib/seo/open-graph";
 
 export const viewport: Viewport = {
   themeColor: "#7c3aed",
@@ -67,24 +68,13 @@ export const metadata: Metadata = {
       "x-default": "/",
     },
   },
+  // Spread, never inline — see lib/seo/open-graph.ts. A page that writes its
+  // own `openGraph` object replaces this one whole.
   openGraph: {
-    type: "website",
-    locale: "en_US",
-    alternateLocale: ["es_ES", "fr_FR"],
-    url: SITE_URL,
+    ...baseOpenGraph,
     title: "Unytea — Where Communities Unite",
     description:
       "The community platform for creators with more than one audience. Live sessions, courses, monetization. Multilingual from day one.",
-    siteName: "Unytea",
-    images: [
-      {
-        url: "/og",
-        width: 1200,
-        height: 630,
-        alt: "Unytea — Where Communities Unite",
-        type: "image/png",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",

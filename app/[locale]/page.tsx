@@ -26,6 +26,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { getLatestPosts } from "./blog/posts";
 import { localizedAlternates } from "@/lib/seo/locale-metadata";
+import { localizedOpenGraph } from "@/lib/seo/open-graph";
 import { HeaderAuthCTA } from "./_home/HeaderAuthCTA";
 import { DemoVideoTrigger } from "./_home/DemoVideoTrigger";
 import { FeatureCard } from "./_home/FeatureCard";
@@ -68,10 +69,13 @@ export async function generateMetadata(props: {
   return {
     title: m.title,
     description: m.description,
+    // Spread the shared defaults. Writing a bare object here is what stripped
+    // the homepage of og:image, og:url and og:site_name — see
+    // lib/seo/open-graph.ts.
     openGraph: {
+      ...localizedOpenGraph(locale),
       title: m.title,
       description: m.description,
-      type: "website",
     },
     ...localizedAlternates({ path: "", locale }),
   };
