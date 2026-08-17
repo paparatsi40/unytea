@@ -62,6 +62,20 @@ export interface PlanLimits {
   maxCommunities: number;
   maxMembers: number;
   transactionFee: number;
+  /**
+   * DEFERRED — nothing reads this, and nothing serves a custom domain.
+   *
+   * `proxy.ts` resolves the request host only to redirect www to the apex; no
+   * code maps a host to a community. The values below are kept as the intended
+   * plan design rather than flipped to false, so whoever builds this knows
+   * which tiers it was meant for — but they are a plan, not a promise, and no
+   * user-facing surface may present them as one until the resolution exists.
+   *
+   * The claim used to appear in three places, all removed:
+   * `billing.tiers.business.features`, `dashboard.billing.plans.BUSINESS.features`,
+   * and a teaser card in the community-creation wizard.
+   * Roadmap: Pro / white-label.
+   */
   customDomain: boolean;
   whiteLabel: boolean;
   apiAccess: boolean;

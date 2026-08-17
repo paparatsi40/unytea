@@ -1527,11 +1527,7 @@
           "privateLabel": "Comunidad Privada",
           "privateDescription": "Solo los miembros aprobados pueden ver el contenido de la comunidad",
           "requireApprovalLabel": "Requerir Aprobación para Nuevos Miembros",
-          "requireApprovalDescription": "Tendrás que aprobar a cada miembro antes de que puedan unirse",
-          "customDomain": {
-            "label": "Dominio Personalizado",
-            "description": "Disponible en el plan Professional y superiores"
-          }
+          "requireApprovalDescription": "Tendrás que aprobar a cada miembro antes de que puedan unirse"
         },
         "preview": {
           "title": "Vista Previa",
@@ -2297,7 +2293,6 @@
           "features": [
             "Todo lo de Creator",
             "Live sessions hasta 300 participantes concurrentes",
-            "Dominio personalizado",
             "Analíticas avanzadas",
             "Hasta 5 admins"
           ]
@@ -2579,12 +2574,7 @@
       "business": {
         "name": "Business",
         "description": "Para hosts establecidos creciendo su comunidad",
-        "features": [
-          "Todo lo de Creator",
-          "Dominio custom",
-          "Analytics avanzados",
-          "Hasta 5 admins"
-        ]
+        "features": ["Todo lo de Creator", "Analytics avanzados", "Hasta 5 admins"]
       },
       "pro": {
         "name": "Pro",
