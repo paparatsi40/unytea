@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { BCRYPT_COST } from "@/lib/auth-hashing";
 import { NextRequest } from "next/server";
 
 vi.mock("bcryptjs", () => ({
@@ -93,7 +94,7 @@ describe("POST /api/auth/signup", () => {
     vi.mocked(prisma.user.findUnique).mockResolvedValue(null);
     vi.mocked(prisma.user.create).mockResolvedValue({} as never);
     await POST(makeRequest({ name: "Test", email: "new@example.com", password: "mypassword123" }));
-    expect(bcrypt.default.hash).toHaveBeenCalledWith("mypassword123", 10);
+    expect(bcrypt.default.hash).toHaveBeenCalledWith("mypassword123", BCRYPT_COST);
   });
   it("should return identical responses for existing and new users", async () => {
     vi.mocked(prisma.user.findUnique).mockResolvedValue({ id: "x" } as never);
