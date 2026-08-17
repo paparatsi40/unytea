@@ -4,11 +4,18 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Chrome, Github, Mail, Lock, ArrowRight, Sparkles } from "lucide-react";
+import { Mail, Lock, ArrowRight, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
+import { OAuthButtons } from "@/components/auth/OAuthButtons";
+import type { OAuthProviderId } from "@/lib/auth-providers";
 
-export function SignInContent() {
+interface SignInContentProps {
+  /** Registered OAuth providers, resolved on the server in `page.tsx`. */
+  oauthProviders: OAuthProviderId[];
+}
+
+export function SignInContent({ oauthProviders }: SignInContentProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams?.get("callbackUrl") || "/dashboard";
@@ -18,7 +25,7 @@ export function SignInContent() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleOAuthSignIn = async (provider: "google" | "github") => {
+  const handleOAuthSignIn = async (provider: OAuthProviderId) => {
     try {
       setIsLoading(true);
       await signIn(provider, { callbackUrl });
@@ -77,36 +84,13 @@ export function SignInContent() {
 
         {/* Main Card */}
         <div className="rounded-2xl border border-gray-100 bg-white/80 p-8 shadow-xl backdrop-blur-xl">
-          {/* OAuth Buttons */}
-          <div className="mb-6 space-y-3">
-            <button
-              onClick={() => handleOAuthSignIn("google")}
-              disabled={isLoading}
-              className="group flex w-full items-center justify-center gap-3 rounded-xl border-2 border-gray-200 bg-white px-4 py-3 transition-all hover:border-purple-300 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <Chrome className="h-5 w-5 text-gray-700 transition-colors group-hover:text-purple-600" />
-              <span className="font-medium text-gray-700">{t("auth.continueWithGoogle")}</span>
-            </button>
-
-            <button
-              onClick={() => handleOAuthSignIn("github")}
-              disabled={isLoading}
-              className="group flex w-full items-center justify-center gap-3 rounded-xl border-2 border-gray-200 bg-white px-4 py-3 transition-all hover:border-purple-300 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <Github className="h-5 w-5 text-gray-700 transition-colors group-hover:text-purple-600" />
-              <span className="font-medium text-gray-700">{t("auth.continueWithGitHub")}</span>
-            </button>
-          </div>
-
-          {/* Divider */}
-          <div className="relative mb-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="bg-white px-4 text-gray-500">{t("auth.orContinueWith")}</span>
-            </div>
-          </div>
+          {/* OAuth buttons — only for providers the server actually registered */}
+          <OAuthButtons
+            providers={oauthProviders}
+            dividerLabel={t("auth.orContinueWith")}
+            disabled={isLoading}
+            onSelect={handleOAuthSignIn}
+          />
 
           {/* Email/Password Form */}
           <form onSubmit={handleCredentialsSignIn} className="space-y-4">

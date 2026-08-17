@@ -1,9 +1,19 @@
-"use client";
-
 import { Suspense } from "react";
 import { SignInContent } from "./signin-content";
+import { configuredOAuthProviders } from "@/lib/auth-providers";
 
+/**
+ * A Server Component so the OAuth button list is resolved where the credentials
+ * live. The alternative — `getProviders()` from `next-auth/react` — would ship
+ * the page with no buttons, fetch `/api/auth/providers`, and pop them in a tick
+ * later; deriving it here renders the correct set in the first paint.
+ *
+ * `SignInContent` stays a Client Component: it owns the form state and reads
+ * `useSearchParams`, which is why the Suspense boundary below has to remain.
+ */
 export default function SignInPage() {
+  const oauthProviders = configuredOAuthProviders();
+
   return (
     <Suspense
       fallback={
@@ -31,7 +41,7 @@ export default function SignInPage() {
         </div>
       }
     >
-      <SignInContent />
+      <SignInContent oauthProviders={oauthProviders} />
     </Suspense>
   );
 }

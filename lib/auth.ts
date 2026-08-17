@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { authorizeCredentials } from "@/lib/auth-credentials";
 import type { UserRole } from "@prisma/client";
 import { sessionCookieName, shouldUseSecureCookies } from "@/lib/auth-cookies";
+import { oauthCredentials } from "@/lib/auth-providers";
 
 // Extend the built-in session types
 declare module "next-auth" {
@@ -40,6 +41,9 @@ declare module "@auth/core/jwt" {
     role?: UserRole;
   }
 }
+
+const googleCredentials = oauthCredentials("google");
+const githubCredentials = oauthCredentials("github");
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NextAuth v5 (beta) and @auth/prisma-adapter ship slightly divergent Adapter interfaces; PrismaAdapter's return type does not structurally match the Adapter type NextAuth expects at this boundary. Cast is required until both packages stabilize on a shared @auth/core version.
@@ -84,15 +88,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     verifyRequest: "/auth/verify",
     newUser: "/onboarding",
   },
+  // An OAuth provider is registered only when both of its env vars are present.
+  // An unconfigured provider therefore does not exist at all: no entry in
+  // /api/auth/providers, no callback route, and — because the sign-in and
+  // sign-up pages derive their buttons from the same `lib/auth-providers.ts` —
+  // no button offering it. Credentials is unconditional; email and password are
+  // always available.
+  //
+  // The credentials come back already validated, which is why there are no `!`
+  // assertions here. Those assertions were the reason a missing variable
+  // travelled all the way to the OAuth handshake before failing.
   providers: [
-    Google({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    }),
-    GitHub({
-      clientId: process.env.GITHUB_CLIENT_ID!,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
-    }),
+    ...(googleCredentials ? [Google(googleCredentials)] : []),
+    ...(githubCredentials ? [GitHub(githubCredentials)] : []),
     Credentials({
       name: "credentials",
       credentials: {
