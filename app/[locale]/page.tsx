@@ -501,45 +501,38 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
               title={t("featureGrid.screenShare.title")}
               description={t("featureGrid.screenShare.description")}
             />
-            <FeatureCard
-              image="https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=400&q=80"
-              title={t("featureGrid.aiCoach.title")}
-              description={t("featureGrid.aiCoach.description")}
-            />
           </div>
         </div>
       </section>
 
-      {/* 3️⃣.5 AI SECTION */}
+      {/* 3️⃣.5 POST-SESSION FOLLOW-UP
+          Was "AI SECTION", with an AI Coach card beside this one. Nothing in
+          the codebase implements that coach — no aiCoach/AICoach/ai-coach
+          anywhere under lib/, app/actions/ or components/ — so the card and its
+          keys are gone. The recap that remains is real but calls no model: it
+          is assembled from session data and the notes taken during the session
+          (lib/jobs/session-recap.ts). With neither half being AI, the section
+          is framed around what it actually is. */}
       <section className="bg-muted/30 py-20">
         <div className="container mx-auto px-4">
-          <div className="mb-16 text-center">
-            <Badge className="mb-4">{t("aiSection.badge")}</Badge>
-            <h2 className="mb-4 text-4xl font-bold">{t("aiSection.title")}</h2>
+          <div className="mb-12 text-center">
+            <Badge className="mb-4">{t("followUp.badge")}</Badge>
+            <h2 className="mb-4 text-4xl font-bold">{t("followUp.title")}</h2>
             <p className="mx-auto max-w-2xl text-xl text-muted-foreground">
-              {t("aiSection.subtitle")}
+              {t("followUp.subtitle")}
             </p>
           </div>
-          <div className="mx-auto grid max-w-4xl gap-8 md:grid-cols-2">
-            <div className="rounded-xl border bg-white p-8 shadow-sm transition-all hover:shadow-lg">
-              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-purple-100">
-                <Sparkles className="h-7 w-7 text-purple-600" />
-              </div>
-              <p className="mb-1 text-sm font-semibold uppercase tracking-wide text-purple-600">
-                {t("aiSection.coach.eyebrow")}
-              </p>
-              <h3 className="mb-3 text-2xl font-bold">{t("aiSection.coach.title")}</h3>
-              <p className="text-muted-foreground">{t("aiSection.coach.description")}</p>
-            </div>
+          {/* One card, centred, rather than a two-column grid left half empty. */}
+          <div className="mx-auto max-w-2xl">
             <div className="rounded-xl border bg-white p-8 shadow-sm transition-all hover:shadow-lg">
               <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-purple-100">
                 <RotateCw className="h-7 w-7 text-purple-600" />
               </div>
               <p className="mb-1 text-sm font-semibold uppercase tracking-wide text-purple-600">
-                {t("aiSection.recap.eyebrow")}
+                {t("followUp.recap.eyebrow")}
               </p>
-              <h3 className="mb-3 text-2xl font-bold">{t("aiSection.recap.title")}</h3>
-              <p className="text-muted-foreground">{t("aiSection.recap.description")}</p>
+              <h3 className="mb-3 text-2xl font-bold">{t("followUp.recap.title")}</h3>
+              <p className="text-muted-foreground">{t("followUp.recap.description")}</p>
             </div>
           </div>
         </div>
@@ -598,12 +591,6 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
             />
             <ComparisonRow
               feature={t("comparison.rows.screenShare")}
-              skool="✗"
-              unytea="✓"
-              highlighted
-            />
-            <ComparisonRow
-              feature={t("comparison.rows.aiCoach")}
               skool="✗"
               unytea="✓"
               highlighted

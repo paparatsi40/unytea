@@ -181,59 +181,6 @@
         "chatMessage3": "Pouvez-vous partager le modèle ?"
       }
     },
-    "features": {
-      "title": "Tout ce dont Vous Avez Besoin",
-      "subtitle": "Tous les outils pour construire, engager et monétiser votre communauté",
-      "video": {
-        "title": "Vidéo Intégrée",
-        "description": "Appels 1-à-1 et en groupe avec enregistrement"
-      },
-      "courses": {
-        "title": "Constructeur de Cours",
-        "description": "Créez et vendez des cours facilement"
-      },
-      "community": {
-        "title": "Fil Communautaire",
-        "description": "Interagissez avec posts, commentaires, réactions"
-      },
-      "analytics": {
-        "title": "Analytiques",
-        "description": "Suivez la croissance et l'engagement"
-      },
-      "monetize": {
-        "title": "Monétisation",
-        "description": "Adhésions payantes et cours"
-      }
-    },
-    "timeline": {
-      "title": "Votre Voyage Commence Ici",
-      "subtitle": "Voici exactement ce qui se passe lorsque vous rejoignez Unytea",
-      "day1": {
-        "title": "Créez Votre Compte",
-        "description": "Inscrivez-vous en 30 secondes. Aucune carte de crédit requise pour l'essai gratuit.",
-        "time": "Jour 1"
-      },
-      "setup": {
-        "title": "Configurez Votre Communauté",
-        "description": "Choisissez votre mise en page, personnalisez votre marque et définissez les règles de votre communauté.",
-        "time": "Jour 1-2"
-      },
-      "invite": {
-        "title": "Invitez Vos Premiers Membres",
-        "description": "Utilisez notre système d'invitation ou partagez le lien de votre communauté. Regardez les membres rejoindre instantanément.",
-        "time": "Jour 2-3"
-      },
-      "launch": {
-        "title": "Lancez Votre Premier Contenu",
-        "description": "Publiez votre première mise à jour, créez un cours ou planifiez une session en direct.",
-        "time": "Jour 3-5"
-      },
-      "ongoing": {
-        "title": "Grandissez et Monétisez",
-        "description": "Engagez votre communauté, suivez les analytiques et commencez à générer des revenus.",
-        "time": "Semaine 2+"
-      }
-    },
     "blogSection": {
       "eyebrow": "Depuis le blog",
       "title": "Lectures pratiques pour bâtisseurs de communautés",
@@ -322,8 +269,8 @@
         "description": "Bientôt : l'enregistrement n'est pas encore disponible"
       },
       "summary": {
-        "title": "Résumé par IA",
-        "description": "Les moments clés extraits automatiquement"
+        "title": "Récap",
+        "description": "Les idées clés, rassemblées à partir de vos notes de session"
       },
       "discussion": {
         "title": "Discussion",
@@ -361,23 +308,14 @@
       "screenShare": {
         "title": "Partage d'écran",
         "description": "Présentez diapositives, démos et tutoriels sans accroc."
-      },
-      "aiCoach": {
-        "title": "Coach IA",
-        "description": "Suggestions, modération et idées de contenu propulsées par l'IA."
       }
     },
-    "aiSection": {
-      "badge": "IA",
-      "title": "Une IA qui change vraiment la donne",
-      "subtitle": "Deux capacités d'IA pensées autour de vos sessions.",
-      "coach": {
-        "eyebrow": "Coach IA",
-        "title": "Savoir quoi faire avant que l'engagement ne retombe.",
-        "description": "Le Coach IA prend le pouls de votre communauté. Il vous alerte dès que la participation faiblit et vous propose l'action précise qui la relance — « publiez une question 24 h avant la prochaine session » — automatiquement."
-      },
+    "followUp": {
+      "badge": "Après la session",
+      "title": "La session se termine. Ce qu'elle laisse, non.",
+      "subtitle": "Chaque session en direct devient quelque chose auquel votre communauté peut revenir.",
       "recap": {
-        "eyebrow": "Récap IA",
+        "eyebrow": "Récap",
         "title": "De la session à un récap prêt à relire",
         "description": "Chaque session devient un récap — idées clés, chapitres et une question pour lancer la discussion — à partir des notes prises pendant la session. Vous le relisez et le modifiez avant qu'il n'arrive à votre communauté."
       }
@@ -425,9 +363,8 @@
         "liveVideo": "Sessions vidéo en direct",
         "whiteboard": "Tableau blanc collaboratif",
         "screenShare": "Partage d'écran",
-        "aiCoach": "Coach IA",
         "certificates": "Certificats",
-        "multiLanguage": "Multilingue (i18n)",
+        "multiLanguage": "Plusieurs langues",
         "customDomain": "Domaine personnalisé",
         "quizzes": "Quiz et évaluations",
         "platformFee": "Commission de la plateforme"

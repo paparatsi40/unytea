@@ -181,59 +181,6 @@
         "chatMessage3": "Can you share the template?"
       }
     },
-    "features": {
-      "title": "Everything You Need",
-      "subtitle": "All the tools to build, engage, and monetize your community",
-      "video": {
-        "title": "Built-in Video",
-        "description": "1-on-1 and group calls with recording"
-      },
-      "courses": {
-        "title": "Course Builder",
-        "description": "Create and sell courses with ease"
-      },
-      "community": {
-        "title": "Community Feed",
-        "description": "Engage with posts, comments, reactions"
-      },
-      "analytics": {
-        "title": "Analytics",
-        "description": "Track growth and engagement"
-      },
-      "monetize": {
-        "title": "Monetization",
-        "description": "Paid memberships and courses"
-      }
-    },
-    "timeline": {
-      "title": "Your Journey Starts Here",
-      "subtitle": "Here's exactly what happens when you join Unytea",
-      "day1": {
-        "title": "Create Your Account",
-        "description": "Sign up in 30 seconds. No credit card required for the free trial.",
-        "time": "Day 1"
-      },
-      "setup": {
-        "title": "Set Up Your Community",
-        "description": "Choose your layout, customize your branding, and set your community rules.",
-        "time": "Day 1-2"
-      },
-      "invite": {
-        "title": "Invite Your First Members",
-        "description": "Use our invite system or share your community link. Watch members join instantly.",
-        "time": "Day 2-3"
-      },
-      "launch": {
-        "title": "Launch Your First Content",
-        "description": "Post your first update, create a course, or schedule a live session.",
-        "time": "Day 3-5"
-      },
-      "ongoing": {
-        "title": "Grow & Monetize",
-        "description": "Engage your community, track analytics, and start generating revenue.",
-        "time": "Week 2+"
-      }
-    },
     "blogSection": {
       "eyebrow": "From the blog",
       "title": "Tactical reads for community builders",
@@ -322,8 +269,8 @@
         "description": "Coming soon — recording isn't available yet"
       },
       "summary": {
-        "title": "AI Summary",
-        "description": "Key moments extracted automatically"
+        "title": "Recap",
+        "description": "Takeaways pulled together from your session notes"
       },
       "discussion": {
         "title": "Discussion",
@@ -361,23 +308,14 @@
       "screenShare": {
         "title": "Screen Sharing",
         "description": "Present slides, demos, and tutorials seamlessly."
-      },
-      "aiCoach": {
-        "title": "AI Coach",
-        "description": "Get AI-powered suggestions, moderation, and content ideas."
       }
     },
-    "aiSection": {
-      "badge": "AI",
-      "title": "AI that actually moves the needle",
-      "subtitle": "Two AI capabilities built around your sessions.",
-      "coach": {
-        "eyebrow": "AI Coach",
-        "title": "Know what to do next. Before engagement drops.",
-        "description": "AI Coach watches your community's pulse. Alerts you when attendance trends down. Suggests the exact action that brings them back — “Post a question 24h before your next session” — automated."
-      },
+    "followUp": {
+      "badge": "After the session",
+      "title": "The session ends. What it leaves doesn't.",
+      "subtitle": "Every live session turns into something your community can come back to.",
       "recap": {
-        "eyebrow": "AI Recap",
+        "eyebrow": "Recap",
         "title": "Sessions → a recap ready to review",
         "description": "Every session turns into a recap — key takeaways, chapters and a discussion prompt, drawn from the notes taken during the session. You read it and edit it before it reaches your community."
       }
@@ -415,9 +353,8 @@
         "liveVideo": "Live Video Sessions",
         "whiteboard": "Collaborative Whiteboard",
         "screenShare": "Screen Sharing",
-        "aiCoach": "AI Coach",
         "certificates": "Certificates",
-        "multiLanguage": "Multi-language (i18n)",
+        "multiLanguage": "Multiple languages",
         "customDomain": "Custom Domain",
         "quizzes": "Quizzes & Assessments",
         "platformFee": "Platform Fee"

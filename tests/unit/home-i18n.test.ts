@@ -146,7 +146,10 @@ describe("the new copy is real translation, not English pasted three times", () 
     "whyFail",
     "howItWorks",
     "featureGrid",
-    "aiSection",
+    // Was "aiSection". Renamed when the AI Coach came out — nothing in the
+    // codebase implements it — and the recap that remains calls no model, so a
+    // namespace called "aiSection" was advertising a capability we do not have.
+    "followUp",
     "useCases",
     "comparison",
     "monetization",

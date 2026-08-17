@@ -181,59 +181,6 @@
         "chatMessage3": "¿Puedes compartir la plantilla?"
       }
     },
-    "features": {
-      "title": "Todo lo que Necesitas",
-      "subtitle": "Todas las herramientas para construir, interactuar y monetizar tu comunidad",
-      "video": {
-        "title": "Video Integrado",
-        "description": "Llamadas 1-a-1 y grupales con grabación"
-      },
-      "courses": {
-        "title": "Constructor de Cursos",
-        "description": "Crea y vende cursos fácilmente"
-      },
-      "community": {
-        "title": "Feed de Comunidad",
-        "description": "Interactúa con posts, comentarios, reacciones"
-      },
-      "analytics": {
-        "title": "Analíticas",
-        "description": "Rastrea crecimiento y engagement"
-      },
-      "monetize": {
-        "title": "Monetización",
-        "description": "Membresías pagadas y cursos"
-      }
-    },
-    "timeline": {
-      "title": "Tu Viaje Comienza Aquí",
-      "subtitle": "Así es exactamente lo que sucede cuando te unes a Unytea",
-      "day1": {
-        "title": "Crea Tu Cuenta",
-        "description": "Regístrate en 30 segundos. No se requiere tarjeta de crédito para la prueba gratuita.",
-        "time": "Día 1"
-      },
-      "setup": {
-        "title": "Configura Tu Comunidad",
-        "description": "Elige tu diseño, personaliza tu marca y establece las reglas de tu comunidad.",
-        "time": "Día 1-2"
-      },
-      "invite": {
-        "title": "Invita Tus Primeros Miembros",
-        "description": "Usa nuestro sistema de invitaciones o comparte el enlace de tu comunidad. Observa cómo se unen al instante.",
-        "time": "Día 2-3"
-      },
-      "launch": {
-        "title": "Lanza Tu Primer Contenido",
-        "description": "Publica tu primera actualización, crea un curso o programa una sesión en vivo.",
-        "time": "Día 3-5"
-      },
-      "ongoing": {
-        "title": "Crece y Monetiza",
-        "description": "Interactúa con tu comunidad, sigue las analíticas y comienza a generar ingresos.",
-        "time": "Semana 2+"
-      }
-    },
     "blogSection": {
       "eyebrow": "Desde el blog",
       "title": "Lecturas prácticas para creadores de comunidades",
@@ -322,8 +269,8 @@
         "description": "Próximamente: la grabación aún no está disponible"
       },
       "summary": {
-        "title": "Resumen con IA",
-        "description": "Los momentos clave, extraídos automáticamente"
+        "title": "Recap",
+        "description": "Las ideas clave, reunidas a partir de tus notas de la sesión"
       },
       "discussion": {
         "title": "Conversación",
@@ -361,23 +308,14 @@
       "screenShare": {
         "title": "Pantalla compartida",
         "description": "Presenta diapositivas, demos y tutoriales sin fricción."
-      },
-      "aiCoach": {
-        "title": "Coach con IA",
-        "description": "Sugerencias, moderación e ideas de contenido con IA."
       }
     },
-    "aiSection": {
-      "badge": "IA",
-      "title": "IA que de verdad mueve la aguja",
-      "subtitle": "Dos capacidades de IA construidas alrededor de tus sesiones.",
-      "coach": {
-        "eyebrow": "Coach con IA",
-        "title": "Sabe qué hacer antes de que caiga la participación.",
-        "description": "El Coach con IA le toma el pulso a tu comunidad. Te avisa cuando la asistencia empieza a bajar y te propone la acción exacta que la recupera —«publica una pregunta 24 h antes de la próxima sesión»— y la automatiza."
-      },
+    "followUp": {
+      "badge": "Después de la sesión",
+      "title": "La sesión termina. Lo que deja, no.",
+      "subtitle": "Cada sesión en vivo se convierte en algo a lo que tu comunidad puede volver.",
       "recap": {
-        "eyebrow": "Recap con IA",
+        "eyebrow": "Recap",
         "title": "De la sesión a un recap listo para revisar",
         "description": "Cada sesión se convierte en un recap —ideas clave, capítulos y una pregunta para abrir conversación— a partir de las notas que se toman durante la sesión. Tú lo lees y lo editas antes de que llegue a tu comunidad."
       }
@@ -425,9 +363,8 @@
         "liveVideo": "Sesiones de vídeo en directo",
         "whiteboard": "Pizarra colaborativa",
         "screenShare": "Pantalla compartida",
-        "aiCoach": "Coach con IA",
         "certificates": "Certificados",
-        "multiLanguage": "Multiidioma (i18n)",
+        "multiLanguage": "Varios idiomas",
         "customDomain": "Dominio propio",
         "quizzes": "Cuestionarios y evaluaciones",
         "platformFee": "Comisión de plataforma"
