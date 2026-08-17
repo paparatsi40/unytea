@@ -286,25 +286,25 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
               <div className="flex h-5 w-5 items-center justify-center rounded-full bg-green-100">
                 <CheckCircle className="h-3 w-3 text-green-600" />
               </div>
-              <span>Live sessions</span>
+              <span>{t("bullets.live")}</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="flex h-5 w-5 items-center justify-center rounded-full bg-green-100">
                 <CheckCircle className="h-3 w-3 text-green-600" />
               </div>
-              <span>Courses</span>
+              <span>{t("bullets.courses")}</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="flex h-5 w-5 items-center justify-center rounded-full bg-green-100">
                 <CheckCircle className="h-3 w-3 text-green-600" />
               </div>
-              <span>Community discussions</span>
+              <span>{t("bullets.discussions")}</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="flex h-5 w-5 items-center justify-center rounded-full bg-green-100">
                 <CheckCircle className="h-3 w-3 text-green-600" />
               </div>
-              <span>Built-in monetization</span>
+              <span>{t("bullets.monetization")}</span>
             </div>
           </div>
         </div>
@@ -315,18 +315,16 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="mb-6 text-3xl font-bold md:text-4xl">
-              Most community platforms are built like{" "}
-              <span className="text-muted-foreground">forums from 2010</span>.
+              {t("problem.titleStart")}
+              <span className="text-muted-foreground">{t("problem.titleHighlight")}</span>.
             </h2>
-            <p className="mb-8 text-lg text-muted-foreground">
-              They focus on posts and discussions. But modern communities need more:
-            </p>
+            <p className="mb-8 text-lg text-muted-foreground">{t("problem.subtitle")}</p>
             <div className="grid gap-6 md:grid-cols-3">
               <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
                 <div className="group relative mb-4 h-40 w-full overflow-hidden rounded-xl bg-gradient-to-br from-gray-100 to-gray-200">
                   <ProblemImage
                     src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=400&q=80"
-                    alt="Boring meeting"
+                    alt={t("problem.live.imageAlt")}
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-500 shadow-lg">
@@ -334,16 +332,14 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
                     </div>
                   </div>
                 </div>
-                <h3 className="mb-2 text-lg font-semibold">Live interaction</h3>
-                <p className="text-sm text-muted-foreground">
-                  Missing real-time video, whiteboard, screen sharing
-                </p>
+                <h3 className="mb-2 text-lg font-semibold">{t("problem.live.title")}</h3>
+                <p className="text-sm text-muted-foreground">{t("problem.live.description")}</p>
               </div>
               <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
                 <div className="group relative mb-4 h-40 w-full overflow-hidden rounded-xl bg-gradient-to-br from-gray-100 to-gray-200">
                   <ProblemImage
                     src="https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?auto=format&fit=crop&w=400&q=80"
-                    alt="Disorganized materials"
+                    alt={t("problem.learning.imageAlt")}
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-500 shadow-lg">
@@ -351,14 +347,14 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
                     </div>
                   </div>
                 </div>
-                <h3 className="mb-2 text-lg font-semibold">Structured learning</h3>
-                <p className="text-sm text-muted-foreground">No integrated courses or workshops</p>
+                <h3 className="mb-2 text-lg font-semibold">{t("problem.learning.title")}</h3>
+                <p className="text-sm text-muted-foreground">{t("problem.learning.description")}</p>
               </div>
               <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
                 <div className="group relative mb-4 h-40 w-full overflow-hidden rounded-xl bg-gradient-to-br from-gray-100 to-gray-200">
                   <ProblemImage
                     src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=400&q=80"
-                    alt="Complex payments"
+                    alt={t("problem.monetization.imageAlt")}
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-500 shadow-lg">
@@ -366,13 +362,16 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
                     </div>
                   </div>
                 </div>
-                <h3 className="mb-2 text-lg font-semibold">Monetization tools</h3>
-                <p className="text-sm text-muted-foreground">Complex payment setups, high fees</p>
+                <h3 className="mb-2 text-lg font-semibold">{t("problem.monetization.title")}</h3>
+                <p className="text-sm text-muted-foreground">
+                  {t("problem.monetization.description")}
+                </p>
               </div>
             </div>
             <p className="mt-12 text-xl font-medium">
-              <span className="font-bold text-primary">Unytea</span> was built for modern community
-              businesses.
+              {t.rich("problem.conclusion", {
+                brand: (chunks) => <span className="font-bold text-primary">{chunks}</span>,
+              })}
             </p>
           </div>
         </div>
@@ -383,34 +382,34 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
         <div className="container mx-auto px-4">
           <div className="mb-16 text-center">
             <Badge variant="destructive" className="mb-4">
-              The problem
+              {t("whyFail.badge")}
             </Badge>
-            <h2 className="mb-4 text-4xl font-bold">Why most communities fail</h2>
+            <h2 className="mb-4 text-4xl font-bold">{t("whyFail.title")}</h2>
             <p className="mx-auto max-w-2xl text-xl text-muted-foreground">
-              Joining is easy. Showing up isn&apos;t.
+              {t("whyFail.subtitle")}
             </p>
           </div>
           <div className="mx-auto mb-12 grid max-w-3xl gap-6 md:grid-cols-2">
             <div className="flex items-start gap-3">
               <X className="mt-1 h-6 w-6 flex-shrink-0 text-red-500" />
-              <p className="text-lg">Members join. Then they disappear.</p>
+              <p className="text-lg">{t("whyFail.pain1")}</p>
             </div>
             <div className="flex items-start gap-3">
               <X className="mt-1 h-6 w-6 flex-shrink-0 text-red-500" />
-              <p className="text-lg">Content gets consumed once, then forgotten.</p>
+              <p className="text-lg">{t("whyFail.pain2")}</p>
             </div>
             <div className="flex items-start gap-3">
               <X className="mt-1 h-6 w-6 flex-shrink-0 text-red-500" />
-              <p className="text-lg">Discussions die after the first week.</p>
+              <p className="text-lg">{t("whyFail.pain3")}</p>
             </div>
             <div className="flex items-start gap-3">
               <X className="mt-1 h-6 w-6 flex-shrink-0 text-red-500" />
-              <p className="text-lg">Attendance drops every session.</p>
+              <p className="text-lg">{t("whyFail.pain4")}</p>
             </div>
           </div>
           <div className="mx-auto max-w-2xl text-center">
             <p className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-2xl font-semibold text-transparent">
-              Unytea turns every live session into a growth loop.
+              {t("whyFail.conclusion")}
             </p>
           </div>
         </div>
@@ -420,42 +419,32 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="mb-16 text-center">
-            <Badge className="mb-4">Workflow</Badge>
-            <h2 className="mb-4 text-4xl font-bold">How Unytea works</h2>
+            <Badge className="mb-4">{t("howItWorks.badge")}</Badge>
+            <h2 className="mb-4 text-4xl font-bold">{t("howItWorks.title")}</h2>
             <p className="mx-auto max-w-2xl text-xl text-muted-foreground">
-              Live sessions are just the start. Every session compounds into community growth.
+              {t("howItWorks.subtitle")}
             </p>
           </div>
           <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-3 lg:grid-cols-6">
             {[
-              { icon: Radio, title: "Session", description: "Host live with your community" },
-              { icon: Video, title: "Recording", description: "Auto-captured, ready to share" },
-              {
-                icon: Sparkles,
-                title: "AI Summary",
-                description: "Key moments extracted automatically",
-              },
-              {
-                icon: MessageSquare,
-                title: "Discussion",
-                description: "Threads continue post-session",
-              },
-              { icon: BookOpen, title: "Library", description: "Searchable knowledge that grows" },
-              {
-                icon: TrendingUp,
-                title: "Growth",
-                description: "Engagement compounds into retention",
-              },
+              { icon: Radio, key: "session" },
+              { icon: Video, key: "recording" },
+              { icon: Sparkles, key: "summary" },
+              { icon: MessageSquare, key: "discussion" },
+              { icon: BookOpen, key: "library" },
+              { icon: TrendingUp, key: "growth" },
             ].map((step, i) => {
               const Icon = step.icon;
               return (
-                <div key={step.title} className="flex flex-col items-center text-center">
+                <div key={step.key} className="flex flex-col items-center text-center">
                   <div className="relative mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary to-purple-600 text-lg font-bold text-white shadow-lg">
                     {i + 1}
                   </div>
                   <Icon className="mb-2 h-8 w-8 text-primary" />
-                  <h3 className="mb-2 font-semibold">{step.title}</h3>
-                  <p className="text-sm text-muted-foreground">{step.description}</p>
+                  <h3 className="mb-2 font-semibold">{t(`howItWorks.${step.key}.title`)}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {t(`howItWorks.${step.key}.description`)}
+                  </p>
                 </div>
               );
             })}
@@ -467,12 +456,10 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
       <section id="features" className="py-20">
         <div className="container mx-auto px-4">
           <div className="mb-16 text-center">
-            <Badge className="mb-4">Features</Badge>
-            <h2 className="mb-4 text-4xl font-bold">
-              Everything you need to run a community business
-            </h2>
+            <Badge className="mb-4">{t("featureGrid.badge")}</Badge>
+            <h2 className="mb-4 text-4xl font-bold">{t("featureGrid.title")}</h2>
             <p className="mx-auto max-w-2xl text-xl text-muted-foreground">
-              One platform. All your tools. Zero integration headaches.
+              {t("featureGrid.subtitle")}
             </p>
           </div>
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -480,36 +467,36 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
             <div className="md:col-span-2 lg:col-span-1 lg:row-span-2">
               <FeatureCard
                 image="https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b?auto=format&fit=crop&w=600&q=80"
-                title="🎥 Live Sessions"
-                description="Interactive video calls with whiteboard, screen sharing, and recordings. Our most loved feature."
+                title={t("featureGrid.live.title")}
+                description={t("featureGrid.live.description")}
                 highlighted
                 large
               />
             </div>
             <FeatureCard
               image="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=400&q=80"
-              title="Courses"
-              description="Create, host, and sell courses with progress tracking and certificates."
+              title={t("featureGrid.courses.title")}
+              description={t("featureGrid.courses.description")}
             />
             <FeatureCard
               image="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=400&q=80"
-              title="Community Feed"
-              description="Engage your members with posts, comments, reactions, and direct messaging."
+              title={t("featureGrid.feed.title")}
+              description={t("featureGrid.feed.description")}
             />
             <FeatureCard
               image="https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=400&q=80"
-              title="Whiteboard"
-              description="Collaborate visually in real-time during live sessions."
+              title={t("featureGrid.whiteboard.title")}
+              description={t("featureGrid.whiteboard.description")}
             />
             <FeatureCard
               image="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=400&q=80"
-              title="Screen Sharing"
-              description="Present slides, demos, and tutorials seamlessly."
+              title={t("featureGrid.screenShare.title")}
+              description={t("featureGrid.screenShare.description")}
             />
             <FeatureCard
               image="https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=400&q=80"
-              title="AI Coach"
-              description="Get AI-powered suggestions, moderation, and content ideas."
+              title={t("featureGrid.aiCoach.title")}
+              description={t("featureGrid.aiCoach.description")}
             />
           </div>
         </div>
@@ -519,10 +506,10 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
       <section className="bg-muted/30 py-20">
         <div className="container mx-auto px-4">
           <div className="mb-16 text-center">
-            <Badge className="mb-4">AI</Badge>
-            <h2 className="mb-4 text-4xl font-bold">AI that actually moves the needle</h2>
+            <Badge className="mb-4">{t("aiSection.badge")}</Badge>
+            <h2 className="mb-4 text-4xl font-bold">{t("aiSection.title")}</h2>
             <p className="mx-auto max-w-2xl text-xl text-muted-foreground">
-              Two AI capabilities built around your sessions.
+              {t("aiSection.subtitle")}
             </p>
           </div>
           <div className="mx-auto grid max-w-4xl gap-8 md:grid-cols-2">
@@ -531,29 +518,20 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
                 <Sparkles className="h-7 w-7 text-purple-600" />
               </div>
               <p className="mb-1 text-sm font-semibold uppercase tracking-wide text-purple-600">
-                AI Coach
+                {t("aiSection.coach.eyebrow")}
               </p>
-              <h3 className="mb-3 text-2xl font-bold">
-                Know what to do next. Before engagement drops.
-              </h3>
-              <p className="text-muted-foreground">
-                AI Coach watches your community&apos;s pulse. Alerts you when attendance trends
-                down. Suggests the exact action that brings them back — &ldquo;Post a question 24h
-                before your next session&rdquo; — automated.
-              </p>
+              <h3 className="mb-3 text-2xl font-bold">{t("aiSection.coach.title")}</h3>
+              <p className="text-muted-foreground">{t("aiSection.coach.description")}</p>
             </div>
             <div className="rounded-xl border bg-white p-8 shadow-sm transition-all hover:shadow-lg">
               <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-purple-100">
                 <RotateCw className="h-7 w-7 text-purple-600" />
               </div>
               <p className="mb-1 text-sm font-semibold uppercase tracking-wide text-purple-600">
-                AI Recap
+                {t("aiSection.recap.eyebrow")}
               </p>
-              <h3 className="mb-3 text-2xl font-bold">Sessions → reusable content automatically</h3>
-              <p className="text-muted-foreground">
-                Live recording becomes summary, highlights, library entries, and discussion prompts.
-                One session powers a week of content.
-              </p>
+              <h3 className="mb-3 text-2xl font-bold">{t("aiSection.recap.title")}</h3>
+              <p className="text-muted-foreground">{t("aiSection.recap.description")}</p>
             </div>
           </div>
         </div>
@@ -563,42 +541,25 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
       <section className="bg-gradient-to-br from-purple-50 to-pink-50 py-20">
         <div className="container mx-auto px-4">
           <div className="mb-16 text-center">
-            <Badge className="mb-4">Use Cases</Badge>
-            <h2 className="mb-4 text-4xl font-bold">Communities built on Unytea</h2>
-            <p className="text-xl text-muted-foreground">
-              See how different creators use our platform
-            </p>
+            <Badge className="mb-4">{t("useCases.badge")}</Badge>
+            <h2 className="mb-4 text-4xl font-bold">{t("useCases.title")}</h2>
+            <p className="text-xl text-muted-foreground">{t("useCases.subtitle")}</p>
           </div>
           <div className="grid gap-8 md:grid-cols-3">
             <UseCaseCard
               image="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&q=80"
-              title="Coaching Communities"
-              features={[
-                "Weekly group calls",
-                "Paid memberships",
-                "Student discussions",
-                "1-on-1 scheduling",
-              ]}
+              title={t("useCases.coaching.title")}
+              features={t.raw("useCases.coaching.features")}
             />
             <UseCaseCard
               image="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&q=80"
-              title="Learning Communities"
-              features={[
-                "Online courses",
-                "Live workshops",
-                "Community support",
-                "Progress tracking",
-              ]}
+              title={t("useCases.learning.title")}
+              features={t.raw("useCases.learning.features")}
             />
             <UseCaseCard
               image="https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&q=80"
-              title="Expert Communities"
-              features={[
-                "Mastermind groups",
-                "Live Q&A sessions",
-                "Premium content",
-                "Direct access",
-              ]}
+              title={t("useCases.expert.title")}
+              features={t.raw("useCases.expert.features")}
             />
           </div>
         </div>
@@ -608,36 +569,75 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
       <section id="comparison" className="bg-muted/30 py-20">
         <div className="container mx-auto px-4">
           <div className="mb-16 text-center">
-            <Badge className="mb-4">Comparison</Badge>
-            <h2 className="mb-4 text-4xl font-bold">Why creators choose Unytea</h2>
-            <p className="text-xl text-muted-foreground">See how we compare to other platforms</p>
+            <Badge className="mb-4">{t("comparison.badge")}</Badge>
+            <h2 className="mb-4 text-4xl font-bold">{t("comparison.title")}</h2>
+            <p className="text-xl text-muted-foreground">{t("comparison.subtitle")}</p>
           </div>
           <div className="mx-auto max-w-3xl overflow-hidden rounded-2xl bg-white shadow-xl">
             <div className="grid grid-cols-3 bg-muted/50 p-4 font-semibold">
-              <div>Feature</div>
+              <div>{t("comparison.headerFeature")}</div>
               <div className="text-center">Skool</div>
               <div className="text-center text-primary">Unytea</div>
             </div>
-            <ComparisonRow feature="Community Feed" skool="✓" unytea="✓" />
-            <ComparisonRow feature="Courses" skool="✓" unytea="✓" />
-            <ComparisonRow feature="Live Video Sessions" skool="✓" unytea="✓" />
-            <ComparisonRow feature="Collaborative Whiteboard" skool="✗" unytea="✓" highlighted />
-            <ComparisonRow feature="Screen Sharing" skool="✗" unytea="✓" highlighted />
-            <ComparisonRow feature="AI Coach" skool="✗" unytea="✓" highlighted />
-            <ComparisonRow feature="Certificates" skool="✗" unytea="✓" highlighted />
-            <ComparisonRow feature="Multi-language (i18n)" skool="✗" unytea="✓" highlighted />
-            <ComparisonRow feature="Custom Domain" skool="✗" unytea="✓" highlighted />
-            <ComparisonRow feature="Quizzes &amp; Assessments" skool="✗" unytea="✓" highlighted />
+            <ComparisonRow feature={t("comparison.rows.feed")} skool="✓" unytea="✓" />
+            <ComparisonRow feature={t("comparison.rows.courses")} skool="✓" unytea="✓" />
+            <ComparisonRow feature={t("comparison.rows.liveVideo")} skool="✓" unytea="✓" />
+            <ComparisonRow
+              feature={t("comparison.rows.whiteboard")}
+              skool="✗"
+              unytea="✓"
+              highlighted
+            />
+            <ComparisonRow
+              feature={t("comparison.rows.screenShare")}
+              skool="✗"
+              unytea="✓"
+              highlighted
+            />
+            <ComparisonRow
+              feature={t("comparison.rows.aiCoach")}
+              skool="✗"
+              unytea="✓"
+              highlighted
+            />
+            <ComparisonRow
+              feature={t("comparison.rows.certificates")}
+              skool="✗"
+              unytea="✓"
+              highlighted
+            />
+            <ComparisonRow
+              feature={t("comparison.rows.multiLanguage")}
+              skool="✗"
+              unytea="✓"
+              highlighted
+            />
+            <ComparisonRow
+              feature={t("comparison.rows.customDomain")}
+              skool="✗"
+              unytea="✓"
+              highlighted
+            />
+            <ComparisonRow
+              feature={t("comparison.rows.quizzes")}
+              skool="✗"
+              unytea="✓"
+              highlighted
+            />
             {/* Skool: Hobby plan ($9/mo) charges 10% per transaction; Pro plan ($99/mo) charges 2.9-3.9%.
                 Unytea: 5% flat across all plans. Stripe processing extra in both. */}
-            <ComparisonRow feature="Platform Fee" skool="2.9–10%*" unytea="5% flat" highlighted />
+            <ComparisonRow
+              feature={t("comparison.rows.platformFee")}
+              skool="2.9–10%*"
+              unytea={t("comparison.unyteaFee")}
+              highlighted
+            />
           </div>
           <p className="mt-6 text-center text-sm text-muted-foreground">
-            * Skool fee depends on plan: 10% on Hobby ($9/mo), 2.9% on Pro ($99/mo). Stripe
-            processing extra in both.
+            {t("comparison.footnote")}
           </p>
           <p className="mt-2 text-center text-sm text-muted-foreground">
-            Used by creators switching from Skool, Circle, Mighty Networks, and Facebook Groups
+            {t("comparison.switchers")}
           </p>
         </div>
       </section>
@@ -647,68 +647,69 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
         <div className="container mx-auto px-4">
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <div>
-              <Badge className="mb-4">Monetization</Badge>
-              <h2 className="mb-6 text-4xl font-bold">
-                Turn your community into a business with live sessions
-              </h2>
-              <p className="mb-8 text-lg text-muted-foreground">
-                Members can pay for access to your content, courses, and live sessions. All powered
-                by Stripe.
-              </p>
+              <Badge className="mb-4">{t("monetization.badge")}</Badge>
+              <h2 className="mb-6 text-4xl font-bold">{t("monetization.title")}</h2>
+              <p className="mb-8 text-lg text-muted-foreground">{t("monetization.description")}</p>
               <div className="space-y-4">
                 <MonetizationItem
                   icon={Users}
-                  title="Paid Memberships"
-                  description="Charge monthly or annual access fees"
+                  title={t("monetization.memberships.title")}
+                  description={t("monetization.memberships.description")}
                 />
                 <MonetizationItem
                   icon={BookOpen}
-                  title="Courses"
-                  description="Sell one-time or drip courses"
+                  title={t("monetization.courses.title")}
+                  description={t("monetization.courses.description")}
                 />
                 <MonetizationItem
                   icon={Video}
-                  title="Workshops"
-                  description="Host paid live sessions and events"
+                  title={t("monetization.workshops.title")}
+                  description={t("monetization.workshops.description")}
                 />
                 <MonetizationItem
                   icon={CreditCard}
-                  title="Flat Platform Fee"
-                  description="One simple 5% on all plans, plus Stripe processing"
+                  title={t("monetization.fee.title")}
+                  description={t("monetization.fee.description")}
                 />
               </div>
             </div>
             <div className="relative rounded-2xl bg-gradient-to-br from-purple-100 to-pink-100 p-8">
               <span className="absolute right-4 top-4 z-10 rounded-md bg-muted px-2 py-1 text-xs font-medium text-muted-foreground shadow-sm">
-                Example
+                {t("monetization.example.badge")}
               </span>
               <div className="rounded-xl bg-white p-6 shadow-lg">
                 <div className="mb-6 flex items-center justify-between">
-                  <span className="font-medium">Monthly Revenue</span>
-                  <Badge variant="secondary">This Month</Badge>
+                  <span className="font-medium">{t("monetization.example.revenueLabel")}</span>
+                  <Badge variant="secondary">{t("monetization.example.periodBadge")}</Badge>
                 </div>
                 <div className="mb-2 text-4xl font-bold">$12,450</div>
                 <div className="mb-6 flex items-center text-sm text-green-600">
                   <TrendingUp className="mr-1 h-4 w-4" />
-                  +23% from last month
+                  {t("monetization.example.delta")}
                 </div>
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Memberships</span>
+                    <span className="text-muted-foreground">
+                      {t("monetization.example.memberships")}
+                    </span>
                     <span className="font-medium">$8,200</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Courses</span>
+                    <span className="text-muted-foreground">
+                      {t("monetization.example.courses")}
+                    </span>
                     <span className="font-medium">$3,150</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Workshops</span>
+                    <span className="text-muted-foreground">
+                      {t("monetization.example.workshops")}
+                    </span>
                     <span className="font-medium">$1,100</span>
                   </div>
                 </div>
               </div>
               <p className="mt-4 text-center text-xs text-muted-foreground">
-                Sample dashboard preview — actual revenue varies by community.
+                {t("monetization.example.disclaimer")}
               </p>
             </div>
           </div>
@@ -719,7 +720,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
       <section id="pricing" className="py-20">
         <div className="container mx-auto px-4">
           <div className="mx-auto mb-16 max-w-4xl text-center">
-            <Badge className="mb-4">Pricing</Badge>
+            <Badge className="mb-4">{t("nav.pricing")}</Badge>
             <h2 className="mb-4 text-4xl font-bold">{tBilling("headerTitle")}</h2>
             <p className="mb-2 text-lg text-muted-foreground">{tBilling("headerSubtitle")}</p>
             <p className="text-base text-muted-foreground">{tBilling("headerDetail")}</p>
@@ -733,26 +734,13 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
           </div>
 
           <div className="mx-auto mt-8 grid max-w-6xl gap-4 md:grid-cols-2">
-            <FaqItem
-              q="Do members pay to use Unytea?"
-              a="No. Members can create an account, explore communities, and join for free. They only pay if a host charges for community access or sells a course."
-            />
-            <FaqItem
-              q="When do transaction fees apply?"
-              a="Transaction fees apply only when you sell paid community access or courses through Unytea."
-            />
-            <FaqItem
-              q="Is there a free trial?"
-              a="Yes. Every plan starts with a 14-day free trial — no credit card required. At day 14, if you haven't added payment, your community is paywalled (your data stays safe, members just can't interact) until you add a card. You can come back any time."
-            />
-            <FaqItem
-              q="Can I change plans later?"
-              a="Yes. You can upgrade as your community grows and unlock lower transaction fees, more tools, and more operational control."
-            />
-            <FaqItem
-              q="Who is Pro for?"
-              a="Pro is for operators managing multiple communities, brands, or teams that need white-labeling, API access, and zero transaction fees."
-            />
+            {["q1", "q2", "q3", "q4", "q5"].map((n) => (
+              <FaqItem
+                key={n}
+                q={t(`pricingFaq.${n}`)}
+                a={t(`pricingFaq.${n.replace("q", "a")}`)}
+              />
+            ))}
           </div>
         </div>
       </section>
@@ -762,24 +750,20 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
         <div className="container mx-auto px-4">
           <div className="mb-12 text-center">
             <Badge className="mb-4 border-white/20 bg-white/10 text-white hover:bg-white/20">
-              Consolidate Your Stack
+              {t("replaceStack.badge")}
             </Badge>
-            <h2 className="mb-4 text-3xl font-bold md:text-4xl">
-              Replace your entire community stack
-            </h2>
-            <p className="mx-auto max-w-2xl text-xl text-gray-400">
-              Run your entire community business with one platform
-            </p>
+            <h2 className="mb-4 text-3xl font-bold md:text-4xl">{t("replaceStack.title")}</h2>
+            <p className="mx-auto max-w-2xl text-xl text-gray-400">{t("replaceStack.subtitle")}</p>
           </div>
 
           {/* Tools being replaced */}
           <div className="mb-10 flex flex-wrap items-center justify-center gap-4 md:gap-6">
             {[
-              { name: "Zoom", color: "bg-blue-500", icon: "Z", feature: "→ Live sessions" },
-              { name: "Kajabi", color: "bg-orange-500", icon: "K", feature: "→ Courses" },
-              { name: "Facebook", color: "bg-blue-600", icon: "f", feature: "→ Community" },
-              { name: "Slack", color: "bg-purple-600", icon: "S", feature: "→ Chat" },
-              { name: "Skool", color: "bg-green-500", icon: "S", feature: "→ Memberships" },
+              { name: "Zoom", color: "bg-blue-500", icon: "Z", key: "zoom" },
+              { name: "Kajabi", color: "bg-orange-500", icon: "K", key: "kajabi" },
+              { name: "Facebook", color: "bg-blue-600", icon: "f", key: "facebook" },
+              { name: "Slack", color: "bg-purple-600", icon: "S", key: "slack" },
+              { name: "Skool", color: "bg-green-500", icon: "S", key: "skool" },
             ].map((tool) => (
               <div
                 key={tool.name}
@@ -792,7 +776,9 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
                 </div>
                 <div>
                   <div className="text-sm font-semibold">{tool.name}</div>
-                  <div className="text-xs font-medium text-green-400">{tool.feature}</div>
+                  <div className="text-xs font-medium text-green-400">
+                    {t(`replaceStack.${tool.key}`)}
+                  </div>
                 </div>
               </div>
             ))}
@@ -815,16 +801,12 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
               </div>
               <div className="text-left">
                 <div className="text-xl font-bold">Unytea</div>
-                <div className="text-sm text-white/80">One platform. Everything you need.</div>
+                <div className="text-sm text-white/80">{t("replaceStack.tagline")}</div>
               </div>
             </div>
 
-            <p className="mt-6 text-base text-gray-400">
-              No integrations. No complexity. Just one platform.
-            </p>
-            <p className="mt-2 text-sm text-gray-500">
-              Save $300+/month • Cancel 5 subscriptions • Everything connected
-            </p>
+            <p className="mt-6 text-base text-gray-400">{t("replaceStack.closing")}</p>
+            <p className="mt-2 text-sm text-gray-500">{t("replaceStack.savings")}</p>
           </div>
         </div>
       </section>
@@ -833,10 +815,10 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
       <section className="bg-gray-50 py-20">
         <div className="container mx-auto px-4">
           <div className="mb-16 text-center">
-            <Badge className="mb-4">All in one</Badge>
-            <h2 className="mb-4 text-4xl font-bold">Run everything from one place</h2>
+            <Badge className="mb-4">{t("allInOne.badge")}</Badge>
+            <h2 className="mb-4 text-4xl font-bold">{t("allInOne.title")}</h2>
             <p className="mx-auto max-w-2xl text-xl text-muted-foreground">
-              Live sessions, courses, community, and content. No more juggling 5 tools.
+              {t("allInOne.subtitle")}
             </p>
           </div>
           <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-3">
@@ -844,28 +826,22 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
               <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-orange-100">
                 <Video className="h-7 w-7 text-orange-600" />
               </div>
-              <h3 className="mb-2 text-lg font-semibold">Host live sessions</h3>
-              <p className="text-sm text-muted-foreground">
-                Schedule, run, and record live sessions — track attendance from one hub.
-              </p>
+              <h3 className="mb-2 text-lg font-semibold">{t("allInOne.host.title")}</h3>
+              <p className="text-sm text-muted-foreground">{t("allInOne.host.description")}</p>
             </div>
             <div className="rounded-xl border bg-white p-6 text-center transition-all hover:shadow-lg">
               <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-blue-100">
                 <LayoutDashboard className="h-7 w-7 text-blue-600" />
               </div>
-              <h3 className="mb-2 text-lg font-semibold">Customize your space</h3>
-              <p className="text-sm text-muted-foreground">
-                Shape your public page with Appearance and Section Presets — no code required.
-              </p>
+              <h3 className="mb-2 text-lg font-semibold">{t("allInOne.customize.title")}</h3>
+              <p className="text-sm text-muted-foreground">{t("allInOne.customize.description")}</p>
             </div>
             <div className="rounded-xl border bg-white p-6 text-center transition-all hover:shadow-lg">
               <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-purple-100">
                 <CreditCard className="h-7 w-7 text-purple-600" />
               </div>
-              <h3 className="mb-2 text-lg font-semibold">Monetize and grow</h3>
-              <p className="text-sm text-muted-foreground">
-                Sell access and courses with Stripe, and use analytics to improve retention.
-              </p>
+              <h3 className="mb-2 text-lg font-semibold">{t("allInOne.monetize.title")}</h3>
+              <p className="text-sm text-muted-foreground">{t("allInOne.monetize.description")}</p>
             </div>
           </div>
         </div>
@@ -937,24 +913,16 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
       {/* 🔟 CTA FINAL */}
       <section className="bg-gradient-to-br from-primary to-purple-600 py-20 text-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="mb-6 text-4xl font-bold md:text-5xl">
-            Start building your community today
-          </h2>
-          <p className="mx-auto mb-8 max-w-2xl text-xl opacity-90">
-            Create your community, invite members, and host your first live session — all in less
-            than 5 minutes.
-          </p>
+          <h2 className="mb-6 text-4xl font-bold md:text-5xl">{t("finalCta.title")}</h2>
+          <p className="mx-auto mb-8 max-w-2xl text-xl opacity-90">{t("finalCta.description")}</p>
           <Link
             href={`/${locale}/auth/signup`}
             className="inline-flex items-center gap-2 rounded-xl bg-white px-8 py-4 text-lg font-bold text-primary transition-colors hover:bg-white/90"
           >
-            Go Live With Your Community
+            {t("finalCta.cta")}
             <ArrowRight className="h-5 w-5" />
           </Link>
-          <p className="mt-6 text-sm opacity-80">
-            ✓ 14-day free trial &nbsp;•&nbsp; ✓ No credit card required &nbsp;•&nbsp; ✓ Cancel
-            anytime
-          </p>
+          <p className="mt-6 text-sm opacity-80">{t("finalCta.guarantee")}</p>
         </div>
       </section>
 
@@ -969,9 +937,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
                 </div>
                 <span className="text-xl font-bold">Unytea</span>
               </div>
-              <p className="mb-4 text-sm text-muted-foreground">
-                The live platform for community-based learning.
-              </p>
+              <p className="mb-4 text-sm text-muted-foreground">{t("footer.description")}</p>
               <div className="flex items-center gap-3">
                 <a
                   href="https://twitter.com/unytea"
@@ -1003,14 +969,14 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
               </div>
             </div>
             <div>
-              <h4 className="mb-4 font-semibold">Product</h4>
+              <h4 className="mb-4 font-semibold">{t("footer.product")}</h4>
               <ul className="space-y-2 text-sm">
                 <li>
                   <Link
                     href="#features"
                     className="text-muted-foreground transition-colors hover:text-foreground"
                   >
-                    Features
+                    {t("footer.links.features")}
                   </Link>
                 </li>
                 <li>
@@ -1018,7 +984,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
                     href="#pricing"
                     className="text-muted-foreground transition-colors hover:text-foreground"
                   >
-                    Pricing
+                    {t("footer.links.pricing")}
                   </Link>
                 </li>
                 <li>
@@ -1026,20 +992,20 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
                     href={`/${locale}/changelog`}
                     className="text-muted-foreground transition-colors hover:text-foreground"
                   >
-                    Changelog
+                    {t("footer.links.changelog")}
                   </Link>
                 </li>
               </ul>
             </div>
             <div>
-              <h4 className="mb-4 font-semibold">Resources</h4>
+              <h4 className="mb-4 font-semibold">{t("footer.resources")}</h4>
               <ul className="space-y-2 text-sm">
                 <li>
                   <Link
                     href={`/${locale}/documentation`}
                     className="text-muted-foreground transition-colors hover:text-foreground"
                   >
-                    Documentation
+                    {t("footer.links.documentation")}
                   </Link>
                 </li>
                 <li>
@@ -1047,20 +1013,20 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
                     href={`/${locale}/blog`}
                     className="text-muted-foreground transition-colors hover:text-foreground"
                   >
-                    Blog
+                    {t("footer.links.blog")}
                   </Link>
                 </li>
               </ul>
             </div>
             <div>
-              <h4 className="mb-4 font-semibold">Legal</h4>
+              <h4 className="mb-4 font-semibold">{t("footer.legalLabel")}</h4>
               <ul className="space-y-2 text-sm">
                 <li>
                   <Link
                     href={`/${locale}/privacy`}
                     className="text-muted-foreground transition-colors hover:text-foreground"
                   >
-                    Privacy
+                    {t("footer.legal.privacy")}
                   </Link>
                 </li>
                 <li>
@@ -1068,7 +1034,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
                     href={`/${locale}/terms`}
                     className="text-muted-foreground transition-colors hover:text-foreground"
                   >
-                    Terms
+                    {t("footer.legal.terms")}
                   </Link>
                 </li>
                 <li>
@@ -1076,14 +1042,14 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
                     href={`/${locale}/cookies`}
                     className="text-muted-foreground transition-colors hover:text-foreground"
                   >
-                    Cookies
+                    {t("footer.legal.cookies")}
                   </Link>
                 </li>
               </ul>
             </div>
           </div>
           <div className="border-t pt-8 text-center text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} Unytea. All rights reserved.
+            &copy; {new Date().getFullYear()} Unytea. {t("footer.rights")}
           </div>
         </div>
       </footer>
