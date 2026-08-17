@@ -36,9 +36,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { AddToCourseDialog } from "@/components/sessions/AddToCourseDialog";
 import { CreateSocialClipDialog } from "@/components/public-content/CreateSocialClipDialog";
+import { RecapReviewPanel } from "@/components/sessions/RecapReviewPanel";
 import { PostSessionFlow } from "@/components/sessions/PostSessionFlow";
 import { toast } from "sonner";
-import { shareSessionRecap } from "@/app/actions/session-jobs";
+import { getRecapDraft, shareSessionRecap } from "@/app/actions/session-jobs";
 import { createResourceFromSession } from "@/app/actions/session-course";
 
 interface SessionPageProps {
@@ -55,6 +56,7 @@ export default function SessionDetailPage(props: SessionPageProps) {
   const [showAddToCourse, setShowAddToCourse] = useState(false);
   const [showCreateClip, setShowCreateClip] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
+  const [showRecapReview, setShowRecapReview] = useState(false);
   const [rsvpStatus, setRsvpStatus] = useState<"attending" | "interested" | null>(null);
   const [attendingCount, setAttendingCount] = useState(0);
   const [interestedCount, setInterestedCount] = useState(0);
@@ -100,28 +102,43 @@ export default function SessionDetailPage(props: SessionPageProps) {
     }
   }
 
-  async function handleShareRecap() {
-    if (!session) return;
+  /**
+   * Fetches the draft for review. Read-only: nothing reaches the feed here.
+   * Returns null so the panel can show its own error state.
+   */
+  async function handleLoadRecapDraft(): Promise<string | null> {
+    if (!session) return null;
+    try {
+      const result = await getRecapDraft(session.id);
+      return result.success ? result.content : null;
+    } catch {
+      return null;
+    }
+  }
+
+  /** Publishes the text the host approved. The only path that creates a post. */
+  async function handleShareRecap(content: string): Promise<boolean> {
+    if (!session) return false;
 
     setIsSharing(true);
     try {
-      // If recap post already exists, show message
       if (session.feedPostId) {
         toast.info("This session has already been shared to the community feed");
-        return;
+        return false;
       }
 
-      // Generate recap post
-      const result = await shareSessionRecap(session.id);
+      const result = await shareSessionRecap(session.id, content);
       if (result.success) {
         toast.success("Session recap shared to community feed!");
         // Reload session to get updated feedPostId
         await loadSession();
-      } else {
-        toast.error(result.error || "Failed to share recap");
+        return true;
       }
-    } catch (error) {
+      toast.error(result.error || "Failed to share recap");
+      return false;
+    } catch {
       toast.error("Error sharing recap");
+      return false;
     } finally {
       setIsSharing(false);
     }
@@ -293,6 +310,7 @@ export default function SessionDetailPage(props: SessionPageProps) {
         <PostSessionFlow
           session={session}
           isHost={session.mentorId === user?.id}
+          onLoadRecapDraft={handleLoadRecapDraft}
           onShareRecap={handleShareRecap}
           onAddToCourse={() => setShowAddToCourse(true)}
           onCreateClip={() => setShowCreateClip(true)}
@@ -538,7 +556,7 @@ export default function SessionDetailPage(props: SessionPageProps) {
           <Button
             variant="outline"
             className="gap-2 border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800"
-            onClick={handleShareRecap}
+            onClick={() => setShowRecapReview(true)}
             disabled={isSharing || !!session?.feedPostId}
           >
             <Share2 className="h-4 w-4" />
@@ -815,7 +833,7 @@ export default function SessionDetailPage(props: SessionPageProps) {
                 <Button
                   variant="outline"
                   className="w-full justify-start gap-2 border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
-                  onClick={handleShareRecap}
+                  onClick={() => setShowRecapReview(true)}
                   disabled={isSharing || !!session?.feedPostId}
                 >
                   <Share2 className="h-4 w-4" />
@@ -853,6 +871,23 @@ export default function SessionDetailPage(props: SessionPageProps) {
             open={showCreateClip}
             onOpenChange={setShowCreateClip}
           />
+
+          {/* The two "Share Recap" buttons on this branch used to post straight
+              to the feed, exactly like the post-session card did. They open the
+              same review panel now, so there is no path left that publishes
+              without the host reading the text. */}
+          {showRecapReview && !session.feedPostId && (
+            <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/80 p-4">
+              <div className="w-full max-w-3xl">
+                <RecapReviewPanel
+                  onLoadDraft={handleLoadRecapDraft}
+                  onShare={handleShareRecap}
+                  onDismiss={() => setShowRecapReview(false)}
+                  alreadyShared={Boolean(session.feedPostId)}
+                />
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>

@@ -28,6 +28,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { SessionNotesEditor } from "./SessionNotesEditor";
 import { AddToCourseDialog } from "./AddToCourseDialog";
 import { CreateSocialClipDialog } from "../public-content/CreateSocialClipDialog";
+import { RecapReviewPanel } from "./RecapReviewPanel";
 
 interface PostSessionFlowProps {
   // Shape aligned to SessionDetail (the getSession Prisma payload). Only the
@@ -51,7 +52,10 @@ interface PostSessionFlowProps {
     feedPostId: string | null;
   };
   isHost: boolean;
-  onShareRecap: () => Promise<void>;
+  /** Fetches the recap draft for review. Publishes nothing. */
+  onLoadRecapDraft: () => Promise<string | null>;
+  /** Publishes the reviewed text. Resolves true when the post was created. */
+  onShareRecap: (content: string) => Promise<boolean>;
   onAddToCourse: () => void;
   onCreateClip: () => void;
   onPublishToLibrary: () => void;
@@ -60,6 +64,7 @@ interface PostSessionFlowProps {
 export function PostSessionFlow({
   session,
   isHost,
+  onLoadRecapDraft,
   onShareRecap,
   onAddToCourse,
   onCreateClip,
@@ -73,6 +78,7 @@ export function PostSessionFlow({
   const [showNotes, setShowNotes] = useState(false);
   const [showAddToCourse, setShowAddToCourse] = useState(false);
   const [showCreateClip, setShowCreateClip] = useState(false);
+  const [showRecapReview, setShowRecapReview] = useState(false);
 
   // Calculate session duration
   const duration =
@@ -187,9 +193,11 @@ export function PostSessionFlow({
               session.feedPostId && "opacity-60"
             )}
             onClick={() => {
+              // Opens the review panel. It does not publish — that is the
+              // point: this card used to fire the share straight at the feed.
               if (!session.feedPostId) {
                 setActiveAction("share");
-                onShareRecap();
+                setShowRecapReview(true);
               }
             }}
           >
@@ -200,10 +208,14 @@ export function PostSessionFlow({
               <div className="flex-1">
                 <h3 className="font-semibold text-white">{t("nextSteps.shareTitle")}</h3>
                 <p className="text-sm text-zinc-400">{t("nextSteps.shareDesc")}</p>
-                {session.feedPostId && (
+                {session.feedPostId ? (
                   <span className="mt-2 inline-flex items-center gap-1 text-xs text-blue-400">
                     <CheckCircle className="h-3 w-3" />
                     {t("nextSteps.shareDone")}
+                  </span>
+                ) : (
+                  <span className="mt-2 inline-flex items-center gap-1 text-xs text-zinc-400">
+                    {t("nextSteps.shareNotShared")}
                   </span>
                 )}
               </div>
@@ -281,6 +293,19 @@ export function PostSessionFlow({
           </Card>
         </div>
       </div>
+
+      {/* ============ RECAP REVIEW (nothing is posted until shared) ============ */}
+      {showRecapReview && !session.feedPostId && (
+        <RecapReviewPanel
+          onLoadDraft={onLoadRecapDraft}
+          onShare={onShareRecap}
+          onDismiss={() => {
+            setShowRecapReview(false);
+            setActiveAction(null);
+          }}
+          alreadyShared={Boolean(session.feedPostId)}
+        />
+      )}
 
       {/* ==================== SESSION STATS ==================== */}
       <Card className="border-zinc-800 bg-zinc-900/50">

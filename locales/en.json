@@ -2740,14 +2740,15 @@
         "notesDesc": "Capture key takeaways, insights, and resources",
         "notesAdded": "Notes added",
         "shareTitle": "Share Recap",
-        "shareDesc": "Post session summary to community feed",
+        "shareDesc": "Review the summary, then post it to the community feed",
         "shareDone": "Already shared",
         "courseTitle": "Add to Course",
         "courseDesc": "Add this recording to a course module",
         "clipsTitle": "Create Clips",
         "clipsDesc": "Generate short clips for social media",
         "libraryTitle": "Publish to Library",
-        "libraryDesc": "Turn this recap into a reusable library resource"
+        "libraryDesc": "Turn this recap into a reusable library resource",
+        "shareNotShared": "Draft — not shared yet"
       },
       "stats": {
         "title": "Session Performance",
@@ -2759,6 +2760,18 @@
       "actions": {
         "backToSessions": "Back to sessions",
         "reEnterRoom": "Re-enter Session Room"
+      },
+      "recap": {
+        "title": "Review recap before sharing",
+        "subtitle": "Nothing is posted to the feed until you press share. Edit anything you like.",
+        "statusDraft": "Draft — not shared",
+        "statusEdited": "Edited — not shared",
+        "statusShared": "Shared to feed",
+        "editorLabel": "Recap content",
+        "loading": "Preparing the draft…",
+        "loadError": "The draft could not be loaded. Nothing was posted.",
+        "share": "Share to feed",
+        "dismiss": "Discard"
       }
     },
     "notesEditor": {

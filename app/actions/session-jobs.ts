@@ -4,7 +4,12 @@ import { z } from "zod";
 import { defineAction } from "@/lib/actions/define-action";
 import { assertSessionHost } from "@/lib/actions/guards";
 import { communityOfSession } from "@/lib/actions/resolvers";
-import { endSessionJob, generateSessionRecap } from "@/lib/jobs/session-jobs";
+import { endSessionJob } from "@/lib/jobs/session-jobs";
+import {
+  getSessionRecapDraft,
+  publishSessionRecap,
+  RECAP_MAX_LENGTH,
+} from "@/lib/jobs/session-recap";
 
 /**
  * The browser-callable slice of the session job pipeline.
@@ -32,16 +37,41 @@ export const endSession = defineAction(
   }
 );
 
+/**
+ * The recap the host is about to review. Read-only — calling it publishes
+ * nothing, which is the whole point of the split.
+ */
+export const getRecapDraft = defineAction(
+  {
+    name: "getRecapDraft",
+    auth: "member",
+    args: [sessionIdSchema],
+    community: ([sessionId]) => communityOfSession(sessionId),
+    rateLimit: "general",
+  },
+  async (ctx, sessionId) => {
+    await assertSessionHost(ctx, sessionId);
+    return getSessionRecapDraft(sessionId);
+  }
+);
+
+/**
+ * Publish the recap, with the text the host approved.
+ *
+ * `content` is required: there is no "share the default" call, because that is
+ * exactly the blind publish this change removes. The client sends whatever is
+ * in the preview box, edits included.
+ */
 export const shareSessionRecap = defineAction(
   {
     name: "shareSessionRecap",
     auth: "member",
-    args: [sessionIdSchema],
+    args: [sessionIdSchema, z.string().min(1).max(RECAP_MAX_LENGTH)],
     community: ([sessionId]) => communityOfSession(sessionId),
     rateLimit: "create",
   },
-  async (ctx, sessionId) => {
+  async (ctx, sessionId, content) => {
     await assertSessionHost(ctx, sessionId);
-    return generateSessionRecap(sessionId);
+    return publishSessionRecap(sessionId, content);
   }
 );
