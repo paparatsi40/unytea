@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Users } from "lucide-react";
 import { headers } from "next/headers";
 import { SITE_URL } from "@/lib/site-url";
+import { baseOpenGraph } from "@/lib/seo/open-graph";
 
 function formatHostName(owner: {
   name: string | null;
@@ -119,24 +120,27 @@ export async function generateMetadata(props: {
   const description =
     community.description?.slice(0, 160) || `Join ${community.name} hosted by ${host} on Unytea.`;
   const canonical = `${SITE_URL}/${params.locale}/community/${params.slug}`;
-  const image = community.imageUrl || `${SITE_URL}/og-image.png`;
+  // The fallback used to be /og-image.png, which does not exist in public/ —
+  // so a community without a cover advertised a 404 as its preview. Omitting
+  // `images` instead lets the shared defaults supply the /og route, which
+  // renders a real card.
+  const image = community.imageUrl;
 
   return {
     title,
     description,
     openGraph: {
+      ...baseOpenGraph,
+      url: canonical,
       title,
       description,
-      type: "website",
-      url: canonical,
-      images: [{ url: image, width: 1200, height: 630 }],
-      siteName: "Unytea",
+      ...(image ? { images: [{ url: image, width: 1200, height: 630 }] } : {}),
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: [image],
+      images: [image ?? "/og"],
     },
     alternates: { canonical },
     robots: { index: true, follow: true },

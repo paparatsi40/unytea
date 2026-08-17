@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { jsonLdSafe } from "@/lib/json-ld";
 import { getAllPosts, getPostBySlug } from "../posts";
 import { SITE_URL } from "@/lib/site-url";
+import { baseOpenGraph } from "@/lib/seo/open-graph";
 
 type RouteParams = {
   locale: string;
@@ -44,11 +45,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: {
       canonical: canonicalUrl,
     },
+    // Spread first, then override: the post keeps its own url, its cover image
+    // and `type: "article"`, and inherits siteName and the locale pair it was
+    // silently dropping.
     openGraph: {
-      title: `${post.title} | Unytea Blog`,
-      description: post.seoDescription,
+      ...baseOpenGraph,
       type: "article",
       url: canonicalUrl,
+      title: `${post.title} | Unytea Blog`,
+      description: post.seoDescription,
       images: [
         {
           url: post.featuredImage,

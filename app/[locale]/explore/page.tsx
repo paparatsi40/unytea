@@ -3,10 +3,10 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { CommunityCategory } from "@prisma/client";
 import { getExploreCommunities } from "@/lib/explore-query";
 import { localizedAlternates } from "@/lib/seo/locale-metadata";
+import { localizedOpenGraph } from "@/lib/seo/open-graph";
 import { ExploreFilters as ExploreFiltersComponent } from "@/components/explore/ExploreFilters";
 import { ExploreInfiniteFeed } from "@/components/explore/ExploreInfiniteFeed";
 import { ExploreBackButton } from "@/components/explore/ExploreBackButton";
-import { SITE_URL } from "@/lib/site-url";
 import type {
   ExploreFilters,
   ExplorePagination,
@@ -56,10 +56,9 @@ export async function generateMetadata({
     description: t("metaDescription"),
     ...localizedAlternates({ path: "/explore", locale }),
     openGraph: {
+      ...localizedOpenGraph(locale, "/explore"),
       title: t("ogTitle"),
       description: t("ogDescription"),
-      url: `${SITE_URL}/${locale}/explore`,
-      type: "website",
     },
   };
 }

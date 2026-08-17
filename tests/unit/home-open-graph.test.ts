@@ -107,28 +107,39 @@ describe("shared Open Graph defaults", () => {
 });
 
 /**
- * Every other page under `app/[locale]` declares `openGraph` the same bare way
- * the homepage did, so every one of them is also missing some subset of the
- * defaults. They are out of scope for this change, which was scoped to the root
- * layout and the homepage.
+ * What is left: the legal and utility pages. They still declare `openGraph` the
+ * bare way the homepage did, so they are still missing some subset of the
+ * defaults — deliberately, for now. Nobody shares a cookie policy, so they rank
+ * below the pages that carry outreach.
  *
  * Rather than pretend they are fine, they are listed. The guard below asserts
- * two things: the pages already migrated still spread the defaults, and this
- * list does not grow. A new page written the old way fails the build.
+ * two things: every page already migrated still spreads the defaults, and this
+ * list does not grow. A new page written the old way fails the build; the list
+ * may only shrink.
  */
 const NOT_YET_MIGRATED = [
-  "app/[locale]/blog/[slug]/page.tsx",
-  "app/[locale]/blog/page.tsx",
   "app/[locale]/changelog/page.tsx",
-  "app/[locale]/community/[slug]/page.tsx",
   "app/[locale]/contact/page.tsx",
   "app/[locale]/cookies/page.tsx",
   "app/[locale]/documentation/page.tsx",
+  "app/[locale]/privacy/page.tsx",
+  "app/[locale]/terms/page.tsx",
+].map((p) => p.split("/").join(path.sep));
+
+/**
+ * The pages people actually share. Each spreads the defaults now, and each is
+ * asserted on its real metadata in tests/unit/outreach-open-graph.test.ts —
+ * this list only pins that they cannot quietly revert to a bare object.
+ */
+const MIGRATED = [
+  "app/layout.tsx",
+  "app/[locale]/page.tsx",
+  "app/[locale]/blog/page.tsx",
+  "app/[locale]/blog/[slug]/page.tsx",
+  "app/[locale]/community/[slug]/page.tsx",
+  "app/[locale]/s/[slug]/page.tsx",
   "app/[locale]/explore/page.tsx",
   "app/[locale]/library/page.tsx",
-  "app/[locale]/privacy/page.tsx",
-  "app/[locale]/s/[slug]/page.tsx",
-  "app/[locale]/terms/page.tsx",
 ].map((p) => p.split("/").join(path.sep));
 
 describe("openGraph is spread, not replaced", () => {
@@ -166,11 +177,8 @@ describe("openGraph is spread, not replaced", () => {
     return offenders.sort();
   }
 
-  it("the root layout and the homepage spread the defaults", () => {
-    const offenders = bareOpenGraphPages();
-
-    expect(offenders).not.toContain(["app", "layout.tsx"].join(path.sep));
-    expect(offenders).not.toContain(["app", "[locale]", "page.tsx"].join(path.sep));
+  it.each(MIGRATED)("%s spreads the defaults", (file) => {
+    expect(bareOpenGraphPages()).not.toContain(file);
   });
 
   it("no page beyond the known backlog writes a bare openGraph", () => {
