@@ -415,12 +415,9 @@
         "feed": "Community Feed",
         "courses": "Courses",
         "liveVideo": "Live Video Sessions",
-        "whiteboard": "Collaborative Whiteboard",
-        "screenShare": "Screen Sharing",
+        "whiteboard": "Collaborative whiteboard in the call",
         "certificates": "Certificates",
         "multiLanguage": "Multiple languages",
-        "customDomain": "Custom Domain",
-        "quizzes": "Quizzes & Assessments",
         "platformFee": "Platform Fee"
       },
       "unyteaFee": "From {min}%",

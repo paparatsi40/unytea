@@ -425,12 +425,9 @@
         "feed": "Fil de la communauté",
         "courses": "Cours",
         "liveVideo": "Sessions vidéo en direct",
-        "whiteboard": "Tableau blanc collaboratif",
-        "screenShare": "Partage d'écran",
+        "whiteboard": "Tableau blanc collaboratif dans l'appel",
         "certificates": "Certificats",
         "multiLanguage": "Plusieurs langues",
-        "customDomain": "Domaine personnalisé",
-        "quizzes": "Quiz et évaluations",
         "platformFee": "Commission de la plateforme"
       },
       "unyteaFee": "À partir de {min} %",
