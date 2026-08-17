@@ -230,10 +230,21 @@ export const getUserSessions = defineAction(
       },
     });
 
-    // Separate upcoming and past sessions
+    // The two buckets want opposite orders, which one `orderBy` cannot express.
+    //
+    // Ascending is right for `upcoming` — soonest first — and exactly wrong for
+    // `past`, where it puts the oldest session at the top. The hub renders only
+    // `past.slice(0, 6)`, so ascending meant the six oldest sessions filled the
+    // list and anything from this week never appeared at all.
+    //
+    // Sorted here rather than in a second query: the rows are already in hand.
     const now = new Date();
-    const upcoming = sessions.filter((s) => new Date(s.scheduledAt) > now);
-    const past = sessions.filter((s) => new Date(s.scheduledAt) <= now);
+    const upcoming = sessions
+      .filter((s) => new Date(s.scheduledAt) > now)
+      .sort((a, b) => a.scheduledAt.getTime() - b.scheduledAt.getTime());
+    const past = sessions
+      .filter((s) => new Date(s.scheduledAt) <= now)
+      .sort((a, b) => b.scheduledAt.getTime() - a.scheduledAt.getTime());
 
     return { success: true, sessions: { upcoming, past } };
   } catch (error) {
