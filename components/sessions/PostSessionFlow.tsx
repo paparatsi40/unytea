@@ -5,17 +5,14 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   CheckCircle,
-  Play,
   FileText,
   Share2,
   BookOpen,
-  Loader2,
   Clock,
   Users,
   MessageSquare,
   Zap,
   ArrowRight,
-  Video,
   Scissors,
   ChevronLeft,
   Radio,
@@ -41,6 +38,8 @@ interface PostSessionFlowProps {
     status: string;
     startedAt: Date | null;
     endedAt: Date | null;
+    /** The denormalised copy on the session. Either source counts as a file. */
+    recordingUrl: string | null;
     recording: {
       url: string | null;
       status: string;
@@ -49,6 +48,8 @@ interface PostSessionFlowProps {
     mentor: { name: string | null } | null;
     _count: { participations: number };
     notes: { content: string } | null;
+    /** Where the host uploads the session's materials. */
+    community: { slug: string } | null;
     feedPostId: string | null;
   };
   isHost: boolean;
@@ -88,9 +89,26 @@ export function PostSessionFlow({
         )
       : 0;
 
-  // Recording status
-  const recordingStatus = session.recording?.status || "PROCESSING";
-  const isRecordingReady = recordingStatus === "READY";
+  /**
+   * Three of the five "next steps" need a recorded video file, and all three
+   * fail closed today because no path produces one — `startRecording` in
+   * lib/jobs/livekit-webhook.ts is still a `TODO: Implement actual Egress API
+   * call`, so no egress event ever fires, no Recording row is written and
+   * `recordingUrl` stays null forever.
+   *
+   * What that looked like: "Add to Course" opened a dialog whose action
+   * returns "Session recording not available yet" every time; "Publish to
+   * Library" builds a `type: "VIDEO"` resource whose `externalUrl` is the
+   * recording, and bails with "Recording not available yet"; "Create Clips"
+   * derives its moments from `session.recording` — null gives an empty list —
+   * and mints a share URL under `/clip/{id}`, a route that does not exist in
+   * app/ at all.
+   *
+   * They are hidden rather than labelled, because a card whose only outcome is
+   * an error toast is not a feature preview. Tied to the URL rather than
+   * deleted, so all three return by themselves the day egress ships.
+   */
+  const hasRecordingFile = !!(session.recordingUrl || session.recording?.url);
 
   // Stats
   const attendeeCount = session._count?.participations || 0;
@@ -110,47 +128,18 @@ export function PostSessionFlow({
         </p>
       </div>
 
-      {/* ==================== RECORDING STATUS ==================== */}
-      <Card className="border-zinc-800 bg-zinc-900/50">
-        <CardContent className="p-6">
-          <div className="flex items-center gap-4">
-            <div
-              className={cn(
-                "flex h-14 w-14 items-center justify-center rounded-full",
-                isRecordingReady ? "bg-green-500/20" : "bg-amber-500/20"
-              )}
-            >
-              {isRecordingReady ? (
-                <Video className="h-7 w-7 text-green-400" />
-              ) : (
-                <Loader2 className="h-7 w-7 animate-spin text-amber-400" />
-              )}
-            </div>
-            <div className="flex-1">
-              {/* `recordingStatus` defaults to PROCESSING when there is no
-                  Recording row, so every completed session showed a spinner
-                  and "processing your recording" — forever, since nothing
-                  produces one. A recording that is genuinely READY still says
-                  so; anything short of that now says what is actually true. */}
-              <h3 className="font-semibold text-white">
-                {isRecordingReady ? t("recording.readyTitle") : t("recording.comingSoonTitle")}
-              </h3>
-              <p className="text-sm text-zinc-400">
-                {isRecordingReady ? t("recording.readyDesc") : t("recording.comingSoonDesc")}
-              </p>
-            </div>
-            {isRecordingReady && session.recording?.url && (
-              <Button
-                onClick={() => setActiveAction("recording")}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                <Play className="mr-2 h-4 w-4" />
-                {t("recording.watch")}
-              </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      {/*
+        The recording card used to live here.
+        Recording is withdrawn (2026-08-18), not delayed, so a card saying
+        "coming soon" would be the same over-promise in a quieter voice — and it
+        would be the first thing a host reads after every session, about the one
+        thing the product has decided not to do. A card explaining an absence is
+        still a card about recording.
+
+        A session's outcome is now the notes, the recap built from them, and
+        whatever the host uploads to the community library. Those are below, and
+        they are all real.
+      */}
 
       {/* ==================== NEXT STEPS ==================== */}
       <div>
@@ -223,74 +212,111 @@ export function PostSessionFlow({
             </CardContent>
           </Card>
 
-          {/* Add to Course */}
-          <Card
-            className={cn(
-              "cursor-pointer border-zinc-800 bg-zinc-900/50 transition-all hover:border-purple-500/50 hover:bg-zinc-800/50",
-              activeAction === "course" && "border-purple-500 bg-zinc-800"
-            )}
-            onClick={() => {
-              setActiveAction("course");
-              onAddToCourse();
-            }}
-          >
-            <CardContent className="flex items-start gap-4 p-5">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-purple-500/20">
-                <BookOpen className="h-6 w-6 text-purple-400" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-white">{t("nextSteps.courseTitle")}</h3>
-                <p className="text-sm text-zinc-400">{t("nextSteps.courseDesc")}</p>
-              </div>
-              <ArrowRight className="h-5 w-5 text-zinc-500" />
-            </CardContent>
-          </Card>
+          {/* Add to Course — needs the video file. See `hasRecordingFile`. */}
+          {hasRecordingFile && (
+            <Card
+              className={cn(
+                "cursor-pointer border-zinc-800 bg-zinc-900/50 transition-all hover:border-purple-500/50 hover:bg-zinc-800/50",
+                activeAction === "course" && "border-purple-500 bg-zinc-800"
+              )}
+              onClick={() => {
+                setActiveAction("course");
+                onAddToCourse();
+              }}
+            >
+              <CardContent className="flex items-start gap-4 p-5">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-purple-500/20">
+                  <BookOpen className="h-6 w-6 text-purple-400" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-white">{t("nextSteps.courseTitle")}</h3>
+                  <p className="text-sm text-zinc-400">{t("nextSteps.courseDesc")}</p>
+                </div>
+                <ArrowRight className="h-5 w-5 text-zinc-500" />
+              </CardContent>
+            </Card>
+          )}
 
-          {/* Create Clips */}
-          <Card
-            className={cn(
-              "cursor-pointer border-zinc-800 bg-zinc-900/50 transition-all hover:border-amber-500/50 hover:bg-zinc-800/50",
-              activeAction === "clips" && "border-amber-500 bg-zinc-800"
-            )}
-            onClick={() => {
-              setActiveAction("clips");
-              onCreateClip();
-            }}
-          >
-            <CardContent className="flex items-start gap-4 p-5">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-500/20">
-                <Scissors className="h-6 w-6 text-amber-400" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-white">{t("nextSteps.clipsTitle")}</h3>
-                <p className="text-sm text-zinc-400">{t("nextSteps.clipsDesc")}</p>
-              </div>
-              <ArrowRight className="h-5 w-5 text-zinc-500" />
-            </CardContent>
-          </Card>
+          {/* Create Clips — needs the video file. */}
+          {hasRecordingFile && (
+            <Card
+              className={cn(
+                "cursor-pointer border-zinc-800 bg-zinc-900/50 transition-all hover:border-amber-500/50 hover:bg-zinc-800/50",
+                activeAction === "clips" && "border-amber-500 bg-zinc-800"
+              )}
+              onClick={() => {
+                setActiveAction("clips");
+                onCreateClip();
+              }}
+            >
+              <CardContent className="flex items-start gap-4 p-5">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-500/20">
+                  <Scissors className="h-6 w-6 text-amber-400" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-white">{t("nextSteps.clipsTitle")}</h3>
+                  <p className="text-sm text-zinc-400">{t("nextSteps.clipsDesc")}</p>
+                </div>
+                <ArrowRight className="h-5 w-5 text-zinc-500" />
+              </CardContent>
+            </Card>
+          )}
 
-          {/* Publish to Library */}
-          <Card
-            className={cn(
-              "cursor-pointer border-zinc-800 bg-zinc-900/50 transition-all hover:border-cyan-500/50 hover:bg-zinc-800/50",
-              activeAction === "library" && "border-cyan-500 bg-zinc-800"
-            )}
-            onClick={() => {
-              setActiveAction("library");
-              onPublishToLibrary();
-            }}
-          >
-            <CardContent className="flex items-start gap-4 p-5">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-cyan-500/20">
-                <Folder className="h-6 w-6 text-cyan-400" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-white">{t("nextSteps.libraryTitle")}</h3>
-                <p className="text-sm text-zinc-400">{t("nextSteps.libraryDesc")}</p>
-              </div>
-              <ArrowRight className="h-5 w-5 text-zinc-500" />
-            </CardContent>
-          </Card>
+          {/* Publish to Library — despite the name this publishes the *replay*:
+              `createResourceFromSession` writes a VIDEO resource whose
+              externalUrl is the recording, and returns "Recording not available
+              yet" without one. The notes only supply its description. */}
+          {hasRecordingFile && (
+            <Card
+              className={cn(
+                "cursor-pointer border-zinc-800 bg-zinc-900/50 transition-all hover:border-cyan-500/50 hover:bg-zinc-800/50",
+                activeAction === "library" && "border-cyan-500 bg-zinc-800"
+              )}
+              onClick={() => {
+                setActiveAction("library");
+                onPublishToLibrary();
+              }}
+            >
+              <CardContent className="flex items-start gap-4 p-5">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-cyan-500/20">
+                  <Folder className="h-6 w-6 text-cyan-400" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-white">{t("nextSteps.libraryTitle")}</h3>
+                  <p className="text-sm text-zinc-400">{t("nextSteps.libraryDesc")}</p>
+                </div>
+                <ArrowRight className="h-5 w-5 text-zinc-500" />
+              </CardContent>
+            </Card>
+          )}
+
+          {/*
+            What replaced the recording.
+            With no video, the way a member catches up on a session they missed
+            is the recap and whatever the host puts in the library. The three
+            cards above are all gated on a recording file and therefore never
+            render, so without this the flow ended at "write notes" and pointed
+            nowhere. This is a plain link — the library upload it opens is real:
+            an upload modal on the community library page, a `documentUploader`
+            route, and `createResource` behind an owner/admin/moderator/mentor
+            check.
+          */}
+          {session.community?.slug && (
+            <Link href={`/dashboard/c/${session.community.slug}/library`} className="block">
+              <Card className="cursor-pointer border-zinc-800 bg-zinc-900/50 transition-all hover:border-cyan-500/50 hover:bg-zinc-800/50">
+                <CardContent className="flex items-start gap-4 p-5">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-cyan-500/20">
+                    <Folder className="h-6 w-6 text-cyan-400" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-white">{t("nextSteps.materialsTitle")}</h3>
+                    <p className="text-sm text-zinc-400">{t("nextSteps.materialsDesc")}</p>
+                  </div>
+                  <ArrowRight className="h-5 w-5 text-zinc-500" />
+                </CardContent>
+              </Card>
+            </Link>
+          )}
         </div>
       </div>
 

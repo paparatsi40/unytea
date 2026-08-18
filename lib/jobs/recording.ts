@@ -1,4 +1,19 @@
 /**
+ * DORMANT — session recording was withdrawn on 2026-08-18.
+ *
+ * Nothing in the UI reaches this code any more: the in-room control, the
+ * recording tab, the library tab and the post-session card were all removed in
+ * the same change. The scaffolding is kept, not deleted, because the decision
+ * was cost and scope rather than a design fault — if recording is revisited,
+ * this is the shape it had.
+ *
+ * DO NOT start egress to "test" it. `MentorSession.recordingUrl` and the
+ * `Recording` table are still in the schema and still empty; anything written
+ * there will surface through code paths that are gated on a URL and are
+ * otherwise unreachable, which is exactly how a withdrawn feature comes back
+ * halfway.
+ */
+/**
  * Internal recording pipeline — deliberately NOT a "use server" module.
  *
  * autoStartRecording is driven by the LiveKit `room_started` webhook, never by

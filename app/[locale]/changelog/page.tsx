@@ -126,7 +126,7 @@ const RELEASES: ReleaseEntry[] = [
     changes: [
       {
         type: "feature",
-        text: "Live video sessions powered by LiveKit with support for screen sharing and recordings.",
+        text: "Live video sessions powered by LiveKit with screen sharing.",
       },
       {
         type: "feature",
@@ -134,7 +134,7 @@ const RELEASES: ReleaseEntry[] = [
       },
       {
         type: "improvement",
-        text: "Excalidraw collaborative whiteboard embedded in session rooms.",
+        text: "Excalidraw whiteboard embedded in session rooms: the host draws, members follow live.",
       },
     ],
   },

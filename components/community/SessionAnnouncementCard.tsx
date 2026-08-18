@@ -93,7 +93,12 @@ export function SessionAnnouncementCard({ post }: SessionAnnouncementCardProps) 
   const isUpcoming = scheduledAt ? scheduledAt > new Date() : false;
   const effectiveStatus = sessionState?.status || (isUpcoming ? "SCHEDULED" : "COMPLETED");
   const isLive = effectiveStatus === "IN_PROGRESS";
-  const hasRecording = !!sessionState?.hasRecording;
+  // From the URL, not from the boolean beside it. The server sets
+  // `hasRecording = !!session.recording?.url`, so the two agree at the source —
+  // but the card had them as separate inputs, and only the href checked the
+  // URL. A true flag with a null URL rendered a "Watch recording" button
+  // pointing at the room. One input cannot disagree with itself.
+  const hasRecording = !!sessionState?.recordingUrl;
 
   const ctaHref = isLive
     ? `/dashboard/sessions/${sessionData.sessionId}/room?src=feed_session_card_live`

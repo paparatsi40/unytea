@@ -40,6 +40,7 @@ import { SessionNotesEditor } from "./SessionNotesEditor";
 import { ReactionsBar } from "./ReactionsBar";
 import { LivePoll, PollCreator } from "@/components/live-session/LivePoll";
 import { useSessionDataChannel } from "@/hooks/useSessionDataChannel";
+import { useWhiteboardChannel } from "@/hooks/useWhiteboardChannel";
 
 // Types
 type PanelTab = "notes" | "chat" | "participants";
@@ -71,11 +72,6 @@ interface VideoRoomUIProps {
   isHost?: boolean;
   attendeeCount?: number;
   sessionStartTime?: Date;
-  isRecording?: boolean;
-  /** Still accepted so the parent's wiring survives untouched; unread while
-   *  the recording control below is disabled. */
-  isRecordingBusy?: boolean;
-  onToggleRecording?: () => void;
   onLeave?: () => void;
   onEndSession?: () => void;
 }
@@ -89,7 +85,6 @@ export function VideoRoomUI({
   isHost = false,
   attendeeCount = 0,
   sessionStartTime,
-  isRecording = false,
   onLeave,
   onEndSession,
 }: VideoRoomUIProps) {
@@ -150,6 +145,36 @@ export function VideoRoomUI({
 
   // Stage mode (video / screen / whiteboard)
   const [stageMode, setStageMode] = useState<SessionMode>("video");
+
+  /**
+   * The whiteboard, as a room-wide fact rather than a local toggle.
+   *
+   * `stageMode` is this client's own state and never left the browser, so a
+   * host opening the board changed nothing for anyone else — the same shape of
+   * bug the screen share had, and the reason a member's stage stayed on video
+   * while the host drew. The host now announces open/closed over the data
+   * channel and everyone else follows `whiteboard.isOpen`.
+   */
+  const whiteboard = useWhiteboardChannel(isHost);
+
+  const isWhiteboardOpen = isHost ? stageMode === "whiteboard" : whiteboard.isOpen;
+
+  /**
+   * What the stage is asked to show. MainStage resolves the rest, and its
+   * precedence is unchanged: whiteboard beats a screen share beats camera.
+   * A member cannot pick "whiteboard" — they have no control that sets it —
+   * so for them this is purely the host's announcement.
+   */
+  const requestedStageMode: SessionMode = isWhiteboardOpen ? "whiteboard" : stageMode;
+
+  const toggleWhiteboard = useCallback(() => {
+    // Host only. The control below is not rendered for anyone else, and the
+    // publish is what makes the change real for the room rather than for one
+    // browser tab.
+    const open = stageMode !== "whiteboard";
+    setStageMode(open ? "whiteboard" : "video");
+    whiteboard.publishMode(open);
+  }, [stageMode, whiteboard]);
 
   // Pinned question
   const [pinnedQuestion, setPinnedQuestion] = useState<PinnedQuestion | null>(null);
@@ -345,14 +370,6 @@ export function VideoRoomUI({
           </div>
         </div>
 
-        {/* Center: Recording Indicator */}
-        {isRecording && (
-          <div className="flex items-center gap-2 rounded-full bg-red-500/10 px-3 py-1.5">
-            <Radio className="h-4 w-4 animate-pulse text-red-500" />
-            <span className="text-sm font-medium text-red-400">{t("header.recordingBadge")}</span>
-          </div>
-        )}
-
         {/* Right: Host Actions / Member Actions */}
         <div className="flex items-center gap-2">
           {isHost ? (
@@ -397,30 +414,14 @@ export function VideoRoomUI({
                 <span className="hidden sm:inline">{t("header.muteAll")}</span>
               </button>
 
-              {/* Recording control — disabled and labelled as unavailable,
-                  because pressing it did not start a recording. It wrote a
-                  Recording row with `egressId: "pending-…"` and flipped the
-                  badge, but the app never calls the Egress API:
-                  lib/jobs/livekit-webhook.ts's startRecording is a console.log
-                  with `TODO: Implement actual Egress API call`. A host would
-                  leave believing the session was captured.
-
-                  Note this disables the *control*, not the feature. Per
-                  lib/jobs/recording.ts, V1 expects the egress to be started by
-                  LiveKit Cloud project config, with `egress_started` /
-                  `egress_ended` webhooks filling in the row — so recordings
-                  that appear in the library may be perfectly real. What was
-                  false was this button claiming to start one. */}
-              <button
-                type="button"
-                disabled
-                aria-disabled="true"
-                title={t("header.recordingComingSoonHint")}
-                className="flex cursor-not-allowed items-center gap-2 rounded-full bg-zinc-800/60 px-3 py-1.5 text-sm font-medium text-zinc-500"
-              >
-                <Radio className="h-4 w-4" />
-                <span>{t("header.recordingComingSoon")}</span>
-              </button>
+              {/*
+                The recording control used to sit here, disabled and labelled
+                "Recording (coming soon)". Recording is withdrawn (2026-08-18),
+                so a permanently greyed-out control in the host's main toolbar
+                is worse than nothing: it occupies the room chrome to advertise
+                something that is not coming, and every host reads it every
+                session.
+              */}
 
               {/* End Session */}
               <button
@@ -554,10 +555,21 @@ export function VideoRoomUI({
 
           {/* Stage */}
           <div className="min-h-0 flex-1 p-4">
+            {/*
+              `stageMode` is this viewer's own choice and nothing more. The
+              screen-share branch used to be forced from here with
+              `isScreenShareEnabled ? "screen" : stageMode` — the *local*
+              participant's publish flag, which is false for everyone except the
+              person sharing. That is why a guest never saw the host's screen.
+              MainStage now resolves it from the published track, which every
+              subscriber can see.
+            */}
             <MainStage
-              mode={isScreenShareEnabled ? "screen" : stageMode}
+              mode={requestedStageMode}
               sessionMode={sessionMode}
               sessionId={sessionId}
+              isHost={isHost}
+              whiteboard={whiteboard}
             />
           </div>
 
@@ -850,19 +862,21 @@ export function VideoRoomUI({
             <Monitor className="h-5 w-5" />
           </button>
 
-          {/* Whiteboard */}
-          <button
-            onClick={() => setStageMode(stageMode === "whiteboard" ? "video" : "whiteboard")}
-            className={cn(
-              "flex h-12 w-12 items-center justify-center rounded-full transition-all",
-              stageMode === "whiteboard"
-                ? "bg-purple-500/20 text-purple-400 hover:bg-purple-500/30"
-                : "bg-zinc-800 text-white hover:bg-zinc-700"
-            )}
-            title={t("controls.whiteboard")}
-          >
-            <Pencil className="h-5 w-5" />
-          </button>
+          {/* Whiteboard — the host presents it; nobody else opens or closes it. */}
+          {isHost && (
+            <button
+              onClick={toggleWhiteboard}
+              className={cn(
+                "flex h-12 w-12 items-center justify-center rounded-full transition-all",
+                stageMode === "whiteboard"
+                  ? "bg-purple-500/20 text-purple-400 hover:bg-purple-500/30"
+                  : "bg-zinc-800 text-white hover:bg-zinc-700"
+              )}
+              title={t("controls.whiteboard")}
+            >
+              <Pencil className="h-5 w-5" />
+            </button>
+          )}
 
           {/* Reactions */}
           <div className="relative">

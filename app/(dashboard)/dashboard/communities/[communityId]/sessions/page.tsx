@@ -56,8 +56,12 @@ function getAttendanceRecommendation(
   if (attendance.rsvpToJoinRate < 50) return { key: "lowRsvp", tone: "warning" };
   if (attendance.avgAttendance < 5 && attendance.completedSessions >= 3)
     return { key: "lowAttendance", tone: "warning" };
-  if (attendance.replayRate < 60 && attendance.completedSessions >= 2)
-    return { key: "lowReplay", tone: "warning" };
+  // `lowReplay` used to sit here: replayRate < 60 with 2+ completed sessions.
+  // replayRate is derived from sessions that have a recording, and none ever
+  // does, so it is always 0 — every host with two sessions was permanently told
+  // to "push recording-ready notifications and share public links", an action
+  // the product cannot perform. A recommendation nobody can act on is worse
+  // than no recommendation. It returns when there is a replay rate to be low.
   if (
     (attendance.trend?.avgAttendanceDelta || 0) > 0 ||
     (attendance.trend?.rsvpToJoinRateDelta || 0) > 0

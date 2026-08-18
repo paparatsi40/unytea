@@ -361,6 +361,20 @@ async function handleParticipantLeft(event: WebhookEvent) {
 /**
  * Egress (recording) started
  */
+/**
+ * DORMANT — session recording was withdrawn on 2026-08-18.
+ *
+ * The three egress handlers below and `startRecording` at the bottom of this
+ * file are kept as scaffolding in case recording is revisited. They are
+ * unreachable in practice: nothing calls the Egress API (`startRecording` is
+ * still a `TODO: Implement actual Egress API call`), so no `egress_*` webhook
+ * ever arrives and no `Recording` row is ever written.
+ *
+ * DO NOT enable egress — in the LiveKit Cloud project config or anywhere else —
+ * without also restoring the UI that was removed. Rows appearing here would
+ * unhide code paths across the app that are gated on `recordingUrl`, which is
+ * how a withdrawn feature comes back halfway.
+ */
 async function handleEgressStarted(event: WebhookEvent) {
   const egressInfo = event.egressInfo;
   if (!egressInfo) return;

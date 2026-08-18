@@ -351,13 +351,23 @@ export function PublicSessionPage({
       <main className="mx-auto max-w-6xl px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <Badge
-            className={`mb-3 border ${session.canWatchRecording ? "border-emerald-500/30 bg-emerald-500/20 text-emerald-400" : "border-amber-500/30 bg-amber-500/20 text-amber-400"}`}
-          >
-            {session.canWatchRecording
-              ? t("header.badgeRecordingAvailable")
-              : t("header.badgeMembersOnly")}
-          </Badge>
+          {/*
+            `canWatchRecording` is `visibility !== "community" || isMember` — it
+            says whether this viewer *would be allowed* to watch, and nothing at
+            all about whether a recording exists. So every public session page
+            carried a green "Recording Available" badge and every gated one an
+            amber "Members-only recording", both about a file that has never
+            existed. The badge now needs an actual URL before it claims one.
+          */}
+          {session.recording?.url && (
+            <Badge
+              className={`mb-3 border ${session.canWatchRecording ? "border-emerald-500/30 bg-emerald-500/20 text-emerald-400" : "border-amber-500/30 bg-amber-500/20 text-amber-400"}`}
+            >
+              {session.canWatchRecording
+                ? t("header.badgeRecordingAvailable")
+                : t("header.badgeMembersOnly")}
+            </Badge>
+          )}
           <h1 className="mb-4 text-3xl font-bold text-white sm:text-4xl">{session.title}</h1>
           <p className="mb-4 max-w-3xl text-lg text-zinc-400">{session.description}</p>
           <div className="flex flex-wrap items-center gap-4 text-sm text-zinc-500">
@@ -399,16 +409,13 @@ export function PublicSessionPage({
           </div>
         )}
 
-        {session.recording && !session.recording.url && (
-          <div className="mb-8 rounded-xl border border-amber-500/30 bg-amber-500/10 p-6">
-            {/* Shown when a Recording row exists without a URL. That state
-                used to read as "your replay is on its way"; with no egress it
-                never arrives. The player above is untouched — it is gated on a
-                URL, so a real recording still plays. */}
-            <h3 className="text-lg font-semibold text-white">{t("replayGate.comingSoonTitle")}</h3>
-            <p className="mt-2 text-sm text-zinc-300">{t("replayGate.comingSoonBody")}</p>
-          </div>
-        )}
+        {/*
+          A "replays are coming soon" panel used to render here whenever a
+          Recording row existed without a URL. Recording is withdrawn
+          (2026-08-18), so it announced an arrival to the public page of every
+          such session. The player above is untouched: it is gated on a real
+          URL, so anything already captured still plays.
+        */}
 
         <div className="grid gap-8 lg:grid-cols-3">
           {/* Main Content */}

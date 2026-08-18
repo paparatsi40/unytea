@@ -328,10 +328,6 @@
         "title": "Session",
         "description": "Animez en direct avec votre communauté"
       },
-      "recording": {
-        "title": "Enregistrement",
-        "description": "Bientôt : l'enregistrement n'est pas encore disponible"
-      },
       "summary": {
         "title": "Récap",
         "description": "Les idées clés, rassemblées à partir de vos notes de session"
@@ -367,7 +363,7 @@
       },
       "whiteboard": {
         "title": "Tableau blanc",
-        "description": "Travaillez ensemble sur le même support, en direct."
+        "description": "L'hôte dessine en direct et tout le monde suit, dans l'appel."
       },
       "screenShare": {
         "title": "Partage d'écran",
@@ -425,7 +421,7 @@
         "feed": "Fil de la communauté",
         "courses": "Cours",
         "liveVideo": "Sessions vidéo en direct",
-        "whiteboard": "Tableau blanc collaboratif dans l'appel",
+        "whiteboard": "Tableau blanc en direct dans l'appel",
         "certificates": "Certificats",
         "multiLanguage": "Plusieurs langues",
         "platformFee": "Commission de la plateforme"
@@ -1128,10 +1124,6 @@
             "title": "La participation reste faible",
             "description": "Essayez un horaire hebdomadaire fixe et annoncez-le plus tôt dans le fil pour créer une habitude."
           },
-          "lowReplay": {
-            "title": "Opportunité de capture de rediffusion",
-            "description": "Plus de sessions ont besoin d'une distribution de rediffusion. Envoyez des notifications d'enregistrement prêt et partagez des liens publics."
-          },
           "momentum": {
             "title": "L'élan s'améliore",
             "description": "Gardez une cadence stable cette semaine et lancez une annonce de session en direct supplémentaire."
@@ -1692,22 +1684,13 @@
         "addToAppleCalendar": "Ajouter à Apple Calendrier",
         "inviteMembers": "Inviter des membres",
         "shareOn": "Partager sur {network}",
-        "watchRecording": "Voir l'enregistrement",
         "addToCourse": "Ajouter à un cours",
         "createClip": "Créer un extrait",
         "download": "Télécharger",
         "tabs": {
-          "recording": "Enregistrement",
           "notes": "Notes",
           "resources": "Ressources",
           "discussion": "Discussion"
-        },
-        "recording": {
-          "processingTitle": "Traitement de l'enregistrement…",
-          "processingBody": "La vidéo sera disponible sous peu. En attendant, vous pouvez relire les notes.",
-          "unsupported": "Votre navigateur ne prend pas en charge la lecture vidéo.",
-          "noneTitle": "Aucun enregistrement",
-          "noneBody": "Cette session n'a pas été enregistrée, ou l'enregistrement est en cours."
         },
         "notes": {
           "title": "Notes de la session",
@@ -2062,10 +2045,9 @@
     },
     "library": {
       "title": "Bibliothèque",
-      "subtitle": "Vos cours, enregistrements et ressources",
+      "subtitle": "Vos cours et ressources",
       "tabs": {
         "courses": "Cours",
-        "recordings": "Enregistrements",
         "resources": "Ressources"
       },
       "courses": {
@@ -2080,29 +2062,6 @@
         "noCoursesTitle": "Aucun cours pour l'instant",
         "noCoursesBody": "Parcourez les cours disponibles et commencez à apprendre dès aujourd'hui"
       },
-      "recordings": {
-        "newSession": "Nouvelle session",
-        "nextLiveSession": "Prochaine session en direct",
-        "viewSession": "Voir la session",
-        "totalRecordings": "Total des enregistrements",
-        "totalContent": "Contenu total",
-        "totalParticipants": "Total des participants",
-        "noRecordingsTitle": "Aucun enregistrement pour l'instant",
-        "noRecordingsBody": "Démarrez une session en direct et enregistrez-la pour construire votre bibliothèque",
-        "createFirstSession": "Créer la première session",
-        "recordingBadge": "Enregistrement",
-        "noDescription": "Aucune description",
-        "participants": "{count, plural, =1 {1 participant} other {# participants}}",
-        "watch": "Regarder",
-        "addToCourse": "Ajouter au cours",
-        "proTipTitle": "💡 Astuce",
-        "proTipBody": "Les enregistrements sont sauvegardés automatiquement après chaque session en direct. Utilisez-les pour :",
-        "proTip1": "Les ajouter à vos cours comme contenu premium",
-        "proTip2": "Les partager avec les membres qui ont manqué la session en direct",
-        "proTip3": "Les réutiliser comme courts clips pour les réseaux sociaux",
-        "comingSoonTitle": "Les enregistrements de sessions arrivent bientôt",
-        "comingSoonBody": "L'enregistrement n'est pas encore disponible, il n'y a donc rien à afficher ici. Vos sessions passées sont préservées : les enregistrements apparaîtront une fois la fonctionnalité activée."
-      },
       "resources": {
         "loading": "Chargement de votre bibliothèque de connaissances...",
         "buildCourse": "Créer un cours à partir de sessions",
@@ -2114,7 +2073,6 @@
         "scoreValue": "{value}/100",
         "createCourse": "Créer un cours",
         "knowledgeImpact": "Votre impact de connaissance",
-        "sessionsRecorded": "Sessions enregistrées",
         "coursesCreated": "Cours créés",
         "conversionRate": "{rate}% de conversion",
         "studentsLearning": "Étudiants en apprentissage",
@@ -2125,8 +2083,6 @@
         "open": "Ouvrir",
         "keyTopics": "Sujets clés",
         "topicsEmpty": "Les sujets apparaîtront à mesure que les sessions s'accumulent.",
-        "curatedRecordings": "Enregistrements sélectionnés",
-        "viewRecordings": "Voir les enregistrements",
         "curatedMeta": "{count} participants · {duration} min",
         "watch": "Regarder",
         "sessionsReadyToConvert": "Sessions prêtes à convertir",
@@ -2135,14 +2091,13 @@
         "score": "Score : {score}/100",
         "view": "Voir",
         "viewAllSessions": "Voir les {count} sessions",
-        "emptyTitleConvertible": "Aucun enregistrement convertible pour l'instant",
-        "emptyTitleNone": "Aucune session à convertir pour l'instant",
-        "emptyBodyConvertible": "Vous avez déjà des sessions terminées. Ouvrez Enregistrements pour vérifier le statut et convertir celles qui sont prêtes pour des cours.",
-        "emptyBodyNone": "Les sessions en direct terminées avec enregistrements apparaîtront ici, prêtes à être transformées en cours.",
-        "openRecordings": "Ouvrir les enregistrements",
+        "emptyTitleNone": "Rien ici pour l'instant",
+        "emptyBodyNone": "Déposez diapositives, notes et documents dans la bibliothèque d'une communauté : ils apparaîtront ici, prêts à devenir un cours.",
         "hostFirstSession": "Animez votre première session",
         "toastLoadError": "Échec du chargement des données",
-        "toastCourseCreated": "Cours créé avec succès !"
+        "toastCourseCreated": "Cours créé avec succès !",
+        "uploadToLibrary": "Ouvrir une bibliothèque",
+        "sessionsCompleted": "Sessions terminées"
       }
     },
     "home": {
@@ -2764,12 +2719,6 @@
       "player": {
         "clickToPlay": "Cliquez pour lire l'enregistrement"
       },
-      "replayGate": {
-        "title": "Rediffusion réservée aux membres",
-        "body": "Cet enregistrement est disponible pour les membres de la communauté. Rejoignez-la pour voir la rediffusion complète et assister à la prochaine session en direct.",
-        "comingSoonTitle": "Les rediffusions arrivent bientôt",
-        "comingSoonBody": "L'enregistrement des sessions n'est pas encore disponible, il n'y a donc pas de rediffusion."
-      },
       "tabs": {
         "about": "À propos",
         "notes": "Notes",
@@ -2851,15 +2800,10 @@
       "header": {
         "hostLabel": "Hôte : {name}",
         "attending": "{count, plural, =1 {1 participant} other {# participants}}",
-        "recordingBadge": "Enregistrement",
-        "startRecording": "Démarrer l'enregistrement",
-        "pauseRecording": "Mettre en pause l'enregistrement",
         "endSession": "Terminer la session",
         "poll": "Sondage",
         "muteAll": "Couper tous les micros",
-        "leave": "Quitter",
-        "recordingComingSoon": "Enregistrement (bientôt)",
-        "recordingComingSoonHint": "L'enregistrement des sessions n'est pas encore disponible."
+        "leave": "Quitter"
       },
       "raiseHand": {
         "raise": "Lever la main",
@@ -2924,10 +2868,7 @@
       "toasts": {
         "loadFailed": "Impossible de charger la session",
         "ended": "Session terminée. Votre récap est prêt à relire.",
-        "endError": "Une erreur est survenue à la fermeture de la session",
-        "recordingPaused": "Enregistrement en pause",
-        "recordingStarted": "Enregistrement lancé",
-        "recordingFailed": "Impossible de modifier l'état de l'enregistrement"
+        "endError": "Une erreur est survenue à la fermeture de la session"
       }
     },
     "videoRoom": {
@@ -2987,6 +2928,7 @@
       "exportPngTooltip": "Exporter en PNG",
       "clear": "Effacer",
       "clearTooltip": "Effacer le canevas",
+      "viewOnly": "Lecture seule",
       "closeTooltip": "Fermer le tableau blanc",
       "sessionLabel": "Session {id}"
     },
@@ -3004,17 +2946,6 @@
         "completed": "Session terminée !",
         "membersAttended": "{count, plural, =1 {1 membre a participé} other {# membres ont participé}}"
       },
-      "recording": {
-        "readyTitle": "Enregistrement prêt",
-        "readyDesc": "L'enregistrement de votre session est prêt à être regardé et partagé",
-        "processingTitle": "L'enregistrement est en cours de traitement...",
-        "processingDesc": "Il sera prêt dans quelques minutes",
-        "defaultTitle": "État de l'enregistrement",
-        "defaultDesc": "Traitement de l'enregistrement de votre session",
-        "watch": "Regarder",
-        "comingSoonTitle": "Enregistrement bientôt disponible",
-        "comingSoonDesc": "Cette session n'a pas été enregistrée. L'enregistrement n'est pas encore disponible."
-      },
       "nextSteps": {
         "title": "Transformez cette session en contenu",
         "notesTitle": "Rédiger des notes",
@@ -3029,7 +2960,9 @@
         "clipsDesc": "Générez de courts clips pour les réseaux sociaux",
         "libraryTitle": "Publier dans la bibliothèque",
         "libraryDesc": "Transformez ce récap en ressource réutilisable de la bibliothèque",
-        "shareNotShared": "Brouillon — non partagé"
+        "shareNotShared": "Brouillon — non partagé",
+        "materialsTitle": "Partagez les supports",
+        "materialsDesc": "Déposez diapositives, notes et documents dans la bibliothèque de la communauté"
       },
       "stats": {
         "title": "Performance de la session",

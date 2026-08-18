@@ -129,15 +129,10 @@ export function ResourcesTab() {
 
   const hasConvertibleSessions = sessions.length > 0;
   const hasSuggestions = suggestions.length > 0;
-  const hasRecordedSessions = (stats?.completedSessions || 0) > 0;
 
   const bestSessions = [...sessions]
     .sort((a, b) => (b.engagementScore || 0) - (a.engagementScore || 0))
     .slice(0, 3);
-
-  const curatedRecordings = [...sessions]
-    .sort((a, b) => (b._count?.participations || 0) - (a._count?.participations || 0))
-    .slice(0, 5);
 
   const keyTopics = Object.entries(
     sessions.reduce(
@@ -263,7 +258,7 @@ export function ResourcesTab() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-foreground">{stats.completedSessions}</p>
-                    <p className="text-sm text-muted-foreground">{t("sessionsRecorded")}</p>
+                    <p className="text-sm text-muted-foreground">{t("sessionsCompleted")}</p>
                   </div>
                 </div>
               </CardContent>
@@ -375,43 +370,14 @@ export function ResourcesTab() {
         </section>
       )}
 
-      {hasConvertibleSessions && (
-        <section className="mb-8">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-foreground">{t("curatedRecordings")}</h2>
-            <Link href="/dashboard/library?tab=recordings">
-              <Button variant="outline" size="sm" className="border-border text-foreground">
-                {t("viewRecordings")}
-              </Button>
-            </Link>
-          </div>
+      {/*
+        A "Curated Recordings" section stood here, linking to
+        /dashboard/library?tab=recordings. Recording is withdrawn (2026-08-18),
+        that tab is gone, and the section was gated on sessions that carry a
+        recordingUrl — a set that is permanently empty. Dead UI naming a dead
+        feature.
+      */}
 
-          <div className="grid gap-3 md:grid-cols-2">
-            {curatedRecordings.map((session) => (
-              <Card key={session.id} className="border-border bg-card">
-                <CardContent className="flex items-center justify-between p-4">
-                  <div>
-                    <p className="font-medium text-foreground">{session.title}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {t("curatedMeta", {
-                        count: session._count.participations,
-                        duration: session.duration,
-                      })}
-                    </p>
-                  </div>
-                  <Link href={`/dashboard/sessions/${session.id}`}>
-                    <Button variant="ghost" size="sm" className="text-purple-400">
-                      {t("watch")}
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* CONVERTIBLE SESSIONS */}
       {hasConvertibleSessions && (
         <section>
           <div className="mb-4 flex items-center justify-between">
@@ -499,20 +465,20 @@ export function ResourcesTab() {
                 <Video className="h-8 w-8 text-muted-foreground" />
               </div>
             </div>
-            <h3 className="mb-2 text-lg font-semibold text-foreground">
-              {hasRecordedSessions ? t("emptyTitleConvertible") : t("emptyTitleNone")}
-            </h3>
-            <p className="mx-auto mb-6 max-w-md text-muted-foreground">
-              {hasRecordedSessions ? t("emptyBodyConvertible") : t("emptyBodyNone")}
-            </p>
-            <Link
-              href={
-                hasRecordedSessions ? "/dashboard/library?tab=recordings" : "/dashboard/sessions"
-              }
-            >
+            {/*
+              One state, not two. Both branches used to explain that a course
+              needs a recording and that recording was on its way; recording is
+              withdrawn (2026-08-18), so the distinction between "you have
+              sessions" and "you have none" led to the same dead end, and the
+              CTA pointed at ?tab=recordings — a tab that no longer exists.
+              What a host can actually do is put the material in the library.
+            */}
+            <h3 className="mb-2 text-lg font-semibold text-foreground">{t("emptyTitleNone")}</h3>
+            <p className="mx-auto mb-6 max-w-md text-muted-foreground">{t("emptyBodyNone")}</p>
+            <Link href="/dashboard/communities">
               <Button className="bg-purple-600 text-white hover:bg-purple-700">
                 <Plus className="mr-2 h-4 w-4" />
-                {hasRecordedSessions ? t("openRecordings") : t("hostFirstSession")}
+                {t("uploadToLibrary")}
               </Button>
             </Link>
           </CardContent>
