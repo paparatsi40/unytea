@@ -359,9 +359,6 @@ async function handleParticipantLeft(event: WebhookEvent) {
 }
 
 /**
- * Egress (recording) started
- */
-/**
  * DORMANT — session recording was withdrawn on 2026-08-18.
  *
  * The three egress handlers below and `startRecording` at the bottom of this
