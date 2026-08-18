@@ -367,7 +367,7 @@
       },
       "whiteboard": {
         "title": "Tableau blanc",
-        "description": "Travaillez ensemble sur le même support, en direct."
+        "description": "L'hôte dessine en direct et tout le monde suit, dans l'appel."
       },
       "screenShare": {
         "title": "Partage d'écran",
@@ -425,7 +425,7 @@
         "feed": "Fil de la communauté",
         "courses": "Cours",
         "liveVideo": "Sessions vidéo en direct",
-        "whiteboard": "Tableau blanc collaboratif dans l'appel",
+        "whiteboard": "Tableau blanc en direct dans l'appel",
         "certificates": "Certificats",
         "multiLanguage": "Plusieurs langues",
         "platformFee": "Commission de la plateforme"
@@ -2983,6 +2983,7 @@
       "exportPngTooltip": "Exporter en PNG",
       "clear": "Effacer",
       "clearTooltip": "Effacer le canevas",
+      "viewOnly": "Lecture seule",
       "closeTooltip": "Fermer le tableau blanc",
       "sessionLabel": "Session {id}"
     },

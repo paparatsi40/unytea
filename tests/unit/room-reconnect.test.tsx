@@ -72,7 +72,16 @@ const localParticipant = {
   publishData: vi.fn(async () => {}),
 };
 
-const room = { switchActiveDevice, localParticipant, on: vi.fn(), off: vi.fn() };
+// The room stands in for a real LiveKit `Room`; the stream-handler pair is
+// what the whiteboard broadcast uses to deliver a late joiner's snapshot.
+const room = {
+  switchActiveDevice,
+  localParticipant,
+  on: vi.fn(),
+  off: vi.fn(),
+  registerTextStreamHandler: vi.fn(),
+  unregisterTextStreamHandler: vi.fn(),
+};
 
 vi.mock("@/app/actions/livekit", () => ({ joinSession: (id: string) => joinSession(id) }));
 vi.mock("@livekit/components-styles", () => ({}));

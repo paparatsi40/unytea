@@ -134,7 +134,7 @@ const RELEASES: ReleaseEntry[] = [
       },
       {
         type: "improvement",
-        text: "Excalidraw collaborative whiteboard embedded in session rooms.",
+        text: "Excalidraw whiteboard embedded in session rooms: the host draws, members follow live.",
       },
     ],
   },

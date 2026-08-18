@@ -77,9 +77,9 @@ export default async function TermsPage(props: { params: Promise<{ locale: strin
             <h2 className="mb-3 text-2xl font-semibold">3. Platform Description</h2>
             <p className="text-muted-foreground">
               Unytea provides tools for community-based learning, including community creation and
-              management, structured courses, live video sessions, real-time messaging,
-              collaborative whiteboards, content publishing, AI-assisted features, and integrated
-              payment processing. Feature availability may vary by plan.
+              management, structured courses, live video sessions, real-time messaging, live
+              whiteboards presented by session hosts, content publishing, and integrated payment
+              processing. Feature availability may vary by plan.
             </p>
           </article>
 
