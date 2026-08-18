@@ -554,11 +554,16 @@ export function VideoRoomUI({
 
           {/* Stage */}
           <div className="min-h-0 flex-1 p-4">
-            <MainStage
-              mode={isScreenShareEnabled ? "screen" : stageMode}
-              sessionMode={sessionMode}
-              sessionId={sessionId}
-            />
+            {/*
+              `stageMode` is this viewer's own choice and nothing more. The
+              screen-share branch used to be forced from here with
+              `isScreenShareEnabled ? "screen" : stageMode` — the *local*
+              participant's publish flag, which is false for everyone except the
+              person sharing. That is why a guest never saw the host's screen.
+              MainStage now resolves it from the published track, which every
+              subscriber can see.
+            */}
+            <MainStage mode={stageMode} sessionMode={sessionMode} sessionId={sessionId} />
           </div>
 
           {/* Chat Panel (below stage on desktop, or replace stage on mobile) */}

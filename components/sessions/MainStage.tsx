@@ -174,18 +174,52 @@ export function MainStage({
     );
   }, [screenTracks, localParticipant.identity]);
 
+  /**
+   * What the stage actually shows, as opposed to what this client asked for.
+   *
+   * `mode` used to be the whole story, and it is a purely local value: the room
+   * passed `isScreenShareEnabled ? "screen" : stageMode`, where
+   * `isScreenShareEnabled` is the *local* participant's publish flag. So when
+   * the host shared their screen, only the host's own stage switched. Every
+   * guest subscribed to the track — autoSubscribe is on and `useTracks` below
+   * returns remote publications — and then rendered the camera branch instead,
+   * which for a guest with no camera up is the "waiting for video" placeholder.
+   * The screen arrived and was thrown away one line before it would have been
+   * drawn.
+   *
+   * A published screen share is a fact about the room, not a preference of the
+   * viewer, so the stage is derived from the track being there. The whiteboard
+   * still wins: it is something a participant opened deliberately, and a screen
+   * share should not yank them out of it.
+   */
+  const effectiveMode: SessionMode = useMemo(() => {
+    if (mode === "whiteboard") return "whiteboard";
+    if (mainScreenTrack) return "screen";
+    return mode;
+  }, [mode, mainScreenTrack]);
+
   const isShowingLocalMain = isCameraEnabled && !!cameraTrack;
 
-  const displayedMainIdentity = isShowingLocalMain
-    ? localParticipant.identity
-    : mainCameraTrack?.participant.identity;
+  /**
+   * Whose camera is on the main stage, or undefined when the main stage is not
+   * showing a camera at all. While a screen share is up nobody's camera is on
+   * the stage, so nobody should be filtered out of the strip below — the old
+   * unconditional filter silently dropped one participant's tile in exactly the
+   * case where you most want to see the faces.
+   */
+  const displayedMainIdentity =
+    effectiveMode !== "video"
+      ? undefined
+      : isShowingLocalMain
+        ? localParticipant.identity
+        : mainCameraTrack?.participant.identity;
 
   const speakerStripTracks = useMemo(() => {
     return cameraTracks.filter((t) => t.participant.identity !== displayedMainIdentity).slice(0, 4);
   }, [cameraTracks, displayedMainIdentity]);
 
   // For audio-only sessions in "screen" mode, show audio stage
-  if (isAudioOnly && mode !== "whiteboard" && mode !== "screen") {
+  if (isAudioOnly && effectiveMode !== "whiteboard" && effectiveMode !== "screen") {
     return (
       <AudioStage
         isMicrophoneEnabled={isMicrophoneEnabled}
@@ -199,7 +233,7 @@ export function MainStage({
     <div className={cn("flex h-full flex-col overflow-hidden", className)}>
       {/* MAIN STAGE */}
       <div className="relative flex-1 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950">
-        {mode === "whiteboard" ? (
+        {effectiveMode === "whiteboard" ? (
           sessionId ? (
             <SessionWhiteboard
               embedded
@@ -213,7 +247,7 @@ export function MainStage({
               description={t("whiteboardUnavailableDesc")}
             />
           )
-        ) : mode === "screen" ? (
+        ) : effectiveMode === "screen" ? (
           mainScreenTrack ? (
             <div className="h-full w-full bg-black">
               <VideoTrack className="h-full w-full object-contain" trackRef={mainScreenTrack} />
@@ -247,7 +281,7 @@ export function MainStage({
       </div>
 
       {/* SPEAKER STRIP - solo para video mode */}
-      {!isAudioOnly && mode !== "whiteboard" && speakerStripTracks.length > 0 && (
+      {!isAudioOnly && effectiveMode !== "whiteboard" && speakerStripTracks.length > 0 && (
         <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {speakerStripTracks.map((trackRef) => (
             <div
