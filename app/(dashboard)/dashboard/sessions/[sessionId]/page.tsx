@@ -54,9 +54,8 @@ export default function SessionDetailPage(props: SessionPageProps) {
   const t = useTranslations("dashboard.sessions.detail");
   const [session, setSession] = useState<SessionDetail | null>(null);
   const [loading, setLoading] = useState(true);
-  // Notes, not recording. The recording tab is empty for every session that
-  // exists, so opening on it made the first thing a host saw after a session an
-  // empty player. Notes are real and are what the recap is built from.
+  // Notes is the first tab now that the recording tab is gone. It is also the
+  // real one: the recap is built from what is written here.
   const [activeTab, setActiveTab] = useState("notes");
   const [showAddToCourse, setShowAddToCourse] = useState(false);
   const [showCreateClip, setShowCreateClip] = useState(false);
@@ -219,7 +218,6 @@ export default function SessionDetailPage(props: SessionPageProps) {
   }
 
   const isAudioOnly = session.mode === "AUDIO";
-  const isProcessing = session.recording?.status === "PROCESSING";
   const hasRecording = !!session.recordingUrl;
   const formattedDate = new Date(session.scheduledAt).toLocaleDateString("en-US", {
     weekday: "short",
@@ -526,16 +524,6 @@ export default function SessionDetailPage(props: SessionPageProps) {
             </>
           )}
 
-          {hasRecording && !isProcessing && (
-            <Button
-              className="gap-2 bg-purple-600 hover:bg-purple-700"
-              onClick={() => setActiveTab("recording")}
-            >
-              <Play className="h-4 w-4" />
-              {t("watchRecording")}
-            </Button>
-          )}
-
           {/*
             Both need the recorded file. `addSessionToCourse` returns "Session
             recording not available yet" without one, and the clip dialog
@@ -593,13 +581,6 @@ export default function SessionDetailPage(props: SessionPageProps) {
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="w-full bg-zinc-900">
                 <TabsTrigger
-                  value="recording"
-                  className="flex-1 data-[state=active]:bg-zinc-800 data-[state=active]:text-white"
-                >
-                  <Play className="mr-2 h-4 w-4" />
-                  {t("tabs.recording")}
-                </TabsTrigger>
-                <TabsTrigger
                   value="notes"
                   className="flex-1 data-[state=active]:bg-zinc-800 data-[state=active]:text-white"
                 >
@@ -623,44 +604,13 @@ export default function SessionDetailPage(props: SessionPageProps) {
               </TabsList>
 
               {/* RECORDING TAB */}
-              <TabsContent value="recording" className="mt-4">
-                <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-1">
-                  {isProcessing ? (
-                    <div className="flex h-[400px] flex-col items-center justify-center gap-4">
-                      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800">
-                        <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
-                      </div>
-                      <div className="text-center">
-                        <p className="text-lg font-medium text-white">
-                          {t("recording.processingTitle")}
-                        </p>
-                        <p className="text-sm text-zinc-400">{t("recording.processingBody")}</p>
-                      </div>
-                    </div>
-                  ) : session.recordingUrl ? (
-                    <div className="aspect-video overflow-hidden rounded-xl bg-black">
-                      <video
-                        src={session.recordingUrl}
-                        controls
-                        className="h-full w-full"
-                        poster="/images/video-poster.jpg"
-                      >
-                        {t("recording.unsupported")}
-                      </video>
-                    </div>
-                  ) : (
-                    <div className="flex h-[400px] flex-col items-center justify-center gap-4">
-                      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800">
-                        <Play className="h-8 w-8 text-zinc-500" />
-                      </div>
-                      <div className="text-center">
-                        <p className="text-lg font-medium text-white">{t("recording.noneTitle")}</p>
-                        <p className="text-sm text-zinc-400">{t("recording.noneBody")}</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </TabsContent>
+              {/*
+                The Recording tab used to sit here — a player, a "processing"
+                state and a "no recording available" empty state. Recording is
+                withdrawn (2026-08-18), so all three described a feature that
+                will not arrive, and one of them was a tab a host could click
+                on every completed session forever.
+              */}
 
               {/* NOTES TAB */}
               <TabsContent value="notes" className="mt-4">

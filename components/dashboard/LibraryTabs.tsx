@@ -4,9 +4,11 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { BookOpen, Video, FileText } from "lucide-react";
+import { BookOpen, FileText } from "lucide-react";
 
-export type LibraryTab = "courses" | "recordings" | "resources";
+// Recording is withdrawn (2026-08-18); the tab it had here is gone rather than
+// left showing a coming-soon panel. The library is courses and resources.
+export type LibraryTab = "courses" | "resources";
 
 /**
  * Library tabs UI. Client component so it can localize via the dashboard's
@@ -15,7 +17,7 @@ export type LibraryTab = "courses" | "recordings" | "resources";
  *
  * The active tab is driven by the ?tab= query param, computed server-side in
  * page.tsx, which also renders ONLY the active tab's content and passes it as
- * `children`. This lets server components (CoursesTab/RecordingsTab) and a
+ * `children`. This lets server components (CoursesTab/ResourcesTab) and a
  * client component (ResourcesTab) live in the same tab set without breaking
  * the server/client boundary, and avoids fetching inactive tabs. Each trigger
  * is a <Link> that swaps the query param — the URL stays bookmarkable and the
@@ -38,17 +40,11 @@ export function LibraryTabs({
       </header>
 
       <Tabs value={activeTab} className="w-full">
-        <TabsList className="mb-6 grid w-full max-w-md grid-cols-3">
+        <TabsList className="mb-6 grid w-full max-w-md grid-cols-2">
           <TabsTrigger value="courses" asChild>
             <Link href="?tab=courses" className="flex items-center gap-2">
               <BookOpen className="h-4 w-4" />
               {t("tabs.courses")}
-            </Link>
-          </TabsTrigger>
-          <TabsTrigger value="recordings" asChild>
-            <Link href="?tab=recordings" className="flex items-center gap-2">
-              <Video className="h-4 w-4" />
-              {t("tabs.recordings")}
             </Link>
           </TabsTrigger>
           <TabsTrigger value="resources" asChild>

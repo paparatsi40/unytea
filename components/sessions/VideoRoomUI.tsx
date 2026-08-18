@@ -72,11 +72,6 @@ interface VideoRoomUIProps {
   isHost?: boolean;
   attendeeCount?: number;
   sessionStartTime?: Date;
-  isRecording?: boolean;
-  /** Still accepted so the parent's wiring survives untouched; unread while
-   *  the recording control below is disabled. */
-  isRecordingBusy?: boolean;
-  onToggleRecording?: () => void;
   onLeave?: () => void;
   onEndSession?: () => void;
 }
@@ -90,7 +85,6 @@ export function VideoRoomUI({
   isHost = false,
   attendeeCount = 0,
   sessionStartTime,
-  isRecording = false,
   onLeave,
   onEndSession,
 }: VideoRoomUIProps) {
@@ -376,14 +370,6 @@ export function VideoRoomUI({
           </div>
         </div>
 
-        {/* Center: Recording Indicator */}
-        {isRecording && (
-          <div className="flex items-center gap-2 rounded-full bg-red-500/10 px-3 py-1.5">
-            <Radio className="h-4 w-4 animate-pulse text-red-500" />
-            <span className="text-sm font-medium text-red-400">{t("header.recordingBadge")}</span>
-          </div>
-        )}
-
         {/* Right: Host Actions / Member Actions */}
         <div className="flex items-center gap-2">
           {isHost ? (
@@ -428,30 +414,14 @@ export function VideoRoomUI({
                 <span className="hidden sm:inline">{t("header.muteAll")}</span>
               </button>
 
-              {/* Recording control — disabled and labelled as unavailable,
-                  because pressing it did not start a recording. It wrote a
-                  Recording row with `egressId: "pending-…"` and flipped the
-                  badge, but the app never calls the Egress API:
-                  lib/jobs/livekit-webhook.ts's startRecording is a console.log
-                  with `TODO: Implement actual Egress API call`. A host would
-                  leave believing the session was captured.
-
-                  Note this disables the *control*, not the feature. Per
-                  lib/jobs/recording.ts, V1 expects the egress to be started by
-                  LiveKit Cloud project config, with `egress_started` /
-                  `egress_ended` webhooks filling in the row — so recordings
-                  that appear in the library may be perfectly real. What was
-                  false was this button claiming to start one. */}
-              <button
-                type="button"
-                disabled
-                aria-disabled="true"
-                title={t("header.recordingComingSoonHint")}
-                className="flex cursor-not-allowed items-center gap-2 rounded-full bg-zinc-800/60 px-3 py-1.5 text-sm font-medium text-zinc-500"
-              >
-                <Radio className="h-4 w-4" />
-                <span>{t("header.recordingComingSoon")}</span>
-              </button>
+              {/*
+                The recording control used to sit here, disabled and labelled
+                "Recording (coming soon)". Recording is withdrawn (2026-08-18),
+                so a permanently greyed-out control in the host's main toolbar
+                is worse than nothing: it occupies the room chrome to advertise
+                something that is not coming, and every host reads it every
+                session.
+              */}
 
               {/* End Session */}
               <button

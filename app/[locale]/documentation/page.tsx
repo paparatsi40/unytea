@@ -82,13 +82,12 @@ const sections: DocSection[] = [
   {
     icon: Video,
     title: "Live Sessions",
-    description:
-      "Host real-time video sessions with screen sharing, recordings, and collaborative tools.",
+    description: "Host real-time video sessions with screen sharing and a live whiteboard.",
     topics: [
       "Scheduling and announcing sessions",
       "Screen sharing and presentation mode",
       "Live whiteboard the host presents (Excalidraw)",
-      "Session recordings and post-session summaries",
+      "Post-session recap drafted from your notes",
     ],
   },
   {

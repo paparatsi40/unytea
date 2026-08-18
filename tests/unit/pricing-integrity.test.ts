@@ -319,71 +319,18 @@ describe("displayed prices are one copy", () => {
 });
 
 /**
- * Confirmed from the LiveKit Cloud dashboard: no auto-egress is configured and
- * the Egresses tab is empty. Combined with the stubbed Egress call, NO path
- * produces a recording. Every surface that presented recordings as a working
- * feature therefore had to say otherwise — not be deleted, since the code and
- * the data model are ready for egress whenever it is built.
+ * The recording block that used to live here is gone.
+ *
+ * It pinned the coming-soon treatment: the library panel, the post-session
+ * card, the public replay gate and the strings behind them. Recording was
+ * withdrawn on 2026-08-18, those surfaces were removed rather than reworded,
+ * and asserting they still say "coming soon" would now hold the product to a
+ * promise it has retracted.
+ *
+ * What replaced it is tests/unit/recording-honesty.test.ts, which checks the
+ * opposite: that no surface offers a recording without a file, and that nothing
+ * tells a user one is on its way.
  */
-describe("no recording surface presents a working feature", () => {
-  it("the library shows coming-soon, not an empty shelf inviting you to fill it", () => {
-    const view = code("components/dashboard/library/RecordingsTabView.tsx");
-    expect(view).toContain('t("comingSoonTitle")');
-    expect(view).toContain('t("comingSoonBody")');
-    // "Create your first session" implied a session would produce a recording.
-    expect(view).not.toContain('t("createFirstSession")');
-    expect(view).not.toContain('t("noRecordingsTitle")');
-  });
-
-  it("the library still renders real recordings if any ever exist", () => {
-    // Marking the empty state must not hide data. The grid is untouched.
-    const view = read("components/dashboard/library/RecordingsTabView.tsx");
-    expect(view).toContain("recordings.map(");
-  });
-
-  it("the post-session card stops claiming a recording is processing", () => {
-    // recordingStatus defaults to PROCESSING with no row, so every completed
-    // session showed a spinner and "processing your recording" forever.
-    const flow = code("components/sessions/PostSessionFlow.tsx");
-    expect(flow).toContain('t("recording.comingSoonTitle")');
-    expect(flow).not.toContain('t("recording.processingTitle")');
-    expect(flow).not.toContain('t("recording.processingDesc")');
-    // A genuinely READY recording still says so.
-    expect(flow).toContain('t("recording.readyTitle")');
-  });
-
-  it("the public replay gate says coming soon rather than 'on its way'", () => {
-    const page = code("components/sessions/PublicSessionPage.tsx");
-    expect(page).toContain('t("replayGate.comingSoonTitle")');
-    expect(page).not.toContain('t("replayGate.title")');
-    // The player is gated on a URL, so a real recording still plays.
-    expect(page).toContain("session.recording?.url &&");
-  });
-
-  it("no recording surface calls the stubbed start path", () => {
-    const surfaces = [
-      "components/sessions/VideoRoomUI.tsx",
-      "components/dashboard/library/RecordingsTabView.tsx",
-      "components/sessions/PostSessionFlow.tsx",
-      "components/sessions/PublicSessionPage.tsx",
-    ];
-    for (const file of surfaces) {
-      expect(code(file), `${file} should not start a recording`).not.toContain(
-        "startCompositeRecording"
-      );
-    }
-  });
-
-  it.each(LOCALES)("%s has every coming-soon string these surfaces render", (name) => {
-    const data = locale(name);
-    expect(data.dashboard.library.recordings.comingSoonTitle).toBeTruthy();
-    expect(data.dashboard.library.recordings.comingSoonBody).toBeTruthy();
-    expect(data.liveSession.postSessionFlow.recording.comingSoonTitle).toBeTruthy();
-    expect(data.liveSession.postSessionFlow.recording.comingSoonDesc).toBeTruthy();
-    expect(data.liveSession.publicPage.replayGate.comingSoonTitle).toBeTruthy();
-    expect(data.liveSession.publicPage.replayGate.comingSoonBody).toBeTruthy();
-  });
-});
 
 describe("the dead landing.pricing namespace stays gone", () => {
   it.each(LOCALES)("%s has no landing.pricing", (name) => {
@@ -423,25 +370,13 @@ describe("the dead landing.pricing namespace stays gone", () => {
   });
 });
 
-describe("the recording control does not promise what it cannot do", () => {
-  it("is disabled and labelled as unavailable", () => {
-    const ui = read("components/sessions/VideoRoomUI.tsx");
-    expect(ui).toContain('t("header.recordingComingSoon")');
-    expect(ui).toContain('aria-disabled="true"');
-    // It must no longer invoke the stubbed start path.
-    const control = ui.slice(ui.indexOf("Recording control"), ui.indexOf("End Session"));
-    expect(control).not.toContain("onToggleRecording");
-  });
-
+describe("the egress path stays dormant", () => {
   it("the egress call really is still a stub", () => {
-    // If this ever stops being true, the control should be re-enabled rather
-    // than left disabled out of inertia.
+    // The one assertion worth keeping from the old recording-control block.
+    // Recording was withdrawn on 2026-08-18 and the in-room control removed, so
+    // nothing left disabled needs re-enabling — but if this ever stops being a
+    // stub, the surface removed in that change has to come back with it rather
+    // than recordings quietly appearing behind URL-gated code paths.
     expect(read("lib/jobs/livekit-webhook.ts")).toContain("TODO: Implement actual Egress API call");
-  });
-
-  it.each(LOCALES)("%s has the coming-soon copy", (name) => {
-    const header = locale(name).liveSession.room.header;
-    expect(header.recordingComingSoon).toBeTruthy();
-    expect(header.recordingComingSoonHint).toBeTruthy();
   });
 });

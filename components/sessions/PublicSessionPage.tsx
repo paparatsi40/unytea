@@ -409,16 +409,13 @@ export function PublicSessionPage({
           </div>
         )}
 
-        {session.recording && !session.recording.url && (
-          <div className="mb-8 rounded-xl border border-amber-500/30 bg-amber-500/10 p-6">
-            {/* Shown when a Recording row exists without a URL. That state
-                used to read as "your replay is on its way"; with no egress it
-                never arrives. The player above is untouched — it is gated on a
-                URL, so a real recording still plays. */}
-            <h3 className="text-lg font-semibold text-white">{t("replayGate.comingSoonTitle")}</h3>
-            <p className="mt-2 text-sm text-zinc-300">{t("replayGate.comingSoonBody")}</p>
-          </div>
-        )}
+        {/*
+          A "replays are coming soon" panel used to render here whenever a
+          Recording row existed without a URL. Recording is withdrawn
+          (2026-08-18), so it announced an arrival to the public page of every
+          such session. The player above is untouched: it is gated on a real
+          URL, so anything already captured still plays.
+        */}
 
         <div className="grid gap-8 lg:grid-cols-3">
           {/* Main Content */}

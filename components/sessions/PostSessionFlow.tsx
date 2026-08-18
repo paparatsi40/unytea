@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   CheckCircle,
-  Play,
   FileText,
   Share2,
   BookOpen,
@@ -14,8 +13,6 @@ import {
   MessageSquare,
   Zap,
   ArrowRight,
-  Video,
-  VideoOff,
   Scissors,
   ChevronLeft,
   Radio,
@@ -51,6 +48,8 @@ interface PostSessionFlowProps {
     mentor: { name: string | null } | null;
     _count: { participations: number };
     notes: { content: string } | null;
+    /** Where the host uploads the session's materials. */
+    community: { slug: string } | null;
     feedPostId: string | null;
   };
   isHost: boolean;
@@ -89,10 +88,6 @@ export function PostSessionFlow({
           (new Date(session.endedAt).getTime() - new Date(session.startedAt).getTime()) / 60000
         )
       : 0;
-
-  // Recording status
-  const recordingStatus = session.recording?.status || "PROCESSING";
-  const isRecordingReady = recordingStatus === "READY";
 
   /**
    * Three of the five "next steps" need a recorded video file, and all three
@@ -133,53 +128,18 @@ export function PostSessionFlow({
         </p>
       </div>
 
-      {/* ==================== RECORDING STATUS ==================== */}
-      <Card className="border-zinc-800 bg-zinc-900/50">
-        <CardContent className="p-6">
-          <div className="flex items-center gap-4">
-            <div
-              className={cn(
-                "flex h-14 w-14 items-center justify-center rounded-full",
-                // Amber reads as "in progress". Neutral reads as "not a thing
-                // yet", which is what this is.
-                isRecordingReady ? "bg-green-500/20" : "bg-zinc-800"
-              )}
-            >
-              {isRecordingReady ? (
-                <Video className="h-7 w-7 text-green-400" />
-              ) : (
-                // Static, not a spinner. A spinner is a promise that something
-                // is happening; nothing is. The copy already said "coming
-                // soon" while the icon underneath it kept turning, which is
-                // the more believable of the two signals.
-                <VideoOff className="h-7 w-7 text-zinc-400" />
-              )}
-            </div>
-            <div className="flex-1">
-              {/* `recordingStatus` defaults to PROCESSING when there is no
-                  Recording row, so every completed session showed a spinner
-                  and "processing your recording" — forever, since nothing
-                  produces one. A recording that is genuinely READY still says
-                  so; anything short of that now says what is actually true. */}
-              <h3 className="font-semibold text-white">
-                {isRecordingReady ? t("recording.readyTitle") : t("recording.comingSoonTitle")}
-              </h3>
-              <p className="text-sm text-zinc-400">
-                {isRecordingReady ? t("recording.readyDesc") : t("recording.comingSoonDesc")}
-              </p>
-            </div>
-            {isRecordingReady && session.recording?.url && (
-              <Button
-                onClick={() => setActiveAction("recording")}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                <Play className="mr-2 h-4 w-4" />
-                {t("recording.watch")}
-              </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      {/*
+        The recording card used to live here.
+        Recording is withdrawn (2026-08-18), not delayed, so a card saying
+        "coming soon" would be the same over-promise in a quieter voice — and it
+        would be the first thing a host reads after every session, about the one
+        thing the product has decided not to do. A card explaining an absence is
+        still a card about recording.
+
+        A session's outcome is now the notes, the recap built from them, and
+        whatever the host uploads to the community library. Those are below, and
+        they are all real.
+      */}
 
       {/* ==================== NEXT STEPS ==================== */}
       <div>
@@ -328,6 +288,34 @@ export function PostSessionFlow({
                 <ArrowRight className="h-5 w-5 text-zinc-500" />
               </CardContent>
             </Card>
+          )}
+
+          {/*
+            What replaced the recording.
+            With no video, the way a member catches up on a session they missed
+            is the recap and whatever the host puts in the library. The three
+            cards above are all gated on a recording file and therefore never
+            render, so without this the flow ended at "write notes" and pointed
+            nowhere. This is a plain link — the library upload it opens is real:
+            an upload modal on the community library page, a `documentUploader`
+            route, and `createResource` behind an owner/admin/moderator/mentor
+            check.
+          */}
+          {session.community?.slug && (
+            <Link href={`/dashboard/c/${session.community.slug}/library`} className="block">
+              <Card className="cursor-pointer border-zinc-800 bg-zinc-900/50 transition-all hover:border-cyan-500/50 hover:bg-zinc-800/50">
+                <CardContent className="flex items-start gap-4 p-5">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-cyan-500/20">
+                    <Folder className="h-6 w-6 text-cyan-400" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-white">{t("nextSteps.materialsTitle")}</h3>
+                    <p className="text-sm text-zinc-400">{t("nextSteps.materialsDesc")}</p>
+                  </div>
+                  <ArrowRight className="h-5 w-5 text-zinc-500" />
+                </CardContent>
+              </Card>
+            </Link>
           )}
         </div>
       </div>

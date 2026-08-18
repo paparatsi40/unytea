@@ -328,10 +328,6 @@
         "title": "Session",
         "description": "Host live with your community"
       },
-      "recording": {
-        "title": "Recording",
-        "description": "Coming soon — recording isn't available yet"
-      },
       "summary": {
         "title": "Recap",
         "description": "Takeaways pulled together from your session notes"
@@ -1678,22 +1674,13 @@
         "addToAppleCalendar": "Add to Apple Calendar",
         "inviteMembers": "Invite members",
         "shareOn": "Share on {network}",
-        "watchRecording": "Watch Recording",
         "addToCourse": "Add to Course",
         "createClip": "Create Clip",
         "download": "Download",
         "tabs": {
-          "recording": "Recording",
           "notes": "Notes",
           "resources": "Resources",
           "discussion": "Discussion"
-        },
-        "recording": {
-          "processingTitle": "Processing recording…",
-          "processingBody": "The video will be available soon. You can review notes in the meantime.",
-          "unsupported": "Your browser does not support the video tag.",
-          "noneTitle": "No recording available",
-          "noneBody": "This session was not recorded or the recording is still being processed."
         },
         "notes": {
           "title": "Session Notes",
@@ -2048,10 +2035,9 @@
     },
     "library": {
       "title": "Library",
-      "subtitle": "Your courses, recordings, and resources",
+      "subtitle": "Your courses and resources",
       "tabs": {
         "courses": "Courses",
-        "recordings": "Recordings",
         "resources": "Resources"
       },
       "courses": {
@@ -2066,29 +2052,6 @@
         "noCoursesTitle": "No courses yet",
         "noCoursesBody": "Browse available courses and start learning today"
       },
-      "recordings": {
-        "newSession": "New Session",
-        "nextLiveSession": "Next live session",
-        "viewSession": "View Session",
-        "totalRecordings": "Total recordings",
-        "totalContent": "Total content",
-        "totalParticipants": "Total participants",
-        "noRecordingsTitle": "No recordings yet",
-        "noRecordingsBody": "Start a live session and record it to build your library",
-        "createFirstSession": "Create First Session",
-        "recordingBadge": "Recording",
-        "noDescription": "No description",
-        "participants": "{count, plural, =1 {1 participant} other {# participants}}",
-        "watch": "Watch",
-        "addToCourse": "Add to Course",
-        "proTipTitle": "💡 Pro tip",
-        "proTipBody": "Recordings are automatically saved after each live session. Use them to:",
-        "proTip1": "Add to your courses as premium content",
-        "proTip2": "Share with members who missed the live session",
-        "proTip3": "Repurpose as short clips for social media",
-        "comingSoonTitle": "Session recordings are coming soon",
-        "comingSoonBody": "Recording isn't available yet, so there's nothing to show here. Your past sessions are safe — recordings will appear once we turn the feature on."
-      },
       "resources": {
         "loading": "Loading your knowledge library...",
         "buildCourse": "Build a Course from Sessions",
@@ -2100,7 +2063,6 @@
         "scoreValue": "{value}/100",
         "createCourse": "Create Course",
         "knowledgeImpact": "Your Knowledge Impact",
-        "sessionsRecorded": "Sessions recorded",
         "coursesCreated": "Courses created",
         "conversionRate": "{rate}% conversion rate",
         "studentsLearning": "Students learning",
@@ -2111,8 +2073,6 @@
         "open": "Open",
         "keyTopics": "Key Topics",
         "topicsEmpty": "Topics will appear as sessions accumulate.",
-        "curatedRecordings": "Curated Recordings",
-        "viewRecordings": "View recordings",
         "curatedMeta": "{count} attendees · {duration} min",
         "watch": "Watch",
         "sessionsReadyToConvert": "Sessions Ready to Convert",
@@ -2121,14 +2081,13 @@
         "score": "Score: {score}/100",
         "view": "View",
         "viewAllSessions": "View all {count} sessions",
-        "emptyTitleConvertible": "No convertible recordings yet",
-        "emptyTitleNone": "No sessions to convert yet",
-        "emptyBodyConvertible": "You already have completed sessions, but converting one into a course needs its recording, and recording isn't available yet.",
-        "emptyBodyNone": "Turning sessions into courses needs a session recording, and recording isn't available yet. Your sessions are safe — this fills in once we turn the feature on.",
-        "openRecordings": "Open Recordings",
+        "emptyTitleNone": "Nothing here yet",
+        "emptyBodyNone": "Upload slides, notes and handouts to a community library, and they will show up here ready to build a course from.",
         "hostFirstSession": "Host Your First Session",
         "toastLoadError": "Failed to load data",
-        "toastCourseCreated": "Course created successfully!"
+        "toastCourseCreated": "Course created successfully!",
+        "uploadToLibrary": "Go to a community library",
+        "sessionsCompleted": "Sessions completed"
       }
     },
     "home": {
@@ -2750,12 +2709,6 @@
       "player": {
         "clickToPlay": "Click to play recording"
       },
-      "replayGate": {
-        "title": "Members-only replay",
-        "body": "This recording is available to community members. Join to watch the full replay and attend the next live session.",
-        "comingSoonTitle": "Replays are coming soon",
-        "comingSoonBody": "Session recording isn't available yet, so there's no replay for this one."
-      },
       "tabs": {
         "about": "About",
         "notes": "Notes",
@@ -2837,15 +2790,10 @@
       "header": {
         "hostLabel": "Host: {name}",
         "attending": "{count, plural, =1 {1 attending} other {# attending}}",
-        "recordingBadge": "Recording",
-        "startRecording": "Start recording",
-        "pauseRecording": "Pause recording",
         "endSession": "End Session",
         "poll": "Poll",
         "muteAll": "Mute All",
-        "leave": "Leave",
-        "recordingComingSoon": "Recording (coming soon)",
-        "recordingComingSoonHint": "Session recording isn't available yet."
+        "leave": "Leave"
       },
       "raiseHand": {
         "raise": "Raise Hand",
@@ -2910,10 +2858,7 @@
       "toasts": {
         "loadFailed": "Failed to load session",
         "ended": "Session ended. Your recap is ready to review.",
-        "endError": "An error occurred while ending the session",
-        "recordingPaused": "Recording paused",
-        "recordingStarted": "Recording started",
-        "recordingFailed": "Failed to update recording state"
+        "endError": "An error occurred while ending the session"
       }
     },
     "videoRoom": {
@@ -2991,17 +2936,6 @@
         "completed": "Session completed!",
         "membersAttended": "{count, plural, =1 {1 member attended} other {# members attended}}"
       },
-      "recording": {
-        "readyTitle": "Recording ready",
-        "readyDesc": "Your session recording is ready to watch and share",
-        "processingTitle": "Recording is processing...",
-        "processingDesc": "It will be ready in a few minutes",
-        "defaultTitle": "Recording status",
-        "defaultDesc": "Processing your session recording",
-        "watch": "Watch",
-        "comingSoonTitle": "Recording coming soon",
-        "comingSoonDesc": "This session wasn't recorded. Recording isn't available yet."
-      },
       "nextSteps": {
         "title": "Turn this session into content",
         "notesTitle": "Write Notes",
@@ -3016,7 +2950,9 @@
         "clipsDesc": "Generate short clips for social media",
         "libraryTitle": "Publish to Library",
         "libraryDesc": "Turn this recap into a reusable library resource",
-        "shareNotShared": "Draft — not shared yet"
+        "shareNotShared": "Draft — not shared yet",
+        "materialsTitle": "Share the materials",
+        "materialsDesc": "Upload slides, notes and handouts to the community library"
       },
       "stats": {
         "title": "Session Performance",

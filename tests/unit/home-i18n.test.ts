@@ -108,7 +108,9 @@ describe("every key the page reads exists in all three locales", () => {
 
   /** The three `t(\`…\`)` loops, expanded by hand from the arrays they map. */
   const TEMPLATED = [
-    ...["session", "recording", "summary", "discussion", "library", "growth"].flatMap((step) => [
+    // "recording" left this list when recording was withdrawn (2026-08-18) and
+    // its step was removed from the page.
+    ...["session", "summary", "discussion", "library", "growth"].flatMap((step) => [
       `howItWorks.${step}.title`,
       `howItWorks.${step}.description`,
     ]),
