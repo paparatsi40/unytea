@@ -40,6 +40,7 @@ import { SessionNotesEditor } from "./SessionNotesEditor";
 import { ReactionsBar } from "./ReactionsBar";
 import { LivePoll, PollCreator } from "@/components/live-session/LivePoll";
 import { useSessionDataChannel } from "@/hooks/useSessionDataChannel";
+import { useWhiteboardChannel } from "@/hooks/useWhiteboardChannel";
 
 // Types
 type PanelTab = "notes" | "chat" | "participants";
@@ -150,6 +151,36 @@ export function VideoRoomUI({
 
   // Stage mode (video / screen / whiteboard)
   const [stageMode, setStageMode] = useState<SessionMode>("video");
+
+  /**
+   * The whiteboard, as a room-wide fact rather than a local toggle.
+   *
+   * `stageMode` is this client's own state and never left the browser, so a
+   * host opening the board changed nothing for anyone else — the same shape of
+   * bug the screen share had, and the reason a member's stage stayed on video
+   * while the host drew. The host now announces open/closed over the data
+   * channel and everyone else follows `whiteboard.isOpen`.
+   */
+  const whiteboard = useWhiteboardChannel(isHost);
+
+  const isWhiteboardOpen = isHost ? stageMode === "whiteboard" : whiteboard.isOpen;
+
+  /**
+   * What the stage is asked to show. MainStage resolves the rest, and its
+   * precedence is unchanged: whiteboard beats a screen share beats camera.
+   * A member cannot pick "whiteboard" — they have no control that sets it —
+   * so for them this is purely the host's announcement.
+   */
+  const requestedStageMode: SessionMode = isWhiteboardOpen ? "whiteboard" : stageMode;
+
+  const toggleWhiteboard = useCallback(() => {
+    // Host only. The control below is not rendered for anyone else, and the
+    // publish is what makes the change real for the room rather than for one
+    // browser tab.
+    const open = stageMode !== "whiteboard";
+    setStageMode(open ? "whiteboard" : "video");
+    whiteboard.publishMode(open);
+  }, [stageMode, whiteboard]);
 
   // Pinned question
   const [pinnedQuestion, setPinnedQuestion] = useState<PinnedQuestion | null>(null);
@@ -563,7 +594,13 @@ export function VideoRoomUI({
               MainStage now resolves it from the published track, which every
               subscriber can see.
             */}
-            <MainStage mode={stageMode} sessionMode={sessionMode} sessionId={sessionId} />
+            <MainStage
+              mode={requestedStageMode}
+              sessionMode={sessionMode}
+              sessionId={sessionId}
+              isHost={isHost}
+              whiteboard={whiteboard}
+            />
           </div>
 
           {/* Chat Panel (below stage on desktop, or replace stage on mobile) */}
@@ -855,19 +892,21 @@ export function VideoRoomUI({
             <Monitor className="h-5 w-5" />
           </button>
 
-          {/* Whiteboard */}
-          <button
-            onClick={() => setStageMode(stageMode === "whiteboard" ? "video" : "whiteboard")}
-            className={cn(
-              "flex h-12 w-12 items-center justify-center rounded-full transition-all",
-              stageMode === "whiteboard"
-                ? "bg-purple-500/20 text-purple-400 hover:bg-purple-500/30"
-                : "bg-zinc-800 text-white hover:bg-zinc-700"
-            )}
-            title={t("controls.whiteboard")}
-          >
-            <Pencil className="h-5 w-5" />
-          </button>
+          {/* Whiteboard — the host presents it; nobody else opens or closes it. */}
+          {isHost && (
+            <button
+              onClick={toggleWhiteboard}
+              className={cn(
+                "flex h-12 w-12 items-center justify-center rounded-full transition-all",
+                stageMode === "whiteboard"
+                  ? "bg-purple-500/20 text-purple-400 hover:bg-purple-500/30"
+                  : "bg-zinc-800 text-white hover:bg-zinc-700"
+              )}
+              title={t("controls.whiteboard")}
+            >
+              <Pencil className="h-5 w-5" />
+            </button>
+          )}
 
           {/* Reactions */}
           <div className="relative">

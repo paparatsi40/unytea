@@ -14,6 +14,7 @@ import { SessionMode } from "./ModeSwitcher";
 import { SessionWhiteboard } from "./SessionWhiteboard";
 import { LocalVideo } from "./LocalVideo";
 import { cn } from "@/lib/utils";
+import type { WhiteboardChannel } from "@/hooks/useWhiteboardChannel";
 
 interface MainStageProps {
   mode: SessionMode;
@@ -21,6 +22,14 @@ interface MainStageProps {
   onModeChange?: (mode: SessionMode) => void;
   sessionId?: string;
   className?: string;
+  /** Only the host draws. Everyone else gets the board read-only. */
+  isHost?: boolean;
+  /**
+   * The live board. Passed in rather than subscribed to here so that one
+   * accumulator serves the whole room — the control that opens the board lives
+   * in the room chrome, and it and the canvas must agree on the same scene.
+   */
+  whiteboard?: WhiteboardChannel;
 }
 
 function EmptyStage({
@@ -143,6 +152,8 @@ export function MainStage({
   onModeChange,
   sessionId,
   className,
+  isHost = false,
+  whiteboard,
 }: MainStageProps) {
   const t = useTranslations("liveSession.mainStage");
   const isAudioOnly = sessionMode === "audio";
@@ -238,6 +249,10 @@ export function MainStage({
             <SessionWhiteboard
               embedded
               sessionId={sessionId}
+              isHost={isHost}
+              remoteElements={whiteboard?.elements}
+              remoteRevision={whiteboard?.revision}
+              onSceneChange={isHost ? whiteboard?.publishElements : undefined}
               onClose={() => onModeChange?.(isAudioOnly ? "screen" : "video")}
             />
           ) : (

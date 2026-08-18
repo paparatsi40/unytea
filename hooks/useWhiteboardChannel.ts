@@ -1,0 +1,233 @@
+"use client";
+
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useRoomContext } from "@livekit/components-react";
+import { RoomEvent, type RemoteParticipant } from "livekit-client";
+import {
+  applyDelta,
+  chunkElements,
+  diffElements,
+  orderedElements,
+  type WhiteboardElement,
+} from "@/lib/whiteboard/protocol";
+
+/**
+ * Moving the host's whiteboard to everyone else.
+ *
+ * Deliberately its own hook rather than more surface on
+ * `useSessionDataChannel`. Both attach their own `RoomEvent.DataReceived`
+ * listener — LiveKit's emitter is additive — and both ignore payloads they do
+ * not recognise, so hands, polls and the whiteboard stay independent. Bundling
+ * them would mean every room screen that wants a raised hand also carries the
+ * whiteboard's accumulator.
+ *
+ * Two transports, chosen by what is being sent:
+ *
+ *   deltas    `publishData`, reliable, chunked to a byte budget by the
+ *             protocol module. Small and frequent.
+ *   snapshot  `sendText` on its own topic, addressed to one identity. Sent once
+ *             per late joiner and unbounded in size, so it uses the API that
+ *             chunks and reassembles for us instead of an ad-hoc framing.
+ */
+
+const SNAPSHOT_TOPIC = "unytea.whiteboard.snapshot";
+
+type WhiteboardMessage =
+  | { kind: "whiteboard_mode"; open: boolean }
+  | { kind: "whiteboard_delta"; elements: WhiteboardElement[] }
+  /** A viewer asking for the current board. Answered only by the host. */
+  | { kind: "whiteboard_request" };
+
+function isWhiteboardMessage(value: unknown): value is WhiteboardMessage {
+  if (typeof value !== "object" || value === null) return false;
+  const kind = (value as { kind?: unknown }).kind;
+  return kind === "whiteboard_mode" || kind === "whiteboard_delta" || kind === "whiteboard_request";
+}
+
+export interface WhiteboardChannel {
+  /** True when the host has the board open. Drives the viewer's stage. */
+  isOpen: boolean;
+  /** The scene to render, ordered. Empty until the first delta or snapshot. */
+  elements: WhiteboardElement[];
+  /** Bumped on every applied update, so a consumer can react without diffing. */
+  revision: number;
+  /** Host only: announce the board opening or closing. */
+  publishMode: (open: boolean) => void;
+  /** Host only: send whatever changed since the last call. */
+  publishElements: (elements: readonly WhiteboardElement[]) => void;
+  /** Host only: forget what has been sent, so the next publish resends all. */
+  resetSentVersions: () => void;
+}
+
+export function useWhiteboardChannel(isHost: boolean): WhiteboardChannel {
+  const room = useRoomContext();
+
+  const [isOpen, setIsOpen] = useState(false);
+  const [elements, setElements] = useState<WhiteboardElement[]>([]);
+  const [revision, setRevision] = useState(0);
+
+  /** The viewer's accumulated scene, keyed by element id. */
+  const sceneRef = useRef<Map<string, WhiteboardElement>>(new Map());
+  /** The host's record of what each element looked like when last sent. */
+  const sentVersionsRef = useRef<Map<string, number>>(new Map());
+  /** The host's latest scene, for answering a late joiner at any moment. */
+  const hostSceneRef = useRef<WhiteboardElement[]>([]);
+  const isOpenRef = useRef(false);
+  const isHostRef = useRef(isHost);
+
+  useEffect(() => {
+    isHostRef.current = isHost;
+  }, [isHost]);
+
+  const encoder = useRef(new TextEncoder());
+  const decoder = useRef(new TextDecoder());
+
+  const publish = useCallback(
+    (message: WhiteboardMessage) => {
+      room.localParticipant
+        .publishData(encoder.current.encode(JSON.stringify(message)), { reliable: true })
+        .catch((error) => {
+          // A dropped delta is not fatal: the element keeps its old version in
+          // `sentVersionsRef` only if the send succeeded, so the next tick
+          // picks it up again.
+          console.error("[whiteboard] publish failed", error);
+        });
+    },
+    [room]
+  );
+
+  // ── viewer: apply what arrives ──────────────────────────────────────────
+  const ingest = useCallback((incoming: readonly WhiteboardElement[]) => {
+    applyDelta(sceneRef.current, incoming);
+    setElements(orderedElements(sceneRef.current));
+    setRevision((previous) => previous + 1);
+  }, []);
+
+  useEffect(() => {
+    const onData = (payload: Uint8Array, participant?: RemoteParticipant) => {
+      let message: unknown;
+      try {
+        message = JSON.parse(decoder.current.decode(payload));
+      } catch {
+        return; // Not ours. Hands and polls share this channel.
+      }
+      if (!isWhiteboardMessage(message)) return;
+
+      switch (message.kind) {
+        case "whiteboard_mode": {
+          // The host's own state is local; this is for everyone else.
+          if (!isHostRef.current) setIsOpen(message.open);
+          break;
+        }
+
+        case "whiteboard_delta": {
+          if (!isHostRef.current) ingest(message.elements);
+          break;
+        }
+
+        case "whiteboard_request": {
+          // Only the host can answer, and only to whoever asked.
+          if (!isHostRef.current || !participant) return;
+
+          publish({ kind: "whiteboard_mode", open: isOpenRef.current });
+
+          // The snapshot is the whole scene and has no size ceiling, so it goes
+          // over the stream API rather than the packet API.
+          const snapshot = JSON.stringify({ elements: hostSceneRef.current });
+          room.localParticipant
+            .sendText(snapshot, {
+              topic: SNAPSHOT_TOPIC,
+              destinationIdentities: [participant.identity],
+            })
+            .catch((error) => {
+              console.error("[whiteboard] snapshot failed", error);
+            });
+          break;
+        }
+      }
+    };
+
+    room.on(RoomEvent.DataReceived, onData);
+    return () => {
+      room.off(RoomEvent.DataReceived, onData);
+    };
+  }, [room, ingest, publish]);
+
+  // ── viewer: receive a snapshot ──────────────────────────────────────────
+  useEffect(() => {
+    if (isHost) return;
+
+    // `registerTextStreamHandler` throws `HandlerAlreadyRegistered` rather than
+    // replacing, and an exception here happens during render of the whole room.
+    // Clearing first makes the registration idempotent by construction, which
+    // is cheaper than reasoning about every path that could mount this twice.
+    room.unregisterTextStreamHandler(SNAPSHOT_TOPIC);
+    room.registerTextStreamHandler(SNAPSHOT_TOPIC, (reader) => {
+      reader
+        .readAll()
+        .then((raw) => {
+          const parsed: unknown = JSON.parse(raw);
+          const incoming = (parsed as { elements?: WhiteboardElement[] })?.elements;
+          if (!Array.isArray(incoming)) return;
+
+          // A snapshot replaces rather than merges: it is the host's whole
+          // scene at a known moment, and anything held that is not in it was
+          // removed while this viewer was not listening.
+          sceneRef.current = new Map();
+          ingest(incoming);
+        })
+        .catch((error) => {
+          console.error("[whiteboard] snapshot read failed", error);
+        });
+    });
+
+    return () => {
+      room.unregisterTextStreamHandler(SNAPSHOT_TOPIC);
+    };
+  }, [room, isHost, ingest]);
+
+  // ── viewer: ask for the board on arrival ────────────────────────────────
+  useEffect(() => {
+    if (isHost) return;
+
+    // Asking, rather than waiting to be told. The host cannot know when this
+    // client's UI is ready, and a viewer who joins mid-session would otherwise
+    // stare at an empty board until the host's next stroke.
+    publish({ kind: "whiteboard_request" });
+  }, [isHost, publish]);
+
+  // ── host: keep the answer to that request current ───────────────────────
+  useEffect(() => {
+    isOpenRef.current = isOpen;
+  }, [isOpen]);
+
+  const publishMode = useCallback(
+    (open: boolean) => {
+      isOpenRef.current = open;
+      setIsOpen(open);
+      publish({ kind: "whiteboard_mode", open });
+    },
+    [publish]
+  );
+
+  const publishElements = useCallback(
+    (current: readonly WhiteboardElement[]) => {
+      hostSceneRef.current = [...current];
+
+      const { changed, versions } = diffElements(sentVersionsRef.current, current);
+      if (changed.length === 0) return;
+
+      for (const chunk of chunkElements(changed)) {
+        publish({ kind: "whiteboard_delta", elements: chunk });
+      }
+      sentVersionsRef.current = versions;
+    },
+    [publish]
+  );
+
+  const resetSentVersions = useCallback(() => {
+    sentVersionsRef.current = new Map();
+  }, []);
+
+  return { isOpen, elements, revision, publishMode, publishElements, resetSentVersions };
+}
