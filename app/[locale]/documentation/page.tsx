@@ -86,7 +86,7 @@ const sections: DocSection[] = [
     topics: [
       "Scheduling and announcing sessions",
       "Screen sharing and presentation mode",
-      "Collaborative whiteboard (Excalidraw)",
+      "Live whiteboard the host presents (Excalidraw)",
       "Post-session recap drafted from your notes",
     ],
   },

@@ -363,7 +363,7 @@
       },
       "whiteboard": {
         "title": "Whiteboard",
-        "description": "Collaborate visually in real-time during live sessions."
+        "description": "The host draws live and everyone follows along, right in the call."
       },
       "screenShare": {
         "title": "Screen Sharing",
@@ -411,7 +411,7 @@
         "feed": "Community Feed",
         "courses": "Courses",
         "liveVideo": "Live Video Sessions",
-        "whiteboard": "Collaborative whiteboard in the call",
+        "whiteboard": "Live whiteboard in the call",
         "certificates": "Certificates",
         "multiLanguage": "Multiple languages",
         "platformFee": "Platform Fee"
@@ -2918,6 +2918,7 @@
       "exportPngTooltip": "Export as PNG",
       "clear": "Clear",
       "clearTooltip": "Clear canvas",
+      "viewOnly": "View only",
       "closeTooltip": "Close Whiteboard",
       "sessionLabel": "Session {id}"
     },

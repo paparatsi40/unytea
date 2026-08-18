@@ -363,7 +363,7 @@
       },
       "whiteboard": {
         "title": "Pizarra",
-        "description": "Trabajad sobre el mismo lienzo, en directo."
+        "description": "El anfitrión dibuja en directo y todos lo siguen, dentro de la llamada."
       },
       "screenShare": {
         "title": "Pantalla compartida",
@@ -421,7 +421,7 @@
         "feed": "Muro de la comunidad",
         "courses": "Cursos",
         "liveVideo": "Sesiones de vídeo en directo",
-        "whiteboard": "Pizarra colaborativa en la llamada",
+        "whiteboard": "Pizarra en vivo en la llamada",
         "certificates": "Certificados",
         "multiLanguage": "Varios idiomas",
         "platformFee": "Comisión de plataforma"
@@ -2928,6 +2928,7 @@
       "exportPngTooltip": "Exportar como PNG",
       "clear": "Borrar",
       "clearTooltip": "Borrar lienzo",
+      "viewOnly": "Solo lectura",
       "closeTooltip": "Cerrar pizarra",
       "sessionLabel": "Sesión {id}"
     },
