@@ -212,6 +212,15 @@ export const leaveSession = defineAction(
       return { success: false as const, error: "Not in session" };
     }
 
+    // A stretch is closed once. `participant_left` accumulates the same span
+    // from the other side, and both firing would count the time twice — which
+    // matters now that these seconds feed the usage counter. `leftAt` is the
+    // flag: non-null means the stretch is already accounted for, and only
+    // `joinSession` clears it.
+    if (participation.leftAt) {
+      return { success: true as const };
+    }
+
     const leftAt = new Date();
     const durationSeconds = Math.floor(
       (leftAt.getTime() - participation.joinedAt.getTime()) / 1000

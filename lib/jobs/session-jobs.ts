@@ -18,6 +18,7 @@ import { runAutopilotDueJobs } from "./autopilot";
 import { sendSessionReminderEmail } from "@/lib/email";
 import { sendPushToUser, pushTemplates } from "@/lib/push";
 import { SITE_URL } from "@/lib/site-url";
+import { METERING_EPOCH, accrueSessionUsage, meterCompletedSession } from "@/lib/usage/video-usage";
 
 /**
  * Session Jobs - Background tasks for recurring sessions
@@ -408,6 +409,86 @@ export async function sendSessionReminders() {
  * Combined job runner - can be called by cron
  * Runs all session-related background tasks
  */
+/**
+ * How long past its booked end a session may sit in IN_PROGRESS before the
+ * sweep decides nothing is going to close it.
+ *
+ * The sweep runs hourly, so anything shorter than an hour would fight the
+ * cadence; anything much longer leaves a session unmetered for a cycle.
+ */
+const ORPHAN_GRACE_MS = 60 * 60 * 1000;
+
+/**
+ * The backstop for the usage counter.
+ *
+ * Two failures are swept up here, and neither is exotic. A session can be left
+ * IN_PROGRESS forever because the only things that end one are a host clicking
+ * End Session and a LiveKit webhook — a host who closes the tab does neither.
+ * And a session can be COMPLETED but unmetered because the accrual at end time
+ * threw.
+ *
+ * Orphans are ended at their booked end, not at the moment the sweep noticed
+ * them: the room was booked until then, and charging for the hours it took a
+ * cron to run would be inventing usage. Capping at `now` covers the session
+ * whose booked end has not arrived yet.
+ *
+ * The accrual itself is idempotent, so a session the sweep and a late webhook
+ * both reach still produces one ledger row.
+ */
+export async function sweepSessionUsage() {
+  const now = new Date();
+  let orphansClosed = 0;
+  let accrued = 0;
+
+  const orphans = await prisma.mentorSession.findMany({
+    where: {
+      status: "IN_PROGRESS",
+      endedAt: null,
+      startedAt: { not: null, gte: METERING_EPOCH },
+    },
+    select: { id: true, startedAt: true, duration: true },
+  });
+
+  for (const orphan of orphans) {
+    if (!orphan.startedAt) continue;
+    const bookedEnd = new Date(orphan.startedAt.getTime() + orphan.duration * 60 * 1000);
+    if (now.getTime() - bookedEnd.getTime() < ORPHAN_GRACE_MS) continue;
+
+    const endedAt = bookedEnd > now ? now : bookedEnd;
+    await prisma.mentorSession.update({
+      where: { id: orphan.id },
+      data: { status: "COMPLETED", endedAt },
+    });
+    await meterCompletedSession(orphan.id, endedAt);
+    orphansClosed += 1;
+  }
+
+  // Anything completed and unmetered. `usageAccrual: null` is the whole
+  // condition — the ledger is the record of what has been counted, so a missing
+  // row is exactly the definition of "not counted yet". METERING_EPOCH is what
+  // keeps this from reaching back over the platform's entire history.
+  const unmetered = await prisma.mentorSession.findMany({
+    where: {
+      endedAt: { not: null, gte: METERING_EPOCH },
+      communityId: { not: null },
+      usageAccrual: null,
+    },
+    select: { id: true },
+    take: 200,
+  });
+
+  for (const session of unmetered) {
+    try {
+      const outcome = await accrueSessionUsage(session.id);
+      if (outcome.status === "accrued") accrued += 1;
+    } catch (error) {
+      console.error(`[sweepSessionUsage] accrual failed for session=${session.id}`, error);
+    }
+  }
+
+  return { success: true as const, orphansClosed, accrued, scanned: unmetered.length };
+}
+
 export async function runSessionJobs() {
   console.log("[runSessionJobs] Starting session job batch...");
 
@@ -415,6 +496,7 @@ export async function runSessionJobs() {
   const ensureFutureResult = await ensureFutureSessions();
   const remindersResult = await sendSessionReminders();
   const autopilotResult = await runAutopilotDueJobs();
+  const usageResult = await sweepSessionUsage();
 
   console.log("[runSessionJobs] Batch complete");
 
@@ -424,6 +506,7 @@ export async function runSessionJobs() {
     ensureFuture: ensureFutureResult,
     reminders: remindersResult,
     autopilot: autopilotResult,
+    usage: usageResult,
     timestamp: new Date().toISOString(),
   };
 }
@@ -456,10 +539,18 @@ function formatTimeUntil(date: Date): string {
  */
 export async function endSessionJob(sessionId: string) {
   try {
+    const endedAt = new Date();
     const session = await prisma.mentorSession.update({
       where: { id: sessionId },
-      data: { status: "COMPLETED", endedAt: new Date() },
+      data: { status: "COMPLETED", endedAt },
     });
+
+    // The same metering the room_finished webhook does, because either can be
+    // the one that actually ends a session: a host who clicks End Session
+    // closes the room from the app, and LiveKit may or may not deliver its own
+    // event afterwards. Both paths meter; the ledger's unique sessionId is what
+    // makes the second one a no-op rather than a double charge.
+    await meterCompletedSession(sessionId, endedAt);
 
     revalidatePath("/dashboard/sessions");
     revalidatePath(`/dashboard/sessions/${sessionId}`);
