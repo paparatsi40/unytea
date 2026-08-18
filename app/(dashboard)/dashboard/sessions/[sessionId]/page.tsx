@@ -54,7 +54,10 @@ export default function SessionDetailPage(props: SessionPageProps) {
   const t = useTranslations("dashboard.sessions.detail");
   const [session, setSession] = useState<SessionDetail | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("recording");
+  // Notes, not recording. The recording tab is empty for every session that
+  // exists, so opening on it made the first thing a host saw after a session an
+  // empty player. Notes are real and are what the recap is built from.
+  const [activeTab, setActiveTab] = useState("notes");
   const [showAddToCourse, setShowAddToCourse] = useState(false);
   const [showCreateClip, setShowCreateClip] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
@@ -533,7 +536,16 @@ export default function SessionDetailPage(props: SessionPageProps) {
             </Button>
           )}
 
-          {session?.mentorId === user?.id && (
+          {/*
+            Both need the recorded file. `addSessionToCourse` returns "Session
+            recording not available yet" without one, and the clip dialog
+            derives its moments from `session.recording` — null gives an empty
+            list — then mints a URL under `/clip/{id}`, a route that does not
+            exist. They were shown to every host on every completed session and
+            could only ever produce an error. Gated on the URL rather than
+            removed, so they come back on their own once egress ships.
+          */}
+          {session?.mentorId === user?.id && hasRecording && (
             <>
               <Button
                 variant="outline"
@@ -806,7 +818,8 @@ export default function SessionDetailPage(props: SessionPageProps) {
                 {t("quickActions.title")}
               </h3>
               <div className="space-y-2">
-                {session?.mentorId === user?.id && (
+                {/* Same two recording-dependent actions as the header. */}
+                {session?.mentorId === user?.id && hasRecording && (
                   <Button
                     variant="outline"
                     className="w-full justify-start gap-2 border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
@@ -816,7 +829,7 @@ export default function SessionDetailPage(props: SessionPageProps) {
                     {t("addToCourse")}
                   </Button>
                 )}
-                {session?.mentorId === user?.id && (
+                {session?.mentorId === user?.id && hasRecording && (
                   <Button
                     variant="outline"
                     className="w-full justify-start gap-2 border-amber-500/30 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20"

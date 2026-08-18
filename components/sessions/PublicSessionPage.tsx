@@ -351,13 +351,23 @@ export function PublicSessionPage({
       <main className="mx-auto max-w-6xl px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <Badge
-            className={`mb-3 border ${session.canWatchRecording ? "border-emerald-500/30 bg-emerald-500/20 text-emerald-400" : "border-amber-500/30 bg-amber-500/20 text-amber-400"}`}
-          >
-            {session.canWatchRecording
-              ? t("header.badgeRecordingAvailable")
-              : t("header.badgeMembersOnly")}
-          </Badge>
+          {/*
+            `canWatchRecording` is `visibility !== "community" || isMember` — it
+            says whether this viewer *would be allowed* to watch, and nothing at
+            all about whether a recording exists. So every public session page
+            carried a green "Recording Available" badge and every gated one an
+            amber "Members-only recording", both about a file that has never
+            existed. The badge now needs an actual URL before it claims one.
+          */}
+          {session.recording?.url && (
+            <Badge
+              className={`mb-3 border ${session.canWatchRecording ? "border-emerald-500/30 bg-emerald-500/20 text-emerald-400" : "border-amber-500/30 bg-amber-500/20 text-amber-400"}`}
+            >
+              {session.canWatchRecording
+                ? t("header.badgeRecordingAvailable")
+                : t("header.badgeMembersOnly")}
+            </Badge>
+          )}
           <h1 className="mb-4 text-3xl font-bold text-white sm:text-4xl">{session.title}</h1>
           <p className="mb-4 max-w-3xl text-lg text-zinc-400">{session.description}</p>
           <div className="flex flex-wrap items-center gap-4 text-sm text-zinc-500">
