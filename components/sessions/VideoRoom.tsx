@@ -20,9 +20,6 @@ interface VideoRoomProps {
   sessionMode?: "video" | "audio";
   sessionTitle?: string;
   isHost?: boolean;
-  isRecording?: boolean;
-  isRecordingBusy?: boolean;
-  onToggleRecording?: () => void;
   onLeave?: () => void;
   onEndSession?: () => void;
 }
@@ -79,9 +76,6 @@ export function VideoRoom({
   sessionMode = "video",
   sessionTitle,
   isHost = false,
-  isRecording = false,
-  isRecordingBusy = false,
-  onToggleRecording,
   onLeave,
   onEndSession,
 }: VideoRoomProps) {
@@ -212,9 +206,6 @@ export function VideoRoom({
           sessionMode={sessionMode}
           sessionTitle={sessionTitle}
           isHost={isHost}
-          isRecording={isRecording}
-          isRecordingBusy={isRecordingBusy}
-          onToggleRecording={onToggleRecording}
           onLeave={onLeave}
           onEndSession={onEndSession}
         />

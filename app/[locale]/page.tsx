@@ -436,7 +436,11 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
           <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-3 lg:grid-cols-6">
             {[
               { icon: Radio, key: "session" },
-              { icon: Video, key: "recording" },
+              // The "recording" step is gone rather than marked coming-soon.
+              // Recording is withdrawn, so a numbered step describing it — in a
+              // sequence the reader is meant to follow — advertised a stage of
+              // the product that does not happen. The steps renumber themselves
+              // from the array index.
               { icon: Sparkles, key: "summary" },
               { icon: MessageSquare, key: "discussion" },
               { icon: BookOpen, key: "library" },

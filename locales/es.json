@@ -328,10 +328,6 @@
         "title": "Sesión",
         "description": "Da la sesión en directo con tu comunidad"
       },
-      "recording": {
-        "title": "Grabación",
-        "description": "Próximamente: la grabación aún no está disponible"
-      },
       "summary": {
         "title": "Recap",
         "description": "Las ideas clave, reunidas a partir de tus notas de la sesión"
@@ -1688,22 +1684,13 @@
         "addToAppleCalendar": "Añadir a Apple Calendar",
         "inviteMembers": "Invitar miembros",
         "shareOn": "Compartir en {network}",
-        "watchRecording": "Ver la grabación",
         "addToCourse": "Añadir a un curso",
         "createClip": "Crear clip",
         "download": "Descargar",
         "tabs": {
-          "recording": "Grabación",
           "notes": "Notas",
           "resources": "Recursos",
           "discussion": "Conversación"
-        },
-        "recording": {
-          "processingTitle": "Procesando la grabación…",
-          "processingBody": "El vídeo estará disponible en breve. Mientras tanto puedes repasar las notas.",
-          "unsupported": "Tu navegador no admite la reproducción de vídeo.",
-          "noneTitle": "No hay grabación",
-          "noneBody": "Esta sesión no se grabó o la grabación aún se está procesando."
         },
         "notes": {
           "title": "Notas de la sesión",
@@ -2058,10 +2045,9 @@
     },
     "library": {
       "title": "Biblioteca",
-      "subtitle": "Tus cursos, grabaciones y recursos",
+      "subtitle": "Tus cursos y recursos",
       "tabs": {
         "courses": "Cursos",
-        "recordings": "Grabaciones",
         "resources": "Recursos"
       },
       "courses": {
@@ -2076,29 +2062,6 @@
         "noCoursesTitle": "Aún no hay cursos",
         "noCoursesBody": "Explora los cursos disponibles y empieza a aprender hoy"
       },
-      "recordings": {
-        "newSession": "Nueva sesión",
-        "nextLiveSession": "Próxima sesión en vivo",
-        "viewSession": "Ver sesión",
-        "totalRecordings": "Grabaciones totales",
-        "totalContent": "Contenido total",
-        "totalParticipants": "Participantes totales",
-        "noRecordingsTitle": "Aún no hay grabaciones",
-        "noRecordingsBody": "Inicia una sesión en vivo y grábala para construir tu biblioteca",
-        "createFirstSession": "Crear primera sesión",
-        "recordingBadge": "Grabación",
-        "noDescription": "Sin descripción",
-        "participants": "{count, plural, =1 {1 participante} other {# participantes}}",
-        "watch": "Ver",
-        "addToCourse": "Agregar a curso",
-        "proTipTitle": "💡 Consejo",
-        "proTipBody": "Las grabaciones se guardan automáticamente después de cada sesión en vivo. Úsalas para:",
-        "proTip1": "Agregarlas a tus cursos como contenido premium",
-        "proTip2": "Compartirlas con members que se perdieron la sesión en vivo",
-        "proTip3": "Reutilizarlas como clips cortos para redes sociales",
-        "comingSoonTitle": "Las grabaciones de sesiones llegan pronto",
-        "comingSoonBody": "La grabación aún no está disponible, así que no hay nada que mostrar aquí. Tus sesiones pasadas están a salvo: las grabaciones aparecerán cuando activemos la función."
-      },
       "resources": {
         "loading": "Cargando tu biblioteca de conocimiento...",
         "buildCourse": "Crear un curso desde sesiones",
@@ -2110,7 +2073,6 @@
         "scoreValue": "{value}/100",
         "createCourse": "Crear curso",
         "knowledgeImpact": "Tu impacto de conocimiento",
-        "sessionsRecorded": "Sesiones grabadas",
         "coursesCreated": "Cursos creados",
         "conversionRate": "{rate}% de conversión",
         "studentsLearning": "Estudiantes aprendiendo",
@@ -2121,8 +2083,6 @@
         "open": "Abrir",
         "keyTopics": "Temas clave",
         "topicsEmpty": "Los temas aparecerán a medida que se acumulen las sesiones.",
-        "curatedRecordings": "Grabaciones destacadas",
-        "viewRecordings": "Ver grabaciones",
         "curatedMeta": "{count} asistentes · {duration} min",
         "watch": "Ver",
         "sessionsReadyToConvert": "Sesiones listas para convertir",
@@ -2131,14 +2091,13 @@
         "score": "Puntuación: {score}/100",
         "view": "Ver",
         "viewAllSessions": "Ver las {count} sesiones",
-        "emptyTitleConvertible": "Aún no hay grabaciones convertibles",
-        "emptyTitleNone": "Aún no hay sesiones para convertir",
-        "emptyBodyConvertible": "Ya tienes sesiones completadas, pero convertir una en curso necesita su grabación, y la grabación aún no está disponible.",
-        "emptyBodyNone": "Convertir sesiones en cursos necesita la grabación de la sesión, y la grabación aún no está disponible. Tus sesiones están a salvo: esto se llenará cuando activemos la función.",
-        "openRecordings": "Abrir grabaciones",
+        "emptyTitleNone": "Aquí todavía no hay nada",
+        "emptyBodyNone": "Sube diapositivas, apuntes y documentos a la biblioteca de una comunidad y aparecerán aquí, listos para montar un curso.",
         "hostFirstSession": "Organiza tu primera sesión",
         "toastLoadError": "Error al cargar los datos",
-        "toastCourseCreated": "¡Curso creado con éxito!"
+        "toastCourseCreated": "¡Curso creado con éxito!",
+        "uploadToLibrary": "Ir a una biblioteca",
+        "sessionsCompleted": "Sesiones completadas"
       }
     },
     "home": {
@@ -2760,12 +2719,6 @@
       "player": {
         "clickToPlay": "Haz clic para reproducir la grabación"
       },
-      "replayGate": {
-        "title": "Repetición solo para miembros",
-        "body": "Esta grabación está disponible para los miembros de la comunidad. Únete para ver la repetición completa y asistir a la próxima sesión en vivo.",
-        "comingSoonTitle": "Las repeticiones llegan pronto",
-        "comingSoonBody": "La grabación de sesiones aún no está disponible, así que no hay repetición de esta."
-      },
       "tabs": {
         "about": "Acerca de",
         "notes": "Notas",
@@ -2847,15 +2800,10 @@
       "header": {
         "hostLabel": "Anfitrión: {name}",
         "attending": "{count, plural, =1 {1 asistente} other {# asistentes}}",
-        "recordingBadge": "Grabando",
-        "startRecording": "Iniciar grabación",
-        "pauseRecording": "Pausar grabación",
         "endSession": "Finalizar sesión",
         "poll": "Encuesta",
         "muteAll": "Silenciar a todos",
-        "leave": "Salir",
-        "recordingComingSoon": "Grabación (muy pronto)",
-        "recordingComingSoonHint": "La grabación de sesiones aún no está disponible."
+        "leave": "Salir"
       },
       "raiseHand": {
         "raise": "Levantar la mano",
@@ -2920,10 +2868,7 @@
       "toasts": {
         "loadFailed": "No se pudo cargar la sesión",
         "ended": "Sesión cerrada. Tu recap está listo para revisar.",
-        "endError": "Ha ocurrido un error al cerrar la sesión",
-        "recordingPaused": "Grabación en pausa",
-        "recordingStarted": "Grabación iniciada",
-        "recordingFailed": "No se pudo cambiar el estado de la grabación"
+        "endError": "Ha ocurrido un error al cerrar la sesión"
       }
     },
     "videoRoom": {
@@ -3000,17 +2945,6 @@
         "completed": "¡Sesión finalizada!",
         "membersAttended": "{count, plural, =1 {1 miembro asistió} other {# miembros asistieron}}"
       },
-      "recording": {
-        "readyTitle": "Grabación lista",
-        "readyDesc": "La grabación de tu sesión está lista para ver y compartir",
-        "processingTitle": "La grabación se está procesando...",
-        "processingDesc": "Estará lista en unos minutos",
-        "defaultTitle": "Estado de la grabación",
-        "defaultDesc": "Procesando la grabación de tu sesión",
-        "watch": "Ver",
-        "comingSoonTitle": "Grabación muy pronto",
-        "comingSoonDesc": "Esta sesión no se grabó. La grabación aún no está disponible."
-      },
       "nextSteps": {
         "title": "Convierte esta sesión en contenido",
         "notesTitle": "Escribir notas",
@@ -3025,7 +2959,9 @@
         "clipsDesc": "Genera clips cortos para redes sociales",
         "libraryTitle": "Publicar en la biblioteca",
         "libraryDesc": "Convierte este resumen en un recurso reutilizable de la biblioteca",
-        "shareNotShared": "Borrador — sin compartir"
+        "shareNotShared": "Borrador — sin compartir",
+        "materialsTitle": "Comparte los materiales",
+        "materialsDesc": "Sube diapositivas, apuntes y documentos a la biblioteca de la comunidad"
       },
       "stats": {
         "title": "Rendimiento de la sesión",

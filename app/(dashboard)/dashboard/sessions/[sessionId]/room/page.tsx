@@ -8,11 +8,6 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
-import {
-  getRecordingStatus,
-  startCompositeRecording,
-  stopRecording,
-} from "@/app/actions/recording";
 
 export default function SessionRoomPage(props: { params: Promise<{ sessionId: string }> }) {
   const params = use(props.params);
@@ -35,8 +30,6 @@ export default function SessionRoomPage(props: { params: Promise<{ sessionId: st
   const [videoSession, setVideoSession] = useState<SessionDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEnding, setIsEnding] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
-  const [isRecordingBusy, setIsRecordingBusy] = useState(false);
   const hasLoadedRef = useRef(false);
 
   useEffect(() => {
@@ -69,13 +62,6 @@ export default function SessionRoomPage(props: { params: Promise<{ sessionId: st
       }
 
       setVideoSession(result.session);
-
-      const recordingStatus = await getRecordingStatus(params.sessionId);
-      if (recordingStatus.success && recordingStatus.recording) {
-        setIsRecording(recordingStatus.recording.status === "PROCESSING");
-      } else {
-        setIsRecording(false);
-      }
     } catch (error) {
       console.error("Failed to load session:", error);
       toast.error(tRef.current("toasts.loadFailed"));
@@ -87,7 +73,7 @@ export default function SessionRoomPage(props: { params: Promise<{ sessionId: st
   const handleEndSession = useCallback(async () => {
     if (
       !confirm(
-        "Are you sure you want to end this session? This will stop the recording and generate a session recap."
+        "Are you sure you want to end this session? A recap will be drafted from your notes for you to review."
       )
     ) {
       return;
@@ -117,44 +103,12 @@ export default function SessionRoomPage(props: { params: Promise<{ sessionId: st
     router.push("/dashboard/sessions");
   }, [router]);
 
-  const handleToggleRecording = useCallback(async () => {
-    if (!videoSession?.id || isRecordingBusy) return;
-
-    const roomId = videoSession.videoRoomName || videoSession.roomId;
-    if (!roomId) return;
-
-    setIsRecordingBusy(true);
-    try {
-      if (isRecording) {
-        const result = await stopRecording(videoSession.id);
-        if (result.success) {
-          setIsRecording(false);
-          toast.success(tRef.current("toasts.recordingPaused"));
-        } else {
-          toast.error(result.error || "Failed to pause recording");
-        }
-      } else {
-        const result = await startCompositeRecording({
-          sessionId: videoSession.id,
-          roomName: roomId,
-          layout: "grid",
-          audioOnly: (videoSession.mode || "VIDEO").toUpperCase() === "AUDIO",
-        });
-
-        if (result.success) {
-          setIsRecording(true);
-          toast.success(tRef.current("toasts.recordingStarted"));
-        } else {
-          toast.error(result.error || "Failed to start recording");
-        }
-      }
-    } catch (error) {
-      console.error("Error toggling recording:", error);
-      toast.error(tRef.current("toasts.recordingFailed"));
-    } finally {
-      setIsRecordingBusy(false);
-    }
-  }, [videoSession, isRecording, isRecordingBusy]);
+  /*
+    `handleToggleRecording` lived here.
+    Recording is withdrawn (2026-08-18). The server actions it called —
+    startCompositeRecording / stopRecording — are kept dormant in
+    app/actions/recording.ts; nothing in the UI reaches them any more.
+  */
 
   if (isAuthLoading || loading) {
     return (
@@ -187,9 +141,6 @@ export default function SessionRoomPage(props: { params: Promise<{ sessionId: st
         sessionMode={normalizedMode}
         sessionTitle={videoSession.title}
         isHost={isHost}
-        isRecording={isRecording}
-        isRecordingBusy={isRecordingBusy}
-        onToggleRecording={isHost ? handleToggleRecording : undefined}
         onLeave={handleLeave}
         onEndSession={isHost ? handleEndSession : undefined}
       />

@@ -116,10 +116,9 @@ describe("gating flags are derived from a real URL", () => {
  * survived the pass that fixed the words directly above it.
  */
 describe("no surface animates a recording that is not being made", () => {
-  const NO_SPINNER = [
-    "components/sessions/PostSessionFlow.tsx",
-    "components/dashboard/library/RecordingsTabView.tsx",
-  ];
+  // RecordingsTabView was deleted with the library's Recordings tab when
+  // recording was withdrawn — the ratchet shrinks.
+  const NO_SPINNER = ["components/sessions/PostSessionFlow.tsx"];
 
   for (const file of NO_SPINNER) {
     it(`${file} shows no spinner`, () => {
@@ -157,19 +156,6 @@ describe("the recap stays honest in both directions", () => {
  * exemption stapled to it.
  */
 const ALLOWED_UNGATED: Record<string, string> = {
-  "components/dashboard/library/RecordingsTabView.tsx":
-    "The empty state is explicitly coming-soon copy, and the grid below is " +
-    "driven by rows that only exist once egress writes them.",
-  "app/(dashboard)/dashboard/library/page.tsx":
-    "Tab chrome only — the label of a tab whose contents carry the coming-soon state.",
-  "components/dashboard/LibraryTabs.tsx":
-    'Routing shell only: a tab id in a union and a <Link href="?tab=recordings">. ' +
-    "It renders no recording and makes no claim about one; the tab it switches to " +
-    "carries the coming-soon state itself.",
-  "components/dashboard/library/ResourcesTab.tsx":
-    "Every recording section is behind `hasConvertibleSessions`, and " +
-    "getConvertibleSessions filters on `recordingUrl != null`, so the sections " +
-    "cannot render. The empty copy says recording isn't available yet.",
   "components/community/CommunitySessionsView.tsx":
     "Replay counts and filters are computed from rows with a recordingUrl, so " +
     "they read zero and the lists are empty rather than promising anything.",
@@ -177,8 +163,8 @@ const ALLOWED_UNGATED: Record<string, string> = {
   "lib/jobs/autopilot.ts":
     "The capture step is behind `recording?.status === READY || recordingUrl`.",
   "lib/jobs/livekit-webhook.ts":
-    "The egress handlers themselves. They are the code that would create a " +
-    "recording; they are not a promise to a user.",
+    "The egress handlers themselves, now marked DORMANT. They are the code that " +
+    "would create a recording; they are not a promise to a user.",
   "components/sessions/RecordingDistributionActions.tsx":
     "Receives `recordingUrl` as a prop and is only rendered by surfaces that have one.",
   "components/public-content/CreateSocialClipDialog.tsx":
@@ -226,5 +212,94 @@ describe("actions that require a recorded file say so", () => {
     const body = source.slice(start);
     expect(body).toMatch(/type: "VIDEO"/);
     expect(body).toMatch(/externalUrl: videoUrl/);
+  });
+});
+
+/**
+ * Recording is withdrawn, not delayed (2026-08-18).
+ *
+ * The previous pass replaced false promises with "coming soon", which was true
+ * at the time. It is not any more: saying a withdrawn feature is on its way is
+ * the same over-promise in a quieter voice, and it is harder to spot precisely
+ * because it sounds honest.
+ *
+ * The backend scaffolding stays — dormant, commented, and unreachable — so this
+ * checks what a user can see, not what exists.
+ */
+describe("nothing tells a user that recording is coming", () => {
+  const COMING =
+    /coming soon|isn't available yet|is not available yet|will appear once|próximamente|aún no está disponible|bientôt disponible|pas encore disponible/i;
+
+  it("no locale promises a recording", () => {
+    // Walks the parsed catalog rather than raw lines, so a value is judged
+    // whole and a key whose *name* is about recording is judged by what it says.
+    const RECORDING = /record|grabaci|enregistrement|replay/i;
+
+    for (const locale of ["en", "es", "fr"]) {
+      const catalog: unknown = JSON.parse(
+        fs.readFileSync(path.join(REPO_ROOT, `locales/${locale}.json`), "utf8")
+      );
+      const offenders: string[] = [];
+
+      const walk = (node: unknown, keyPath: string) => {
+        if (typeof node === "string") {
+          if ((RECORDING.test(node) || RECORDING.test(keyPath)) && COMING.test(node)) {
+            offenders.push(`${keyPath}: ${node}`);
+          }
+          return;
+        }
+        if (Array.isArray(node)) {
+          node.forEach((item, index) => walk(item, `${keyPath}[${index}]`));
+          return;
+        }
+        if (node && typeof node === "object") {
+          for (const [key, value] of Object.entries(node)) walk(value, `${keyPath}.${key}`);
+        }
+      };
+      walk(catalog, locale);
+
+      expect(offenders, `locales/${locale}.json still promises recording`).toEqual([]);
+    }
+  });
+
+  it("the surfaces that carried the coming-soon copy are gone", () => {
+    // Each of these rendered a panel, tab or control whose only content was an
+    // explanation that recording had not arrived.
+    const removed = [
+      "components/dashboard/library/RecordingsTab.tsx",
+      "components/dashboard/library/RecordingsTabView.tsx",
+    ];
+    for (const file of removed) {
+      expect(fs.existsSync(path.join(REPO_ROOT, file)), `${file} is back`).toBe(false);
+    }
+  });
+
+  it("the room has no recording control", () => {
+    // A permanently disabled button in the host's main toolbar advertises the
+    // feature every session.
+    const source = code("components/sessions/VideoRoomUI.tsx");
+    expect(source).not.toMatch(/recordingComingSoon|header\.recordingBadge/);
+  });
+
+  it("the post-session flow has no recording card", () => {
+    const source = code("components/sessions/PostSessionFlow.tsx");
+    expect(source).not.toMatch(/recording\.comingSoonTitle|recording\.readyTitle/);
+  });
+
+  it("the session detail has no recording tab", () => {
+    const source = code("app/(dashboard)/dashboard/sessions/[sessionId]/page.tsx");
+    expect(source).not.toMatch(/value="recording"|tabs\.recording/);
+  });
+
+  it("the scaffolding that stays is marked dormant", () => {
+    // Kept deliberately, so the next reader needs to know it is not a gap.
+    for (const file of [
+      "app/actions/recording.ts",
+      "lib/jobs/recording.ts",
+      "lib/jobs/livekit-webhook.ts",
+    ]) {
+      const source = fs.readFileSync(path.join(REPO_ROOT, file), "utf8");
+      expect(source, `${file} is unreachable but unlabelled`).toMatch(/DORMANT/);
+    }
   });
 });
