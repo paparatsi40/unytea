@@ -1128,10 +1128,6 @@
             "title": "La participation reste faible",
             "description": "Essayez un horaire hebdomadaire fixe et annoncez-le plus tôt dans le fil pour créer une habitude."
           },
-          "lowReplay": {
-            "title": "Opportunité de capture de rediffusion",
-            "description": "Plus de sessions ont besoin d'une distribution de rediffusion. Envoyez des notifications d'enregistrement prêt et partagez des liens publics."
-          },
           "momentum": {
             "title": "L'élan s'améliore",
             "description": "Gardez une cadence stable cette semaine et lancez une annonce de session en direct supplémentaire."
@@ -2137,8 +2133,8 @@
         "viewAllSessions": "Voir les {count} sessions",
         "emptyTitleConvertible": "Aucun enregistrement convertible pour l'instant",
         "emptyTitleNone": "Aucune session à convertir pour l'instant",
-        "emptyBodyConvertible": "Vous avez déjà des sessions terminées. Ouvrez Enregistrements pour vérifier le statut et convertir celles qui sont prêtes pour des cours.",
-        "emptyBodyNone": "Les sessions en direct terminées avec enregistrements apparaîtront ici, prêtes à être transformées en cours.",
+        "emptyBodyConvertible": "Vous avez déjà des sessions terminées, mais convertir l'une d'elles en cours nécessite son enregistrement, et l'enregistrement n'est pas encore disponible.",
+        "emptyBodyNone": "Transformer une session en cours nécessite son enregistrement, et l'enregistrement n'est pas encore disponible. Vos sessions sont intactes : ceci se remplira une fois la fonctionnalité activée.",
         "openRecordings": "Ouvrir les enregistrements",
         "hostFirstSession": "Animez votre première session",
         "toastLoadError": "Échec du chargement des données",

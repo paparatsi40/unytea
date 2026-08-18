@@ -43,6 +43,11 @@ export interface RecapSource {
   duration: number;
   scheduledAt: Date;
   notes: RecapNotes | null;
+  /**
+   * Whether a recorded file actually exists. The recap goes to the community
+   * feed, so a replay link here is a promise made to everyone who reads it.
+   */
+  recordingUrl: string | null;
 }
 
 function safeParseStringArray(value: string | null): string[] {
@@ -103,6 +108,26 @@ export function buildSessionRecapContent(session: RecapSource): string {
       .join("\n");
   }
 
+  /**
+   * Both links need a recorded video file, and this text goes to the community
+   * feed, so they were a promise made to every member of it.
+   *
+   * "Watch Recording" landed on the session page, whose recording tab says
+   * there is nothing to watch. "Reuse in Course/Library" opens two actions that
+   * both return "Recording not available yet". Nothing produces a recording —
+   * the Egress call in lib/jobs/livekit-webhook.ts is still a TODO — so on
+   * every recap ever posted, both were dead ends.
+   *
+   * The recap itself is untouched: it is built from the host's notes, which are
+   * real, and it remains the whole point of the post.
+   */
+  const replayLinks = session.recordingUrl
+    ? `
+[Watch Recording →](/dashboard/sessions/${session.id}?src=recap_post)
+[Reuse in Course/Library →](/dashboard/sessions/${session.id}?src=recap_reuse_cta)
+`
+    : "";
+
   const chaptersBlock = parsedChapters.length
     ? `**Chapters:**\n${parsedChapters
         .slice(0, 5)
@@ -117,10 +142,7 @@ ${isAudioOnly ? "🎙️ Audio session" : "🎬 Video session"} • ${session.du
 
 ${session.description ? `*${session.description}*\n\n` : ""}${noteSummary ? `**Summary:**\n${noteSummary}\n\n` : ""}${keyTakeaways ? `**Key Takeaways:**\n${keyTakeaways}\n\n` : ""}${chaptersBlock}💬 **What was your biggest takeaway?**
 Share your thoughts below or ask follow-up questions.
-
-[Watch Recording →](/dashboard/sessions/${session.id}?src=recap_post)
-[Reuse in Course/Library →](/dashboard/sessions/${session.id}?src=recap_reuse_cta)
-`;
+${replayLinks}`;
 }
 
 export type RecapDraftResult =

@@ -1118,10 +1118,6 @@
             "title": "Attendance is still low",
             "description": "Try a fixed weekly time and announce it earlier in feed to build a habit loop."
           },
-          "lowReplay": {
-            "title": "Replay capture opportunity",
-            "description": "More sessions need replay distribution. Push recording-ready notifications and share public links."
-          },
           "momentum": {
             "title": "Momentum is improving",
             "description": "Keep cadence stable this week and push one extra live session announcement."
@@ -2127,8 +2123,8 @@
         "viewAllSessions": "View all {count} sessions",
         "emptyTitleConvertible": "No convertible recordings yet",
         "emptyTitleNone": "No sessions to convert yet",
-        "emptyBodyConvertible": "You already have completed sessions. Open Recordings to review status and convert those ready for courses.",
-        "emptyBodyNone": "Complete live sessions with recordings will appear here, ready to be turned into courses.",
+        "emptyBodyConvertible": "You already have completed sessions, but converting one into a course needs its recording, and recording isn't available yet.",
+        "emptyBodyNone": "Turning sessions into courses needs a session recording, and recording isn't available yet. Your sessions are safe — this fills in once we turn the feature on.",
         "openRecordings": "Open Recordings",
         "hostFirstSession": "Host Your First Session",
         "toastLoadError": "Failed to load data",

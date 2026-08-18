@@ -1128,10 +1128,6 @@
             "title": "La asistencia sigue baja",
             "description": "Prueba un horario semanal fijo y anúncialo antes en el feed para crear un hábito."
           },
-          "lowReplay": {
-            "title": "Oportunidad de capturar repeticiones",
-            "description": "Más sesiones necesitan distribución de repeticiones. Envía notificaciones de grabación lista y comparte enlaces públicos."
-          },
           "momentum": {
             "title": "El impulso está mejorando",
             "description": "Mantén la cadencia estable esta semana y lanza un anuncio extra de sesión en vivo."
@@ -2137,8 +2133,8 @@
         "viewAllSessions": "Ver las {count} sesiones",
         "emptyTitleConvertible": "Aún no hay grabaciones convertibles",
         "emptyTitleNone": "Aún no hay sesiones para convertir",
-        "emptyBodyConvertible": "Ya tienes sesiones completadas. Abre Grabaciones para revisar el estado y convertir las que estén listas para cursos.",
-        "emptyBodyNone": "Las sesiones en vivo completadas con grabaciones aparecerán aquí, listas para convertirse en cursos.",
+        "emptyBodyConvertible": "Ya tienes sesiones completadas, pero convertir una en curso necesita su grabación, y la grabación aún no está disponible.",
+        "emptyBodyNone": "Convertir sesiones en cursos necesita la grabación de la sesión, y la grabación aún no está disponible. Tus sesiones están a salvo: esto se llenará cuando activemos la función.",
         "openRecordings": "Abrir grabaciones",
         "hostFirstSession": "Organiza tu primera sesión",
         "toastLoadError": "Error al cargar los datos",

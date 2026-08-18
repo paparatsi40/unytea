@@ -370,17 +370,21 @@ async function executeAutopilotJob(sessionId: string, jobType: AutopilotJobType)
     // publish, and the least visible of them. The nudge below stays: it tells
     // the host their recap is ready to share, which is now literally true, and
     // it is the host who decides whether members ever read it.
+    // "invite members to watch replay" was an instruction the host could not
+    // carry out: there is no replay, and the `replayLink` below pointed at a
+    // page whose recording tab is empty. The recap half is true and is what
+    // this nudge is for, so that is all it says now.
     await prisma.post.create({
       data: {
         title: `📣 Share highlights: ${session.title}`,
-        content: `Your recap is ready. Share one highlight and invite members to watch replay.`,
+        content: `Your recap is ready. Share one highlight and invite members to continue the discussion.`,
         contentType: "ANNOUNCEMENT",
         authorId: session.mentorId,
         communityId: session.communityId,
         attachments: {
           sessionId: session.id,
           lifecycleStage: "autopilot_distribution",
-          replayLink: session.slug
+          sessionLink: session.slug
             ? `/sessions/${session.slug}`
             : `/dashboard/sessions/${session.id}`,
         } as Prisma.InputJsonValue,

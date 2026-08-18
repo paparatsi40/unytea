@@ -9,13 +9,13 @@ import {
   FileText,
   Share2,
   BookOpen,
-  Loader2,
   Clock,
   Users,
   MessageSquare,
   Zap,
   ArrowRight,
   Video,
+  VideoOff,
   Scissors,
   ChevronLeft,
   Radio,
@@ -41,6 +41,8 @@ interface PostSessionFlowProps {
     status: string;
     startedAt: Date | null;
     endedAt: Date | null;
+    /** The denormalised copy on the session. Either source counts as a file. */
+    recordingUrl: string | null;
     recording: {
       url: string | null;
       status: string;
@@ -92,6 +94,27 @@ export function PostSessionFlow({
   const recordingStatus = session.recording?.status || "PROCESSING";
   const isRecordingReady = recordingStatus === "READY";
 
+  /**
+   * Three of the five "next steps" need a recorded video file, and all three
+   * fail closed today because no path produces one — `startRecording` in
+   * lib/jobs/livekit-webhook.ts is still a `TODO: Implement actual Egress API
+   * call`, so no egress event ever fires, no Recording row is written and
+   * `recordingUrl` stays null forever.
+   *
+   * What that looked like: "Add to Course" opened a dialog whose action
+   * returns "Session recording not available yet" every time; "Publish to
+   * Library" builds a `type: "VIDEO"` resource whose `externalUrl` is the
+   * recording, and bails with "Recording not available yet"; "Create Clips"
+   * derives its moments from `session.recording` — null gives an empty list —
+   * and mints a share URL under `/clip/{id}`, a route that does not exist in
+   * app/ at all.
+   *
+   * They are hidden rather than labelled, because a card whose only outcome is
+   * an error toast is not a feature preview. Tied to the URL rather than
+   * deleted, so all three return by themselves the day egress ships.
+   */
+  const hasRecordingFile = !!(session.recordingUrl || session.recording?.url);
+
   // Stats
   const attendeeCount = session._count?.participations || 0;
 
@@ -117,13 +140,19 @@ export function PostSessionFlow({
             <div
               className={cn(
                 "flex h-14 w-14 items-center justify-center rounded-full",
-                isRecordingReady ? "bg-green-500/20" : "bg-amber-500/20"
+                // Amber reads as "in progress". Neutral reads as "not a thing
+                // yet", which is what this is.
+                isRecordingReady ? "bg-green-500/20" : "bg-zinc-800"
               )}
             >
               {isRecordingReady ? (
                 <Video className="h-7 w-7 text-green-400" />
               ) : (
-                <Loader2 className="h-7 w-7 animate-spin text-amber-400" />
+                // Static, not a spinner. A spinner is a promise that something
+                // is happening; nothing is. The copy already said "coming
+                // soon" while the icon underneath it kept turning, which is
+                // the more believable of the two signals.
+                <VideoOff className="h-7 w-7 text-zinc-400" />
               )}
             </div>
             <div className="flex-1">
@@ -223,74 +252,83 @@ export function PostSessionFlow({
             </CardContent>
           </Card>
 
-          {/* Add to Course */}
-          <Card
-            className={cn(
-              "cursor-pointer border-zinc-800 bg-zinc-900/50 transition-all hover:border-purple-500/50 hover:bg-zinc-800/50",
-              activeAction === "course" && "border-purple-500 bg-zinc-800"
-            )}
-            onClick={() => {
-              setActiveAction("course");
-              onAddToCourse();
-            }}
-          >
-            <CardContent className="flex items-start gap-4 p-5">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-purple-500/20">
-                <BookOpen className="h-6 w-6 text-purple-400" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-white">{t("nextSteps.courseTitle")}</h3>
-                <p className="text-sm text-zinc-400">{t("nextSteps.courseDesc")}</p>
-              </div>
-              <ArrowRight className="h-5 w-5 text-zinc-500" />
-            </CardContent>
-          </Card>
+          {/* Add to Course — needs the video file. See `hasRecordingFile`. */}
+          {hasRecordingFile && (
+            <Card
+              className={cn(
+                "cursor-pointer border-zinc-800 bg-zinc-900/50 transition-all hover:border-purple-500/50 hover:bg-zinc-800/50",
+                activeAction === "course" && "border-purple-500 bg-zinc-800"
+              )}
+              onClick={() => {
+                setActiveAction("course");
+                onAddToCourse();
+              }}
+            >
+              <CardContent className="flex items-start gap-4 p-5">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-purple-500/20">
+                  <BookOpen className="h-6 w-6 text-purple-400" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-white">{t("nextSteps.courseTitle")}</h3>
+                  <p className="text-sm text-zinc-400">{t("nextSteps.courseDesc")}</p>
+                </div>
+                <ArrowRight className="h-5 w-5 text-zinc-500" />
+              </CardContent>
+            </Card>
+          )}
 
-          {/* Create Clips */}
-          <Card
-            className={cn(
-              "cursor-pointer border-zinc-800 bg-zinc-900/50 transition-all hover:border-amber-500/50 hover:bg-zinc-800/50",
-              activeAction === "clips" && "border-amber-500 bg-zinc-800"
-            )}
-            onClick={() => {
-              setActiveAction("clips");
-              onCreateClip();
-            }}
-          >
-            <CardContent className="flex items-start gap-4 p-5">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-500/20">
-                <Scissors className="h-6 w-6 text-amber-400" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-white">{t("nextSteps.clipsTitle")}</h3>
-                <p className="text-sm text-zinc-400">{t("nextSteps.clipsDesc")}</p>
-              </div>
-              <ArrowRight className="h-5 w-5 text-zinc-500" />
-            </CardContent>
-          </Card>
+          {/* Create Clips — needs the video file. */}
+          {hasRecordingFile && (
+            <Card
+              className={cn(
+                "cursor-pointer border-zinc-800 bg-zinc-900/50 transition-all hover:border-amber-500/50 hover:bg-zinc-800/50",
+                activeAction === "clips" && "border-amber-500 bg-zinc-800"
+              )}
+              onClick={() => {
+                setActiveAction("clips");
+                onCreateClip();
+              }}
+            >
+              <CardContent className="flex items-start gap-4 p-5">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-500/20">
+                  <Scissors className="h-6 w-6 text-amber-400" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-white">{t("nextSteps.clipsTitle")}</h3>
+                  <p className="text-sm text-zinc-400">{t("nextSteps.clipsDesc")}</p>
+                </div>
+                <ArrowRight className="h-5 w-5 text-zinc-500" />
+              </CardContent>
+            </Card>
+          )}
 
-          {/* Publish to Library */}
-          <Card
-            className={cn(
-              "cursor-pointer border-zinc-800 bg-zinc-900/50 transition-all hover:border-cyan-500/50 hover:bg-zinc-800/50",
-              activeAction === "library" && "border-cyan-500 bg-zinc-800"
-            )}
-            onClick={() => {
-              setActiveAction("library");
-              onPublishToLibrary();
-            }}
-          >
-            <CardContent className="flex items-start gap-4 p-5">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-cyan-500/20">
-                <Folder className="h-6 w-6 text-cyan-400" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-white">{t("nextSteps.libraryTitle")}</h3>
-                <p className="text-sm text-zinc-400">{t("nextSteps.libraryDesc")}</p>
-              </div>
-              <ArrowRight className="h-5 w-5 text-zinc-500" />
-            </CardContent>
-          </Card>
+          {/* Publish to Library — despite the name this publishes the *replay*:
+              `createResourceFromSession` writes a VIDEO resource whose
+              externalUrl is the recording, and returns "Recording not available
+              yet" without one. The notes only supply its description. */}
+          {hasRecordingFile && (
+            <Card
+              className={cn(
+                "cursor-pointer border-zinc-800 bg-zinc-900/50 transition-all hover:border-cyan-500/50 hover:bg-zinc-800/50",
+                activeAction === "library" && "border-cyan-500 bg-zinc-800"
+              )}
+              onClick={() => {
+                setActiveAction("library");
+                onPublishToLibrary();
+              }}
+            >
+              <CardContent className="flex items-start gap-4 p-5">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-cyan-500/20">
+                  <Folder className="h-6 w-6 text-cyan-400" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-white">{t("nextSteps.libraryTitle")}</h3>
+                  <p className="text-sm text-zinc-400">{t("nextSteps.libraryDesc")}</p>
+                </div>
+                <ArrowRight className="h-5 w-5 text-zinc-500" />
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
 
