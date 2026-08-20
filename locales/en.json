@@ -501,6 +501,19 @@
       "guarantee": "✓ 14-day free trial • ✓ No credit card required • ✓ Cancel anytime"
     }
   },
+  "email": {
+    "videoUsage": {
+      "subject80": "{community} has used 80% of its video hours",
+      "subject100": "{community} has used all of its video hours",
+      "heading80": "80% of your video hours",
+      "heading100": "All of your video hours",
+      "used": "{used} of {cap} participant-hours used this cycle",
+      "unitNote": "One hour with six people in the room counts as six.",
+      "resets": "Your allowance comes back on {date}.",
+      "measuredOnly": "Nothing is blocked. We are measuring live video while the allowance settles, so this is a heads-up rather than a limit.",
+      "cta": "See the numbers"
+    }
+  },
   "dashboard": {
     "accountSettings": {
       "shell": {
@@ -2301,6 +2314,19 @@
         "title": "This session didn't load",
         "description": "Something went wrong loading the session. Retry, or head back to your sessions list."
       }
+    },
+    "videoUsage": {
+      "title": "Video hours",
+      "plan": "{plan} plan",
+      "used": "{used} of {cap} hours used",
+      "resets": "resets {date}",
+      "unitNote": "One hour with six people in the room counts as six.",
+      "bannerWarn": "{community} has used {percent}% of its video hours this cycle.",
+      "bannerOver": "{community} has used all of its video hours this cycle.",
+      "bannerNote": "Nothing is blocked — the allowance comes back on {date}.",
+      "viewUsage": "See the numbers",
+      "sectionTitle": "Video hours by community",
+      "noCommunities": "You do not host any communities yet."
     }
   },
   "navigation": {

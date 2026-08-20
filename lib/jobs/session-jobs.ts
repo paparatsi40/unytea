@@ -23,6 +23,7 @@ import {
   accrueSessionUsage,
   logAccrualOutcome,
   meterCompletedSession,
+  notifyAccruedSession,
 } from "@/lib/usage/video-usage";
 
 /**
@@ -489,7 +490,12 @@ export async function sweepSessionUsage() {
       // the last word on that session. It used to be the quietest place in the
       // system: the outcome was read for the counter and discarded otherwise.
       logAccrualOutcome(session.id, outcome);
-      if (outcome.status === "accrued") accrued += 1;
+      if (outcome.status === "accrued") {
+        accrued += 1;
+        // The sweep moves the counter too, so it owes the same warning. It does
+        // not go through `meterCompletedSession`, so the call is explicit here.
+        await notifyAccruedSession(session.id);
+      }
     } catch (error) {
       console.error("[sweepSessionUsage] accrual threw", {
         sessionId: session.id,

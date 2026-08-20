@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getLocale } from "next-intl/server";
 import { PremiumCommunityHeader } from "@/components/community/PremiumCommunityHeader";
 import { PaywallLockedView } from "@/components/community/PaywallLockedView";
+import { VideoUsageBanner } from "@/components/billing/VideoUsageBanner";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -56,6 +57,23 @@ export default async function CommunityLayout(props: LayoutProps) {
   const isOwner = membership?.role === "OWNER" || community.ownerId === session?.user?.id;
   const isPending = membership?.status === "PENDING";
 
+  /**
+   * Who may see the video allowance. Its own boolean, deliberately.
+   *
+   * `isOwner` above is OWNER-only and is shared with `PremiumCommunityHeader`
+   * and the paywall gate below — widening it to reach the banner would quietly
+   * change who those two treat as an owner, which is a different decision than
+   * the one being made here.
+   *
+   * This one matches `getCommunityVideoUsage`, which the usage card calls with
+   * `roles: ["OWNER", "ADMIN"]`. The banner and the card now answer to the same
+   * rule; before this, an admin saw the card and never the warning above it.
+   */
+  const canSeeVideoUsage =
+    membership?.role === "OWNER" ||
+    membership?.role === "ADMIN" ||
+    community.ownerId === session?.user?.id;
+
   // Paywall gate: non-owner viewers see the locked screen. Owner passes through
   // to admin views (their dashboard route group will mount the PaywallBanner
   // global banner above the page content).
@@ -78,6 +96,15 @@ export default async function CommunityLayout(props: LayoutProps) {
         isOwner={isOwner}
         isPending={isPending}
       />
+      {/* The community's allowance, for the people who administer it — a member
+          has no allowance and no way to act on one. Silent below 80%. */}
+      {canSeeVideoUsage && (
+        <VideoUsageBanner
+          communityId={community.id}
+          communityName={community.name}
+          communitySlug={community.slug}
+        />
+      )}
       {children}
     </div>
   );

@@ -819,10 +819,27 @@ describe("the accrual triggers are wired", () => {
     expect(source).toMatch(/usage: usageResult/);
   });
 
-  it("keeps the counter invisible: nothing under app/ or components/ reads it", () => {
-    // Step A ships the measurement only. The gate, the banner and the usage
-    // screen are step B, and shipping any of them here would mean enforcing a
-    // number nobody has watched for a cycle yet.
+  /**
+   * Step A asserted that nothing under `app/` or `components/` imported this
+   * module at all — the counter shipped blind on purpose, and any UI would have
+   * meant showing a number nobody had watched for a cycle.
+   *
+   * B1 is that decision changing: the number is shown, and warned on. What has
+   * to hold instead is narrower and more useful — the surfaces may *read*, and
+   * only read.
+   */
+  it("lets the UI read the counter and nothing else", () => {
+    // These move money-shaped data or create billing periods. A render reaching
+    // for one of them is a page view with a side effect.
+    const forbidden = [
+      "accrueSessionUsage",
+      "meterCompletedSession",
+      "closeOpenParticipations",
+      "resolveUsageRow",
+      "notifyUsageThresholds",
+      "notifyAccruedSession",
+    ];
+
     const offenders: string[] = [];
     const walk = (dir: string) => {
       for (const entry of fs.readdirSync(path.join(REPO_ROOT, dir), { withFileTypes: true })) {
@@ -830,9 +847,14 @@ describe("the accrual triggers are wired", () => {
         const rel = `${dir}/${entry.name}`;
         if (entry.isDirectory()) {
           walk(rel);
-        } else if (/\.tsx?$/.test(entry.name)) {
-          const source = fs.readFileSync(path.join(REPO_ROOT, rel), "utf8");
-          if (source.includes("lib/usage/video-usage")) offenders.push(rel);
+          continue;
+        }
+        if (!/\.tsx?$/.test(entry.name)) continue;
+
+        const source = code(rel);
+        if (!source.includes("lib/usage/video-usage")) continue;
+        for (const name of forbidden) {
+          if (source.includes(name)) offenders.push(`${rel} → ${name}`);
         }
       }
     };
@@ -840,5 +862,29 @@ describe("the accrual triggers are wired", () => {
     walk("components");
 
     expect(offenders).toEqual([]);
+  });
+
+  it("never shows the applied ledger to anyone", () => {
+    // `community_video_usage.usedSeconds` accumulates max(exact, approx), and
+    // approx counts every participant for the whole session window regardless
+    // of when they arrived. It stays as the internal record for the comparison
+    // that decides what the gate enforces on; what a coach is shown comes from
+    // `exactSeconds`.
+    const read = code("lib/usage/video-usage.ts").slice(
+      code("lib/usage/video-usage.ts").indexOf("export async function readCommunityVideoUsage")
+    );
+    expect(read).toMatch(/_sum: \{ exactSeconds: true \}/);
+    expect(read).not.toMatch(/usedSeconds: true/);
+  });
+
+  it("does not open a billing period to draw a page", () => {
+    // `resolveUsageRow` creates. The read path must not reach it — a row made
+    // by a page view would anchor its period on whoever happened to look.
+    const source = code("lib/usage/video-usage.ts");
+    const read = source.slice(source.indexOf("export async function readCommunityVideoUsage"));
+    expect(read).toMatch(/communityVideoUsage\.findUnique/);
+    expect(read).not.toMatch(/resolveUsageRow/);
+    expect(read).not.toMatch(/\.upsert\(/);
+    expect(read).not.toMatch(/\.create\(/);
   });
 });
