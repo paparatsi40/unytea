@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { unstable_cache } from "next/cache";
 import { subDays } from "date-fns";
 import { prisma } from "@/lib/prisma";
@@ -24,6 +25,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { PaywallLockedView } from "@/components/community/PaywallLockedView";
+import { resolveDisplayName } from "@/lib/user-display-name";
 
 // Cached base fetch — pure DB read. The auth-dependent paywall gate (isOwner)
 // stays per-request in the page below, so the page remains dynamic.
@@ -207,6 +209,7 @@ export default async function PublicCommunityPage(props: {
   let sampleMembers: LandingSampleMember[] = [];
   let activityStatus: LandingActivityStatus | null = null;
   if (sections.some((s) => s.type === "stats")) {
+    const tMembers = await getTranslations("community.landing.stats");
     const since = subDays(new Date(), ACTIVITY_WINDOW_DAYS);
     const [memberRows, postCount, commentCount] = await Promise.all([
       prisma.member.findMany({
@@ -217,7 +220,18 @@ export default async function PublicCommunityPage(props: {
         },
         orderBy: { joinedAt: "asc" },
         take: 7,
-        select: { user: { select: { id: true, name: true, image: true } } },
+        select: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+              username: true,
+              firstName: true,
+              lastName: true,
+            },
+          },
+        },
       }),
       prisma.post.count({
         where: { communityId: community.id, deletedAt: null, createdAt: { gte: since } },
@@ -226,12 +240,19 @@ export default async function PublicCommunityPage(props: {
         where: { post: { communityId: community.id }, createdAt: { gte: since } },
       }),
     ]);
-    sampleMembers = memberRows.map((m) => ({
-      id: m.user.id,
-      name: m.user.name ?? "Unknown",
-      image: m.user.image,
-      initials: computeInitials(m.user.name),
-    }));
+    sampleMembers = memberRows.map((m) => {
+      // Was `m.user.name ?? "Unknown"` — an English word on a page that renders
+      // in three locales, for accounts that usually have a username. This page
+      // is a server component with the locale in hand, so it translates its own
+      // fallback.
+      const resolved = resolveDisplayName(m.user);
+      return {
+        id: m.user.id,
+        name: resolved || tMembers("anonymousMember"),
+        image: m.user.image,
+        initials: resolved ? computeInitials(resolved) : "??",
+      };
+    });
     activityStatus = classifyActivity(postCount + commentCount);
   }
 

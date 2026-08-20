@@ -9,7 +9,8 @@ import { cn } from "@/lib/utils";
 
 type ReactionData = {
   count: number;
-  users: Array<{ id: string; name: string; imageUrl: string | null }>;
+  /** Null when the account has no name of any kind; this file names them. */
+  users: Array<{ id: string; name: string | null; imageUrl: string | null }>;
   userReacted: boolean;
 };
 
@@ -191,7 +192,10 @@ export function PostReactions({ postId }: { postId: string }) {
                         <div className="mt-1 max-w-[200px] text-muted-foreground">
                           {data.users
                             .slice(0, 3)
-                            .map((u) => u.name)
+                            // The action returns null for an account with no
+                            // name of any kind; the wording for that belongs
+                            // here, where it can be translated.
+                            .map((u) => u.name || t("anonymous"))
                             .join(", ")}
                           {data.users.length > 3 &&
                             ` ${t("andMore", { count: data.users.length - 3 })}`}

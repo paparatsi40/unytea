@@ -22,6 +22,17 @@ interface VideoRoomProps {
   sessionMode?: "video" | "audio";
   sessionTitle?: string;
   isHost?: boolean;
+  /**
+   * Who is hosting, resolved by the caller from the session's mentor.
+   *
+   * `VideoRoomUI` has declared these for as long as it has existed and nothing
+   * ever passed them, so they took their defaults — an empty string — and the
+   * room rendered "Host:" with nothing after it and an avatar circle with no
+   * initial in it. Exactly the shape of the `attendeeCount` prop that produced
+   * "0 attending"; two props, one habit.
+   */
+  hostName?: string;
+  hostAvatar?: string;
   onLeave?: () => void;
   onEndSession?: () => void;
 }
@@ -78,6 +89,8 @@ export function VideoRoom({
   sessionMode = "video",
   sessionTitle,
   isHost = false,
+  hostName,
+  hostAvatar,
   onLeave,
   onEndSession,
 }: VideoRoomProps) {
@@ -229,6 +242,8 @@ export function VideoRoom({
           sessionMode={sessionMode}
           sessionTitle={sessionTitle}
           isHost={isHost}
+          hostName={hostName}
+          hostAvatar={hostAvatar}
           onLeave={onLeave}
           onEndSession={onEndSession}
         />

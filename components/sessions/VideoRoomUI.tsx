@@ -43,6 +43,7 @@ import { LivePoll, PollCreator } from "@/components/live-session/LivePoll";
 import { useSessionDataChannel } from "@/hooks/useSessionDataChannel";
 import { useWhiteboardChannel } from "@/hooks/useWhiteboardChannel";
 import { inviteToSpeak } from "@/app/actions/livekit";
+import { roleFromMetadata } from "@/lib/livekit/permissions";
 
 // Types
 type PanelTab = "notes" | "chat" | "participants";
@@ -99,7 +100,18 @@ export function VideoRoomUI({
   // `identity === localParticipant.identity`, so "Speakers" meant "everyone but
   // me" and "Audience" meant "me" — which is why a host saw themselves filed
   // under AUDIENCE regardless of role.
-  const speakers = participants.filter((p) => p.permissions?.canPublish);
+  /**
+   * The host is listed under HOST and must not appear again under SPEAKERS.
+   *
+   * `canPublish` was the only filter, and the host has it — so a room with two
+   * people in it drew the host twice and read as three. Publishing permission
+   * answers "may they talk", never "are they running this"; a promoted speaker
+   * carries it too. The role in the token's metadata is the thing that
+   * distinguishes them.
+   */
+  const speakers = participants.filter(
+    (p) => p.permissions?.canPublish && roleFromMetadata(p.metadata) !== "host"
+  );
   const audience = participants.filter((p) => !p.permissions?.canPublish);
 
   /**
@@ -116,6 +128,14 @@ export function VideoRoomUI({
    * headcount as it stands, and it updates as people come and go.
    */
   const attendingCount = participants.length;
+
+  /**
+   * Never an empty string. `hostName` arrives already resolved through
+   * name → firstName + lastName → username, and is empty only when the account
+   * genuinely has none of the three — at which point this is a piece of copy,
+   * so it is translated rather than hardcoded.
+   */
+  const hostLabel = hostName.trim() || t("participants.hostFallback");
   const room = useRoomContext();
   const localParticipantData = useLocalParticipant();
   const localParticipant = localParticipantData.localParticipant;
@@ -414,7 +434,7 @@ export function VideoRoomUI({
             <div className="flex items-center gap-2 text-sm text-zinc-400">
               <span className="flex items-center gap-1">
                 <Crown className="h-3.5 w-3.5 text-amber-400" />
-                {t("header.hostLabel", { name: hostName })}
+                {t("header.hostLabel", { name: hostLabel })}
               </span>
               <span>•</span>
               <span className="flex items-center gap-1">
@@ -558,24 +578,34 @@ export function VideoRoomUI({
 
       {/* ==================== MAIN CONTENT ==================== */}
       <div className="flex flex-1 overflow-hidden">
-        {/* LEFT: Notes Panel */}
-        <div
-          className={cn(
-            "flex w-80 flex-col border-r border-zinc-800 bg-zinc-900/50 transition-all",
-            !showAllPanels && activePanel !== "notes" && "hidden"
-          )}
-        >
-          <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-3">
-            <div className="flex items-center gap-2 text-sm font-medium text-zinc-300">
-              <FileText className="h-4 w-4 text-emerald-400" />
-              {t("notesPanel.title")}
+        {/* LEFT: Notes Panel — the host's, and only theirs.
+
+            `updateSessionNotes` authorises the session's mentor or mentee and
+            nobody else, so a community member's autosave was refused every few
+            seconds; production logs filled with
+            `[action:updateSessionNotes] Unauthorized`. The panel was offering
+            an editor the server would never accept a write from. Hiding it ends
+            the refusals at the source and gives the member back a third of the
+            width. */}
+        {isHost && (
+          <div
+            className={cn(
+              "flex w-80 flex-col border-r border-zinc-800 bg-zinc-900/50 transition-all",
+              !showAllPanels && activePanel !== "notes" && "hidden"
+            )}
+          >
+            <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-3">
+              <div className="flex items-center gap-2 text-sm font-medium text-zinc-300">
+                <FileText className="h-4 w-4 text-emerald-400" />
+                {t("notesPanel.title")}
+              </div>
+              <span className="text-xs text-zinc-500">{t("notesPanel.autoSaved")}</span>
             </div>
-            <span className="text-xs text-zinc-500">{t("notesPanel.autoSaved")}</span>
+            <div className="flex-1 overflow-hidden">
+              <SessionNotesEditor sessionId={sessionId || ""} />
+            </div>
           </div>
-          <div className="flex-1 overflow-hidden">
-            <SessionNotesEditor sessionId={sessionId || ""} />
-          </div>
-        </div>
+        )}
 
         {/* CENTER: Stage + Chat */}
         <div className="flex min-w-0 flex-1 flex-col">
@@ -691,19 +721,19 @@ export function VideoRoomUI({
                   {hostAvatar ? (
                     <Image
                       src={hostAvatar}
-                      alt={hostName}
+                      alt={hostLabel}
                       width={32}
                       height={32}
                       className="h-8 w-8 rounded-full object-cover"
                     />
                   ) : (
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-sm font-medium text-white">
-                      {hostName.charAt(0)}
+                      {hostLabel.charAt(0)}
                     </div>
                   )}
                   <Crown className="absolute -right-1 -top-1 h-3 w-3 text-amber-400" />
                 </div>
-                <span className="text-sm font-medium text-white">{hostName}</span>
+                <span className="text-sm font-medium text-white">{hostLabel}</span>
               </div>
             </div>
 
@@ -1004,7 +1034,10 @@ export function VideoRoomUI({
         <div className="flex items-center gap-2">
           {/* Panel Toggle (mobile) */}
           <div className="flex rounded-lg bg-zinc-800 p-1 md:hidden">
-            {(["notes", "chat", "participants"] as PanelTab[]).map((tab) => (
+            {/* No tab for a panel that is not there. */}
+            {(
+              (isHost ? ["notes", "chat", "participants"] : ["chat", "participants"]) as PanelTab[]
+            ).map((tab) => (
               <button
                 key={tab}
                 onClick={() => {

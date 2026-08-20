@@ -35,7 +35,8 @@
           "moderate": "Moderada",
           "quiet": "Tranquila"
         },
-        "joinCommunity": "Unirme a la comunidad"
+        "joinCommunity": "Unirme a la comunidad",
+        "anonymousMember": "Miembro"
       },
       "hero": {
         "fallbackTitle": "Bienvenido a nuestra comunidad",
@@ -858,7 +859,8 @@
         "idea": "Idea",
         "clap": "Aplauso",
         "react": "Reaccionar",
-        "andMore": "y {count} más"
+        "andMore": "y {count} más",
+        "anonymous": "Anónimo"
       },
       "sessionAnnouncement": {
         "today": "Hoy",
@@ -2827,7 +2829,8 @@
         "more": "+{count} más",
         "inviteToSpeak": "Invitar a hablar",
         "dismiss": "Descartar",
-        "guest": "Invitado"
+        "guest": "Invitado",
+        "hostFallback": "el anfitrión"
       },
       "handQueue": {
         "title": "Cola de manos levantadas"

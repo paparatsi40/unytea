@@ -35,7 +35,8 @@
           "moderate": "Moderate",
           "quiet": "Quiet"
         },
-        "joinCommunity": "Join community"
+        "joinCommunity": "Join community",
+        "anonymousMember": "Member"
       },
       "hero": {
         "fallbackTitle": "Welcome to our community",
@@ -848,7 +849,8 @@
         "idea": "Idea",
         "clap": "Clap",
         "react": "React",
-        "andMore": "and {count} more"
+        "andMore": "and {count} more",
+        "anonymous": "Anonymous"
       },
       "sessionAnnouncement": {
         "today": "Today",
@@ -2817,7 +2819,8 @@
         "more": "+{count} more",
         "inviteToSpeak": "Invite to speak",
         "dismiss": "Dismiss",
-        "guest": "Guest"
+        "guest": "Guest",
+        "hostFallback": "the host"
       },
       "handQueue": {
         "title": "Hand Raised Queue"

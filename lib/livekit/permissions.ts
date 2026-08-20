@@ -43,3 +43,32 @@ export function canPublishTracks(role: ParticipationRole): boolean {
  * reasoning at the point where it is made.
  */
 export const AUDIENCE_PUBLISHES_DATA = true;
+
+/**
+ * The role the token was minted with, as the browser can see it.
+ *
+ * `joinSession` puts `{ userId, sessionId, role, communityId }` in the token's
+ * metadata, and LiveKit hands that back on every participant. It is the only
+ * client-side way to tell the host apart from anyone else who may publish: a
+ * promoted speaker also carries `canPublish`, so that flag answers "may they
+ * talk", never "are they running this".
+ *
+ * The alternative would be rebuilding the host's identity as
+ * `${sessionId}:${mentorId}` and comparing. That is the identity format leaking
+ * into a second place — the same coupling that broke the usage webhook — so the
+ * metadata is read instead.
+ *
+ * Returns null for anything unparseable. Metadata is a string LiveKit relays
+ * verbatim, and a participant with none is not an error.
+ */
+export function roleFromMetadata(metadata: string | undefined): ParticipationRole | null {
+  if (!metadata) return null;
+
+  try {
+    const parsed: unknown = JSON.parse(metadata);
+    const role = (parsed as { role?: unknown })?.role;
+    return role === "host" || role === "speaker" || role === "listener" ? role : null;
+  } catch {
+    return null;
+  }
+}
