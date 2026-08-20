@@ -18,7 +18,12 @@ import { runAutopilotDueJobs } from "./autopilot";
 import { sendSessionReminderEmail } from "@/lib/email";
 import { sendPushToUser, pushTemplates } from "@/lib/push";
 import { SITE_URL } from "@/lib/site-url";
-import { METERING_EPOCH, accrueSessionUsage, meterCompletedSession } from "@/lib/usage/video-usage";
+import {
+  METERING_EPOCH,
+  accrueSessionUsage,
+  logAccrualOutcome,
+  meterCompletedSession,
+} from "@/lib/usage/video-usage";
 
 /**
  * Session Jobs - Background tasks for recurring sessions
@@ -480,9 +485,16 @@ export async function sweepSessionUsage() {
   for (const session of unmetered) {
     try {
       const outcome = await accrueSessionUsage(session.id);
+      // The sweep is the backstop, so a session it also declines to count is
+      // the last word on that session. It used to be the quietest place in the
+      // system: the outcome was read for the counter and discarded otherwise.
+      logAccrualOutcome(session.id, outcome);
       if (outcome.status === "accrued") accrued += 1;
     } catch (error) {
-      console.error(`[sweepSessionUsage] accrual failed for session=${session.id}`, error);
+      console.error("[sweepSessionUsage] accrual threw", {
+        sessionId: session.id,
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
   }
 

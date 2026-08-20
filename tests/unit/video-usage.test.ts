@@ -57,12 +57,38 @@ function code(relativePath: string) {
 }
 
 const AFTER_EPOCH = new Date(METERING_EPOCH.getTime() + 24 * 60 * 60 * 1000);
+const HOUR_MS = 60 * 60 * 1000;
+const SESSION_END = new Date(AFTER_EPOCH.getTime() + HOUR_MS);
 
-/** An hour-long session, ended, after the epoch. */
+/**
+ * One participation.
+ *
+ * `joinedAt` and `leftAt` are the point of these fixtures now. The window a
+ * session is charged for comes from these two columns and from nothing else —
+ * in particular not from `session.startedAt`, which no code path in this
+ * product ever sets.
+ */
+function participation(
+  durationSeconds: number | null,
+  options: { joinedAt?: Date; leftAt?: Date | null } = {}
+) {
+  return {
+    durationSeconds,
+    joinedAt: options.joinedAt ?? AFTER_EPOCH,
+    leftAt: options.leftAt === undefined ? SESSION_END : options.leftAt,
+  };
+}
+
+/**
+ * An hour-long session, ended, after the epoch.
+ *
+ * Note what is *not* here: `startedAt`. `computeSessionUsage` no longer selects
+ * it, and a fixture that carried it would quietly re-introduce the assumption
+ * that broke the counter.
+ */
 function sessionRow(overrides: Record<string, unknown> = {}) {
   return {
-    startedAt: AFTER_EPOCH,
-    endedAt: new Date(AFTER_EPOCH.getTime() + 60 * 60 * 1000),
+    endedAt: SESSION_END,
     attendeeCount: 3,
     communityId: "comm-1",
     participations: [],
@@ -81,9 +107,9 @@ describe("computeSessionUsage", () => {
       sessionRow({
         attendeeCount: 3,
         participations: [
-          { durationSeconds: 3600 }, // host, present the whole hour
-          { durationSeconds: 3600 },
-          { durationSeconds: 3000 },
+          participation(3600), // host, present the whole hour
+          participation(3600),
+          participation(3000, { joinedAt: new Date(AFTER_EPOCH.getTime() + 600 * 1000) }),
         ],
       }) as never
     );
@@ -96,23 +122,23 @@ describe("computeSessionUsage", () => {
     expect(figures?.elapsedSeconds).toBe(3600);
   });
 
-  it("applies the exact figure when it is the larger of the two", async () => {
+  it("applies the exact figure when everyone was there the whole time", async () => {
+    // The approximation is `attendees × the window they occupied`, so it is a
+    // ceiling the exact figure can meet but not beat: nobody can be connected
+    // for longer than the window is open. A tie means full attendance, and the
+    // tie goes to the measured figure.
     vi.mocked(prisma.mentorSession.findUnique).mockResolvedValue(
       sessionRow({
-        attendeeCount: 2, // approx = 2 × 3600 = 7200
-        participations: [
-          { durationSeconds: 3600 },
-          { durationSeconds: 3600 },
-          { durationSeconds: 1800 },
-        ],
+        attendeeCount: 2,
+        participations: [participation(3600), participation(3600)],
       }) as never
     );
 
     const figures = await computeSessionUsage("s1");
 
-    expect(figures?.exactSeconds).toBe(9000);
+    expect(figures?.exactSeconds).toBe(7200);
     expect(figures?.approxSeconds).toBe(7200);
-    expect(figures?.appliedSeconds).toBe(9000);
+    expect(figures?.appliedSeconds).toBe(7200);
     expect(figures?.basis).toBe("exact");
   });
 
@@ -120,7 +146,10 @@ describe("computeSessionUsage", () => {
     // The shape of a partly-delivered webhook: three people joined, one
     // `participant_left` arrived.
     vi.mocked(prisma.mentorSession.findUnique).mockResolvedValue(
-      sessionRow({ attendeeCount: 3, participations: [{ durationSeconds: 3600 }] }) as never
+      sessionRow({
+        attendeeCount: 3,
+        participations: [participation(3600), participation(null), participation(null)],
+      }) as never
     );
 
     const figures = await computeSessionUsage("s1");
@@ -133,19 +162,22 @@ describe("computeSessionUsage", () => {
 
   it("treats a missing durationSeconds as zero rather than NaN", async () => {
     vi.mocked(prisma.mentorSession.findUnique).mockResolvedValue(
-      sessionRow({ participations: [{ durationSeconds: null }, { durationSeconds: 600 }] }) as never
+      sessionRow({ participations: [participation(null), participation(600)] }) as never
     );
 
     expect((await computeSessionUsage("s1"))?.exactSeconds).toBe(600);
   });
 
-  it("measures elapsed from the real clock, not the booked duration", async () => {
-    // Booked for an hour, actually ran twenty minutes.
+  it("measures the window people were actually connected for", async () => {
+    // Booked for an hour, everyone was in for twenty minutes.
+    const twentyMinutes = new Date(AFTER_EPOCH.getTime() + 20 * 60 * 1000);
     vi.mocked(prisma.mentorSession.findUnique).mockResolvedValue(
       sessionRow({
-        endedAt: new Date(AFTER_EPOCH.getTime() + 20 * 60 * 1000),
         attendeeCount: 2,
-        participations: [],
+        participations: [
+          participation(1200, { leftAt: twentyMinutes }),
+          participation(1200, { leftAt: twentyMinutes }),
+        ],
       }) as never
     );
 
@@ -154,23 +186,96 @@ describe("computeSessionUsage", () => {
     expect(figures?.approxSeconds).toBe(2400);
   });
 
-  it("returns null for a session that never ran", async () => {
+  it("measures a session that was never marked live", async () => {
+    // The bug, in one test. `startedAt` is NULL on every session this product
+    // has ever run — nothing marks a session IN_PROGRESS — and the window used
+    // to be `endedAt − startedAt`, so every real session computed to null and
+    // was never counted. The participation rows were there the whole time.
     vi.mocked(prisma.mentorSession.findUnique).mockResolvedValue(
-      sessionRow({ startedAt: null }) as never
+      sessionRow({
+        attendeeCount: 2,
+        participations: [
+          participation(673, {
+            joinedAt: new Date(SESSION_END.getTime() - 678 * 1000),
+            leftAt: SESSION_END,
+          }),
+          participation(678, {
+            joinedAt: new Date(SESSION_END.getTime() - 678 * 1000),
+            leftAt: SESSION_END,
+          }),
+        ],
+      }) as never
     );
-    expect(await computeSessionUsage("s1")).toBeNull();
+
+    const figures = await computeSessionUsage("s1");
+
+    expect(figures).not.toBeNull();
+    expect(figures?.exactSeconds).toBe(1351);
+    expect(figures?.elapsedSeconds).toBe(678);
+    expect(figures?.approxSeconds).toBe(1356);
+    expect(figures?.appliedSeconds).toBe(1356);
+  });
+
+  it("holds a participation that never closed open until the session ended", async () => {
+    // `participant_left` not delivered, or the sweep arriving before
+    // `closeOpenParticipations`. Dropping the row would shorten the window for
+    // exactly the person whose data is missing.
+    vi.mocked(prisma.mentorSession.findUnique).mockResolvedValue(
+      sessionRow({
+        attendeeCount: 1,
+        participations: [participation(null, { leftAt: null })],
+      }) as never
+    );
+
+    const figures = await computeSessionUsage("s1");
+    expect(figures?.elapsedSeconds).toBe(3600);
+    expect(figures?.approxSeconds).toBe(3600);
+  });
+
+  it("counts the rows rather than trusting a stale attendeeCount", async () => {
+    // `attendeeCount` is a denormalised count of these same rows. It can lag
+    // them; it cannot lead them.
+    vi.mocked(prisma.mentorSession.findUnique).mockResolvedValue(
+      sessionRow({
+        attendeeCount: 0,
+        participations: [participation(3600), participation(3600)],
+      }) as never
+    );
+
+    expect((await computeSessionUsage("s1"))?.attendeeCount).toBe(2);
+  });
+
+  it("returns zeros, not null, for a session nobody joined", async () => {
+    // Counted and it came to nothing. A `skipped` that says nothing is how this
+    // module hid its own failure for a week.
+    vi.mocked(prisma.mentorSession.findUnique).mockResolvedValue(
+      sessionRow({ attendeeCount: 0, participations: [] }) as never
+    );
+
+    const figures = await computeSessionUsage("s1");
+    expect(figures).toMatchObject({ exactSeconds: 0, approxSeconds: 0, elapsedSeconds: 0 });
+  });
+
+  it("returns null only when there is nothing to measure against", async () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
 
     vi.mocked(prisma.mentorSession.findUnique).mockResolvedValue(
       sessionRow({ endedAt: null }) as never
     );
     expect(await computeSessionUsage("s1")).toBeNull();
-  });
 
-  it("returns null when the end is not after the start", async () => {
-    vi.mocked(prisma.mentorSession.findUnique).mockResolvedValue(
-      sessionRow({ endedAt: AFTER_EPOCH }) as never
-    );
+    vi.mocked(prisma.mentorSession.findUnique).mockResolvedValue(null as never);
     expect(await computeSessionUsage("s1")).toBeNull();
+
+    // And says so. The empty table was the only symptom before.
+    expect(error).toHaveBeenCalledWith(
+      "[video-usage] not measurable",
+      expect.objectContaining({ sessionId: "s1", reason: "no_ended_at" })
+    );
+    expect(error).toHaveBeenCalledWith(
+      "[video-usage] not measurable",
+      expect.objectContaining({ sessionId: "s1", reason: "session_not_found" })
+    );
   });
 });
 
@@ -183,7 +288,15 @@ describe("the divergence monitor", () => {
   it("warns when the exact figure lands under half the approximation", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     vi.mocked(prisma.mentorSession.findUnique).mockResolvedValue(
-      sessionRow({ attendeeCount: 4, participations: [{ durationSeconds: 3600 }] }) as never
+      sessionRow({
+        attendeeCount: 4,
+        participations: [
+          participation(3600),
+          participation(null),
+          participation(null),
+          participation(null),
+        ],
+      }) as never
     );
 
     await computeSessionUsage("s1");
@@ -199,11 +312,7 @@ describe("the divergence monitor", () => {
     vi.mocked(prisma.mentorSession.findUnique).mockResolvedValue(
       sessionRow({
         attendeeCount: 3,
-        participations: [
-          { durationSeconds: 3600 },
-          { durationSeconds: 3000 },
-          { durationSeconds: 2400 },
-        ],
+        participations: [participation(3600), participation(3000), participation(2400)],
       }) as never
     );
 
@@ -218,7 +327,7 @@ describe("accrueSessionUsage", () => {
     vi.mocked(prisma.mentorSession.findUnique).mockResolvedValue(
       sessionRow({
         attendeeCount: 2,
-        participations: [{ durationSeconds: 3600 }],
+        participations: [participation(3600), participation(null)],
         ...overrides,
       }) as never
     );
@@ -260,6 +369,8 @@ describe("accrueSessionUsage", () => {
           basis: "approx",
           attendeeCount: 2,
           elapsedSeconds: 3600,
+          // The window comes from the participation rows. Nothing here was ever
+          // derived from `session.startedAt`, and now nothing can be.
         }),
       })
     );
@@ -306,7 +417,6 @@ describe("accrueSessionUsage", () => {
   it("skips a session that ended before the counter existed", async () => {
     // No backfill: the counter starts at zero and history is not swept in.
     mockSession({
-      startedAt: new Date(METERING_EPOCH.getTime() - 3 * 60 * 60 * 1000),
       endedAt: new Date(METERING_EPOCH.getTime() - 2 * 60 * 60 * 1000),
     });
 
@@ -324,16 +434,63 @@ describe("accrueSessionUsage", () => {
     expect(prisma.sessionUsageAccrual.create).not.toHaveBeenCalled();
   });
 
-  it("skips an unmeasurable session instead of accruing a zero", async () => {
-    // A zero row would claim the unique sessionId and block the real accrual
-    // that a later, successful end would produce.
-    mockSession({ startedAt: null });
+  it("accrues a session that was never marked live", async () => {
+    // The reported bug end to end: "vamos" closed COMPLETED with two
+    // participations carrying 673 and 678 seconds, and `session_usage_accruals`
+    // stayed empty because `startedAt` was NULL. It is not read any more.
+    const endedAt = new Date(AFTER_EPOCH.getTime() + HOUR_MS);
+    mockSession({
+      endedAt,
+      attendeeCount: 2,
+      participations: [
+        participation(673, { joinedAt: new Date(endedAt.getTime() - 678 * 1000), leftAt: endedAt }),
+        participation(678, { joinedAt: new Date(endedAt.getTime() - 678 * 1000), leftAt: endedAt }),
+      ],
+    });
+    vi.mocked(prisma.communityVideoUsage.findUnique).mockResolvedValue({ id: "usage-1" } as never);
+    vi.mocked(prisma.sessionUsageAccrual.create).mockResolvedValue({} as never);
+    vi.mocked(prisma.communityVideoUsage.update).mockResolvedValue({ usedSeconds: 1356 } as never);
+
+    const outcome = await accrueSessionUsage("s1");
+
+    expect(outcome).toMatchObject({ status: "accrued", appliedSeconds: 1356 });
+    expect(prisma.sessionUsageAccrual.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          sessionId: "s1",
+          exactSeconds: 1351,
+          approxSeconds: 1356,
+          elapsedSeconds: 678,
+          attendeeCount: 2,
+        }),
+      })
+    );
+  });
+
+  it("reports a session that has not ended as unmeasurable, not as pre-epoch", async () => {
+    // They shared a branch, so every unmeasurable session was reported as an
+    // intentional skip — and intentional skips are silent.
+    mockSession({ endedAt: null });
 
     expect(await accrueSessionUsage("s1")).toEqual({
       status: "skipped",
       reason: "not_measurable",
     });
     expect(prisma.sessionUsageAccrual.create).not.toHaveBeenCalled();
+  });
+
+  it("accrues a zero for a session nobody joined", async () => {
+    // The row is the record that this session has been counted. Leaving it out
+    // puts the session back in the sweep's queue on every run, for ever.
+    mockSession({ attendeeCount: 0, participations: [] });
+    vi.mocked(prisma.communityVideoUsage.findUnique).mockResolvedValue({ id: "usage-1" } as never);
+    vi.mocked(prisma.sessionUsageAccrual.create).mockResolvedValue({} as never);
+    vi.mocked(prisma.communityVideoUsage.update).mockResolvedValue({ usedSeconds: 0 } as never);
+
+    expect(await accrueSessionUsage("s1")).toMatchObject({
+      status: "accrued",
+      appliedSeconds: 0,
+    });
   });
 });
 
@@ -514,6 +671,117 @@ describe("the webhook identity lookup", () => {
     const source = code("lib/jobs/livekit-webhook.ts");
     expect(source).not.toMatch(/identity\.split\(/);
     expect(source).not.toMatch(/sessionId_userId/);
+  });
+});
+
+describe("a session that is not counted says so", () => {
+  /**
+   * The failure that hid the failure.
+   *
+   * `session_usage_accruals` was empty from the day it shipped and no log
+   * anywhere said why, because by this module's own lights nothing had gone
+   * wrong: `computeSessionUsage` returned null, `accrueSessionUsage` turned
+   * that into a `skipped` outcome, `meterCompletedSession` returned it to a
+   * caller that ignored return values, and the `try/catch` written to keep
+   * metering from breaking the room never fired — there was no exception to
+   * catch. An empty table was the entire symptom.
+   */
+  function endedSession(overrides: Record<string, unknown> = {}) {
+    vi.mocked(prisma.sessionParticipation.findMany).mockResolvedValue([] as never);
+    vi.mocked(prisma.mentorSession.findUnique).mockResolvedValue(
+      sessionRow({
+        attendeeCount: 2,
+        participations: [participation(3600), participation(3600)],
+        ...overrides,
+      }) as never
+    );
+    vi.mocked(prisma.community.findUnique).mockResolvedValue({ ownerId: "owner-1" } as never);
+    vi.mocked(prisma.subscription.findFirst).mockResolvedValue(null as never);
+  }
+
+  it("logs an error when a session ends and is not counted", async () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    endedSession({ communityId: null });
+
+    await meterCompletedSession("s1");
+
+    expect(error).toHaveBeenCalledWith(
+      "[video-usage] session ended without being counted",
+      expect.objectContaining({ sessionId: "s1", reason: "no_community" })
+    );
+  });
+
+  it("logs an error when the session cannot be measured", async () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    endedSession({ endedAt: null });
+
+    await meterCompletedSession("s1");
+
+    expect(error).toHaveBeenCalledWith(
+      "[video-usage] session ended without being counted",
+      expect.objectContaining({ sessionId: "s1", reason: "not_measurable" })
+    );
+  });
+
+  it("stays quiet about history, which is a decision and not a failure", async () => {
+    // The sweep re-reads every session that ended before the epoch on every
+    // run. Reporting those would bury the one line that matters.
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    endedSession({ endedAt: new Date(METERING_EPOCH.getTime() - HOUR_MS) });
+
+    await meterCompletedSession("s1");
+
+    expect(error).not.toHaveBeenCalled();
+  });
+
+  it("says what it counted when it does count", async () => {
+    const info = vi.spyOn(console, "info").mockImplementation(() => {});
+    endedSession();
+    vi.mocked(prisma.communityVideoUsage.findUnique).mockResolvedValue({ id: "usage-1" } as never);
+    vi.mocked(prisma.sessionUsageAccrual.create).mockResolvedValue({} as never);
+    vi.mocked(prisma.communityVideoUsage.update).mockResolvedValue({ usedSeconds: 7200 } as never);
+
+    await meterCompletedSession("s1");
+
+    expect(info).toHaveBeenCalledWith(
+      "[video-usage] accrued",
+      expect.objectContaining({ sessionId: "s1", appliedSeconds: 7200, usedSeconds: 7200 })
+    );
+  });
+
+  it("reports the exception it swallows", async () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.mocked(prisma.sessionParticipation.findMany).mockRejectedValue(new Error("db down"));
+
+    await meterCompletedSession("s1");
+
+    expect(error).toHaveBeenCalledWith(
+      "[video-usage] metering threw",
+      expect.objectContaining({ sessionId: "s1", error: "db down" })
+    );
+  });
+
+  it("routes the sweep's outcomes through the same log", () => {
+    // The backstop is the last word on a session, and it was the quietest
+    // place in the system: the outcome was read for the counter and dropped.
+    const source = code("lib/jobs/session-jobs.ts");
+    expect(source).toMatch(/logAccrualOutcome\(session\.id, outcome\)/);
+  });
+});
+
+describe("the window is measured from the participation rows", () => {
+  it("does not read session.startedAt at all", () => {
+    // Nothing in this product sets it — a session goes SCHEDULED to COMPLETED —
+    // so a window derived from it is null for every session that ever ran.
+    const source = code("lib/usage/video-usage.ts");
+    expect(source).not.toMatch(/startedAt/);
+  });
+
+  it("selects the two columns the window is built from", () => {
+    const source = code("lib/usage/video-usage.ts");
+    const select = source.slice(source.indexOf("export async function computeSessionUsage"));
+    expect(select).toMatch(/joinedAt: true/);
+    expect(select).toMatch(/leftAt: true/);
   });
 });
 
