@@ -38,6 +38,7 @@ import { SessionMode } from "./ModeSwitcher";
 import { SessionChat } from "./SessionChat";
 import { SessionNotesEditor } from "./SessionNotesEditor";
 import { ReactionsBar } from "./ReactionsBar";
+import { ReactionOverlay } from "./ReactionOverlay";
 import { LivePoll, PollCreator } from "@/components/live-session/LivePoll";
 import { useSessionDataChannel } from "@/hooks/useSessionDataChannel";
 import { useWhiteboardChannel } from "@/hooks/useWhiteboardChannel";
@@ -144,6 +145,8 @@ export function VideoRoomUI({
     createPoll,
     votePoll,
     closePoll,
+    reactions,
+    sendReaction,
     muteAll,
     muteAllSignal,
     invitedToSpeak,
@@ -480,7 +483,7 @@ export function VideoRoomUI({
             <>
               {/* Raise Hand */}
               <button
-                onClick={toggleRaiseHand}
+                onClick={() => void toggleRaiseHand()}
                 className={cn(
                   "flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
                   hasRaisedHand
@@ -604,8 +607,10 @@ export function VideoRoomUI({
             </div>
           )}
 
-          {/* Stage */}
-          <div className="min-h-0 flex-1 p-4">
+          {/* Stage. `relative` because the reaction overlay floats over it —
+              a reaction should interrupt nobody's place in what they are
+              watching. */}
+          <div className="relative min-h-0 flex-1 p-4">
             {/*
               `stageMode` is this viewer's own choice and nothing more. The
               screen-share branch used to be forced from here with
@@ -622,6 +627,8 @@ export function VideoRoomUI({
               isHost={isHost}
               whiteboard={whiteboard}
             />
+
+            <ReactionOverlay reactions={reactions} />
           </div>
 
           {/* Chat Panel (below stage on desktop, or replace stage on mobile) */}
@@ -955,7 +962,7 @@ export function VideoRoomUI({
             </button>
             {showReactions && (
               <div className="absolute bottom-full left-1/2 mb-2 -translate-x-1/2">
-                <ReactionsBar />
+                <ReactionsBar onReact={(emoji, label) => void sendReaction(emoji, label)} />
               </div>
             )}
           </div>

@@ -308,16 +308,35 @@ describe("the whiteboard asks when it can be heard", () => {
   });
 });
 
-describe("every data publish goes through the same gate", () => {
-  it.each([
-    ["hooks/useWhiteboardChannel.ts"],
-    ["hooks/useSessionDataChannel.ts"],
-    ["components/sessions/ReactionsBar.tsx"],
-  ])("%s checks the transport before publishing", (file) => {
-    const source = code(file);
-    const gate = source.indexOf("isDataTransportReady(room)");
-    const publish = source.indexOf("publishData(");
-    expect(gate).toBeGreaterThan(-1);
-    expect(publish).toBeGreaterThan(gate);
+describe("every data publish goes through the transport, by the right door", () => {
+  /**
+   * There are two doors and picking the wrong one is a bug either way.
+   *
+   * An automatic stream drops what it cannot send right now, because it has a
+   * next tick. A person pressing a button has no next tick, so that one waits.
+   * Shipping the drop for both is what silenced the audience's reactions and
+   * raised hands; shipping the wait for both would queue stale strokes and
+   * replay them when a blip ends.
+   */
+  it("drops for the whiteboard, which re-sends on its next tick", () => {
+    const source = code("hooks/useWhiteboardChannel.ts");
+    expect(source).toMatch(/if \(!isDataTransportReady\(room\)\) return false;/);
+    expect(source).not.toMatch(/publishWhenReady/);
+  });
+
+  it("waits for anything a person pressed", () => {
+    const source = code("hooks/useSessionDataChannel.ts");
+    expect(source).toMatch(/await publishWhenReady\(/);
+    // The drop is what made a reaction do nothing and a hand reach nobody.
+    expect(source).not.toMatch(/isDataTransportReady/);
+  });
+
+  it("keeps the data channel behind one hook rather than per-component", () => {
+    // `ReactionsBar` used to reach for the room and publish on its own, which
+    // is how it ended up with its own idea of when the transport was usable.
+    const bar = code("components/sessions/ReactionsBar.tsx");
+    expect(bar).not.toMatch(/publishData\(/);
+    expect(bar).not.toMatch(/useRoomContext/);
+    expect(bar).toMatch(/onReact\(/);
   });
 });

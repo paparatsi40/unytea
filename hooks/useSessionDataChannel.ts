@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRoomContext } from "@livekit/components-react";
 import { RoomEvent, RemoteParticipant } from "livekit-client";
-import { isDataTransportReady } from "@/lib/livekit/data-transport";
+import { publishWhenReady } from "@/lib/livekit/data-transport";
 
 // ── Event types sent over LiveKit data channel ──────────────────────────
 export type DataChannelEvent =
@@ -35,6 +35,31 @@ export interface RaisedHand {
   timestamp: number;
 }
 
+/**
+ * A reaction currently on screen.
+ *
+ * There was no such thing until now. `ReactionsBar` published a `reaction`
+ * packet and the handler below answered it with `case "reaction": break;`,
+ * under a comment saying reactions were "handled by ReactionsBar already" —
+ * which was never true: that component only ever sent. So every reaction anyone
+ * has ever pressed, host or member, went onto the wire and was displayed by
+ * nobody. This is the half that was missing.
+ */
+export interface RoomReaction {
+  id: string;
+  emoji: string;
+  label: string;
+  from: string;
+  timestamp: number;
+}
+
+/** How long a reaction stays on screen. Long enough to read, short enough to
+ * not become clutter when several arrive at once. */
+export const REACTION_TTL_MS = 4000;
+
+/** Nothing on screen past this, so a burst cannot grow without bound. */
+const MAX_VISIBLE_REACTIONS = 12;
+
 export interface ActivePoll {
   id: string;
   question: string;
@@ -62,27 +87,50 @@ export function useSessionDataChannel() {
   const [activePolls, setActivePolls] = useState<ActivePoll[]>([]);
   const [invitedToSpeak, setInvitedToSpeak] = useState(false);
   const [muteAllSignal, setMuteAllSignal] = useState(0); // increment to trigger
+  const [reactions, setReactions] = useState<RoomReaction[]>([]);
   const decoder = useRef(new TextDecoder());
   const encoder = useRef(new TextEncoder());
 
+  /** Ids for on-screen reactions. A counter, because two people can react in
+   * the same millisecond and a timestamp would collide. */
+  const reactionSeq = useRef(0);
+  /** Every pending expiry, so unmounting does not leave timers setting state
+   * on a component that is gone. */
+  const reactionTimers = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
+
+  const showReaction = useCallback((reaction: Omit<RoomReaction, "id">) => {
+    const id = `reaction-${reactionSeq.current++}`;
+    setReactions((prev) => [...prev, { ...reaction, id }].slice(-MAX_VISIBLE_REACTIONS));
+
+    const timer = setTimeout(() => {
+      reactionTimers.current.delete(timer);
+      setReactions((prev) => prev.filter((r) => r.id !== id));
+    }, REACTION_TTL_MS);
+    reactionTimers.current.add(timer);
+  }, []);
+
+  useEffect(() => {
+    const timers = reactionTimers.current;
+    return () => {
+      for (const timer of timers) clearTimeout(timer);
+      timers.clear();
+    };
+  }, []);
+
   // ── Publish helper ──────────────────────────────────────────────────
   const publish = useCallback(
-    async (event: DataChannelEvent) => {
-      // Hands, votes and reactions all come from a click, so the room is
-      // normally long connected by now — but a reconnect is exactly when
-      // someone hammers the button, and `publishData` rejects rather than
-      // queues while the engine has no peer connection.
-      if (!isDataTransportReady(room)) {
-        console.warn("[DataChannel] Dropped, transport not ready:", event.type);
-        return;
+    async (event: DataChannelEvent): Promise<boolean> => {
+      // Everything on this channel comes from someone pressing something, so
+      // there is no next tick to retry on. A member presses within seconds of
+      // arriving — the window where the engine has no peer connection yet — so
+      // this waits for the transport instead of throwing the packet away.
+      const sent = await publishWhenReady(room, encoder.current.encode(JSON.stringify(event)), {
+        reliable: true,
+      });
+      if (!sent) {
+        console.warn("[DataChannel] Not sent, transport unavailable:", event.type);
       }
-
-      try {
-        const data = encoder.current.encode(JSON.stringify(event));
-        await room.localParticipant.publishData(data, { reliable: true });
-      } catch (err) {
-        console.error("[DataChannel] Failed to publish:", err);
-      }
+      return sent;
     },
     [room]
   );
@@ -201,10 +249,20 @@ export function useSessionDataChannel() {
             break;
           }
 
-          // Reactions are handled by ReactionsBar already, but we can
-          // listen here too for future overlay features
-          case "reaction":
+          case "reaction": {
+            // Someone else's reaction. Your own is shown when you send it —
+            // LiveKit does not echo a packet back to its publisher.
+            // Both fields come from another participant and are rendered, so
+            // they are trimmed to something an emoji fits in. Nothing else on
+            // this channel is drawn straight from a peer.
+            showReaction({
+              emoji: String(event.emoji ?? "").slice(0, 8),
+              label: String(event.label ?? "").slice(0, 32),
+              from: event.from,
+              timestamp: event.timestamp,
+            });
             break;
+          }
         }
       } catch (err) {
         // Silently ignore non-JSON payloads (e.g. LiveKit internal data)
@@ -215,7 +273,7 @@ export function useSessionDataChannel() {
     return () => {
       room.off(RoomEvent.DataReceived, handleData);
     };
-  }, [room]);
+  }, [room, showReaction]);
 
   // Clean up hands when participants leave
   useEffect(() => {
@@ -231,7 +289,7 @@ export function useSessionDataChannel() {
 
   // ── Actions ─────────────────────────────────────────────────────────
 
-  const toggleRaiseHand = useCallback(() => {
+  const toggleRaiseHand = useCallback(async () => {
     const newState = !hasRaisedHand;
     setHasRaisedHand(newState);
 
@@ -258,8 +316,45 @@ export function useSessionDataChannel() {
       setRaisedHands((prev) => prev.filter((h) => h.identity !== room.localParticipant.identity));
     }
 
-    publish(event);
+    // Optimistic, but not a lie: if the packet never left, put the button back
+    // the way it was. A hand that reads "raised" while the host's queue is
+    // empty is the worst of both — the member waits, and nobody is coming.
+    const sent = await publish(event);
+    if (sent) return;
+
+    setHasRaisedHand(!newState);
+    if (newState) {
+      setRaisedHands((prev) => prev.filter((h) => h.identity !== room.localParticipant.identity));
+    }
   }, [hasRaisedHand, room, publish]);
+
+  /**
+   * Send a reaction, and show your own.
+   *
+   * The publish used to live in `ReactionsBar`, reaching for the room context
+   * on its own. It moved here because this hook is the room's data channel:
+   * one place that knows how a packet is sent and what happens when it cannot
+   * be. `ReactionsBar` is the row of buttons.
+   */
+  const sendReaction = useCallback(
+    async (emoji: string, label: string) => {
+      const event: DataChannelEvent = {
+        type: "reaction",
+        emoji,
+        label,
+        from: room.localParticipant.identity,
+        timestamp: Date.now(),
+      };
+
+      // Shown only once it is really on the wire. Floating an emoji that the
+      // room never received is the same lie as the raised hand above.
+      const sent = await publish(event);
+      if (!sent) return;
+
+      showReaction({ emoji, label, from: event.from, timestamp: event.timestamp });
+    },
+    [room, publish, showReaction]
+  );
 
   const inviteSpeaker = useCallback(
     (identity: string) => {
@@ -391,6 +486,10 @@ export function useSessionDataChannel() {
     createPoll,
     votePoll,
     closePoll,
+
+    // Reactions
+    reactions,
+    sendReaction,
 
     // Moderation
     muteAll,
