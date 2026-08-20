@@ -118,7 +118,11 @@ describe("searchGlobal — community visibility scope (H1)", () => {
     // The same private community is foreign to this caller and their own to the first.
     expect(admits(clause, ownPrivateCommunity)).toBe(false);
     expect(
-      admits(clause, { id: "c", isPrivate: true, members: [{ userId: "other_user", status: "ACTIVE" }] })
+      admits(clause, {
+        id: "c",
+        isPrivate: true,
+        members: [{ userId: "other_user", status: "ACTIVE" }],
+      })
     ).toBe(true);
   });
 

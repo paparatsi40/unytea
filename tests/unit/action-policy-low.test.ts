@@ -95,9 +95,9 @@ describe("L1 — channel provisioning is an admin operation", () => {
 
   it.each(["MODERATOR", "ADMIN", "OWNER"] as const)("admits a %s", async (role) => {
     memberOf(role);
-    vi.mocked(prisma.channel.findMany).mockResolvedValueOnce([]).mockResolvedValueOnce([
-      { id: "ch_1", name: "General" },
-    ] as never);
+    vi.mocked(prisma.channel.findMany)
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([{ id: "ch_1", name: "General" }] as never);
 
     const result = await provisionDefaultChannels(COMMUNITY);
 

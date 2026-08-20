@@ -110,10 +110,7 @@ export const getReports = defineAction(
   {
     name: "getReports",
     auth: "admin",
-    args: [
-      z.string().min(1).max(64),
-      z.nativeEnum(ReportStatus).optional(),
-    ],
+    args: [z.string().min(1).max(64), z.nativeEnum(ReportStatus).optional()],
     community: ([communityId]) => communityId,
     roles: ["OWNER", "ADMIN", "MODERATOR"],
     allowPlatformAdmin: true,

@@ -63,78 +63,29 @@ export const getOrCreateConversation = defineAction(
     rateLimit: "create",
   },
   async (ctx, otherUserId: string, communityId: string) => {
-  try {
+    try {
+      const currentUserId = ctx.userId;
 
-    const currentUserId = ctx.userId;
+      if (currentUserId === otherUserId) {
+        return { success: false, error: "Cannot message yourself" };
+      }
 
-    if (currentUserId === otherUserId) {
-      return { success: false, error: "Cannot message yourself" };
-    }
+      const canMessage = await canUsersDirectMessage(currentUserId, otherUserId, communityId);
+      if (!canMessage) {
+        return {
+          success: false,
+          error: "Direct messages are only allowed between a community host and its members.",
+        };
+      }
 
-    const canMessage = await canUsersDirectMessage(currentUserId, otherUserId, communityId);
-    if (!canMessage) {
-      return {
-        success: false,
-        error: "Direct messages are only allowed between a community host and its members.",
-      };
-    }
+      // Sort user IDs to ensure consistent conversation lookup
+      const [participant1Id, participant2Id] = [currentUserId, otherUserId].sort();
 
-    // Sort user IDs to ensure consistent conversation lookup
-    const [participant1Id, participant2Id] = [currentUserId, otherUserId].sort();
-
-    // Try to find existing conversation
-    let conversation = await prisma.conversation.findFirst({
-      where: {
-        participant1Id,
-        participant2Id,
-      },
-      include: {
-        participant1: {
-          select: {
-            id: true,
-            name: true,
-            firstName: true,
-            lastName: true,
-            username: true,
-            image: true,
-          },
-        },
-        participant2: {
-          select: {
-            id: true,
-            name: true,
-            firstName: true,
-            lastName: true,
-            username: true,
-            image: true,
-          },
-        },
-        messages: {
-          take: 50,
-          orderBy: { createdAt: "desc" },
-          include: {
-            sender: {
-              select: {
-                id: true,
-                name: true,
-                firstName: true,
-                lastName: true,
-                username: true,
-                image: true,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    // Create conversation if it doesn't exist
-    if (!conversation) {
-      conversation = await prisma.conversation.create({
-        data: {
+      // Try to find existing conversation
+      let conversation = await prisma.conversation.findFirst({
+        where: {
           participant1Id,
           participant2Id,
-          lastMessageAt: new Date(),
         },
         include: {
           participant1: {
@@ -158,6 +109,8 @@ export const getOrCreateConversation = defineAction(
             },
           },
           messages: {
+            take: 50,
+            orderBy: { createdAt: "desc" },
             include: {
               sender: {
                 select: {
@@ -173,14 +126,60 @@ export const getOrCreateConversation = defineAction(
           },
         },
       });
-    }
 
-    return { success: true, conversation };
-  } catch (error) {
-    console.error("Error getting/creating conversation:", error);
-    return { success: false, error: "Failed to get conversation" };
+      // Create conversation if it doesn't exist
+      if (!conversation) {
+        conversation = await prisma.conversation.create({
+          data: {
+            participant1Id,
+            participant2Id,
+            lastMessageAt: new Date(),
+          },
+          include: {
+            participant1: {
+              select: {
+                id: true,
+                name: true,
+                firstName: true,
+                lastName: true,
+                username: true,
+                image: true,
+              },
+            },
+            participant2: {
+              select: {
+                id: true,
+                name: true,
+                firstName: true,
+                lastName: true,
+                username: true,
+                image: true,
+              },
+            },
+            messages: {
+              include: {
+                sender: {
+                  select: {
+                    id: true,
+                    name: true,
+                    firstName: true,
+                    lastName: true,
+                    username: true,
+                    image: true,
+                  },
+                },
+              },
+            },
+          },
+        });
+      }
+
+      return { success: true, conversation };
+    } catch (error) {
+      console.error("Error getting/creating conversation:", error);
+      return { success: false, error: "Failed to get conversation" };
+    }
   }
-}
 );
 
 /**
@@ -194,95 +193,94 @@ export const sendMessage = defineAction(
     rateLimit: "message",
   },
   async (ctx, conversationId: string, content: string, attachments?: string[]) => {
-  try {
+    try {
+      const currentUserId = ctx.userId;
 
-    const currentUserId = ctx.userId;
+      // Verify user is part of conversation
+      const conversation = await prisma.conversation.findFirst({
+        where: {
+          id: conversationId,
+          OR: [{ participant1Id: currentUserId }, { participant2Id: currentUserId }],
+        },
+      });
 
-    // Verify user is part of conversation
-    const conversation = await prisma.conversation.findFirst({
-      where: {
-        id: conversationId,
-        OR: [{ participant1Id: currentUserId }, { participant2Id: currentUserId }],
-      },
-    });
+      if (!conversation) {
+        return { success: false, error: "Conversation not found" };
+      }
 
-    if (!conversation) {
-      return { success: false, error: "Conversation not found" };
-    }
+      // Check if conversation is blocked
+      if (conversation.isBlocked) {
+        return { success: false, error: "This conversation is blocked" };
+      }
 
-    // Check if conversation is blocked
-    if (conversation.isBlocked) {
-      return { success: false, error: "This conversation is blocked" };
-    }
+      // Determine receiver
+      const receiverId =
+        conversation.participant1Id === currentUserId
+          ? conversation.participant2Id
+          : conversation.participant1Id;
 
-    // Determine receiver
-    const receiverId =
-      conversation.participant1Id === currentUserId
-        ? conversation.participant2Id
-        : conversation.participant1Id;
-
-    // Create message
-    const message = await prisma.directMessage.create({
-      data: {
-        content,
-        senderId: currentUserId,
-        receiverId,
-        conversationId,
-        attachments: attachments ? JSON.stringify(attachments) : undefined,
-        isRead: false,
-        readAt: null,
-      },
-      include: {
-        sender: {
-          select: {
-            id: true,
-            name: true,
-            firstName: true,
-            lastName: true,
-            username: true,
-            image: true,
+      // Create message
+      const message = await prisma.directMessage.create({
+        data: {
+          content,
+          senderId: currentUserId,
+          receiverId,
+          conversationId,
+          attachments: attachments ? JSON.stringify(attachments) : undefined,
+          isRead: false,
+          readAt: null,
+        },
+        include: {
+          sender: {
+            select: {
+              id: true,
+              name: true,
+              firstName: true,
+              lastName: true,
+              username: true,
+              image: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    // Update conversation's lastMessageAt
-    await prisma.conversation.update({
-      where: { id: conversationId },
-      data: { lastMessageAt: new Date() },
-    });
+      // Update conversation's lastMessageAt
+      await prisma.conversation.update({
+        where: { id: conversationId },
+        data: { lastMessageAt: new Date() },
+      });
 
-    // Create notification for receiver
-    await prisma.notification.create({
-      data: {
-        userId: receiverId,
-        type: "MESSAGE",
-        title: "New message",
-        message: `${message.sender.firstName || message.sender.name} sent you a message`,
+      // Create notification for receiver
+      await prisma.notification.create({
         data: {
-          conversationId,
-          messageId: message.id,
-          senderId: currentUserId,
+          userId: receiverId,
+          type: "MESSAGE",
+          title: "New message",
+          message: `${message.sender.firstName || message.sender.name} sent you a message`,
+          data: {
+            conversationId,
+            messageId: message.id,
+            senderId: currentUserId,
+          },
         },
-      },
-    });
+      });
 
-    await emitRealtime(conversationId, "message", {
-      id: message.id,
-      content: message.content,
-      senderId: currentUserId,
-      senderName: message.sender.firstName || message.sender.name || "User",
-      timestamp: message.createdAt.toISOString(),
-      conversationId,
-    });
+      await emitRealtime(conversationId, "message", {
+        id: message.id,
+        content: message.content,
+        senderId: currentUserId,
+        senderName: message.sender.firstName || message.sender.name || "User",
+        timestamp: message.createdAt.toISOString(),
+        conversationId,
+      });
 
-    revalidatePath("/dashboard/messages");
-    return { success: true, message };
-  } catch (error) {
-    console.error("Error sending message:", error);
-    return { success: false, error: "Failed to send message" };
+      revalidatePath("/dashboard/messages");
+      return { success: true, message };
+    } catch (error) {
+      console.error("Error sending message:", error);
+      return { success: false, error: "Failed to send message" };
+    }
   }
-}
 );
 
 /**
@@ -295,29 +293,28 @@ export const markMessagesAsRead = defineAction(
     args: [z.string().min(1).max(64)],
   },
   async (ctx, conversationId: string) => {
-  try {
+    try {
+      const currentUserId = ctx.userId;
 
-    const currentUserId = ctx.userId;
+      await prisma.directMessage.updateMany({
+        where: {
+          conversationId,
+          receiverId: currentUserId,
+          readAt: null,
+        },
+        data: {
+          isRead: true,
+          readAt: new Date(),
+        },
+      });
 
-    await prisma.directMessage.updateMany({
-      where: {
-        conversationId,
-        receiverId: currentUserId,
-        readAt: null,
-      },
-      data: {
-        isRead: true,
-        readAt: new Date(),
-      },
-    });
-
-    revalidatePath("/dashboard/messages");
-    return { success: true };
-  } catch (error) {
-    console.error("Error marking messages as read:", error);
-    return { success: false, error: "Failed to mark messages as read" };
+      revalidatePath("/dashboard/messages");
+      return { success: true };
+    } catch (error) {
+      console.error("Error marking messages as read:", error);
+      return { success: false, error: "Failed to mark messages as read" };
+    }
   }
-}
 );
 
 /**
@@ -330,115 +327,118 @@ export const getUserConversations = defineAction(
     args: [],
   },
   async (ctx) => {
-  try {
+    try {
+      const currentUserId = ctx.userId;
 
-    const currentUserId = ctx.userId;
-
-    const conversations = await prisma.conversation.findMany({
-      where: {
-        OR: [{ participant1Id: currentUserId }, { participant2Id: currentUserId }],
-      },
-      include: {
-        participant1: {
-          select: {
-            id: true,
-            name: true,
-            firstName: true,
-            lastName: true,
-            username: true,
-            image: true,
-          },
+      const conversations = await prisma.conversation.findMany({
+        where: {
+          OR: [{ participant1Id: currentUserId }, { participant2Id: currentUserId }],
         },
-        participant2: {
-          select: {
-            id: true,
-            name: true,
-            firstName: true,
-            lastName: true,
-            username: true,
-            image: true,
+        include: {
+          participant1: {
+            select: {
+              id: true,
+              name: true,
+              firstName: true,
+              lastName: true,
+              username: true,
+              image: true,
+            },
           },
-        },
-        messages: {
-          take: 1,
-          orderBy: { createdAt: "desc" },
-          include: {
-            sender: {
-              select: {
-                id: true,
-                name: true,
-                firstName: true,
-                lastName: true,
-                username: true,
-                image: true,
+          participant2: {
+            select: {
+              id: true,
+              name: true,
+              firstName: true,
+              lastName: true,
+              username: true,
+              image: true,
+            },
+          },
+          messages: {
+            take: 1,
+            orderBy: { createdAt: "desc" },
+            include: {
+              sender: {
+                select: {
+                  id: true,
+                  name: true,
+                  firstName: true,
+                  lastName: true,
+                  username: true,
+                  image: true,
+                },
+              },
+            },
+          },
+          _count: {
+            select: {
+              messages: {
+                where: {
+                  receiverId: currentUserId,
+                  readAt: null,
+                },
               },
             },
           },
         },
-        _count: {
-          select: {
-            messages: {
-              where: {
-                receiverId: currentUserId,
-                readAt: null,
-              },
-            },
-          },
+        orderBy: {
+          lastMessageAt: "desc",
         },
-      },
-      orderBy: {
-        lastMessageAt: "desc",
-      },
-    });
-
-    // PD V1 §5 Cat B defense-in-depth: hide legacy member↔member conversations
-    // from the inbox. Auth gate prevents creation post-Phase 3.3, but any
-    // pre-existing pair where neither participant is OWNER of a shared
-    // community is filtered out here too. Pre-launch (0 real users) makes
-    // the cost of in-memory filter negligible.
-    const otherUserIds = conversations.map((c) =>
-      c.participant1Id === currentUserId ? c.participant2Id : c.participant1Id
-    );
-
-    if (otherUserIds.length === 0) {
-      return { success: true, conversations };
-    }
-
-    const [myMemberships, otherMemberships] = await Promise.all([
-      prisma.member.findMany({
-        where: { userId: currentUserId, status: "ACTIVE" },
-        select: { communityId: true, role: true },
-      }),
-      prisma.member.findMany({
-        where: { userId: { in: otherUserIds }, status: "ACTIVE" },
-        select: { userId: true, communityId: true, role: true },
-      }),
-    ]);
-
-    const myRoleByCommunity = new Map(myMemberships.map((m) => [m.communityId, m.role]));
-    const otherMembershipsByUser = new Map<string, Array<{ communityId: string; role: string }>>();
-    for (const om of otherMemberships) {
-      const list = otherMembershipsByUser.get(om.userId) ?? [];
-      list.push({ communityId: om.communityId, role: om.role });
-      otherMembershipsByUser.set(om.userId, list);
-    }
-
-    const filteredConversations = conversations.filter((c) => {
-      const otherUserId = c.participant1Id === currentUserId ? c.participant2Id : c.participant1Id;
-      const others = otherMembershipsByUser.get(otherUserId) ?? [];
-      return others.some((om) => {
-        const myRole = myRoleByCommunity.get(om.communityId);
-        if (!myRole) return false;
-        return (myRole === "OWNER") !== (om.role === "OWNER");
       });
-    });
 
-    return { success: true, conversations: filteredConversations };
-  } catch (error) {
-    console.error("Error getting conversations:", error);
-    return { success: false, error: "Failed to get conversations" };
+      // PD V1 §5 Cat B defense-in-depth: hide legacy member↔member conversations
+      // from the inbox. Auth gate prevents creation post-Phase 3.3, but any
+      // pre-existing pair where neither participant is OWNER of a shared
+      // community is filtered out here too. Pre-launch (0 real users) makes
+      // the cost of in-memory filter negligible.
+      const otherUserIds = conversations.map((c) =>
+        c.participant1Id === currentUserId ? c.participant2Id : c.participant1Id
+      );
+
+      if (otherUserIds.length === 0) {
+        return { success: true, conversations };
+      }
+
+      const [myMemberships, otherMemberships] = await Promise.all([
+        prisma.member.findMany({
+          where: { userId: currentUserId, status: "ACTIVE" },
+          select: { communityId: true, role: true },
+        }),
+        prisma.member.findMany({
+          where: { userId: { in: otherUserIds }, status: "ACTIVE" },
+          select: { userId: true, communityId: true, role: true },
+        }),
+      ]);
+
+      const myRoleByCommunity = new Map(myMemberships.map((m) => [m.communityId, m.role]));
+      const otherMembershipsByUser = new Map<
+        string,
+        Array<{ communityId: string; role: string }>
+      >();
+      for (const om of otherMemberships) {
+        const list = otherMembershipsByUser.get(om.userId) ?? [];
+        list.push({ communityId: om.communityId, role: om.role });
+        otherMembershipsByUser.set(om.userId, list);
+      }
+
+      const filteredConversations = conversations.filter((c) => {
+        const otherUserId =
+          c.participant1Id === currentUserId ? c.participant2Id : c.participant1Id;
+        const others = otherMembershipsByUser.get(otherUserId) ?? [];
+        return others.some((om) => {
+          const myRole = myRoleByCommunity.get(om.communityId);
+          if (!myRole) return false;
+          return (myRole === "OWNER") !== (om.role === "OWNER");
+        });
+      });
+
+      return { success: true, conversations: filteredConversations };
+    } catch (error) {
+      console.error("Error getting conversations:", error);
+      return { success: false, error: "Failed to get conversations" };
+    }
   }
-}
 );
 
 /**
@@ -451,55 +451,54 @@ export const getSharedMessageContext = defineAction(
     args: [z.string().min(1).max(64)],
   },
   async (ctx, otherUserId: string) => {
-  try {
+    try {
+      const currentUserId = ctx.userId;
 
-    const currentUserId = ctx.userId;
+      if (!otherUserId || otherUserId === currentUserId) {
+        return { success: true, sharedCommunities: [] };
+      }
 
-    if (!otherUserId || otherUserId === currentUserId) {
-      return { success: true, sharedCommunities: [] };
-    }
+      const currentMemberships = await prisma.member.findMany({
+        where: {
+          userId: currentUserId,
+          status: "ACTIVE",
+        },
+        select: { communityId: true },
+      });
 
-    const currentMemberships = await prisma.member.findMany({
-      where: {
-        userId: currentUserId,
-        status: "ACTIVE",
-      },
-      select: { communityId: true },
-    });
+      const currentCommunityIds = currentMemberships.map((membership) => membership.communityId);
+      if (currentCommunityIds.length === 0) {
+        return { success: true, sharedCommunities: [] };
+      }
 
-    const currentCommunityIds = currentMemberships.map((membership) => membership.communityId);
-    if (currentCommunityIds.length === 0) {
-      return { success: true, sharedCommunities: [] };
-    }
-
-    const sharedMemberships = await prisma.member.findMany({
-      where: {
-        userId: otherUserId,
-        status: "ACTIVE",
-        communityId: { in: currentCommunityIds },
-      },
-      include: {
-        community: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
+      const sharedMemberships = await prisma.member.findMany({
+        where: {
+          userId: otherUserId,
+          status: "ACTIVE",
+          communityId: { in: currentCommunityIds },
+        },
+        include: {
+          community: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+            },
           },
         },
-      },
-      take: 5,
-      orderBy: { updatedAt: "desc" },
-    });
+        take: 5,
+        orderBy: { updatedAt: "desc" },
+      });
 
-    return {
-      success: true,
-      sharedCommunities: sharedMemberships.map((membership) => membership.community),
-    };
-  } catch (error) {
-    console.error("Error getting shared message context:", error);
-    return { success: false, error: "Failed to load shared communities" };
+      return {
+        success: true,
+        sharedCommunities: sharedMemberships.map((membership) => membership.community),
+      };
+    } catch (error) {
+      console.error("Error getting shared message context:", error);
+      return { success: false, error: "Failed to load shared communities" };
+    }
   }
-}
 );
 
 /**
@@ -512,59 +511,58 @@ export const getConversationMessages = defineAction(
     args: [z.string().min(1).max(64), z.string().min(1).max(64).optional()],
   },
   async (ctx, conversationId: string, cursor?: string) => {
-  try {
+    try {
+      const currentUserId = ctx.userId;
 
-    const currentUserId = ctx.userId;
+      // Verify user is part of conversation
+      const conversation = await prisma.conversation.findFirst({
+        where: {
+          id: conversationId,
+          OR: [{ participant1Id: currentUserId }, { participant2Id: currentUserId }],
+        },
+      });
 
-    // Verify user is part of conversation
-    const conversation = await prisma.conversation.findFirst({
-      where: {
-        id: conversationId,
-        OR: [{ participant1Id: currentUserId }, { participant2Id: currentUserId }],
-      },
-    });
+      if (!conversation) {
+        return { success: false, error: "Conversation not found" };
+      }
 
-    if (!conversation) {
-      return { success: false, error: "Conversation not found" };
-    }
-
-    const messages = await prisma.directMessage.findMany({
-      where: {
-        conversationId,
-      },
-      take: 50,
-      ...(cursor && {
-        skip: 1,
-        cursor: { id: cursor },
-      }),
-      orderBy: {
-        createdAt: "desc",
-      },
-      include: {
-        sender: {
-          select: {
-            id: true,
-            name: true,
-            firstName: true,
-            lastName: true,
-            username: true,
-            image: true,
+      const messages = await prisma.directMessage.findMany({
+        where: {
+          conversationId,
+        },
+        take: 50,
+        ...(cursor && {
+          skip: 1,
+          cursor: { id: cursor },
+        }),
+        orderBy: {
+          createdAt: "desc",
+        },
+        include: {
+          sender: {
+            select: {
+              id: true,
+              name: true,
+              firstName: true,
+              lastName: true,
+              username: true,
+              image: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    return {
-      success: true,
-      messages: messages.reverse(), // Return in chronological order
-      hasMore: messages.length === 50,
-      nextCursor: messages.length > 0 ? messages[0].id : null,
-    };
-  } catch (error) {
-    console.error("Error getting messages:", error);
-    return { success: false, error: "Failed to get messages" };
+      return {
+        success: true,
+        messages: messages.reverse(), // Return in chronological order
+        hasMore: messages.length === 50,
+        nextCursor: messages.length > 0 ? messages[0].id : null,
+      };
+    } catch (error) {
+      console.error("Error getting messages:", error);
+      return { success: false, error: "Failed to get messages" };
+    }
   }
-}
 );
 
 /**
@@ -577,34 +575,33 @@ export const deleteMessage = defineAction(
     args: [z.string().min(1).max(64)],
   },
   async (ctx, messageId: string) => {
-  try {
+    try {
+      const currentUserId = ctx.userId;
 
-    const currentUserId = ctx.userId;
+      // Verify user is the sender
+      const message = await prisma.directMessage.findUnique({
+        where: { id: messageId },
+      });
 
-    // Verify user is the sender
-    const message = await prisma.directMessage.findUnique({
-      where: { id: messageId },
-    });
+      if (!message) {
+        return { success: false, error: "Message not found" };
+      }
 
-    if (!message) {
-      return { success: false, error: "Message not found" };
+      if (message.senderId !== currentUserId) {
+        return { success: false, error: "Not authorized to delete this message" };
+      }
+
+      await prisma.directMessage.delete({
+        where: { id: messageId },
+      });
+
+      revalidatePath("/dashboard/messages");
+      return { success: true };
+    } catch (error) {
+      console.error("Error deleting message:", error);
+      return { success: false, error: "Failed to delete message" };
     }
-
-    if (message.senderId !== currentUserId) {
-      return { success: false, error: "Not authorized to delete this message" };
-    }
-
-    await prisma.directMessage.delete({
-      where: { id: messageId },
-    });
-
-    revalidatePath("/dashboard/messages");
-    return { success: true };
-  } catch (error) {
-    console.error("Error deleting message:", error);
-    return { success: false, error: "Failed to delete message" };
   }
-}
 );
 
 /**
@@ -617,36 +614,35 @@ export const toggleBlockConversation = defineAction(
     args: [z.string().min(1).max(64)],
   },
   async (ctx, conversationId: string) => {
-  try {
+    try {
+      const currentUserId = ctx.userId;
 
-    const currentUserId = ctx.userId;
+      const conversation = await prisma.conversation.findFirst({
+        where: {
+          id: conversationId,
+          OR: [{ participant1Id: currentUserId }, { participant2Id: currentUserId }],
+        },
+      });
 
-    const conversation = await prisma.conversation.findFirst({
-      where: {
-        id: conversationId,
-        OR: [{ participant1Id: currentUserId }, { participant2Id: currentUserId }],
-      },
-    });
+      if (!conversation) {
+        return { success: false, error: "Conversation not found" };
+      }
 
-    if (!conversation) {
-      return { success: false, error: "Conversation not found" };
+      const isCurrentlyBlocked = conversation.isBlocked && conversation.blockedBy === currentUserId;
+
+      await prisma.conversation.update({
+        where: { id: conversationId },
+        data: {
+          isBlocked: !isCurrentlyBlocked,
+          blockedBy: !isCurrentlyBlocked ? currentUserId : null,
+        },
+      });
+
+      revalidatePath("/dashboard/messages");
+      return { success: true, isBlocked: !isCurrentlyBlocked };
+    } catch (error) {
+      console.error("Error toggling block:", error);
+      return { success: false, error: "Failed to update block status" };
     }
-
-    const isCurrentlyBlocked = conversation.isBlocked && conversation.blockedBy === currentUserId;
-
-    await prisma.conversation.update({
-      where: { id: conversationId },
-      data: {
-        isBlocked: !isCurrentlyBlocked,
-        blockedBy: !isCurrentlyBlocked ? currentUserId : null,
-      },
-    });
-
-    revalidatePath("/dashboard/messages");
-    return { success: true, isBlocked: !isCurrentlyBlocked };
-  } catch (error) {
-    console.error("Error toggling block:", error);
-    return { success: false, error: "Failed to update block status" };
   }
-}
 );

@@ -103,7 +103,8 @@ export function findViolations(entries) {
     if (typeof value !== "string" || value.length === 0) continue;
 
     for (const { pattern, label } of FORBIDDEN_VALUE_PREFIXES) {
-      if (value.startsWith(pattern)) violations.push({ name, reason: `value looks like a ${label}` });
+      if (value.startsWith(pattern))
+        violations.push({ name, reason: `value looks like a ${label}` });
     }
     for (const { pattern, label } of FORBIDDEN_VALUE_SUBSTRINGS) {
       if (value.includes(pattern)) violations.push({ name, reason: `value contains a ${label}` });

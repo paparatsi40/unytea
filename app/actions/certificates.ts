@@ -22,20 +22,20 @@ export const getCertificate = defineAction(
     args: [z.string().min(1).max(64)],
   },
   async (ctx, certificateId: string) => {
-  try {
-    // Scoped to the holder: this used to return any certificate row by id.
-    const certificate = await prisma.certificate.findFirst({
-      where: { id: certificateId, userId: ctx.userId },
-    });
+    try {
+      // Scoped to the holder: this used to return any certificate row by id.
+      const certificate = await prisma.certificate.findFirst({
+        where: { id: certificateId, userId: ctx.userId },
+      });
 
-    if (!certificate) return { success: false, error: "Certificate not found" };
+      if (!certificate) return { success: false, error: "Certificate not found" };
 
-    return { success: true, certificate };
-  } catch (error) {
-    console.error("[getCertificate] Error:", error);
-    return { success: false, error: "Failed to get certificate" };
+      return { success: true, certificate };
+    } catch (error) {
+      console.error("[getCertificate] Error:", error);
+      return { success: false, error: "Failed to get certificate" };
+    }
   }
-}
 );
 
 // ── Verify Certificate by Number (public) ────────────────────────────
@@ -47,32 +47,32 @@ export const verifyCertificate = defineAction(
     rateLimit: "api",
   },
   async (_ctx, certificateNumber: string) => {
-  try {
-    const certificate = await prisma.certificate.findUnique({
-      where: { certificateNumber },
-    });
+    try {
+      const certificate = await prisma.certificate.findUnique({
+        where: { certificateNumber },
+      });
 
-    if (!certificate) {
-      return { success: false, error: "Certificate not found", valid: false };
+      if (!certificate) {
+        return { success: false, error: "Certificate not found", valid: false };
+      }
+
+      return {
+        success: true,
+        valid: true,
+        certificate: {
+          certificateNumber: certificate.certificateNumber,
+          userName: certificate.userName,
+          courseName: certificate.courseName,
+          communityName: certificate.communityName,
+          completionDate: certificate.completionDate,
+          issuedAt: certificate.issuedAt,
+        },
+      };
+    } catch (error) {
+      console.error("[verifyCertificate] Error:", error);
+      return { success: false, error: "Failed to verify certificate" };
     }
-
-    return {
-      success: true,
-      valid: true,
-      certificate: {
-        certificateNumber: certificate.certificateNumber,
-        userName: certificate.userName,
-        courseName: certificate.courseName,
-        communityName: certificate.communityName,
-        completionDate: certificate.completionDate,
-        issuedAt: certificate.issuedAt,
-      },
-    };
-  } catch (error) {
-    console.error("[verifyCertificate] Error:", error);
-    return { success: false, error: "Failed to verify certificate" };
   }
-}
 );
 
 // ── Get User Certificates ────────────────────────────────────────────
@@ -83,18 +83,18 @@ export const getUserCertificates = defineAction(
     args: [],
   },
   async (ctx) => {
-  try {
-    const userId = ctx.userId;
+    try {
+      const userId = ctx.userId;
 
-    const certificates = await prisma.certificate.findMany({
-      where: { userId },
-      orderBy: { issuedAt: "desc" },
-    });
+      const certificates = await prisma.certificate.findMany({
+        where: { userId },
+        orderBy: { issuedAt: "desc" },
+      });
 
-    return { success: true, certificates };
-  } catch (error) {
-    console.error("[getUserCertificates] Error:", error);
-    return { success: false, error: "Failed to get certificates" };
+      return { success: true, certificates };
+    } catch (error) {
+      console.error("[getUserCertificates] Error:", error);
+      return { success: false, error: "Failed to get certificates" };
+    }
   }
-}
 );

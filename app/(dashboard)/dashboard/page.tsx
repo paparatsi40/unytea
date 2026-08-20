@@ -24,7 +24,10 @@ export default async function DashboardPage() {
 
   // Only surface the checklist for new users who haven't finished it.
   const onboardingProgress =
-    !isActionFailure(onboarding) && onboarding.success && onboarding.showChecklist && onboarding.progress
+    !isActionFailure(onboarding) &&
+    onboarding.success &&
+    onboarding.showChecklist &&
+    onboarding.progress
       ? onboarding.progress
       : null;
 

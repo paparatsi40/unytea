@@ -44,7 +44,8 @@ export async function createSessionRecording(config: RecordingCoreConfig) {
   });
 
   if (!session) return { success: false as const, error: "Session not found" };
-  if (session.status !== "IN_PROGRESS") return { success: false as const, error: "Session not live" };
+  if (session.status !== "IN_PROGRESS")
+    return { success: false as const, error: "Session not live" };
 
   const existing = await prisma.recording.findUnique({
     where: { sessionId: config.sessionId },

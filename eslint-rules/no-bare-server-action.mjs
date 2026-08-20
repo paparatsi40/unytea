@@ -27,8 +27,7 @@ const rule = {
   meta: {
     type: "problem",
     docs: {
-      description:
-        'Require every export in a "use server" module to be created by defineAction',
+      description: 'Require every export in a "use server" module to be created by defineAction',
     },
     schema: [
       {
@@ -106,7 +105,10 @@ const rule = {
         // is checked at its own declaration site.
         if (!declaration) return;
 
-        if (declaration.type === "TSTypeAliasDeclaration" || declaration.type === "TSInterfaceDeclaration") {
+        if (
+          declaration.type === "TSTypeAliasDeclaration" ||
+          declaration.type === "TSInterfaceDeclaration"
+        ) {
           return;
         }
 
@@ -121,7 +123,8 @@ const rule = {
 
         if (declaration.type === "VariableDeclaration") {
           for (const declarator of declaration.declarations) {
-            const name = declarator.id.type === "Identifier" ? declarator.id.name : "<destructured>";
+            const name =
+              declarator.id.type === "Identifier" ? declarator.id.name : "<destructured>";
             const init = declarator.init;
 
             if (isFactoryCall(init)) continue;

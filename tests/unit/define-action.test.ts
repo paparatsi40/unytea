@@ -25,7 +25,9 @@ const mockHeaders = vi.fn();
 vi.mock("next/headers", () => ({ headers: () => mockHeaders() }));
 
 const mockCaptureException = vi.fn();
-vi.mock("@sentry/nextjs", () => ({ captureException: (...a: unknown[]) => mockCaptureException(...a) }));
+vi.mock("@sentry/nextjs", () => ({
+  captureException: (...a: unknown[]) => mockCaptureException(...a),
+}));
 
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -39,7 +41,9 @@ const asSession = (over: Record<string, unknown> = {}) => ({
 beforeEach(() => {
   vi.clearAllMocks();
   mockRateLimitCheck.mockResolvedValue({ success: true, remaining: 10, resetTime: Date.now() });
-  mockHeaders.mockResolvedValue(new Headers({ "x-forwarded-for": "1.2.3.4", "user-agent": "test" }));
+  mockHeaders.mockResolvedValue(
+    new Headers({ "x-forwarded-for": "1.2.3.4", "user-agent": "test" })
+  );
   vi.mocked(auth).mockResolvedValue(asSession() as never);
   vi.mocked(prisma.community.findUnique).mockResolvedValue(makeCommunityRow());
   vi.mocked(prisma.member.findUnique).mockResolvedValue(makeMemberRow());
@@ -105,7 +109,11 @@ describe("defineAction — auth: member", () => {
       args: [z.string()],
       community: ([communityId]) => communityId,
     },
-    async (ctx) => ({ success: true as const, member: ctx.member?.role, communityId: ctx.communityId })
+    async (ctx) => ({
+      success: true as const,
+      member: ctx.member?.role,
+      communityId: ctx.communityId,
+    })
   );
 
   it("rejects an anonymous caller", async () => {
@@ -115,7 +123,10 @@ describe("defineAction — auth: member", () => {
 
   it("rejects an authenticated non-member with FORBIDDEN", async () => {
     vi.mocked(prisma.member.findUnique).mockResolvedValue(null);
-    await expect(action("community_1")).resolves.toMatchObject({ success: false, code: "FORBIDDEN" });
+    await expect(action("community_1")).resolves.toMatchObject({
+      success: false,
+      code: "FORBIDDEN",
+    });
   });
 
   it("rejects a member whose status is not ACTIVE", async () => {
@@ -141,7 +152,9 @@ describe("defineAction — auth: member", () => {
 
   it("throws at definition time if a member action has no community resolver", () => {
     expect(() =>
-      defineAction({ name: "bad", auth: "member", args: [] }, async () => ({ success: true as const }))
+      defineAction({ name: "bad", auth: "member", args: [] }, async () => ({
+        success: true as const,
+      }))
     ).toThrow(/requires a `community` resolver/);
   });
 
@@ -411,7 +424,11 @@ describe("defineAction — error handling", () => {
       throw new ForbiddenError("nope");
     });
 
-    await expect(action()).resolves.toMatchObject({ success: false, code: "FORBIDDEN", error: "nope" });
+    await expect(action()).resolves.toMatchObject({
+      success: false,
+      code: "FORBIDDEN",
+      error: "nope",
+    });
   });
 
   it("converts a thrown UnauthorizedError into an UNAUTHORIZED failure", async () => {

@@ -115,10 +115,7 @@ describe("every JSON-LD injection site uses the helper", () => {
     return out;
   }
 
-  const files = [
-    ...walk(path.join(REPO_ROOT, "app")),
-    ...walk(path.join(REPO_ROOT, "components")),
-  ];
+  const files = [...walk(path.join(REPO_ROOT, "app")), ...walk(path.join(REPO_ROOT, "components"))];
 
   /** Lines that inject into __html using JSON.stringify. */
   function offendingLines(source: string): string[] {

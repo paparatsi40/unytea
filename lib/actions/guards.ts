@@ -53,7 +53,8 @@ export async function assertPostAuthorOrModerator(
   });
   if (!post) throw new ForbiddenError("Post not found");
 
-  const isModerator = ctx.member != null && ["OWNER", "ADMIN", "MODERATOR"].includes(ctx.member.role);
+  const isModerator =
+    ctx.member != null && ["OWNER", "ADMIN", "MODERATOR"].includes(ctx.member.role);
   if (post.authorId !== ctx.userId && !isModerator) {
     throw new ForbiddenError("Not authorized to modify this post");
   }

@@ -167,99 +167,99 @@ export const getPublicSession = defineAction(
     rateLimit: "api",
   },
   async (ctx, slug: string) => {
-  try {
-    // Heavy DB read is cached (tag `session:${slug}`); the auth-dependent
-    // recording.url gate below stays per-request.
-    const session = await getCachedSessionData(slug);
+    try {
+      // Heavy DB read is cached (tag `session:${slug}`); the auth-dependent
+      // recording.url gate below stays per-request.
+      const session = await getCachedSessionData(slug);
 
-    if (!session) {
-      return { success: false, error: "Session not found" };
-    }
+      if (!session) {
+        return { success: false, error: "Session not found" };
+      }
 
-    // Only show completed sessions with recordings
-    if (session.status !== "COMPLETED" || !session.recording) {
-      return { success: false, error: "Session not available" };
-    }
+      // Only show completed sessions with recordings
+      if (session.status !== "COMPLETED" || !session.recording) {
+        return { success: false, error: "Session not available" };
+      }
 
-    if (!session.community) {
-      return { success: false, error: "Session community not found" };
-    }
+      if (!session.community) {
+        return { success: false, error: "Session community not found" };
+      }
 
-    const viewerId = ctx.userId;
-    let isMember = false;
+      const viewerId = ctx.userId;
+      let isMember = false;
 
-    if (viewerId) {
-      const membership = await prisma.member.findUnique({
-        where: {
-          userId_communityId: {
-            userId: viewerId,
-            communityId: session.community.id,
+      if (viewerId) {
+        const membership = await prisma.member.findUnique({
+          where: {
+            userId_communityId: {
+              userId: viewerId,
+              communityId: session.community.id,
+            },
           },
+          select: { status: true },
+        });
+        isMember = membership?.status === "ACTIVE";
+      }
+
+      const canWatchRecording = session.visibility !== "community" || isMember;
+
+      const data: PublicSessionData = {
+        id: session.id,
+        slug: session.slug!,
+        title: session.title,
+        description: session.description,
+        status: session.status,
+        visibility: session.visibility,
+        canWatchRecording,
+        isMember,
+        scheduledAt: session.scheduledAt,
+        duration: session.duration,
+        attendeeCount: session._count.participations,
+        host: {
+          id: session.mentor.id,
+          name: session.mentor.name,
+          image: session.mentor.image,
+          bio: null, // Could be added to User model
         },
-        select: { status: true },
-      });
-      isMember = membership?.status === "ACTIVE";
-    }
-
-    const canWatchRecording = session.visibility !== "community" || isMember;
-
-    const data: PublicSessionData = {
-      id: session.id,
-      slug: session.slug!,
-      title: session.title,
-      description: session.description,
-      status: session.status,
-      visibility: session.visibility,
-      canWatchRecording,
-      isMember,
-      scheduledAt: session.scheduledAt,
-      duration: session.duration,
-      attendeeCount: session._count.participations,
-      host: {
-        id: session.mentor.id,
-        name: session.mentor.name,
-        image: session.mentor.image,
-        bio: null, // Could be added to User model
-      },
-      community: {
-        id: session.community.id,
-        name: session.community.name,
-        slug: session.community.slug,
-        description: session.community.description,
-        imageUrl: session.community.imageUrl,
-        memberCount: session.community._count.members,
-      },
-      recording: session.recording
-        ? {
-            ...session.recording,
-            url: canWatchRecording ? session.recording.url : null,
-          }
-        : null,
-      // Notes are gated by exactly the same rule as the recording. They were
-      // previously returned unconditionally, so on a `visibility: "community"`
-      // session a non-member received a null video alongside the complete
-      // written notes — content, summary, key insights, chapters and quotes —
-      // which is the substantive paywalled material (H2).
-      notes:
-        canWatchRecording && session.notes
+        community: {
+          id: session.community.id,
+          name: session.community.name,
+          slug: session.community.slug,
+          description: session.community.description,
+          imageUrl: session.community.imageUrl,
+          memberCount: session.community._count.members,
+        },
+        recording: session.recording
           ? {
-              id: session.notes.id,
-              content: session.notes.content,
-              summary: session.notes.summary,
-              keyInsights: safeParseStringArray(session.notes.keyInsights),
-              chapters: safeParseChapters(session.notes.resources),
-              quotes: safeParseQuotes(session.notes.resources),
-              createdAt: session.notes.createdAt,
+              ...session.recording,
+              url: canWatchRecording ? session.recording.url : null,
             }
           : null,
-    };
+        // Notes are gated by exactly the same rule as the recording. They were
+        // previously returned unconditionally, so on a `visibility: "community"`
+        // session a non-member received a null video alongside the complete
+        // written notes — content, summary, key insights, chapters and quotes —
+        // which is the substantive paywalled material (H2).
+        notes:
+          canWatchRecording && session.notes
+            ? {
+                id: session.notes.id,
+                content: session.notes.content,
+                summary: session.notes.summary,
+                keyInsights: safeParseStringArray(session.notes.keyInsights),
+                chapters: safeParseChapters(session.notes.resources),
+                quotes: safeParseQuotes(session.notes.resources),
+                createdAt: session.notes.createdAt,
+              }
+            : null,
+      };
 
-    return { success: true, session: data };
-  } catch (error) {
-    console.error("Error fetching public session:", error);
-    return { success: false, error: "Failed to load session" };
+      return { success: true, session: data };
+    } catch (error) {
+      console.error("Error fetching public session:", error);
+      return { success: false, error: "Failed to load session" };
+    }
   }
-}
 );
 
 /** Sesión relacionada formateada para la página pública. */
@@ -281,51 +281,55 @@ export const getRelatedSessions = defineAction(
   {
     name: "getRelatedSessions",
     auth: "public",
-    args: [z.string().min(1).max(64), z.string().min(1).max(64), z.number().int().min(1).max(20).default(3)],
+    args: [
+      z.string().min(1).max(64),
+      z.string().min(1).max(64),
+      z.number().int().min(1).max(20).default(3),
+    ],
     rateLimit: "api",
   },
   async (_ctx, communityId: string, currentSessionId: string, limit: number = 3) => {
-  try {
-    const sessions = await prisma.mentorSession.findMany({
-      where: {
-        communityId,
-        id: { not: currentSessionId },
-        status: "COMPLETED",
-        visibility: "public",
-        recording: { status: "READY" },
-      },
-      include: {
-        mentor: {
-          select: { id: true, name: true, image: true },
+    try {
+      const sessions = await prisma.mentorSession.findMany({
+        where: {
+          communityId,
+          id: { not: currentSessionId },
+          status: "COMPLETED",
+          visibility: "public",
+          recording: { status: "READY" },
         },
-        recording: {
-          select: { durationSeconds: true },
+        include: {
+          mentor: {
+            select: { id: true, name: true, image: true },
+          },
+          recording: {
+            select: { durationSeconds: true },
+          },
+          _count: {
+            select: { participations: true },
+          },
         },
-        _count: {
-          select: { participations: true },
-        },
-      },
-      orderBy: { scheduledAt: "desc" },
-      take: limit,
-    });
+        orderBy: { scheduledAt: "desc" },
+        take: limit,
+      });
 
-    const formatted = sessions.map((s) => ({
-      id: s.id,
-      slug: s.slug,
-      title: s.title,
-      description: s.description,
-      scheduledAt: s.scheduledAt,
-      host: s.mentor,
-      attendeeCount: s._count.participations,
-      duration: s.recording?.durationSeconds ?? null,
-    }));
+      const formatted = sessions.map((s) => ({
+        id: s.id,
+        slug: s.slug,
+        title: s.title,
+        description: s.description,
+        scheduledAt: s.scheduledAt,
+        host: s.mentor,
+        attendeeCount: s._count.participations,
+        duration: s.recording?.durationSeconds ?? null,
+      }));
 
-    return { success: true, sessions: formatted };
-  } catch (error) {
-    console.error("Error fetching related sessions:", error);
-    return { success: false, error: "Failed to load related sessions" };
+      return { success: true, sessions: formatted };
+    } catch (error) {
+      console.error("Error fetching related sessions:", error);
+      return { success: false, error: "Failed to load related sessions" };
+    }
   }
-}
 );
 
 // Alias for compatibility with existing code
@@ -337,20 +341,20 @@ export const getPublicSessionBySlug = defineAction(
     rateLimit: "api",
   },
   async (_ctx, slug: string) => {
-  const result = await getPublicSession(slug);
-  if (!result.success || !result.session) return null;
+    const result = await getPublicSession(slug);
+    if (!result.success || !result.session) return null;
 
-  // Transform to legacy format expected by other components
-  const session = result.session;
-  return {
-    ...session,
-    mentor: session.host,
-    community: {
-      ...session.community,
-      imageUrl: session.community.imageUrl,
-    },
-  };
-}
+    // Transform to legacy format expected by other components
+    const session = result.session;
+    return {
+      ...session,
+      mentor: session.host,
+      community: {
+        ...session.community,
+        imageUrl: session.community.imageUrl,
+      },
+    };
+  }
 );
 
 // For sitemap generation
@@ -362,31 +366,31 @@ export const getPublicSessionsForSEO = defineAction(
     rateLimit: "api",
   },
   async (_ctx, limit: number = 100) => {
-  try {
-    const sessions = await prisma.mentorSession.findMany({
-      where: {
-        status: "COMPLETED",
-        visibility: "public",
-        recording: { status: "READY" },
-        slug: { not: null },
-      },
-      select: {
-        slug: true,
-        updatedAt: true,
-        scheduledAt: true,
-      },
-      orderBy: { updatedAt: "desc" },
-      take: limit,
-    });
+    try {
+      const sessions = await prisma.mentorSession.findMany({
+        where: {
+          status: "COMPLETED",
+          visibility: "public",
+          recording: { status: "READY" },
+          slug: { not: null },
+        },
+        select: {
+          slug: true,
+          updatedAt: true,
+          scheduledAt: true,
+        },
+        orderBy: { updatedAt: "desc" },
+        take: limit,
+      });
 
-    return sessions
-      .filter((s): s is { slug: string; updatedAt: Date; scheduledAt: Date } => s.slug !== null)
-      .map((s) => ({ slug: s.slug, updatedAt: s.updatedAt, scheduledAt: s.scheduledAt }));
-  } catch (error) {
-    console.error("Error fetching sessions for SEO:", error);
-    return [];
+      return sessions
+        .filter((s): s is { slug: string; updatedAt: Date; scheduledAt: Date } => s.slug !== null)
+        .map((s) => ({ slug: s.slug, updatedAt: s.updatedAt, scheduledAt: s.scheduledAt }));
+    } catch (error) {
+      console.error("Error fetching sessions for SEO:", error);
+      return [];
+    }
   }
-}
 );
 
 export const getRelatedCommunitiesHostingThisWeek = defineAction(
@@ -397,85 +401,85 @@ export const getRelatedCommunitiesHostingThisWeek = defineAction(
     rateLimit: "api",
   },
   async (_ctx, currentCommunityId: string, limit: number = 4) => {
-  try {
-    const now = new Date();
-    const weekEnd = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    try {
+      const now = new Date();
+      const weekEnd = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
 
-    const communities = await prisma.community.findMany({
-      where: {
-        id: { not: currentCommunityId },
-        isPrivate: false,
-        sessions: {
-          some: {
-            status: "SCHEDULED",
-            scheduledAt: {
-              gte: now,
-              lte: weekEnd,
+      const communities = await prisma.community.findMany({
+        where: {
+          id: { not: currentCommunityId },
+          isPrivate: false,
+          sessions: {
+            some: {
+              status: "SCHEDULED",
+              scheduledAt: {
+                gte: now,
+                lte: weekEnd,
+              },
             },
           },
         },
-      },
-      select: {
-        id: true,
-        slug: true,
-        name: true,
-        description: true,
-        imageUrl: true,
-        _count: {
-          select: { members: true },
-        },
-        sessions: {
-          where: {
-            status: "SCHEDULED",
-            scheduledAt: {
-              gte: now,
-              lte: weekEnd,
+        select: {
+          id: true,
+          slug: true,
+          name: true,
+          description: true,
+          imageUrl: true,
+          _count: {
+            select: { members: true },
+          },
+          sessions: {
+            where: {
+              status: "SCHEDULED",
+              scheduledAt: {
+                gte: now,
+                lte: weekEnd,
+              },
+            },
+            orderBy: { scheduledAt: "asc" },
+            take: 1,
+            select: {
+              id: true,
+              title: true,
+              scheduledAt: true,
+              _count: {
+                select: { participations: true },
+              },
             },
           },
-          orderBy: { scheduledAt: "asc" },
-          take: 1,
-          select: {
-            id: true,
-            title: true,
-            scheduledAt: true,
-            _count: {
-              select: { participations: true },
-            },
+        },
+        orderBy: {
+          members: {
+            _count: "desc",
           },
         },
-      },
-      orderBy: {
-        members: {
-          _count: "desc",
-        },
-      },
-      take: limit,
-    });
+        take: limit,
+      });
 
-    return {
-      success: true,
-      communities: communities.map((community) => ({
-        id: community.id,
-        slug: community.slug,
-        name: community.name,
-        description: community.description,
-        imageUrl: community.imageUrl,
-        memberCount: community._count.members,
-        nextSession: community.sessions[0]
-          ? {
-              id: community.sessions[0].id,
-              title: community.sessions[0].title,
-              scheduledAt: community.sessions[0].scheduledAt,
-              attendingCount: community.sessions[0]._count.participations,
-            }
-          : null,
-      })),
-    };
-  } catch (error) {
-    console.error("Error fetching related communities:", error);
-    return { success: false, error: "Failed to load related communities" };
+      return {
+        success: true,
+        communities: communities.map((community) => ({
+          id: community.id,
+          slug: community.slug,
+          name: community.name,
+          description: community.description,
+          imageUrl: community.imageUrl,
+          memberCount: community._count.members,
+          nextSession: community.sessions[0]
+            ? {
+                id: community.sessions[0].id,
+                title: community.sessions[0].title,
+                scheduledAt: community.sessions[0].scheduledAt,
+                attendingCount: community.sessions[0]._count.participations,
+              }
+            : null,
+        })),
+      };
+    } catch (error) {
+      console.error("Error fetching related communities:", error);
+      return { success: false, error: "Failed to load related communities" };
+    }
   }
-}
 );
 
 export const getNextCommunitySession = defineAction(
@@ -486,33 +490,33 @@ export const getNextCommunitySession = defineAction(
     rateLimit: "api",
   },
   async (_ctx, communityId: string) => {
-  try {
-    const nextSession = await prisma.mentorSession.findFirst({
-      where: {
-        communityId,
-        status: "SCHEDULED",
-        scheduledAt: { gt: new Date() },
-        // This action is anonymous-callable, so without a privacy filter it let
-        // anyone enumerate a private community's upcoming session titles and
-        // times by id (L3). The sibling getRelatedCommunitiesHostingThisWeek
-        // already filters this way.
-        community: { isPrivate: false },
-      },
-      orderBy: { scheduledAt: "asc" },
-      select: {
-        id: true,
-        title: true,
-        scheduledAt: true,
-        duration: true,
-      },
-    });
+    try {
+      const nextSession = await prisma.mentorSession.findFirst({
+        where: {
+          communityId,
+          status: "SCHEDULED",
+          scheduledAt: { gt: new Date() },
+          // This action is anonymous-callable, so without a privacy filter it let
+          // anyone enumerate a private community's upcoming session titles and
+          // times by id (L3). The sibling getRelatedCommunitiesHostingThisWeek
+          // already filters this way.
+          community: { isPrivate: false },
+        },
+        orderBy: { scheduledAt: "asc" },
+        select: {
+          id: true,
+          title: true,
+          scheduledAt: true,
+          duration: true,
+        },
+      });
 
-    return { success: true, session: nextSession ?? null };
-  } catch (error) {
-    console.error("Error fetching next community session:", error);
-    return { success: false, error: "Failed to load next session" };
+      return { success: true, session: nextSession ?? null };
+    } catch (error) {
+      console.error("Error fetching next community session:", error);
+      return { success: false, error: "Failed to load next session" };
+    }
   }
-}
 );
 
 export const askQuestionForNextSession = defineAction(
@@ -529,71 +533,70 @@ export const askQuestionForNextSession = defineAction(
     community: ([params]) => communityById(params.communityId),
     rateLimit: "create",
   },
-  async (ctx, params: { communityId: string; question: string; source?: string; }) => {
-  try {
+  async (ctx, params: { communityId: string; question: string; source?: string }) => {
+    try {
+      const userId = ctx.userId;
 
-    const userId = ctx.userId;
+      const question = params.question.trim();
+      if (question.length < 5) {
+        return { success: false, error: "Question is too short" };
+      }
 
-    const question = params.question.trim();
-    if (question.length < 5) {
-      return { success: false, error: "Question is too short" };
-    }
-
-    const membership = await prisma.member.findUnique({
-      where: {
-        userId_communityId: {
-          userId,
-          communityId: params.communityId,
+      const membership = await prisma.member.findUnique({
+        where: {
+          userId_communityId: {
+            userId,
+            communityId: params.communityId,
+          },
         },
-      },
-      select: { status: true },
-    });
+        select: { status: true },
+      });
 
-    if (!membership || membership.status !== "ACTIVE") {
-      return { success: false, error: "Join the community to ask questions" };
+      if (!membership || membership.status !== "ACTIVE") {
+        return { success: false, error: "Join the community to ask questions" };
+      }
+
+      const nextSession = await prisma.mentorSession.findFirst({
+        where: {
+          communityId: params.communityId,
+          status: "SCHEDULED",
+          scheduledAt: { gt: new Date() },
+        },
+        orderBy: { scheduledAt: "asc" },
+        select: {
+          id: true,
+          title: true,
+        },
+      });
+
+      if (!nextSession) {
+        return { success: false, error: "No upcoming session available" };
+      }
+
+      const normalizedSource = (params.source || "public_session_page")
+        .toLowerCase()
+        .replace(/[^a-z0-9_:-]/g, "_")
+        .slice(0, 80);
+
+      const post = await prisma.post.create({
+        data: {
+          title: `❓ Question for next session: ${nextSession.title}`,
+          content: question,
+          contentType: PostContentType.QUESTION,
+          authorId: userId,
+          communityId: params.communityId,
+          attachments: {
+            targetSessionId: nextSession.id,
+            targetSessionTitle: nextSession.title,
+            source: normalizedSource,
+          } as Prisma.InputJsonValue,
+        },
+      });
+
+      return { success: true, postId: post.id, sessionId: nextSession.id };
+    } catch (error) {
+      console.error("Error creating pre-session question:", error);
+      return { success: false, error: "Failed to submit question" };
     }
-
-    const nextSession = await prisma.mentorSession.findFirst({
-      where: {
-        communityId: params.communityId,
-        status: "SCHEDULED",
-        scheduledAt: { gt: new Date() },
-      },
-      orderBy: { scheduledAt: "asc" },
-      select: {
-        id: true,
-        title: true,
-      },
-    });
-
-    if (!nextSession) {
-      return { success: false, error: "No upcoming session available" };
-    }
-
-    const normalizedSource = (params.source || "public_session_page")
-      .toLowerCase()
-      .replace(/[^a-z0-9_:-]/g, "_")
-      .slice(0, 80);
-
-    const post = await prisma.post.create({
-      data: {
-        title: `❓ Question for next session: ${nextSession.title}`,
-        content: question,
-        contentType: PostContentType.QUESTION,
-        authorId: userId,
-        communityId: params.communityId,
-        attachments: {
-          targetSessionId: nextSession.id,
-          targetSessionTitle: nextSession.title,
-          source: normalizedSource,
-        } as Prisma.InputJsonValue,
-      },
-    });
-
-    return { success: true, postId: post.id, sessionId: nextSession.id };
-  } catch (error) {
-    console.error("Error creating pre-session question:", error);
-    return { success: false, error: "Failed to submit question" };
   }
-}
 );

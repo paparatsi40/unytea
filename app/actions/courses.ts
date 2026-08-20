@@ -4,7 +4,12 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { defineAction } from "@/lib/actions/define-action";
 import { issueCertificateForEnrollment } from "@/lib/certificates";
-import { communityById, communityOfCourse, communityOfLesson, communityOfModule } from "@/lib/actions/resolvers";
+import {
+  communityById,
+  communityOfCourse,
+  communityOfLesson,
+  communityOfModule,
+} from "@/lib/actions/resolvers";
 import { prisma } from "@/lib/prisma";
 import { getLimitsForPlan } from "@/lib/plans";
 
@@ -29,72 +34,82 @@ export const createCourse = defineAction(
     community: ([data]) => communityById(data.communityId),
     rateLimit: "create",
   },
-  async (ctx, data: { title: string; slug: string; description?: string; imageUrl?: string; communityId: string; isPaid?: boolean; price?: number; }) => {
-  try {
-
-    const userId = ctx.userId;
-
-    // Verify user owns the community
-    const community = await prisma.community.findFirst({
-      where: {
-        id: data.communityId,
-        ownerId: userId,
-      },
-    });
-
-    if (!community) {
-      return { success: false, error: "Community not found or unauthorized" };
+  async (
+    ctx,
+    data: {
+      title: string;
+      slug: string;
+      description?: string;
+      imageUrl?: string;
+      communityId: string;
+      isPaid?: boolean;
+      price?: number;
     }
+  ) => {
+    try {
+      const userId = ctx.userId;
 
-    // ── PLAN GATE: paidCourses ────────────────────────────────────────────
-    if (data.isPaid) {
-      const owner = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { platformPlan: true },
+      // Verify user owns the community
+      const community = await prisma.community.findFirst({
+        where: {
+          id: data.communityId,
+          ownerId: userId,
+        },
       });
-      const limits = getLimitsForPlan(owner?.platformPlan);
-      if (!limits.paidCourses) {
-        return {
-          success: false,
-          error: "Tu plan no permite cursos de pago. Actualiza a Creator o superior.",
-          code: "PLAN_LIMIT_PAID_COURSES",
-        };
+
+      if (!community) {
+        return { success: false, error: "Community not found or unauthorized" };
       }
+
+      // ── PLAN GATE: paidCourses ────────────────────────────────────────────
+      if (data.isPaid) {
+        const owner = await prisma.user.findUnique({
+          where: { id: userId },
+          select: { platformPlan: true },
+        });
+        const limits = getLimitsForPlan(owner?.platformPlan);
+        if (!limits.paidCourses) {
+          return {
+            success: false,
+            error: "Tu plan no permite cursos de pago. Actualiza a Creator o superior.",
+            code: "PLAN_LIMIT_PAID_COURSES",
+          };
+        }
+      }
+      // ─────────────────────────────────────────────────────────────────────
+
+      // Check if slug exists
+      const existingCourse = await prisma.course.findFirst({
+        where: {
+          communityId: data.communityId,
+          slug: data.slug,
+        },
+      });
+
+      if (existingCourse) {
+        return { success: false, error: "Course slug already exists" };
+      }
+
+      const course = await prisma.course.create({
+        data: {
+          title: data.title,
+          slug: data.slug,
+          description: data.description,
+          imageUrl: data.imageUrl,
+          communityId: data.communityId,
+          isPaid: data.isPaid || false,
+          price: data.price || 0,
+          isPublished: false,
+        },
+      });
+
+      revalidatePath("/dashboard/courses");
+      return { success: true, course };
+    } catch (error) {
+      console.error("Error creating course:", error);
+      return { success: false, error: "Failed to create course" };
     }
-    // ─────────────────────────────────────────────────────────────────────
-
-    // Check if slug exists
-    const existingCourse = await prisma.course.findFirst({
-      where: {
-        communityId: data.communityId,
-        slug: data.slug,
-      },
-    });
-
-    if (existingCourse) {
-      return { success: false, error: "Course slug already exists" };
-    }
-
-    const course = await prisma.course.create({
-      data: {
-        title: data.title,
-        slug: data.slug,
-        description: data.description,
-        imageUrl: data.imageUrl,
-        communityId: data.communityId,
-        isPaid: data.isPaid || false,
-        price: data.price || 0,
-        isPublished: false,
-      },
-    });
-
-    revalidatePath("/dashboard/courses");
-    return { success: true, course };
-  } catch (error) {
-    console.error("Error creating course:", error);
-    return { success: false, error: "Failed to create course" };
   }
-}
 );
 
 /**
@@ -108,28 +123,26 @@ export const getCommunityCourses = defineAction(
     community: ([communityId]) => communityById(communityId),
   },
   async (_ctx, communityId: string) => {
-  try {
-
-
-    const courses = await prisma.course.findMany({
-      where: { communityId },
-      include: {
-        _count: {
-          select: {
-            modules: true,
-            enrollments: true,
+    try {
+      const courses = await prisma.course.findMany({
+        where: { communityId },
+        include: {
+          _count: {
+            select: {
+              modules: true,
+              enrollments: true,
+            },
           },
         },
-      },
-      orderBy: { createdAt: "desc" },
-    });
+        orderBy: { createdAt: "desc" },
+      });
 
-    return { success: true, courses };
-  } catch (error) {
-    console.error("Error fetching courses:", error);
-    return { success: false, error: "Failed to fetch courses" };
+      return { success: true, courses };
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+      return { success: false, error: "Failed to fetch courses" };
+    }
   }
-}
 );
 
 /**
@@ -143,52 +156,51 @@ export const getCourse = defineAction(
     community: ([courseId]) => communityOfCourse(courseId),
   },
   async (ctx, courseId: string) => {
-  try {
+    try {
+      const userId = ctx.userId;
 
-    const userId = ctx.userId;
-
-    const course = await prisma.course.findUnique({
-      where: { id: courseId },
-      include: {
-        modules: {
-          include: {
-            lessons: {
-              orderBy: { position: "asc" },
+      const course = await prisma.course.findUnique({
+        where: { id: courseId },
+        include: {
+          modules: {
+            include: {
+              lessons: {
+                orderBy: { position: "asc" },
+              },
+            },
+            orderBy: { position: "asc" },
+          },
+          community: {
+            select: {
+              id: true,
+              name: true,
+              ownerId: true,
             },
           },
-          orderBy: { position: "asc" },
         },
-        community: {
-          select: {
-            id: true,
-            name: true,
-            ownerId: true,
-          },
-        },
-      },
-    });
+      });
 
-    if (!course) {
-      return { success: false, error: "Course not found" };
+      if (!course) {
+        return { success: false, error: "Course not found" };
+      }
+
+      // Check if user has access
+      const isOwner = course.community.ownerId === userId;
+      const enrollment = await prisma.enrollment.findFirst({
+        where: {
+          courseId,
+          userId,
+        },
+      });
+
+      const hasAccess = isOwner || enrollment || !course.isPaid;
+
+      return { success: true, course, hasAccess, isOwner, enrollment };
+    } catch (error) {
+      console.error("Error fetching course:", error);
+      return { success: false, error: "Failed to fetch course" };
     }
-
-    // Check if user has access
-    const isOwner = course.community.ownerId === userId;
-    const enrollment = await prisma.enrollment.findFirst({
-      where: {
-        courseId,
-        userId,
-      },
-    });
-
-    const hasAccess = isOwner || enrollment || !course.isPaid;
-
-    return { success: true, course, hasAccess, isOwner, enrollment };
-  } catch (error) {
-    console.error("Error fetching course:", error);
-    return { success: false, error: "Failed to fetch course" };
   }
-}
 );
 
 /**
@@ -211,53 +223,63 @@ export const updateCourse = defineAction(
     ],
     community: ([courseId]) => communityOfCourse(courseId),
   },
-  async (ctx, courseId: string, data: { title?: string; description?: string; imageUrl?: string; isPaid?: boolean; price?: number; isPublished?: boolean; }) => {
-  try {
-
-    const userId = ctx.userId;
-
-    const course = await prisma.course.findUnique({
-      where: { id: courseId },
-      include: { community: true },
-    });
-
-    if (!course) {
-      return { success: false, error: "Course not found" };
+  async (
+    ctx,
+    courseId: string,
+    data: {
+      title?: string;
+      description?: string;
+      imageUrl?: string;
+      isPaid?: boolean;
+      price?: number;
+      isPublished?: boolean;
     }
+  ) => {
+    try {
+      const userId = ctx.userId;
 
-    if (course.community.ownerId !== userId) {
-      return { success: false, error: "Unauthorized" };
-    }
-
-    // ── PLAN GATE: paidCourses (on update) ───────────────────────────────
-    if (data.isPaid) {
-      const owner = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { platformPlan: true },
+      const course = await prisma.course.findUnique({
+        where: { id: courseId },
+        include: { community: true },
       });
-      const limits = getLimitsForPlan(owner?.platformPlan);
-      if (!limits.paidCourses) {
-        return {
-          success: false,
-          error: "Tu plan no permite cursos de pago. Actualiza a Creator o superior.",
-          code: "PLAN_LIMIT_PAID_COURSES",
-        };
+
+      if (!course) {
+        return { success: false, error: "Course not found" };
       }
+
+      if (course.community.ownerId !== userId) {
+        return { success: false, error: "Unauthorized" };
+      }
+
+      // ── PLAN GATE: paidCourses (on update) ───────────────────────────────
+      if (data.isPaid) {
+        const owner = await prisma.user.findUnique({
+          where: { id: userId },
+          select: { platformPlan: true },
+        });
+        const limits = getLimitsForPlan(owner?.platformPlan);
+        if (!limits.paidCourses) {
+          return {
+            success: false,
+            error: "Tu plan no permite cursos de pago. Actualiza a Creator o superior.",
+            code: "PLAN_LIMIT_PAID_COURSES",
+          };
+        }
+      }
+      // ─────────────────────────────────────────────────────────────────────
+
+      const updatedCourse = await prisma.course.update({
+        where: { id: courseId },
+        data,
+      });
+
+      revalidatePath("/dashboard/courses");
+      return { success: true, course: updatedCourse };
+    } catch (error) {
+      console.error("Error updating course:", error);
+      return { success: false, error: "Failed to update course" };
     }
-    // ─────────────────────────────────────────────────────────────────────
-
-    const updatedCourse = await prisma.course.update({
-      where: { id: courseId },
-      data,
-    });
-
-    revalidatePath("/dashboard/courses");
-    return { success: true, course: updatedCourse };
-  } catch (error) {
-    console.error("Error updating course:", error);
-    return { success: false, error: "Failed to update course" };
   }
-}
 );
 
 /**
@@ -271,34 +293,33 @@ export const deleteCourse = defineAction(
     community: ([courseId]) => communityOfCourse(courseId),
   },
   async (ctx, courseId: string) => {
-  try {
+    try {
+      const userId = ctx.userId;
 
-    const userId = ctx.userId;
+      const course = await prisma.course.findUnique({
+        where: { id: courseId },
+        include: { community: true },
+      });
 
-    const course = await prisma.course.findUnique({
-      where: { id: courseId },
-      include: { community: true },
-    });
+      if (!course) {
+        return { success: false, error: "Course not found" };
+      }
 
-    if (!course) {
-      return { success: false, error: "Course not found" };
+      if (course.community.ownerId !== userId) {
+        return { success: false, error: "Unauthorized" };
+      }
+
+      await prisma.course.delete({
+        where: { id: courseId },
+      });
+
+      revalidatePath("/dashboard/courses");
+      return { success: true };
+    } catch (error) {
+      console.error("Error deleting course:", error);
+      return { success: false, error: "Failed to delete course" };
     }
-
-    if (course.community.ownerId !== userId) {
-      return { success: false, error: "Unauthorized" };
-    }
-
-    await prisma.course.delete({
-      where: { id: courseId },
-    });
-
-    revalidatePath("/dashboard/courses");
-    return { success: true };
-  } catch (error) {
-    console.error("Error deleting course:", error);
-    return { success: false, error: "Failed to delete course" };
   }
-}
 );
 
 /**
@@ -318,36 +339,38 @@ export const createModule = defineAction(
     ],
     community: ([data]) => communityOfCourse(data.courseId),
   },
-  async (ctx, data: { courseId: string; title: string; description?: string; position: number; }) => {
-  try {
+  async (
+    ctx,
+    data: { courseId: string; title: string; description?: string; position: number }
+  ) => {
+    try {
+      const userId = ctx.userId;
 
-    const userId = ctx.userId;
+      const course = await prisma.course.findUnique({
+        where: { id: data.courseId },
+        include: { community: true },
+      });
 
-    const course = await prisma.course.findUnique({
-      where: { id: data.courseId },
-      include: { community: true },
-    });
+      if (!course || course.community.ownerId !== userId) {
+        return { success: false, error: "Unauthorized" };
+      }
 
-    if (!course || course.community.ownerId !== userId) {
-      return { success: false, error: "Unauthorized" };
+      const courseModule = await prisma.module.create({
+        data: {
+          title: data.title,
+          description: data.description,
+          position: data.position,
+          courseId: data.courseId,
+        },
+      });
+
+      revalidatePath(`/dashboard/courses/${data.courseId}`);
+      return { success: true, module: courseModule };
+    } catch (error) {
+      console.error("Error creating module:", error);
+      return { success: false, error: "Failed to create module" };
     }
-
-    const courseModule = await prisma.module.create({
-      data: {
-        title: data.title,
-        description: data.description,
-        position: data.position,
-        courseId: data.courseId,
-      },
-    });
-
-    revalidatePath(`/dashboard/courses/${data.courseId}`);
-    return { success: true, module: courseModule };
-  } catch (error) {
-    console.error("Error creating module:", error);
-    return { success: false, error: "Failed to create module" };
   }
-}
 );
 
 /**
@@ -371,45 +394,56 @@ export const createLesson = defineAction(
     ],
     community: ([data]) => communityOfModule(data.moduleId),
   },
-  async (ctx, data: { moduleId: string; title: string; content: string; contentType?: "TEXT" | "VIDEO" | "AUDIO"; videoUrl?: string; duration?: number; position: number; isFree?: boolean; }) => {
-  try {
-
-    const userId = ctx.userId;
-
-    const courseModule = await prisma.module.findUnique({
-      where: { id: data.moduleId },
-      include: {
-        course: {
-          include: { community: true },
-        },
-      },
-    });
-
-    if (!courseModule || courseModule.course.community.ownerId !== userId) {
-      return { success: false, error: "Unauthorized" };
+  async (
+    ctx,
+    data: {
+      moduleId: string;
+      title: string;
+      content: string;
+      contentType?: "TEXT" | "VIDEO" | "AUDIO";
+      videoUrl?: string;
+      duration?: number;
+      position: number;
+      isFree?: boolean;
     }
+  ) => {
+    try {
+      const userId = ctx.userId;
 
-    const lesson = await prisma.lesson.create({
-      data: {
-        title: data.title,
-        content: data.content,
-        contentType: data.contentType || "TEXT",
-        videoUrl: data.videoUrl,
-        duration: data.duration,
-        position: data.position,
-        moduleId: data.moduleId,
-        isFree: data.isFree || false,
-        isPublished: true,
-      },
-    });
+      const courseModule = await prisma.module.findUnique({
+        where: { id: data.moduleId },
+        include: {
+          course: {
+            include: { community: true },
+          },
+        },
+      });
 
-    revalidatePath(`/dashboard/courses/${courseModule.courseId}`);
-    return { success: true, lesson };
-  } catch (error) {
-    console.error("Error creating lesson:", error);
-    return { success: false, error: "Failed to create lesson" };
+      if (!courseModule || courseModule.course.community.ownerId !== userId) {
+        return { success: false, error: "Unauthorized" };
+      }
+
+      const lesson = await prisma.lesson.create({
+        data: {
+          title: data.title,
+          content: data.content,
+          contentType: data.contentType || "TEXT",
+          videoUrl: data.videoUrl,
+          duration: data.duration,
+          position: data.position,
+          moduleId: data.moduleId,
+          isFree: data.isFree || false,
+          isPublished: true,
+        },
+      });
+
+      revalidatePath(`/dashboard/courses/${courseModule.courseId}`);
+      return { success: true, lesson };
+    } catch (error) {
+      console.error("Error creating lesson:", error);
+      return { success: false, error: "Failed to create lesson" };
+    }
   }
-}
 );
 
 /**
@@ -429,30 +463,33 @@ export const updateModule = defineAction(
     ],
     community: ([moduleId]) => communityOfModule(moduleId),
   },
-  async (ctx, moduleId: string, data: { title?: string; description?: string; position?: number }) => {
-  try {
+  async (
+    ctx,
+    moduleId: string,
+    data: { title?: string; description?: string; position?: number }
+  ) => {
+    try {
+      const userId = ctx.userId;
 
-    const userId = ctx.userId;
+      const mod = await prisma.module.findUnique({
+        where: { id: moduleId },
+        include: { course: { include: { community: true } } },
+      });
+      if (!mod || mod.course.community.ownerId !== userId)
+        return { success: false, error: "Unauthorized" };
 
-    const mod = await prisma.module.findUnique({
-      where: { id: moduleId },
-      include: { course: { include: { community: true } } },
-    });
-    if (!mod || mod.course.community.ownerId !== userId)
-      return { success: false, error: "Unauthorized" };
+      const updated = await prisma.module.update({
+        where: { id: moduleId },
+        data,
+      });
 
-    const updated = await prisma.module.update({
-      where: { id: moduleId },
-      data,
-    });
-
-    revalidatePath(`/dashboard/courses/${mod.courseId}`);
-    return { success: true, module: updated };
-  } catch (error) {
-    console.error("Error updating module:", error);
-    return { success: false, error: "Failed to update module" };
+      revalidatePath(`/dashboard/courses/${mod.courseId}`);
+      return { success: true, module: updated };
+    } catch (error) {
+      console.error("Error updating module:", error);
+      return { success: false, error: "Failed to update module" };
+    }
   }
-}
 );
 
 /**
@@ -466,26 +503,25 @@ export const deleteModule = defineAction(
     community: ([moduleId]) => communityOfModule(moduleId),
   },
   async (ctx, moduleId: string) => {
-  try {
+    try {
+      const userId = ctx.userId;
 
-    const userId = ctx.userId;
+      const mod = await prisma.module.findUnique({
+        where: { id: moduleId },
+        include: { course: { include: { community: true } } },
+      });
+      if (!mod || mod.course.community.ownerId !== userId)
+        return { success: false, error: "Unauthorized" };
 
-    const mod = await prisma.module.findUnique({
-      where: { id: moduleId },
-      include: { course: { include: { community: true } } },
-    });
-    if (!mod || mod.course.community.ownerId !== userId)
-      return { success: false, error: "Unauthorized" };
+      await prisma.module.delete({ where: { id: moduleId } });
 
-    await prisma.module.delete({ where: { id: moduleId } });
-
-    revalidatePath(`/dashboard/courses/${mod.courseId}`);
-    return { success: true };
-  } catch (error) {
-    console.error("Error deleting module:", error);
-    return { success: false, error: "Failed to delete module" };
+      revalidatePath(`/dashboard/courses/${mod.courseId}`);
+      return { success: true };
+    } catch (error) {
+      console.error("Error deleting module:", error);
+      return { success: false, error: "Failed to delete module" };
+    }
   }
-}
 );
 
 /**
@@ -510,30 +546,42 @@ export const updateLesson = defineAction(
     ],
     community: ([lessonId]) => communityOfLesson(lessonId),
   },
-  async (ctx, lessonId: string, data: { title?: string; content?: string; contentType?: "TEXT" | "VIDEO" | "AUDIO"; videoUrl?: string; duration?: number; position?: number; isFree?: boolean; isPublished?: boolean; }) => {
-  try {
+  async (
+    ctx,
+    lessonId: string,
+    data: {
+      title?: string;
+      content?: string;
+      contentType?: "TEXT" | "VIDEO" | "AUDIO";
+      videoUrl?: string;
+      duration?: number;
+      position?: number;
+      isFree?: boolean;
+      isPublished?: boolean;
+    }
+  ) => {
+    try {
+      const userId = ctx.userId;
 
-    const userId = ctx.userId;
+      const lesson = await prisma.lesson.findUnique({
+        where: { id: lessonId },
+        include: { module: { include: { course: { include: { community: true } } } } },
+      });
+      if (!lesson || lesson.module.course.community.ownerId !== userId)
+        return { success: false, error: "Unauthorized" };
 
-    const lesson = await prisma.lesson.findUnique({
-      where: { id: lessonId },
-      include: { module: { include: { course: { include: { community: true } } } } },
-    });
-    if (!lesson || lesson.module.course.community.ownerId !== userId)
-      return { success: false, error: "Unauthorized" };
+      const updated = await prisma.lesson.update({
+        where: { id: lessonId },
+        data,
+      });
 
-    const updated = await prisma.lesson.update({
-      where: { id: lessonId },
-      data,
-    });
-
-    revalidatePath(`/dashboard/courses/${lesson.module.courseId}`);
-    return { success: true, lesson: updated };
-  } catch (error) {
-    console.error("Error updating lesson:", error);
-    return { success: false, error: "Failed to update lesson" };
+      revalidatePath(`/dashboard/courses/${lesson.module.courseId}`);
+      return { success: true, lesson: updated };
+    } catch (error) {
+      console.error("Error updating lesson:", error);
+      return { success: false, error: "Failed to update lesson" };
+    }
   }
-}
 );
 
 /**
@@ -547,26 +595,25 @@ export const deleteLesson = defineAction(
     community: ([lessonId]) => communityOfLesson(lessonId),
   },
   async (ctx, lessonId: string) => {
-  try {
+    try {
+      const userId = ctx.userId;
 
-    const userId = ctx.userId;
+      const lesson = await prisma.lesson.findUnique({
+        where: { id: lessonId },
+        include: { module: { include: { course: { include: { community: true } } } } },
+      });
+      if (!lesson || lesson.module.course.community.ownerId !== userId)
+        return { success: false, error: "Unauthorized" };
 
-    const lesson = await prisma.lesson.findUnique({
-      where: { id: lessonId },
-      include: { module: { include: { course: { include: { community: true } } } } },
-    });
-    if (!lesson || lesson.module.course.community.ownerId !== userId)
-      return { success: false, error: "Unauthorized" };
+      await prisma.lesson.delete({ where: { id: lessonId } });
 
-    await prisma.lesson.delete({ where: { id: lessonId } });
-
-    revalidatePath(`/dashboard/courses/${lesson.module.courseId}`);
-    return { success: true };
-  } catch (error) {
-    console.error("Error deleting lesson:", error);
-    return { success: false, error: "Failed to delete lesson" };
+      revalidatePath(`/dashboard/courses/${lesson.module.courseId}`);
+      return { success: true };
+    } catch (error) {
+      console.error("Error deleting lesson:", error);
+      return { success: false, error: "Failed to delete lesson" };
+    }
   }
-}
 );
 
 /**
@@ -581,44 +628,43 @@ export const enrollInCourse = defineAction(
     rateLimit: "create",
   },
   async (ctx, courseId: string) => {
-  try {
+    try {
+      const userId = ctx.userId;
 
-    const userId = ctx.userId;
+      // Check if already enrolled
+      const existing = await prisma.enrollment.findFirst({
+        where: {
+          userId,
+          courseId,
+        },
+      });
 
-    // Check if already enrolled
-    const existing = await prisma.enrollment.findFirst({
-      where: {
-        userId,
-        courseId,
-      },
-    });
+      if (existing) {
+        return { success: false, error: "Already enrolled" };
+      }
 
-    if (existing) {
-      return { success: false, error: "Already enrolled" };
+      const enrollment = await prisma.enrollment.create({
+        data: {
+          userId,
+          courseId,
+        },
+      });
+
+      // Increment enrollment count
+      await prisma.course.update({
+        where: { id: courseId },
+        data: {
+          enrollmentCount: { increment: 1 },
+        },
+      });
+
+      revalidatePath(`/dashboard/courses/${courseId}`);
+      return { success: true, enrollment };
+    } catch (error) {
+      console.error("Error enrolling in course:", error);
+      return { success: false, error: "Failed to enroll" };
     }
-
-    const enrollment = await prisma.enrollment.create({
-      data: {
-        userId,
-        courseId,
-      },
-    });
-
-    // Increment enrollment count
-    await prisma.course.update({
-      where: { id: courseId },
-      data: {
-        enrollmentCount: { increment: 1 },
-      },
-    });
-
-    revalidatePath(`/dashboard/courses/${courseId}`);
-    return { success: true, enrollment };
-  } catch (error) {
-    console.error("Error enrolling in course:", error);
-    return { success: false, error: "Failed to enroll" };
   }
-}
 );
 
 /**
@@ -632,113 +678,112 @@ export const markLessonComplete = defineAction(
     community: ([lessonId]) => communityOfLesson(lessonId),
   },
   async (ctx, lessonId: string) => {
-  try {
+    try {
+      const userId = ctx.userId;
 
-    const userId = ctx.userId;
-
-    const lesson = await prisma.lesson.findUnique({
-      where: { id: lessonId },
-      include: {
-        module: {
-          include: { course: true },
+      const lesson = await prisma.lesson.findUnique({
+        where: { id: lessonId },
+        include: {
+          module: {
+            include: { course: true },
+          },
         },
-      },
-    });
+      });
 
-    if (!lesson) {
-      return { success: false, error: "Lesson not found" };
-    }
+      if (!lesson) {
+        return { success: false, error: "Lesson not found" };
+      }
 
-    // Get or create enrollment
-    let enrollment = await prisma.enrollment.findFirst({
-      where: {
-        userId,
-        courseId: lesson.module.courseId,
-      },
-    });
-
-    if (!enrollment) {
-      enrollment = await prisma.enrollment.create({
-        data: {
+      // Get or create enrollment
+      let enrollment = await prisma.enrollment.findFirst({
+        where: {
           userId,
           courseId: lesson.module.courseId,
         },
       });
-    }
 
-    // Create or update lesson progress
-    const progress = await prisma.lessonProgress.upsert({
-      where: {
-        enrollmentId_lessonId: {
+      if (!enrollment) {
+        enrollment = await prisma.enrollment.create({
+          data: {
+            userId,
+            courseId: lesson.module.courseId,
+          },
+        });
+      }
+
+      // Create or update lesson progress
+      const progress = await prisma.lessonProgress.upsert({
+        where: {
+          enrollmentId_lessonId: {
+            enrollmentId: enrollment.id,
+            lessonId,
+          },
+        },
+        create: {
           enrollmentId: enrollment.id,
           lessonId,
+          isCompleted: true,
+          completedAt: new Date(),
         },
-      },
-      create: {
-        enrollmentId: enrollment.id,
-        lessonId,
-        isCompleted: true,
-        completedAt: new Date(),
-      },
-      update: {
-        isCompleted: true,
-        completedAt: new Date(),
-      },
-    });
-
-    // Update enrollment progress
-    const totalLessons = await prisma.lesson.count({
-      where: {
-        module: {
-          courseId: lesson.module.courseId,
+        update: {
+          isCompleted: true,
+          completedAt: new Date(),
         },
-      },
-    });
+      });
 
-    const completedLessons = await prisma.lessonProgress.count({
-      where: {
-        enrollmentId: enrollment.id,
-        isCompleted: true,
-      },
-    });
+      // Update enrollment progress
+      const totalLessons = await prisma.lesson.count({
+        where: {
+          module: {
+            courseId: lesson.module.courseId,
+          },
+        },
+      });
 
-    const progressPercent = (completedLessons / totalLessons) * 100;
+      const completedLessons = await prisma.lessonProgress.count({
+        where: {
+          enrollmentId: enrollment.id,
+          isCompleted: true,
+        },
+      });
 
-    await prisma.enrollment.update({
-      where: { id: enrollment.id },
-      data: {
-        progress: progressPercent,
-        completedAt: progressPercent === 100 ? new Date() : null,
-      },
-    });
+      const progressPercent = (completedLessons / totalLessons) * 100;
 
-    // Completing the course issues the certificate. It is a consequence of
-    // finishing, not something the learner asks for — there is no
-    // client-callable issuance path. Idempotent, so re-completing a lesson on an
-    // already-finished course does not mint a second one.
-    let certificate = null;
-    if (progressPercent === 100) {
-      try {
-        const issued = await issueCertificateForEnrollment(enrollment.id, userId);
-        if (issued.success) {
-          certificate = issued.certificate;
-        } else {
-          console.warn("[markLessonComplete] certificate not issued:", issued.error);
+      await prisma.enrollment.update({
+        where: { id: enrollment.id },
+        data: {
+          progress: progressPercent,
+          completedAt: progressPercent === 100 ? new Date() : null,
+        },
+      });
+
+      // Completing the course issues the certificate. It is a consequence of
+      // finishing, not something the learner asks for — there is no
+      // client-callable issuance path. Idempotent, so re-completing a lesson on an
+      // already-finished course does not mint a second one.
+      let certificate = null;
+      if (progressPercent === 100) {
+        try {
+          const issued = await issueCertificateForEnrollment(enrollment.id, userId);
+          if (issued.success) {
+            certificate = issued.certificate;
+          } else {
+            console.warn("[markLessonComplete] certificate not issued:", issued.error);
+          }
+        } catch (certificateError) {
+          // Never let issuance failure lose the lesson completion the learner
+          // just earned; the next completion call will retry.
+          console.error("[markLessonComplete] certificate issuance failed:", certificateError);
         }
-      } catch (certificateError) {
-        // Never let issuance failure lose the lesson completion the learner
-        // just earned; the next completion call will retry.
-        console.error("[markLessonComplete] certificate issuance failed:", certificateError);
       }
-    }
 
-    revalidatePath(`/dashboard/courses/${lesson.module.courseId}`);
-    return { success: true, progress, courseCompleted: progressPercent === 100, certificate };
-  } catch (error) {
-    console.error("Error marking lesson complete:", error);
-    return { success: false, error: "Failed to mark lesson complete" };
+      revalidatePath(`/dashboard/courses/${lesson.module.courseId}`);
+      return { success: true, progress, courseCompleted: progressPercent === 100, certificate };
+    } catch (error) {
+      console.error("Error marking lesson complete:", error);
+      return { success: false, error: "Failed to mark lesson complete" };
+    }
   }
-}
 );
 
 /**
@@ -751,36 +796,35 @@ export const getUserEnrollments = defineAction(
     args: [],
   },
   async (ctx) => {
-  try {
+    try {
+      const userId = ctx.userId;
 
-    const userId = ctx.userId;
-
-    const enrollments = await prisma.enrollment.findMany({
-      where: { userId },
-      include: {
-        course: {
-          include: {
-            community: {
-              select: {
-                id: true,
-                name: true,
+      const enrollments = await prisma.enrollment.findMany({
+        where: { userId },
+        include: {
+          course: {
+            include: {
+              community: {
+                select: {
+                  id: true,
+                  name: true,
+                },
               },
-            },
-            _count: {
-              select: {
-                modules: true,
+              _count: {
+                select: {
+                  modules: true,
+                },
               },
             },
           },
         },
-      },
-      orderBy: { enrolledAt: "desc" },
-    });
+        orderBy: { enrolledAt: "desc" },
+      });
 
-    return { success: true, enrollments };
-  } catch (error) {
-    console.error("Error fetching enrollments:", error);
-    return { success: false, error: "Failed to fetch enrollments" };
+      return { success: true, enrollments };
+    } catch (error) {
+      console.error("Error fetching enrollments:", error);
+      return { success: false, error: "Failed to fetch enrollments" };
+    }
   }
-}
 );
