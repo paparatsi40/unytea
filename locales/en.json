@@ -2875,7 +2875,9 @@
       "noScreenDesc": "Share your screen to present slides, demos, or walkthroughs.",
       "noCameraTitle": "Waiting for video…",
       "noCameraWaiting": "Your camera is on — waiting for the video to start.",
-      "noCameraDesc": "Turn on your camera or wait for another participant's camera."
+      "noCameraDesc": "Turn on your camera or wait for another participant's camera.",
+      "enterFullscreen": "Full screen",
+      "exitFullscreen": "Exit full screen"
     },
     "localVideo": {
       "cameraOff": "Camera is off",
