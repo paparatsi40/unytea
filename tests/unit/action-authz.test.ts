@@ -203,6 +203,35 @@ describe("H9 — Server Action authorization harness", () => {
    * error-swallowing.
    */
   describe("guards run before the handler's try block", () => {
+    /**
+     * Is line `i` the head of a `defineAction` handler?
+     *
+     * Two shapes, because prettier splits a signature that runs past
+     * printWidth:
+     *
+     *     async (ctx, partnershipId: string) => {     one line
+     *
+     *     async (                                     split — `ctx` lands on
+     *       ctx,                                      the following line
+     *
+     * Recognising only the first shape is what made this check report a false
+     * offender: the walk below sailed past a split head and kept going until it
+     * hit the `try {` of some earlier action in the same file.
+     *
+     * Deliberately not "any line that is `async (`". Handlers are full of inner
+     * async arrows — `items.map(async (item) => …)`,
+     * `prisma.$transaction(async (tx) => …)` — and treating one of those as the
+     * head would stop the walk early and blind the check to a guard that really
+     * is nested in a try. The context parameter is what identifies the handler,
+     * so it has to be present either way.
+     */
+    function isHandlerHead(lines: string[], i: number): boolean {
+      const line = lines[i].trim();
+      if (/^async \(_?ctx\b/.test(line)) return true;
+      if (line !== "async (") return false;
+      return /^_?ctx\b/.test((lines[i + 1] ?? "").trim());
+    }
+
     function guardsInsideTry(source: string): string[] {
       const offenders: string[] = [];
       const lines = source.split("\n");
@@ -216,7 +245,7 @@ describe("H9 — Server Action authorization harness", () => {
             offenders.push(`${index + 1}: ${line.trim()}`);
             return;
           }
-          if (/^async \(_?ctx\b/.test(prev)) return;
+          if (isHandlerHead(lines, i)) return;
         }
       });
       return offenders;
@@ -224,6 +253,124 @@ describe("H9 — Server Action authorization harness", () => {
 
     it.each(serverModules)("%s: no guard is nested inside a try", (rel) => {
       expect(guardsInsideTry(readSource(path.resolve(REPO_ROOT, rel)))).toEqual([]);
+    });
+
+    /**
+     * The detector reads formatting, so formatting can break it. These fixtures
+     * pin both halves of the fix: it must stop reporting the shape prettier
+     * produces, and it must still catch the thing it exists to catch.
+     */
+    /**
+     * Two actions, because one is not enough to reproduce the bug: the walk
+     * only reports when it *finds* a `try {`, so a defeated walk in a file with
+     * a single action simply runs off the top and reports nothing. The false
+     * positive needs an earlier action with a try in it for the walk to land
+     * on — which is exactly the shape of every real action module.
+     */
+    const SPLIT_SIGNATURE_GUARD_FIRST = [
+      "export const first = defineAction(",
+      '  { name: "first", auth: "member" },',
+      "  async (ctx, id: string) => {",
+      "    try {",
+      "      return load(id);",
+      "    } catch {",
+      "      return null;",
+      "    }",
+      "  }",
+      ");",
+      "",
+      "export const logMood = defineAction(",
+      '  { name: "logMood", auth: "member" },',
+      "  async (",
+      "    ctx,",
+      "    partnershipId: string,",
+      "    mood: number,",
+      "    notes?: string,",
+      "  ) => {",
+      "    await assertBuddyPartner(ctx, partnershipId);",
+      "    try {",
+      "      return { success: true };",
+      "    } catch {",
+      "      return { success: false };",
+      "    }",
+      "  }",
+      ");",
+    ].join("\n");
+
+    const SPLIT_SIGNATURE_GUARD_INSIDE = [
+      "export const logMood = defineAction(",
+      '  { name: "logMood", auth: "member" },',
+      "  async (",
+      "    ctx,",
+      "    partnershipId: string,",
+      "    mood: number,",
+      "    notes?: string,",
+      "  ) => {",
+      "    try {",
+      "      await assertBuddyPartner(ctx, partnershipId);",
+      "      return { success: true };",
+      "    } catch {",
+      "      return { success: false };",
+      "    }",
+      "  }",
+      ");",
+    ].join("\n");
+
+    /**
+     * An inner async arrow must not be mistaken for the handler's head.
+     *
+     * Two things have to line up for this to bite, and both are deliberate.
+     * `async (` is alone on its line — the shape prettier gives a long inner
+     * callback, and the only one confusable with a split handler signature.
+     * And it sits *between* the `try {` and the guard, so a walk that stopped
+     * there would never reach the try and would report nothing. Put the arrow
+     * anywhere else and the fixture passes whatever the detector does.
+     */
+    const INNER_ARROW_THEN_GUARD_INSIDE = [
+      "export const logMood = defineAction(",
+      '  { name: "logMood", auth: "member" },',
+      "  async (ctx, partnershipId: string) => {",
+      "    try {",
+      "      const rows = await Promise.all(",
+      "        ids.map(",
+      "          async (",
+      "            id,",
+      "          ) => {",
+      "            return load(id);",
+      "          },",
+      "        ),",
+      "      );",
+      "      await assertBuddyPartner(ctx, partnershipId);",
+      "      return rows;",
+      "    } catch {",
+      "      return [];",
+      "    }",
+      "  }",
+      ");",
+    ].join("\n");
+
+    it("accepts a split signature whose guard runs before the try", () => {
+      // The false positive. `async (` on its own line used to defeat the walk,
+      // which then found an unrelated `try {` further up the file.
+      expect(guardsInsideTry(SPLIT_SIGNATURE_GUARD_FIRST)).toEqual([]);
+    });
+
+    it("still catches a guard nested in a try under a split signature", () => {
+      // The half that matters. A guard called from inside the try has its
+      // ForbiddenError swallowed by the catch, so the seam never reports
+      // FORBIDDEN and the caller is told something generic instead.
+      expect(guardsInsideTry(SPLIT_SIGNATURE_GUARD_INSIDE)).toEqual([
+        "10: await assertBuddyPartner(ctx, partnershipId);",
+      ]);
+    });
+
+    it("is not blinded by an inner async arrow", () => {
+      // `ids.map(async (` is not a handler head. If it were treated as one, the
+      // walk would stop there and the nested guard below would go unreported —
+      // which is how a fix for a false positive turns into a hole.
+      expect(guardsInsideTry(INNER_ARROW_THEN_GUARD_INSIDE)).toEqual([
+        "14: await assertBuddyPartner(ctx, partnershipId);",
+      ]);
     });
   });
 
