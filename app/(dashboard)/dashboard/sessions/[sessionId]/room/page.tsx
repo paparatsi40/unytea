@@ -8,6 +8,7 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
+import { resolveDisplayName } from "@/lib/user-display-name";
 
 export default function SessionRoomPage(props: { params: Promise<{ sessionId: string }> }) {
   const params = use(props.params);
@@ -141,6 +142,11 @@ export default function SessionRoomPage(props: { params: Promise<{ sessionId: st
         sessionMode={normalizedMode}
         sessionTitle={videoSession.title}
         isHost={isHost}
+        // The session already carries its mentor; the room simply never asked
+        // for them. Empty when the account has no name of any kind, and the
+        // room supplies the localized word for that case.
+        hostName={resolveDisplayName(videoSession.mentor)}
+        hostAvatar={videoSession.mentor?.image ?? undefined}
         onLeave={handleLeave}
         onEndSession={isHost ? handleEndSession : undefined}
       />

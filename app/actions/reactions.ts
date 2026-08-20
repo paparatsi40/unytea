@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidateLocalizedPath } from "@/lib/cache-invalidation";
 import { defineAction } from "@/lib/actions/define-action";
 import { communityOfPost } from "@/lib/actions/resolvers";
+import { resolveDisplayName } from "@/lib/user-display-name";
 
 export type ReactionType = "LIKE" | "LOVE" | "CELEBRATE" | "FIRE" | "IDEA" | "CLAP";
 
@@ -62,7 +63,18 @@ export const getPostReactions = defineAction(
   async (ctx, postId) => {
     const reactions = await prisma.reaction.findMany({
       where: { postId },
-      include: { user: { select: { id: true, name: true, image: true } } },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+            username: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+      },
     });
 
     const grouped = reactions.reduce(
@@ -73,7 +85,10 @@ export const getPostReactions = defineAction(
         acc[reaction.type].count++;
         acc[reaction.type].users.push({
           id: reaction.user.id,
-          name: reaction.user.name || "Unknown",
+          // Null, not a literal. "Unknown" was English shipped from a server
+          // action into a product that renders in three languages, and it beat
+          // a perfectly good username sitting one column over.
+          name: resolveDisplayName(reaction.user) || null,
           imageUrl: reaction.user.image,
         });
         if (reaction.userId === ctx.userId) {
@@ -85,7 +100,7 @@ export const getPostReactions = defineAction(
         string,
         {
           count: number;
-          users: Array<{ id: string; name: string; imageUrl: string | null }>;
+          users: Array<{ id: string; name: string | null; imageUrl: string | null }>;
           userReacted: boolean;
         }
       >

@@ -35,7 +35,8 @@
           "moderate": "Modérée",
           "quiet": "Calme"
         },
-        "joinCommunity": "Rejoindre la communauté"
+        "joinCommunity": "Rejoindre la communauté",
+        "anonymousMember": "Membre"
       },
       "hero": {
         "fallbackTitle": "Bienvenue dans notre communauté",
@@ -858,7 +859,8 @@
         "idea": "Idée",
         "clap": "Applaudir",
         "react": "Réagir",
-        "andMore": "et {count} de plus"
+        "andMore": "et {count} de plus",
+        "anonymous": "Anonyme"
       },
       "sessionAnnouncement": {
         "today": "Aujourd'hui",
@@ -2827,7 +2829,8 @@
         "more": "+{count} de plus",
         "inviteToSpeak": "Inviter à parler",
         "dismiss": "Ignorer",
-        "guest": "Invité"
+        "guest": "Invité",
+        "hostFallback": "l'hôte"
       },
       "handQueue": {
         "title": "File des mains levées"

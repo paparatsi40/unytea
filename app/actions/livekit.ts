@@ -9,6 +9,7 @@ import { defineAction } from "@/lib/actions/define-action";
 import { assertSessionHost } from "@/lib/actions/guards";
 import { communityOfSession } from "@/lib/actions/resolvers";
 import { AUDIENCE_PUBLISHES_DATA, canPublishTracks } from "@/lib/livekit/permissions";
+import { resolveDisplayName } from "@/lib/user-display-name";
 
 /**
  * LiveKit access — the single token issuer for the product.
@@ -249,11 +250,10 @@ export const joinSession = defineAction(
       where: { id: ctx.userId },
       select: { name: true, firstName: true, lastName: true, username: true },
     });
-    const displayName =
-      profile?.name?.trim() ||
-      [profile?.firstName, profile?.lastName].filter(Boolean).join(" ").trim() ||
-      profile?.username?.trim() ||
-      "";
+    // The precedence moved to `lib/user-display-name.ts` unchanged. It was
+    // written out here and nowhere else, so every other surface in the product
+    // read `user.name` alone and fell back to a hardcoded "Unknown".
+    const displayName = resolveDisplayName(profile);
 
     const token = new AccessToken(LIVEKIT_API_KEY, LIVEKIT_API_SECRET, {
       identity,
