@@ -66,6 +66,10 @@ Object.defineProperty(globalThis.navigator, "mediaDevices", {
 const localParticipant = {
   identity: "u1",
   name: "Tester",
+  // The grant the token carries, as livekit-client exposes it. The media
+  // controls are rendered from this and not from `isHost`, so a stand-in
+  // without it is an audience member and has no camera picker to click.
+  permissions: { canPublish: true, canPublishData: true, canSubscribe: true },
   setMicrophoneEnabled: vi.fn(async () => {}),
   setCameraEnabled: vi.fn(async () => {}),
   setScreenShareEnabled: vi.fn(async () => {}),
@@ -77,6 +81,9 @@ const localParticipant = {
 const room = {
   switchActiveDevice,
   localParticipant,
+  // Data publishes are gated on the engine actually being connected; see
+  // lib/livekit/data-transport.ts.
+  state: "connected",
   on: vi.fn(),
   off: vi.fn(),
   registerTextStreamHandler: vi.fn(),
@@ -166,7 +173,7 @@ beforeEach(() => {
   joinSession.mockReset();
   joinSession.mockResolvedValue({
     success: true,
-    access: { token: "tok", wsUrl: "wss://example.livekit.cloud" },
+    access: { token: "tok", wsUrl: "wss://example.livekit.cloud", role: "host" },
   });
   switchActiveDevice.mockClear();
   roomProps.length = 0;

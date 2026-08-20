@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRoomContext } from "@livekit/components-react";
 import { RoomEvent, RemoteParticipant } from "livekit-client";
+import { isDataTransportReady } from "@/lib/livekit/data-transport";
 
 // ── Event types sent over LiveKit data channel ──────────────────────────
 export type DataChannelEvent =
@@ -67,6 +68,15 @@ export function useSessionDataChannel() {
   // ── Publish helper ──────────────────────────────────────────────────
   const publish = useCallback(
     async (event: DataChannelEvent) => {
+      // Hands, votes and reactions all come from a click, so the room is
+      // normally long connected by now — but a reconnect is exactly when
+      // someone hammers the button, and `publishData` rejects rather than
+      // queues while the engine has no peer connection.
+      if (!isDataTransportReady(room)) {
+        console.warn("[DataChannel] Dropped, transport not ready:", event.type);
+        return;
+      }
+
       try {
         const data = encoder.current.encode(JSON.stringify(event));
         await room.localParticipant.publishData(data, { reliable: true });

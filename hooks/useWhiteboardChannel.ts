@@ -10,6 +10,7 @@ import {
   orderedElements,
   type WhiteboardElement,
 } from "@/lib/whiteboard/protocol";
+import { isDataTransportReady, whenConnected } from "@/lib/livekit/data-transport";
 
 /**
  * Moving the host's whiteboard to everyone else.
@@ -82,8 +83,22 @@ export function useWhiteboardChannel(isHost: boolean): WhiteboardChannel {
   const encoder = useRef(new TextEncoder());
   const decoder = useRef(new TextDecoder());
 
+  /**
+   * Hand one message to the data channel, or decline to.
+   *
+   * Returns whether the message was handed over at all, so a caller that
+   * records what it has sent can avoid recording something that never left.
+   *
+   * The check is what fixes `UnexpectedConnectionState: PC manager is closed`.
+   * `publishData` rejects rather than queues when the engine has no peer
+   * connection, and this hook publishes from a mount effect — which runs while
+   * `<LiveKitRoom>` is still connecting, because it renders its children
+   * immediately. See `lib/livekit/data-transport.ts`.
+   */
   const publish = useCallback(
-    (message: WhiteboardMessage) => {
+    (message: WhiteboardMessage): boolean => {
+      if (!isDataTransportReady(room)) return false;
+
       room.localParticipant
         .publishData(encoder.current.encode(JSON.stringify(message)), { reliable: true })
         .catch((error) => {
@@ -92,6 +107,7 @@ export function useWhiteboardChannel(isHost: boolean): WhiteboardChannel {
           // picks it up again.
           console.error("[whiteboard] publish failed", error);
         });
+      return true;
     },
     [room]
   );
@@ -133,6 +149,7 @@ export function useWhiteboardChannel(isHost: boolean): WhiteboardChannel {
 
           // The snapshot is the whole scene and has no size ceiling, so it goes
           // over the stream API rather than the packet API.
+          if (!isDataTransportReady(room)) return;
           const snapshot = JSON.stringify({ elements: hostSceneRef.current });
           room.localParticipant
             .sendText(snapshot, {
@@ -193,8 +210,29 @@ export function useWhiteboardChannel(isHost: boolean): WhiteboardChannel {
     // Asking, rather than waiting to be told. The host cannot know when this
     // client's UI is ready, and a viewer who joins mid-session would otherwise
     // stare at an empty board until the host's next stroke.
-    publish({ kind: "whiteboard_request" });
-  }, [isHost, publish]);
+    //
+    // Asking *once connected*, rather than on mount. This effect used to fire
+    // the moment the component appeared, which is several hundred milliseconds
+    // before the room finishes connecting — the request threw
+    // `UnexpectedConnectionState: PC manager is closed` and was never retried,
+    // so the late joiner got the blank canvas the request exists to prevent.
+    // It looked like a permission problem because it only ever happened to
+    // members; it was a timing problem, and the host was immune only because a
+    // host publishes from a click.
+    const ask = () => {
+      publish({ kind: "whiteboard_request" });
+    };
+
+    const cancel = whenConnected(room, ask);
+
+    // A reconnect can span strokes this client never saw, and the accumulated
+    // scene has no way to know it is stale. Ask again.
+    room.on(RoomEvent.Reconnected, ask);
+    return () => {
+      cancel();
+      room.off(RoomEvent.Reconnected, ask);
+    };
+  }, [isHost, publish, room]);
 
   // ── host: keep the answer to that request current ───────────────────────
   useEffect(() => {
@@ -212,15 +250,22 @@ export function useWhiteboardChannel(isHost: boolean): WhiteboardChannel {
 
   const publishElements = useCallback(
     (current: readonly WhiteboardElement[]) => {
+      // The host's own copy is kept regardless, so a late joiner arriving after
+      // a blip still gets everything drawn during it.
       hostSceneRef.current = [...current];
 
       const { changed, versions } = diffElements(sentVersionsRef.current, current);
       if (changed.length === 0) return;
 
+      let allSent = true;
       for (const chunk of chunkElements(changed)) {
-        publish({ kind: "whiteboard_delta", elements: chunk });
+        if (!publish({ kind: "whiteboard_delta", elements: chunk })) allSent = false;
       }
-      sentVersionsRef.current = versions;
+
+      // Recording versions for a chunk that was refused would mark those
+      // elements as sent forever — the next diff would skip them and the stroke
+      // would be lost for everyone. Only a send that happened counts.
+      if (allSent) sentVersionsRef.current = versions;
     },
     [publish]
   );

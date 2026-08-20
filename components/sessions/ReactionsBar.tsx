@@ -2,6 +2,7 @@
 
 import { useRoomContext } from "@livekit/components-react";
 import { useTranslations } from "next-intl";
+import { isDataTransportReady } from "@/lib/livekit/data-transport";
 
 const REACTIONS = [
   { emoji: "👍", label: "thumbsup" },
@@ -16,6 +17,10 @@ export function ReactionsBar() {
   const room = useRoomContext();
 
   const sendReaction = async (emoji: string, label: string) => {
+    // Same gate as every other data publish in the room: the engine rejects a
+    // packet it has no peer connection for. See lib/livekit/data-transport.ts.
+    if (!isDataTransportReady(room)) return;
+
     try {
       const encoder = new TextEncoder();
       const data = encoder.encode(
