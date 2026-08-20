@@ -188,3 +188,166 @@ export function orderedElements(scene: Map<string, WhiteboardElement>): Whiteboa
     return left < right ? -1 : 1;
   });
 }
+
+// ───────────────────────────────────────────────────────────────────────────
+// Images
+//
+// An image on the board is two things and only one of them was ever broadcast.
+// The element carries the geometry and a `fileId`; the bytes live in a separate
+// map Excalidraw calls `files`, keyed by that id. `onChange` hands over both —
+// its signature is `(elements, appState, files)` — and the third argument was
+// being discarded, so a guest received the element, looked up its `fileId` in
+// an empty map, and Excalidraw drew its pending placeholder: a grey rectangle
+// with a picture glyph, forever.
+//
+// Files ride their own transport (LiveKit byte streams) rather than the delta
+// packets. A pasted screenshot is 200 KB–1 MB, which as a base64 dataURL is
+// 267 KB–1.3 MB — twenty to ninety times a reliable packet's budget. The delta
+// path has no sequence numbers and reassembles nothing; the stream API chunks
+// and reassembles for us, the same way the late-join snapshot already relies on.
+//
+// The helpers below are the parts with no LiveKit in them.
+// ───────────────────────────────────────────────────────────────────────────
+
+/** One entry of Excalidraw's `files` map, as it travels. */
+export interface WhiteboardFile {
+  id: string;
+  mimeType: string;
+  /** The base64 data URL, moved verbatim — never re-encoded on either side. */
+  dataURL: string;
+}
+
+/** The shape of Excalidraw's `files` argument, narrowed to what is used. */
+export type WhiteboardFiles = Record<string, { mimeType?: string; dataURL?: string } | undefined>;
+
+/**
+ * The files that have not been sent yet.
+ *
+ * Identity is enough, unlike elements, which need a version: an Excalidraw file
+ * id is derived from the file's contents and the entry is immutable once added.
+ * A file that has been sent can never need sending again under the same id.
+ */
+export function diffFiles(sent: ReadonlySet<string>, files: WhiteboardFiles): WhiteboardFile[] {
+  const fresh: WhiteboardFile[] = [];
+
+  for (const [id, file] of Object.entries(files)) {
+    if (!file?.dataURL || sent.has(id)) continue;
+    fresh.push({
+      id,
+      mimeType: file.mimeType ?? "application/octet-stream",
+      dataURL: file.dataURL,
+    });
+  }
+
+  return fresh;
+}
+
+/**
+ * File ids the scene refers to but the viewer does not hold.
+ *
+ * This is the convergence check. A stroke that fails to arrive is repaired by
+ * the next stroke, because the host re-diffs its whole scene every tick — but a
+ * file is sent once and never again, so a dropped stream leaves a placeholder
+ * that nothing will ever fill. Asking for what is missing is what turns
+ * "usually works" into "converges".
+ *
+ * Deleted elements are skipped: their bytes would be fetched to draw nothing.
+ */
+export function missingFileIds(
+  elements: readonly WhiteboardElement[],
+  held: ReadonlySet<string>
+): string[] {
+  const wanted = new Set<string>();
+
+  for (const element of elements) {
+    if (element.isDeleted) continue;
+    if (element.type !== "image") continue;
+    const fileId = element.fileId;
+    if (typeof fileId !== "string" || fileId.length === 0) continue;
+    if (held.has(fileId)) continue;
+    wanted.add(fileId);
+  }
+
+  return [...wanted];
+}
+
+/** How long before a file asked for and not delivered is asked for again. */
+export const FILE_REQUEST_RETRY_MS = 5_000;
+
+/**
+ * How many times to ask for one file before giving up.
+ *
+ * Bounded on purpose. The host may have closed the board, left the room, or
+ * genuinely no longer hold that file, and a viewer that asks forever is a
+ * viewer generating traffic nobody will ever answer.
+ */
+export const FILE_REQUEST_MAX_ATTEMPTS = 3;
+
+export interface FileRequestAttempt {
+  attempts: number;
+  lastAskedAt: number;
+}
+
+/**
+ * Which of the wanted files to ask for right now.
+ *
+ * Filters out the ones already in flight — a request sent 200 ms ago is still
+ * arriving, and asking again would have the host stream the same megabyte
+ * twice — and the ones already asked for the maximum number of times.
+ *
+ * Pure: the caller records the attempt with `recordFileRequests` once the
+ * request has actually gone out, so a publish that fails is retried on the next
+ * pass rather than being counted as an attempt.
+ */
+export function pendingFileRequests(
+  wanted: readonly string[],
+  ledger: ReadonlyMap<string, FileRequestAttempt>,
+  now: number
+): string[] {
+  return wanted.filter((fileId) => {
+    const previous = ledger.get(fileId);
+    if (!previous) return true;
+    if (previous.attempts >= FILE_REQUEST_MAX_ATTEMPTS) return false;
+    return now - previous.lastAskedAt >= FILE_REQUEST_RETRY_MS;
+  });
+}
+
+/** Record that these files were just asked for. Mutates the ledger. */
+export function recordFileRequests(
+  ledger: Map<string, FileRequestAttempt>,
+  fileIds: readonly string[],
+  now: number
+): Map<string, FileRequestAttempt> {
+  for (const fileId of fileIds) {
+    const previous = ledger.get(fileId);
+    ledger.set(fileId, { attempts: (previous?.attempts ?? 0) + 1, lastAskedAt: now });
+  }
+  return ledger;
+}
+
+/**
+ * The files a scene needs, in the order they are referenced.
+ *
+ * Used to answer a late joiner: the host holds every file it has ever pasted,
+ * but only the ones the current scene points at are worth streaming.
+ */
+export function filesForScene(
+  elements: readonly WhiteboardElement[],
+  held: ReadonlyMap<string, WhiteboardFile>
+): WhiteboardFile[] {
+  const out: WhiteboardFile[] = [];
+  const seen = new Set<string>();
+
+  for (const element of elements) {
+    if (element.isDeleted) continue;
+    if (element.type !== "image") continue;
+    const fileId = element.fileId;
+    if (typeof fileId !== "string" || seen.has(fileId)) continue;
+    const file = held.get(fileId);
+    if (!file) continue;
+    seen.add(fileId);
+    out.push(file);
+  }
+
+  return out;
+}

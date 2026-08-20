@@ -303,7 +303,10 @@ export function MainStage({
               isHost={isHost}
               remoteElements={whiteboard?.elements}
               remoteRevision={whiteboard?.revision}
+              remoteFiles={whiteboard?.files}
+              remoteFileRevision={whiteboard?.fileRevision}
               onSceneChange={isHost ? whiteboard?.publishElements : undefined}
+              onFilesChange={isHost ? whiteboard?.publishFiles : undefined}
               onClose={() => onModeChange?.(isAudioOnly ? "screen" : "video")}
             />
           ) : (

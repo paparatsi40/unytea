@@ -5,7 +5,12 @@ import { X, Image as ImageIcon, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
-import { BROADCAST_INTERVAL_MS, type WhiteboardElement } from "@/lib/whiteboard/protocol";
+import {
+  BROADCAST_INTERVAL_MS,
+  type WhiteboardElement,
+  type WhiteboardFile,
+  type WhiteboardFiles,
+} from "@/lib/whiteboard/protocol";
 
 // Excalidraw 0.18+ ships CSS as a separate export (breaking change vs 0.17 which
 // auto-injected styles). Without this import the component mounts but the toolbar,
@@ -43,8 +48,21 @@ interface SessionWhiteboardProps {
   remoteElements?: readonly WhiteboardElement[];
   /** Bumps on every applied update, so the viewer knows to re-render. */
   remoteRevision?: number;
+  /** Image bytes from the channel, to hand to Excalidraw's own file store. */
+  remoteFiles?: readonly WhiteboardFile[];
+  /** Bumps on every file that lands, for the same reason `remoteRevision` does. */
+  remoteFileRevision?: number;
   /** Host only: called with the whole scene, already coalesced. */
   onSceneChange?: (elements: readonly WhiteboardElement[]) => void;
+  /**
+   * Host only: called with Excalidraw's `files` map on every change.
+   *
+   * Separate from `onSceneChange` because the two have nothing in common on the
+   * wire. Elements are small, versioned and diffed every tick; a file is
+   * hundreds of kilobytes, immutable, and sent once. Coalescing them on the
+   * same timer would delay an image behind a stroke for no reason.
+   */
+  onFilesChange?: (files: WhiteboardFiles) => void;
 }
 
 export function SessionWhiteboard({
@@ -54,7 +72,10 @@ export function SessionWhiteboard({
   isHost = false,
   remoteElements,
   remoteRevision = 0,
+  remoteFiles,
+  remoteFileRevision = 0,
   onSceneChange,
+  onFilesChange,
 }: SessionWhiteboardProps) {
   const t = useTranslations("liveSession.whiteboard");
   const tControls = useTranslations("liveSession.room.controls");
@@ -81,15 +102,30 @@ export function SessionWhiteboard({
     if (pending && onSceneChange) onSceneChange(pending);
   }, [onSceneChange]);
 
+  /**
+   * Excalidraw's `onChange` is `(elements, appState, files)`.
+   *
+   * The third argument used to be dropped on the floor — the parameter list
+   * stopped at the first one — and with it went every pasted image. The element
+   * carries only a `fileId`; the bytes live in that map and nowhere else, so a
+   * guest received a reference to something it had never been sent and
+   * Excalidraw drew its pending placeholder in place of the picture.
+   *
+   * The files are handed on unbatched. The stroke timer exists because
+   * `onChange` fires on every pointer move; a `files` map changes only when
+   * somebody pastes, and `publishFiles` diffs by id anyway, so there is nothing
+   * for a timer to coalesce.
+   */
   const handleChange = useCallback(
-    (elements: readonly unknown[]) => {
+    (elements: readonly unknown[], _appState: unknown, files?: WhiteboardFiles) => {
       if (!isHost || !onSceneChange) return;
+      if (files && onFilesChange) onFilesChange(files);
       pendingRef.current = elements as readonly WhiteboardElement[];
       if (timerRef.current === null) {
         timerRef.current = setTimeout(flush, BROADCAST_INTERVAL_MS);
       }
     },
-    [isHost, onSceneChange, flush]
+    [isHost, onSceneChange, onFilesChange, flush]
   );
 
   useEffect(() => {
@@ -109,6 +145,27 @@ export function SessionWhiteboard({
     if (isHost || !excalidrawAPI || !remoteElements) return;
     excalidrawAPI.updateScene({ elements: remoteElements });
   }, [isHost, excalidrawAPI, remoteElements, remoteRevision]);
+
+  /**
+   * The image bytes, into Excalidraw's own file store.
+   *
+   * `addFiles` is idempotent by file id, so re-adding one the canvas already
+   * holds costs a map write. That matters here: elements and files arrive as
+   * independent messages with no ordering between them, and this effect runs
+   * whenever either side moves. Whichever lands second completes the picture,
+   * and neither has to know about the other.
+   */
+  useEffect(() => {
+    if (isHost || !excalidrawAPI || !remoteFiles?.length) return;
+    excalidrawAPI.addFiles(
+      remoteFiles.map((file) => ({
+        id: file.id,
+        mimeType: file.mimeType,
+        dataURL: file.dataURL,
+        created: Date.now(),
+      }))
+    );
+  }, [isHost, excalidrawAPI, remoteFiles, remoteFileRevision]);
 
   const handleExportPNG = async () => {
     if (!excalidrawAPI) return;
