@@ -24,6 +24,12 @@ public/workbox-*.js
 # Vendor assets (pre-built bundles from upstream packages, hashed filenames)
 public/excalidraw-assets/
 
+# Historical documents (audits, remediation plans, unit economics). Prettier
+# does more than reflow prose here: it repads every table so a one-cell edit
+# rewrites the whole table, which is the churn this ignore file exists to
+# prevent. They are records of what was written, not source.
+docs/
+
 # Test coverage
 coverage/
 
