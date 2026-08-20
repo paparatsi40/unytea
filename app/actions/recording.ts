@@ -68,17 +68,17 @@ export const startCompositeRecording = defineAction(
   },
   async (ctx, config: RecordingConfig) => {
     await assertSessionHost(ctx, config.sessionId);
-  try {
-    return await createSessionRecording({
-      sessionId: config.sessionId,
-      layout: config.layout,
-      audioOnly: config.audioOnly,
-    });
-  } catch (error) {
-    console.error("[Recording] Failed to start:", error);
-    return { success: false, error: "Failed to start recording" };
+    try {
+      return await createSessionRecording({
+        sessionId: config.sessionId,
+        layout: config.layout,
+        audioOnly: config.audioOnly,
+      });
+    } catch (error) {
+      console.error("[Recording] Failed to start:", error);
+      return { success: false, error: "Failed to start recording" };
+    }
   }
-}
 );
 
 /**
@@ -96,42 +96,41 @@ export const stopRecording = defineAction(
   },
   async (ctx, sessionId: string) => {
     await assertSessionHost(ctx, sessionId);
-  try {
+    try {
+      const userId = ctx.userId;
+      // Verify host
+      const session = await prisma.mentorSession.findUnique({
+        where: { id: sessionId },
+        select: { mentorId: true },
+      });
 
-    const userId = ctx.userId;
-    // Verify host
-    const session = await prisma.mentorSession.findUnique({
-      where: { id: sessionId },
-      select: { mentorId: true },
-    });
+      if (!session || session.mentorId !== userId) {
+        return { success: false, error: "Not authorized" };
+      }
 
-    if (!session || session.mentorId !== userId) {
-      return { success: false, error: "Not authorized" };
+      // Find active recording
+      const recording = await prisma.recording.findFirst({
+        where: {
+          sessionId,
+          status: "PROCESSING",
+        },
+      });
+
+      if (!recording) {
+        return { success: false, error: "No active recording" };
+      }
+
+      // For V1: Recording stops automatically via LiveKit when room ends
+      // We just update our DB record. The webhook will update final status.
+      console.log(`[Recording] Stop requested for session ${sessionId}`);
+      console.log(`[Recording] Actual stop will be handled by LiveKit when room ends`);
+
+      return { success: true };
+    } catch (error) {
+      console.error("[Recording] Failed to stop:", error);
+      return { success: false, error: "Failed to stop recording" };
     }
-
-    // Find active recording
-    const recording = await prisma.recording.findFirst({
-      where: {
-        sessionId,
-        status: "PROCESSING",
-      },
-    });
-
-    if (!recording) {
-      return { success: false, error: "No active recording" };
-    }
-
-    // For V1: Recording stops automatically via LiveKit when room ends
-    // We just update our DB record. The webhook will update final status.
-    console.log(`[Recording] Stop requested for session ${sessionId}`);
-    console.log(`[Recording] Actual stop will be handled by LiveKit when room ends`);
-
-    return { success: true };
-  } catch (error) {
-    console.error("[Recording] Failed to stop:", error);
-    return { success: false, error: "Failed to stop recording" };
   }
-}
 );
 
 /**
@@ -145,29 +144,29 @@ export const getRecordingStatus = defineAction(
     community: ([sessionId]) => communityOfSession(sessionId),
   },
   async (_ctx, sessionId: string) => {
-  try {
-    const recording = await prisma.recording.findUnique({
-      where: { sessionId },
-    });
+    try {
+      const recording = await prisma.recording.findUnique({
+        where: { sessionId },
+      });
 
-    if (!recording) {
-      return { success: false, error: "No recording found" };
+      if (!recording) {
+        return { success: false, error: "No recording found" };
+      }
+
+      return {
+        success: true,
+        recording: {
+          id: recording.id,
+          status: recording.status,
+          url: recording.url,
+          durationSeconds: recording.durationSeconds,
+        },
+      };
+    } catch (error) {
+      console.error("[Recording] Failed to get status:", error);
+      return { success: false, error: "Failed to get recording status" };
     }
-
-    return {
-      success: true,
-      recording: {
-        id: recording.id,
-        status: recording.status,
-        url: recording.url,
-        durationSeconds: recording.durationSeconds,
-      },
-    };
-  } catch (error) {
-    console.error("[Recording] Failed to get status:", error);
-    return { success: false, error: "Failed to get recording status" };
   }
-}
 );
 
 /**
@@ -189,46 +188,50 @@ export const listRecordings = defineAction(
     ],
     community: ([communityId]) => communityById(communityId),
   },
-  async (_ctx, communityId: string, options?: { limit?: number; offset?: number; status?: "PROCESSING" | "READY" | "FAILED"; }) => {
-  try {
-    const recordings = await prisma.recording.findMany({
-      where: {
-        session: {
-          communityId,
+  async (
+    _ctx,
+    communityId: string,
+    options?: { limit?: number; offset?: number; status?: "PROCESSING" | "READY" | "FAILED" }
+  ) => {
+    try {
+      const recordings = await prisma.recording.findMany({
+        where: {
+          session: {
+            communityId,
+          },
+          ...(options?.status && { status: options.status }),
         },
-        ...(options?.status && { status: options.status }),
-      },
-      include: {
-        session: {
-          select: {
-            id: true,
-            title: true,
-            scheduledAt: true,
+        include: {
+          session: {
+            select: {
+              id: true,
+              title: true,
+              scheduledAt: true,
+            },
           },
         },
-      },
-      orderBy: { createdAt: "desc" },
-      take: options?.limit || 20,
-      skip: options?.offset || 0,
-    });
+        orderBy: { createdAt: "desc" },
+        take: options?.limit || 20,
+        skip: options?.offset || 0,
+      });
 
-    return {
-      success: true,
-      recordings: recordings.map((r) => ({
-        id: r.id,
-        sessionId: r.sessionId,
-        sessionTitle: r.session.title,
-        status: r.status,
-        url: r.url,
-        durationSeconds: r.durationSeconds,
-        createdAt: r.createdAt,
-      })),
-    };
-  } catch (error) {
-    console.error("[Recording] Failed to list:", error);
-    return { success: false, error: "Failed to list recordings" };
+      return {
+        success: true,
+        recordings: recordings.map((r) => ({
+          id: r.id,
+          sessionId: r.sessionId,
+          sessionTitle: r.session.title,
+          status: r.status,
+          url: r.url,
+          durationSeconds: r.durationSeconds,
+          createdAt: r.createdAt,
+        })),
+      };
+    } catch (error) {
+      console.error("[Recording] Failed to list:", error);
+      return { success: false, error: "Failed to list recordings" };
+    }
   }
-}
 );
 
 /**
@@ -258,25 +261,23 @@ export const deleteRecording = defineAction(
     // its ForbiddenError reaches the seam.
     await assertSessionHost(ctx, recording.sessionId);
 
-  try {
-    // TODO: Delete from S3/R2 storage
-    // const s3Client = new S3Client(...);
-    // await s3Client.send(new DeleteObjectCommand({...}));
+    try {
+      // TODO: Delete from S3/R2 storage
+      // const s3Client = new S3Client(...);
+      // await s3Client.send(new DeleteObjectCommand({...}));
 
-    // Delete from database
-    await prisma.recording.delete({
-      where: { id: recordingId },
-    });
+      // Delete from database
+      await prisma.recording.delete({
+        where: { id: recordingId },
+      });
 
-    return { success: true };
-  } catch (error) {
-    console.error("[Recording] Failed to delete:", error);
-    return { success: false, error: "Failed to delete recording" };
+      return { success: true };
+    } catch (error) {
+      console.error("[Recording] Failed to delete:", error);
+      return { success: false, error: "Failed to delete recording" };
+    }
   }
-}
 );
-
-
 
 /**
  * Generate signed URL for private recording access
@@ -290,34 +291,31 @@ export const getSignedRecordingUrl = defineAction(
     community: ([recordingId]) => communityOfRecording(recordingId),
   },
   async (_ctx, recordingId: string) => {
-  try {
-
-
-
-    const recording = await prisma.recording.findUnique({
-      where: { id: recordingId },
-      include: {
-        session: {
-          select: {
-            communityId: true,
-            mentorId: true,
+    try {
+      const recording = await prisma.recording.findUnique({
+        where: { id: recordingId },
+        include: {
+          session: {
+            select: {
+              communityId: true,
+              mentorId: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    if (!recording || !recording.url) {
-      return { success: false, error: "Recording not found" };
+      if (!recording || !recording.url) {
+        return { success: false, error: "Recording not found" };
+      }
+
+      // TODO: Implement signed URL generation
+      // For now, return the direct URL if it's public
+      // In production, use S3 GetObjectCommand with Presigner
+
+      return { success: true, url: recording.url };
+    } catch (error) {
+      console.error("[Recording] Failed to get signed URL:", error);
+      return { success: false, error: "Failed to generate URL" };
     }
-
-    // TODO: Implement signed URL generation
-    // For now, return the direct URL if it's public
-    // In production, use S3 GetObjectCommand with Presigner
-
-    return { success: true, url: recording.url };
-  } catch (error) {
-    console.error("[Recording] Failed to get signed URL:", error);
-    return { success: false, error: "Failed to generate URL" };
   }
-}
 );

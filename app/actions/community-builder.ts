@@ -58,56 +58,74 @@ export const updateCommunityTheme = defineAction(
     args: [z.string().min(1).max(64), z.record(z.string().max(64), z.unknown())],
     community: ([communityId]) => communityById(communityId),
   },
-  async (ctx, communityId: string, data: { primaryColor?: string; secondaryColor?: string; accentColor?: string; fontFamily?: string; heroTitle?: string; heroSubtitle?: string; heroCTA?: string; heroCTALink?: string; aboutSection?: string; showStats?: boolean; showMembers?: boolean; showCourses?: boolean; }) => {
-  try {
+  async (
+    ctx,
+    communityId: string,
+    data: {
+      primaryColor?: string;
+      secondaryColor?: string;
+      accentColor?: string;
+      fontFamily?: string;
+      heroTitle?: string;
+      heroSubtitle?: string;
+      heroCTA?: string;
+      heroCTALink?: string;
+      aboutSection?: string;
+      showStats?: boolean;
+      showMembers?: boolean;
+      showCourses?: boolean;
+    }
+  ) => {
+    try {
+      const userId = ctx.userId;
 
-    const userId = ctx.userId;
-
-    // Verify ownership or admin
-    const member = await prisma.member.findUnique({
-      where: {
-        userId_communityId: {
-          userId,
-          communityId,
+      // Verify ownership or admin
+      const member = await prisma.member.findUnique({
+        where: {
+          userId_communityId: {
+            userId,
+            communityId,
+          },
         },
-      },
-    });
+      });
 
-    if (!member || (member.role !== "OWNER" && member.role !== "ADMIN")) {
-      return { success: false, error: "Not authorized to edit community" };
-    }
+      if (!member || (member.role !== "OWNER" && member.role !== "ADMIN")) {
+        return { success: false, error: "Not authorized to edit community" };
+      }
 
-    // Validate input shape and lengths
-    const parsed = themeUpdateSchema.safeParse(data);
-    if (!parsed.success) {
-      return {
-        success: false,
-        error: "Validation failed",
-        details: parsed.error.flatten(),
+      // Validate input shape and lengths
+      const parsed = themeUpdateSchema.safeParse(data);
+      if (!parsed.success) {
+        return {
+          success: false,
+          error: "Validation failed",
+          details: parsed.error.flatten(),
+        };
+      }
+
+      // Sanitize HTML in aboutSection (Tiptap WYSIWYG output → DOMPurify allowlist)
+      const sanitized = {
+        ...parsed.data,
+        aboutSection:
+          parsed.data.aboutSection !== undefined
+            ? sanitizeHTML(parsed.data.aboutSection)
+            : undefined,
       };
+
+      const community = await prisma.community.update({
+        where: { id: communityId },
+        data: sanitized,
+      });
+
+      revalidatePath(`/dashboard/c/${community.slug}`);
+      revalidatePath(`/dashboard/c/${community.slug}/settings`);
+
+      return { success: true, community };
+    } catch (error) {
+      console.error("Error updating community theme:", error);
+      return { success: false, error: "Failed to update theme" };
     }
-
-    // Sanitize HTML in aboutSection (Tiptap WYSIWYG output → DOMPurify allowlist)
-    const sanitized = {
-      ...parsed.data,
-      aboutSection:
-        parsed.data.aboutSection !== undefined ? sanitizeHTML(parsed.data.aboutSection) : undefined,
-    };
-
-    const community = await prisma.community.update({
-      where: { id: communityId },
-      data: sanitized,
-    });
-
-    revalidatePath(`/dashboard/c/${community.slug}`);
-    revalidatePath(`/dashboard/c/${community.slug}/settings`);
-
-    return { success: true, community };
-  } catch (error) {
-    console.error("Error updating community theme:", error);
-    return { success: false, error: "Failed to update theme" };
   }
-}
 );
 
 /**
@@ -117,41 +135,47 @@ export const updateCommunityLayout = defineAction(
   {
     name: "updateCommunityLayout",
     auth: "admin",
-    args: [z.string().min(1).max(64), z.enum(["MODERN_GRID", "CLASSIC_FORUM", "ACADEMY", "DASHBOARD", "MINIMALIST"])],
+    args: [
+      z.string().min(1).max(64),
+      z.enum(["MODERN_GRID", "CLASSIC_FORUM", "ACADEMY", "DASHBOARD", "MINIMALIST"]),
+    ],
     community: ([communityId]) => communityById(communityId),
   },
-  async (ctx, communityId: string, layoutType: "MODERN_GRID" | "CLASSIC_FORUM" | "ACADEMY" | "DASHBOARD" | "MINIMALIST") => {
-  try {
+  async (
+    ctx,
+    communityId: string,
+    layoutType: "MODERN_GRID" | "CLASSIC_FORUM" | "ACADEMY" | "DASHBOARD" | "MINIMALIST"
+  ) => {
+    try {
+      const userId = ctx.userId;
 
-    const userId = ctx.userId;
-
-    // Verify ownership or admin
-    const member = await prisma.member.findUnique({
-      where: {
-        userId_communityId: {
-          userId,
-          communityId,
+      // Verify ownership or admin
+      const member = await prisma.member.findUnique({
+        where: {
+          userId_communityId: {
+            userId,
+            communityId,
+          },
         },
-      },
-    });
+      });
 
-    if (!member || (member.role !== "OWNER" && member.role !== "ADMIN")) {
-      return { success: false, error: "Not authorized" };
+      if (!member || (member.role !== "OWNER" && member.role !== "ADMIN")) {
+        return { success: false, error: "Not authorized" };
+      }
+
+      const community = await prisma.community.update({
+        where: { id: communityId },
+        data: { layoutType },
+      });
+
+      revalidatePath(`/dashboard/c/${community.slug}`);
+
+      return { success: true, community };
+    } catch (error) {
+      console.error("Error updating layout:", error);
+      return { success: false, error: "Failed to update layout" };
     }
-
-    const community = await prisma.community.update({
-      where: { id: communityId },
-      data: { layoutType },
-    });
-
-    revalidatePath(`/dashboard/c/${community.slug}`);
-
-    return { success: true, community };
-  } catch (error) {
-    console.error("Error updating layout:", error);
-    return { success: false, error: "Failed to update layout" };
   }
-}
 );
 
 /**
@@ -174,57 +198,67 @@ export const createCommunitySection = defineAction(
     ],
     community: ([communityId]) => communityById(communityId),
   },
-  async (ctx, communityId: string, data: { type: string; title?: string; content?: Prisma.InputJsonValue; position?: number; isVisible?: boolean; settings?: Prisma.InputJsonValue; }) => {
-  try {
-
-    const userId = ctx.userId;
-
-    // Verify ownership or admin
-    const member = await prisma.member.findUnique({
-      where: {
-        userId_communityId: {
-          userId,
-          communityId,
-        },
-      },
-    });
-
-    if (!member || (member.role !== "OWNER" && member.role !== "ADMIN")) {
-      return { success: false, error: "Not authorized" };
+  async (
+    ctx,
+    communityId: string,
+    data: {
+      type: string;
+      title?: string;
+      content?: Prisma.InputJsonValue;
+      position?: number;
+      isVisible?: boolean;
+      settings?: Prisma.InputJsonValue;
     }
+  ) => {
+    try {
+      const userId = ctx.userId;
 
-    // Get max position
-    const maxPosition = await prisma.communitySection.findFirst({
-      where: { communityId },
-      orderBy: { position: "desc" },
-      select: { position: true },
-    });
+      // Verify ownership or admin
+      const member = await prisma.member.findUnique({
+        where: {
+          userId_communityId: {
+            userId,
+            communityId,
+          },
+        },
+      });
 
-    const section = await prisma.communitySection.create({
-      data: {
-        communityId,
-        type: data.type as CommunitySectionType,
-        title: data.title,
-        content: data.content,
-        position: data.position ?? (maxPosition?.position ?? 0) + 1,
-        isVisible: data.isVisible ?? true,
-        settings: data.settings,
-      },
-    });
+      if (!member || (member.role !== "OWNER" && member.role !== "ADMIN")) {
+        return { success: false, error: "Not authorized" };
+      }
 
-    const community = await prisma.community.findUnique({
-      where: { id: communityId },
-      select: { slug: true },
-    });
+      // Get max position
+      const maxPosition = await prisma.communitySection.findFirst({
+        where: { communityId },
+        orderBy: { position: "desc" },
+        select: { position: true },
+      });
 
-    revalidatePath(`/dashboard/c/${community?.slug}`);
+      const section = await prisma.communitySection.create({
+        data: {
+          communityId,
+          type: data.type as CommunitySectionType,
+          title: data.title,
+          content: data.content,
+          position: data.position ?? (maxPosition?.position ?? 0) + 1,
+          isVisible: data.isVisible ?? true,
+          settings: data.settings,
+        },
+      });
 
-    return { success: true, section };
-  } catch (error) {
-    console.error("Error creating section:", error);
-    return { success: false, error: "Failed to create section" };
+      const community = await prisma.community.findUnique({
+        where: { id: communityId },
+        select: { slug: true },
+      });
+
+      revalidatePath(`/dashboard/c/${community?.slug}`);
+
+      return { success: true, section };
+    } catch (error) {
+      console.error("Error creating section:", error);
+      return { success: false, error: "Failed to create section" };
+    }
   }
-}
 );
 
 /**
@@ -245,47 +279,55 @@ export const updateCommunitySection = defineAction(
     ],
     community: ([sectionId]) => communityOfSection(sectionId),
   },
-  async (ctx, sectionId: string, data: { title?: string; content?: Prisma.InputJsonValue; isVisible?: boolean; settings?: Prisma.InputJsonValue; }) => {
-  try {
+  async (
+    ctx,
+    sectionId: string,
+    data: {
+      title?: string;
+      content?: Prisma.InputJsonValue;
+      isVisible?: boolean;
+      settings?: Prisma.InputJsonValue;
+    }
+  ) => {
+    try {
+      const userId = ctx.userId;
 
-    const userId = ctx.userId;
-
-    // Get section to verify ownership
-    const section = await prisma.communitySection.findUnique({
-      where: { id: sectionId },
-      include: {
-        community: {
-          include: {
-            members: {
-              where: { userId },
+      // Get section to verify ownership
+      const section = await prisma.communitySection.findUnique({
+        where: { id: sectionId },
+        include: {
+          community: {
+            include: {
+              members: {
+                where: { userId },
+              },
             },
           },
         },
-      },
-    });
+      });
 
-    if (!section) {
-      return { success: false, error: "Section not found" };
+      if (!section) {
+        return { success: false, error: "Section not found" };
+      }
+
+      const member = section.community.members[0];
+      if (!member || (member.role !== "OWNER" && member.role !== "ADMIN")) {
+        return { success: false, error: "Not authorized" };
+      }
+
+      const updatedSection = await prisma.communitySection.update({
+        where: { id: sectionId },
+        data,
+      });
+
+      revalidatePath(`/dashboard/c/${section.community.slug}`);
+
+      return { success: true, section: updatedSection };
+    } catch (error) {
+      console.error("Error updating section:", error);
+      return { success: false, error: "Failed to update section" };
     }
-
-    const member = section.community.members[0];
-    if (!member || (member.role !== "OWNER" && member.role !== "ADMIN")) {
-      return { success: false, error: "Not authorized" };
-    }
-
-    const updatedSection = await prisma.communitySection.update({
-      where: { id: sectionId },
-      data,
-    });
-
-    revalidatePath(`/dashboard/c/${section.community.slug}`);
-
-    return { success: true, section: updatedSection };
-  } catch (error) {
-    console.error("Error updating section:", error);
-    return { success: false, error: "Failed to update section" };
   }
-}
 );
 
 /**
@@ -299,45 +341,44 @@ export const deleteCommunitySection = defineAction(
     community: ([sectionId]) => communityOfSection(sectionId),
   },
   async (ctx, sectionId: string) => {
-  try {
+    try {
+      const userId = ctx.userId;
 
-    const userId = ctx.userId;
-
-    // Get section to verify ownership
-    const section = await prisma.communitySection.findUnique({
-      where: { id: sectionId },
-      include: {
-        community: {
-          include: {
-            members: {
-              where: { userId },
+      // Get section to verify ownership
+      const section = await prisma.communitySection.findUnique({
+        where: { id: sectionId },
+        include: {
+          community: {
+            include: {
+              members: {
+                where: { userId },
+              },
             },
           },
         },
-      },
-    });
+      });
 
-    if (!section) {
-      return { success: false, error: "Section not found" };
+      if (!section) {
+        return { success: false, error: "Section not found" };
+      }
+
+      const member = section.community.members[0];
+      if (!member || (member.role !== "OWNER" && member.role !== "ADMIN")) {
+        return { success: false, error: "Not authorized" };
+      }
+
+      await prisma.communitySection.delete({
+        where: { id: sectionId },
+      });
+
+      revalidatePath(`/dashboard/c/${section.community.slug}`);
+
+      return { success: true };
+    } catch (error) {
+      console.error("Error deleting section:", error);
+      return { success: false, error: "Failed to delete section" };
     }
-
-    const member = section.community.members[0];
-    if (!member || (member.role !== "OWNER" && member.role !== "ADMIN")) {
-      return { success: false, error: "Not authorized" };
-    }
-
-    await prisma.communitySection.delete({
-      where: { id: sectionId },
-    });
-
-    revalidatePath(`/dashboard/c/${section.community.slug}`);
-
-    return { success: true };
-  } catch (error) {
-    console.error("Error deleting section:", error);
-    return { success: false, error: "Failed to delete section" };
   }
-}
 );
 
 /**
@@ -351,60 +392,59 @@ export const reorderCommunitySections = defineAction(
     community: ([communityId]) => communityById(communityId),
   },
   async (ctx, communityId: string, sectionIds: string[]) => {
-  try {
+    try {
+      const userId = ctx.userId;
 
-    const userId = ctx.userId;
-
-    // Verify ownership or admin
-    const member = await prisma.member.findUnique({
-      where: {
-        userId_communityId: {
-          userId,
-          communityId,
+      // Verify ownership or admin
+      const member = await prisma.member.findUnique({
+        where: {
+          userId_communityId: {
+            userId,
+            communityId,
+          },
         },
-      },
-    });
+      });
 
-    if (!member || (member.role !== "OWNER" && member.role !== "ADMIN")) {
-      return { success: false, error: "Not authorized" };
+      if (!member || (member.role !== "OWNER" && member.role !== "ADMIN")) {
+        return { success: false, error: "Not authorized" };
+      }
+
+      // Each write is scoped to the tenant that passed the gate. Previously the
+      // where was `{ id }` alone, so an OWNER/ADMIN of community A could pass A's
+      // id to satisfy the gate and then hand in section ids belonging to
+      // community B, silently rewriting B's ordering (M5). updateMany with a
+      // communityId predicate makes a foreign id a no-op rather than a write.
+      const results = await prisma.$transaction(
+        sectionIds.map((id, index) =>
+          prisma.communitySection.updateMany({
+            where: { id, communityId },
+            data: { position: index },
+          })
+        )
+      );
+
+      const applied = results.reduce((sum, r) => sum + r.count, 0);
+      if (applied !== sectionIds.length) {
+        // Surface the mismatch rather than reporting success for a partial write.
+        return {
+          success: false,
+          error: "One or more sections do not belong to this community",
+        };
+      }
+
+      const community = await prisma.community.findUnique({
+        where: { id: communityId },
+        select: { slug: true },
+      });
+
+      revalidatePath(`/dashboard/c/${community?.slug}`);
+
+      return { success: true };
+    } catch (error) {
+      console.error("Error reordering sections:", error);
+      return { success: false, error: "Failed to reorder sections" };
     }
-
-    // Each write is scoped to the tenant that passed the gate. Previously the
-    // where was `{ id }` alone, so an OWNER/ADMIN of community A could pass A's
-    // id to satisfy the gate and then hand in section ids belonging to
-    // community B, silently rewriting B's ordering (M5). updateMany with a
-    // communityId predicate makes a foreign id a no-op rather than a write.
-    const results = await prisma.$transaction(
-      sectionIds.map((id, index) =>
-        prisma.communitySection.updateMany({
-          where: { id, communityId },
-          data: { position: index },
-        })
-      )
-    );
-
-    const applied = results.reduce((sum, r) => sum + r.count, 0);
-    if (applied !== sectionIds.length) {
-      // Surface the mismatch rather than reporting success for a partial write.
-      return {
-        success: false,
-        error: "One or more sections do not belong to this community",
-      };
-    }
-
-    const community = await prisma.community.findUnique({
-      where: { id: communityId },
-      select: { slug: true },
-    });
-
-    revalidatePath(`/dashboard/c/${community?.slug}`);
-
-    return { success: true };
-  } catch (error) {
-    console.error("Error reordering sections:", error);
-    return { success: false, error: "Failed to reorder sections" };
   }
-}
 );
 
 /**
@@ -418,43 +458,43 @@ export const getCommunityWithSections = defineAction(
     rateLimit: "api",
   },
   async (_ctx, slug: string) => {
-  try {
-    console.log("🔍 getCommunityWithSections - Looking for slug:", slug);
+    try {
+      console.log("🔍 getCommunityWithSections - Looking for slug:", slug);
 
-    const community = await prisma.community.findUnique({
-      where: { slug },
-      include: {
-        sections: {
-          where: { isVisible: true },
-          orderBy: { position: "asc" },
-        },
-        owner: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
+      const community = await prisma.community.findUnique({
+        where: { slug },
+        include: {
+          sections: {
+            where: { isVisible: true },
+            orderBy: { position: "asc" },
+          },
+          owner: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+          _count: {
+            select: {
+              members: true,
+              posts: true,
+              courses: true,
+            },
           },
         },
-        _count: {
-          select: {
-            members: true,
-            posts: true,
-            courses: true,
-          },
-        },
-      },
-    });
+      });
 
-    if (!community) {
-      console.log("❌ Community not found with slug:", slug);
-      return { success: false, error: "Community not found" };
+      if (!community) {
+        console.log("❌ Community not found with slug:", slug);
+        return { success: false, error: "Community not found" };
+      }
+
+      console.log("✅ Community found:", community.name, "ID:", community.id);
+      return { success: true, community };
+    } catch (error) {
+      console.error("❌ Error fetching community:", error);
+      return { success: false, error: "Failed to fetch community" };
     }
-
-    console.log("✅ Community found:", community.name, "ID:", community.id);
-    return { success: true, community };
-  } catch (error) {
-    console.error("❌ Error fetching community:", error);
-    return { success: false, error: "Failed to fetch community" };
   }
-}
 );

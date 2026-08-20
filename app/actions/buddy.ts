@@ -4,7 +4,11 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { defineAction } from "@/lib/actions/define-action";
 import { assertBuddyPartner } from "@/lib/actions/guards";
-import { communityById, communityOfBuddyGoal, communityOfPartnership } from "@/lib/actions/resolvers";
+import {
+  communityById,
+  communityOfBuddyGoal,
+  communityOfPartnership,
+} from "@/lib/actions/resolvers";
 import { revalidatePath } from "next/cache";
 
 /**
@@ -18,80 +22,79 @@ export const findBuddyMatch = defineAction(
     community: ([communityId]) => communityById(communityId),
   },
   async (ctx, communityId: string) => {
-  try {
+    try {
+      const userId = ctx.userId;
 
-    const userId = ctx.userId;
-
-    // Check if user already has an active buddy in this community
-    const existingPartnership = await prisma.buddyPartnership.findFirst({
-      where: {
-        communityId,
-        status: "ACTIVE",
-        OR: [{ user1Id: userId }, { user2Id: userId }],
-      },
-    });
-
-    if (existingPartnership) {
-      return { success: false, error: "You already have an active buddy" };
-    }
-
-    // Find users without a buddy (excluding current user)
-    const availableUsers = await prisma.member.findMany({
-      where: {
-        communityId,
-        status: "ACTIVE",
-        userId: { not: userId },
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
-            skills: true,
-            interests: true,
-          },
-        },
-      },
-    });
-
-    // Filter users who don't have an active buddy
-    const usersWithoutBuddy = [];
-    for (const member of availableUsers) {
-      const hasBuddy = await prisma.buddyPartnership.findFirst({
+      // Check if user already has an active buddy in this community
+      const existingPartnership = await prisma.buddyPartnership.findFirst({
         where: {
           communityId,
           status: "ACTIVE",
-          OR: [{ user1Id: member.userId }, { user2Id: member.userId }],
+          OR: [{ user1Id: userId }, { user2Id: userId }],
         },
       });
-      if (!hasBuddy) {
-        usersWithoutBuddy.push(member);
+
+      if (existingPartnership) {
+        return { success: false, error: "You already have an active buddy" };
       }
+
+      // Find users without a buddy (excluding current user)
+      const availableUsers = await prisma.member.findMany({
+        where: {
+          communityId,
+          status: "ACTIVE",
+          userId: { not: userId },
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+              skills: true,
+              interests: true,
+            },
+          },
+        },
+      });
+
+      // Filter users who don't have an active buddy
+      const usersWithoutBuddy = [];
+      for (const member of availableUsers) {
+        const hasBuddy = await prisma.buddyPartnership.findFirst({
+          where: {
+            communityId,
+            status: "ACTIVE",
+            OR: [{ user1Id: member.userId }, { user2Id: member.userId }],
+          },
+        });
+        if (!hasBuddy) {
+          usersWithoutBuddy.push(member);
+        }
+      }
+
+      if (usersWithoutBuddy.length === 0) {
+        return { success: false, error: "No available buddies found" };
+      }
+
+      // Simple random match for MVP (can be improved with ML later)
+      const randomMatch = usersWithoutBuddy[Math.floor(Math.random() * usersWithoutBuddy.length)];
+
+      return {
+        success: true,
+        match: {
+          id: randomMatch.userId,
+          name: randomMatch.user.name,
+          image: randomMatch.user.image,
+          skills: randomMatch.user.skills,
+          interests: randomMatch.user.interests,
+        },
+      };
+    } catch (error) {
+      console.error("Error finding buddy match:", error);
+      return { success: false, error: "Failed to find buddy match" };
     }
-
-    if (usersWithoutBuddy.length === 0) {
-      return { success: false, error: "No available buddies found" };
-    }
-
-    // Simple random match for MVP (can be improved with ML later)
-    const randomMatch = usersWithoutBuddy[Math.floor(Math.random() * usersWithoutBuddy.length)];
-
-    return {
-      success: true,
-      match: {
-        id: randomMatch.userId,
-        name: randomMatch.user.name,
-        image: randomMatch.user.image,
-        skills: randomMatch.user.skills,
-        interests: randomMatch.user.interests,
-      },
-    };
-  } catch (error) {
-    console.error("Error finding buddy match:", error);
-    return { success: false, error: "Failed to find buddy match" };
   }
-}
 );
 
 /**
@@ -106,93 +109,92 @@ export const createBuddyPartnership = defineAction(
     rateLimit: "create",
   },
   async (ctx, buddyId: string, communityId: string) => {
-  try {
+    try {
+      const userId = ctx.userId;
 
-    const userId = ctx.userId;
+      if (!userId) {
+        return { success: false, error: "Not authenticated" };
+      }
 
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+      if (userId === buddyId) {
+        return { success: false, error: "Cannot match with yourself" };
+      }
 
-    if (userId === buddyId) {
-      return { success: false, error: "Cannot match with yourself" };
-    }
+      // Check if both users are members of the community
+      const [member1, member2] = await Promise.all([
+        prisma.member.findUnique({
+          where: {
+            userId_communityId: {
+              userId,
+              communityId,
+            },
+          },
+        }),
+        prisma.member.findUnique({
+          where: {
+            userId_communityId: {
+              userId: buddyId,
+              communityId,
+            },
+          },
+        }),
+      ]);
 
-    // Check if both users are members of the community
-    const [member1, member2] = await Promise.all([
-      prisma.member.findUnique({
+      if (!member1 || !member2 || member1.status !== "ACTIVE" || member2.status !== "ACTIVE") {
+        return { success: false, error: "Both users must be active members" };
+      }
+
+      // Check if partnership already exists
+      const existing = await prisma.buddyPartnership.findFirst({
         where: {
-          userId_communityId: {
-            userId,
-            communityId,
-          },
+          communityId,
+          OR: [
+            { user1Id: userId, user2Id: buddyId },
+            { user1Id: buddyId, user2Id: userId },
+          ],
         },
-      }),
-      prisma.member.findUnique({
-        where: {
-          userId_communityId: {
-            userId: buddyId,
-            communityId,
-          },
-        },
-      }),
-    ]);
+      });
 
-    if (!member1 || !member2 || member1.status !== "ACTIVE" || member2.status !== "ACTIVE") {
-      return { success: false, error: "Both users must be active members" };
+      if (existing) {
+        return { success: false, error: "Partnership already exists" };
+      }
+
+      // Create partnership
+      const partnership = await prisma.buddyPartnership.create({
+        data: {
+          user1Id: userId,
+          user2Id: buddyId,
+          communityId,
+          status: "ACTIVE",
+        },
+        include: {
+          user1: {
+            select: {
+              id: true,
+              name: true,
+              username: true,
+              image: true,
+            },
+          },
+          user2: {
+            select: {
+              id: true,
+              name: true,
+              username: true,
+              image: true,
+            },
+          },
+        },
+      });
+
+      revalidatePath(`/dashboard/c/${communityId}/buddy`);
+
+      return { success: true, partnership };
+    } catch (error) {
+      console.error("Error creating buddy partnership:", error);
+      return { success: false, error: "Failed to create partnership" };
     }
-
-    // Check if partnership already exists
-    const existing = await prisma.buddyPartnership.findFirst({
-      where: {
-        communityId,
-        OR: [
-          { user1Id: userId, user2Id: buddyId },
-          { user1Id: buddyId, user2Id: userId },
-        ],
-      },
-    });
-
-    if (existing) {
-      return { success: false, error: "Partnership already exists" };
-    }
-
-    // Create partnership
-    const partnership = await prisma.buddyPartnership.create({
-      data: {
-        user1Id: userId,
-        user2Id: buddyId,
-        communityId,
-        status: "ACTIVE",
-      },
-      include: {
-        user1: {
-          select: {
-            id: true,
-            name: true,
-            username: true,
-            image: true,
-          },
-        },
-        user2: {
-          select: {
-            id: true,
-            name: true,
-            username: true,
-            image: true,
-          },
-        },
-      },
-    });
-
-    revalidatePath(`/dashboard/c/${communityId}/buddy`);
-
-    return { success: true, partnership };
-  } catch (error) {
-    console.error("Error creating buddy partnership:", error);
-    return { success: false, error: "Failed to create partnership" };
   }
-}
 );
 
 /**
@@ -206,63 +208,62 @@ export const getMyBuddyPartnership = defineAction(
     community: ([communityId]) => communityById(communityId),
   },
   async (ctx, communityId: string) => {
-  try {
+    try {
+      const userId = ctx.userId;
 
-    const userId = ctx.userId;
-
-    const partnership = await prisma.buddyPartnership.findFirst({
-      where: {
-        communityId,
-        status: "ACTIVE",
-        OR: [{ user1Id: userId }, { user2Id: userId }],
-      },
-      include: {
-        user1: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
+      const partnership = await prisma.buddyPartnership.findFirst({
+        where: {
+          communityId,
+          status: "ACTIVE",
+          OR: [{ user1Id: userId }, { user2Id: userId }],
+        },
+        include: {
+          user1: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
           },
-        },
-        user2: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
+          user2: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
           },
-        },
-        goals: {
-          orderBy: { createdAt: "desc" },
-        },
-        checkIns: {
-          orderBy: { createdAt: "desc" },
-          take: 10,
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                image: true,
+          goals: {
+            orderBy: { createdAt: "desc" },
+          },
+          checkIns: {
+            orderBy: { createdAt: "desc" },
+            take: 10,
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  image: true,
+                },
               },
             },
           },
         },
-      },
-    });
+      });
 
-    if (!partnership) {
-      return { success: true, partnership: null };
+      if (!partnership) {
+        return { success: true, partnership: null };
+      }
+
+      // Determine who is the buddy (the other person)
+      const buddy = partnership.user1Id === userId ? partnership.user2 : partnership.user1;
+
+      return { success: true, partnership, buddy };
+    } catch (error) {
+      console.error("Error getting buddy partnership:", error);
+      return { success: false, error: "Failed to get partnership", partnership: null };
     }
-
-    // Determine who is the buddy (the other person)
-    const buddy = partnership.user1Id === userId ? partnership.user2 : partnership.user1;
-
-    return { success: true, partnership, buddy };
-  } catch (error) {
-    console.error("Error getting buddy partnership:", error);
-    return { success: false, error: "Failed to get partnership", partnership: null };
   }
-}
 );
 
 /**
@@ -272,31 +273,36 @@ export const createBuddyGoal = defineAction(
   {
     name: "createBuddyGoal",
     auth: "member",
-    args: [z.string().min(1).max(64), z.string().min(1).max(300), z.string().max(5000).optional(), z.coerce.date().optional()],
+    args: [
+      z.string().min(1).max(64),
+      z.string().min(1).max(300),
+      z.string().max(5000).optional(),
+      z.coerce.date().optional(),
+    ],
     community: ([partnershipId]) => communityOfPartnership(partnershipId),
     rateLimit: "create",
   },
   async (ctx, partnershipId: string, title: string, description?: string, targetDate?: Date) => {
     await assertBuddyPartner(ctx, partnershipId);
 
-  try {
-    const goal = await prisma.buddyGoal.create({
-      data: {
-        partnershipId,
-        title,
-        description,
-        targetDate,
-      },
-    });
+    try {
+      const goal = await prisma.buddyGoal.create({
+        data: {
+          partnershipId,
+          title,
+          description,
+          targetDate,
+        },
+      });
 
-    revalidatePath("/dashboard/c/[slug]/buddy", "page");
+      revalidatePath("/dashboard/c/[slug]/buddy", "page");
 
-    return { success: true, goal };
-  } catch (error) {
-    console.error("Error creating buddy goal:", error);
-    return { success: false, error: "Failed to create goal" };
+      return { success: true, goal };
+    } catch (error) {
+      console.error("Error creating buddy goal:", error);
+      return { success: false, error: "Failed to create goal" };
+    }
   }
-}
 );
 
 /**
@@ -317,23 +323,23 @@ export const completeBuddyGoal = defineAction(
     if (!owning) return { success: false, error: "Goal not found" };
     await assertBuddyPartner(ctx, owning.partnershipId);
 
-  try {
-    const goal = await prisma.buddyGoal.update({
-      where: { id: goalId },
-      data: {
-        completed: true,
-        completedAt: new Date(),
-      },
-    });
+    try {
+      const goal = await prisma.buddyGoal.update({
+        where: { id: goalId },
+        data: {
+          completed: true,
+          completedAt: new Date(),
+        },
+      });
 
-    revalidatePath("/dashboard/c/[slug]/buddy", "page");
+      revalidatePath("/dashboard/c/[slug]/buddy", "page");
 
-    return { success: true, goal };
-  } catch (error) {
-    console.error("Error completing buddy goal:", error);
-    return { success: false, error: "Failed to complete goal" };
+      return { success: true, goal };
+    } catch (error) {
+      console.error("Error completing buddy goal:", error);
+      return { success: false, error: "Failed to complete goal" };
+    }
   }
-}
 );
 
 /**
@@ -343,7 +349,12 @@ export const createBuddyCheckIn = defineAction(
   {
     name: "createBuddyCheckIn",
     auth: "member",
-    args: [z.string().min(1).max(64), z.number().int().min(1).max(5), z.string().max(5000).optional(), z.array(z.string().max(64)).max(100).optional()],
+    args: [
+      z.string().min(1).max(64),
+      z.number().int().min(1).max(5),
+      z.string().max(5000).optional(),
+      z.array(z.string().max(64)).max(100).optional(),
+    ],
     community: ([partnershipId]) => communityOfPartnership(partnershipId),
     rateLimit: "create",
   },
@@ -356,27 +367,27 @@ export const createBuddyCheckIn = defineAction(
     // being swallowed into a generic failure.
     await assertBuddyPartner(ctx, partnershipId);
 
-  try {
-    const userId = ctx.userId;
+    try {
+      const userId = ctx.userId;
 
-    const checkIn = await prisma.buddyCheckIn.create({
-      data: {
-        partnershipId,
-        userId,
-        mood,
-        notes,
-        completedGoals: completedGoals || [],
-      },
-    });
+      const checkIn = await prisma.buddyCheckIn.create({
+        data: {
+          partnershipId,
+          userId,
+          mood,
+          notes,
+          completedGoals: completedGoals || [],
+        },
+      });
 
-    revalidatePath("/dashboard/c/[slug]/buddy", "page");
+      revalidatePath("/dashboard/c/[slug]/buddy", "page");
 
-    return { success: true, checkIn };
-  } catch (error) {
-    console.error("Error creating buddy check-in:", error);
-    return { success: false, error: "Failed to create check-in" };
+      return { success: true, checkIn };
+    } catch (error) {
+      console.error("Error creating buddy check-in:", error);
+      return { success: false, error: "Failed to create check-in" };
+    }
   }
-}
 );
 
 /**
@@ -392,21 +403,21 @@ export const endBuddyPartnership = defineAction(
   async (ctx, partnershipId: string) => {
     await assertBuddyPartner(ctx, partnershipId);
 
-  try {
-    const partnership = await prisma.buddyPartnership.update({
-      where: { id: partnershipId },
-      data: {
-        status: "ENDED",
-        endedAt: new Date(),
-      },
-    });
+    try {
+      const partnership = await prisma.buddyPartnership.update({
+        where: { id: partnershipId },
+        data: {
+          status: "ENDED",
+          endedAt: new Date(),
+        },
+      });
 
-    revalidatePath("/dashboard/c/[slug]/buddy", "page");
+      revalidatePath("/dashboard/c/[slug]/buddy", "page");
 
-    return { success: true, partnership };
-  } catch (error) {
-    console.error("Error ending buddy partnership:", error);
-    return { success: false, error: "Failed to end partnership" };
+      return { success: true, partnership };
+    } catch (error) {
+      console.error("Error ending buddy partnership:", error);
+      return { success: false, error: "Failed to end partnership" };
+    }
   }
-}
 );

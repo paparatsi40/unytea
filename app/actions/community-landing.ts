@@ -24,47 +24,47 @@ export const resetCommunityLandingToDefault = defineAction(
     rateLimit: "create",
   },
   async (ctx, communityId) => {
-  // Atomic ownership check retained on top of the seam's OWNER gate: the
-  // ownerId guard in the WHERE clause means a mid-call ownership change cannot
-  // slip a write through.
-  const community = await prisma.community.findFirst({
-    where: { id: communityId, ownerId: ctx.userId },
-    include: {
-      owner: {
-        select: { name: true, image: true },
+    // Atomic ownership check retained on top of the seam's OWNER gate: the
+    // ownerId guard in the WHERE clause means a mid-call ownership change cannot
+    // slip a write through.
+    const community = await prisma.community.findFirst({
+      where: { id: communityId, ownerId: ctx.userId },
+      include: {
+        owner: {
+          select: { name: true, image: true },
+        },
       },
-    },
-  });
+    });
 
-  if (!community) {
-    throw new Error("Community not found or not authorized");
-  }
+    if (!community) {
+      throw new Error("Community not found or not authorized");
+    }
 
-  const layout = buildDefaultLandingLayout({
-    name: community.name,
-    slug: community.slug,
-    description: community.description,
-    coverImageUrl: community.coverImageUrl,
-    ownerTitle: community.ownerTitle,
-    ownerBio: community.ownerBio,
-    owner: community.owner,
-  });
+    const layout = buildDefaultLandingLayout({
+      name: community.name,
+      slug: community.slug,
+      description: community.description,
+      coverImageUrl: community.coverImageUrl,
+      ownerTitle: community.ownerTitle,
+      ownerBio: community.ownerBio,
+      owner: community.owner,
+    });
 
-  // Re-assert ownership in the update WHERE clause so a mid-call ownership
-  // change / deletion can't slip a write through. Persist the bare sections
-  // array — landingLayout stores SectionInstance[].
-  const result = await prisma.community.updateMany({
-    where: { id: communityId, ownerId: ctx.userId },
-    data: { landingLayout: layout.sections as unknown as Prisma.InputJsonValue },
-  });
+    // Re-assert ownership in the update WHERE clause so a mid-call ownership
+    // change / deletion can't slip a write through. Persist the bare sections
+    // array — landingLayout stores SectionInstance[].
+    const result = await prisma.community.updateMany({
+      where: { id: communityId, ownerId: ctx.userId },
+      data: { landingLayout: layout.sections as unknown as Prisma.InputJsonValue },
+    });
 
-  if (result.count === 0) {
-    throw new Error("Failed to update — community may have been modified");
-  }
+    if (result.count === 0) {
+      throw new Error("Failed to update — community may have been modified");
+    }
 
-  revalidatePath(`/dashboard/c/${community.slug}/settings/landing`);
-  revalidateLocalizedPath(`/c/${community.slug}`);
+    revalidatePath(`/dashboard/c/${community.slug}/settings/landing`);
+    revalidateLocalizedPath(`/c/${community.slug}`);
 
-  return { success: true as const };
+    return { success: true as const };
   }
 );

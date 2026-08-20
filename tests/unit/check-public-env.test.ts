@@ -81,16 +81,19 @@ describe("check-public-env guard", () => {
     ])("flags connection-string / key material %s", (value, expectedLabel) => {
       const violations = findViolations([{ name: "NEXT_PUBLIC_THING", value }]);
       expect(violations.length).toBeGreaterThanOrEqual(1);
-      expect(violations.some((v: { reason: string }) => v.reason.includes(expectedLabel))).toBe(true);
+      expect(violations.some((v: { reason: string }) => v.reason.includes(expectedLabel))).toBe(
+        true
+      );
     });
 
-    it.each([["NEXT_PUBLIC_API_SECRET"], ["NEXT_PUBLIC_VAPID_PRIVATE_KEY"], ["NEXT_PUBLIC_DB_PASSWORD"]])(
-      "flags secret-shaped variable name %s regardless of value",
-      (name) => {
-        const violations = findViolations([{ name, value: "harmless" }]);
-        expect(violations).toHaveLength(1);
-      }
-    );
+    it.each([
+      ["NEXT_PUBLIC_API_SECRET"],
+      ["NEXT_PUBLIC_VAPID_PRIVATE_KEY"],
+      ["NEXT_PUBLIC_DB_PASSWORD"],
+    ])("flags secret-shaped variable name %s regardless of value", (name) => {
+      const violations = findViolations([{ name, value: "harmless" }]);
+      expect(violations).toHaveLength(1);
+    });
 
     it("allows the public variables this project legitimately ships", () => {
       const violations = findViolations([

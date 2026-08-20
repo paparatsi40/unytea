@@ -42,9 +42,7 @@ function channelBelongsTo(communityId: string) {
 }
 
 function callerMembership(status: string | null) {
-  vi.mocked(prisma.member.findUnique).mockResolvedValue(
-    status ? ({ status } as never) : null
-  );
+  vi.mocked(prisma.member.findUnique).mockResolvedValue(status ? ({ status } as never) : null);
 }
 
 function conversationBetween(a: string, b: string) {
@@ -122,16 +120,16 @@ describe("canAccessRealtimeChannel — DM conversations", () => {
 
   it("admits participant 1", async () => {
     conversationBetween(CALLER, OTHER);
-    await expect(
-      pusherRoute.canAccessRealtimeChannel(CONVERSATION, CALLER)
-    ).resolves.toMatchObject({ allowed: true });
+    await expect(pusherRoute.canAccessRealtimeChannel(CONVERSATION, CALLER)).resolves.toMatchObject(
+      { allowed: true }
+    );
   });
 
   it("admits participant 2", async () => {
     conversationBetween(OTHER, CALLER);
-    await expect(
-      pusherRoute.canAccessRealtimeChannel(CONVERSATION, CALLER)
-    ).resolves.toMatchObject({ allowed: true });
+    await expect(pusherRoute.canAccessRealtimeChannel(CONVERSATION, CALLER)).resolves.toMatchObject(
+      { allowed: true }
+    );
   });
 
   it("does not fall back to community membership for a conversation", async () => {
@@ -139,9 +137,9 @@ describe("canAccessRealtimeChannel — DM conversations", () => {
     conversationBetween(OTHER, "someone_else");
     callerMembership("ACTIVE");
 
-    await expect(
-      pusherRoute.canAccessRealtimeChannel(CONVERSATION, CALLER)
-    ).resolves.toMatchObject({ allowed: false });
+    await expect(pusherRoute.canAccessRealtimeChannel(CONVERSATION, CALLER)).resolves.toMatchObject(
+      { allowed: false }
+    );
   });
 });
 
@@ -220,7 +218,10 @@ describe("the free-form trigger endpoint is gone", () => {
   it("exports only POST", () => {
     const verbs = ["GET", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"];
     for (const verb of verbs) {
-      expect((pusherRoute as Record<string, unknown>)[verb], `${verb} should not exist`).toBeUndefined();
+      expect(
+        (pusherRoute as Record<string, unknown>)[verb],
+        `${verb} should not exist`
+      ).toBeUndefined();
     }
     expect(typeof pusherRoute.POST).toBe("function");
   });

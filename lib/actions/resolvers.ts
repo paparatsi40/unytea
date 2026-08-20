@@ -96,7 +96,9 @@ export async function communityOfLesson(lessonId: string): Promise<string | null
 export async function communityOfQuiz(quizId: string): Promise<string | null> {
   const quiz = await prisma.quiz.findUnique({
     where: { id: quizId },
-    select: { lesson: { select: { module: { select: { course: { select: { communityId: true } } } } } } },
+    select: {
+      lesson: { select: { module: { select: { course: { select: { communityId: true } } } } } },
+    },
   });
   return quiz?.lesson?.module.course.communityId ?? null;
 }

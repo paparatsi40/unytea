@@ -184,13 +184,16 @@ describe("joinSession — attendance is idempotent (C3)", () => {
 });
 
 describe("joinSession — session lifecycle", () => {
-  it.each(["COMPLETED", "CANCELLED"])("refuses to issue a token for a %s session", async (status) => {
-    vi.mocked(prisma.mentorSession.findUnique).mockResolvedValue({
-      communityId: "community_1",
-      ...sessionRow,
-      status,
-    } as never);
+  it.each(["COMPLETED", "CANCELLED"])(
+    "refuses to issue a token for a %s session",
+    async (status) => {
+      vi.mocked(prisma.mentorSession.findUnique).mockResolvedValue({
+        communityId: "community_1",
+        ...sessionRow,
+        status,
+      } as never);
 
-    await expect(joinSession("session_1")).resolves.toMatchObject({ success: false });
-  });
+      await expect(joinSession("session_1")).resolves.toMatchObject({ success: false });
+    }
+  );
 });
