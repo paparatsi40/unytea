@@ -41,6 +41,7 @@ import { ReactionsBar } from "./ReactionsBar";
 import { LivePoll, PollCreator } from "@/components/live-session/LivePoll";
 import { useSessionDataChannel } from "@/hooks/useSessionDataChannel";
 import { useWhiteboardChannel } from "@/hooks/useWhiteboardChannel";
+import { inviteToSpeak } from "@/app/actions/livekit";
 
 // Types
 type PanelTab = "notes" | "chat" | "participants";
@@ -109,6 +110,21 @@ export function VideoRoomUI({
   const isScreenShareEnabled = localParticipantData.isScreenShareEnabled;
 
   /**
+   * Whether this client may put a track on the wire, read from the grant the
+   * server issued rather than from `isHost`.
+   *
+   * The media controls below used to render for everyone. A member of the
+   * audience saw a microphone, a camera and a screen-share button, pressed one,
+   * and got `insufficient permissions to publish` in the console and nothing on
+   * screen — the control was offering something the token had already refused.
+   *
+   * Live, not fixed at join: `useLocalParticipant` observes
+   * `ParticipantPermissionsChanged`, so when the host grants the floor the
+   * controls appear without a reconnect.
+   */
+  const canPublishMedia = localParticipant.permissions?.canPublish ?? false;
+
+  /**
    * `sessionStartTime` used to default to `new Date()` in the parameter list,
    * which evaluates on every render — so the timer effect below, keyed on it,
    * tore down and rebuilt its interval on every render too. Under a busy room
@@ -167,6 +183,31 @@ export function VideoRoomUI({
    */
   const requestedStageMode: SessionMode = isWhiteboardOpen ? "whiteboard" : stageMode;
 
+  /**
+   * Give someone the floor: grant first, announce second.
+   *
+   * `inviteSpeaker` only ever published a data-channel event. It moved a banner
+   * onto the member's screen and changed no permission anywhere, so the
+   * microphone it offered could not be turned on — the invitation was theatre.
+   * The server action is the part that is real; the event is how the room finds
+   * out. If the grant fails there is nothing to announce, so nothing is.
+   */
+  const handleInviteToSpeak = useCallback(
+    async (identity: string) => {
+      // The prop is optional on this component; without it there is no session
+      // to grant anything in.
+      if (!sessionId) return;
+
+      const result = await inviteToSpeak(sessionId, identity);
+      if (!result.success) {
+        console.error("[room] could not give the floor:", result.error);
+        return;
+      }
+      inviteSpeaker(identity);
+    },
+    [sessionId, inviteSpeaker]
+  );
+
   const toggleWhiteboard = useCallback(() => {
     // Host only. The control below is not rendered for anyone else, and the
     // publish is what makes the change real for the room rather than for one
@@ -190,9 +231,12 @@ export function VideoRoomUI({
   // ── Mute-all listener ───────────────────────────────────────────────
   useEffect(() => {
     if (muteAllSignal === 0) return;
+    // Nothing to mute for someone who was never allowed to publish, and asking
+    // anyway walks into the same rejection the controls used to.
+    if (!canPublishMedia) return;
     // When host sends mute_all, mute our mic
     localParticipant.setMicrophoneEnabled(false).catch(console.error);
-  }, [muteAllSignal, localParticipant]);
+  }, [muteAllSignal, localParticipant, canPublishMedia]);
 
   // Calculate elapsed time
   useEffect(() => {
@@ -469,12 +513,19 @@ export function VideoRoomUI({
             <p className="text-sm font-medium text-emerald-200">{t("speakerInvite.message")}</p>
           </div>
           <div className="flex items-center gap-2">
+            {/* The invitation arrives on the data channel and the grant arrives
+                on the signalling connection; neither can be ordered against the
+                other. So the button waits for the grant rather than assuming
+                it — pressing early is what produced PublishTrackError. In
+                practice the wait is invisible: the host promotes before it
+                announces. */}
             <button
+              disabled={!canPublishMedia}
               onClick={() => {
                 localParticipant.setMicrophoneEnabled(true).catch(console.error);
                 clearSpeakerInvite();
               }}
-              className="rounded-full bg-emerald-500 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-emerald-600"
+              className="rounded-full bg-emerald-500 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {t("speakerInvite.enableMic")}
             </button>
@@ -655,7 +706,7 @@ export function VideoRoomUI({
                     {isHost && (
                       <div className="flex items-center gap-1">
                         <button
-                          onClick={() => inviteSpeaker(hand.identity)}
+                          onClick={() => void handleInviteToSpeak(hand.identity)}
                           className="rounded-lg bg-blue-500/20 p-1.5 text-blue-400 transition-colors hover:bg-blue-500/30"
                           title={t("participants.inviteToSpeak")}
                         >
@@ -760,7 +811,7 @@ export function VideoRoomUI({
                 </div>
                 <div className="flex items-center gap-1">
                   <button
-                    onClick={() => inviteSpeaker(request.identity)}
+                    onClick={() => void handleInviteToSpeak(request.identity)}
                     className="rounded-lg bg-blue-500/20 px-2 py-1 text-xs font-medium text-blue-400 transition-colors hover:bg-blue-500/30"
                     title={t("participants.inviteToSpeak")}
                   >
@@ -798,69 +849,84 @@ export function VideoRoomUI({
       <div className="flex items-center justify-between border-t border-zinc-800 bg-zinc-900 px-4 py-3">
         {/* Left: Media Controls */}
         <div className="flex items-center gap-2">
-          {/* Mic */}
-          <button
-            onClick={toggleMicrophone}
-            title={isMicrophoneEnabled ? t("controls.muteMic") : t("controls.unmuteMic")}
-            className={cn(
-              "flex h-12 w-12 items-center justify-center rounded-full transition-all",
-              isMicrophoneEnabled
-                ? "bg-zinc-800 text-white hover:bg-zinc-700"
-                : "bg-red-500/20 text-red-400 hover:bg-red-500/30"
-            )}
-          >
-            {isMicrophoneEnabled ? <Mic className="h-5 w-5" /> : <MicOff className="h-5 w-5" />}
-          </button>
-
-          {/* Camera (video mode only) */}
-          {!isAudioOnly && (
+          {/* Capture controls exist only for someone the room lets publish.
+              The audience is view-only for tracks; offering them a microphone
+              only produced a PublishTrackError. */}
+          {canPublishMedia && (
             <>
+              {/* Mic */}
               <button
-                onClick={toggleCamera}
-                title={isCameraEnabled ? t("controls.turnOffCamera") : t("controls.turnOnCamera")}
+                onClick={toggleMicrophone}
+                title={isMicrophoneEnabled ? t("controls.muteMic") : t("controls.unmuteMic")}
                 className={cn(
                   "flex h-12 w-12 items-center justify-center rounded-full transition-all",
-                  isCameraEnabled
+                  isMicrophoneEnabled
                     ? "bg-zinc-800 text-white hover:bg-zinc-700"
                     : "bg-red-500/20 text-red-400 hover:bg-red-500/30"
                 )}
               >
-                {isCameraEnabled ? <Video className="h-5 w-5" /> : <VideoOff className="h-5 w-5" />}
+                {isMicrophoneEnabled ? <Mic className="h-5 w-5" /> : <MicOff className="h-5 w-5" />}
               </button>
 
-              {videoInputs.length > 1 && (
-                <select
-                  value={selectedCameraId}
-                  onChange={(e) => void handleCameraDeviceChange(e.target.value)}
-                  className="h-10 max-w-[220px] rounded-lg border border-zinc-700 bg-zinc-900 px-3 text-xs text-zinc-200"
-                  title={t("controls.selectCamera")}
-                >
-                  {videoInputs.map((device, index) => (
-                    <option
-                      key={device.deviceId || `${device.label}-${index}`}
-                      value={device.deviceId}
+              {/* Camera (video mode only) */}
+              {!isAudioOnly && (
+                <>
+                  <button
+                    onClick={toggleCamera}
+                    title={
+                      isCameraEnabled ? t("controls.turnOffCamera") : t("controls.turnOnCamera")
+                    }
+                    className={cn(
+                      "flex h-12 w-12 items-center justify-center rounded-full transition-all",
+                      isCameraEnabled
+                        ? "bg-zinc-800 text-white hover:bg-zinc-700"
+                        : "bg-red-500/20 text-red-400 hover:bg-red-500/30"
+                    )}
+                  >
+                    {isCameraEnabled ? (
+                      <Video className="h-5 w-5" />
+                    ) : (
+                      <VideoOff className="h-5 w-5" />
+                    )}
+                  </button>
+
+                  {videoInputs.length > 1 && (
+                    <select
+                      value={selectedCameraId}
+                      onChange={(e) => void handleCameraDeviceChange(e.target.value)}
+                      className="h-10 max-w-[220px] rounded-lg border border-zinc-700 bg-zinc-900 px-3 text-xs text-zinc-200"
+                      title={t("controls.selectCamera")}
                     >
-                      {device.label || t("controls.cameraFallback", { number: index + 1 })}
-                    </option>
-                  ))}
-                </select>
+                      {videoInputs.map((device, index) => (
+                        <option
+                          key={device.deviceId || `${device.label}-${index}`}
+                          value={device.deviceId}
+                        >
+                          {device.label || t("controls.cameraFallback", { number: index + 1 })}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </>
               )}
+
+              {/* Screen Share */}
+              <button
+                onClick={toggleScreenShare}
+                title={
+                  isScreenShareEnabled ? t("controls.stopShareScreen") : t("controls.shareScreen")
+                }
+                className={cn(
+                  "flex h-12 w-12 items-center justify-center rounded-full transition-all",
+                  isScreenShareEnabled
+                    ? "bg-green-500/20 text-green-400 hover:bg-green-500/30"
+                    : "bg-zinc-800 text-white hover:bg-zinc-700"
+                )}
+              >
+                <Monitor className="h-5 w-5" />
+              </button>
             </>
           )}
-
-          {/* Screen Share */}
-          <button
-            onClick={toggleScreenShare}
-            title={isScreenShareEnabled ? t("controls.stopShareScreen") : t("controls.shareScreen")}
-            className={cn(
-              "flex h-12 w-12 items-center justify-center rounded-full transition-all",
-              isScreenShareEnabled
-                ? "bg-green-500/20 text-green-400 hover:bg-green-500/30"
-                : "bg-zinc-800 text-white hover:bg-zinc-700"
-            )}
-          >
-            <Monitor className="h-5 w-5" />
-          </button>
 
           {/* Whiteboard — the host presents it; nobody else opens or closes it. */}
           {isHost && (

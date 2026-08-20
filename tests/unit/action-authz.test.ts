@@ -36,6 +36,13 @@ vi.mock("livekit-server-sdk", () => ({
       return {};
     }
   },
+  // The token issuer also reaches for the room API now, to move a promoted
+  // member's grant on a connection that is already open.
+  RoomServiceClient: class {
+    async updateParticipant() {
+      return {};
+    }
+  },
   EgressStatus: {},
 }));
 vi.mock("pusher", () => ({

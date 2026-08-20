@@ -3,12 +3,14 @@
 import { useCallback, useEffect, useState, useRef } from "react";
 import { LiveKitRoom, RoomAudioRenderer } from "@livekit/components-react";
 import type { MediaDeviceFailure } from "livekit-client";
+import type { ParticipationRole } from "@prisma/client";
 import "@livekit/components-styles";
 import { useTranslations } from "next-intl";
 import { Loader2, AlertCircle } from "lucide-react";
 import { VideoRoomUI } from "./VideoRoomUI";
 import { joinSession } from "@/app/actions/livekit";
 import { ROOM_OPTIONS } from "@/lib/livekit/room-options";
+import { canPublishTracks } from "@/lib/livekit/permissions";
 
 interface VideoRoomProps {
   /**
@@ -82,6 +84,18 @@ export function VideoRoom({
   const t = useTranslations("liveSession.videoRoom");
   const [token, setToken] = useState<string | null>(null);
   const [wsUrl, setWsUrl] = useState<string | null>(null);
+  /**
+   * The role the token was actually minted with, kept so that the connection
+   * below does not ask for a capture device the grant forbids.
+   *
+   * `<LiveKitRoom video audio>` is not a preference — `useLiveKitRoom` turns it
+   * into `setCameraEnabled` / `setMicrophoneEnabled` the moment the room
+   * connects. With both hardcoded on, every member of the audience opened their
+   * camera and microphone, offered the tracks, and was refused by the SFU:
+   * `insufficient permissions to publish (PublishTrackError)`, twice, before
+   * they had clicked anything — and with a live camera light to go with it.
+   */
+  const [role, setRole] = useState<ParticipationRole | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<TokenError | null>(null);
 
@@ -123,6 +137,7 @@ export function VideoRoom({
 
         setToken(result.access.token);
         setWsUrl(result.access.wsUrl);
+        setRole(result.access.role);
       } catch (err) {
         if (cancelled) return;
         setError(
@@ -172,6 +187,11 @@ export function VideoRoom({
     );
   }
 
+  // Derived from the grant, not from the `isHost` prop: a listener the host has
+  // already promoted to speaker joins with publish rights and no other signal
+  // says so.
+  const mayPublishTracks = role !== null && canPublishTracks(role);
+
   if (error || !token || !wsUrl) {
     const message =
       error === null ? t("missingConfig") : error.type === "server" ? error.message : t(error.type);
@@ -194,8 +214,11 @@ export function VideoRoom({
         // livekit-client's defaults, which pull the 720p layer for every tile
         // regardless of its rendered size. See lib/livekit/room-options.ts.
         options={ROOM_OPTIONS}
-        video={sessionMode === "video"}
-        audio={true}
+        // Only someone the token lets publish opens a capture device on
+        // connect. For the audience both are false, so nothing is requested,
+        // nothing is refused, and no camera light comes on.
+        video={mayPublishTracks && sessionMode === "video"}
+        audio={mayPublishTracks}
         onDisconnected={handleDisconnected}
         onError={handleError}
         onMediaDeviceFailure={handleMediaDeviceFailure}

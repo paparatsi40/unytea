@@ -1,13 +1,14 @@
 "use server";
 
 import { z } from "zod";
-import { AccessToken } from "livekit-server-sdk";
+import { AccessToken, RoomServiceClient } from "livekit-server-sdk";
 import { ParticipationRole, Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 import { defineAction } from "@/lib/actions/define-action";
 import { assertSessionHost } from "@/lib/actions/guards";
 import { communityOfSession } from "@/lib/actions/resolvers";
+import { AUDIENCE_PUBLISHES_DATA, canPublishTracks } from "@/lib/livekit/permissions";
 
 /**
  * LiveKit access — the single token issuer for the product.
@@ -41,6 +42,68 @@ const LIVEKIT_URL =
 const TOKEN_TTL_SECONDS = 2 * 60 * 60;
 
 const sessionIdSchema = z.string().min(1).max(64);
+const identitySchema = z.string().min(1).max(200);
+
+/**
+ * The server-side room API, for changing a permission on a participant who is
+ * already connected.
+ *
+ * A token's grant is frozen at join. Promoting someone to speaker in the
+ * database changed a row and nothing else — the browser's token still said
+ * `canPublish: false`, so the "Enable microphone" button in the invite banner
+ * asked for something the SFU had already been told to refuse. That is the
+ * second source of `insufficient permissions to publish`, and unlike the first
+ * it is not a UI mistake: the promotion genuinely never reached LiveKit.
+ *
+ * `updateParticipant` is the only way to move that grant without a reconnect.
+ * The client is notified through `ParticipantPermissionsChanged`, which
+ * `useLocalParticipant` already observes, so the controls appear on their own.
+ *
+ * Built per call rather than at module scope: the constructor reads the
+ * credentials, and holding one for the process would outlive a key rotation.
+ */
+function roomService(): RoomServiceClient {
+  // RoomServiceClient speaks HTTP; LIVEKIT_URL is the websocket endpoint. Same
+  // host, different scheme.
+  const httpUrl = LIVEKIT_URL.replace(/^wss:/i, "https:").replace(/^ws:/i, "http:");
+  return new RoomServiceClient(httpUrl, LIVEKIT_API_KEY, LIVEKIT_API_SECRET);
+}
+
+/**
+ * Push a role's publishing rights to a connected participant.
+ *
+ * `permission` replaces rather than merges on LiveKit's side, so every field
+ * this product relies on has to be restated — dropping `canPublishData` here
+ * would silently mute the promoted member's chat, hand and poll votes, which
+ * all ride the data channel.
+ *
+ * Absence is not an error. `updateParticipant` 404s for someone who has left
+ * or has not connected yet, and both are ordinary: their next token is minted
+ * from the row this function's caller already wrote.
+ */
+async function syncRoomPermissions(
+  roomName: string,
+  identity: string,
+  role: ParticipationRole
+): Promise<void> {
+  if (!LIVEKIT_API_KEY || !LIVEKIT_API_SECRET) return;
+
+  try {
+    await roomService().updateParticipant(roomName, identity, {
+      permission: {
+        canSubscribe: true,
+        canPublish: canPublishTracks(role),
+        canPublishData: AUDIENCE_PUBLISHES_DATA,
+      },
+    });
+  } catch (error) {
+    console.warn("[livekit] could not push permissions to a live participant", {
+      roomName,
+      role,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+}
 
 export interface SessionAccess {
   token: string;
@@ -143,7 +206,9 @@ export const joinSession = defineAction(
       data: { attendeeCount },
     });
 
-    const canPublish = role === ParticipationRole.host || role === ParticipationRole.speaker;
+    // One rule, shared with the browser. `lib/livekit/permissions.ts` explains
+    // why the client needs to be able to ask the same question.
+    const canPublish = canPublishTracks(role);
 
     // LiveKit populates `Participant.name` from the token's `name` claim and
     // from nothing else. This token only ever carried `identity`, so every
@@ -181,7 +246,9 @@ export const joinSession = defineAction(
       room: roomName,
       canPublish,
       canSubscribe: true,
-      canPublishData: true,
+      // Everyone, audience included. Chat, hands, poll votes, reactions and the
+      // late joiner's whiteboard request are all data. See the constant.
+      canPublishData: AUDIENCE_PUBLISHES_DATA,
     });
 
     const access: SessionAccess = {
@@ -253,10 +320,87 @@ export const updateParticipantRole = defineAction(
   async (ctx, sessionId, targetUserId, newRole) => {
     await assertSessionHost(ctx, sessionId);
 
-    await prisma.sessionParticipation.update({
+    const participation = await prisma.sessionParticipation.update({
       where: { sessionId_userId: { sessionId, userId: targetUserId } },
       data: { role: newRole, wasInvited: newRole === ParticipationRole.speaker },
+      select: { livekitIdentity: true },
     });
+
+    // The row is only half of it: a participant who is connected right now
+    // carries the old grant until this lands.
+    await pushRoleToLiveRoom(sessionId, participation.livekitIdentity, newRole);
+
+    return { success: true as const };
+  }
+);
+
+/**
+ * Resolve the room and hand the new role to LiveKit.
+ *
+ * Split out because both role-changing actions need it and neither should own
+ * the room lookup.
+ */
+async function pushRoleToLiveRoom(
+  sessionId: string,
+  identity: string | null,
+  role: ParticipationRole
+): Promise<void> {
+  if (!identity) return;
+
+  const session = await prisma.mentorSession.findUnique({
+    where: { id: sessionId },
+    select: { videoRoomName: true, roomId: true, id: true },
+  });
+  if (!session) return;
+
+  const roomName = session.videoRoomName || session.roomId || `session-${session.id}`;
+  await syncRoomPermissions(roomName, identity, role);
+}
+
+/**
+ * Give a member the floor.
+ *
+ * The host's "invite to speak" control used to publish a data-channel event and
+ * nothing more. The member saw a banner offering a microphone, pressed it, and
+ * got `insufficient permissions to publish` — the invitation was a UI state,
+ * never a grant. This is the grant.
+ *
+ * It takes the LiveKit identity because that is what the room UI holds: the
+ * raised-hand queue is built from data-channel events, which carry identities.
+ * The identity is opaque on purpose and is looked up in the
+ * `livekitIdentity` column rather than parsed — its shape has changed once
+ * already, and the code that split it on `-` is what kept the usage webhook
+ * from ever recording a second.
+ */
+export const inviteToSpeak = defineAction(
+  {
+    name: "inviteToSpeak",
+    auth: "member",
+    args: [sessionIdSchema, identitySchema],
+    community: ([sessionId]) => communityOfSession(sessionId),
+    rateLimit: "message",
+  },
+  async (ctx, sessionId, identity) => {
+    await assertSessionHost(ctx, sessionId);
+
+    const participation = await prisma.sessionParticipation.findFirst({
+      where: { sessionId, livekitIdentity: identity },
+      select: { id: true },
+    });
+    if (!participation) {
+      return { success: false as const, error: "That participant is not in this session." };
+    }
+
+    await prisma.sessionParticipation.update({
+      where: { id: participation.id },
+      data: { role: ParticipationRole.speaker, wasInvited: true },
+    });
+
+    // Awaited before the caller announces the invitation, so the permission is
+    // already on its way when the banner appears. The two travel on different
+    // paths and cannot be ordered end to end, which is why the banner's button
+    // waits on the permission rather than assuming it.
+    await pushRoleToLiveRoom(sessionId, identity, ParticipationRole.speaker);
 
     return { success: true as const };
   }
