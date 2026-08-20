@@ -88,6 +88,12 @@ const room = {
   off: vi.fn(),
   registerTextStreamHandler: vi.fn(),
   unregisterTextStreamHandler: vi.fn(),
+  // The image half of the whiteboard broadcast: files travel on byte streams
+  // rather than in the delta packets, so the stand-in needs the byte-stream
+  // pair as well.
+  registerByteStreamHandler: vi.fn(),
+  unregisterByteStreamHandler: vi.fn(),
+  streamBytes: vi.fn(async () => ({ write: vi.fn(async () => {}), close: vi.fn(async () => {}) })),
 };
 
 vi.mock("@/app/actions/livekit", () => ({ joinSession: (id: string) => joinSession(id) }));
