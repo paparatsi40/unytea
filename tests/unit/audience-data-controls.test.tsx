@@ -104,11 +104,11 @@ function makeRoom(options: {
 
 type FakeRoom = ReturnType<typeof makeRoom>;
 
-const holder = vi.hoisted(() => ({ room: null as unknown }));
+const holder = vi.hoisted(() => ({ room: null as unknown, participants: [] as unknown[] }));
 
 vi.mock("@livekit/components-react", () => ({
   useRoomContext: () => holder.room,
-  useParticipants: () => [],
+  useParticipants: () => holder.participants,
   useLocalParticipant: () => ({
     localParticipant: (holder.room as FakeRoom).localParticipant,
     isCameraEnabled: false,
@@ -190,6 +190,7 @@ async function react(room: FakeRoom, label: string) {
 afterEach(() => {
   cleanup();
   vi.clearAllMocks();
+  holder.participants = [];
 });
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -432,6 +433,49 @@ describe("the other end of the wire", () => {
     // The queue header counts what arrived, which is the only proof the packet
     // was understood rather than merely received.
     expect(screen.getByText(ROOM.participants.raisedHands.replace("{count}", "1"))).toBeTruthy();
+  });
+});
+
+// ───────────────────────────────────────────────────────────────────────────
+describe("how many people the room says are here", () => {
+  /**
+   * The header read an `attendeeCount` prop that nothing ever passed — not
+   * `VideoRoom`, not the room page — so it fell back to its default of 0 and
+   * announced "0 attending" to a room full of people, whatever the database
+   * held. It is counted from the room now.
+   */
+  function person(identity: string, canPublish = false) {
+    return { identity, name: identity, permissions: { canPublish, canPublishData: true } };
+  }
+
+  it("counts everyone who is actually connected", () => {
+    holder.participants = [person("s1:host", true), person("s1:member"), person("s1:other")];
+    renderRoom(listener());
+
+    expect(screen.getByText("3 attending")).toBeTruthy();
+  });
+
+  it("says one, not zero, when the host is alone in there", () => {
+    // `useParticipants()` returns local and remote together, so the local
+    // participant is already in the count.
+    holder.participants = [person("s1:host", true)];
+    renderRoom(makeRoom({ identity: "s1:host", name: "Host", canPublish: true }), {
+      isHost: true,
+    });
+
+    expect(screen.getByText("1 attending")).toBeTruthy();
+  });
+
+  it("does not add one to itself in the participants badge either", () => {
+    // The panel header used `participants.length + 1`, which counted whoever
+    // was reading it twice.
+    holder.participants = [person("s1:host", true), person("s1:member")];
+    const { container } = renderRoom(listener());
+
+    const badges = [...container.querySelectorAll("span")].filter(
+      (node) => node.textContent === "3"
+    );
+    expect(badges).toHaveLength(0);
   });
 });
 

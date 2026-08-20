@@ -72,7 +72,6 @@ interface VideoRoomUIProps {
   hostName?: string;
   hostAvatar?: string;
   isHost?: boolean;
-  attendeeCount?: number;
   sessionStartTime?: Date;
   onLeave?: () => void;
   onEndSession?: () => void;
@@ -85,7 +84,6 @@ export function VideoRoomUI({
   hostName = "",
   hostAvatar,
   isHost = false,
-  attendeeCount = 0,
   sessionStartTime,
   onLeave,
   onEndSession,
@@ -103,6 +101,21 @@ export function VideoRoomUI({
   // under AUDIENCE regardless of role.
   const speakers = participants.filter((p) => p.permissions?.canPublish);
   const audience = participants.filter((p) => !p.permissions?.canPublish);
+
+  /**
+   * How many people are in the room, counted from the room.
+   *
+   * The header read an `attendeeCount` prop that **nothing has ever passed** —
+   * not `VideoRoom`, not the room page — so it took its default of 0 and the
+   * live session announced "0 attending" to a room full of people, whatever the
+   * database said. Threading the prop through would only move the problem: the
+   * column counts everyone who has ever joined, which is the right number for
+   * billing and the wrong one for a header that says *attending*.
+   *
+   * `useParticipants()` returns local and remote together, so this is the
+   * headcount as it stands, and it updates as people come and go.
+   */
+  const attendingCount = participants.length;
   const room = useRoomContext();
   const localParticipantData = useLocalParticipant();
   const localParticipant = localParticipantData.localParticipant;
@@ -406,7 +419,7 @@ export function VideoRoomUI({
               <span>•</span>
               <span className="flex items-center gap-1">
                 <Users className="h-3.5 w-3.5" />
-                {t("header.attending", { count: attendeeCount })}
+                {t("header.attending", { count: attendingCount })}
               </span>
               <span>•</span>
               <span className="flex items-center gap-1">
@@ -658,8 +671,11 @@ export function VideoRoomUI({
               <Users className="h-4 w-4 text-blue-400" />
               {t("participants.title")}
             </div>
+            {/* `useParticipants()` already includes the local participant, so
+                the `+ 1` that used to be here counted whoever was reading it
+                twice. */}
             <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-400">
-              {participants.length + 1}
+              {attendingCount}
             </span>
           </div>
 

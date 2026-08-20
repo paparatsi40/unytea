@@ -156,6 +156,7 @@ export const joinSession = defineAction(
         title: true,
         mentorId: true,
         status: true,
+        startedAt: true,
         videoRoomName: true,
         roomId: true,
       },
@@ -201,9 +202,36 @@ export const joinSession = defineAction(
     // call, so a page refresh inflated the host's attendance metric without
     // bound (C3).
     const attendeeCount = await prisma.sessionParticipation.count({ where: { sessionId } });
+
+    /**
+     * Somebody is in the room, so the session is live.
+     *
+     * This used to be the LiveKit `room_started` webhook's job alone, and that
+     * handler resolved the session by stripping `session-` off the room name —
+     * which is not how room names are built here, so it never found the row and
+     * every session this platform has run went SCHEDULED → COMPLETED with
+     * `startedAt` NULL. That single NULL is what emptied the usage counter,
+     * pinned "sessions this week" at zero and rendered every post-session
+     * duration as 0 min.
+     *
+     * The webhook is fixed too, but the transition does not belong to it alone:
+     * this action is the one place a person can enter a room, it runs on the
+     * server, and it already knows which session it is. A lifecycle that
+     * depends on a third party delivering an event is a lifecycle that is NULL
+     * whenever they do not.
+     *
+     * Only SCHEDULED moves. COMPLETED and CANCELLED are refused above, and
+     * `startedAt` is written once — the first arrival is the start, not the
+     * latest one.
+     */
+    const goingLive = session.status === "SCHEDULED";
     await prisma.mentorSession.update({
       where: { id: sessionId },
-      data: { attendeeCount },
+      data: {
+        attendeeCount,
+        ...(goingLive ? { status: "IN_PROGRESS" as const } : {}),
+        ...(session.startedAt ? {} : { startedAt: new Date() }),
+      },
     });
 
     // One rule, shared with the browser. `lib/livekit/permissions.ts` explains
