@@ -2885,7 +2885,9 @@
       "noScreenDesc": "Comparte tu pantalla para presentar diapositivas, demos o tutoriales.",
       "noCameraTitle": "Esperando a que empiece el vídeo…",
       "noCameraWaiting": "Tu cámara está encendida. Esperando a que empiece el vídeo.",
-      "noCameraDesc": "Enciende tu cámara o espera la cámara de otro participante."
+      "noCameraDesc": "Enciende tu cámara o espera la cámara de otro participante.",
+      "enterFullscreen": "Pantalla completa",
+      "exitFullscreen": "Salir de pantalla completa"
     },
     "localVideo": {
       "cameraOff": "La cámara está apagada",

@@ -2885,7 +2885,9 @@
       "noScreenDesc": "Partagez votre écran pour présenter des diapositives, des démos ou des tutoriels.",
       "noCameraTitle": "En attente de la vidéo…",
       "noCameraWaiting": "Votre caméra est activée. En attente du démarrage de la vidéo.",
-      "noCameraDesc": "Activez votre caméra ou attendez la caméra d'un autre participant."
+      "noCameraDesc": "Activez votre caméra ou attendez la caméra d'un autre participant.",
+      "enterFullscreen": "Plein écran",
+      "exitFullscreen": "Quitter le plein écran"
     },
     "localVideo": {
       "cameraOff": "La caméra est éteinte",

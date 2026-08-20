@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import {
   ParticipantTile,
   VideoTrack,
@@ -9,12 +9,13 @@ import {
 } from "@livekit/components-react";
 import { Track, LocalTrack } from "livekit-client";
 import { useTranslations } from "next-intl";
-import { Monitor, Pencil, Headphones, Sparkles } from "lucide-react";
+import { Monitor, Pencil, Headphones, Sparkles, Maximize2, Minimize2 } from "lucide-react";
 import { SessionMode } from "./ModeSwitcher";
 import { SessionWhiteboard } from "./SessionWhiteboard";
 import { LocalVideo } from "./LocalVideo";
 import { cn } from "@/lib/utils";
 import type { WhiteboardChannel } from "@/hooks/useWhiteboardChannel";
+import { useFullscreen } from "@/lib/hooks/useFullscreen";
 
 interface MainStageProps {
   mode: SessionMode;
@@ -229,6 +230,38 @@ export function MainStage({
     return cameraTracks.filter((t) => t.participant.identity !== displayedMainIdentity).slice(0, 4);
   }, [cameraTracks, displayedMainIdentity]);
 
+  /**
+   * The stage on its own, for as long as the viewer wants it.
+   *
+   * A shared screen is letterboxed to its own aspect ratio inside a box that
+   * the notes and chat panels have already narrowed, so it arrives small no
+   * matter how large the display is. Everyone gets this, host and audience
+   * alike: it changes what one person sees and publishes nothing.
+   */
+  const stageRef = useRef<HTMLDivElement>(null);
+  const stage = useFullscreen(stageRef);
+
+  /**
+   * Only offered over something worth enlarging. Expanding the "waiting for
+   * video" placeholder to fill a display is a worse experience than not
+   * offering it, and the whiteboard is excluded because it is an interactive
+   * canvas with its own zoom.
+   */
+  const stageHasPicture =
+    effectiveMode === "screen"
+      ? Boolean(mainScreenTrack)
+      : effectiveMode === "video"
+        ? isShowingLocalMain || Boolean(mainCameraTrack)
+        : false;
+  const canExpand = stage.isSupported && stageHasPicture;
+
+  /**
+   * Filling a display by cropping is not filling it. `object-cover` is right
+   * for a camera in a small box — a face should not be surrounded by bars —
+   * and wrong once that box is the whole screen.
+   */
+  const cameraFit = stage.isFullscreen ? "object-contain" : "object-cover";
+
   // For audio-only sessions in "screen" mode, show audio stage
   if (isAudioOnly && effectiveMode !== "whiteboard" && effectiveMode !== "screen") {
     return (
@@ -243,7 +276,25 @@ export function MainStage({
   return (
     <div className={cn("flex h-full flex-col overflow-hidden", className)}>
       {/* MAIN STAGE */}
-      <div className="relative flex-1 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950">
+      <div
+        ref={stageRef}
+        className="relative flex-1 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950"
+      >
+        {canExpand && (
+          <button
+            type="button"
+            onClick={stage.toggle}
+            aria-label={stage.isFullscreen ? t("exitFullscreen") : t("enterFullscreen")}
+            title={stage.isFullscreen ? t("exitFullscreen") : t("enterFullscreen")}
+            className="absolute right-3 top-3 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white opacity-70 backdrop-blur transition-all hover:bg-black/70 hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
+          >
+            {stage.isFullscreen ? (
+              <Minimize2 className="h-5 w-5" />
+            ) : (
+              <Maximize2 className="h-5 w-5" />
+            )}
+          </button>
+        )}
         {effectiveMode === "whiteboard" ? (
           sessionId ? (
             <SessionWhiteboard
@@ -279,13 +330,13 @@ export function MainStage({
           )
         ) : isCameraEnabled && cameraTrack ? (
           <LocalVideo
-            className="h-full w-full object-cover"
+            className={cn("h-full w-full", cameraFit)}
             cameraTrack={cameraTrack}
             isCameraEnabled={isCameraEnabled}
           />
         ) : mainCameraTrack ? (
           <div className="h-full w-full bg-black">
-            <VideoTrack className="h-full w-full object-cover" trackRef={mainCameraTrack} />
+            <VideoTrack className={cn("h-full w-full", cameraFit)} trackRef={mainCameraTrack} />
           </div>
         ) : (
           <BrandedEmptyStage
