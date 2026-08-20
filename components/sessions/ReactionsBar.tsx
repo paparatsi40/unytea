@@ -1,8 +1,6 @@
 "use client";
 
-import { useRoomContext } from "@livekit/components-react";
 import { useTranslations } from "next-intl";
-import { isDataTransportReady } from "@/lib/livekit/data-transport";
 
 const REACTIONS = [
   { emoji: "👍", label: "thumbsup" },
@@ -12,39 +10,28 @@ const REACTIONS = [
   { emoji: "👏", label: "clap" },
 ];
 
-export function ReactionsBar() {
+interface ReactionsBarProps {
+  /**
+   * Send one. Owned by `useSessionDataChannel`, which is the room's single
+   * door to the data channel.
+   *
+   * This component used to reach for `useRoomContext()` and publish on its own,
+   * which put a second, slightly different publish path in the product — and it
+   * was the one that quietly stopped working, because it had its own idea of
+   * when the transport was usable. There is one path now.
+   */
+  onReact: (emoji: string, label: string) => void;
+}
+
+export function ReactionsBar({ onReact }: ReactionsBarProps) {
   const t = useTranslations("liveSession.reactionsBar");
-  const room = useRoomContext();
-
-  const sendReaction = async (emoji: string, label: string) => {
-    // Same gate as every other data publish in the room: the engine rejects a
-    // packet it has no peer connection for. See lib/livekit/data-transport.ts.
-    if (!isDataTransportReady(room)) return;
-
-    try {
-      const encoder = new TextEncoder();
-      const data = encoder.encode(
-        JSON.stringify({
-          type: "reaction",
-          emoji,
-          label,
-          from: room.localParticipant.identity,
-          timestamp: Date.now(),
-        })
-      );
-
-      await room.localParticipant.publishData(data, { reliable: true });
-    } catch (error) {
-      console.error("Failed to send reaction:", error);
-    }
-  };
 
   return (
     <div className="flex items-center gap-1">
       {REACTIONS.map((reaction) => (
         <button
           key={reaction.label}
-          onClick={() => sendReaction(reaction.emoji, reaction.label)}
+          onClick={() => onReact(reaction.emoji, reaction.label)}
           className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-100 text-lg transition-all hover:scale-110 hover:bg-zinc-200"
           title={t(reaction.label)}
         >

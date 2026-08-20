@@ -133,6 +133,8 @@ vi.mock("@/hooks/useSessionDataChannel", () => ({
     createPoll: vi.fn(),
     votePoll: vi.fn(),
     closePoll: vi.fn(),
+    reactions: [],
+    sendReaction: vi.fn(),
     muteAll: vi.fn(),
     muteAllSignal: 0,
     invitedToSpeak: false,
