@@ -511,6 +511,19 @@
       "guarantee": "✓ 14 días gratis • ✓ Sin tarjeta • ✓ Cancela cuando quieras"
     }
   },
+  "email": {
+    "videoUsage": {
+      "subject80": "{community} ha usado el 80% de sus horas de vídeo",
+      "subject100": "{community} ha usado todas sus horas de vídeo",
+      "heading80": "80% de tus horas de vídeo",
+      "heading100": "Todas tus horas de vídeo",
+      "used": "{used} de {cap} horas-participante usadas este ciclo",
+      "unitNote": "Una hora con seis personas en la sala cuenta como seis.",
+      "resets": "Tu asignación vuelve el {date}.",
+      "measuredOnly": "No hay nada bloqueado. Estamos midiendo el vídeo en directo mientras se asienta la asignación, así que esto es un aviso, no un límite.",
+      "cta": "Ver los números"
+    }
+  },
   "dashboard": {
     "accountSettings": {
       "shell": {
@@ -2311,6 +2324,19 @@
         "title": "Esta sesión no se cargó",
         "description": "Algo falló al cargar la sesión. Reintenta o vuelve a tu lista de sesiones."
       }
+    },
+    "videoUsage": {
+      "title": "Horas de vídeo",
+      "plan": "Plan {plan}",
+      "used": "{used} de {cap} horas usadas",
+      "resets": "se reinicia el {date}",
+      "unitNote": "Una hora con seis personas en la sala cuenta como seis.",
+      "bannerWarn": "{community} ha usado el {percent}% de sus horas de vídeo de este ciclo.",
+      "bannerOver": "{community} ha usado todas sus horas de vídeo de este ciclo.",
+      "bannerNote": "No hay nada bloqueado — la asignación vuelve el {date}.",
+      "viewUsage": "Ver los números",
+      "sectionTitle": "Horas de vídeo por comunidad",
+      "noCommunities": "Todavía no tienes ninguna comunidad."
     }
   },
   "navigation": {

@@ -511,6 +511,19 @@
       "guarantee": "✓ 14 jours d'essai • ✓ Sans carte bancaire • ✓ Résiliable à tout moment"
     }
   },
+  "email": {
+    "videoUsage": {
+      "subject80": "{community} a utilisé 80% de ses heures de vidéo",
+      "subject100": "{community} a utilisé toutes ses heures de vidéo",
+      "heading80": "80% de vos heures de vidéo",
+      "heading100": "Toutes vos heures de vidéo",
+      "used": "{used} heures-participant sur {cap} utilisées ce cycle",
+      "unitNote": "Une heure avec six personnes dans la salle compte pour six.",
+      "resets": "Votre quota revient le {date}.",
+      "measuredOnly": "Rien n'est bloqué. Nous mesurons la vidéo en direct pendant que le quota se stabilise : ceci est un signalement, pas une limite.",
+      "cta": "Voir les chiffres"
+    }
+  },
   "dashboard": {
     "accountSettings": {
       "shell": {
@@ -2311,6 +2324,19 @@
         "title": "Cette session ne s'est pas chargée",
         "description": "Le chargement de la session a échoué. Réessayez ou revenez à votre liste de sessions."
       }
+    },
+    "videoUsage": {
+      "title": "Heures de vidéo",
+      "plan": "Forfait {plan}",
+      "used": "{used} heures sur {cap} utilisées",
+      "resets": "réinitialisation le {date}",
+      "unitNote": "Une heure avec six personnes dans la salle compte pour six.",
+      "bannerWarn": "{community} a utilisé {percent}% de ses heures de vidéo ce cycle.",
+      "bannerOver": "{community} a utilisé toutes ses heures de vidéo ce cycle.",
+      "bannerNote": "Rien n'est bloqué — le quota revient le {date}.",
+      "viewUsage": "Voir les chiffres",
+      "sectionTitle": "Heures de vidéo par communauté",
+      "noCommunities": "Vous n'animez encore aucune communauté."
     }
   },
   "navigation": {

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getLocale } from "next-intl/server";
 import { PremiumCommunityHeader } from "@/components/community/PremiumCommunityHeader";
 import { PaywallLockedView } from "@/components/community/PaywallLockedView";
+import { VideoUsageBanner } from "@/components/billing/VideoUsageBanner";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -78,6 +79,15 @@ export default async function CommunityLayout(props: LayoutProps) {
         isOwner={isOwner}
         isPending={isPending}
       />
+      {/* The owner's allowance, and only theirs — a member has no allowance and
+          no way to act on one. Silent below 80%. */}
+      {isOwner && (
+        <VideoUsageBanner
+          communityId={community.id}
+          communityName={community.name}
+          communitySlug={community.slug}
+        />
+      )}
       {children}
     </div>
   );

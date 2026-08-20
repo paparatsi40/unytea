@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "next-intl";
+import { VideoUsageCard } from "@/components/billing/VideoUsageCard";
 
 export default function CommunityPaymentsPage() {
   const t = useTranslations("dashboard.communityAdmin.settings.payments");
@@ -197,6 +198,10 @@ export default function CommunityPaymentsPage() {
         <h2 className="text-2xl font-bold text-gray-900">{t("title")}</h2>
         <p className="mt-1 text-gray-500">{t("subtitle")}</p>
       </div>
+
+      {/* Live video consumed this cycle. Community-scoped, like the counter —
+          this is the owner's allowance for this community, not for the account. */}
+      {slug && <VideoUsageCard communitySlug={slug} />}
 
       {/* Stripe Connect Status */}
       <Card>

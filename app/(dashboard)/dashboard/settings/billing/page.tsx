@@ -15,6 +15,7 @@ import {
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { PLAN_PRICING, PLATFORM_FEE_PERCENT } from "@/lib/plans";
+import { VideoUsageSummary } from "@/components/billing/VideoUsageSummary";
 
 // Plan order for comparison (lower = entry tier; higher = more capability).
 // START is kept as the implicit "no active subscription" sentinel state used
@@ -139,6 +140,10 @@ export default function BillingPage() {
         <h2 className="text-3xl font-bold tracking-tight">{t("title")}</h2>
         <p className="text-muted-foreground">{t("subtitle")}</p>
       </div>
+
+      {/* One row per community hosted. Next to the plan, because that is where
+          somebody already is when they are thinking about limits. */}
+      <VideoUsageSummary />
 
       {/* Current Plan Banner */}
       <Card className="border-primary/20 bg-primary/5">

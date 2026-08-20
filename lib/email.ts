@@ -1,5 +1,7 @@
 import { Resend } from "resend";
+import { createTranslator } from "next-intl";
 import { SITE_URL } from "@/lib/site-url";
+import { DEFAULT_LOCALE, isSupportedLocale, type SupportedLocale } from "@/lib/locale";
 
 // ── Resend client (lazy init so builds don't fail without the key) ────
 let _resend: Resend | null = null;
@@ -50,6 +52,20 @@ export interface CommunityInviteData {
   communityName: string;
   communityDescription?: string;
   joinLink: string;
+}
+
+export interface VideoUsageWarningData {
+  communityName: string;
+  /** 80 or 100. Decides the subject line and the tone, nothing else. */
+  threshold: 80 | 100;
+  usedHours: number;
+  capHours: number;
+  /** End of the current billing period — when the allowance comes back. */
+  resetsAt: Date;
+  /** Where to see the number in full. */
+  usageLink: string;
+  /** The reader's language. Falls back to the default when unsupported. */
+  locale?: string;
 }
 
 export interface SessionRecapData {
@@ -334,4 +350,73 @@ function ctaButton(label: string, href: string): string {
         </td>
       </tr>
     </table>`;
+}
+
+// ── Template: Video usage warning ─────────────────────────────────────
+/**
+ * The first localized email in the product.
+ *
+ * Every other template here is hardcoded English, which was survivable while
+ * they were transactional one-liners. This one lands in an inbox unprompted and
+ * talks about someone's allowance, so it goes out in the language the community
+ * is run in.
+ *
+ * `createTranslator` rather than `getTranslations`: this is called from the
+ * accrual path — a webhook, a cron sweep, a Server Action — where there is no
+ * request scope for next-intl to read a locale from. The messages are imported
+ * by hand for the same reason.
+ *
+ * Nothing in this copy threatens to block anything. B1 has no gate: the cap is
+ * measured and reported and that is all it does. An email that says "your
+ * sessions will stop" would be describing software that does not exist yet.
+ */
+export async function sendVideoUsageWarningEmail(to: string, data: VideoUsageWarningData) {
+  const locale: SupportedLocale = isSupportedLocale(data.locale) ? data.locale : DEFAULT_LOCALE;
+  const messages = (await import(`../locales/${locale}.json`)).default;
+  const t = createTranslator({ locale, messages, namespace: "email.videoUsage" });
+
+  const resets = new Intl.DateTimeFormat(locale, {
+    day: "numeric",
+    month: "long",
+    timeZone: "UTC",
+  }).format(data.resetsAt);
+
+  const numbers = {
+    community: data.communityName,
+    used: new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(data.usedHours),
+    cap: new Intl.NumberFormat(locale).format(data.capHours),
+  };
+
+  const heading = data.threshold === 100 ? t("heading100") : t("heading80");
+  const accent = data.threshold === 100 ? "#f59e0b" : "#7c3aed";
+
+  return sendEmail({
+    to,
+    subject: data.threshold === 100 ? t("subject100", numbers) : t("subject80", numbers),
+    tags: [
+      { name: "category", value: "video-usage" },
+      { name: "threshold", value: String(data.threshold) },
+    ],
+    html: emailLayout(`
+      <div style="background: ${accent}15; border: 1px solid ${accent}40; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
+        <p style="color: ${accent}; font-size: 14px; font-weight: 600; margin: 0;">
+          ${heading}
+        </p>
+      </div>
+      <h1 style="color: #ffffff; font-size: 24px; margin: 0 0 16px 0;">
+        ${t("used", numbers)}
+      </h1>
+      <p style="color: #a1a1aa; font-size: 15px; line-height: 1.6; margin: 0 0 8px 0;">
+        ${t("unitNote")}
+      </p>
+      <p style="color: #a1a1aa; font-size: 15px; line-height: 1.6; margin: 0 0 24px 0;">
+        ${t("resets", { date: resets })}
+      </p>
+      <p style="color: #d4d4d8; font-size: 16px; line-height: 1.6; margin: 0 0 32px 0;">
+        ${t("measuredOnly")}
+      </p>
+      ${ctaButton(t("cta"), data.usageLink)}
+    `),
+    text: `${t("used", numbers)} ${t("resets", { date: resets })} ${data.usageLink}`,
+  });
 }

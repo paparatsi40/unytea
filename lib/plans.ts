@@ -86,6 +86,18 @@ export interface PlanLimits {
   whiteLabel: boolean;
   apiAccess: boolean;
   maxAdmins: number;
+  /**
+   * Live-video allowance per billing period, in participant-hours.
+   *
+   * One hour with six people in the room is six. The host counts: they occupy a
+   * connection with the same cost as anyone else.
+   *
+   * Here rather than in a config module of its own, for the reason the file
+   * header already gives at length about the commission: a second place a
+   * tier's entitlements live is a second place they can be right while the
+   * first is wrong. `getLimitsForPlan()` resolves it like everything else.
+   */
+  videoParticipantHours: number;
   advancedAnalytics: boolean;
   paidCommunity: boolean;
   paidCourses: boolean;
@@ -100,6 +112,7 @@ export const PLAN_LIMITS: Record<PlatformPlan, PlanLimits> = {
     whiteLabel: false,
     apiAccess: false,
     maxAdmins: 1,
+    videoParticipantHours: 15,
     advancedAnalytics: false,
     paidCommunity: false,
     paidCourses: false,
@@ -112,6 +125,7 @@ export const PLAN_LIMITS: Record<PlatformPlan, PlanLimits> = {
     whiteLabel: false,
     apiAccess: false,
     maxAdmins: 3,
+    videoParticipantHours: 150,
     advancedAnalytics: false,
     paidCommunity: true,
     paidCourses: true,
@@ -124,6 +138,7 @@ export const PLAN_LIMITS: Record<PlatformPlan, PlanLimits> = {
     whiteLabel: false,
     apiAccess: false,
     maxAdmins: 5,
+    videoParticipantHours: 500,
     advancedAnalytics: true,
     paidCommunity: true,
     paidCourses: true,
@@ -136,6 +151,7 @@ export const PLAN_LIMITS: Record<PlatformPlan, PlanLimits> = {
     whiteLabel: true,
     apiAccess: true,
     maxAdmins: Infinity,
+    videoParticipantHours: 2000,
     advancedAnalytics: true,
     paidCommunity: true,
     paidCourses: true,
