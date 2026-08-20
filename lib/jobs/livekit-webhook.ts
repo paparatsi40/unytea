@@ -130,33 +130,69 @@ export async function handleLiveKitWebhook(
 }
 
 /**
+ * Find the session a LiveKit room belongs to.
+ *
+ * The room name is NOT `session-${id}`, and treating it as one is what took
+ * this webhook down. Every handler derived the id with
+ * `roomName.replace("session-", "")`, against a name that `joinSession` picks
+ * as `videoRoomName || roomId || "session-" + id` — so for any session that
+ * already carried a `roomId`, the stripped value was somebody else's string.
+ * Production: room `session-avkC13q3ImvD` for session
+ * `cmt1tdkyc0001ylf2i6n711mo`.
+ *
+ * The damage was different in each handler and all of it was invisible:
+ *
+ *   room_started    `findUnique` missed, the handler warned "Ack & skip" and
+ *                   returned. The session was never marked IN_PROGRESS and
+ *                   `startedAt` stayed NULL — which is the lifecycle bug, and
+ *                   through it the empty usage counter, "sessions this week"
+ *                   stuck at zero, and a post-session duration of 0 min.
+ *   room_finished   Same miss, so the room's own end never marked the session
+ *                   COMPLETED and never metered it.
+ *   participant_*   The join handler did not check. `mentorSession.update`
+ *                   raised P2025 "Record to update not found", the outer catch
+ *                   turned it into a 500, and LiveKit retried the same event
+ *                   for as long as it kept failing.
+ *
+ * The name is matched against the columns it is actually stored in. The
+ * stripped id stays as the last arm because a room genuinely created as
+ * `session-${id}` before `videoRoomName` was written back still has to resolve.
+ */
+async function resolveSessionByRoom(roomName: string) {
+  const strippedId = roomName.startsWith("session-") ? roomName.slice("session-".length) : roomName;
+
+  return prisma.mentorSession.findFirst({
+    where: {
+      OR: [{ videoRoomName: roomName }, { roomId: roomName }, { id: strippedId }],
+    },
+    select: { id: true, communityId: true, status: true, startedAt: true },
+  });
+}
+
+/**
  * Room started - Session is now live
  */
 async function handleRoomStarted(event: WebhookEvent) {
   const roomName = event.room?.name;
   if (!roomName) return;
 
-  // Extract session ID from room name (format: "session-{id}")
-  const sessionId = roomName.replace("session-", "");
-
-  const session = await prisma.mentorSession.findUnique({
-    where: { id: sessionId },
-    select: { id: true, communityId: true },
-  });
+  const session = await resolveSessionByRoom(roomName);
 
   if (!session) {
-    console.warn(
-      `[livekit-webhook] room_started for unknown sessionId=${sessionId} (room=${roomName}). Ack & skip.`
-    );
+    console.warn(`[livekit-webhook] room_started for unresolvable room=${roomName}. Ack & skip.`);
     return;
   }
 
-  // Update session status
+  const sessionId = session.id;
+
+  // The room is live, so the session is. `startedAt` is written once — a room
+  // can be restarted, and moving the start forward would shorten every figure
+  // derived from it.
   await prisma.mentorSession.update({
-    where: { id: session.id },
+    where: { id: sessionId },
     data: {
       status: "IN_PROGRESS",
-      startedAt: new Date(),
+      ...(session.startedAt ? {} : { startedAt: new Date() }),
     },
   });
 
@@ -198,19 +234,14 @@ async function handleRoomFinished(event: WebhookEvent) {
   const roomName = event.room?.name;
   if (!roomName) return;
 
-  const sessionId = roomName.replace("session-", "");
-
-  const finishedSession = await prisma.mentorSession.findUnique({
-    where: { id: sessionId },
-    select: { id: true, communityId: true },
-  });
+  const finishedSession = await resolveSessionByRoom(roomName);
 
   if (!finishedSession) {
-    console.warn(
-      `[livekit-webhook] room_finished for unknown sessionId=${sessionId} (room=${roomName}). Ack & skip.`
-    );
+    console.warn(`[livekit-webhook] room_finished for unresolvable room=${roomName}. Ack & skip.`);
     return;
   }
+
+  const sessionId = finishedSession.id;
 
   // Update session status
   await prisma.mentorSession.update({
@@ -252,11 +283,8 @@ async function handleRoomFinished(event: WebhookEvent) {
  * Participant joined
  */
 async function handleParticipantJoined(event: WebhookEvent) {
-  const roomName = event.room?.name;
   const identity = event.participant?.identity;
-  if (!roomName || !identity) return;
-
-  const sessionId = roomName.replace("session-", "");
+  if (!identity) return;
 
   // Looked up by identity, never parsed out of it.
   //
@@ -272,33 +300,43 @@ async function handleParticipantJoined(event: WebhookEvent) {
   // so the row can be found by the exact value the token carries. The webhook
   // now has no opinion about the identity's internal shape, which is what stops
   // this class of drift from recurring.
+  // The row also carries the session, so this handler needs no opinion about
+  // the room name at all — and the room name is exactly what it used to get
+  // wrong. `livekitIdentity` is unique, so this is one index hit per event,
+  // which matters: these fire once per person rather than once per session.
   const participation = await prisma.sessionParticipation.findUnique({
     where: { livekitIdentity: identity },
-    select: { id: true, userId: true },
+    select: { id: true, userId: true, sessionId: true },
   });
 
   if (!participation) {
     // The room was joined without going through `joinSession` — the only place
     // that mints an identity — or the row was deleted. Nothing to attribute.
     console.warn(
-      `[livekit-webhook] participant_joined for unknown identity=${identity} (session=${sessionId}). Ack & skip.`
+      `[livekit-webhook] participant_joined for unknown identity=${identity}. Ack & skip.`
     );
     return;
   }
+
+  const sessionId = participation.sessionId;
 
   await prisma.sessionParticipation.update({
     where: { id: participation.id },
     data: { leftAt: null }, // Rejoining
   });
 
-  // Update attendee count
+  // Recounted, not incremented.
+  //
+  // `attendeeCount` means distinct people who joined, and `joinSession` already
+  // maintains it as `count(participations)`. An increment here counted the same
+  // person twice on their first join and once more on every reconnect, so the
+  // two writers disagreed by an amount that grew with the session's flakiness.
+  // Counting the rows is idempotent, which is the only thing that survives a
+  // webhook that retries.
+  const attendeeCount = await prisma.sessionParticipation.count({ where: { sessionId } });
   await prisma.mentorSession.update({
     where: { id: sessionId },
-    data: {
-      attendeeCount: {
-        increment: 1,
-      },
-    },
+    data: { attendeeCount },
   });
 
   await logSessionEvent(sessionId, SessionEventType.PARTICIPANT_JOINED, {
@@ -312,11 +350,8 @@ async function handleParticipantJoined(event: WebhookEvent) {
  * Participant left
  */
 async function handleParticipantLeft(event: WebhookEvent) {
-  const roomName = event.room?.name;
   const identity = event.participant?.identity;
-  if (!roomName || !identity) return;
-
-  const sessionId = roomName.replace("session-", "");
+  if (!identity) return;
 
   // Same lookup as the join path: by identity, never parsed. This is the write
   // that fills `durationSeconds`, and it is the whole reason the metering in
@@ -327,10 +362,12 @@ async function handleParticipantLeft(event: WebhookEvent) {
 
   if (!participation) {
     console.warn(
-      `[livekit-webhook] participant_left for unknown identity=${identity} (session=${sessionId}). Ack & skip.`
+      `[livekit-webhook] participant_left for unknown identity=${identity}. Ack & skip.`
     );
     return;
   }
+
+  const sessionId = participation.sessionId;
 
   // Closed once. `leaveSession` accumulates the same span from the app side,
   // and LiveKit itself can redeliver an event; either would count the time
@@ -377,8 +414,13 @@ async function handleEgressStarted(event: WebhookEvent) {
   if (!egressInfo) return;
 
   const roomName = egressInfo.roomName;
-  const sessionId = roomName?.replace("session-", "");
-  if (!sessionId) return;
+  if (!roomName) return;
+
+  // Same resolution as everywhere else. DORMANT, but a stripped room name here
+  // would write a Recording row keyed to a session that does not exist.
+  const session = await resolveSessionByRoom(roomName);
+  if (!session) return;
+  const sessionId = session.id;
 
   // Create or update recording
   await prisma.recording.upsert({
