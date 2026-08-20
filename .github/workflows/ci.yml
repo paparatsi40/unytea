@@ -119,7 +119,15 @@ jobs:
   format-check:
     name: Prettier format check
     runs-on: ubuntu-latest
-    continue-on-error: true
+    # Blocking as of the repo-wide prettier sweep. It ran with
+    # continue-on-error because the repo was never uniformly formatted, so this
+    # job was red on every PR and nobody could tell a real regression from the
+    # standing noise — a check that always fails is a check nobody reads.
+    #
+    # `prettier --check .` rather than `npm run format:check`: that script globs
+    # {ts,tsx,js,jsx,json,css,md} and so never looked at the two .mjs files in
+    # the repo (eslint-rules/, scripts/). Passing `.` uses .prettierignore for
+    # exclusions, which is the one place they should be decided.
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -128,4 +136,4 @@ jobs:
           cache: "npm"
       - run: npm ci
       - name: Prettier check
-        run: npm run format:check
+        run: npx prettier --check .
