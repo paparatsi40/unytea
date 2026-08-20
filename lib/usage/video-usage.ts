@@ -27,7 +27,24 @@ import { Prisma } from "@prisma/client";
  * compound across a cycle.
  */
 
-/** Elapsed is measured from the real clock, never the scheduled `duration`. */
+/**
+ * Elapsed is measured from the participation rows, never from the scheduled
+ * `duration` and — since the fix below — never from `session.startedAt`.
+ *
+ * It used to be `endedAt − startedAt`, and that is what kept
+ * `session_usage_accruals` empty from the day it shipped. Nothing in this
+ * product sets `startedAt`: a session goes SCHEDULED → COMPLETED, because the
+ * two writers that would set it are a `startSession` action no surface calls
+ * and a `room_started` webhook that does not arrive. So `computeSessionUsage`
+ * returned null for every session that had ever ended, `accrueSessionUsage`
+ * turned that into `skipped/not_measurable`, and nothing was logged, because
+ * nothing threw. The empty table was the only symptom.
+ *
+ * `joinedAt` and `leftAt` are better ground truth anyway. They are written by
+ * the code path that actually happened — somebody connected — rather than by a
+ * lifecycle transition the product does not perform, and they describe
+ * occupancy, which is what a participant-hour is.
+ */
 export interface SessionUsageFigures {
   exactSeconds: number;
   approxSeconds: number;
@@ -47,36 +64,64 @@ const DIVERGENCE_FLOOR = 0.5;
 /**
  * Compute both figures for one session. Pure read; accrues nothing.
  *
- * Returns null when the session never actually ran — no `startedAt`, no
- * `endedAt`, or an end before its start. There is no usage to count and
- * inventing zero would create an accrual row that blocks a later, real one.
+ * Returns null only when there is genuinely nothing to measure against: no
+ * session, or a session that has not ended. A session that ended with nobody in
+ * it returns zeros rather than null, and is accrued as zero — "counted, and it
+ * came to nothing" is a fact worth writing down, and a `skipped` that says
+ * nothing is precisely how this module hid its own failure for a week.
+ *
+ * `endedAt` is the only session column read. `startedAt` is deliberately not
+ * consulted; see the note on `SessionUsageFigures`.
  */
 export async function computeSessionUsage(sessionId: string): Promise<SessionUsageFigures | null> {
   const session = await prisma.mentorSession.findUnique({
     where: { id: sessionId },
     select: {
-      startedAt: true,
       endedAt: true,
       attendeeCount: true,
-      participations: { select: { durationSeconds: true } },
+      participations: { select: { durationSeconds: true, joinedAt: true, leftAt: true } },
     },
   });
 
-  if (!session?.startedAt || !session.endedAt) return null;
+  if (!session) {
+    console.error("[video-usage] not measurable", { sessionId, reason: "session_not_found" });
+    return null;
+  }
+  if (!session.endedAt) {
+    console.error("[video-usage] not measurable", { sessionId, reason: "no_ended_at" });
+    return null;
+  }
 
-  const elapsedSeconds = Math.floor(
-    (session.endedAt.getTime() - session.startedAt.getTime()) / 1000
-  );
-  if (elapsedSeconds <= 0) return null;
+  const participations = session.participations;
 
-  const exactSeconds = session.participations.reduce(
-    (total, p) => total + (p.durationSeconds ?? 0),
-    0
-  );
+  const exactSeconds = participations.reduce((total, p) => total + (p.durationSeconds ?? 0), 0);
 
-  // `attendeeCount` is distinct joiners, which is what this wants: everyone who
-  // occupied a connection at any point, host included.
-  const approxSeconds = session.attendeeCount * elapsedSeconds;
+  /**
+   * The occupancy window: first arrival to last departure.
+   *
+   * A participation still open — `participant_left` never delivered, or the
+   * accrual reached here before `closeOpenParticipations` did — is measured to
+   * the session's end rather than dropped. Dropping it would shorten the window
+   * for exactly the person whose data is missing, which is backwards.
+   */
+  const closedAt = session.endedAt;
+  let elapsedSeconds = 0;
+  if (participations.length > 0) {
+    const firstJoin = Math.min(...participations.map((p) => p.joinedAt.getTime()));
+    const lastLeave = Math.max(
+      ...participations.map((p) => (p.leftAt ?? closedAt).getTime()),
+      firstJoin
+    );
+    elapsedSeconds = Math.max(0, Math.floor((lastLeave - firstJoin) / 1000));
+  }
+
+  // Distinct joiners: everyone who occupied a connection at any point, host
+  // included. `attendeeCount` is a denormalised count of these same rows, so
+  // the larger of the two is taken — a stale cache may lag the table, never
+  // lead it, and this module's standing rule is to err upward.
+  const attendeeCount = Math.max(session.attendeeCount, participations.length);
+
+  const approxSeconds = attendeeCount * elapsedSeconds;
 
   const appliedSeconds = Math.max(exactSeconds, approxSeconds);
 
@@ -89,7 +134,7 @@ export async function computeSessionUsage(sessionId: string): Promise<SessionUsa
       exactSeconds,
       approxSeconds,
       elapsedSeconds,
-      attendeeCount: session.attendeeCount,
+      attendeeCount,
       ratio: Number((exactSeconds / approxSeconds).toFixed(3)),
     });
   }
@@ -99,7 +144,7 @@ export async function computeSessionUsage(sessionId: string): Promise<SessionUsa
     approxSeconds,
     appliedSeconds,
     basis: exactSeconds >= approxSeconds ? "exact" : "approx",
-    attendeeCount: session.attendeeCount,
+    attendeeCount,
     elapsedSeconds,
   };
 }
@@ -253,6 +298,45 @@ export type AccrualOutcome =
   | { status: "skipped"; reason: "no_community" | "not_measurable" | "before_epoch" };
 
 /**
+ * Say out loud what happened to one session's usage.
+ *
+ * The counter was empty for a week and nothing anywhere said why, because
+ * nothing had gone wrong in the sense the code recognised: `computeSessionUsage`
+ * returned null, `accrueSessionUsage` turned that into a `skipped` outcome, the
+ * caller ignored the return value, and the `try/catch` built to keep metering
+ * from breaking the room never fired — there was no exception. A silent skip is
+ * a worse failure mode than a thrown one, because a thrown one is at least in a
+ * log.
+ *
+ * Every caller routes its outcome through here. A session that ended and was
+ * not counted is an error, whatever the reason: it is revenue-shaped data that
+ * did not get recorded. The one exception is `before_epoch`, which is not a
+ * failure but a decision — the counter starts at zero, and the sweep re-reads
+ * every historical session on every run.
+ */
+export function logAccrualOutcome(sessionId: string, outcome: AccrualOutcome | null): void {
+  if (outcome === null) return; // Already reported by `meterCompletedSession`.
+
+  switch (outcome.status) {
+    case "accrued":
+      console.info("[video-usage] accrued", {
+        sessionId,
+        appliedSeconds: outcome.appliedSeconds,
+        usedSeconds: outcome.usedSeconds,
+      });
+      return;
+    case "already_accrued":
+      return;
+    case "skipped":
+      if (outcome.reason === "before_epoch") return;
+      console.error("[video-usage] session ended without being counted", {
+        sessionId,
+        reason: outcome.reason,
+      });
+  }
+}
+
+/**
  * Add one session's usage to its community's counter, exactly once.
  *
  * Three callers reach this — `endSessionJob`, the `room_finished` webhook and
@@ -273,9 +357,12 @@ export async function accrueSessionUsage(sessionId: string): Promise<AccrualOutc
   if (!session?.communityId) return { status: "skipped", reason: "no_community" };
   const communityId = session.communityId;
 
-  if (!session.endedAt || session.endedAt < METERING_EPOCH) {
-    return { status: "skipped", reason: "before_epoch" };
-  }
+  // Told apart on purpose. "Ended before the counter existed" is a decision and
+  // is silent; "has not ended" is a session that cannot be measured, and the
+  // log has to be able to say which it saw. They shared a branch before, so
+  // every unmeasurable session was reported as an intentional skip.
+  if (!session.endedAt) return { status: "skipped", reason: "not_measurable" };
+  if (session.endedAt < METERING_EPOCH) return { status: "skipped", reason: "before_epoch" };
 
   const figures = await computeSessionUsage(sessionId);
   if (!figures) return { status: "skipped", reason: "not_measurable" };
@@ -339,9 +426,14 @@ export async function accrueSessionUsage(sessionId: string): Promise<AccrualOutc
 export async function meterCompletedSession(sessionId: string, endedAt: Date = new Date()) {
   try {
     await closeOpenParticipations(sessionId, endedAt);
-    return await accrueSessionUsage(sessionId);
+    const outcome = await accrueSessionUsage(sessionId);
+    logAccrualOutcome(sessionId, outcome);
+    return outcome;
   } catch (error) {
-    console.error(`[video-usage] metering failed for session=${sessionId}`, error);
+    console.error("[video-usage] metering threw", {
+      sessionId,
+      error: error instanceof Error ? error.message : String(error),
+    });
     return null;
   }
 }
