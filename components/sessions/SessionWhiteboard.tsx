@@ -105,17 +105,21 @@ export function SessionWhiteboard({
   const initialSceneRef = useRef({
     // Excalidraw's own element type is far wider than the handful of fields the
     // protocol reads; the objects here came from Excalidraw in the first place.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    elements: (remoteElements ? [...remoteElements] : []) as any,
+    elements: (remoteElements ? [...remoteElements] : []) as never[],
     // Same widening as the elements above, and for the same reason: the mime
     // type is a string on the wire and a narrow union in Excalidraw's types.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //
+    // `created` is Excalidraw's own bookkeeping for deciding when to evict an
+    // unused file from storage, and nothing in this product reads it. A fixed
+    // value rather than `Date.now()` because this runs during render, where an
+    // impure call gives a different answer every time React happens to re-run
+    // it — and a ref initialiser that changes is a ref nobody can reason about.
     files: Object.fromEntries(
       (remoteFiles ?? []).map((file) => [
         file.id,
-        { id: file.id, mimeType: file.mimeType, dataURL: file.dataURL, created: Date.now() },
+        { id: file.id, mimeType: file.mimeType, dataURL: file.dataURL, created: 0 },
       ])
-    ) as any,
+    ) as never,
   });
 
   /**
