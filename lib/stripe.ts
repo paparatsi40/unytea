@@ -1,4 +1,5 @@
 import Stripe from "stripe";
+import { siteUrl } from "@/lib/site-url";
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-02-24.acacia",
@@ -60,8 +61,8 @@ export const getStripeSession = async ({
         quantity: 1,
       },
     ],
-    success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/settings/billing?success=true`,
-    cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/upgrade?canceled=true`,
+    success_url: siteUrl(`/dashboard/settings/billing?success=true`),
+    cancel_url: siteUrl(`/dashboard/upgrade?canceled=true`),
     metadata: {
       userId,
     },
@@ -99,7 +100,7 @@ export const getStripeSession = async ({
 export const createStripeCustomerPortal = async ({ customerId }: { customerId: string }) => {
   const portalSession = await stripe.billingPortal.sessions.create({
     customer: customerId,
-    return_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/settings/billing`,
+    return_url: siteUrl(`/dashboard/settings/billing`),
   });
 
   return portalSession;

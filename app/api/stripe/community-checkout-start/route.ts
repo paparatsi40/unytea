@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getPlatformFeePercent } from "@/lib/plans";
 import { stripe, getOrCreateStripeCustomer } from "@/lib/stripe";
+import { siteUrl } from "@/lib/site-url";
 
 async function getPlatformFeePercentForOwner(ownerId: string): Promise<number> {
   const ownerSubscription = await prisma.subscription.findFirst({
@@ -93,8 +94,8 @@ export async function GET(req: Request) {
     customer: customer.id,
     line_items: [{ price: priceId, quantity: 1 }],
     mode: "subscription",
-    success_url: `${process.env.NEXT_PUBLIC_APP_URL}/${locale}/community/${slug}?paid=1`,
-    cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/${locale}/community/${slug}?paywall=1&canceled=1`,
+    success_url: siteUrl(`/${locale}/community/${slug}?paid=1`),
+    cancel_url: siteUrl(`/${locale}/community/${slug}?paywall=1&canceled=1`),
     metadata: {
       userId: session.user.id,
       communityId,

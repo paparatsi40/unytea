@@ -20,6 +20,9 @@
  */
 const CANONICAL_ORIGIN = "https://unytea.com";
 
+/** The host being retired. Kept named so the redirect and its test agree. */
+export const LEGACY_WWW_HOST = "www.unytea.com";
+
 /** Origin with no trailing slash, e.g. `https://unytea.com`. */
 export const SITE_URL: string = normalizeOrigin(
   process.env.NEXT_PUBLIC_APP_URL || CANONICAL_ORIGIN
@@ -29,7 +32,6 @@ export const SITE_URL: string = normalizeOrigin(
 export const CANONICAL_HOST = "unytea.com";
 
 /** The host being retired. Kept named so the redirect and its test agree. */
-export const LEGACY_WWW_HOST = "www.unytea.com";
 
 /**
  * Absolute URL for a path on the canonical origin.
@@ -47,7 +49,27 @@ export function siteUrl(path = ""): string {
 function normalizeOrigin(value: string): string {
   const withoutTrailing = value.trim().replace(/\/+$/, "");
   try {
-    return new URL(withoutTrailing).origin;
+    const url = new URL(withoutTrailing);
+
+    /**
+     * The retired host is demoted, whatever the environment says.
+     *
+     * `www.unytea.com` 308s to the apex at the edge, so a canonical, an og:url
+     * or a Stripe return URL pointing at it advertises a URL that does not
+     * serve — and a cross-host hop is where Next's RSC prefetch gives up. The
+     * environment variable is not the place to get this right: it lives in a
+     * dashboard, it has been wrong, and nothing in the code noticed.
+     *
+     * Only this exact host is rewritten. A preview on `*.vercel.app`, a
+     * localhost, or any future domain passes through untouched — silently
+     * rewriting an origin nobody asked about would be a worse bug than the one
+     * this fixes.
+     */
+    if (url.host === LEGACY_WWW_HOST) {
+      return CANONICAL_ORIGIN;
+    }
+
+    return url.origin;
   } catch {
     return CANONICAL_ORIGIN;
   }

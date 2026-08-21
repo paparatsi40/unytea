@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getPlatformFeePercent } from "@/lib/plans";
 import { stripe } from "@/lib/stripe";
 import { getOrCreateStripeCustomer } from "@/lib/stripe";
+import { siteUrl } from "@/lib/site-url";
 
 async function getPlatformFeePercentForOwner(ownerId: string): Promise<number> {
   const ownerSubscription = await prisma.subscription.findFirst({
@@ -126,8 +127,12 @@ export async function POST(req: Request) {
         },
       ],
       mode: "payment",
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/c/${course.community.slug}/courses/${course.slug}?success=true`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/c/${course.community.slug}/courses/${course.slug}?canceled=true`,
+      success_url: siteUrl(
+        `/dashboard/c/${course.community.slug}/courses/${course.slug}?success=true`
+      ),
+      cancel_url: siteUrl(
+        `/dashboard/c/${course.community.slug}/courses/${course.slug}?canceled=true`
+      ),
       payment_intent_data: {
         application_fee_amount: Math.round((course.price * 100 * platformFeePercent) / 100),
         transfer_data: {
