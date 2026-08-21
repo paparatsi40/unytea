@@ -120,6 +120,45 @@ export function dataUrlByteLength(dataURL: string): number {
 }
 
 /**
+ * Why an image came out the size it did.
+ *
+ * Returned rather than inferred, because the caller is the only place that can
+ * say it out loud and silence was indistinguishable from "the feature is not
+ * running" — which is exactly the question that had to be answered by driving
+ * the component in a test harness instead of reading a log.
+ */
+export type DownscaleReason =
+  | "shrunk"
+  | "already_small"
+  | "unsupported_type"
+  | "below_floor"
+  | "not_smaller"
+  | "failed";
+
+export interface DownscaleOutcome {
+  dataURL: string;
+  mimeType: string;
+  reason: DownscaleReason;
+  bytesBefore: number;
+  bytesAfter: number;
+}
+
+/**
+ * How long to wait for the browser to decode an image before giving up.
+ *
+ * `new Image()` resolves through `onload`, and there is no guarantee either
+ * handler ever fires — a data URL the decoder rejects outright can leave both
+ * silent. That used to be survivable, because the file was forwarded before any
+ * of this ran. It stopped being survivable when the order was inverted to send
+ * only the shrunk copy: a promise that never settles now withholds the image
+ * from the room for the rest of the session.
+ *
+ * So the wait is bounded and the timeout falls back to sending what we were
+ * given. Hygiene must not be able to lose a picture.
+ */
+export const DECODE_TIMEOUT_MS = 5_000;
+
+/**
  * Shrink a data URL, or hand back the one given.
  *
  * Returns the original whenever shrinking would not help or could not be done —
@@ -132,14 +171,23 @@ export async function downscaleDataUrl(
   dataURL: string,
   mimeType: string,
   maxEdge: number = MAX_IMAGE_EDGE_PX
-): Promise<string> {
+): Promise<DownscaleOutcome> {
   const bytes = dataUrlByteLength(dataURL);
-  if (!RESIZABLE_TYPES.has(mimeType) || bytes < MIN_DOWNSCALE_BYTES) return dataURL;
+  const unchanged = (reason: DownscaleReason): DownscaleOutcome => ({
+    dataURL,
+    mimeType,
+    reason,
+    bytesBefore: bytes,
+    bytesAfter: bytes,
+  });
+
+  if (!RESIZABLE_TYPES.has(mimeType)) return unchanged("unsupported_type");
+  if (bytes < MIN_DOWNSCALE_BYTES) return unchanged("below_floor");
 
   try {
     const image = await loadImage(dataURL);
     if (!shouldDownscale({ mimeType, width: image.width, height: image.height, bytes })) {
-      return dataURL;
+      return unchanged("already_small");
     }
 
     const size = targetDimensions(image.width, image.height, maxEdge);
@@ -148,26 +196,56 @@ export async function downscaleDataUrl(
     canvas.height = size.height;
 
     const context = canvas.getContext("2d");
-    if (!context) return dataURL;
+    if (!context) return unchanged("failed");
     context.drawImage(image, 0, 0, size.width, size.height);
 
     const output = outputMimeType(mimeType);
     const shrunk = canvas.toDataURL(output, output === "image/jpeg" ? JPEG_QUALITY : undefined);
+    const shrunkBytes = dataUrlByteLength(shrunk);
 
     // A re-encode is not guaranteed to win — a flat diagram can come out of the
     // PNG encoder larger than it went in. Keep whichever is smaller.
-    return dataUrlByteLength(shrunk) < bytes ? shrunk : dataURL;
+    if (shrunkBytes >= bytes) return unchanged("not_smaller");
+
+    return {
+      dataURL: shrunk,
+      mimeType: output,
+      reason: "shrunk",
+      bytesBefore: bytes,
+      bytesAfter: shrunkBytes,
+    };
   } catch (error) {
     console.warn("[whiteboard] could not downscale an image; sending it as-is", error);
-    return dataURL;
+    return unchanged("failed");
   }
 }
 
+/**
+ * Decode a data URL, with a deadline.
+ *
+ * Neither `onload` nor `onerror` is guaranteed to fire — a data URL the decoder
+ * rejects outright can leave both silent — and since the forward now waits on
+ * this, a promise that never settles withholds the image from the room for the
+ * rest of the session. The image is held in a local until it settles so that a
+ * garbage collector cannot take it mid-decode.
+ */
 function loadImage(dataURL: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const image = new Image();
-    image.onload = () => resolve(image);
-    image.onerror = () => reject(new Error("image decode failed"));
+    const timer = setTimeout(() => {
+      image.onload = null;
+      image.onerror = null;
+      reject(new Error(`image decode timed out after ${DECODE_TIMEOUT_MS}ms`));
+    }, DECODE_TIMEOUT_MS);
+
+    image.onload = () => {
+      clearTimeout(timer);
+      resolve(image);
+    };
+    image.onerror = () => {
+      clearTimeout(timer);
+      reject(new Error("image decode failed"));
+    };
     image.src = dataURL;
   });
 }

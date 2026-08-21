@@ -257,15 +257,28 @@ describe("the order in the component", () => {
 
   it("forwards the shrunk version once the work is done", () => {
     const shrink = board.slice(board.indexOf("const shrinkAndForward"));
-    expect(shrink).toMatch(/onFilesChange\(\{ \[id\]: \{ mimeType: finalMimeType, dataURL \} \}\)/);
+    expect(shrink).toMatch(/onFilesChange\(\{ \[id\]: \{ mimeType: outcome\.mimeType/);
   });
 
-  it("says what it did, in bytes", () => {
+  it("says what it did, in bytes, whichever way it went", () => {
     // The byte-streams are invisible in the network tab, so a console line is
-    // the only way anyone can check this from a browser.
+    // the only way anyone can check this from a browser — and it is printed
+    // unconditionally, because logging only the shrink made silence ambiguous
+    // between "left alone on purpose" and "the feature never ran".
     const shrink = board.slice(board.indexOf("const shrinkAndForward"));
-    expect(shrink).toMatch(/console\.info\("\[whiteboard\] downscaled image"/);
-    expect(shrink).toMatch(/before,\s*after,\s*sent: after,/);
+    expect(shrink).toMatch(/console\.info\("\[whiteboard\] image"/);
+    expect(shrink).toMatch(/reason: outcome\.reason/);
+    // `sent` is measured, never copied from what the shrinker claimed.
+    expect(shrink).toMatch(/const sent = dataUrlByteLength\(outcome\.dataURL\)/);
+    expect(shrink).not.toMatch(/sent: outcome\.bytesAfter/);
+  });
+
+  it("never lets a failed shrink strand the image", () => {
+    // The forward waits on the shrink now, so a rejection that got past the
+    // module's own catch would withhold the picture for the whole session.
+    const shrink = board.slice(board.indexOf("const shrinkAndForward"));
+    const rescue = shrink.slice(shrink.indexOf(".catch("));
+    expect(rescue).toMatch(/onFilesChange\(\{ \[id\]: \{ mimeType, dataURL: source \} \}\)/);
   });
 });
 
@@ -300,7 +313,9 @@ describe("where it is wired in", () => {
     // what makes the delta path, the snapshot, the convergence pass and the
     // send dedup unable to tell this happened at all.
     const shrink = board.slice(board.indexOf("const shrinkAndForward"));
-    expect(shrink).toMatch(/addFiles\(\[\s*\{ id, mimeType: finalMimeType, dataURL/);
+    expect(shrink).toMatch(
+      /addFiles\(\[\s*\{ id, mimeType: outcome\.mimeType, dataURL: outcome\.dataURL/
+    );
   });
 
   it("leaves the transport alone", () => {

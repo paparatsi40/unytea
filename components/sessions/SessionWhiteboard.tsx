@@ -8,7 +8,6 @@ import { useTranslations } from "next-intl";
 import {
   dataUrlByteLength,
   downscaleDataUrl,
-  outputMimeType,
   partitionFilesForForward,
 } from "@/lib/whiteboard/downscale";
 import {
@@ -190,30 +189,45 @@ export function SessionWhiteboard({
         shrinkingFilesRef.current.add(id);
 
         void downscaleDataUrl(source, mimeType)
-          .then((dataURL) => {
-            const shrunk = dataURL !== source;
-            const finalMimeType = shrunk ? outputMimeType(mimeType) : mimeType;
-
-            // Back into Excalidraw under the same id, so the host's own canvas
-            // holds the smaller copy too and both ends look at the same pixels.
-            if (shrunk) {
-              excalidrawAPI?.addFiles([{ id, mimeType: finalMimeType, dataURL, created: 0 }]);
-              const before = dataUrlByteLength(source);
-              const after = dataUrlByteLength(dataURL);
-              // `sent` is measured off the value handed to the transport rather
-              // than assumed equal to `after`: if these two ever disagree, some
-              // other copy reached the wire and this line is how anyone finds
-              // out. The byte-streams are invisible in the network tab.
-              console.info("[whiteboard] downscaled image", {
-                id,
-                before,
-                after,
-                sent: after,
-              });
+          .then((outcome) => {
+            if (outcome.reason === "shrunk") {
+              // `addFiles` ignores an id it already holds, so the host's own
+              // canvas keeps its original copy. That is fine and it is the
+              // point: the host already has the pixels; this is about the wire.
+              excalidrawAPI?.addFiles([
+                { id, mimeType: outcome.mimeType, dataURL: outcome.dataURL, created: 0 },
+              ]);
             }
 
+            /**
+             * One line per image, whichever way it went.
+             *
+             * Logging only the shrink made silence ambiguous: it could mean
+             * "left alone on purpose" or "the feature never ran", and telling
+             * those two apart took a test harness rather than a glance at the
+             * console. `sent` is measured off the value actually handed to the
+             * transport rather than assumed, so if it ever disagrees with
+             * `after`, some other copy reached the wire.
+             */
+            const sent = dataUrlByteLength(outcome.dataURL);
+            console.info("[whiteboard] image", {
+              id,
+              reason: outcome.reason,
+              before: outcome.bytesBefore,
+              after: outcome.bytesAfter,
+              sent,
+            });
+
             settledFilesRef.current.add(id);
-            onFilesChange({ [id]: { mimeType: finalMimeType, dataURL } });
+            onFilesChange({ [id]: { mimeType: outcome.mimeType, dataURL: outcome.dataURL } });
+          })
+          .catch((error) => {
+            // The forward waits on the shrink now, so a rejection that got past
+            // the module's own catch must not strand the image: send what we
+            // were given rather than nothing at all.
+            console.warn("[whiteboard] shrink failed; sending the original", { id, error });
+            settledFilesRef.current.add(id);
+            onFilesChange({ [id]: { mimeType, dataURL: source } });
           })
           .finally(() => {
             shrinkingFilesRef.current.delete(id);
