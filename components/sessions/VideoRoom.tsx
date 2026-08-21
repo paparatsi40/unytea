@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState, useRef } from "react";
 import { LiveKitRoom, RoomAudioRenderer } from "@livekit/components-react";
-import type { MediaDeviceFailure } from "livekit-client";
+import type { DisconnectReason, MediaDeviceFailure } from "livekit-client";
 import type { ParticipationRole } from "@prisma/client";
 import "@livekit/components-styles";
 import { useTranslations } from "next-intl";
@@ -11,6 +11,7 @@ import { VideoRoomUI } from "./VideoRoomUI";
 import { joinSession } from "@/app/actions/livekit";
 import { ROOM_OPTIONS } from "@/lib/livekit/room-options";
 import { canPublishTracks } from "@/lib/livekit/permissions";
+import { disconnectReasonName, isTerminalDisconnect } from "@/lib/livekit/disconnect";
 
 interface VideoRoomProps {
   /**
@@ -148,6 +149,16 @@ export function VideoRoom({
           return;
         }
 
+        // One line per token minted. A room that reconnects on its own reuses
+        // the token it has; a *new* one means this component mounted again,
+        // which is a different fault with a different fix — and the two are
+        // indistinguishable in the client's own logs.
+        console.info("[LiveKit] session token minted", {
+          sessionId,
+          identity: result.access.identity,
+          role: result.access.role,
+        });
+
         setToken(result.access.token);
         setWsUrl(result.access.wsUrl);
         setRole(result.access.role);
@@ -180,9 +191,35 @@ export function VideoRoom({
    * line repeating in the console, and a listener rebind for every render on
    * top of it.
    */
-  const handleDisconnected = useCallback(() => {
-    onLeave?.();
-  }, [onLeave]);
+  /**
+   * A disconnect is not the same thing as leaving.
+   *
+   * This used to be `onLeave?.()` unconditionally, and `onLeave` navigates to
+   * the session list — so a signal socket closing for two seconds, which
+   * livekit-client recovers from on its own, threw the user out of a live
+   * workshop. Only reasons with nothing to come back to end the visit; a
+   * transient one is left alone, because the client is already reconnecting and
+   * the worst case of staying is a frozen tile.
+   *
+   * The reason is logged either way, and that is the point of the line as much
+   * as the branch: `onDisconnected` receives it and this handler used to throw
+   * it away, which is why "why did the room drop?" has been unanswerable from
+   * production logs. DUPLICATE_IDENTITY in particular is a completely different
+   * problem from a bad network and they are indistinguishable without it.
+   */
+  const handleDisconnected = useCallback(
+    (reason?: DisconnectReason) => {
+      const terminal = isTerminalDisconnect(reason);
+      console.warn("[LiveKit] disconnected", {
+        sessionId,
+        reason: disconnectReasonName(reason),
+        terminal,
+      });
+
+      if (terminal) onLeave?.();
+    },
+    [onLeave, sessionId]
+  );
 
   const handleError = useCallback((err: Error) => {
     console.error("[LiveKit] Error:", err);
