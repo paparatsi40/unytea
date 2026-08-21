@@ -4,6 +4,7 @@ import path from "node:path";
 
 import {
   dataUrlByteLength,
+  partitionFilesForForward,
   outputMimeType,
   shouldDownscale,
   targetDimensions,
@@ -176,22 +177,122 @@ describe("measuring a data URL", () => {
 });
 
 // ───────────────────────────────────────────────────────────────────────────
+describe("only the smaller copy reaches the wire", () => {
+  /**
+   * The bug this replaced, and it made the whole feature inert.
+   *
+   * `shrinkAndForward` used to forward the file map on its first line and
+   * shrink afterwards. `onChange` arrives with the original; the forward
+   * reached `publishFiles`; and the transport claims a file the instant it
+   * starts streaming it. By the time the smaller copy existed the id was
+   * already spent, so the send dedup filtered it out — the reduction reached
+   * the host's own canvas and nowhere else, and every guest got the full-size
+   * image, as did the snapshot and the convergence pass afterwards.
+   *
+   * There was never a double send: the claim from the send-storm fix saw to
+   * that. It is the same mechanism that made the reduction unreachable.
+   */
+  const png = { mimeType: "image/png", dataURL: "data:image/png;base64,QUJD" };
+
+  it("holds a new image back until it has been shrunk", () => {
+    const { ready, toShrink } = partitionFilesForForward({ f1: png }, new Set(), new Set());
+
+    expect(ready).toEqual({});
+    expect(toShrink).toEqual([{ id: "f1", mimeType: png.mimeType, dataURL: png.dataURL }]);
+  });
+
+  it("does not start the same shrink twice", () => {
+    // `onChange` fires many times per image; each one used to be another full
+    // decode of the same picture.
+    const { ready, toShrink } = partitionFilesForForward({ f1: png }, new Set(), new Set(["f1"]));
+
+    expect(ready).toEqual({});
+    expect(toShrink).toEqual([]);
+  });
+
+  it("passes a settled image through again, so a refused send can retry", () => {
+    const { ready, toShrink } = partitionFilesForForward({ f1: png }, new Set(["f1"]), new Set());
+
+    expect(ready).toEqual({ f1: png });
+    expect(toShrink).toEqual([]);
+  });
+
+  it("judges each image on its own", () => {
+    const { ready, toShrink } = partitionFilesForForward(
+      { done: png, working: png, fresh: png },
+      new Set(["done"]),
+      new Set(["working"])
+    );
+
+    expect(Object.keys(ready)).toEqual(["done"]);
+    expect(toShrink.map((f) => f.id)).toEqual(["fresh"]);
+  });
+
+  it("skips an entry with no bytes in it yet", () => {
+    // Excalidraw keeps a placeholder in the map while it reads the file.
+    const { ready, toShrink } = partitionFilesForForward(
+      { f1: { mimeType: "image/png" }, f2: { dataURL: "data:x" }, f3: undefined },
+      new Set(),
+      new Set()
+    );
+
+    expect(ready).toEqual({});
+    expect(toShrink).toEqual([]);
+  });
+});
+
+describe("the order in the component", () => {
+  const board = code("components/sessions/SessionWhiteboard.tsx");
+
+  it("forwards nothing before the partition has decided", () => {
+    // The line that caused it: `onFilesChange(files)` as the first statement,
+    // with the original map.
+    const shrink = board.slice(board.indexOf("const shrinkAndForward"));
+    expect(shrink).not.toMatch(/onFilesChange\(files\)/);
+    const partition = shrink.indexOf("partitionFilesForForward(");
+    const forward = shrink.indexOf("onFilesChange(ready)");
+    expect(partition).toBeGreaterThan(-1);
+    expect(forward).toBeGreaterThan(partition);
+  });
+
+  it("forwards the shrunk version once the work is done", () => {
+    const shrink = board.slice(board.indexOf("const shrinkAndForward"));
+    expect(shrink).toMatch(/onFilesChange\(\{ \[id\]: \{ mimeType: finalMimeType, dataURL \} \}\)/);
+  });
+
+  it("says what it did, in bytes", () => {
+    // The byte-streams are invisible in the network tab, so a console line is
+    // the only way anyone can check this from a browser.
+    const shrink = board.slice(board.indexOf("const shrinkAndForward"));
+    expect(shrink).toMatch(/console\.info\("\[whiteboard\] downscaled image"/);
+    expect(shrink).toMatch(/before,\s*after,\s*sent: after,/);
+  });
+});
+
+// ───────────────────────────────────────────────────────────────────────────
 describe("where it is wired in", () => {
   const board = code("components/sessions/SessionWhiteboard.tsx");
 
   it("shrinks each image once, not on every onChange", () => {
     // `onChange` fires many times per image — an insert is several renders and
     // every pointer move after it is another.
-    expect(board).toMatch(/downscaledRef\.current\.has\(id\)/);
-    expect(board).toMatch(/downscaledRef\.current\.add\(id\)/);
+    expect(board).toMatch(/shrinkingFilesRef\.current\.add\(id\)/);
+    expect(board).toMatch(/settledFilesRef\.current\.add\(id\)/);
   });
 
-  it("hands the map on before waiting for anything", () => {
+  /**
+   * This test used to assert the opposite, and it was wrong.
+   *
+   * It pinned `onFilesChange(files)` running *before* `downscaleDataUrl` —
+   * "hands the map on before waiting for anything" — which reads like
+   * responsiveness and was in fact the bug: the map handed on was the original,
+   * the transport claimed the id immediately, and the smaller copy could never
+   * be sent afterwards. A green test locking in the defect it was written to
+   * prevent.
+   */
+  it("does not hand an image on before it has been shrunk", () => {
     const shrink = board.slice(board.indexOf("const shrinkAndForward"));
-    const forward = shrink.indexOf("onFilesChange(files)");
-    const work = shrink.indexOf("downscaleDataUrl(");
-    expect(forward).toBeGreaterThan(-1);
-    expect(work).toBeGreaterThan(forward);
+    expect(shrink).not.toMatch(/onFilesChange\(files\)/);
   });
 
   it("puts the smaller copy back under the same id", () => {
@@ -199,7 +300,7 @@ describe("where it is wired in", () => {
     // what makes the delta path, the snapshot, the convergence pass and the
     // send dedup unable to tell this happened at all.
     const shrink = board.slice(board.indexOf("const shrinkAndForward"));
-    expect(shrink).toMatch(/addFiles\(\[\s*\{ id, mimeType: outputMimeType\(mimeType\), dataURL/);
+    expect(shrink).toMatch(/addFiles\(\[\s*\{ id, mimeType: finalMimeType, dataURL/);
   });
 
   it("leaves the transport alone", () => {

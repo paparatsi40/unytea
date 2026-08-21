@@ -5,7 +5,12 @@ import { X, Image as ImageIcon, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
-import { downscaleDataUrl, outputMimeType } from "@/lib/whiteboard/downscale";
+import {
+  dataUrlByteLength,
+  downscaleDataUrl,
+  outputMimeType,
+  partitionFilesForForward,
+} from "@/lib/whiteboard/downscale";
 import {
   BROADCAST_INTERVAL_MS,
   type WhiteboardElement,
@@ -139,52 +144,80 @@ export function SessionWhiteboard({
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   /**
-   * Images already put through the shrinker, by file id.
+   * Images whose final version has been forwarded, by file id.
    *
-   * `onChange` fires many times per image — an insert is several renders and
-   * every pointer move after it is another — so without this every one of them
-   * would decode and re-encode the same picture. Excalidraw file ids are
-   * content-derived and the entries immutable, so seeing an id once is enough.
+   * Excalidraw file ids are content-derived and the entries immutable, so
+   * seeing an id once is enough — and `onChange` fires many times per image (an
+   * insert is several renders, and every pointer move after it is another).
    */
-  const downscaledRef = useRef<Set<string>>(new Set());
+  const settledFilesRef = useRef<Set<string>>(new Set());
+  /** Images being shrunk right now. Held back until they are done. */
+  const shrinkingFilesRef = useRef<Set<string>>(new Set());
 
   /**
-   * Shrink what is worth shrinking, then hand the map on.
+   * Shrink first, forward second.
    *
-   * A whiteboard is a screen. A 4000-pixel photo is displayed at a few hundred
-   * and broadcast at full size to everyone in the room, as base64, which is a
-   * third larger again — so the long edge is capped and nobody can see the
-   * difference. Anything already small, vector, or animated passes through
-   * untouched; see `lib/whiteboard/downscale.ts`.
+   * This used to forward the map on its first line and shrink afterwards, and
+   * that made the whole reduction pointless: `onChange` arrives with the
+   * original, the forward reached `publishFiles`, and the transport claims a
+   * file the instant it starts streaming it. By the time the smaller copy
+   * existed the id was already spent, so the send dedup filtered it and the
+   * reduction reached the host's own canvas and nowhere else. The full-size
+   * image was what every guest received, and what the snapshot and the
+   * convergence pass served afterwards.
    *
-   * The smaller copy goes back into Excalidraw under the same id, so the host's
-   * own canvas holds it too and host and guest are looking at the same pixels.
-   * The id never changes, which is the point: the delta path, the snapshot, the
-   * convergence pass and the send dedup all key on it and none of them can tell
-   * this happened.
+   * So an image is now withheld until its shrink has run, and what is forwarded
+   * is the version that will actually be looked at. The cost is the decode —
+   * a few hundred milliseconds for a large photo — during which the guest sees
+   * the element's placeholder, which is what it is for.
    *
-   * Fire-and-forget on purpose. The un-shrunk map is handed on immediately, so
-   * a slow decode delays nobody — the shrunk copy simply arrives on a later
-   * `onChange`, under the same id, and replaces it.
+   * Everything already settled is passed through again on each call, so a send
+   * the transport refused still gets retried on the next change.
    */
   const shrinkAndForward = useCallback(
     (files: WhiteboardFiles) => {
       if (!onFilesChange) return;
-      onFilesChange(files);
 
-      for (const [id, file] of Object.entries(files)) {
-        const source = file?.dataURL;
-        const mimeType = file?.mimeType;
-        if (!source || !mimeType) continue;
-        if (downscaledRef.current.has(id)) continue;
-        downscaledRef.current.add(id);
+      const { ready, toShrink } = partitionFilesForForward(
+        files,
+        settledFilesRef.current,
+        shrinkingFilesRef.current
+      );
 
-        void downscaleDataUrl(source, mimeType).then((dataURL) => {
-          if (dataURL === source) return;
-          excalidrawAPI?.addFiles([
-            { id, mimeType: outputMimeType(mimeType), dataURL, created: 0 },
-          ]);
-        });
+      if (Object.keys(ready).length > 0) onFilesChange(ready);
+
+      for (const { id, mimeType, dataURL: source } of toShrink) {
+        shrinkingFilesRef.current.add(id);
+
+        void downscaleDataUrl(source, mimeType)
+          .then((dataURL) => {
+            const shrunk = dataURL !== source;
+            const finalMimeType = shrunk ? outputMimeType(mimeType) : mimeType;
+
+            // Back into Excalidraw under the same id, so the host's own canvas
+            // holds the smaller copy too and both ends look at the same pixels.
+            if (shrunk) {
+              excalidrawAPI?.addFiles([{ id, mimeType: finalMimeType, dataURL, created: 0 }]);
+              const before = dataUrlByteLength(source);
+              const after = dataUrlByteLength(dataURL);
+              // `sent` is measured off the value handed to the transport rather
+              // than assumed equal to `after`: if these two ever disagree, some
+              // other copy reached the wire and this line is how anyone finds
+              // out. The byte-streams are invisible in the network tab.
+              console.info("[whiteboard] downscaled image", {
+                id,
+                before,
+                after,
+                sent: after,
+              });
+            }
+
+            settledFilesRef.current.add(id);
+            onFilesChange({ [id]: { mimeType: finalMimeType, dataURL } });
+          })
+          .finally(() => {
+            shrinkingFilesRef.current.delete(id);
+          });
       }
     },
     [onFilesChange, excalidrawAPI]

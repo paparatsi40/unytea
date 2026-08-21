@@ -171,3 +171,50 @@ function loadImage(dataURL: string): Promise<HTMLImageElement> {
     image.src = dataURL;
   });
 }
+
+/**
+ * Which files may be forwarded now, and which still have work to do.
+ *
+ * An image has two versions in its short life: the one Excalidraw built from
+ * the clipboard, and the smaller one this module makes from it. Only the second
+ * is worth putting on the wire, and the first was getting there anyway —
+ * `onChange` fires with the original, the forward was the first line of the
+ * handler, and the transport claims a file the moment it starts sending. By the
+ * time the smaller copy existed, the id was already spent and the send dedup
+ * filtered it out. The reduction reached the host's own canvas and nothing else.
+ *
+ * So an image is held back until its shrink has run. `pending` is the set being
+ * worked on right now — those are withheld — and `settled` is the set whose
+ * final version has already been forwarded, which are passed through again so
+ * that a send refused by an unready transport still gets retried.
+ *
+ * Entries with no bytes yet are skipped: Excalidraw keeps a placeholder in the
+ * map while it reads the file, and forwarding that would send nothing.
+ */
+export function partitionFilesForForward(
+  files: Record<string, { mimeType?: string; dataURL?: string } | undefined>,
+  settled: ReadonlySet<string>,
+  pending: ReadonlySet<string>
+): {
+  ready: Record<string, { mimeType?: string; dataURL?: string }>;
+  toShrink: Array<{ id: string; mimeType: string; dataURL: string }>;
+} {
+  const ready: Record<string, { mimeType?: string; dataURL?: string }> = {};
+  const toShrink: Array<{ id: string; mimeType: string; dataURL: string }> = [];
+
+  for (const [id, file] of Object.entries(files)) {
+    const dataURL = file?.dataURL;
+    const mimeType = file?.mimeType;
+    if (!dataURL || !mimeType) continue;
+
+    if (settled.has(id)) {
+      ready[id] = file;
+      continue;
+    }
+    if (pending.has(id)) continue;
+
+    toShrink.push({ id, mimeType, dataURL });
+  }
+
+  return { ready, toShrink };
+}
