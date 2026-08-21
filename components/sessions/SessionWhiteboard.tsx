@@ -99,10 +99,12 @@ export function SessionWhiteboard({
    * while it is doing that is a race, and the guest lost it: a blank board until
    * the host's next stroke pushed everything again.
    *
-   * Captured once, in a ref, because `initialData` is read at mount and a value
-   * that changed afterwards would be misleading to any future reader.
+   * A lazy `useState` rather than a ref: the value is computed once and then
+   * read during render, which is what state is for and what a ref is not — the
+   * linter is right about that, and `initialData` is only ever read at mount
+   * anyway, so a value that changed later would mislead any future reader.
    */
-  const initialSceneRef = useRef({
+  const [initialScene] = useState(() => ({
     // Excalidraw's own element type is far wider than the handful of fields the
     // protocol reads; the objects here came from Excalidraw in the first place.
     elements: (remoteElements ? [...remoteElements] : []) as never[],
@@ -120,7 +122,7 @@ export function SessionWhiteboard({
         { id: file.id, mimeType: file.mimeType, dataURL: file.dataURL, created: 0 },
       ])
     ) as never,
-  });
+  }));
 
   /**
    * The host's outgoing changes, coalesced.
@@ -272,7 +274,7 @@ export function SessionWhiteboard({
             excalidrawAPI={(api) => setExcalidrawAPI(api)}
             // Born with the scene when there already is one. See the ref above:
             // for a late joiner the snapshot lands before this component does.
-            initialData={isHost ? undefined : initialSceneRef.current}
+            initialData={isHost ? undefined : initialScene}
             theme="light"
             // The read-only half of the contract. `viewModeEnabled` removes the
             // toolbar and every editing gesture, and no change listener is

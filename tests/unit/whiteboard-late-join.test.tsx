@@ -235,11 +235,11 @@ describe("from the hook's state onto the canvas", () => {
     // finished initialising itself with an empty one. For a late joiner that is
     // every scene: the host answers the request with the mode and the snapshot
     // together, so the elements arrive in the same breath that opens the board.
-    expect(board()).toMatch(/initialData=\{isHost \? undefined : initialSceneRef\.current\}/);
+    expect(board()).toMatch(/initialData=\{isHost \? undefined : initialScene\}/);
   });
 
   it("seeds it from the elements and the files both", () => {
-    const seed = board().slice(board().indexOf("const initialSceneRef"));
+    const seed = board().slice(board().indexOf("const [initialScene]"));
     expect(seed).toMatch(/elements: \(remoteElements \? \[\.\.\.remoteElements\] : \[\]\)/);
     expect(seed).toMatch(/remoteFiles \?\? \[\]/);
   });
