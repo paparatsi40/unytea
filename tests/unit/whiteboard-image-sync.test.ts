@@ -289,7 +289,12 @@ describe("how the pieces are wired", () => {
     // The gap, in one line: the parameter list used to stop at `elements`.
     const board = code("components/sessions/SessionWhiteboard.tsx");
     expect(board).toMatch(/\(elements: readonly unknown\[\], _appState: unknown, files\?/);
-    expect(board).toMatch(/if \(files && onFilesChange\) onFilesChange\(files\)/);
+    // The map reaches the file pipeline. It goes through `shrinkAndForward`
+    // now, which caps oversized images on the way past — see
+    // tests/unit/whiteboard-downscale.test.ts — but the forward itself is
+    // unconditional and immediate, which is what this pins.
+    expect(board).toMatch(/if \(files\) shrinkAndForward\(files\)/);
+    expect(board).toMatch(/onFilesChange\(files\)/);
   });
 
   it("hands the bytes to Excalidraw's own file store", () => {

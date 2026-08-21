@@ -5,6 +5,7 @@ import { X, Image as ImageIcon, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
+import { downscaleDataUrl, outputMimeType } from "@/lib/whiteboard/downscale";
 import {
   BROADCAST_INTERVAL_MS,
   type WhiteboardElement,
@@ -137,6 +138,58 @@ export function SessionWhiteboard({
   const pendingRef = useRef<readonly WhiteboardElement[] | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  /**
+   * Images already put through the shrinker, by file id.
+   *
+   * `onChange` fires many times per image — an insert is several renders and
+   * every pointer move after it is another — so without this every one of them
+   * would decode and re-encode the same picture. Excalidraw file ids are
+   * content-derived and the entries immutable, so seeing an id once is enough.
+   */
+  const downscaledRef = useRef<Set<string>>(new Set());
+
+  /**
+   * Shrink what is worth shrinking, then hand the map on.
+   *
+   * A whiteboard is a screen. A 4000-pixel photo is displayed at a few hundred
+   * and broadcast at full size to everyone in the room, as base64, which is a
+   * third larger again — so the long edge is capped and nobody can see the
+   * difference. Anything already small, vector, or animated passes through
+   * untouched; see `lib/whiteboard/downscale.ts`.
+   *
+   * The smaller copy goes back into Excalidraw under the same id, so the host's
+   * own canvas holds it too and host and guest are looking at the same pixels.
+   * The id never changes, which is the point: the delta path, the snapshot, the
+   * convergence pass and the send dedup all key on it and none of them can tell
+   * this happened.
+   *
+   * Fire-and-forget on purpose. The un-shrunk map is handed on immediately, so
+   * a slow decode delays nobody — the shrunk copy simply arrives on a later
+   * `onChange`, under the same id, and replaces it.
+   */
+  const shrinkAndForward = useCallback(
+    (files: WhiteboardFiles) => {
+      if (!onFilesChange) return;
+      onFilesChange(files);
+
+      for (const [id, file] of Object.entries(files)) {
+        const source = file?.dataURL;
+        const mimeType = file?.mimeType;
+        if (!source || !mimeType) continue;
+        if (downscaledRef.current.has(id)) continue;
+        downscaledRef.current.add(id);
+
+        void downscaleDataUrl(source, mimeType).then((dataURL) => {
+          if (dataURL === source) return;
+          excalidrawAPI?.addFiles([
+            { id, mimeType: outputMimeType(mimeType), dataURL, created: 0 },
+          ]);
+        });
+      }
+    },
+    [onFilesChange, excalidrawAPI]
+  );
+
   const flush = useCallback(() => {
     timerRef.current = null;
     const pending = pendingRef.current;
@@ -161,13 +214,13 @@ export function SessionWhiteboard({
   const handleChange = useCallback(
     (elements: readonly unknown[], _appState: unknown, files?: WhiteboardFiles) => {
       if (!isHost || !onSceneChange) return;
-      if (files && onFilesChange) onFilesChange(files);
+      if (files) shrinkAndForward(files);
       pendingRef.current = elements as readonly WhiteboardElement[];
       if (timerRef.current === null) {
         timerRef.current = setTimeout(flush, BROADCAST_INTERVAL_MS);
       }
     },
-    [isHost, onSceneChange, onFilesChange, flush]
+    [isHost, onSceneChange, shrinkAndForward, flush]
   );
 
   useEffect(() => {
