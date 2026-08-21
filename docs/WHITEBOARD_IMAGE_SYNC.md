@@ -140,6 +140,46 @@ counted.
 
 ---
 
+## Postscript: the send storm (2026-08-21)
+
+The first version of this shipped a stability bug that took rooms down, and the
+shape of it is worth keeping.
+
+`publishFiles` marked a file as sent *after* the stream completed. A 1.5 MB
+image takes seconds, and Excalidraw fires `onChange` many times in those seconds
+— inserting an image is several renders on its own, and every pointer move after
+it is another. Each call re-diffed, saw the file as still owed, and started
+**another full stream of the same megabyte**. A handful of those saturated the
+reliable data channel — which is the same channel carrying the room's video and
+audio — and LiveKit reconnected. The reconnect truncated the streams in flight
+(the guest's errors landed on exact multiples of the 15 000-byte chunk, which is
+what a cut connection looks like, not a lost packet), the guest's convergence
+pass asked for the missing files, and the host answered with another full copy.
+A feedback loop with the call inside it.
+
+Three changes, none of them to the transport:
+
+1. **Claim before sending, not after.** The file is marked the moment the send
+   starts, and un-marked only if it actually failed. The `onChange` burst now
+   diffs to nothing.
+2. **One send per file per destination.** `claimFileSend` refuses a second
+   stream of the same bytes to the same place while one is in flight. Keyed on
+   file *and* destination, so a broadcast and a targeted answer to a late joiner
+   do not block each other.
+3. **Sends run one at a time.** Eight images to a joiner is up to 16 MB; all of
+   it at once is what put the channel over. Slower for the pictures, survivable
+   for the call — and that is the trade this feature has to make, because
+   nothing about a whiteboard image is worth a dropped session.
+
+What was *not* the problem, checked before changing anything: backpressure.
+`ByteStreamWriter.write` splits the buffer into 15 000-byte packets internally
+and `sendDataPacket` awaits `waitForBufferStatusLow` before every one of them
+(`bufferedAmountLowThreshold` is 65 535). Handing the writer a whole 1.5 MB
+buffer is correct usage; the SDK paces it. What the SDK does not do — and cannot
+— is stop a second caller opening a second stream.
+
+---
+
 ## What this does not do
 
 - **No persistence.** Nothing is stored anywhere, so there is nothing to clean

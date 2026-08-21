@@ -7,8 +7,11 @@ import {
   applyDelta,
   chunkElements,
   diffElements,
+  claimFileSend,
   diffFiles,
+  fileSendKey,
   filesForScene,
+  releaseFileSend,
   FILE_REQUEST_RETRY_MS,
   missingFileIds,
   orderedElements,
@@ -134,6 +137,19 @@ export function useWhiteboardChannel(isHost: boolean): WhiteboardChannel {
   const hostFilesRef = useRef<Map<string, WhiteboardFile>>(new Map());
   /** What the room has already been sent, so nothing is streamed twice. */
   const sentFileIdsRef = useRef<Set<string>>(new Set());
+  /** Sends currently on the wire, keyed by file and destination. */
+  const inFlightSendsRef = useRef<Set<string>>(new Set());
+  /**
+   * The tail of the send queue.
+   *
+   * File sends run one at a time. Eight images to a late joiner is up to 16 MB,
+   * and pushing all of it onto the reliable channel at once is what took the
+   * room down with it — and that channel carries the video. One at a time is
+   * slower for the pictures and survivable for the call, which is the trade
+   * this feature has to make: nothing about a whiteboard image is worth a
+   * dropped session.
+   */
+  const sendQueueRef = useRef<Promise<void>>(Promise.resolve());
   /** The viewer's image bytes, keyed by file id. */
   const viewerFilesRef = useRef<Map<string, WhiteboardFile>>(new Map());
   /**
@@ -200,23 +216,48 @@ export function useWhiteboardChannel(isHost: boolean): WhiteboardChannel {
     async (file: WhiteboardFile, destinationIdentities?: string[]) => {
       if (!isDataTransportReady(room)) return false;
 
-      try {
-        const bytes = encoder.current.encode(file.dataURL);
-        const writer = await room.localParticipant.streamBytes({
-          topic: FILE_TOPIC,
-          attributes: { fileId: file.id, mimeType: file.mimeType },
-          totalSize: bytes.byteLength,
-          ...(destinationIdentities ? { destinationIdentities } : {}),
-        });
-        await writer.write(bytes);
-        await writer.close();
-        return true;
-      } catch (error) {
-        // Not fatal, and not silent: the viewer will notice the file it can see
-        // referenced is missing and ask for it again.
-        console.error("[whiteboard] file send failed", error);
-        return false;
-      }
+      // One send of these bytes to this destination at a time. Excalidraw fires
+      // `onChange` repeatedly while an image is being inserted and placed, and
+      // each of those used to start another full stream of the same megabyte.
+      const key = fileSendKey(file.id, destinationIdentities?.[0]);
+      if (!claimFileSend(inFlightSendsRef.current, key)) return false;
+
+      const run = async (): Promise<boolean> => {
+        try {
+          const bytes = encoder.current.encode(file.dataURL);
+          const writer = await room.localParticipant.streamBytes({
+            topic: FILE_TOPIC,
+            attributes: { fileId: file.id, mimeType: file.mimeType },
+            totalSize: bytes.byteLength,
+            ...(destinationIdentities ? { destinationIdentities } : {}),
+          });
+          // `write` splits into 15 KB packets internally and each one awaits
+          // `bufferedamountlow`, so the backpressure is the SDK's and handing it
+          // the whole buffer is correct. What it does not do is stop a second
+          // caller starting a second stream — that is the claim above.
+          await writer.write(bytes);
+          await writer.close();
+          releaseFileSend(inFlightSendsRef.current, key);
+          return true;
+        } catch (error) {
+          // Not fatal, and not silent: the viewer notices the file it can see
+          // referenced is missing and asks for it again.
+          releaseFileSend(inFlightSendsRef.current, key);
+          console.error("[whiteboard] file send failed", error);
+          return false;
+        }
+      };
+
+      // Queued rather than started. `.then` on the tail serialises without a
+      // lock, and the `catch` keeps one failed send from breaking the chain for
+      // every send after it. No try/finally anywhere in here: the React
+      // Compiler cannot lower it.
+      const queued = sendQueueRef.current.then(run, run);
+      sendQueueRef.current = queued.then(
+        () => undefined,
+        () => undefined
+      );
+      return queued;
     },
     [room]
   );
@@ -514,8 +555,27 @@ export function useWhiteboardChannel(isHost: boolean): WhiteboardChannel {
       for (const file of fresh) hostFilesRef.current.set(file.id, file);
 
       for (const file of fresh) {
+        /**
+         * Marked before the send, not after it.
+         *
+         * This is the bug that took rooms down. Marking on completion left the
+         * file looking unsent for the several seconds a 1.5 MB stream takes,
+         * and `onChange` fires many times in those seconds — an image insert is
+         * several renders on its own, and every pointer move after it is
+         * another. Each call re-diffed, saw the file as still owed, and started
+         * another full stream. A handful of those saturated the reliable data
+         * channel, which is the channel carrying the room's video: the stream
+         * was cut mid-flight (hence truncations at exact multiples of the
+         * 15 000-byte chunk), the guest asked for the file again, and the host
+         * answered with another full copy. A feedback loop with the call inside
+         * it.
+         *
+         * Un-marked only if the send actually failed, so the convergence pass
+         * can still get the file across.
+         */
+        sentFileIdsRef.current.add(file.id);
         void sendFile(file).then((sent) => {
-          if (sent) sentFileIdsRef.current.add(file.id);
+          if (!sent) sentFileIdsRef.current.delete(file.id);
         });
       }
     },
