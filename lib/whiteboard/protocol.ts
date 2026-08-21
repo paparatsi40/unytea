@@ -351,3 +351,37 @@ export function filesForScene(
 
   return out;
 }
+
+/**
+ * The key one file-send is claimed under.
+ *
+ * A broadcast and a targeted answer to one guest are different sends of the
+ * same bytes and must not block each other: a late joiner asking for an image
+ * while the host happens to be broadcasting a different copy of it is a
+ * legitimate pair of streams, not a duplicate.
+ */
+export function fileSendKey(fileId: string, identity?: string): string {
+  return `${fileId}→${identity ?? "*"}`;
+}
+
+/**
+ * Take the right to send this file, if nobody else holds it.
+ *
+ * Returns false when a send of the same bytes to the same destination is
+ * already in flight — which is the whole point. A 1.5 MB image takes seconds to
+ * stream, and in those seconds Excalidraw fires `onChange` many times (an
+ * insert alone is several renders, and every pointer move that follows is
+ * another). Without this, each of those calls started *another* full stream of
+ * the same megabyte and a handful of them was enough to saturate the reliable
+ * data channel — the one carrying the room's video and audio.
+ */
+export function claimFileSend(claims: Set<string>, key: string): boolean {
+  if (claims.has(key)) return false;
+  claims.add(key);
+  return true;
+}
+
+/** Give the right back, whether the send succeeded or failed. */
+export function releaseFileSend(claims: Set<string>, key: string): void {
+  claims.delete(key);
+}

@@ -3,8 +3,11 @@ import fs from "node:fs";
 import path from "node:path";
 
 import {
+  claimFileSend,
   diffFiles,
+  fileSendKey,
   filesForScene,
+  releaseFileSend,
   missingFileIds,
   pendingFileRequests,
   recordFileRequests,
@@ -226,6 +229,61 @@ describe("answering a late joiner", () => {
 });
 
 // ───────────────────────────────────────────────────────────────────────────
+describe("one send of one file at a time", () => {
+  /**
+   * The bug that took rooms down.
+   *
+   * A 1.5 MB image takes seconds to stream, and Excalidraw fires `onChange`
+   * many times in those seconds — inserting an image is several renders on its
+   * own, and every pointer move after it is another. Each call re-diffed, saw
+   * the file as still owed, and started another full stream of the same
+   * megabyte. A handful of those saturated the reliable data channel, which is
+   * the channel carrying the room's video and audio: the stream was cut
+   * mid-flight (truncations landed on exact multiples of the 15 000-byte
+   * chunk), the guest asked for the file again, and the host answered with
+   * another full copy. A feedback loop with the call inside it.
+   */
+  it("refuses a second send of the same file to the same place", () => {
+    const claims = new Set<string>();
+    const key = fileSendKey("f1");
+
+    expect(claimFileSend(claims, key)).toBe(true);
+    expect(claimFileSend(claims, key)).toBe(false);
+    expect(claimFileSend(claims, key)).toBe(false);
+  });
+
+  it("lets the same file go to two different guests at once", () => {
+    // A broadcast and a targeted answer are different sends of the same bytes.
+    // Blocking one on the other would starve a late joiner while the host is
+    // busy broadcasting to everybody else.
+    const claims = new Set<string>();
+
+    expect(claimFileSend(claims, fileSendKey("f1"))).toBe(true);
+    expect(claimFileSend(claims, fileSendKey("f1", "guest-a"))).toBe(true);
+    expect(claimFileSend(claims, fileSendKey("f1", "guest-b"))).toBe(true);
+    expect(claimFileSend(claims, fileSendKey("f1", "guest-a"))).toBe(false);
+  });
+
+  it("lets the next send through once the first is done", () => {
+    const claims = new Set<string>();
+    const key = fileSendKey("f1", "guest-a");
+
+    claimFileSend(claims, key);
+    releaseFileSend(claims, key);
+
+    // Released whether it succeeded or failed — a send that died must not lock
+    // the file out of the convergence pass for the rest of the session.
+    expect(claimFileSend(claims, key)).toBe(true);
+  });
+
+  it("survives a release of something never claimed", () => {
+    const claims = new Set<string>();
+    releaseFileSend(claims, fileSendKey("f1"));
+    expect(claims.size).toBe(0);
+  });
+});
+
+// ───────────────────────────────────────────────────────────────────────────
 describe("how the pieces are wired", () => {
   it("takes the third argument of onChange", () => {
     // The gap, in one line: the parameter list used to stop at `elements`.
@@ -265,6 +323,36 @@ describe("how the pieces are wired", () => {
     const request = channel.slice(channel.indexOf('case "whiteboard_file_request"'));
     expect(request).toMatch(/if \(!isHostRef\.current \|\| !participant\) return;/);
     expect(request).toMatch(/sendFile\(file, \[participant\.identity\]\)/);
+  });
+
+  it("marks a file as sent before streaming it, not after", () => {
+    // The ordering *is* the fix. Marking on completion left the file looking
+    // unsent for the seconds the stream took, and every `onChange` in that
+    // window started another copy.
+    const channel = code("hooks/useWhiteboardChannel.ts");
+    const loop = channel.slice(channel.indexOf("for (const file of fresh) {"));
+    const mark = loop.indexOf("sentFileIdsRef.current.add(file.id)");
+    const send = loop.indexOf("sendFile(file)");
+    expect(mark).toBeGreaterThan(-1);
+    expect(send).toBeGreaterThan(mark);
+    // And un-marked only on failure, so convergence can still get it across.
+    expect(loop).toMatch(/if \(!sent\) sentFileIdsRef\.current\.delete\(file\.id\)/);
+  });
+
+  it("claims the send before opening the stream", () => {
+    const channel = code("hooks/useWhiteboardChannel.ts");
+    const send = channel.slice(channel.indexOf("const sendFile = useCallback"));
+    const claim = send.indexOf("claimFileSend(inFlightSendsRef.current, key)");
+    const stream = send.indexOf("streamBytes({");
+    expect(claim).toBeGreaterThan(-1);
+    expect(stream).toBeGreaterThan(claim);
+  });
+
+  it("sends files one at a time", () => {
+    // Eight images to a late joiner is up to 16 MB. All of it at once on the
+    // reliable channel is what took the room down with it.
+    const channel = code("hooks/useWhiteboardChannel.ts");
+    expect(channel).toMatch(/sendQueueRef\.current\.then\(run, run\)/);
   });
 
   it("records a request only once it is on the wire", () => {
