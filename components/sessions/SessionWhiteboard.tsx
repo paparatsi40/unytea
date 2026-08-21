@@ -83,6 +83,42 @@ export function SessionWhiteboard({
   const [excalidrawAPI, setExcalidrawAPI] = useState<any>(null);
 
   /**
+   * The scene the canvas is born with.
+   *
+   * A viewer's board used to be constructed empty and filled entirely by the
+   * `updateScene` effect below — which is right for everything that arrives
+   * while the board is open, and wrong for the one case where the scene is
+   * already known before the canvas exists.
+   *
+   * That case is late join, and it is the common one. The host answers a
+   * `whiteboard_request` with two things at once: the mode, which is what makes
+   * the guest's stage switch to the whiteboard and mount this component, and the
+   * snapshot. So by the time Excalidraw is asked for, the scene is already in
+   * hand — and Excalidraw is a dynamic import that initialises itself over
+   * several ticks after that, with an empty scene of its own. Pushing into it
+   * while it is doing that is a race, and the guest lost it: a blank board until
+   * the host's next stroke pushed everything again.
+   *
+   * Captured once, in a ref, because `initialData` is read at mount and a value
+   * that changed afterwards would be misleading to any future reader.
+   */
+  const initialSceneRef = useRef({
+    // Excalidraw's own element type is far wider than the handful of fields the
+    // protocol reads; the objects here came from Excalidraw in the first place.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    elements: (remoteElements ? [...remoteElements] : []) as any,
+    // Same widening as the elements above, and for the same reason: the mime
+    // type is a string on the wire and a narrow union in Excalidraw's types.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    files: Object.fromEntries(
+      (remoteFiles ?? []).map((file) => [
+        file.id,
+        { id: file.id, mimeType: file.mimeType, dataURL: file.dataURL, created: Date.now() },
+      ])
+    ) as any,
+  });
+
+  /**
    * The host's outgoing changes, coalesced.
    *
    * Excalidraw fires `onChange` on every pointer move, so a single dragged
@@ -230,6 +266,9 @@ export function SessionWhiteboard({
         <div className="flex-1 overflow-hidden">
           <Excalidraw
             excalidrawAPI={(api) => setExcalidrawAPI(api)}
+            // Born with the scene when there already is one. See the ref above:
+            // for a late joiner the snapshot lands before this component does.
+            initialData={isHost ? undefined : initialSceneRef.current}
             theme="light"
             // The read-only half of the contract. `viewModeEnabled` removes the
             // toolbar and every editing gesture, and no change listener is
