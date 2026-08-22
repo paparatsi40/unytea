@@ -86,6 +86,10 @@ export function SignUpContent({ oauthProviders }: SignUpContentProps) {
         toast.error(t("auth.signInError"));
       } else {
         toast.success(t("auth.accountCreated"));
+        // Same as sign-in: the cookie is set, but the client Router Cache still
+        // holds what the server said while there was no session. Discard it, or
+        // the navigation below answers from the logged-out copy.
+        router.refresh();
         // Redirect to onboarding with flag to prevent middleware interference
         router.push("/onboarding?newUser=true");
       }

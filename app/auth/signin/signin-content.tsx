@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { OAuthButtons } from "@/components/auth/OAuthButtons";
 import type { OAuthProviderId } from "@/lib/auth-providers";
+import { safeCallbackUrl } from "@/lib/auth-callback-url";
 
 interface SignInContentProps {
   /** Registered OAuth providers, resolved on the server in `page.tsx`. */
@@ -18,7 +19,13 @@ interface SignInContentProps {
 export function SignInContent({ oauthProviders }: SignInContentProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams?.get("callbackUrl") || "/dashboard";
+  /**
+   * Narrowed before it is used. `callbackUrl` comes from the query string —
+   * from whoever wrote the link — and handing it straight to `router.push`
+   * would make this page an open redirect for anyone who has just proved they
+   * trust us with a password.
+   */
+  const callbackUrl = safeCallbackUrl(searchParams?.get("callbackUrl"));
   const t = useTranslations();
 
   const [email, setEmail] = useState("");
@@ -56,6 +63,23 @@ export function SignInContent({ oauthProviders }: SignInContentProps) {
         toast.error(t("auth.invalidCredentials"));
       } else {
         toast.success(t("auth.welcomeBack"));
+
+        /**
+         * Refresh first, then navigate.
+         *
+         * With `redirect: false` the cookie is set but nothing tells the App
+         * Router about it, and the client Router Cache still holds the payload
+         * it fetched for the destination while logged out — which, for anyone
+         * who arrived here by being bounced off `/dashboard`, is the bounce
+         * itself. So `push` served the old answer, the visitor landed back on
+         * this page looking signed out, and a manual reload was the only way
+         * in. `router.refresh()` discards that cache, so the `push` below has
+         * to ask the server, and the server has the session.
+         *
+         * The order matters: refreshing after the push would clear the cache a
+         * navigation had already used.
+         */
+        router.refresh();
         router.push(callbackUrl);
       }
     } catch {
