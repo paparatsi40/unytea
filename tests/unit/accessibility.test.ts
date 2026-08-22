@@ -81,6 +81,23 @@ function elements(src: string, tag: string): Element[] {
         if (c === quote) quote = null;
         continue;
       }
+      // Comments inside a JSX expression are JavaScript, where an apostrophe is
+      // punctuation and not a string delimiter. Reading one as a quote opened a
+      // string that never closed, and the scan then ran off the end of the file
+      // and handed back an empty body — which reads as "this button renders
+      // nothing but an icon" and reported a labelled button as unnamed.
+      if (c === "/" && src[i + 1] === "/") {
+        const eol = src.indexOf("\n", i);
+        if (eol === -1) break;
+        i = eol;
+        continue;
+      }
+      if (c === "/" && src[i + 1] === "*") {
+        const end = src.indexOf("*/", i + 2);
+        if (end === -1) break;
+        i = end + 1;
+        continue;
+      }
       if (c === '"' || c === "'" || c === "`") quote = c;
       else if (c === "{") depth++;
       else if (c === "}") depth--;
@@ -184,6 +201,52 @@ function unnamedIconButtons(): string[] {
   }
   return offenders;
 }
+
+/**
+ * The scanner's own positive control.
+ *
+ * Everything below rests on `elements()` finding the right span of source. When
+ * it loses its place it does so silently and in the safe-looking direction —
+ * an empty body reads as an unlabelled icon button — so the parse is asserted
+ * directly, on the shape that broke it.
+ */
+describe("the button scanner keeps its place", () => {
+  const ICONS = new Set(["LogOut"]);
+
+  const LABELLED = `<button
+  type="button"
+  onClick={() =>
+    run(async () => {
+      // the server's answer is what settles this
+      await go();
+    })
+  }
+>
+  <LogOut className="mr-2 h-4 w-4" aria-hidden="true" />
+  <span>{t("logout")}</span>
+</button>`;
+
+  const UNLABELLED = LABELLED.replace(`  <span>{t("logout")}</span>\n`, "");
+
+  it("reads the whole button even when a comment contains an apostrophe", () => {
+    const found = elements(LABELLED, "button");
+    expect(found).toHaveLength(1);
+    expect(found[0].body).toContain("<span>");
+  });
+
+  it("still calls that button labelled", () => {
+    expect(hasVisibleText(elements(LABELLED, "button")[0].body, ICONS)).toBe(true);
+  });
+
+  it("and still calls the icon-only one unlabelled", () => {
+    // The half that matters: hardening the parse must not have made the scan
+    // agreeable. Strip the text and it has to object.
+    const found = elements(UNLABELLED, "button");
+    expect(found).toHaveLength(1);
+    expect(found[0].body).toContain("<LogOut");
+    expect(hasVisibleText(found[0].body, ICONS)).toBe(false);
+  });
+});
 
 describe("icon-only buttons expose an accessible name", () => {
   it("scans a realistic number of files", () => {
