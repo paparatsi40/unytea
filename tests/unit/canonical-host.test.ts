@@ -295,3 +295,97 @@ describe("auth cookies stay pinned to the single host", () => {
     expect(cookies).toContain('new URL(url).protocol === "https:"');
   });
 });
+
+// ───────────────────────────────────────────────────────────────────────────
+describe("the retired host cannot come back through the environment", () => {
+  /**
+   * `SITE_URL` is read once at module load, so each case re-imports the module
+   * with the variable it is testing.
+   */
+  async function siteUrlWith(value: string | undefined) {
+    const previous = process.env.NEXT_PUBLIC_APP_URL;
+    if (value === undefined) delete process.env.NEXT_PUBLIC_APP_URL;
+    else process.env.NEXT_PUBLIC_APP_URL = value;
+
+    vi.resetModules();
+    const mod = await import("@/lib/site-url");
+    const result = { SITE_URL: mod.SITE_URL, siteUrl: mod.siteUrl("/auth/signin") };
+
+    if (previous === undefined) delete process.env.NEXT_PUBLIC_APP_URL;
+    else process.env.NEXT_PUBLIC_APP_URL = previous;
+    vi.resetModules();
+    return result;
+  }
+
+  it("demotes www to the apex even when the environment says www", async () => {
+    // The environment variable lives in a dashboard, it has been wrong, and
+    // nothing in the code noticed. A canonical or an og:url on the retired host
+    // advertises a URL that 308s, and the cross-host hop is where Next's RSC
+    // prefetch gives up.
+    const { SITE_URL, siteUrl } = await siteUrlWith("https://www.unytea.com");
+    expect(SITE_URL).toBe("https://unytea.com");
+    expect(siteUrl).toBe("https://unytea.com/auth/signin");
+  });
+
+  it("demotes it with a trailing slash or a path on the end too", async () => {
+    expect((await siteUrlWith("https://www.unytea.com/")).SITE_URL).toBe("https://unytea.com");
+    expect((await siteUrlWith("https://www.unytea.com/en")).SITE_URL).toBe("https://unytea.com");
+  });
+
+  it("leaves a preview origin alone", async () => {
+    // Only the one retired host is rewritten. Silently rewriting an origin
+    // nobody asked about would be a worse bug than the one this prevents.
+    expect((await siteUrlWith("https://unytea-git-x.vercel.app")).SITE_URL).toBe(
+      "https://unytea-git-x.vercel.app"
+    );
+  });
+
+  it("leaves a different www host alone", async () => {
+    // Scoped to the one retired host, not to any name beginning with "www.".
+    // A blanket rule would quietly rewrite somebody else's origin, which is a
+    // worse bug than the one being fixed — and the first draft of the test
+    // above could not tell the two apart, because a preview host has no "www."
+    // in it either way.
+    expect((await siteUrlWith("https://www.example.com")).SITE_URL).toBe("https://www.example.com");
+  });
+
+  it("leaves localhost alone", async () => {
+    expect((await siteUrlWith("http://localhost:3000")).SITE_URL).toBe("http://localhost:3000");
+  });
+
+  it("falls back to the apex when nothing is set", async () => {
+    expect((await siteUrlWith(undefined)).SITE_URL).toBe("https://unytea.com");
+  });
+});
+
+describe("every absolute URL the app hands out comes from one place", () => {
+  it("no Stripe return URL builds its own origin", async () => {
+    // These read `process.env.NEXT_PUBLIC_APP_URL` directly, which meant they
+    // bypassed the canonicalisation entirely — and rendered the literal
+    // "undefined/dashboard/..." whenever the variable was unset.
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+    const root = path.resolve(__dirname, "../..");
+
+    const offenders: string[] = [];
+    const walk = (dir: string) => {
+      for (const entry of fs.readdirSync(path.join(root, dir), { withFileTypes: true })) {
+        if (entry.name === "node_modules" || entry.name.startsWith(".")) continue;
+        const rel = `${dir}/${entry.name}`;
+        if (entry.isDirectory()) {
+          walk(rel);
+          continue;
+        }
+        if (!/\.tsx?$/.test(entry.name)) continue;
+        if (rel === "lib/site-url.ts") continue;
+        const source = fs.readFileSync(path.join(root, rel), "utf8");
+        if (source.includes("process.env.NEXT_PUBLIC_APP_URL")) offenders.push(rel);
+      }
+    };
+    walk("app");
+    walk("lib");
+    walk("components");
+
+    expect(offenders).toEqual([]);
+  });
+});

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
+import { siteUrl } from "@/lib/site-url";
 
 export const dynamic = "force-dynamic";
 
@@ -73,8 +74,8 @@ export async function POST() {
     // Create onboarding link
     const accountLink = await stripe.accountLinks.create({
       account: user.stripeConnectAccountId,
-      refresh_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/settings/payments?step=onboarding`,
-      return_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/settings/payments?step=complete`,
+      refresh_url: siteUrl(`/dashboard/settings/payments?step=onboarding`),
+      return_url: siteUrl(`/dashboard/settings/payments?step=complete`),
       type: "account_onboarding",
     });
 

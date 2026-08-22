@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getPlatformFeePercent } from "@/lib/plans";
 import { stripe } from "@/lib/stripe";
 import { getOrCreateStripeCustomer } from "@/lib/stripe";
+import { siteUrl } from "@/lib/site-url";
 
 async function getPlatformFeePercentForOwner(ownerId: string): Promise<number> {
   const ownerSubscription = await prisma.subscription.findFirst({
@@ -109,8 +110,8 @@ export async function POST(req: Request) {
         },
       ],
       mode: "subscription",
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/c/${community.slug}?success=true`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/c/${community.slug}?canceled=true`,
+      success_url: siteUrl(`/dashboard/c/${community.slug}?success=true`),
+      cancel_url: siteUrl(`/dashboard/c/${community.slug}?canceled=true`),
       metadata: {
         userId: session.user.id,
         communityId: communityId,
