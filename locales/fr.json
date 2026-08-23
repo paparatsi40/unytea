@@ -209,6 +209,31 @@
       "VALIDATION_EMAIL": "Cette adresse e-mail semble incorrecte",
       "VALIDATION_PASSWORD": "Le mot de passe doit faire au moins 8 caractères",
       "generic": "Une erreur est survenue. Réessayez."
+    },
+    "errorPage": {
+      "AccessDenied": {
+        "title": "Connexion annulée",
+        "body": "Vous n'avez pas terminé l'autorisation d'accès, nous n'avons donc pas pu vous connecter. Rien n'a changé sur votre compte : réessayez quand vous voulez."
+      },
+      "OAuthAccountNotLinked": {
+        "title": "Cette adresse e-mail est déjà utilisée",
+        "body": "Un compte existe déjà avec cette adresse, créé d'une autre manière. Connectez-vous avec la méthode d'origine, puis liez celle-ci depuis vos paramètres."
+      },
+      "Configuration": {
+        "title": "La connexion est indisponible pour le moment",
+        "body": "Quelque chose est mal configuré de notre côté et la connexion n'a pas pu aboutir. Vous n'y êtes pour rien. Réessayez dans quelques minutes."
+      },
+      "Verification": {
+        "title": "Ce lien n'est plus valide",
+        "body": "Les liens de connexion ne servent qu'une fois et expirent. Demandez-en un nouveau et il fonctionnera."
+      },
+      "Default": {
+        "title": "Nous n'avons pas pu vous connecter",
+        "body": "Quelque chose s'est mal passé au retour de la connexion. Rien n'a changé sur votre compte : réessayez, et écrivez-nous si cela persiste."
+      },
+      "backToSignIn": "Retour à la connexion",
+      "backToHome": "Aller à la page d'accueil",
+      "needHelp": "Toujours bloqué ? <contact>Écrivez-nous</contact> et nous vous aiderons."
     }
   },
   "landing": {
@@ -3114,5 +3139,12 @@
     "closeChecklist": "Masquer la liste de démarrage",
     "pollDialog": "Sondage en direct",
     "pollCreatorDialog": "Créer un sondage"
+  },
+  "notFound": {
+    "code": "Erreur 404",
+    "title": "Cette page est introuvable",
+    "body": "Le lien est peut-être obsolète, ou la page a été déplacée. Voici comment revenir.",
+    "backToHome": "Aller à la page d'accueil",
+    "signIn": "Se connecter"
   }
 }

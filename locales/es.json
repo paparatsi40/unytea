@@ -209,6 +209,31 @@
       "VALIDATION_EMAIL": "Ese correo no parece correcto",
       "VALIDATION_PASSWORD": "La contraseña debe tener al menos 8 caracteres",
       "generic": "Algo ha fallado. Inténtalo de nuevo."
+    },
+    "errorPage": {
+      "AccessDenied": {
+        "title": "Se canceló el inicio de sesión",
+        "body": "No llegaste a conceder el acceso, así que no pudimos iniciar tu sesión. No se cambió nada en tu cuenta: inténtalo de nuevo cuando quieras."
+      },
+      "OAuthAccountNotLinked": {
+        "title": "Ese correo ya está en uso",
+        "body": "Ya existe una cuenta con este correo, creada de otra forma. Inicia sesión con el método que usaste al principio y luego vincula este desde tus ajustes."
+      },
+      "Configuration": {
+        "title": "El inicio de sesión no está disponible ahora mismo",
+        "body": "Hay algo mal configurado de nuestro lado y no pudimos completar el inicio de sesión. No es culpa tuya. Vuelve a intentarlo en unos minutos."
+      },
+      "Verification": {
+        "title": "Ese enlace ya no es válido",
+        "body": "Los enlaces de inicio de sesión solo sirven una vez y caducan. Pide uno nuevo y funcionará."
+      },
+      "Default": {
+        "title": "No pudimos iniciar tu sesión",
+        "body": "Algo falló al volver del inicio de sesión. No se cambió nada en tu cuenta: inténtalo otra vez y escríbenos si sigue pasando."
+      },
+      "backToSignIn": "Volver a iniciar sesión",
+      "backToHome": "Ir a la página de inicio",
+      "needHelp": "¿Sigues atascado? <contact>Escríbenos</contact> y te ayudamos."
     }
   },
   "landing": {
@@ -3114,5 +3139,12 @@
     "closeChecklist": "Ocultar la lista de primeros pasos",
     "pollDialog": "Encuesta en vivo",
     "pollCreatorDialog": "Crear una encuesta"
+  },
+  "notFound": {
+    "code": "Error 404",
+    "title": "No encontramos esa página",
+    "body": "Puede que el enlace esté desactualizado o que la página haya cambiado de sitio. Por aquí se vuelve.",
+    "backToHome": "Ir a la página de inicio",
+    "signIn": "Iniciar sesión"
   }
 }

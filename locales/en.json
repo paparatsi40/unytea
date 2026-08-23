@@ -209,6 +209,31 @@
       "VALIDATION_EMAIL": "That email address doesn't look right",
       "VALIDATION_PASSWORD": "Password must be at least 8 characters",
       "generic": "Something went wrong. Please try again."
+    },
+    "errorPage": {
+      "AccessDenied": {
+        "title": "Sign-in was cancelled",
+        "body": "You didn't finish granting access, so we couldn't sign you in. Nothing was changed on your account — try again whenever you're ready."
+      },
+      "OAuthAccountNotLinked": {
+        "title": "That email is already in use",
+        "body": "An account already exists with this email address, created a different way. Sign in with the method you used originally, then link this one from your settings."
+      },
+      "Configuration": {
+        "title": "Sign-in isn't available right now",
+        "body": "Something on our side is misconfigured, so we couldn't complete sign-in. This isn't anything you did. Please try again in a few minutes."
+      },
+      "Verification": {
+        "title": "That link is no longer valid",
+        "body": "Sign-in links can only be used once, and they expire. Request a new one and it'll work."
+      },
+      "Default": {
+        "title": "We couldn't sign you in",
+        "body": "Something went wrong on the way back from sign-in. Nothing was changed on your account — try again, and get in touch if it keeps happening."
+      },
+      "backToSignIn": "Back to sign in",
+      "backToHome": "Go to the home page",
+      "needHelp": "Still stuck? <contact>Get in touch</contact> and we'll help."
     }
   },
   "landing": {
@@ -3104,5 +3129,12 @@
     "closeChecklist": "Hide the getting-started checklist",
     "pollDialog": "Live poll",
     "pollCreatorDialog": "Create a poll"
+  },
+  "notFound": {
+    "code": "Error 404",
+    "title": "We can't find that page",
+    "body": "The link may be out of date, or the page may have moved. Here's the way back.",
+    "backToHome": "Go to the home page",
+    "signIn": "Sign in"
   }
 }
