@@ -100,10 +100,19 @@ vi.mock("@/lib/auth-utils", () => ({
   hasActiveSubscription: vi.fn(),
   getUserSubscription: vi.fn(),
 }));
+/**
+ * The password senders resolve `{ success: true }` rather than `undefined`
+ * because that is what `sendEmail` really returns, and callers now read it:
+ * `/api/auth/forgot-password` answers 500 on `success === false` instead of
+ * reporting "check your inbox" over a delivery that never happened. A mock that
+ * resolved `undefined` would make every caller crash on the property access,
+ * which is a fake failure hiding a real contract.
+ */
 vi.mock("@/lib/email", () => ({
   sendWelcomeEmail: vi.fn().mockResolvedValue(undefined),
   sendSessionReminderEmail: vi.fn().mockResolvedValue(undefined),
-  sendPasswordResetEmail: vi.fn().mockResolvedValue(undefined),
+  sendPasswordResetEmail: vi.fn().mockResolvedValue({ success: true }),
+  sendSetPasswordEmail: vi.fn().mockResolvedValue({ success: true }),
   sendCommunityInviteEmail: vi.fn().mockResolvedValue(undefined),
   sendSessionRecapEmail: vi.fn().mockResolvedValue(undefined),
 }));

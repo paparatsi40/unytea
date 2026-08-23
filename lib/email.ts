@@ -252,28 +252,72 @@ export async function sendSessionRecapEmail(to: string, data: SessionRecapData) 
   });
 }
 
-// ── Template: Password Reset ─────────────────────────────────────────
-export async function sendPasswordResetEmail(
-  to: string,
-  data: { userName: string; resetLink: string }
-) {
+// ── Template: Password Reset / Password Set ──────────────────────────
+
+export interface PasswordEmailData {
+  /** Empty or absent when the account has no name — the copy handles it. */
+  userName?: string | null;
+  resetLink: string;
+  /** Falls back to English, as everywhere else that takes a locale. */
+  locale?: string;
+}
+
+/**
+ * The two halves of the same errand.
+ *
+ * `reset` is the one that has always existed. `set` is for an account created
+ * through Google or GitHub, which has no password at all: `/api/auth/forgot-
+ * password` used to answer those with a cheerful "check your inbox" and send
+ * nothing, so somebody who had lost access to their provider had no route back
+ * in and no way to find out they had been ignored.
+ *
+ * They share the token, the expiry, the single-use deletion and the
+ * destination — `/auth/reset-password` writes the `password` column whether or
+ * not one was there before, so no second mechanism is needed and none is built.
+ * What differs is only what the message says, and that has to differ: telling
+ * someone to "reset" a password they never had is asking them to remember
+ * something that never happened.
+ *
+ * Localized, unlike most templates here, because the copy is new and the rule
+ * is parity. The locale arrives as a parameter for the same reason
+ * `sendVideoUsageWarningEmail` takes one — this is called from a route handler
+ * where next-intl has no `[locale]` segment to read.
+ */
+async function sendPasswordEmail(to: string, data: PasswordEmailData, mode: "reset" | "set") {
+  const locale: SupportedLocale = isSupportedLocale(data.locale) ? data.locale : DEFAULT_LOCALE;
+  const messages = (await import(`../locales/${locale}.json`)).default;
+  const t = createTranslator({ locale, messages, namespace: "email.password" });
+
+  const name = data.userName?.trim();
+  const greeting = name ? t("greeting", { userName: name }) : t("greetingNoName");
+
   return sendEmail({
     to,
-    subject: "Reset your Unytea password",
+    subject: t(`${mode}.subject`),
     html: emailLayout(`
       <h1 style="color: #f4f4f5; font-size: 22px; font-weight: 700; margin: 0 0 12px 0;">
-        Reset Your Password
+        ${t(`${mode}.heading`)}
       </h1>
       <p style="color: #a1a1aa; font-size: 15px; line-height: 1.6; margin: 0 0 24px 0;">
-        Hi ${data.userName}, we received a request to reset your password. Click the button below to choose a new one. This link expires in 1 hour.
+        ${greeting} ${t(`${mode}.intro`)}
       </p>
-      ${ctaButton("Reset Password", data.resetLink)}
+      ${ctaButton(t(`${mode}.cta`), data.resetLink)}
       <p style="color: #71717a; font-size: 13px; line-height: 1.5; margin: 24px 0 0 0;">
-        If you didn't request this, you can safely ignore this email. Your password won't change.
+        ${t(`${mode}.ignore`)}
       </p>
     `),
-    text: `Hi ${data.userName}, reset your password here: ${data.resetLink} (expires in 1 hour). If you didn't request this, ignore this email.`,
+    text: `${greeting} ${t(`${mode}.plain`, { link: data.resetLink })}`,
   });
+}
+
+/** For an account that has a password and wants a different one. */
+export async function sendPasswordResetEmail(to: string, data: PasswordEmailData) {
+  return sendPasswordEmail(to, data, "reset");
+}
+
+/** For an account that has never had one — see `sendPasswordEmail`. */
+export async function sendSetPasswordEmail(to: string, data: PasswordEmailData) {
+  return sendPasswordEmail(to, data, "set");
 }
 
 // ── Shared Layout ─────────────────────────────────────────────────────

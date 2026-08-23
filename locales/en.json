@@ -558,6 +558,26 @@
       "resets": "Your allowance comes back on {date}.",
       "measuredOnly": "Nothing is blocked. We are measuring live video while the allowance settles, so this is a heads-up rather than a limit.",
       "cta": "See the numbers"
+    },
+    "password": {
+      "greeting": "Hi {userName},",
+      "greetingNoName": "Hi,",
+      "reset": {
+        "subject": "Reset your Unytea password",
+        "heading": "Reset your password",
+        "intro": "we received a request to reset your password. Use the button below to choose a new one. This link works once and expires in 1 hour.",
+        "cta": "Reset password",
+        "ignore": "If you didn't ask for this, you can ignore this email. Your password won't change.",
+        "plain": "reset your password here: {link} — the link works once and expires in 1 hour. If you didn't ask for this, ignore this email."
+      },
+      "set": {
+        "subject": "Set a password for your Unytea account",
+        "heading": "Set your password",
+        "intro": "your account doesn't have a password yet — you sign in with a connected account. Use the button below to create one, and you'll be able to sign in either way. This link works once and expires in 1 hour.",
+        "cta": "Set password",
+        "ignore": "If you didn't ask for this, you can ignore this email. Nothing changes, and you can keep signing in the way you do now.",
+        "plain": "set a password here: {link} — the link works once and expires in 1 hour. If you didn't ask for this, ignore this email."
+      }
     }
   },
   "dashboard": {
