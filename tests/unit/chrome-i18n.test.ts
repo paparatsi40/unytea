@@ -198,7 +198,12 @@ describe("auth API errors travel as codes, not English sentences", () => {
   it.each(ROUTES)("%s returns a code with every error", (route) => {
     const src = source(route);
     const errors = src.match(/error:\s*"/g) ?? [];
-    const codes = src.match(/code:\s*"/g) ?? [];
+    // `code: "LITERAL"` or the shorthand `code` — the signup route's conflict
+    // code is computed (which of Google, GitHub or a password the existing
+    // account uses), so it cannot be written as a literal. What the rule is
+    // about is that a code travels beside every English sentence, not the
+    // syntax it is written in.
+    const codes = src.match(/code:\s*"|(?<![\w.])code\s*[,}]/g) ?? [];
 
     expect(errors.length).toBeGreaterThan(0);
     // One code per hardcoded error string, so nothing falls back to raw English.

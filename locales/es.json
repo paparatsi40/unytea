@@ -162,7 +162,8 @@
       "submit": "Crear cuenta",
       "legal": "Al registrarte aceptas nuestros <terms>Términos del servicio</terms> y nuestra <privacy>Política de privacidad</privacy>",
       "haveAccount": "¿Ya tienes cuenta?",
-      "signIn": "Inicia sesión"
+      "signIn": "Inicia sesión",
+      "orWithEmail": "o regístrate con tu correo"
     },
     "forgot": {
       "title": "Recuperar contraseña",
@@ -234,6 +235,26 @@
       "backToSignIn": "Volver a iniciar sesión",
       "backToHome": "Ir a la página de inicio",
       "needHelp": "¿Sigues atascado? <contact>Escríbenos</contact> y te ayudamos."
+    },
+    "signupConflict": {
+      "title": "Ese correo ya está registrado",
+      "EMAIL_IN_USE_PASSWORD": "Ya tienes una cuenta con esta dirección. Inicia sesión con tu contraseña, o restablécela si no la recuerdas.",
+      "EMAIL_IN_USE_GOOGLE": "Esa cuenta se creó con Google. Usa el botón “Continuar con Google” de arriba y entrarás.",
+      "EMAIL_IN_USE_GITHUB": "Esa cuenta se creó con GitHub. Usa el botón “Continuar con GitHub” de arriba y entrarás.",
+      "EMAIL_IN_USE": "Ya existe una cuenta con esta dirección. Restablece la contraseña para volver a entrar.",
+      "signInCta": "Iniciar sesión",
+      "forgotCta": "¿Olvidaste tu contraseña?"
+    },
+    "signinErrors": {
+      "OAuthAccountNotLinked": "Ese correo ya tiene una cuenta creada de otra forma. Inicia sesión con el método que usaste la primera vez y luego vincula este desde tus ajustes.",
+      "AccountNotLinked": "Ese correo ya tiene una cuenta creada de otra forma. Inicia sesión con el método que usaste la primera vez y luego vincula este desde tus ajustes.",
+      "CredentialsSignin": "Ese correo y esa contraseña no coinciden. Revísalos e inténtalo otra vez, o restablece la contraseña.",
+      "OAuthCallbackError": "El proveedor devolvió un error antes de terminar. Vuelve a intentarlo.",
+      "MissingCSRF": "Esa solicitud caducó antes de llegar. Inténtalo de nuevo desde esta página.",
+      "Configuration": "El inicio de sesión no está disponible ahora mismo: hay algo mal configurado de nuestro lado. No es culpa tuya.",
+      "SessionRequired": "Tienes que iniciar sesión para abrir esa página.",
+      "AccessDenied": "Se canceló el inicio de sesión, así que no se cambió nada en tu cuenta. Inténtalo cuando quieras.",
+      "Default": "No pudimos iniciar tu sesión. Inténtalo de nuevo."
     }
   },
   "landing": {

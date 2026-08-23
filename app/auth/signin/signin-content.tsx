@@ -4,12 +4,13 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Mail, Lock, ArrowRight, Sparkles } from "lucide-react";
+import { Mail, Lock, ArrowRight, Sparkles, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { OAuthButtons } from "@/components/auth/OAuthButtons";
 import type { OAuthProviderId } from "@/lib/auth-providers";
 import { safeCallbackUrl } from "@/lib/auth-callback-url";
+import { signInErrorKey } from "@/lib/auth-error-page";
 
 interface SignInContentProps {
   /** Registered OAuth providers, resolved on the server in `page.tsx`. */
@@ -26,9 +27,26 @@ export function SignInContent({ oauthProviders }: SignInContentProps) {
    * trust us with a password.
    */
   const callbackUrl = safeCallbackUrl(searchParams?.get("callbackUrl"));
+  /**
+   * Why the last attempt failed, if it did.
+   *
+   * This page did not read `?error=` at all, so every failure NextAuth routes
+   * here — `OAuthAccountNotLinked` above all, which is what a Google sign-in
+   * refused for a clashing address produces — rendered a blank, ordinary login
+   * form. The person was left to guess, and the commonest guess is that the
+   * button is broken.
+   *
+   * Resolved through an allow-list, never rendered raw: the value is written by
+   * whoever wrote the link, and an arbitrary sentence in our alert box under
+   * our own logo is a phishing surface, not an error message.
+   */
+  const signInError = searchParams?.get("error") ?? null;
+  const errorKey = signInError ? signInErrorKey(signInError) : null;
   const t = useTranslations();
 
-  const [email, setEmail] = useState("");
+  // Prefilled when the signup page sends someone here because the address is
+  // already registered — retyping it would be busywork with a typo in it.
+  const [email, setEmail] = useState(() => searchParams?.get("email")?.trim().slice(0, 320) ?? "");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -108,6 +126,18 @@ export function SignInContent({ oauthProviders }: SignInContentProps) {
 
         {/* Main Card */}
         <div className="rounded-2xl border border-gray-100 bg-white/80 p-8 shadow-xl backdrop-blur-xl">
+          {errorKey && (
+            <div role="alert" className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4">
+              <div className="flex items-start gap-3">
+                <AlertTriangle
+                  className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600"
+                  aria-hidden="true"
+                />
+                <p className="text-sm text-amber-900">{t(`auth.signinErrors.${errorKey}`)}</p>
+              </div>
+            </div>
+          )}
+
           {/* OAuth buttons — only for providers the server actually registered */}
           <OAuthButtons
             providers={oauthProviders}
@@ -137,9 +167,21 @@ export function SignInContent({ oauthProviders }: SignInContentProps) {
             </div>
 
             <div>
-              <label htmlFor="password" className="mb-2 block text-sm font-medium text-gray-700">
-                {t("auth.password")}
-              </label>
+              {/* Recovery belongs beside the field that fails, not in grey type
+                  at the foot of the page under "Don't have an account?" — which
+                  is where it was, and where somebody who has just mistyped a
+                  password is not looking. */}
+              <div className="mb-2 flex items-baseline justify-between gap-2">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                  {t("auth.password")}
+                </label>
+                <Link
+                  href="/auth/forgot-password"
+                  className="text-sm font-medium text-purple-600 hover:text-purple-700"
+                >
+                  {t("auth.forgotPassword")}
+                </Link>
+              </div>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
                 <input
@@ -172,16 +214,11 @@ export function SignInContent({ oauthProviders }: SignInContentProps) {
         </div>
 
         {/* Footer Links */}
-        <div className="mt-6 space-y-2 text-center">
+        <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
             {t("auth.noAccount")}{" "}
             <Link href="/auth/signup" className="font-medium text-purple-600 hover:text-purple-700">
               {t("auth.signUp")}
-            </Link>
-          </p>
-          <p className="text-sm text-gray-500">
-            <Link href="/auth/forgot-password" className="hover:text-gray-700">
-              {t("auth.forgotPassword")}
             </Link>
           </p>
         </div>

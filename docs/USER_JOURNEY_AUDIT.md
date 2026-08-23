@@ -35,7 +35,7 @@ Severity: 🔴 blocker (stops the user) · 🟠 friction (annoying, survivable) 
       **Fixed** — re-export added. _Verify manually: request a reset and open
       the link from the mail client, not by pasting it (the Referer matters)._
 
-- [ ] **B3 · Signing up with an email that already exists is a dead end** 🔴 **[C]**
+- [x] **B3 · Signing up with an email that already exists was a dead end** 🔴 **[C]**
       `app/api/auth/signup/route.ts:44` returns **201 with a generic message**
       when the email exists (anti-enumeration). The client reads `response.ok`
       as success and immediately calls `signIn("credentials", …)`, which fails
@@ -47,6 +47,14 @@ Severity: 🔴 blocker (stops the user) · 🟠 friction (annoying, survivable) 
       anyway**: with a random password, a new email signs in and an existing
       one does not, so an attacker distinguishes them regardless. The UX cost
       is being paid for no security benefit.
+      **Fixed** — the route answers **409** with a code naming the method
+      (`EMAIL_IN_USE_PASSWORD` / `_GOOGLE` / `_GITHUB` / generic), decided in
+      `lib/signup-conflict.ts`. The page shows it in place with links to sign
+      in (carrying the address) and to reset, and no longer calls `signIn()`.
+      Approach A of the two on the table: the address was already
+      discoverable, so hiding it cost the user everything and bought nothing.
+      Naming the provider is a deliberate, bounded disclosure — the rate
+      limiter still runs first.
 
 - [ ] **B4 · A brand-new GitHub user can never sign up** 🔴 **[C]** — only if
       `GITHUB_CLIENT_ID`/`SECRET` are set.
@@ -91,11 +99,15 @@ Severity: 🔴 blocker (stops the user) · 🟠 friction (annoying, survivable) 
       and an email user who just typed their name, must both retype it — and
       step 1 is mandatory. What they type **overwrites** `user.name`.
 
-- [ ] **F5 · The sign-in page never reads `?error=`** 🟠 **[C]**
+- [x] **F5 · The sign-in page never read `?error=`** 🟠 **[C]**
       `signin-content.tsx` uses `useSearchParams` only for `callbackUrl`. Every
       `SignInError` routed to `/auth/signin?error=…` — `OAuthAccountNotLinked`
       among them — renders a blank, ordinary login form. The user is never told
       why Google refused.
+      **Fixed** — `signInErrorKey` in `lib/auth-error-page.ts` maps the
+      sign-in-kind codes to sentences shown in an alert above the form. The
+      raw value is never rendered. Password recovery also moved from grey
+      type at the foot of the page to beside the password field.
 
 - [ ] **F6 · Signup is capped at 5 attempts per IP per 15 minutes** 🟠 **[C]**
       `rateLimiters.auth` (`lib/rate-limit.ts:172`), keyed `signup:${ip}`, and
@@ -112,6 +124,9 @@ Severity: 🔴 blocker (stops the user) · 🟠 friction (annoying, survivable) 
       `"Video is not configured."`). `signup-content.tsx:127` has
       `dividerLabel="or sign up with email"` in fixed English — sign-in's
       equivalent is translated.
+      **Partly done** — the signup divider is now `auth.signup.orWithEmail`
+      in all three locales. The plan-limit Spanish and the ~20 English
+      strings in `app/actions/sessions.ts` are still open.
 
 - [ ] **F8 · `alert()` on community-creation failure** 🟠 **[C]**
       `communities/new/page.tsx:248`, in the `catch` — the rest of the file
@@ -189,7 +204,8 @@ Severity: 🔴 blocker (stops the user) · 🟠 friction (annoying, survivable) 
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | All of OAuth signup | ⚠️ `/[locale]/auth/signin` and `signup` are **prerendered** — the button list is baked at build time. Adding these needs a **redeploy**, not just a save. |
 | Google Console redirect URI | The OAuth handshake | Must be the apex: `https://unytea.com/api/auth/callback/google`. `/api/*` is **outside the middleware matcher**, so a `www` URI is never redirected — it just fails. |
 | `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET` | See **B4** | If set, the button appears and no new user can use it. |
-| `RESEND_API_KEY`, `EMAIL_FROM` | Password reset (critical); welcome mail (not) | `getResend()` throws when absent. |
+| `RESEND_API_KEY` | Password reset (critical); welcome mail (not) | `getResend()` throws when absent — **this** is the variable that stops mail. |
+| `EMAIL_FROM` | Nothing, unless the default domain is unverified | **Optional.** `lib/email.ts:20` defaults to `Unytea <noreply@unytea.com>`. Format is RFC 5322: `Display Name <address@domain>`, or a bare address. What actually matters is that the sending domain is **verified in Resend** — an unverified one is refused whatever this says. |
 | `UPSTASH_REDIS_REST_URL` / `_TOKEN` | Rate limiting | Falls back to in-memory, which on serverless means per-instance counters — effectively no limit. |
 | `UPLOADTHING_TOKEN` | Community logo/cover | ⚠️ **Missing from `.env.example`.** The SDK reads it implicitly. |
 | `LIVEKIT_API_KEY` / `_SECRET` / `NEXT_PUBLIC_LIVEKIT_URL` | Joining a session room | Fails cleanly with `"Video is not configured."` (English only). There is a hardcoded fallback URL `wss://unytea-livekit.livekit.cloud` when the URL is unset. |
@@ -216,6 +232,9 @@ Severity: 🔴 blocker (stops the user) · 🟠 friction (annoying, survivable) 
 ## Changelog
 
 - **2026-08-22** — audit carried out against `main` `1b0d8605`.
+- **2026-08-22** — B3 fixed (409 + a named method + a way out), F5 fixed
+  (`?error=` read through an allow-list), signup divider localized. Password
+  recovery moved next to the password field.
 - **2026-08-22** — B1, B2 fixed; root `not-found.tsx` added as a net for any
   future missing route; `pages.verifyRequest` removed (unreachable — it is fed
   only by `@auth/core`'s `sendToken`, which runs for a provider of

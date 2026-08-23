@@ -4,12 +4,13 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Mail, Lock, User, ArrowRight, Sparkles, Check } from "lucide-react";
+import { Mail, Lock, User, ArrowRight, Sparkles, Check, Info } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { authErrorMessage } from "@/lib/auth-error-message";
 import { OAuthButtons } from "@/components/auth/OAuthButtons";
 import type { OAuthProviderId } from "@/lib/auth-providers";
+import { isSignupConflictCode, type SignupConflictCode } from "@/lib/signup-conflict";
 
 interface SignUpContentProps {
   /** Registered OAuth providers, resolved on the server in `page.tsx`. */
@@ -26,6 +27,12 @@ export function SignUpContent({ oauthProviders }: SignUpContentProps) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  /**
+   * Set when the address is already registered. Not a toast: this is a fork in
+   * the road, and the other branch has to still be on screen when the reader
+   * reaches for it.
+   */
+  const [conflict, setConflict] = useState<SignupConflictCode | null>(null);
 
   const handleOAuthSignIn = async (provider: OAuthProviderId) => {
     try {
@@ -41,6 +48,7 @@ export function SignUpContent({ oauthProviders }: SignUpContentProps) {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    setConflict(null);
 
     // Validation
     if (!name || !email || !password || !confirmPassword) {
@@ -71,6 +79,15 @@ export function SignUpContent({ oauthProviders }: SignUpContentProps) {
       const data = await response.json();
 
       if (!response.ok) {
+        // An address that is already taken is not a failure to flash and
+        // dismiss. Show it in place, with the two doors that actually lead
+        // somewhere, and do not go on to sign in — signing in with a password
+        // that was never this account's is precisely how this used to end in a
+        // bare "sign-in error" on a signup form.
+        if (isSignupConflictCode(data.code)) {
+          setConflict(data.code);
+          return;
+        }
         toast.error(authErrorMessage(tError, data.code));
         return;
       }
@@ -121,10 +138,48 @@ export function SignUpContent({ oauthProviders }: SignUpContentProps) {
 
         {/* Main Card */}
         <div className="rounded-2xl border border-gray-100 bg-white/80 p-8 shadow-xl backdrop-blur-xl">
+          {/* Above the OAuth buttons on purpose: when the notice says the
+              account uses Google, the Google button is the next thing on the
+              page rather than something to go hunting for. */}
+          {conflict && (
+            <div role="alert" className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4">
+              <div className="flex items-start gap-3">
+                <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600" aria-hidden="true" />
+                <div>
+                  <p className="text-sm font-medium text-amber-900">
+                    {t("auth.signupConflict.title")}
+                  </p>
+                  <p className="mt-1 text-sm text-amber-800">
+                    {t(`auth.signupConflict.${conflict}`)}
+                  </p>
+                  <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1">
+                    <Link
+                      href={`/auth/signin?email=${encodeURIComponent(email)}`}
+                      className="text-sm font-medium text-purple-700 underline underline-offset-2 hover:text-purple-900"
+                    >
+                      {t("auth.signupConflict.signInCta")}
+                    </Link>
+                    {/* Only where there is a password to recover. On an account
+                        that has none, "forgot your password?" is a question
+                        about something that never existed. */}
+                    {(conflict === "EMAIL_IN_USE_PASSWORD" || conflict === "EMAIL_IN_USE") && (
+                      <Link
+                        href="/auth/forgot-password"
+                        className="text-sm font-medium text-purple-700 underline underline-offset-2 hover:text-purple-900"
+                      >
+                        {t("auth.signupConflict.forgotCta")}
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* OAuth buttons — only for providers the server actually registered */}
           <OAuthButtons
             providers={oauthProviders}
-            dividerLabel="or sign up with email"
+            dividerLabel={t("auth.signup.orWithEmail")}
             disabled={isLoading}
             onSelect={handleOAuthSignIn}
           />
@@ -159,7 +214,12 @@ export function SignUpContent({ oauthProviders }: SignUpContentProps) {
                   id="email"
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    // The notice names one address. Once it is being edited it
+                    // is advice about somebody else's account.
+                    setConflict(null);
+                  }}
                   placeholder={t("auth.signup.emailPlaceholder")}
                   disabled={isLoading}
                   className="w-full rounded-xl border-2 border-gray-200 py-3 pl-10 pr-4 outline-none transition-all focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 disabled:cursor-not-allowed disabled:opacity-50"
