@@ -162,7 +162,8 @@
       "submit": "Create Account",
       "legal": "By signing up, you agree to our <terms>Terms of Service</terms> and <privacy>Privacy Policy</privacy>",
       "haveAccount": "Already have an account?",
-      "signIn": "Sign in"
+      "signIn": "Sign in",
+      "orWithEmail": "or sign up with email"
     },
     "forgot": {
       "title": "Reset Password",
@@ -234,6 +235,26 @@
       "backToSignIn": "Back to sign in",
       "backToHome": "Go to the home page",
       "needHelp": "Still stuck? <contact>Get in touch</contact> and we'll help."
+    },
+    "signupConflict": {
+      "title": "That email is already registered",
+      "EMAIL_IN_USE_PASSWORD": "You already have an account with this address. Sign in with your password instead — or reset it if you've forgotten it.",
+      "EMAIL_IN_USE_GOOGLE": "That account was created with Google. Use the “Continue with Google” button above and you're in.",
+      "EMAIL_IN_USE_GITHUB": "That account was created with GitHub. Use the “Continue with GitHub” button above and you're in.",
+      "EMAIL_IN_USE": "An account already exists with this address. Reset your password to get back into it.",
+      "signInCta": "Sign in instead",
+      "forgotCta": "Forgot your password?"
+    },
+    "signinErrors": {
+      "OAuthAccountNotLinked": "That email already has an account created a different way. Sign in with the method you used the first time, then link this one from your settings.",
+      "AccountNotLinked": "That email already has an account created a different way. Sign in with the method you used the first time, then link this one from your settings.",
+      "CredentialsSignin": "That email and password don't match. Check them and try again, or reset your password.",
+      "OAuthCallbackError": "The sign-in provider returned an error before it could finish. Please try again.",
+      "MissingCSRF": "That sign-in request expired before it arrived. Try again from this page.",
+      "Configuration": "Sign-in isn't available right now — something on our side is misconfigured. This isn't anything you did.",
+      "SessionRequired": "You need to be signed in to open that page.",
+      "AccessDenied": "Sign-in was cancelled, so nothing was changed on your account. Try again whenever you're ready.",
+      "Default": "We couldn't sign you in. Please try again."
     }
   },
   "landing": {

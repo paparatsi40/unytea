@@ -41,17 +41,64 @@ export const AUTH_PAGE_ERROR_FALLBACK = "Default";
 export type AuthPageErrorKey = AuthPageErrorCode | typeof AUTH_PAGE_ERROR_FALLBACK;
 
 /**
- * The `auth.errorPage` catalog key for a raw `?error=` value.
+ * Resolve a raw `?error=` value against an allow-list.
  *
  * Matching is exact after trimming: the codes are @auth/core's class names and
  * a near-miss is not a match. Anything else — a typo, a code from a future
  * version, a string someone invented — is the generic message.
+ *
+ * The exactness is the point. A case-insensitive or substring match would let
+ * whoever wrote the link choose which of our sentences to display, which is the
+ * same problem as rendering their text, one step removed.
  */
-export function authPageErrorKey(raw: unknown): AuthPageErrorKey {
+function resolveErrorKey<T extends string>(raw: unknown, codes: readonly T[]): T | "Default" {
   if (typeof raw !== "string") return AUTH_PAGE_ERROR_FALLBACK;
 
   const code = raw.trim();
-  return (AUTH_PAGE_ERROR_CODES as readonly string[]).includes(code)
-    ? (code as AuthPageErrorCode)
-    : AUTH_PAGE_ERROR_FALLBACK;
+  return (codes as readonly string[]).includes(code) ? (code as T) : AUTH_PAGE_ERROR_FALLBACK;
+}
+
+/** The `auth.errorPage` catalog key for a raw `?error=` value. */
+export function authPageErrorKey(raw: unknown): AuthPageErrorKey {
+  return resolveErrorKey(raw, AUTH_PAGE_ERROR_CODES);
+}
+
+/**
+ * Which failure the sign-in page is being asked to explain.
+ *
+ * A different list from the one above, because a different set of errors
+ * arrives here. @auth/core routes by `error.kind`, and `pages.signIn` receives
+ * the `SignInError`s — so this page gets the codes the error page does not.
+ *
+ * The list is every client-safe type whose kind is `"signIn"`
+ * (`OAuthAccountNotLinked`, `AccountNotLinked`, `CredentialsSignin`,
+ * `OAuthCallbackError`, `MissingCSRF`), plus two that arrive by other routes:
+ * `Configuration`, which is what a sign-in-kind error that is *not* client-safe
+ * is flattened to, and `SessionRequired`, which `next-auth/react` appends
+ * itself when `useSession({ required: true })` bounces someone. `AccessDenied`
+ * is included last because hand-written and older links carry it here even
+ * though @auth/core sends it to the error page.
+ *
+ * Without this the page read `?error=` not at all: every one of these rendered
+ * a blank, ordinary login form, and someone whose Google sign-in had just been
+ * refused was left to guess why.
+ */
+export const SIGNIN_ERROR_CODES = [
+  "OAuthAccountNotLinked",
+  "AccountNotLinked",
+  "CredentialsSignin",
+  "OAuthCallbackError",
+  "MissingCSRF",
+  "Configuration",
+  "SessionRequired",
+  "AccessDenied",
+] as const;
+
+export type SignInErrorCode = (typeof SIGNIN_ERROR_CODES)[number];
+
+export type SignInErrorKey = SignInErrorCode | typeof AUTH_PAGE_ERROR_FALLBACK;
+
+/** The `auth.signinErrors` catalog key for a raw `?error=` value. */
+export function signInErrorKey(raw: unknown): SignInErrorKey {
+  return resolveErrorKey(raw, SIGNIN_ERROR_CODES);
 }

@@ -6,6 +6,7 @@ import { rateLimiters, getIP } from "@/lib/rate-limit";
 import { sendWelcomeEmail } from "@/lib/email";
 import { normalizeEmail } from "@/lib/normalize-email";
 import { BCRYPT_COST } from "@/lib/auth-hashing";
+import { signupConflictCode } from "@/lib/signup-conflict";
 
 const signUpSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -38,16 +39,30 @@ export async function POST(request: NextRequest) {
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { email },
+      // `password` for its presence only — the hash is read by
+      // `signupConflictCode` and never leaves this function.
+      select: {
+        id: true,
+        password: true,
+        accounts: { select: { provider: true } },
+      },
     });
 
     if (existingUser) {
-      // Return generic success to prevent email enumeration
+      // This used to answer 201 with "if this email is available, an account
+      // has been created", so as not to confirm the address was taken. The
+      // client then called signIn() with the credentials just typed — which
+      // succeeds for a new address and fails for a taken one, handing back the
+      // answer the 201 had withheld. The protection was already gone; only the
+      // user was still being kept in the dark, and what they saw was a bare
+      // "sign-in error" on a signup form.
+      //
+      // So say it, and say which door to use. See lib/signup-conflict.ts for
+      // why naming the provider is worth its cost.
+      const code = signupConflictCode(existingUser);
       return NextResponse.json(
-        {
-          message:
-            "If this email is available, an account has been created. Please check your email.",
-        },
-        { status: 201 }
+        { error: "An account already exists for this email address.", code },
+        { status: 409 }
       );
     }
 
@@ -69,13 +84,11 @@ export async function POST(request: NextRequest) {
       console.warn("[signup] Welcome email failed:", err);
     });
 
-    return NextResponse.json(
-      {
-        message:
-          "If this email is available, an account has been created. Please check your email.",
-      },
-      { status: 201 }
-    );
+    // The hedge this used to carry — "if this email is available, an account
+    // has been created" — was the other half of the enumeration guard, and it
+    // is now the only half left. Saying it while the branch above answers 409
+    // would be a hedge about something already stated plainly.
+    return NextResponse.json({ message: "Account created." }, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
       const field = String(error.errors[0]?.path?.[0] ?? "");

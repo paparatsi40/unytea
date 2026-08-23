@@ -162,7 +162,8 @@
       "submit": "Créer mon compte",
       "legal": "En vous inscrivant, vous acceptez nos <terms>Conditions d'utilisation</terms> et notre <privacy>Politique de confidentialité</privacy>",
       "haveAccount": "Vous avez déjà un compte ?",
-      "signIn": "Connectez-vous"
+      "signIn": "Connectez-vous",
+      "orWithEmail": "ou inscrivez-vous par e-mail"
     },
     "forgot": {
       "title": "Réinitialiser le mot de passe",
@@ -234,6 +235,26 @@
       "backToSignIn": "Retour à la connexion",
       "backToHome": "Aller à la page d'accueil",
       "needHelp": "Toujours bloqué ? <contact>Écrivez-nous</contact> et nous vous aiderons."
+    },
+    "signupConflict": {
+      "title": "Cette adresse e-mail est déjà enregistrée",
+      "EMAIL_IN_USE_PASSWORD": "Vous avez déjà un compte avec cette adresse. Connectez-vous avec votre mot de passe, ou réinitialisez-le si vous l'avez oublié.",
+      "EMAIL_IN_USE_GOOGLE": "Ce compte a été créé avec Google. Utilisez le bouton « Continuer avec Google » ci-dessus et vous y êtes.",
+      "EMAIL_IN_USE_GITHUB": "Ce compte a été créé avec GitHub. Utilisez le bouton « Continuer avec GitHub » ci-dessus et vous y êtes.",
+      "EMAIL_IN_USE": "Un compte existe déjà avec cette adresse. Réinitialisez le mot de passe pour y accéder.",
+      "signInCta": "Se connecter",
+      "forgotCta": "Mot de passe oublié ?"
+    },
+    "signinErrors": {
+      "OAuthAccountNotLinked": "Cette adresse a déjà un compte créé d'une autre manière. Connectez-vous avec la méthode d'origine, puis liez celle-ci depuis vos paramètres.",
+      "AccountNotLinked": "Cette adresse a déjà un compte créé d'une autre manière. Connectez-vous avec la méthode d'origine, puis liez celle-ci depuis vos paramètres.",
+      "CredentialsSignin": "Cette adresse et ce mot de passe ne correspondent pas. Vérifiez-les et réessayez, ou réinitialisez votre mot de passe.",
+      "OAuthCallbackError": "Le fournisseur a renvoyé une erreur avant d'avoir terminé. Réessayez.",
+      "MissingCSRF": "Cette demande de connexion a expiré avant d'arriver. Réessayez depuis cette page.",
+      "Configuration": "La connexion est indisponible pour le moment : quelque chose est mal configuré de notre côté. Vous n'y êtes pour rien.",
+      "SessionRequired": "Vous devez être connecté pour ouvrir cette page.",
+      "AccessDenied": "La connexion a été annulée, rien n'a changé sur votre compte. Réessayez quand vous voulez.",
+      "Default": "Nous n'avons pas pu vous connecter. Réessayez."
     }
   },
   "landing": {
