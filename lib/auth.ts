@@ -111,10 +111,24 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     },
   },
+  // Every path here must resolve to a real route. Each one is a promise made to
+  // @auth/core that it will redirect somebody to that address, and a promise
+  // this config cannot keep lands the visitor on a 404 — which is what
+  // `error: "/auth/error"` did for months, including for the most ordinary
+  // failure there is: pressing "Cancel" on Google's consent screen.
+  //
+  // `verifyRequest: "/auth/verify"` was the same kind of claim and has been
+  // removed rather than built. It is reached from exactly one place —
+  // `sendToken` in @auth/core's sign-in action, which runs only for a provider
+  // of `type: "email"` (`lib/actions/signin/index.js`, the `case "email"`
+  // branch). This app registers Google, GitHub and Credentials; there is no
+  // magic-link provider anywhere, so nothing can send anyone there. With the
+  // line gone, @auth/core falls back to its own built-in verify-request page,
+  // so even a hand-typed `/api/auth/verify-request` renders something instead
+  // of 404ing. Adding an email provider later means adding the page back here.
   pages: {
     signIn: "/auth/signin",
     error: "/auth/error",
-    verifyRequest: "/auth/verify",
     newUser: "/onboarding",
   },
   // An OAuth provider is registered only when both of its env vars are present.
