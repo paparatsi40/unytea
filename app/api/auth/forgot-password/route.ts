@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { sendPasswordResetEmail } from "@/lib/email";
+import { sendPasswordResetEmail, sendSetPasswordEmail } from "@/lib/email";
 import { normalizeEmail } from "@/lib/normalize-email";
 import { randomBytes } from "crypto";
 import { rateLimiters, getIP } from "@/lib/rate-limit";
 import { SITE_URL } from "@/lib/site-url";
+import { LOCALE_COOKIE, resolveLocale } from "@/lib/locale";
 
 export async function POST(request: NextRequest) {
   try {
@@ -38,10 +39,23 @@ export async function POST(request: NextRequest) {
       select: { id: true, name: true, email: true, password: true },
     });
 
-    // Only send reset for users with passwords (not OAuth-only)
-    if (!user || !user.password) {
+    // No account: the same 200, and nothing sent. This is the enumeration
+    // guard and it is the only branch that still needs one — the response is
+    // identical whichever way the rest of this goes.
+    if (!user) {
       return genericResponse;
     }
+
+    // An account with no password used to be turned away here, on the same
+    // line and with the same silence as an address that does not exist. That
+    // was wrong in both directions: it told someone who signs in with Google
+    // that a mail was on its way, and it left them with no route to a password
+    // at all if they ever lost the provider. They get a mail now — one that
+    // says "set", because "reset" would be asking them to remember something
+    // that never happened. Same token, same expiry, same single use; only the
+    // words differ. `/api/auth/reset-password` writes the column whether or
+    // not one was there before.
+    const isFirstPassword = !user.password;
 
     // Delete existing tokens for this email
     await prisma.passwordResetToken.deleteMany({
@@ -63,11 +77,29 @@ export async function POST(request: NextRequest) {
     // Send email
     const appUrl = SITE_URL;
     const resetLink = `${appUrl}/auth/reset-password?token=${token}`;
+    // Same source the rest of the non-`[locale]` tree reads (see src/i18n.ts).
+    const locale = resolveLocale(request.cookies.get(LOCALE_COOKIE)?.value);
 
-    await sendPasswordResetEmail(user.email, {
-      userName: user.name || "there",
+    const send = isFirstPassword ? sendSetPasswordEmail : sendPasswordResetEmail;
+    const delivery = await send(user.email, {
+      userName: user.name,
       resetLink,
+      locale,
     });
+
+    // `sendEmail` reports failure by returning, not by throwing — a missing or
+    // wrong RESEND_API_KEY, an unverified sending domain, a rejected address.
+    // This return value used to be discarded, so every one of those answered
+    // 200 "check your inbox" and left no trace anywhere the user could see.
+    // The token row above is left in place deliberately: it stays valid for its
+    // hour, so a retry that reaches Resend still works.
+    if (!delivery.success) {
+      console.error("[forgot-password] Delivery failed:", delivery.error);
+      return NextResponse.json(
+        { error: "Something went wrong. Please try again.", code: "SERVER_ERROR" },
+        { status: 500 }
+      );
+    }
 
     return genericResponse;
   } catch (error) {

@@ -568,6 +568,26 @@
       "resets": "Tu asignación vuelve el {date}.",
       "measuredOnly": "No hay nada bloqueado. Estamos midiendo el vídeo en directo mientras se asienta la asignación, así que esto es un aviso, no un límite.",
       "cta": "Ver los números"
+    },
+    "password": {
+      "greeting": "Hola {userName}:",
+      "greetingNoName": "Hola:",
+      "reset": {
+        "subject": "Restablece tu contraseña de Unytea",
+        "heading": "Restablece tu contraseña",
+        "intro": "hemos recibido una solicitud para restablecer tu contraseña. Usa el botón de abajo para elegir una nueva. El enlace sirve una sola vez y caduca en 1 hora.",
+        "cta": "Restablecer contraseña",
+        "ignore": "Si no lo has pedido tú, puedes ignorar este correo. Tu contraseña no cambiará.",
+        "plain": "restablece tu contraseña aquí: {link} — el enlace sirve una sola vez y caduca en 1 hora. Si no lo has pedido tú, ignora este correo."
+      },
+      "set": {
+        "subject": "Crea una contraseña para tu cuenta de Unytea",
+        "heading": "Crea tu contraseña",
+        "intro": "tu cuenta todavía no tiene contraseña: entras con una cuenta vinculada. Usa el botón de abajo para crear una y podrás entrar de las dos formas. El enlace sirve una sola vez y caduca en 1 hora.",
+        "cta": "Crear contraseña",
+        "ignore": "Si no lo has pedido tú, puedes ignorar este correo. No cambia nada y puedes seguir entrando como hasta ahora.",
+        "plain": "crea tu contraseña aquí: {link} — el enlace sirve una sola vez y caduca en 1 hora. Si no lo has pedido tú, ignora este correo."
+      }
     }
   },
   "dashboard": {

@@ -568,6 +568,26 @@
       "resets": "Votre quota revient le {date}.",
       "measuredOnly": "Rien n'est bloqué. Nous mesurons la vidéo en direct pendant que le quota se stabilise : ceci est un signalement, pas une limite.",
       "cta": "Voir les chiffres"
+    },
+    "password": {
+      "greeting": "Bonjour {userName},",
+      "greetingNoName": "Bonjour,",
+      "reset": {
+        "subject": "Réinitialisez votre mot de passe Unytea",
+        "heading": "Réinitialisez votre mot de passe",
+        "intro": "nous avons reçu une demande de réinitialisation de votre mot de passe. Utilisez le bouton ci-dessous pour en choisir un nouveau. Ce lien ne sert qu'une fois et expire dans 1 heure.",
+        "cta": "Réinitialiser le mot de passe",
+        "ignore": "Si vous n'êtes pas à l'origine de cette demande, ignorez cet e-mail. Votre mot de passe ne changera pas.",
+        "plain": "réinitialisez votre mot de passe ici : {link} — le lien ne sert qu'une fois et expire dans 1 heure. Si vous n'êtes pas à l'origine de cette demande, ignorez cet e-mail."
+      },
+      "set": {
+        "subject": "Définissez un mot de passe pour votre compte Unytea",
+        "heading": "Définissez votre mot de passe",
+        "intro": "votre compte n'a pas encore de mot de passe : vous vous connectez avec un compte lié. Utilisez le bouton ci-dessous pour en créer un, et vous pourrez vous connecter des deux façons. Ce lien ne sert qu'une fois et expire dans 1 heure.",
+        "cta": "Définir le mot de passe",
+        "ignore": "Si vous n'êtes pas à l'origine de cette demande, ignorez cet e-mail. Rien ne change et vous pouvez continuer à vous connecter comme aujourd'hui.",
+        "plain": "définissez votre mot de passe ici : {link} — le lien ne sert qu'une fois et expire dans 1 heure. Si vous n'êtes pas à l'origine de cette demande, ignorez cet e-mail."
+      }
     }
   },
   "dashboard": {

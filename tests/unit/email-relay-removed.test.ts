@@ -88,9 +88,12 @@ describe("legitimate server-side mail is unaffected", () => {
     expect(signup).toContain("sendWelcomeEmail");
   });
 
-  it("forgot-password still sends the reset email", () => {
+  it("forgot-password still sends a password email", () => {
     const forgot = read(path.join(APP_DIR, "api/auth/forgot-password/route.ts"));
+    // Two templates now: "reset" for an account that has a password, "set" for
+    // one created through a provider, which used to be turned away in silence.
     expect(forgot).toContain("sendPasswordResetEmail");
+    expect(forgot).toContain("sendSetPasswordEmail");
   });
 
   it("neither derives the recipient from a client-supplied 'to' field", () => {
@@ -98,9 +101,22 @@ describe("legitimate server-side mail is unaffected", () => {
     const signup = read(path.join(APP_DIR, "api/auth/signup/route.ts"));
     const forgot = read(path.join(APP_DIR, "api/auth/forgot-password/route.ts"));
 
-    // signup mails the address being registered; forgot-password mails the
-    // address resolved from the database, not the raw input.
+    // signup mails the address being registered.
     expect(signup).toContain("sendWelcomeEmail(email");
-    expect(forgot).toContain("sendPasswordResetEmail(user.email");
+
+    // forgot-password mails the address resolved from the database, never the
+    // raw input. It picks its template through a local alias now, so every call
+    // site is enumerated rather than one spelling being matched — the property
+    // is "the recipient is the row we found", not "this function name appears".
+    const recipients = [
+      ...forgot.matchAll(/\b(?:sendPasswordResetEmail|sendSetPasswordEmail|send)\(\s*([\w.]+)/g),
+    ].map((m) => m[1]);
+
+    expect(recipients.length).toBeGreaterThan(0);
+    for (const recipient of recipients) {
+      expect(recipient, "forgot-password must mail the address from the database").toBe(
+        "user.email"
+      );
+    }
   });
 });
