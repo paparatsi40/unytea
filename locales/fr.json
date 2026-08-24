@@ -202,6 +202,7 @@
     },
     "errors": {
       "RATE_LIMITED": "Trop de tentatives. Réessayez dans quelques minutes.",
+      "RATE_LIMITED_IN": "Trop de tentatives. Réessayez dans {minutes, plural, one {# minute} other {# minutes}}.",
       "SERVER_ERROR": "Une erreur est survenue. Réessayez.",
       "EMAIL_REQUIRED": "Indiquez votre adresse e-mail",
       "RESET_LINK_INVALID": "Ce lien n'est pas valide. Demandez-en un nouveau.",

@@ -1,4 +1,5 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { createHash } from "crypto";
 
 // ============================================
 // RATE LIMITER - Redis/Upstash with in-memory fallback
@@ -237,6 +238,59 @@ export function rateLimit(config: RateLimitConfig) {
   };
 }
 
+// ── Helper: telling the caller when to come back ────────────────────
+
+/**
+ * Seconds until the window resets, rounded up, never below one.
+ *
+ * A 429 that does not say when to retry leaves the page guessing — ours said
+ * "try again in a few minutes" whether the wait was 20 seconds or 14 minutes.
+ * Zero is never returned: `Retry-After: 0` reads as "retry immediately", which
+ * is exactly what the refusal is asking the caller not to do.
+ */
+export function retryAfterSeconds(resetTime: number, now: number = Date.now()): number {
+  return Math.max(1, Math.ceil((resetTime - now) / 1000));
+}
+
+/**
+ * The one shape a refusal takes, so five call sites cannot drift apart.
+ *
+ * The seconds go in the header for machines and in the body for the page — the
+ * client reads JSON already and would otherwise have to reach for headers it
+ * has no other reason to touch. `code` is what the UI translates; the English
+ * sentence is for logs and non-UI consumers.
+ */
+export function rateLimitedResponse(result: RateLimitResult): NextResponse {
+  const seconds = retryAfterSeconds(result.resetTime);
+  return NextResponse.json(
+    {
+      error: "Too many attempts. Please try again later.",
+      code: "RATE_LIMITED",
+      retryAfterSeconds: seconds,
+    },
+    { status: 429, headers: { "Retry-After": String(seconds) } }
+  );
+}
+
+// ── Helper: keys that must not carry their subject ──────────────────
+
+/**
+ * A bucket key derived from a value that should not be readable in the store.
+ *
+ * The password-reset limiter counts per recipient, so its key is built from
+ * somebody's email address — and Redis keys are listed by any dashboard, any
+ * `SCAN`, any support engineer with the console open. Hashing keeps the bucket
+ * exact and the address out of it. Truncated to 128 bits, which is far past
+ * collision territory for a keyspace this size and keeps the keys readable.
+ *
+ * The caller normalizes before calling: `A@B.com` and `a@b.com` are one
+ * mailbox, and a bucket that treats them as two is bypassed by pressing shift.
+ */
+export function hashedKey(prefix: string, value: string): string {
+  const digest = createHash("sha256").update(value).digest("hex").slice(0, 32);
+  return `${prefix}:${digest}`;
+}
+
 // ── Helper: get IP from request ─────────────────────────────────────
 
 export function getIP(request: NextRequest): string {
@@ -263,10 +317,60 @@ export function getIdentifier(request: NextRequest, userId?: string): string {
 // ── Predefined rate limiters ────────────────────────────────────────
 
 export const rateLimiters = {
-  // Authentication endpoints - strict
+  // Authentication endpoints - strict.
+  //
+  // Do not retune this one to fix a signup or password-reset problem. It is
+  // shared: `deleteAccount` (app/actions/settings.ts) counts here too, under a
+  // per-user key, and would move with it. The two auth routes have their own
+  // ceilings below for exactly that reason.
   auth: rateLimit({
     interval: 15 * 60 * 1000, // 15 minutes
     uniqueTokenPerInterval: 5, // 5 attempts per 15 min
+  }),
+
+  /**
+   * Signup attempts that got past validation — per IP.
+   *
+   * 20 an hour instead of the 5-per-15-minutes this used to borrow from `auth`.
+   * The hourly average is identical; what changes is that the twenty are
+   * allowed to arrive together. That is the whole point: five per quarter hour
+   * cannot onboard a room, and a workshop, a classroom or anything behind
+   * CGNAT is one IP. The sixth person in the room was being told to come back
+   * later.
+   */
+  signupAttempt: rateLimit({
+    interval: 60 * 60 * 1000, // 1 hour
+    uniqueTokenPerInterval: 20, // 20 valid attempts per hour
+  }),
+
+  /**
+   * Password-reset requests that got past validation — per IP.
+   *
+   * Deliberately left where it was, at the same numbers `auth` carries. Nobody
+   * resets a password in a group, so there is no shared-IP pressure here to
+   * relieve; it has its own entry only so that tuning it later cannot reach
+   * `deleteAccount` by accident.
+   */
+  passwordReset: rateLimit({
+    interval: 15 * 60 * 1000, // 15 minutes
+    uniqueTokenPerInterval: 5, // 5 valid attempts per 15 min
+  }),
+
+  /**
+   * Password-reset requests aimed at one address, from anywhere at all.
+   *
+   * The per-IP bucket protects us from a flood. It does nothing for the person
+   * being flooded: an attacker who rotates IPs can put a reset mail in one
+   * victim's inbox as often as they like, and every one of those mails is
+   * genuinely from us and passes every check the victim's provider makes. This
+   * is the bucket that protects the recipient, and it is the only one that can.
+   *
+   * Three an hour is enough for somebody who deleted the first mail by mistake
+   * and is short of a mailbox anyone would call bombed.
+   */
+  passwordResetRecipient: rateLimit({
+    interval: 60 * 60 * 1000, // 1 hour
+    uniqueTokenPerInterval: 3, // 3 mails per hour per address
   }),
 
   // AI endpoints - very strict (costs money per request)

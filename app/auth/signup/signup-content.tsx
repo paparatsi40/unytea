@@ -7,7 +7,7 @@ import Link from "next/link";
 import { Mail, Lock, User, ArrowRight, Sparkles, Check, Info } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
-import { authErrorMessage } from "@/lib/auth-error-message";
+import { authErrorMessageWithRetry } from "@/lib/auth-error-message";
 import { OAuthButtons } from "@/components/auth/OAuthButtons";
 import type { OAuthProviderId } from "@/lib/auth-providers";
 import { isSignupConflictCode, type SignupConflictCode } from "@/lib/signup-conflict";
@@ -88,7 +88,7 @@ export function SignUpContent({ oauthProviders }: SignUpContentProps) {
           setConflict(data.code);
           return;
         }
-        toast.error(authErrorMessage(tError, data.code));
+        toast.error(authErrorMessageWithRetry(tError, data.code, data.retryAfterSeconds));
         return;
       }
 

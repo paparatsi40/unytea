@@ -202,6 +202,7 @@
     },
     "errors": {
       "RATE_LIMITED": "Demasiados intentos. Vuelve a probar en unos minutos.",
+      "RATE_LIMITED_IN": "Demasiados intentos. Inténtalo en {minutes, plural, one {# minuto} other {# minutos}}.",
       "SERVER_ERROR": "Algo ha fallado. Inténtalo de nuevo.",
       "EMAIL_REQUIRED": "Escribe tu correo electrónico",
       "RESET_LINK_INVALID": "Ese enlace no es válido. Pide uno nuevo.",

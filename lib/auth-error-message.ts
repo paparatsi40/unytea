@@ -41,3 +41,46 @@ function isKnown(code: unknown): code is AuthErrorCode {
 export function authErrorMessage(t: (key: string) => string, code: unknown): string {
   return isKnown(code) ? t(code) : t("generic");
 }
+
+/**
+ * How long to tell someone to wait, in whole minutes, rounded up.
+ *
+ * Rounded up because the honest thing to promise is "not before"; a wait of
+ * 61 seconds reported as "1 minute" sends them back to a second refusal.
+ * Never zero, and never below one: "try again in 0 minutes" is what the
+ * refusal is asking them not to do.
+ *
+ * Returns null for anything that is not a positive, finite number of seconds,
+ * which is the signal to fall back to the message without a time in it — an
+ * older deployment that does not send the field, or a body that never had one.
+ */
+export function retryAfterMinutes(seconds: unknown): number | null {
+  if (typeof seconds !== "number" || !Number.isFinite(seconds) || seconds <= 0) return null;
+  return Math.max(1, Math.ceil(seconds / 60));
+}
+
+/**
+ * The same message, plus the wait when the server told us one.
+ *
+ * "Too many attempts, try again later" is true and useless: the wait behind it
+ * ranges from twenty seconds to a quarter of an hour, and the reader has no
+ * way to tell which, so they either give up or retry immediately and are
+ * refused again. The routes that refuse now send the seconds; this puts them in
+ * the sentence.
+ *
+ * @param t  a translator bound to `auth.errors`, able to take ICU values
+ */
+export function authErrorMessageWithRetry(
+  // Narrower than `unknown` values on purpose: this is what next-intl's
+  // translator accepts, so the signature fits `useTranslations("auth.errors")`
+  // without a cast at either call site.
+  t: (key: string, values?: Record<string, string | number | Date>) => string,
+  code: unknown,
+  retryAfterSeconds: unknown
+): string {
+  const minutes = retryAfterMinutes(retryAfterSeconds);
+  if (code === "RATE_LIMITED" && minutes !== null) {
+    return t("RATE_LIMITED_IN", { minutes });
+  }
+  return authErrorMessage(t, code);
+}

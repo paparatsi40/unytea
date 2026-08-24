@@ -3,29 +3,76 @@ import { prisma } from "@/lib/prisma";
 import { sendPasswordResetEmail, sendSetPasswordEmail } from "@/lib/email";
 import { normalizeEmail } from "@/lib/normalize-email";
 import { randomBytes } from "crypto";
-import { rateLimiters, getIP } from "@/lib/rate-limit";
+import { rateLimiters, getIP, rateLimitedResponse, hashedKey } from "@/lib/rate-limit";
 import { SITE_URL } from "@/lib/site-url";
 import { LOCALE_COOKIE, resolveLocale } from "@/lib/locale";
 
+/**
+ * Asking for a password link, in four stages.
+ *
+ * Same reordering as signup — a cheap flood bucket before the body is read, a
+ * 400 that costs nothing, then the strict per-IP bucket for requests that were
+ * actually well-formed.
+ *
+ * With one bucket signup does not need: a third, counted per *recipient*. The
+ * per-IP ceiling protects us from a flood; it does nothing at all for the
+ * person being flooded. An attacker rotating IPs can put a reset mail in one
+ * victim's inbox as often as they like, and every one of those is genuinely
+ * from us and passes every check their provider makes. That bucket is keyed on
+ * the address being mailed, so it holds however the request arrives.
+ *
+ * It is checked before the database is touched, which is what keeps it from
+ * becoming an enumeration oracle: it refuses at the same count and with the
+ * same answer whether or not an account exists, because at that point we have
+ * not looked.
+ */
 export async function POST(request: NextRequest) {
   try {
-    // Rate limit
     const ip = getIP(request);
-    const { success: rateLimitOk } = await rateLimiters.auth.check(`forgot:${ip}`);
-    if (!rateLimitOk) {
+
+    // ── 1. Flood ────────────────────────────────────────────────────────
+    const flood = await rateLimiters.api.check(`forgot-flood:${ip}`);
+    if (!flood.success) {
+      return rateLimitedResponse(flood);
+    }
+
+    // ── 2. Parse and validate ───────────────────────────────────────────
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
       return NextResponse.json(
-        { error: "Too many attempts. Please try again later.", code: "RATE_LIMITED" },
-        { status: 429 }
+        { error: "Malformed request body", code: "SERVER_ERROR" },
+        { status: 400 }
       );
     }
 
-    const { email } = await request.json();
+    const email = (body as { email?: unknown } | null)?.email;
 
     if (!email || typeof email !== "string") {
       return NextResponse.json(
         { error: "Email is required", code: "EMAIL_REQUIRED" },
         { status: 400 }
       );
+    }
+
+    // ── 3. The two strict buckets ───────────────────────────────────────
+    // Per IP first: someone spraying random addresses from one place trips
+    // this at five and never writes a recipient bucket for any of them.
+    const attempt = await rateLimiters.passwordReset.check(`forgot:${ip}`);
+    if (!attempt.success) {
+      return rateLimitedResponse(attempt);
+    }
+
+    // Then per recipient. Normalized first — `A@B.com` and `a@b.com` are one
+    // mailbox, and a bucket that treats them as two is bypassed by pressing
+    // shift — and hashed, so the address is not sitting in a Redis key for
+    // anyone with the console open.
+    const recipient = await rateLimiters.passwordResetRecipient.check(
+      hashedKey("forgot-to", normalizeEmail(email))
+    );
+    if (!recipient.success) {
+      return rateLimitedResponse(recipient);
     }
 
     // Always return success to prevent email enumeration
