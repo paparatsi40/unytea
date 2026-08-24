@@ -202,6 +202,7 @@
     },
     "errors": {
       "RATE_LIMITED": "Too many attempts. Please try again in a few minutes.",
+      "RATE_LIMITED_IN": "Too many attempts. Try again in {minutes, plural, one {# minute} other {# minutes}}.",
       "SERVER_ERROR": "Something went wrong. Please try again.",
       "EMAIL_REQUIRED": "Please enter your email address",
       "RESET_LINK_INVALID": "That reset link is not valid. Request a new one.",

@@ -129,8 +129,21 @@ describe("Signup Route - No Email Enumeration", () => {
     expect(content).not.toContain("already registered");
   });
   it("should have rate limiting", () => {
-    expect(content).toContain("rateLimiters");
-    expect(content).toContain("rateLimitOk");
+    // This used to match on the name of a local, `rateLimitOk`, which stopped
+    // existing when the route went from one counter to two: a cheap flood
+    // bucket before the body is parsed, and the strict one only for requests
+    // that validated. The property is "the route counts, and refuses", not the
+    // spelling of a variable — so both buckets are named and both refusals are
+    // required, which is a stronger claim than the one it replaces.
+    expect(content).toContain("rateLimiters.api.check(`signup-flood:${ip}`)");
+    expect(content).toContain("rateLimiters.signupAttempt.check(`signup:${ip}`)");
+
+    const refusals = content.match(/return rateLimitedResponse\(/g) ?? [];
+    expect(refusals.length).toBeGreaterThanOrEqual(2);
+
+    // The flood bucket has to come first, or a stream of malformed bodies is
+    // unlimited — the reason the strict counter could be moved at all.
+    expect(content.indexOf("signup-flood:")).toBeLessThan(content.indexOf("request.json()"));
   });
   it("should not expose user data in response", () => {
     expect(content).not.toMatch(/user:\s*\{[^}]*id:/);

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { authErrorMessage } from "@/lib/auth-error-message";
+import { authErrorMessageWithRetry } from "@/lib/auth-error-message";
 import Link from "next/link";
 import { ArrowLeft, Mail, Sparkles, Loader2, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
@@ -32,7 +32,7 @@ export default function ForgotPasswordPage() {
 
       if (!res.ok) {
         const data = await res.json();
-        toast.error(authErrorMessage(tError, data.code));
+        toast.error(authErrorMessageWithRetry(tError, data.code, data.retryAfterSeconds));
         return;
       }
 

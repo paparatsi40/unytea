@@ -24,10 +24,28 @@ import { NextRequest } from "next/server";
  */
 
 const mockRateLimitCheck = vi.fn();
-vi.mock("@/lib/rate-limit", () => ({
-  rateLimiters: { auth: { check: (...a: unknown[]) => mockRateLimitCheck(...a) } },
-  getIP: vi.fn().mockReturnValue("203.0.113.9"),
-}));
+/**
+ * Every bucket resolves to the same tracked stub.
+ *
+ * The auth routes count in stages now — a cheap flood bucket before the body is
+ * read, then the strict one only for requests that validated — so a mock that
+ * named one limiter would leave the others undefined and the route would throw
+ * rather than refuse. A proxy keeps this honest as more buckets appear, and
+ * routing them all through one spy is what lets a test assert on the keys.
+ *
+ * `importOriginal` so the real `rateLimitedResponse` and `hashedKey` come
+ * through: the shape of a 429 and the hashing of a recipient key are behaviour
+ * worth exercising, not scaffolding worth faking.
+ */
+vi.mock("@/lib/rate-limit", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/rate-limit")>();
+  const bucket = { check: (...args: unknown[]) => mockRateLimitCheck(...args) };
+  return {
+    ...actual,
+    rateLimiters: new Proxy({} as Record<string, typeof bucket>, { get: () => bucket }),
+    getIP: vi.fn().mockReturnValue("203.0.113.9"),
+  };
+});
 
 const mail = vi.hoisted(() => ({
   reset: vi.fn(),
