@@ -17,6 +17,78 @@ interface RateLimitResult {
   resetTime: number;
 }
 
+// ── Upstash credentials ─────────────────────────────────────────────
+
+/**
+ * Where the Upstash REST URL is looked for, in order.
+ *
+ * Vercel's Upstash integration writes its variables under the name of the
+ * store, so connecting it produced `UPSTASH_REDIS_KV_REST_API_URL` — while this
+ * file read `UPSTASH_REDIS_REST_URL`, which nothing had ever set. The two names
+ * never met, `useRedis` was false, and every limiter quietly fell back to the
+ * in-memory store: a counter held per serverless instance, reset by every cold
+ * start. The limits were still reported and still enforced, just against a
+ * fraction of the traffic each, which is the kind of failure that looks exactly
+ * like success from the outside.
+ *
+ * The flat names are kept as a fallback so that setting them by hand — which is
+ * what `.env.example` still documents, and what a local `redis-server` shim
+ * would use — keeps working.
+ */
+export const UPSTASH_URL_VARS = [
+  "UPSTASH_REDIS_KV_REST_API_URL",
+  "UPSTASH_REDIS_REST_URL",
+] as const;
+
+/**
+ * Where the Upstash REST token is looked for, in order.
+ *
+ * `UPSTASH_REDIS_KV_REST_API_READ_ONLY_TOKEN` is deliberately absent from this
+ * list and must never be added to it. The limiter's whole operation is `INCR`
+ * — it counts by writing — so a read-only token would authenticate, be
+ * accepted, and then fail on every single call. Because the failure lands in
+ * the `catch` below, which falls back to memory rather than refusing traffic,
+ * the result would be indistinguishable from having no Redis at all: exactly
+ * the bug this list exists to fix, wearing a working connection as a disguise.
+ */
+export const UPSTASH_TOKEN_VARS = [
+  "UPSTASH_REDIS_KV_REST_API_TOKEN",
+  "UPSTASH_REDIS_REST_TOKEN",
+] as const;
+
+export interface UpstashCredentials {
+  url: string;
+  token: string;
+}
+
+type Env = Record<string, string | undefined>;
+
+/**
+ * A variable that exists but holds an empty or whitespace-only string counts as
+ * absent — hosting dashboards make it easy to save a blank value, and a blank
+ * token fails the request exactly like a missing one. Same rule
+ * `lib/auth-providers.ts` applies to the OAuth credentials.
+ */
+function firstPresent(env: Env, names: readonly string[]): string | null {
+  for (const name of names) {
+    const value = env[name];
+    if (typeof value === "string" && value.trim().length > 0) return value.trim();
+  }
+  return null;
+}
+
+/**
+ * The read-write REST credentials, or `null` when either half is missing.
+ *
+ * Exported so the wiring can be asserted directly instead of through the
+ * module-level constant it feeds, which is fixed at import time.
+ */
+export function resolveUpstashCredentials(env: Env = process.env): UpstashCredentials | null {
+  const url = firstPresent(env, UPSTASH_URL_VARS);
+  const token = firstPresent(env, UPSTASH_TOKEN_VARS);
+  return url && token ? { url, token } : null;
+}
+
 // ── Redis Store (Production) ────────────────────────────────────────
 // Uses Upstash Redis REST API directly to avoid extra dependencies.
 // Each key is prefixed with "rl:" and has a TTL matching the interval.
@@ -25,12 +97,13 @@ async function redisIncrement(
   key: string,
   intervalMs: number
 ): Promise<{ count: number; ttl: number }> {
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  const credentials = resolveUpstashCredentials();
 
-  if (!url || !token) {
+  if (!credentials) {
     throw new Error("Upstash Redis not configured");
   }
+
+  const { url, token } = credentials;
 
   const ttlSeconds = Math.ceil(intervalMs / 1000);
   const redisKey = `rl:${key}`;
@@ -113,7 +186,29 @@ function memoryIncrement(key: string, intervalMs: number, limit: number): RateLi
 
 // ── Rate Limiter Factory ────────────────────────────────────────────
 
-const useRedis = !!(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN);
+/**
+ * Which store this process is counting in, decided once at import.
+ *
+ * Announced on load, because the failure it replaces was silent: the limiter
+ * had been running on per-instance memory in production for as long as anyone
+ * could tell, and nothing said so. One line in the boot log makes "is the rate
+ * limiter actually shared?" a question you can answer by looking.
+ *
+ * The line carries the kind of store and nothing else. The URL identifies the
+ * database and the token opens it; neither belongs in a log that ships to a
+ * platform dashboard.
+ */
+export const RATE_LIMIT_STORE: "redis" | "memory" = resolveUpstashCredentials()
+  ? "redis"
+  : "memory";
+
+const useRedis = RATE_LIMIT_STORE === "redis";
+
+console.info(
+  useRedis
+    ? "[rate-limit] store=redis"
+    : "[rate-limit] store=memory reason=no-upstash-env (counters are per-instance)"
+);
 
 export function rateLimit(config: RateLimitConfig) {
   return {
